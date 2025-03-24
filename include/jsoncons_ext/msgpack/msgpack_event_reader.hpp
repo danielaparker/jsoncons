@@ -46,8 +46,7 @@ namespace msgpack {
         msgpack_event_reader(Sourceable&& source,
                              const msgpack_decode_options& options = msgpack_decode_options(),
                              const Allocator& alloc = Allocator())
-            : parser_(std::forward<Sourceable>(source), options, alloc), 
-              cursor_visitor_(accept_all)
+            : parser_(std::forward<Sourceable>(source), options, alloc)
         {
             parser_.cursor_mode(true);
             if (!done())
@@ -88,8 +87,7 @@ namespace msgpack {
                              Sourceable&& source,
                              const msgpack_decode_options& options,
                              std::error_code& ec)
-           : parser_(std::forward<Sourceable>(source), options, alloc), 
-             cursor_visitor_(accept_all),
+           : parser_(std::forward<Sourceable>(source), options, alloc),
              eof_(false)
         {
             parser_.cursor_mode(true);
@@ -236,11 +234,6 @@ namespace msgpack {
         }
 
     private:
-        static bool accept_all(const item_event&, const ser_context&) 
-        {
-            return true;
-        }
-
         void read_next(std::error_code& ec)
         {
             if (cursor_visitor_.in_available())

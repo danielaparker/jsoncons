@@ -49,8 +49,7 @@ public:
     basic_ubjson_cursor(Sourceable&& source,
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc), 
-         cursor_visitor_(accept_all)
+       : parser_(std::forward<Sourceable>(source), options, alloc)
     {
         parser_.cursor_mode(true);
         if (!done())
@@ -87,8 +86,7 @@ public:
                         Sourceable&& source,
                         const ubjson_decode_options& options,
                         std::error_code& ec)
-       : parser_(std::forward<Sourceable>(source), options, alloc), 
-         cursor_visitor_(accept_all),
+       : parser_(std::forward<Sourceable>(source), options, alloc),
          eof_(false)
     {
         parser_.cursor_mode(true);
@@ -234,11 +232,6 @@ public:
     }
 
 private:
-    static bool accept_all(const staj_event&, const ser_context&) 
-    {
-        return true;
-    }
-
     void read_next(std::error_code& ec)
     {
         parser_.restart();

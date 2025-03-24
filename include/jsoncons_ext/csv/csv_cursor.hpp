@@ -59,8 +59,7 @@ public:
                      const Allocator& alloc = Allocator(),
                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
         if (!done())
@@ -76,8 +75,7 @@ public:
                      const Allocator& alloc = Allocator(),
                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
@@ -130,8 +128,7 @@ public:
                      std::error_code& ec,
                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
         if (!done())
@@ -148,8 +145,7 @@ public:
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
@@ -261,11 +257,6 @@ public:
     void next(std::error_code& ec) override
     {
         read_next(ec);
-    }
-
-    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
-    {
-        return true;
     }
 
     const ser_context& context() const override

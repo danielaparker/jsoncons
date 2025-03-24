@@ -46,7 +46,6 @@ public:
     using char_type = CharT;
     using typename super_type::string_view_type;
 private:
-    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred_;
     basic_staj_event<CharT> event_;
 
     staj_cursor_state state_;
@@ -55,13 +54,7 @@ private:
     std::size_t index_{0};
 public:
     basic_staj_visitor()
-        : pred_(accept), event_(staj_event_type::null_value),
-          state_(), data_(), shape_()
-    {
-    }
-
-    basic_staj_visitor(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
-        : pred_(pred), event_(staj_event_type::null_value),
+        : event_(staj_event_type::null_value),
           state_(), data_(), shape_()
     {
     }

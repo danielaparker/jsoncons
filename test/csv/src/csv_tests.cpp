@@ -972,19 +972,19 @@ TEST_CASE("serialize_tab_delimited_file")
     reader.read_next();
     ojson employees1 = decoder.get_result();
     
-    std::cout << pretty_print(employees1) << "\n";
+    //std::cout << pretty_print(employees1) << "\n";
 
     std::stringstream ss;
     csv::csv_stream_encoder encoder(ss,options);
     //std::cout << pretty_print(employees1) << '\n';
     employees1.dump(encoder);
-    std::cout << ss.str() << '\n';
+    //std::cout << ss.str() << '\n';
 
     json_decoder<ojson> encoder2;
     csv::csv_stream_reader reader2(ss,encoder2,options);
     reader2.read();
     ojson employees2 = encoder2.get_result();
-    std::cout << pretty_print(employees2) << '\n';
+    //std::cout << pretty_print(employees2) << '\n';
 
     CHECK(employees1.size() == employees2.size());
 

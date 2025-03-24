@@ -56,8 +56,7 @@ public:
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
         if (!done())
@@ -85,8 +84,7 @@ public:
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all)
+         parser_(options, err_handler, alloc)
     {
         parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source));
@@ -138,8 +136,7 @@ public:
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
 
@@ -169,8 +166,7 @@ public:
                       std::error_code& ec,
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all)
+         parser_(options, err_handler, alloc)
     {
         parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
@@ -387,11 +383,6 @@ public:
     }
 
 private:
-
-    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
-    {
-        return true;
-    }
 
     void initialize_with_string_view(string_view_type sv)
     {
