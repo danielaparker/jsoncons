@@ -551,7 +551,6 @@ private:
 
     temp_allocator_type alloc_;
     csv_parse_state state_;
-    basic_json_visitor<CharT>* visitor_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     std::size_t column_{1};
     std::size_t line_{1};
@@ -609,7 +608,6 @@ public:
                      const TempAllocator& alloc = TempAllocator())
        : alloc_(alloc),
          state_(csv_parse_state::start),
-         visitor_(nullptr),
          err_handler_(err_handler),
          options_(options),
          m_columns_filter_(alloc),
@@ -689,7 +687,6 @@ public:
     void reinitialize()
     {
         state_ = csv_parse_state::start;
-        visitor_ = nullptr;
         column_ = 1;
         line_ = 1;
         nesting_depth_ = default_depth;
@@ -736,11 +733,9 @@ public:
         switch (options_.mapping_kind())
         {
             case csv_mapping_kind::m_columns:
-                visitor_ = &m_columns_filter_;
                 cursor_mode_ = false;
                 break;
             default:
-                visitor_ = std::addressof(visitor);
                 break;
         } 
 
@@ -756,7 +751,7 @@ public:
                     return;
                 case csv_parse_state::before_unquoted_field:
                 case csv_parse_state::before_last_unquoted_field:
-                    end_unquoted_string_value(ec);
+                    end_unquoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_last_unquoted_field_tail;
                     break;
                 case csv_parse_state::before_last_unquoted_field_tail:
@@ -791,12 +786,12 @@ public:
                     }
                     else
                     {
-                        before_value(ec);
+                        before_value(local_visitor, ec);
                         state_ = csv_parse_state::before_unquoted_field;
                     }
                     break;
                 case csv_parse_state::before_last_quoted_field:
-                    end_quoted_string_value(ec);
+                    end_quoted_string_value(local_visitor, ec);
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
                     break;
@@ -805,7 +800,7 @@ public:
                     {
                         if (!(options_.ignore_empty_values() && buffer_.empty()))
                         {
-                            before_value(ec);
+                            before_value(local_visitor, ec);
                             ++column_;
                             state_ = csv_parse_state::before_last_quoted_field;
                         }
@@ -1048,7 +1043,7 @@ public:
                             }
                             if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_last_quoted_field;
                             }
                             else
@@ -1064,7 +1059,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_quoted_field;
                             }
                             else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
@@ -1073,7 +1068,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_quoted_subfield;
                             }
                             else if (curr_char == ' ' || curr_char == '\t')
@@ -1097,7 +1092,7 @@ public:
                     break;
                 }
                 case csv_parse_state::before_unquoted_field:
-                    end_unquoted_string_value(ec);
+                    end_unquoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_unquoted_field_tail;
                     break;
                 case csv_parse_state::before_unquoted_field_tail:
@@ -1145,7 +1140,7 @@ public:
                 }
 
                 case csv_parse_state::before_last_unquoted_field:
-                    end_unquoted_string_value(ec);
+                    end_unquoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_last_unquoted_field_tail;
                     break;
 
@@ -1179,13 +1174,13 @@ public:
                     state_ = csv_parse_state::before_unquoted_subfield_tail;
                     break; 
                 case csv_parse_state::before_unquoted_subfield_tail:
-                    end_unquoted_string_value(ec);
+                    end_unquoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
                 case csv_parse_state::before_quoted_field:
-                    end_quoted_string_value(ec);
+                    end_quoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_unquoted_field_tail; // return to unquoted
                     break;
                 case csv_parse_state::before_quoted_subfield:
@@ -1199,13 +1194,13 @@ public:
                     state_ = csv_parse_state::before_quoted_subfield_tail;
                     break; 
                 case csv_parse_state::before_quoted_subfield_tail:
-                    end_quoted_string_value(ec);
+                    end_quoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
                 case csv_parse_state::before_last_quoted_field:
-                    end_quoted_string_value(ec);
+                    end_quoted_string_value(local_visitor, ec);
                     state_ = csv_parse_state::before_last_quoted_field_tail;
                     break;
                 case csv_parse_state::before_last_quoted_field_tail:
@@ -1239,7 +1234,7 @@ public:
                             }
                             if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_last_unquoted_field;
                             }
                             else
@@ -1255,7 +1250,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_unquoted_field;
                             }
                             else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
@@ -1264,7 +1259,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value(ec);
+                                before_value(local_visitor, ec);
                                 state_ = csv_parse_state::before_unquoted_subfield;
                             }
                             else if (curr_char == options_.quote_char())
@@ -1456,7 +1451,8 @@ private:
     }
 
     // name
-    void before_value(std::error_code& ec)
+    void before_value(basic_json_visitor<CharT>& visitor, 
+        std::error_code& ec)
     {
         switch (stack_.back())
         {
@@ -1470,7 +1466,7 @@ private:
                     column_names_.push_back(buffer_);
                     if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
-                        visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        visitor.string_value(buffer_, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
                 }
@@ -1482,7 +1478,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            visitor_->key(column_names_[column_index_ - offset_], *this, ec);
+                            visitor.key(column_names_[column_index_ - offset_], *this, ec);
                             more_ = !cursor_mode_;
                         }
                     }
@@ -1683,7 +1679,7 @@ private:
     /*
         end_array, begin_array, xxx_value (end_value)
     */
-    void end_unquoted_string_value(std::error_code& ec) 
+    void end_unquoted_string_value(basic_json_visitor<CharT>& visitor, std::error_code& ec) 
     {
         switch (stack_.back())
         {
@@ -1694,12 +1690,12 @@ private:
                 case csv_mapping_kind::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
-                        visitor_->null_value(semantic_tag::none, *this, ec);
+                        visitor.null_value(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else
                     {
-                        end_value(options_.infer_types(), ec);
+                        end_value(visitor, options_.infer_types(), ec);
                     }
                     break;
                 case csv_mapping_kind::n_objects:
@@ -1709,24 +1705,24 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                             else
                             {
-                                end_value(options_.infer_types(), ec);
+                                end_value(visitor, options_.infer_types(), ec);
                             }
                         }
                         else if (depth_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                             else
                             {
-                                end_value(options_.infer_types(), ec);
+                                end_value(visitor, options_.infer_types(), ec);
                             }
                         }
                     }
@@ -1734,7 +1730,7 @@ private:
                 case csv_mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        end_value(options_.infer_types(), ec);
+                        end_value(visitor, options_.infer_types(), ec);
                     }
                     else
                     {
@@ -1748,7 +1744,8 @@ private:
         }
     }
 
-    void end_quoted_string_value(std::error_code& ec) 
+    void end_quoted_string_value(basic_json_visitor<CharT>& visitor, 
+        std::error_code& ec) 
     {
         switch (stack_.back())
         {
@@ -1761,7 +1758,7 @@ private:
                 switch (options_.mapping_kind())
                 {
                 case csv_mapping_kind::n_rows:
-                    end_value(false, ec);
+                    end_value(visitor, false, ec);
                     break;
                 case csv_mapping_kind::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
@@ -1770,24 +1767,24 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                             else 
                             {
-                                end_value(false, ec);
+                                end_value(visitor, false, ec);
                             }
                         }
                         else if (depth_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                             else
                             {
-                                end_value(false, ec);
+                                end_value(visitor, false, ec);
                             }
                         }
                     }
@@ -1795,7 +1792,7 @@ private:
                 case csv_mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        end_value(false, ec);
+                        end_value(visitor, false, ec);
                     }
                     else
                     {
@@ -1809,12 +1806,13 @@ private:
         }
     }
 
-    void end_value(bool infer_types, std::error_code&  ec)
+    void end_value(basic_json_visitor<CharT>& visitor, 
+        bool infer_types, std::error_code&  ec)
     {
         auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ buffer_ });
         if (it != string_double_map_.end())
         {
-            visitor_->double_value((*it).second, semantic_tag::none, *this, ec);
+            visitor.double_value((*it).second, semantic_tag::none, *this, ec);
             more_ = !cursor_mode_;
         }
         else if (column_index_ < column_types_.size() + offset_)
@@ -1826,7 +1824,7 @@ private:
                 {
                     if (column_index_ == offset_ || depth_ > column_types_[column_index_-offset_].level)
                     {
-                        visitor_->end_array(*this, ec);
+                        visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -1842,14 +1840,14 @@ private:
             }
             if (depth_ < column_types_[column_index_ - offset_].level)
             {
-                visitor_->begin_array(semantic_tag::none, *this, ec);
+                visitor.begin_array(semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 depth_ = column_types_[column_index_ - offset_].level;
                 ++level_;
             }
             else if (depth_ > column_types_[column_index_ - offset_].level)
             {
-                visitor_->end_array(*this, ec);
+                visitor.end_array(*this, ec);
                 more_ = !cursor_mode_;
                 if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                 {
@@ -1870,7 +1868,7 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                            visitor.int64_value(val, semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else
@@ -1879,12 +1877,12 @@ private:
                             {
                                 basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                parser.parse_some(*visitor_);
-                                parser.finish_parse(*visitor_);
+                                parser.parse_some(visitor);
+                                parser.finish_parse(visitor);
                             }
                             else
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                         }
@@ -1894,7 +1892,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                            visitor.string_value(buffer_,semantic_tag::bigdec, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else
@@ -1904,7 +1902,7 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                visitor_->double_value(val, semantic_tag::none, *this, ec);
+                                visitor.double_value(val, semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                             else
@@ -1913,12 +1911,12 @@ private:
                                 {
                                     basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                     parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                    parser.parse_some(*visitor_);
-                                    parser.finish_parse(*visitor_);
+                                    parser.parse_some(visitor);
+                                    parser.finish_parse(visitor);
                                 }
                                 else
                                 {
-                                    visitor_->null_value(semantic_tag::none, *this, ec);
+                                    visitor.null_value(semantic_tag::none, *this, ec);
                                     more_ = !cursor_mode_;
                                 }
                             }
@@ -1929,22 +1927,22 @@ private:
                     {
                         if (buffer_.length() == 1 && buffer_[0] == '0')
                         {
-                            visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            visitor.bool_value(false, semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 1 && buffer_[0] == '1')
                         {
-                            visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            visitor.bool_value(true, semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 5 && ((buffer_[0] == 'f' || buffer_[0] == 'F') && (buffer_[1] == 'a' || buffer_[1] == 'A') && (buffer_[2] == 'l' || buffer_[2] == 'L') && (buffer_[3] == 's' || buffer_[3] == 'S') && (buffer_[4] == 'e' || buffer_[4] == 'E')))
                         {
-                            visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            visitor.bool_value(false, semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 4 && ((buffer_[0] == 't' || buffer_[0] == 'T') && (buffer_[1] == 'r' || buffer_[1] == 'R') && (buffer_[2] == 'u' || buffer_[2] == 'U') && (buffer_[3] == 'e' || buffer_[3] == 'E')))
                         {
-                            visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            visitor.bool_value(true, semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                         else
@@ -1953,12 +1951,12 @@ private:
                             {
                                 basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                parser.parse_some(*visitor_);
-                                parser.finish_parse(*visitor_);
+                                parser.parse_some(visitor);
+                                parser.finish_parse(visitor);
                             }
                             else
                             {
-                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
                             }
                         }
@@ -1967,7 +1965,7 @@ private:
                 default:
                     if (buffer_.length() > 0)
                     {
-                        visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        visitor.string_value(buffer_, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else
@@ -1976,12 +1974,12 @@ private:
                         {
                             basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                             parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                            parser.parse_some(*visitor_);
-                            parser.finish_parse(*visitor_);
+                            parser.parse_some(visitor);
+                            parser.finish_parse(visitor);
                         }
                         else
                         {
-                            visitor_->string_value(string_view_type(), semantic_tag::none, *this, ec);
+                            visitor.string_value(string_view_type(), semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
                         }
                     }
@@ -1992,11 +1990,11 @@ private:
         {
             if (infer_types)
             {
-                end_value_with_numeric_check(ec);
+                end_value_with_numeric_check(visitor, ec);
             }
             else
             {
-                visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(buffer_, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }
         }
@@ -2021,7 +2019,8 @@ private:
     /*
         xxx_value 
     */
-    void end_value_with_numeric_check(std::error_code& ec)
+    void end_value_with_numeric_check(basic_json_visitor<CharT>& visitor, 
+        std::error_code& ec)
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
@@ -2225,15 +2224,15 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                visitor_->null_value(semantic_tag::none, *this, ec);
+                visitor.null_value(semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             case numeric_check_state::boolean_true:
-                visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                visitor.bool_value(true, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             case numeric_check_state::boolean_false:
-                visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                visitor.bool_value(false, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             case numeric_check_state::zero:
@@ -2245,12 +2244,12 @@ private:
                     auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
-                        visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                        visitor.int64_value(val, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else // Must be overflow
                     {
-                        visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
                         more_ = !cursor_mode_;
                     }
                 }
@@ -2260,12 +2259,12 @@ private:
                     auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
-                        visitor_->uint64_value(val, semantic_tag::none, *this, ec);
+                        visitor.uint64_value(val, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else
@@ -2282,20 +2281,20 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                    visitor.string_value(buffer_,semantic_tag::bigdec, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    visitor_->double_value(d, semantic_tag::none, *this, ec);
+                    visitor.double_value(d, semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 break;
             }
             default:
             {
-                visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(buffer_, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
