@@ -39,31 +39,30 @@ Type                |Definition
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
-                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
-                     const Allocator& alloc = Allocator()); (1)
+        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),  (1)
+        std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+        const Allocator& alloc = Allocator()); 
+
+    template <typename Sourceable>
+    basic_csv_cursor(Sourceable&& source, std::error_code& ec);                              (2)
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     std::error_code& ec); (2)
+        const basic_csv_decode_options<CharT>& options,                                      (3)
+        std::error_code& ec); 
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec); (3)
-
-    template <typename Sourceable>
-    basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); (4)
+        const basic_csv_decode_options<CharT>& options,                                      (4)
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        std::error_code& ec); 
 
     template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                     Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); (5)
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,                                      (5)  
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        std::error_code& ec);                                                
 
 Constructors (1) reads from a character sequence or stream and throws a 
 [ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.
@@ -118,9 +117,9 @@ Reset cursor to read new value from a new sources
 
 #### Non-member functions
 
-   template <typename CharT,typename Source,typename Allocator>
-   basic_staj_filter_view<CharT> operator|(basic_csv_cursor<CharT,Source,Allocator>& cursor, 
-                                    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
+    template <typename CharT,typename Source,typename Allocator>
+    basic_staj_filter_view<CharT> operator|(basic_csv_cursor<CharT,Source,Allocator>& cursor, 
+        std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples
 
