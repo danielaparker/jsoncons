@@ -174,23 +174,26 @@ namespace cbor {
         void read_to(basic_item_event_visitor<char_type>& visitor,
                      std::error_code& ec) override
         {
-            if (is_begin_container(current().event_type()))
+            if (is_typed_array())
+            {
+                cursor_visitor_.dump(visitor, *this, ec);
+            }
+            else if (is_begin_container(current().event_type()))
             {
                 parser_.cursor_mode(false);
                 parser_.mark_level(parser_.level());
-                if (cursor_visitor_.dump(visitor, *this, ec))
+                cursor_visitor_.dump(visitor, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
                 {
-                    read_next(visitor, ec);
+                    return;
                 }
+                read_next(visitor, ec);
                 parser_.cursor_mode(true);
                 parser_.mark_level(0);
             }
             else
             {
-                if (cursor_visitor_.dump(visitor, *this, ec))
-                {
-                    read_next(visitor, ec);
-                }
+                cursor_visitor_.dump(visitor, *this, ec);
             }
         }
 

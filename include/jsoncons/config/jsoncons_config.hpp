@@ -227,6 +227,12 @@ namespace jsoncons {
 #define JSONCONS_STRING_CONSTANT(CharT, Str) string_constant_of_type<CharT>(Str, JSONCONS_WIDEN(Str))
 #define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_WIDEN(Str))
 
+#define JSONCONS_VISITOR_RETURN_TYPE \
+#if defined(JSONCONS_VISITOR_NO_RETURN) void \
+#else bool
+
+#define JSONCONS_VISITOR_RETURN_VALUE \
+#if !defined(JSONCONS_VISITOR_NO_RETURN) return true;
 
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
