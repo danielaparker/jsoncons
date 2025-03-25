@@ -55,7 +55,7 @@ namespace bson {
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -88,7 +88,7 @@ namespace bson {
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -121,7 +121,7 @@ namespace bson {
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -160,7 +160,7 @@ namespace bson {
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -195,7 +195,7 @@ namespace bson {
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }

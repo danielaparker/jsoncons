@@ -53,7 +53,7 @@ public:
     {
         std::error_code ec;
         read(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line(),column()));
         }
@@ -63,7 +63,7 @@ public:
     {
         parser_.reset();
         parser_.parse(visitor_, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }

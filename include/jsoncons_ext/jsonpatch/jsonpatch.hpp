@@ -170,7 +170,7 @@ namespace detail {
                     if ((*it).op == op_type::add)
                     {
                         jsonpointer::add(target,(*it).path,(*it).value,ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             //std::cout << "add: " << (*it).path << '\n';
                             break;
@@ -179,7 +179,7 @@ namespace detail {
                     else if ((*it).op == op_type::remove)
                     {
                         jsonpointer::remove(target,(*it).path,ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             //std::cout << "remove: " << (*it).path << '\n';
                             break;
@@ -188,7 +188,7 @@ namespace detail {
                     else if ((*it).op == op_type::replace)
                     {
                         jsonpointer::replace(target,(*it).path,(*it).value,ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             //std::cout << "replace: " << (*it).path << '\n';
                             break;
@@ -578,7 +578,7 @@ void apply_patch(Json& target, const Json& patch)
 {
     std::error_code ec;
     apply_patch(target, patch, ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         JSONCONS_THROW(jsonpatch_error(ec));
     }

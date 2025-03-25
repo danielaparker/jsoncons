@@ -43,7 +43,7 @@ namespace jsoncons {
         {
             decoder.reset();
             cursor.read_to(decoder, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
             }
@@ -125,7 +125,7 @@ namespace jsoncons {
         {
             using value_type = std::pair<T1, T2>;
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return value_type{};
             }
@@ -135,17 +135,17 @@ namespace jsoncons {
                 return value_type();
             }
             cursor.next(ec); // skip past array
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return value_type();
             }
 
             T1 v1 = decode_traits<T1,CharT>::decode(cursor, decoder, ec);
-            if (ec) {return value_type();}
+            if (JSONCONS_UNLIKELY(ec)) {return value_type();}
             cursor.next(ec);
-            if (ec) {return value_type();}
+            if (JSONCONS_UNLIKELY(ec)) {return value_type();}
             T2 v2 = decode_traits<T2, CharT>::decode(cursor, decoder, ec);
-            if (ec) {return value_type();}
+            if (JSONCONS_UNLIKELY(ec)) {return value_type();}
             cursor.next(ec);
 
             if (cursor.current().event_type() != staj_event_type::end_array)
@@ -176,7 +176,7 @@ namespace jsoncons {
             T v;
 
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return T{};
             }
@@ -189,7 +189,7 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.push_back(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
-                if (ec) {return T{};}
+                if (JSONCONS_UNLIKELY(ec)) {return T{};}
                 //std::cout << "read next 10\n";
                 cursor.next(ec);
             }
@@ -334,7 +334,7 @@ namespace jsoncons {
             std::error_code& ec)
         {
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return T{};
             }
@@ -408,7 +408,7 @@ namespace jsoncons {
             std::error_code& ec)
         {
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return T{};
             }
@@ -462,7 +462,7 @@ namespace jsoncons {
             T v;
 
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return T{};
             }
@@ -479,10 +479,10 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.insert(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
-                if (ec) {return T{};}
+                if (JSONCONS_UNLIKELY(ec)) {return T{};}
                 //std::cout << "cursor.next 20\n";
                 cursor.next(ec);
-                if (ec) {return T{};}
+                if (JSONCONS_UNLIKELY(ec)) {return T{};}
             }
             return v;
         }
@@ -511,7 +511,7 @@ namespace jsoncons {
         {
             std::array<T,N> v;
             cursor.array_expected(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 v.fill(T());
                 return v;
@@ -526,10 +526,10 @@ namespace jsoncons {
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
                 v[i] = decode_traits<value_type,CharT>::decode(cursor, decoder, ec);
-                if (ec) {return v;}
+                if (JSONCONS_UNLIKELY(ec)) {return v;}
                 //std::cout << "cursor.next 100\n";
                 cursor.next(ec);
-                if (ec) {return v;}
+                if (JSONCONS_UNLIKELY(ec)) {return v;}
             }
             return v;
         }
@@ -573,15 +573,15 @@ namespace jsoncons {
                     return val;
                 }
                 auto key = cursor.current().template get<key_type>(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 //std::cout << "cursor.next 200\n";
                 cursor.next(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 val.emplace(std::move(key),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 //std::cout << "cursor.next 300\n";
                 cursor.next(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
             }
             return val;
         }
@@ -632,7 +632,7 @@ namespace jsoncons {
                     return val;
                 }
                 auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 key_type n{0};
                 auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
                 if (r.ec != jsoncons::detail::to_integer_errc())
@@ -642,12 +642,12 @@ namespace jsoncons {
                 }
                 //std::cout << "cursor.next 500\n";
                 cursor.next(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
                 //std::cout << "cursor.next 600\n";
                 cursor.next(ec);
-                if (ec) {return val;}
+                if (JSONCONS_UNLIKELY(ec)) {return val;}
             }
             return val;
         }

@@ -586,10 +586,8 @@ private:
         }
     }
 
-    bool write_decimal_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
+    void write_decimal_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
     {
-        bool more = true;
-
         decimal_parse_state state = decimal_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -610,7 +608,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -631,7 +629,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -651,7 +649,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -666,7 +664,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -682,7 +680,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -692,7 +690,7 @@ private:
 
         write_tag(4);
         visit_begin_array((std::size_t)2, semantic_tag::none, context, ec);
-        if (ec) {JSONCONS_VISITOR_RETURN}
+        if (JSONCONS_UNLIKELY(ec)) {return;}
         if (exponent.length() > 0)
         {
             int64_t val{};
@@ -700,19 +698,19 @@ private:
             if (!r)
             {
                 ec = r.error_code();
-                JSONCONS_VISITOR_RETURN
+                return;
             }
             scale += val;
         }
         visit_int64(scale, semantic_tag::none, context, ec);
-        if (ec) {JSONCONS_VISITOR_RETURN}
+        if (JSONCONS_UNLIKELY(ec)) {return;}
 
         int64_t val{ 0 };
         auto r = jsoncons::detail::to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
@@ -723,17 +721,13 @@ private:
         else
         {
             ec = r.error_code();
-            JSONCONS_VISITOR_RETURN
+            return;
         }
-        more = visit_end_array(context, ec);
-
-        return more;
+        visit_end_array(context, ec);
     }
 
-    bool write_hexfloat_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
+    void write_hexfloat_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
     {
-        bool more = true;
-
         hexfloat_parse_state state = hexfloat_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -757,7 +751,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -772,7 +766,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -788,7 +782,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -809,7 +803,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -829,7 +823,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -844,7 +838,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -860,7 +854,7 @@ private:
                         default:
                         {
                             ec = cbor_errc::invalid_bigfloat;
-                            JSONCONS_VISITOR_RETURN
+                            return;
                         }
                     }
                     break;
@@ -869,8 +863,8 @@ private:
         }
 
         write_tag(5);
-        more = visit_begin_array((std::size_t)2, semantic_tag::none, context, ec);
-        if (ec) JSONCONS_VISITOR_RETURN
+        visit_begin_array((std::size_t)2, semantic_tag::none, context, ec);
+        if (JSONCONS_UNLIKELY(ec)) return;
 
         if (exponent.length() > 0)
         {
@@ -879,19 +873,19 @@ private:
             if (!r)
             {
                 ec = r.error_code();
-                JSONCONS_VISITOR_RETURN
+                return;
             }
             scale += val;
         }
-        more = visit_int64(scale, semantic_tag::none, context, ec);
-        if (ec) JSONCONS_VISITOR_RETURN
+        visit_int64(scale, semantic_tag::none, context, ec);
+        if (JSONCONS_UNLIKELY(ec)) return;
 
         int64_t val{ 0 };
         auto r = jsoncons::detail::hex_to_integer(s.data(),s.length(), val);
         if (r)
         {
-            more = visit_int64(val, semantic_tag::none, context, ec);
-            if (ec) JSONCONS_VISITOR_RETURN
+            visit_int64(val, semantic_tag::none, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) return;
         }
         else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
@@ -901,9 +895,10 @@ private:
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(r.error_code().message()));
+            ec = r.error_code();
+            return;
         }
-        return visit_end_array(context, ec);
+        visit_end_array(context, ec);
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -919,11 +914,13 @@ private:
             }
             case semantic_tag::bigdec:
             {
-                return write_decimal_value(sv, context, ec);
+                write_decimal_value(sv, context, ec);
+                JSONCONS_VISITOR_RETURN
             }
             case semantic_tag::bigfloat:
             {
-                return write_hexfloat_value(sv, context, ec);
+                write_hexfloat_value(sv, context, ec);
+                JSONCONS_VISITOR_RETURN
             }
             case semantic_tag::datetime:
             {
@@ -1363,11 +1360,11 @@ private:
         else
         {
             this->begin_array(v.size(), semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = v.begin(); p != v.end(); ++p)
             {
                 this->uint64_value(*p, tag, context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1392,11 +1389,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->uint64_value(*p, tag, context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1421,11 +1418,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->uint64_value(*p, semantic_tag::none, context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1450,11 +1447,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->uint64_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1477,11 +1474,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->int64_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1506,11 +1503,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->int64_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1535,11 +1532,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->int64_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1564,14 +1561,14 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->int64_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             JSONCONS_VISITOR_RETURN
         }
     }
@@ -1594,11 +1591,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->half_value(*p, tag, context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1623,11 +1620,11 @@ private:
         else
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             for (const auto* p = data.begin(); p != data.end(); ++p)
             {
                 this->double_value(*p,semantic_tag::none,context, ec);
-                if (ec) {JSONCONS_VISITOR_RETURN}
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
             this->end_array(context, ec);
             JSONCONS_VISITOR_RETURN
@@ -1651,11 +1648,11 @@ private:
         }
         
         this->begin_array(data.size(), semantic_tag::none,context, ec);
-        if (ec) {JSONCONS_VISITOR_RETURN}
+        if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
         for (auto p = data.begin(); p != data.end(); ++p)
         {
             this->double_value(*p,semantic_tag::none,context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
         }
         this->end_array(context, ec);
         JSONCONS_VISITOR_RETURN
@@ -1684,13 +1681,13 @@ private:
                 break;
         }
         visit_begin_array(2, semantic_tag::none, context, ec);
-        if (ec) {JSONCONS_VISITOR_RETURN}
+        if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
         visit_begin_array(shape.size(), semantic_tag::none, context, ec);
-        if (ec) {JSONCONS_VISITOR_RETURN}
+        if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
         for (auto it = shape.begin(); it != shape.end(); ++it)
         {
             visit_uint64(*it, semantic_tag::none, context, ec);
-            if (ec) {JSONCONS_VISITOR_RETURN}
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
         }
         visit_end_array(context, ec);
         JSONCONS_VISITOR_RETURN

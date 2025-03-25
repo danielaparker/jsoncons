@@ -586,7 +586,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 value_converter<byte_string_view,T> converter;
                 auto v = converter.convert(j.as_byte_string_view(),j.tag(), ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     JSONCONS_THROW(conv_error(ec));
                 }
@@ -596,7 +596,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 value_converter<basic_string_view<char>,T> converter;
                 auto v = converter.convert(j.as_string_view(),j.tag(), ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     JSONCONS_THROW(conv_error(ec));
                 }

@@ -122,7 +122,7 @@ namespace jsoncons { namespace jsonpointer {
         {
             std::error_code ec;
             auto jp = parse(s, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(jsonpointer_error(ec));
             }
@@ -508,7 +508,7 @@ namespace jsoncons { namespace jsonpointer {
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, create_if_missing, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
                 return *current;
             ++it;
         }
@@ -523,7 +523,7 @@ namespace jsoncons { namespace jsonpointer {
         std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return root;
         }
@@ -546,7 +546,7 @@ namespace jsoncons { namespace jsonpointer {
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
                 return *current;
             ++it;
         }
@@ -560,7 +560,7 @@ namespace jsoncons { namespace jsonpointer {
         std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return root;
         }
@@ -591,7 +591,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         Json& j = get(root, location, create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -606,7 +606,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         Json& result = get(root, location_str, create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -618,7 +618,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         const Json& j = get(root, location, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -631,7 +631,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         const Json& j = get(root, location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -676,7 +676,7 @@ namespace jsoncons { namespace jsonpointer {
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
@@ -735,7 +735,7 @@ namespace jsoncons { namespace jsonpointer {
              std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -769,7 +769,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         add(root, location, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -784,7 +784,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         add(root, location_str, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -812,7 +812,7 @@ namespace jsoncons { namespace jsonpointer {
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
@@ -878,7 +878,7 @@ namespace jsoncons { namespace jsonpointer {
                        std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -904,7 +904,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         add_if_absent(root, location_str, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -927,7 +927,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         add_if_absent(root, location, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -951,7 +951,7 @@ namespace jsoncons { namespace jsonpointer {
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
@@ -1003,7 +1003,7 @@ namespace jsoncons { namespace jsonpointer {
     remove(Json& root, const StringSource& location_str, std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -1016,7 +1016,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         remove(root, location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -1027,7 +1027,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         remove(root, location, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -1055,7 +1055,7 @@ namespace jsoncons { namespace jsonpointer {
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
@@ -1119,7 +1119,7 @@ namespace jsoncons { namespace jsonpointer {
                  std::error_code& ec)
     {
         auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -1145,7 +1145,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         replace(root, location_str, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
@@ -1168,7 +1168,7 @@ namespace jsoncons { namespace jsonpointer {
     {
         std::error_code ec;
         replace(root, location, std::forward<T>(value), create_if_missing, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }

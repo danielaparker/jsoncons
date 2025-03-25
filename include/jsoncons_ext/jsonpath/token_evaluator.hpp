@@ -3405,7 +3405,7 @@ namespace detail {
                             }
 
                             value_type val = tok.function_->evaluate(arg_stack, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return Json::null();
                             }

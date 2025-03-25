@@ -155,7 +155,7 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_type_and_value(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -172,7 +172,7 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_value(visitor, state_stack_.back().type, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -196,7 +196,7 @@ public:
                     {
                         source_.ignore(1);
                         end_array(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -210,7 +210,7 @@ public:
                             return;
                         }
                         read_type_and_value(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -223,7 +223,7 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_key(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -239,7 +239,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
                     read_type_and_value(visitor, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -251,7 +251,7 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_key(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -267,7 +267,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::strongly_typed_map_key;
                     read_value(visitor, state_stack_.back().type, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -286,7 +286,7 @@ public:
                     {
                         source_.ignore(1);
                         end_object(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -300,7 +300,7 @@ public:
                             return;
                         }
                         read_key(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -312,7 +312,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::indefinite_map_key;
                     read_type_and_value(visitor, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -322,7 +322,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::accept;
                     read_type_and_value(visitor, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -506,7 +506,7 @@ private:
             case jsoncons::ubjson::ubjson_type::string_type: 
             {
                 std::size_t length = get_length(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -531,7 +531,7 @@ private:
             case jsoncons::ubjson::ubjson_type::high_precision_number_type: 
             {
                 std::size_t length = get_length(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -570,7 +570,7 @@ private:
                 break;
             }
         }
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             more_ = false;
         }
@@ -613,7 +613,7 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -638,7 +638,7 @@ private:
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -710,7 +710,7 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -744,7 +744,7 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -910,7 +910,7 @@ private:
     void read_key(json_visitor& visitor, std::error_code& ec)
     {
         std::size_t length = get_length(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = ubjson_errc::key_expected;
             more_ = false;

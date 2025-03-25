@@ -1535,7 +1535,7 @@ namespace jsoncons {
                 {
                     value_converter<jsoncons::string_view, byte_string_type> converter;
                     byte_string_type v = converter.convert(as_string_view(),tag(), ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         JSONCONS_THROW(ser_error(ec));
                     }
@@ -2642,7 +2642,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             dump(cont, options, indent, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2655,7 +2655,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             dump_pretty(cont, options, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2667,7 +2667,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             dump(os, options, indent, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2696,7 +2696,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             dump_pretty(os, options, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2723,7 +2723,7 @@ namespace jsoncons {
             std::error_code ec;
 
             dump(cont, indent, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2735,7 +2735,7 @@ namespace jsoncons {
             std::error_code ec;
 
             dump(os, indent, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2745,7 +2745,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             dump(visitor, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec));
             }
@@ -2854,7 +2854,7 @@ namespace jsoncons {
                   std::error_code& ec) const
         {
             dump_noflush(visitor, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -3309,7 +3309,7 @@ namespace jsoncons {
                         {
                             value_converter<jsoncons::basic_string_view<char_type>,T> converter;
                             T v = converter.convert(as_string_view(),tag(), ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 JSONCONS_THROW(ser_error(ec));
                             }
@@ -3319,7 +3319,7 @@ namespace jsoncons {
                         {
                             value_converter<jsoncons::basic_string_view<char_type>, T> converter;
                             T v = converter.convert(as_string_view(), hint, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 JSONCONS_THROW(ser_error(ec));
                             }
@@ -3535,7 +3535,7 @@ namespace jsoncons {
                 {
                     value_converter<byte_string_view,string_type2> converter;
                     auto s = converter.convert(as_byte_string_view(), tag(), ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         JSONCONS_THROW(ser_error(ec));
                     }

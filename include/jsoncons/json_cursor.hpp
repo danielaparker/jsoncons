@@ -267,7 +267,7 @@ public:
     {
         std::error_code ec;
         read_to(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -299,7 +299,7 @@ public:
     {
         std::error_code ec;
         next(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -314,7 +314,7 @@ public:
     {
         std::error_code ec;
         check_done(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -335,7 +335,7 @@ public:
         if (source_.eof())
         {
             parser_.check_done(ec);
-            if (ec) {return;}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         else
         {
@@ -344,7 +344,7 @@ public:
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) {return;}
+                    if (JSONCONS_UNLIKELY(ec)) {return;}
                     if (s.size() > 0)
                     {
                         parser_.update(s.data(),s.size());
@@ -353,7 +353,7 @@ public:
                 if (!parser_.source_exhausted())
                 {
                     parser_.check_done(ec);
-                    if (ec) {return;}
+                    if (JSONCONS_UNLIKELY(ec)) {return;}
                 }
             }
             while (!eof());
@@ -427,7 +427,7 @@ private:
     {
         std::error_code ec;
         read_next(cursor_visitor_, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -446,16 +446,16 @@ private:
             if (parser_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
-                if (ec) {return;}
+                if (JSONCONS_UNLIKELY(ec)) {return;}
                 if (s.size() > 0)
                 {
                     parser_.update(s.data(),s.size());
-                    if (ec) {return;}
+                    if (JSONCONS_UNLIKELY(ec)) {return;}
                 }
             }
             bool eof = parser_.source_exhausted() && source_.eof();
             parser_.parse_some(visitor, ec);
-            if (ec) {return;}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
             if (eof)
             {
                 if (parser_.enter())

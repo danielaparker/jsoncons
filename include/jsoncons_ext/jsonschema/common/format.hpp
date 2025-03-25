@@ -971,7 +971,7 @@ namespace jsonschema {
     {
         std::error_code ec;
         auto u = uri::parse(str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
@@ -1004,7 +1004,7 @@ namespace jsonschema {
     {
         std::error_code ec;
         auto u = uri::parse(str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
@@ -1026,7 +1026,7 @@ namespace jsonschema {
     {
         std::error_code ec;
         jsonpointer::json_pointer::parse(str, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,

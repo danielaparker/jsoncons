@@ -253,7 +253,7 @@ public:
     {
         std::error_code ec;
         T val = get<T>(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
         }

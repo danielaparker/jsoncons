@@ -1060,7 +1060,7 @@ private:
                 }
                 value_buffer_.clear();
                 write_double_value(val, context, value_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return false;
                 }

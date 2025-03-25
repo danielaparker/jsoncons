@@ -719,7 +719,7 @@ public:
     {
         std::error_code ec;
         parse_some(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line_,column_));
         }
@@ -1396,7 +1396,7 @@ public:
     {
         std::error_code ec;
         finish_parse(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line_,column_));
         }

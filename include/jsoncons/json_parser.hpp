@@ -516,7 +516,7 @@ public:
     {
         std::error_code ec;
         check_done(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line_,column()));
         }
@@ -562,7 +562,7 @@ public:
     {
         std::error_code ec;
         parse_some(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line_,column()));
         }
@@ -577,7 +577,7 @@ public:
     {
         std::error_code ec;
         finish_parse(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,line_,column()));
         }
@@ -611,12 +611,12 @@ public:
                     if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
                     {
                         end_integer_value(visitor, ec);
-                        if (ec) return;
+                        if (JSONCONS_UNLIKELY(ec)) return;
                     }
                     else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
                     {
                         end_fraction_value(visitor, ec);
-                        if (ec) return;
+                        if (JSONCONS_UNLIKELY(ec)) return;
                     }
                     else
                     {
@@ -712,14 +712,14 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 begin_object(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '[':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 begin_array(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\"':
                                 state_ = parse_state::string;
@@ -729,7 +729,7 @@ public:
                                 ++position_;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '-':
                                 string_buffer_.clear();
@@ -740,7 +740,7 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '0': 
                                 string_buffer_.clear();
@@ -751,7 +751,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
@@ -762,19 +762,19 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'n':
                                 parse_null(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 't':
                                 parse_true(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'f':
                                 parse_false(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '}':
                                 err_handler_(json_errc::unexpected_rbrace, *this);
@@ -835,18 +835,18 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 end_object(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case ']':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 end_array(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case ',':
                                 begin_member_or_element(ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 ++input_ptr_;
                                 ++position_;
                                 break;
@@ -915,7 +915,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 end_object(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -926,7 +926,7 @@ public:
                                 string_state_ = parse_string_state{};
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -995,7 +995,7 @@ public:
                                 string_state_ = parse_string_state{};
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '}':
                                 saved_position_ = position_;
@@ -1011,7 +1011,7 @@ public:
                                     }
                                 }
                                 end_object(visitor, ec);  // Recover
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1130,14 +1130,14 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 begin_object(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '[':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 begin_array(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -1147,7 +1147,7 @@ public:
                                 string_state_ = parse_string_state{};
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '-':
                                 string_buffer_.clear();
@@ -1158,7 +1158,7 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '0': 
                                 string_buffer_.clear();
@@ -1169,7 +1169,7 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::zero;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
@@ -1180,19 +1180,19 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'n':
                                 parse_null(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 't':
                                 parse_true(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'f':
                                 parse_false(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case ']':
                                 saved_position_ = position_;
@@ -1210,7 +1210,7 @@ public:
                                         }
                                     }
                                     end_array(visitor, ec);  // Recover
-                                    if (ec) return;
+                                    if (JSONCONS_UNLIKELY(ec)) return;
                                 }
                                 else
                                 {
@@ -1286,21 +1286,21 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 begin_object(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '[':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 begin_array(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case ']':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 end_array(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -1310,7 +1310,7 @@ public:
                                 string_state_ = parse_string_state{};
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (JSONCONS_UNLIKELY(ec)) return;
                                 break;
                             case '-':
                                 string_buffer_.clear();
@@ -1321,7 +1321,7 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '0': 
                                 string_buffer_.clear();
@@ -1332,7 +1332,7 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::zero;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
@@ -1343,19 +1343,19 @@ public:
                                 state_ = parse_state::number;
                                 number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'n':
                                 parse_null(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 't':
                                 parse_true(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case 'f':
                                 parse_false(visitor, ec);
-                                if (ec) {return;}
+                                if (JSONCONS_UNLIKELY(ec)) {return;}
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1382,11 +1382,11 @@ public:
                     break;
                 case parse_state::string: 
                     parse_string(visitor, ec);
-                    if (ec) return;
+                    if (JSONCONS_UNLIKELY(ec)) return;
                     break;
                 case parse_state::number:
                     parse_number(visitor, ec);  
-                    if (ec) return;
+                    if (JSONCONS_UNLIKELY(ec)) return;
                     break;
                 case parse_state::t: 
                     switch (*input_ptr_)
@@ -1841,7 +1841,7 @@ zero:
         {
             case '\r': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 push_state(state_);
@@ -1849,7 +1849,7 @@ zero:
                 return; 
             case '\n': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++line_;
                 ++position_;
@@ -1857,12 +1857,12 @@ zero:
                 return;   
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 skip_space();
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 push_state(state_);
@@ -1871,7 +1871,7 @@ zero:
             case '}':
             case ']':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case '.':
@@ -1886,9 +1886,9 @@ zero:
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -1915,7 +1915,7 @@ integer:
         {
             case '\r': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -1923,7 +1923,7 @@ integer:
                 return; 
             case '\n': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++line_;
                 ++position_;
@@ -1931,12 +1931,12 @@ integer:
                 return;   
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 skip_space();
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -1945,7 +1945,7 @@ integer:
             case '}':
             case ']':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1965,9 +1965,9 @@ integer:
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -2008,7 +2008,7 @@ fraction2:
         {
             case '\r': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -2016,7 +2016,7 @@ fraction2:
                 return; 
             case '\n': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++line_;
                 ++position_;
@@ -2024,12 +2024,12 @@ fraction2:
                 return;   
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 skip_space();
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -2037,19 +2037,19 @@ fraction2:
                 return;
             case '}':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -2130,7 +2130,7 @@ exp3:
         {
             case '\r': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 push_state(state_);
@@ -2138,7 +2138,7 @@ exp3:
                 return; 
             case '\n': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++line_;
                 ++position_;
@@ -2146,12 +2146,12 @@ exp3:
                 return;   
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 skip_space();
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -2159,19 +2159,19 @@ exp3:
                 return;
             case '}':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -2276,13 +2276,13 @@ text:
                     if (string_buffer_.length() == 0)
                     {
                         end_string_value(sb,input_ptr_-sb, visitor, ec);
-                        if (ec) {return;}
+                        if (JSONCONS_UNLIKELY(ec)) {return;}
                     }
                     else
                     {
                         string_buffer_.append(sb,input_ptr_-sb);
                         end_string_value(string_buffer_.data(),string_buffer_.length(), visitor, ec);
-                        if (ec) {return;}
+                        if (JSONCONS_UNLIKELY(ec)) {return;}
                     }
                     ++input_ptr_;
                     return;
@@ -2370,7 +2370,7 @@ escape_u1:
         }
         {
             cp_ = append_to_codepoint(0, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u1;
                 return;
@@ -2388,7 +2388,7 @@ escape_u2:
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u2;
                 return;
@@ -2406,7 +2406,7 @@ escape_u3:
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u3;
                 return;
@@ -2424,7 +2424,7 @@ escape_u4:
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u4;
                 return;
@@ -2498,7 +2498,7 @@ escape_u5:
         }
         {
             cp2_ = append_to_codepoint(0, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u5;
                 return;
@@ -2516,7 +2516,7 @@ escape_u6:
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u6;
                 return;
@@ -2534,7 +2534,7 @@ escape_u7:
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u7;
                 return;
@@ -2552,7 +2552,7 @@ escape_u8:
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 string_state_ = parse_string_state::escape_u8;
                 return;

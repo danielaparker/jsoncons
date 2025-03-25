@@ -165,7 +165,7 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_item(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -183,7 +183,7 @@ public:
                         ++state_stack_.back().index;
                         state_stack_.back().mode = parse_mode::map_value;
                         read_item(visitor, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -198,7 +198,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
                     read_item(visitor, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -208,7 +208,7 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::accept;
                     read_item(visitor, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }

@@ -161,7 +161,7 @@ public:
     {
         std::error_code ec;
         read_to(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -193,7 +193,7 @@ public:
     {
         std::error_code ec;
         next(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -238,7 +238,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(cursor_visitor_, ec);
-            if (ec) {return;}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
 
@@ -248,7 +248,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(visitor, ec);
-            if (ec) {return;}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
 };

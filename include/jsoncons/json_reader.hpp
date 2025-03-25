@@ -276,7 +276,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             read_next(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
             }
@@ -295,7 +295,7 @@ namespace jsoncons {
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) return;
+                    if (JSONCONS_UNLIKELY(ec)) return;
                     if (s.size() > 0)
                     {
                         parser_.update(s.data(),s.size());
@@ -303,7 +303,7 @@ namespace jsoncons {
                 }
                 bool eof = parser_.source_exhausted();
                 parser_.parse_some(visitor_, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
                 if (eof)
                 {
                     if (parser_.enter())
@@ -325,7 +325,7 @@ namespace jsoncons {
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) return;
+                    if (JSONCONS_UNLIKELY(ec)) return;
                     if (s.size() > 0)
                     {
                         parser_.update(s.data(),s.size());
@@ -342,7 +342,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             check_done(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
             }
@@ -368,7 +368,7 @@ namespace jsoncons {
             if (source_.eof())
             {
                 parser_.check_done(ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
             }
             else
             {
@@ -377,7 +377,7 @@ namespace jsoncons {
                     if (parser_.source_exhausted())
                     {
                         auto s = source_.read_buffer(ec);
-                        if (ec) return;
+                        if (JSONCONS_UNLIKELY(ec)) return;
                         if (s.size() > 0)
                         {
                             parser_.update(s.data(),s.size());
@@ -386,7 +386,7 @@ namespace jsoncons {
                     if (!parser_.source_exhausted())
                     {
                         parser_.check_done(ec);
-                        if (ec) return;
+                        if (JSONCONS_UNLIKELY(ec)) return;
                     }
                 }
                 while (!eof());

@@ -1864,7 +1864,7 @@ namespace detail {
                 for (auto& item : arg0.array_range())
                 {
                     auto& j = expr.evaluate(item, context, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
@@ -2620,7 +2620,7 @@ namespace detail {
                         JSONCONS_ASSERT(!stack.empty());
                         stack.pop_back();
                         const auto& j = context.get_variable(t.key_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             ec = jmespath_errc::undefined_variable;
                             return std::addressof(context.null_value());
@@ -2681,7 +2681,7 @@ namespace detail {
                         }
 
                         reference r = t.function_->evaluate(arg_stack, context, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return std::addressof(context.null_value());
                         }
@@ -3758,7 +3758,7 @@ namespace detail {
                 }
                 std::error_code ec;
                 Json result = evaluate(doc, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     JSONCONS_THROW(jmespath_error(ec));
                 }
@@ -3774,7 +3774,7 @@ namespace detail {
                 }
                 std::error_code ec;
                 Json result = evaluate(doc, params, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     JSONCONS_THROW(jmespath_error(ec));
                 }
@@ -3975,7 +3975,7 @@ namespace detail {
                     {
                         push_token(token<Json>{variable_binding_arg, buffer},
                             resources, output_stack, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4008,7 +4008,7 @@ namespace detail {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
@@ -4016,7 +4016,7 @@ namespace detail {
                             case '*': // wildcard
                                 push_token(token<Json>(resources.create_expression(object_projection())), 
                                     resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
@@ -4026,7 +4026,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(lparen_arg, resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::expect_rparen;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4038,14 +4038,14 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(token<Json>(resources.get_not_operator()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 break;
                             }
                             case '@':
                                 ++p_;
                                 ++column_;
                                 push_token(resources.create_expression(current_node()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 break;
                             case '[': 
@@ -4094,14 +4094,14 @@ namespace detail {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 push_token(resources.create_expression(object_projection()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
@@ -4132,13 +4132,13 @@ namespace detail {
                     }
                     case expr_state::key_expr:
                         push_token(token<Json>(key_arg, buffer), resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         buffer.clear(); 
                         state_stack.pop_back(); 
                         break;
                     case expr_state::val_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         buffer.clear();
                         state_stack.pop_back(); 
                         break;
@@ -4150,7 +4150,7 @@ namespace detail {
                                 break;
                             case '&':
                                 push_token(token<Json>(begin_expression_type_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::expression_type;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4186,7 +4186,7 @@ namespace detail {
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return jmespath_expression{};
                             }
@@ -4214,7 +4214,7 @@ namespace detail {
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return jmespath_expression{};
                             }
@@ -4290,13 +4290,13 @@ namespace detail {
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return jmespath_expression{};
                                 }
                                 buffer.clear();
                                 push_token(token<Json>(f), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::function_expression;
                                 // check no-args function
                                 bool is_no_args_func = true;
@@ -4343,7 +4343,7 @@ namespace detail {
                             default:
                             {
                                 push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 buffer.clear();
                                 state_stack.pop_back(); 
                                 break;
@@ -4359,7 +4359,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
@@ -4367,7 +4367,7 @@ namespace detail {
                             case ')':
                             {
                                 push_token(token<Json>(end_function_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -4380,14 +4380,14 @@ namespace detail {
 
                     case expr_state::argument:
                         push_token(argument_arg, resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back();
                         break;
 
                     case expr_state::expression_type:
                         push_token(end_expression_type_arg, resources, output_stack, ec);
                         push_token(argument_arg, resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back();
                         break;
 
@@ -4514,7 +4514,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4524,7 +4524,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u2:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4534,7 +4534,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u3:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4544,7 +4544,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u4:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4590,7 +4590,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4600,7 +4600,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u6:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4610,7 +4610,7 @@ namespace detail {
                         break;
                     case expr_state::escape_u7:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4621,7 +4621,7 @@ namespace detail {
                     case expr_state::escape_u8:
                     {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -4638,7 +4638,7 @@ namespace detail {
                             case '\'':
                             {
                                 push_token(token<Json>(literal_arg, Json(buffer)), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 buffer.clear();
                                 state_stack.pop_back(); // raw_string
                                 ++p_;
@@ -4674,7 +4674,7 @@ namespace detail {
                                 auto j = decoder.get_result();
 
                                 push_token(token<Json>(literal_arg, std::move(j)), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 buffer.clear();
                                 state_stack.pop_back(); // json_value
                                 ++p_;
@@ -4740,21 +4740,21 @@ namespace detail {
                         {
                             case '*':
                                 push_token(resources.create_expression(list_projection()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': // []
                                 push_token(resources.create_expression(flatten_projection()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
                             case '?':
                                 push_token(token<Json>(begin_filter_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::filter;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4794,7 +4794,7 @@ namespace detail {
                                 else
                                 {
                                     push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
-                                    if (ec) {return jmespath_expression{};}
+                                    if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                     state_stack.back() = expr_state::multi_select_list;
                                     state_stack.push_back(expr_state::rhs_expression);                                
                                     state_stack.push_back(expr_state::lhs_expression);                                
@@ -4809,7 +4809,7 @@ namespace detail {
                                 break;
                             default:
                                 push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_list;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4829,14 +4829,14 @@ namespace detail {
                                 return jmespath_expression{};
                             case '*':
                                 push_token(resources.create_expression(list_projection()), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_list;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4868,7 +4868,7 @@ namespace detail {
                                 if (buffer.empty())
                                 {
                                     push_token(resources.create_expression(flatten_projection()), resources, output_stack, ec);
-                                    if (ec) {return jmespath_expression{};}
+                                    if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 }
                                 else
                                 {
@@ -4880,7 +4880,7 @@ namespace detail {
                                         return jmespath_expression{};
                                     }
                                     push_token(resources.create_expression(index_selector(val)), resources, output_stack, ec);
-                                    if (ec) {return jmespath_expression{};}
+                                    if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
 
                                     buffer.clear();
                                 }
@@ -4932,7 +4932,7 @@ namespace detail {
                         {
                             case ']':
                                 push_token(resources.create_expression(slice_projection(slic)), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 slic = slice{};
                                 state_stack.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -4973,7 +4973,7 @@ namespace detail {
                         {
                             case ']':
                                 push_token(resources.create_expression(slice_projection(slic)), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack.pop_back(); // rhs_slice_expression_step
@@ -5011,7 +5011,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(rparen_arg, resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 break;
                             default:
@@ -5065,7 +5065,7 @@ namespace detail {
                             case '=':
                                 push_token(token<Json>(resources.get_lte_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
@@ -5073,7 +5073,7 @@ namespace detail {
                             default:
                                 push_token(token<Json>(resources.get_lt_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 break;
                         }
@@ -5086,7 +5086,7 @@ namespace detail {
                             case '=':
                                 push_token(token<Json>(resources.get_gte_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -5094,7 +5094,7 @@ namespace detail {
                             default:
                                 push_token(token<Json>(resources.get_gt_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 break;
                         }
@@ -5107,7 +5107,7 @@ namespace detail {
                             case '=':
                                 push_token(token<Json>(resources.get_eq_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -5125,7 +5125,7 @@ namespace detail {
                             case '=':
                                 push_token(token<Json>(resources.get_ne_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -5161,14 +5161,14 @@ namespace detail {
                             case '|':
                                 push_token(token<Json>(resources.get_or_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token<Json>(pipe_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 break;
                         }
@@ -5181,7 +5181,7 @@ namespace detail {
                             case '&':
                                 push_token(token<Json>(resources.get_and_operator()), resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -5202,7 +5202,7 @@ namespace detail {
                             case ',':
                                 JSONCONS_ASSERT(!context_stack.empty());
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
@@ -5226,7 +5226,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(token<Json>(end_multi_select_list_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
 
                                 ++p_;
@@ -5249,7 +5249,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(token<Json>(end_filter_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
@@ -5270,7 +5270,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
@@ -5288,7 +5288,7 @@ namespace detail {
                             {
                                 state_stack.pop_back();
                                 push_token(end_multi_select_hash_arg, resources, output_stack, ec);
-                                if (ec) {return jmespath_expression{};}
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5340,7 +5340,7 @@ namespace detail {
                     {
                         push_token(token<Json>{variable_binding_arg, buffer},
                             resources, output_stack, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return jmespath_expression{};
                         }
@@ -5350,12 +5350,12 @@ namespace detail {
                     }
                     case expr_state::val_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back(); 
                         break;
                     case expr_state::identifier_or_function_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                        if (ec) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back(); 
                         break;
                     case expr_state::unquoted_string: 
@@ -5379,7 +5379,7 @@ namespace detail {
             context_stack.pop_back();
             
             push_token(end_of_expression_arg, resources, output_stack, ec);
-            if (ec) {return jmespath_expression{};}
+            if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
 
             JSONCONS_ASSERT(context_stack.empty());
             
@@ -5795,12 +5795,12 @@ namespace detail {
         std::error_code ec;
         auto expr = evaluator.compile(path.data(), path.size(), 
             jsoncons::jmespath::custom_functions<Json>{}, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
         }
         auto result = expr.evaluate(doc, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jmespath_error(ec));
         }
@@ -5813,12 +5813,12 @@ namespace detail {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator;
         auto expr = evaluator.compile(path.data(), path.size(), 
             jsoncons::jmespath::custom_functions<Json>{}, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return Json::null();
         }
         auto result = expr.evaluate(doc, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return Json::null();
         }
@@ -5832,7 +5832,7 @@ namespace detail {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
         std::error_code ec;
         auto compiled = evaluator.compile(expr.data(), expr.size(), funcs, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
         }

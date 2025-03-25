@@ -199,7 +199,7 @@ namespace jsoncons {
     {
         std::error_code ec;
         encode_traits<T,CharT>::encode(val, encoder, basic_json<CharT>(), ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
         }

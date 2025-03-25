@@ -310,7 +310,7 @@ private:
 
         visitor.begin_array(semantic_tag::none, *this, ec);
         more_ = !cursor_mode_;
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -342,7 +342,7 @@ private:
     {
         name_buffer_.clear();
         read_cstring(name_buffer_, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }
@@ -387,7 +387,7 @@ private:
             {
                 text_buffer_.clear();
                 read_string(text_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -406,7 +406,7 @@ private:
             {
                 text_buffer_.clear();
                 read_string(text_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -426,13 +426,13 @@ private:
                 text_buffer_.clear();
                 text_buffer_.push_back('/');
                 read_cstring(text_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
                 text_buffer_.push_back('/');
                 read_cstring(text_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }

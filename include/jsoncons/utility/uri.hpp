@@ -160,7 +160,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             *this = parse(str, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(std::system_error(ec));
             }

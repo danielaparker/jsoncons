@@ -54,7 +54,7 @@ namespace csv {
 
         std::error_code ec;
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -87,7 +87,7 @@ namespace csv {
 
         std::error_code ec;
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -124,7 +124,7 @@ namespace csv {
         jsoncons::json_decoder<basic_json<char_type>> decoder;
         std::error_code ec;
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -167,7 +167,7 @@ namespace csv {
 
         std::error_code ec;
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
@@ -204,7 +204,7 @@ namespace csv {
 
         std::error_code ec;
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }

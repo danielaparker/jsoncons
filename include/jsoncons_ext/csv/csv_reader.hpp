@@ -119,7 +119,7 @@ namespace jsoncons { namespace csv {
         {
             std::error_code ec;
             read(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
             }
@@ -159,14 +159,14 @@ namespace jsoncons { namespace csv {
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) return;
+                    if (JSONCONS_UNLIKELY(ec)) return;
                     if (s.size() > 0)
                     {
                         parser_.update(s.data(),s.size());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
-                if (ec) return;
+                if (JSONCONS_UNLIKELY(ec)) return;
             }
         }
     };

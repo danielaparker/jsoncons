@@ -191,7 +191,7 @@ namespace jsonpath {
             {
                 std::error_code ec;
                 auto result = parse(path, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     JSONCONS_THROW(jsonpath_error(ec, line_, column_));
                 }
@@ -742,7 +742,7 @@ namespace jsonpath {
             jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
 
             std::vector<value_type> location = parser.parse(normalized_path, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return basic_json_location();
             }

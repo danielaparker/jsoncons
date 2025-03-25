@@ -37,7 +37,7 @@ TEST_CASE("JSON Parsing Test Suite")
                 json_stream_reader reader(is, options);
                 std::error_code ec;
                 reader.read(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     std::cout << p.path().filename().string() << " failed, expected success\n";
                 }

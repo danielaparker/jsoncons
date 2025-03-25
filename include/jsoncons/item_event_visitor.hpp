@@ -62,7 +62,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_begin_object(tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -75,7 +75,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_begin_object(length, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -86,7 +86,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_end_object(context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -98,7 +98,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_begin_array(tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -111,7 +111,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_begin_array(length, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -122,7 +122,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_end_array(context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -133,7 +133,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_string(name, semantic_tag::none, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -145,7 +145,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_null(tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -158,7 +158,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_bool(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -171,7 +171,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_string(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -186,7 +186,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -201,7 +201,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -214,7 +214,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_uint64(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -227,7 +227,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_int64(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -240,7 +240,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_half(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -253,7 +253,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_double(value, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -382,7 +382,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_typed_array(data, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -404,7 +404,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_typed_array(half_arg, s, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -425,7 +425,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_begin_multi_dim(shape, tag, context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
@@ -444,7 +444,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             visit_end_multi_dim(context, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }

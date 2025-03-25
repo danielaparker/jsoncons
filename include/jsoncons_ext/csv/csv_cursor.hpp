@@ -216,7 +216,7 @@ public:
     {
         std::error_code ec;
         read_to(visitor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -248,7 +248,7 @@ public:
     {
         std::error_code ec;
         next(ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
@@ -332,14 +332,14 @@ private:
             if (parser_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
-                if (ec) {return;}
+                if (JSONCONS_UNLIKELY(ec)) {return;}
                 if (s.size() > 0)
                 {
                     parser_.update(s.data(),s.size());
                 }
             }
             parser_.parse_some(visitor, ec);
-            if (ec) {return;}
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
 };

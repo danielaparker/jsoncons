@@ -167,7 +167,7 @@ namespace detail {
         {
             std::error_code ec;
             auto result = compile(resources, path, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
@@ -209,7 +209,7 @@ namespace detail {
                             case '@':
                             {
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
                                 ++column_;
@@ -234,7 +234,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(root_node_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -242,7 +242,7 @@ namespace detail {
                             case '@':
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -257,7 +257,7 @@ namespace detail {
                         {
                             case '.':
                                 push_token(resources, token_type(resources.new_selector(recursive_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::name_or_lbracket;
@@ -288,7 +288,7 @@ namespace detail {
                     {
                         //std::cout << "literal: " << buffer << "\n";
                         push_token(resources, token_type(literal_arg, Json(buffer,semantic_tag::none,alloc_)), ec);
-                        if (ec) {return path_expression_type(alloc_);}
+                        if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); // json_value
                         break;
@@ -310,7 +310,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expect_rparen;
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -333,7 +333,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, token_type(resources.get_unary_not()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 break;
                             }
                             case '-':
@@ -341,7 +341,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, token_type(resources.get_unary_minus()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 break;
                             }
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -365,15 +365,15 @@ namespace detail {
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -386,17 +386,17 @@ namespace detail {
                                 basic_json_parser<char_type> parser;
                                 parser.update(buffer.data(),buffer.size());
                                 parser.parse_some(decoder, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 parser.finish_parse(decoder, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -410,17 +410,17 @@ namespace detail {
                         basic_json_parser<char_type> parser;
                         parser.update(buffer.data(),buffer.size());
                         parser.parse_some(decoder, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
                         parser.finish_parse(decoder, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
                         push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                        if (ec) {return path_expression_type(alloc_);}
+                        if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back();
                         break;
@@ -438,17 +438,17 @@ namespace detail {
                                 basic_json_parser<char_type> parser;
                                 parser.update(p_,end_input_ - p_);
                                 parser.parse_some(decoder, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 parser.finish_parse(decoder, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 p_ = parser.current();
@@ -529,7 +529,7 @@ namespace detail {
                                 break;
                             case '*':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -567,14 +567,14 @@ namespace detail {
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -584,7 +584,7 @@ namespace detail {
                             default:
                             {
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
@@ -602,14 +602,14 @@ namespace detail {
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
-                                if (ec)
+                                if (JSONCONS_UNLIKELY(ec))
                                 {
                                     return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -634,9 +634,9 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(resources, token_type(current_node_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -646,7 +646,7 @@ namespace detail {
                             case ')':
                             {
                                 push_token(resources, token_type(end_function_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -670,7 +670,7 @@ namespace detail {
                                 break;
                             default:
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::one_or_more_arguments;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -691,7 +691,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -714,7 +714,7 @@ namespace detail {
                                 push_token(resources, token_type(end_argument_expression_arg), ec);
                                 push_token(resources, argument_arg, ec);
                                 //push_token(resources, argument_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
@@ -864,35 +864,35 @@ namespace detail {
                             case '+':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_plus_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '-':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_minus_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_mult_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '/':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_div_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '%':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_modulus_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
@@ -911,7 +911,7 @@ namespace detail {
                         {
                             case '|':
                                 push_token(resources, token_type(resources.get_or_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -928,7 +928,7 @@ namespace detail {
                         {
                             case '&':
                                 push_token(resources, token_type(resources.get_and_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -979,7 +979,7 @@ namespace detail {
                             case '=':
                             {
                                 push_token(resources, token_type(resources.get_eq_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::path_or_literal_or_function;
                                 ++p_;
                                 ++column_;
@@ -1032,7 +1032,7 @@ namespace detail {
                         }
                         std::basic_regex<char_type> pattern(buffer, options);
                         push_token(resources, resources.get_regex_operator(std::move(pattern)), ec);
-                        if (ec) {return path_expression_type(alloc_);}
+                        if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         buffer.clear();
                         buffer2.clear();
                         state_stack_.pop_back();
@@ -1078,14 +1078,14 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_lte_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(resources, token_type(resources.get_lt_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -1097,7 +1097,7 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_gte_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1105,7 +1105,7 @@ namespace detail {
                             default:
                                 //std::cout << "Parse: gt_operator\n";
                                 push_token(resources, token_type(resources.get_gt_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -1117,7 +1117,7 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_ne_operator()), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1130,7 +1130,7 @@ namespace detail {
                     }
                     case path_state::identifier:
                         push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                        if (ec) {return path_expression_type(alloc_);}
+                        if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); 
                         break;
@@ -1221,7 +1221,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, rparen_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expression_rhs;
                                 break;
                             default:
@@ -1240,7 +1240,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(begin_expression_arg), ec);
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::expression);
                                 state_stack_.emplace_back(path_state::expect_rparen);
@@ -1254,7 +1254,7 @@ namespace detail {
                             {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(begin_filter_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::filter_expression);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1290,7 +1290,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, root_node_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_location);                                
                                 ++p_;
@@ -1300,7 +1300,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
@@ -1328,7 +1328,7 @@ namespace detail {
                             {
                                 push_token(resources, token_type(begin_expression_arg), ec);
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expression;
                                 state_stack_.emplace_back(path_state::expect_rparen);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1340,7 +1340,7 @@ namespace detail {
                             case '?':
                             {
                                 push_token(resources, token_type(begin_filter_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::filter_expression;
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -1350,7 +1350,7 @@ namespace detail {
                             }
                             case '*':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1358,7 +1358,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(root_node_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1366,7 +1366,7 @@ namespace detail {
                             case '@':
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1437,7 +1437,7 @@ namespace detail {
                                     return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back(); // index_or_slice_or_union
                                 ++p_;
@@ -1447,7 +1447,7 @@ namespace detail {
                             case ',':
                             {
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 if (buffer.empty())
                                 {
                                     ec = jsonpath_errc::invalid_number;
@@ -1462,12 +1462,12 @@ namespace detail {
                                     return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
 
                                 buffer.clear();
                                 
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);
@@ -1490,7 +1490,7 @@ namespace detail {
                                     buffer.clear();
                                 }
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::slice_expression_stop);
                                 state_stack_.emplace_back(path_state::integer);
@@ -1525,7 +1525,7 @@ namespace detail {
                             case ']':
                             case ',':
                                 push_token(resources, token_type(resources.new_selector(slice_selector<Json,JsonReference>(slic))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 break;
@@ -1568,7 +1568,7 @@ namespace detail {
                             case ']':
                             case ',':
                                 push_token(resources, token_type(resources.new_selector(slice_selector<Json,JsonReference>(slic))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // slice_expression_step
@@ -1588,7 +1588,7 @@ namespace detail {
                                 break;
                             case ']': 
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1597,7 +1597,7 @@ namespace detail {
                             case '.':
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
@@ -1607,7 +1607,7 @@ namespace detail {
                             case '[':
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
                                 ++p_;
@@ -1617,7 +1617,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
@@ -1649,14 +1649,14 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::union_element);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': 
                                 push_token(resources, token_type(end_union_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1674,7 +1674,7 @@ namespace detail {
                                 break;
                             case ']': 
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1684,7 +1684,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);                                
@@ -1707,7 +1707,7 @@ namespace detail {
                             case ',':
                             case '.':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1739,7 +1739,7 @@ namespace detail {
                                     return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
 
                                 buffer.clear();
                                 
@@ -1779,7 +1779,7 @@ namespace detail {
                                 break;
                             case ']': 
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1789,7 +1789,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);                                
@@ -1870,7 +1870,7 @@ namespace detail {
                         break;
                     case path_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1880,7 +1880,7 @@ namespace detail {
                         break;
                     case path_state::escape_u2:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1890,7 +1890,7 @@ namespace detail {
                         break;
                     case path_state::escape_u3:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1900,7 +1900,7 @@ namespace detail {
                         break;
                     case path_state::escape_u4:
                         cp = append_to_codepoint(cp, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1946,7 +1946,7 @@ namespace detail {
                         break;
                     case path_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1956,7 +1956,7 @@ namespace detail {
                         break;
                     case path_state::escape_u6:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1966,7 +1966,7 @@ namespace detail {
                         break;
                     case path_state::escape_u7:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1977,7 +1977,7 @@ namespace detail {
                     case path_state::escape_u8:
                     {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return path_expression_type(alloc_);
                         }
@@ -1999,7 +1999,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(resources, token_type(end_filter_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
@@ -2020,7 +2020,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(resources, token_type(end_index_expression_arg), ec);
-                                if (ec) {return path_expression_type(alloc_);}
+                                if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
@@ -2058,7 +2058,7 @@ namespace detail {
                         if (!buffer.empty()) // Can't be quoted string
                         {
                             push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                            if (ec) {return path_expression_type(alloc_);}
+                            if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
                         break;
@@ -2072,14 +2072,14 @@ namespace detail {
                         if (!buffer.empty()) // Can't be quoted string
                         {
                             push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                            if (ec) {return path_expression_type(alloc_);}
+                            if (JSONCONS_UNLIKELY(ec)) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
                         break;
                     case path_state::parent_operator: 
                     {
                         push_token(resources, token_type(resources.new_selector(parent_node_selector<Json,JsonReference>(ancestor_depth))), ec);
-                        if (ec) { return path_expression_type(alloc_); }
+                        if (JSONCONS_UNLIKELY(ec)) { return path_expression_type(alloc_); }
                         paths_required = true;
                         state_stack_.pop_back(); 
                         break;
@@ -2177,7 +2177,7 @@ namespace detail {
                     //}
                     //std::cout << "\n\n";
                     unwind_rparen(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -2227,7 +2227,7 @@ namespace detail {
                     //}
                     //std::cout << "/jsonpath_token_kind::end_index_expression\n";
                     unwind_rparen(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -2266,7 +2266,7 @@ namespace detail {
                     //}
                     //std::cout << "/jsonpath_token_kind::end_index_expression\n";
                     unwind_rparen(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -2357,7 +2357,7 @@ namespace detail {
                 {
                     //std::cout << "jsonpath_token_kind::end_function\n";
                     unwind_rparen(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }

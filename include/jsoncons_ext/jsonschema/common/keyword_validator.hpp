@@ -544,7 +544,7 @@ namespace jsonschema {
                 std::error_code ec;
                 reader.read(ec);
 
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),

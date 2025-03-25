@@ -412,7 +412,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
                 uint64_t val = get_uint64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -438,7 +438,7 @@ private:
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
                             handle_string(visitor, jsoncons::basic_string_view<char>(str.str.data(),str.str.length()),ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
                             }
@@ -448,7 +448,7 @@ private:
                         {
                             read_byte_string_from_buffer read(byte_string_view(str.bytes));
                             write_byte_string(read, visitor, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
                             }
@@ -478,7 +478,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 int64_t val = get_int64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -499,7 +499,7 @@ private:
             {
                 read_byte_string_from_source read(this);
                 write_byte_string(read, visitor, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -510,7 +510,7 @@ private:
                 text_buffer_.clear();
 
                 read_text_string(text_buffer_, ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -522,7 +522,7 @@ private:
                     return;
                 }
                 handle_string(visitor, jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()),ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -560,7 +560,7 @@ private:
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     {
                         uint64_t val = get_uint64_value(ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -572,7 +572,7 @@ private:
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
                     {
                         double val = get_double(ec);
-                        if (ec)
+                        if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
@@ -607,7 +607,7 @@ private:
                         case 0x04:
                             text_buffer_.clear();
                             read_decimal_fraction(text_buffer_, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
                             }
@@ -617,7 +617,7 @@ private:
                         case 0x05:
                             text_buffer_.clear();
                             read_bigfloat(text_buffer_, ec);
-                            if (ec)
+                            if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
                             }
@@ -852,7 +852,7 @@ private:
             default:
             {
                 std::size_t length = get_size(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     more = false;
                     return more;
@@ -1087,7 +1087,7 @@ private:
                 case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
                 {
                     uint64_t x = get_uint64_value(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return 0;
                     }
@@ -1183,7 +1183,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
                 exponent = get_uint64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1192,7 +1192,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 exponent = get_int64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1221,7 +1221,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
                 uint64_t val = get_uint64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1231,7 +1231,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 int64_t val = get_int64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1260,7 +1260,7 @@ private:
                 {
                     bytes_buffer_.clear();
                     read_byte_string(bytes_buffer_, ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1342,7 +1342,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
                 exponent = get_uint64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1351,7 +1351,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 exponent = get_int64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1377,7 +1377,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
                 uint64_t val = get_uint64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1389,7 +1389,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 int64_t val = get_int64_value(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1573,7 +1573,7 @@ private:
                 {
                     bytes_buffer_.clear();
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1589,7 +1589,7 @@ private:
                 {
                     bytes_buffer_.clear();
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1605,7 +1605,7 @@ private:
                 case 0x15:
                 {
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1617,7 +1617,7 @@ private:
                 case 0x16:
                 {
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1629,7 +1629,7 @@ private:
                 case 0x17:
                 {
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1642,7 +1642,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1657,7 +1657,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1673,7 +1673,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1701,7 +1701,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1728,7 +1728,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1754,7 +1754,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1770,7 +1770,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1797,7 +1797,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1824,7 +1824,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1851,7 +1851,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1878,7 +1878,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1905,7 +1905,7 @@ private:
                 {
                     typed_array_.clear();
                     read(typed_array_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1931,7 +1931,7 @@ private:
                 default:
                 {
                     read(bytes_buffer_,ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
@@ -1946,7 +1946,7 @@ private:
         else
         {
             read(bytes_buffer_,ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -1971,7 +1971,7 @@ private:
         uint8_t info = get_additional_information_value(b);
        
         read_shape(info, ec);   
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return;
         }

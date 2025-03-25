@@ -69,7 +69,7 @@ namespace jsoncons {
             if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next(ec);
-                if (ec) {view_ = nullptr;}
+                if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
             }
             else
             {
@@ -119,7 +119,7 @@ namespace jsoncons {
         staj_array_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (ec) {view_ = nullptr;}
+            if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
             return *this;
         }
 
@@ -153,7 +153,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             next(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
             }
@@ -164,7 +164,7 @@ namespace jsoncons {
             if (!done())
             {
                 view_->cursor_->next(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -229,7 +229,7 @@ namespace jsoncons {
             if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next(ec);
-                if (ec) {view_ = nullptr;}
+                if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
             }
             else
             {
@@ -279,7 +279,7 @@ namespace jsoncons {
         staj_object_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 view_ = nullptr;
             }
@@ -316,7 +316,7 @@ namespace jsoncons {
         {
             std::error_code ec;
             next(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
             }
@@ -325,7 +325,7 @@ namespace jsoncons {
         void next(std::error_code& ec)
         {
             view_->cursor_->next(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -334,7 +334,7 @@ namespace jsoncons {
                 JSONCONS_ASSERT(view_->cursor_->current().event_type() == staj_event_type::key);
                 auto key = view_->cursor_->current(). template get<key_type>();
                 view_->cursor_->next(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
