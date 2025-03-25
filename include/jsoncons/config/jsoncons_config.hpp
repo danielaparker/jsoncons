@@ -240,12 +240,6 @@ namespace jsoncons {
 #define JSONCONS_VISITOR_RETURN return true; 
 #endif
 
-#if defined(JSONCONS_VISITOR_NO_RETURN) 
-#define JSONCONS_VISITOR_COPY_INIT 
-#else 
-#define JSONCONS_VISITOR_COPY_INIT bool More_ = 
-#endif
-
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 
