@@ -34,25 +34,26 @@ public:
     }
 
 private:
-    bool visit_key(const string_view_type& name,
-                 const ser_context& context,
-                 std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
+        const ser_context& context,
+        std::error_code& ec) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")
         {
-            return this->destination().key(name, context, ec);
+            this->destination().key(name, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
         else
         {
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
     }
 
-    bool visit_string(const string_view_type& s,
-                         semantic_tag tag,
-                         const ser_context& context,
-                         std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s,
+        semantic_tag tag,
+        const ser_context& context,
+        std::error_code&) override
     {
         if (member_name_ == "name")
         {
@@ -78,7 +79,7 @@ private:
         {
             this->destination().string_value(s, tag, context);
         }
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 };
 

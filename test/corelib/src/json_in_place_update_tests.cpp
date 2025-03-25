@@ -28,7 +28,7 @@ namespace {
         {
             (void)length_;
         }
-        bool visit_string(const string_view_type& value,
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
                           jsoncons::semantic_tag,
                           const jsoncons::ser_context& context,
                           std::error_code&) override
@@ -42,7 +42,7 @@ namespace {
                     *p++ = *it;
                 }
             }
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
     };
 

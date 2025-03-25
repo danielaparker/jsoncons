@@ -210,7 +210,7 @@ namespace jsoncons {
         {
         }
     private:
-        bool visit_begin_array(semantic_tag, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, 
                                const ser_context&, 
                                std::error_code& ec) override
         {      
@@ -219,10 +219,10 @@ namespace jsoncons {
                 ec = conv_errc::not_vector;
                 return false;
             }
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_begin_array(std::size_t size, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t size, 
                             semantic_tag, 
                             const ser_context&, 
                             std::error_code& ec) override
@@ -236,10 +236,10 @@ namespace jsoncons {
             {
                 reserve_storage(typename std::integral_constant<bool, extension_traits::has_reserve<T>::value>::type(), v_, size);
             }
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_end_array(const ser_context&, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
                           std::error_code& ec) override
         {
             if (level_ != 1)
@@ -250,25 +250,25 @@ namespace jsoncons {
             return false;
         }
 
-        bool visit_uint64(uint64_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
                              semantic_tag, 
                              const ser_context&,
                              std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_int64(int64_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_half(uint16_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
                            semantic_tag,
                            const ser_context&,
                            std::error_code&) override
@@ -276,28 +276,28 @@ namespace jsoncons {
             return visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
         }
 
-        bool visit_half_(std::true_type, uint16_t value)
+        JSONCONS_VISITOR_RETURN_TYPE visit_half_(std::true_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(value));
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_half_(std::false_type, uint16_t value)
+        JSONCONS_VISITOR_RETURN_TYPE visit_half_(std::false_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(binary::decode_half(value)));
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_double(double value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
                              semantic_tag,
                              const ser_context&,
                              std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_typed_array(const jsoncons::span<const value_type>& data,  
+        JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const value_type>& data,  
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override

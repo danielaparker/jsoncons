@@ -253,9 +253,9 @@ struct my_cbor_visitor : public default_json_visitor
     std::vector<double> v;
 private:
     bool visit_typed_array(const span<const double>& data,  
-                        semantic_tag,
-                        const ser_context&,
-                        std::error_code&) override
+        semantic_tag,
+        const ser_context&,
+        std::error_code&) override
     {
         v = std::vector<double>(data.begin(),data.end());
         return false;

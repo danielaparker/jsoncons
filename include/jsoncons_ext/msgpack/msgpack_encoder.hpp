@@ -135,18 +135,18 @@ namespace msgpack {
             sink_.flush();
         }
 
-        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             ec = msgpack_errc::object_length_required;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             stack_.emplace_back(msgpack_container_type::object, length);
 
@@ -170,10 +170,10 @@ namespace msgpack {
                                       std::back_inserter(sink_));
             }
 
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_end_object(const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             --nesting_depth_;
@@ -181,31 +181,31 @@ namespace msgpack {
             if (stack_.back().count() < stack_.back().length())
             {
                 ec = msgpack_errc::too_few_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             else if (stack_.back().count() > stack_.back().length())
             {
                 ec = msgpack_errc::too_many_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
 
             stack_.pop_back();
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             ec = msgpack_errc::array_length_required;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             stack_.emplace_back(msgpack_container_type::array, length);
             if (length <= 15)
@@ -225,10 +225,10 @@ namespace msgpack {
                 sink_.push_back(jsoncons::msgpack::msgpack_type::array32_type);
                 binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
             }
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_end_array(const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
         {
             JSONCONS_ASSERT(!stack_.empty());
 
@@ -237,30 +237,30 @@ namespace msgpack {
             if (stack_.back().count() < stack_.back().length())
             {
                 ec = msgpack_errc::too_few_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             else if (stack_.back().count() > stack_.back().length())
             {
                 ec = msgpack_errc::too_many_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
 
             stack_.pop_back();
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
         {
             return visit_string(name, semantic_tag::none, context, ec);
         }
 
-        bool visit_null(semantic_tag, const ser_context&, std::error_code&) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) final
         {
             // nil
             sink_.push_back(jsoncons::msgpack::msgpack_type::nil_type);
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
         void write_timestamp(int64_t seconds, int64_t nanoseconds)
@@ -294,7 +294,7 @@ namespace msgpack {
             }
         }
 
-        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) final
         {
             switch (tag)
             {
@@ -305,7 +305,7 @@ namespace msgpack {
                     if (!result)
                     {
                         ec = msgpack_errc::invalid_timestamp;
-                        return false;
+                        JSONCONS_VISITOR_RETURN
                     }
                     write_timestamp(seconds, 0);
                     break;
@@ -361,7 +361,7 @@ namespace msgpack {
                     break;
                 }
             }
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
         void write_string_value(const string_view_type& sv) 
@@ -403,7 +403,7 @@ namespace msgpack {
             }
         }
 
-        bool visit_byte_string(const byte_string_view& b, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                                semantic_tag, 
                                const ser_context&,
                                std::error_code&) final
@@ -435,10 +435,10 @@ namespace msgpack {
             }
 
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_byte_string(const byte_string_view& b, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                                uint64_t ext_tag, 
                                const ser_context&,
                                std::error_code&) final
@@ -494,10 +494,10 @@ namespace msgpack {
             }
 
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_double(double val, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
                              semantic_tag,
                              const ser_context&,
                              std::error_code&) final
@@ -519,10 +519,10 @@ namespace msgpack {
             // write double
 
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_int64(int64_t val, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) final
@@ -640,10 +640,10 @@ namespace msgpack {
                 break;
             }
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_uint64(uint64_t val, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
                           semantic_tag tag, 
                           const ser_context&,
                           std::error_code&) final
@@ -726,16 +726,16 @@ namespace msgpack {
                 }
             }
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
-        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) final
         {
             // true and false
             sink_.push_back(static_cast<uint8_t>(val ? jsoncons::msgpack::msgpack_type::true_type : jsoncons::msgpack::msgpack_type::false_type));
 
             end_value();
-            return true;
+            JSONCONS_VISITOR_RETURN
         }
 
         void end_value()

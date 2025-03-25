@@ -47,7 +47,7 @@ struct my_cbor_visitor : public default_json_visitor
 {
     std::vector<double> v;
 private:
-    bool visit_typed_array(const span<const double>& data,  
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const span<const double>& data,  
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override

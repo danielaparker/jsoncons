@@ -142,35 +142,35 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         stack_.emplace_back(ubjson_container_type::indefinite_length_object);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         stack_.emplace_back(ubjson_container_type::object, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_end_object(const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -184,48 +184,48 @@ private:
             if (stack_.back().count() < stack_.back().length())
             {
                 ec = ubjson_errc::too_few_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             if (stack_.back().count() > stack_.back().length())
             {
                 ec = ubjson_errc::too_many_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
         }
         stack_.pop_back();
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         stack_.emplace_back(ubjson_container_type::indefinite_length_array);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         stack_.emplace_back(ubjson_container_type::array, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_end_array(const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -239,26 +239,26 @@ private:
             if (stack_.back().count() < stack_.back().length())
             {
                 ec = ubjson_errc::too_few_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             if (stack_.back().count() > stack_.back().length())
             {
                 ec = ubjson_errc::too_many_items;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
         }
         stack_.pop_back();
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
         auto sink = unicode_traits::validate(name.data(), name.size());
         if (sink.ec != unicode_traits::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         put_length(name.length());
@@ -267,18 +267,18 @@ private:
         {
             sink_.push_back(c);
         }
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
         binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::null_type), std::back_inserter(sink_));
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -299,7 +299,7 @@ private:
         if (sink.ec != unicode_traits::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         put_length(sv.length());
@@ -310,7 +310,7 @@ private:
         }
 
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
     void put_length(std::size_t length)
@@ -341,7 +341,7 @@ private:
         }
     }
 
-    bool visit_byte_string(const byte_string_view& b, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -360,10 +360,10 @@ private:
         }
 
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_double(double val, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override
@@ -385,10 +385,10 @@ private:
         // write double
 
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_int64(int64_t val, semantic_tag, const ser_context&, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, semantic_tag, const ser_context&, 
         std::error_code&) override
     {
         if (val >= 0)
@@ -450,10 +450,10 @@ private:
             }
         }
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_uint64(uint64_t val, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
                       semantic_tag, 
                       const ser_context&,
                       std::error_code&) override
@@ -479,16 +479,16 @@ private:
             binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
         }
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         // true and false
         sink_.push_back(static_cast<uint8_t>(val ? jsoncons::ubjson::ubjson_type::true_type : jsoncons::ubjson::ubjson_type::false_type));
 
         end_value();
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
     void end_value()

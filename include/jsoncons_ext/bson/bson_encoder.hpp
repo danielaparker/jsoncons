@@ -149,19 +149,19 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         if (buffer_.size() > 0)
         {
             if (stack_.empty())
             {
                 ec = bson_errc::expected_bson_document;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             before_value(jsoncons::bson::bson_type::document_type);
         }
@@ -169,10 +169,10 @@ private:
         stack_.emplace_back(jsoncons::bson::bson_container_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_end_object(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -190,31 +190,31 @@ private:
                 sink_.push_back(c);
             }
         }
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         if (buffer_.size() > 0)
         {
             if (stack_.empty())
             {
                 ec = bson_errc::expected_bson_document;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             before_value(jsoncons::bson::bson_type::array_type);
         }
         stack_.emplace_back(jsoncons::bson::bson_container_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_end_array(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -232,10 +232,10 @@ private:
                 sink_.push_back(c);
             }
         }
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code
@@ -244,15 +244,15 @@ private:
             buffer_.push_back(c);
         }
         buffer_.push_back(0x00);
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_null(semantic_tag tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         switch (tag)
         {
@@ -263,15 +263,15 @@ private:
                 before_value(jsoncons::bson::bson_type::null_type);
                 break;
         }
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         before_value(jsoncons::bson::bson_type::bool_type);
         if (val)
@@ -283,15 +283,15 @@ private:
             buffer_.push_back(0x00);
         }
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         switch (tag)
@@ -304,7 +304,7 @@ private:
                 if (rc.ec != std::errc())
                 {
                     ec = bson_errc::invalid_decimal128_string;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 binary::native_to_little(dec.low,std::back_inserter(buffer_));
                 binary::native_to_little(dec.high,std::back_inserter(buffer_));
@@ -328,7 +328,7 @@ private:
                 if (first == string_view::npos || last == string_view::npos || first == last)
                 {
                     ec = bson_errc::invalid_regex_string;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 string_view regex = sv.substr(first+1,last-1);
                 for (auto c : regex)
@@ -361,7 +361,7 @@ private:
                 if (sink.ec != unicode_traits::conv_errc())
                 {
                     ec = bson_errc::invalid_utf8_text_string;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 for (auto c : sv)
                 {
@@ -373,10 +373,10 @@ private:
                 break;
         }
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_byte_string(const byte_string_view& b, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                            semantic_tag, 
                            const ser_context&,
                            std::error_code& ec) override
@@ -384,7 +384,7 @@ private:
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         before_value(jsoncons::bson::bson_type::binary_type);
 
@@ -401,10 +401,10 @@ private:
         std::size_t length = buffer_.size() - string_offset - 1;
         binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_byte_string(const byte_string_view& b, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                            uint64_t ext_tag, 
                            const ser_context&,
                            std::error_code& ec) override
@@ -412,7 +412,7 @@ private:
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         before_value(jsoncons::bson::bson_type::binary_type);
 
@@ -429,10 +429,10 @@ private:
         std::size_t length = buffer_.size() - string_offset - 1;
         binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
-    bool visit_int64(int64_t val, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, 
                      semantic_tag tag, 
                      const ser_context&,
                      std::error_code& ec) override
@@ -442,7 +442,7 @@ private:
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         switch (tag)
@@ -451,20 +451,20 @@ private:
                 if (val < min_value_div_1000)
                 {
                     ec = bson_errc::datetime_too_small;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 if (val > max_value_div_1000)
                 {
                     ec = bson_errc::datetime_too_large;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val,std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
@@ -472,7 +472,7 @@ private:
                     val /= nanos_in_milli;
                 }
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             default:
             {
                 if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
@@ -485,12 +485,12 @@ private:
                     before_value(jsoncons::bson::bson_type::int64_type);
                     binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 }
-                return true;
+                JSONCONS_VISITOR_RETURN
             }
         }
     }
 
-    bool visit_uint64(uint64_t val, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
                       semantic_tag tag, 
                       const ser_context&,
                       std::error_code& ec) override
@@ -499,7 +499,7 @@ private:
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         switch (tag)
@@ -508,15 +508,15 @@ private:
                 if (val > max_value_div_1000)
                 {
                     ec = bson_errc::datetime_too_large;
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
@@ -524,7 +524,7 @@ private:
                     val /= nanos_in_second;
                 }
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-                return true;
+                JSONCONS_VISITOR_RETURN
             default:
             {
                 bool more;
@@ -550,7 +550,7 @@ private:
         }
     }
 
-    bool visit_double(double val, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
                       semantic_tag,
                       const ser_context&,
                       std::error_code& ec) override
@@ -558,11 +558,11 @@ private:
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         before_value(jsoncons::bson::bson_type::double_type);
         binary::native_to_little(val,std::back_inserter(buffer_));
-        return true;
+        JSONCONS_VISITOR_RETURN
     }
 
     void before_value(uint8_t code) 
