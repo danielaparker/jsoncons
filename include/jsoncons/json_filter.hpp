@@ -305,7 +305,7 @@ private:
         destination1_->begin_object(tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->begin_object(tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -316,7 +316,7 @@ private:
         destination1_->begin_object(length, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->begin_object(length, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -327,7 +327,7 @@ private:
         destination1_->end_object(context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->end_object(context, ec);
         JSONCONS_VISITOR_RETURN
@@ -338,7 +338,7 @@ private:
         destination1_->begin_array(tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->begin_array(tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -349,7 +349,7 @@ private:
         destination1_->begin_array(length, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->begin_array(length, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -360,7 +360,7 @@ private:
         destination1_->end_array(context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->end_array(context, ec);
         JSONCONS_VISITOR_RETURN
@@ -373,7 +373,7 @@ private:
         destination1_->key(name, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->key(name, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -387,7 +387,7 @@ private:
         destination1_->string_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->string_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -401,7 +401,7 @@ private:
         destination1_->byte_string_value(b, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->byte_string_value(b, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -415,7 +415,7 @@ private:
         destination1_->byte_string_value(b, ext_tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->byte_string_value(b, ext_tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -426,7 +426,7 @@ private:
         destination1_->uint64_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->uint64_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -437,7 +437,7 @@ private:
         destination1_->int64_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->int64_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -448,7 +448,7 @@ private:
         destination1_->half_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->half_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -459,7 +459,7 @@ private:
         destination1_->double_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->double_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -470,7 +470,7 @@ private:
         destination1_->bool_value(value, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->bool_value(value, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -481,7 +481,7 @@ private:
         destination1_->null_value(tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->null_value(tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -495,7 +495,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -509,7 +509,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -523,7 +523,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -537,7 +537,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -551,7 +551,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -565,7 +565,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -579,7 +579,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -593,7 +593,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -608,7 +608,7 @@ private:
         destination1_->typed_array(half_arg, s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(half_arg, s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -622,7 +622,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -636,7 +636,7 @@ private:
         destination1_->typed_array(s, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->typed_array(s, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -650,7 +650,7 @@ private:
         destination1_->begin_multi_dim(shape, tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->begin_multi_dim(shape, tag, context, ec);
         JSONCONS_VISITOR_RETURN
@@ -662,7 +662,7 @@ private:
         destination1_->end_multi_dim(context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return;
+            JSONCONS_VISITOR_RETURN
         }
         destination2_->end_multi_dim(context, ec);
         JSONCONS_VISITOR_RETURN
