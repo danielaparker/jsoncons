@@ -45,7 +45,7 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_object(semantic_tag tag=semantic_tag::none,
-                          const ser_context& context=ser_context())
+            const ser_context& context=ser_context())
         {
             std::error_code ec;
             visit_begin_object(tag, context, ec);
@@ -57,8 +57,8 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_object(std::size_t length, 
-                          semantic_tag tag=semantic_tag::none, 
-                          const ser_context& context = ser_context())
+            semantic_tag tag=semantic_tag::none, 
+            const ser_context& context = ser_context())
         {
             std::error_code ec;
             visit_begin_object(length, tag, context, ec);
@@ -81,7 +81,7 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_array(semantic_tag tag=semantic_tag::none,
-                         const ser_context& context=ser_context())
+            const ser_context& context=ser_context())
         {
             std::error_code ec;
             visit_begin_array(tag, context, ec);
@@ -93,8 +93,8 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_array(std::size_t length, 
-                         semantic_tag tag=semantic_tag::none,
-                         const ser_context& context=ser_context())
+            semantic_tag tag=semantic_tag::none,
+            const ser_context& context=ser_context())
         {
             std::error_code ec;
             visit_begin_array(length, tag, context, ec);
@@ -128,7 +128,7 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE null_value(semantic_tag tag = semantic_tag::none,
-                        const ser_context& context=ser_context()) 
+            const ser_context& context=ser_context()) 
         {
             std::error_code ec;
             visit_null(tag, context, ec);
@@ -140,8 +140,8 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE bool_value(bool value, 
-                        semantic_tag tag = semantic_tag::none,
-                        const ser_context& context=ser_context()) 
+            semantic_tag tag = semantic_tag::none,
+            const ser_context& context=ser_context()) 
         {
             std::error_code ec;
             visit_bool(value, tag, context, ec);
@@ -153,8 +153,8 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE string_value(const string_view_type& value, 
-                          semantic_tag tag = semantic_tag::none, 
-                          const ser_context& context=ser_context()) 
+            semantic_tag tag = semantic_tag::none, 
+            const ser_context& context=ser_context()) 
         {
             std::error_code ec;
             visit_string(value, tag, context, ec);
@@ -251,7 +251,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_begin_object(tag, context, ec);
+            visit_begin_object(tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_object(std::size_t length, 
@@ -259,39 +260,46 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_begin_object(length, tag, context, ec);
+            visit_begin_object(length, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE end_object(const ser_context& context, std::error_code& ec)
         {
-            return visit_end_object(context, ec);
+            visit_end_object(context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec)
         {
-            return visit_begin_array(tag, context, ec);
+            visit_begin_array(tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
         {
-            return visit_begin_array(length, tag, context, ec);
+            visit_begin_array(length, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE end_array(const ser_context& context, std::error_code& ec)
         {
-            return visit_end_array(context, ec);
+            visit_end_array(context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE key(const string_view_type& name, const ser_context& context, std::error_code& ec)
         {
-            return visit_key(name, context, ec);
+            visit_key(name, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE null_value(semantic_tag tag,
             const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_null(tag, context, ec);
+            visit_null(tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE bool_value(bool value, 
@@ -299,7 +307,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_bool(value, tag, context, ec);
+            visit_bool(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE string_value(const string_view_type& value, 
@@ -307,7 +316,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_string(value, tag, context, ec);
+            visit_string(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         template <typename Source>
@@ -317,7 +327,8 @@ namespace jsoncons {
             std::error_code& ec,
             typename std::enable_if<extension_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
+            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         template <typename Source>
@@ -327,7 +338,8 @@ namespace jsoncons {
             std::error_code& ec,
             typename std::enable_if<extension_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE uint64_value(uint64_t value, 
@@ -335,7 +347,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_uint64(value, tag, context, ec);
+            visit_uint64(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE int64_value(int64_t value, 
@@ -343,7 +356,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_int64(value, tag, context, ec);
+            visit_int64(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE half_value(uint16_t value, 
@@ -351,7 +365,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_half(value, tag, context, ec);
+            visit_half(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE double_value(double value, 
@@ -359,7 +374,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_double(value, tag, context, ec);
+            visit_double(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         template <typename T>
@@ -382,7 +398,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_typed_array(data, tag, context, ec);
+            visit_typed_array(data, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE typed_array(half_arg_t, const jsoncons::span<const uint16_t>& s,
@@ -403,7 +420,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_typed_array(half_arg, s, tag, context, ec);
+            visit_typed_array(half_arg, s, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE begin_multi_dim(const jsoncons::span<const size_t>& shape,
@@ -424,7 +442,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_begin_multi_dim(shape, tag, context, ec);
+            visit_begin_multi_dim(shape, tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE end_multi_dim(const ser_context& context=ser_context()) 
@@ -441,7 +460,8 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE end_multi_dim(const ser_context& context,
                            std::error_code& ec) 
         {
-            return visit_end_multi_dim(context, ec);
+            visit_end_multi_dim(context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
     private:
@@ -457,7 +477,8 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)
         {
-            return visit_begin_object(tag, context, ec);
+            visit_begin_object(tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, 
@@ -472,7 +493,8 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)
         {
-            return visit_begin_array(tag, context, ec);
+            visit_begin_array(tag, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, 
@@ -506,7 +528,8 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_byte_string(value, semantic_tag::none, context, ec);
+            visit_byte_string(value, semantic_tag::none, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
@@ -524,10 +547,11 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            return visit_double(binary::decode_half(value),
+            visit_double(binary::decode_half(value),
                 tag,
                 context,
                 ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
@@ -708,7 +732,8 @@ namespace jsoncons {
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
             std::error_code& ec) 
         {
-            return visit_end_array(context, ec);
+            visit_end_array(context, ec);
+            JSONCONS_VISITOR_RETURN
         }
     };
 
