@@ -549,15 +549,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag, context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = uint64_value(*p, semantic_tag::none, context, ec);
+                uint64_value(*p, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -566,15 +565,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag, context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = uint64_value(*p, semantic_tag::none, context, ec);
+                uint64_value(*p, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -583,15 +581,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec) 
         {
-            bool more = begin_array(s.size(), tag, context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = uint64_value(*p, semantic_tag::none, context, ec);
+                uint64_value(*p, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -600,15 +597,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec) 
         {
-            bool more = begin_array(s.size(), tag, context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = uint64_value(*p,semantic_tag::none,context, ec);
+                uint64_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -617,15 +613,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = int64_value(*p,semantic_tag::none,context, ec);
+                int64_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -634,15 +629,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = int64_value(*p,semantic_tag::none,context, ec);
+                int64_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -651,15 +645,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = int64_value(*p,semantic_tag::none,context, ec);
+                int64_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -668,15 +661,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = int64_value(*p,semantic_tag::none,context, ec);
+                int64_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -686,15 +678,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag, context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = half_value(*p, semantic_tag::none, context, ec);
+                half_value(*p, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -703,15 +694,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = double_value(*p,semantic_tag::none,context, ec);
+                double_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -720,15 +710,14 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec)  
         {
-            bool more = begin_array(s.size(), tag,context, ec);
-            for (auto p = s.begin(); more && p != s.end(); ++p)
+            begin_array(s.size(), tag,context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            for (auto p = s.begin(); p != s.end(); ++p)
             {
-                more = double_value(*p,semantic_tag::none,context, ec);
+                double_value(*p,semantic_tag::none,context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
-            if (more)
-            {
-                more = end_array(context, ec);
-            }
+            end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
@@ -737,19 +726,15 @@ namespace jsoncons {
             const ser_context& context, 
             std::error_code& ec) 
         {
-            bool more = visit_begin_array(2, tag, context, ec);
-            if (more)
+            visit_begin_array(2, tag, context, ec);
+            if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
+            visit_begin_array(shape.size(), tag, context, ec);
+            for (auto it = shape.begin(); it != shape.end(); ++it)
             {
-                more = visit_begin_array(shape.size(), tag, context, ec);
-                for (auto it = shape.begin(); more && it != shape.end(); ++it)
-                {
-                    visit_uint64(*it, semantic_tag::none, context, ec);
-                }
-                if (more)
-                {
-                    more = visit_end_array(context, ec);
-                }
+                visit_uint64(*it, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN}
             }
+            visit_end_array(context, ec);
             JSONCONS_VISITOR_RETURN
         }
 
