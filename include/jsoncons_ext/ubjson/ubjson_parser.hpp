@@ -186,7 +186,7 @@ public:
                 case parse_mode::indefinite_array:
                 {
                     auto c = source_.peek();
-                    if (c.eof)
+                    if (JSONCONS_UNLIKELY(c.eof))
                     {
                         ec = ubjson_errc::unexpected_eof;
                         more_ = false;
@@ -276,7 +276,7 @@ public:
                 case parse_mode::indefinite_map_key:
                 {
                     auto c = source_.peek();
-                    if (c.eof)
+                    if (JSONCONS_UNLIKELY(c.eof))
                     {
                         ec = ubjson_errc::unexpected_eof;
                         more_ = false;
@@ -586,7 +586,7 @@ private:
         } 
 
         auto c = source_.peek();
-        if (c.eof)
+        if (JSONCONS_UNLIKELY(c.eof))
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;
@@ -603,7 +603,7 @@ private:
                 return;
             }
             c = source_.peek();
-            if (c.eof)
+            if (JSONCONS_UNLIKELY(c.eof))
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
@@ -683,7 +683,7 @@ private:
         } 
 
         auto c = source_.peek();
-        if (c.eof)
+        if (JSONCONS_UNLIKELY(c.eof))
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;
@@ -700,7 +700,7 @@ private:
                 return;
             }
             c = source_.peek();
-            if (c.eof)
+            if (JSONCONS_UNLIKELY(c.eof))
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
@@ -734,7 +734,7 @@ private:
         else
         {
             c = source_.peek();
-            if (c.eof)
+            if (JSONCONS_UNLIKELY(c.eof))
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
