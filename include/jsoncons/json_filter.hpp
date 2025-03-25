@@ -50,39 +50,46 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->begin_object(tag, context, ec);
+        destination_->begin_object(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->begin_object(length, tag, context, ec);
+        destination_->begin_object(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return destination_->end_object(context, ec);
+        destination_->end_object(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->begin_array(tag, context, ec);
+        destination_->begin_array(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->begin_array(length, tag, context, ec);
+        destination_->begin_array(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return destination_->end_array(context, ec);
+        destination_->end_array(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
-        return destination_->key(name, context, ec);
+        destination_->key(name, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
@@ -90,7 +97,8 @@ private:
                       const ser_context& context,
                       std::error_code& ec) override
     {
-        return destination_->string_value(value, tag, context, ec);
+        destination_->string_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -98,7 +106,8 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination_->byte_string_value(b, tag, context, ec);
+        destination_->byte_string_value(b, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -106,37 +115,44 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination_->byte_string_value(b, ext_tag, context, ec);
+        destination_->byte_string_value(b, ext_tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->uint64_value(value, tag, context, ec);
+        destination_->uint64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->int64_value(value, tag, context, ec);
+        destination_->int64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->half_value(value, tag, context, ec);
+        destination_->half_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->double_value(value, tag, context, ec);
+        destination_->double_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->bool_value(value, tag, context, ec);
+        destination_->bool_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_->null_value(tag, context, ec);
+        destination_->null_value(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& s, 
@@ -144,7 +160,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& s, 
@@ -152,7 +169,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& s, 
@@ -160,7 +178,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& s, 
@@ -168,7 +187,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& s, 
@@ -176,7 +196,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& s, 
@@ -184,7 +205,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& s, 
@@ -192,7 +214,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& s, 
@@ -200,7 +223,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, 
@@ -209,7 +233,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(half_arg, s, tag, context, ec);
+        destination_->typed_array(half_arg, s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& s, 
@@ -217,7 +242,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& s, 
@@ -225,7 +251,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_->typed_array(s, tag, context, ec);
+        destination_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
@@ -233,13 +260,15 @@ private:
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        return destination_->begin_multi_dim(shape, tag, context, ec);
+        destination_->begin_multi_dim(shape, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
-        return destination_->end_multi_dim(context, ec);
+        destination_->end_multi_dim(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 };
 
@@ -274,37 +303,43 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->begin_object(tag, context, ec);
-        return destination2_->begin_object(tag, context, ec);
+        destination2_->begin_object(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->begin_object(length, tag, context, ec);
-        return destination2_->begin_object(length, tag, context, ec);
+        destination2_->begin_object(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
     {
         destination1_->end_object(context, ec);
-        return destination2_->end_object(context, ec);
+        destination2_->end_object(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->begin_array(tag, context, ec);
-        return destination2_->begin_array(tag, context, ec);
+        destination2_->begin_array(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->begin_array(length, tag, context, ec);
-        return destination2_->begin_array(length, tag, context, ec);
+        destination2_->begin_array(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
     {
         destination1_->end_array(context, ec);
-        return destination2_->end_array(context, ec);
+        destination2_->end_array(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
@@ -312,7 +347,8 @@ private:
                  std::error_code& ec) override
     {
         destination1_->key(name, context, ec);
-        return destination2_->key(name, context, ec);
+        destination2_->key(name, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
@@ -321,7 +357,8 @@ private:
                       std::error_code& ec) override
     {
         destination1_->string_value(value, tag, context, ec);
-        return destination2_->string_value(value, tag, context, ec);
+        destination2_->string_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -330,7 +367,8 @@ private:
                            std::error_code& ec) override
     {
         destination1_->byte_string_value(b, tag, context, ec);
-        return destination2_->byte_string_value(b, tag, context, ec);
+        destination2_->byte_string_value(b, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -339,43 +377,50 @@ private:
                            std::error_code& ec) override
     {
         destination1_->byte_string_value(b, ext_tag, context, ec);
-        return destination2_->byte_string_value(b, ext_tag, context, ec);
+        destination2_->byte_string_value(b, ext_tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->uint64_value(value, tag, context, ec);
-        return destination2_->uint64_value(value, tag, context, ec);
+        destination2_->uint64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->int64_value(value, tag, context, ec);
-        return destination2_->int64_value(value, tag, context, ec);
+        destination2_->int64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->half_value(value, tag, context, ec);
-        return destination2_->half_value(value, tag, context, ec);
+        destination2_->half_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->double_value(value, tag, context, ec);
-        return destination2_->double_value(value, tag, context, ec);
+        destination2_->double_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->bool_value(value, tag, context, ec);
-        return destination2_->bool_value(value, tag, context, ec);
+        destination2_->bool_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         destination1_->null_value(tag, context, ec);
-        return destination2_->null_value(tag, context, ec);
+        destination2_->null_value(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& s, 
@@ -384,7 +429,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& s, 
@@ -393,7 +439,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& s, 
@@ -402,7 +449,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& s, 
@@ -411,7 +459,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& s, 
@@ -420,7 +469,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& s, 
@@ -429,7 +479,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& s, 
@@ -438,7 +489,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& s, 
@@ -447,7 +499,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, 
@@ -457,7 +510,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(half_arg, s, tag, context, ec);
-        return destination2_->typed_array(half_arg, s, tag, context, ec);
+        destination2_->typed_array(half_arg, s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& s, 
@@ -466,7 +520,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& s, 
@@ -475,7 +530,8 @@ private:
                         std::error_code& ec) override
     {
         destination1_->typed_array(s, tag, context, ec);
-        return destination2_->typed_array(s, tag, context, ec);
+        destination2_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
@@ -484,14 +540,16 @@ private:
                             std::error_code& ec) override
     {
         destination1_->begin_multi_dim(shape, tag, context, ec);
-        return destination2_->begin_multi_dim(shape, tag, context, ec);
+        destination2_->begin_multi_dim(shape, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
         destination1_->end_multi_dim(context, ec);
-        return destination2_->end_multi_dim(context, ec);
+        destination2_->end_multi_dim(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 };
 
@@ -520,12 +578,13 @@ private:
     {
         if (name == name_)
         {
-            return this->destination().key(new_name_,context, ec);
+            this->destination().key(new_name_,context, ec);
         }
         else
         {
-            return this->destination().key(name,context,ec);
+            this->destination().key(name,context,ec);
         }
+        JSONCONS_VISITOR_RETURN
     }
 };
 
@@ -567,7 +626,8 @@ private:
                          const ser_context& context,
                          std::error_code& ec) override
     {
-        return destination1_->begin_object(tag, context, ec);
+        destination1_->begin_object(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, 
@@ -575,19 +635,22 @@ private:
                          const ser_context& context,
                          std::error_code& ec) override
     {
-        return destination1_->begin_object(length, tag, context, ec);
+        destination1_->begin_object(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->end_object(context, ec);
+        destination1_->end_object(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, 
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        return destination1_->begin_array(tag, context, ec);
+        destination1_->begin_array(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, 
@@ -595,12 +658,14 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        return destination1_->begin_array(length, tag, context, ec);
+        destination1_->begin_array(length, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->end_array(context, ec);
+        destination1_->end_array(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -608,7 +673,8 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination1_->byte_string_value(b, tag, context, ec);
+        destination1_->byte_string_value(b, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -616,37 +682,44 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination1_->byte_string_value(b, ext_tag, context, ec);
+        destination1_->byte_string_value(b, ext_tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->half_value(value, tag, context, ec);
+        destination1_->half_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->double_value(value, tag, context, ec);
+        destination1_->double_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->int64_value(value, tag, context, ec);
+        destination1_->int64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->uint64_value(value, tag, context, ec);
+        destination1_->uint64_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->bool_value(value, tag, context, ec);
+        destination1_->bool_value(value, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination1_->null_value(tag, context, ec);
+        destination1_->null_value(tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& s, 
@@ -654,7 +727,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& s, 
@@ -662,7 +736,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& s, 
@@ -670,7 +745,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& s, 
@@ -678,7 +754,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& s, 
@@ -686,7 +763,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& s, 
@@ -694,7 +772,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& s, 
@@ -702,7 +781,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& s, 
@@ -710,7 +790,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, 
@@ -719,7 +800,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(half_arg, s, tag, context, ec);
+        destination1_->typed_array(half_arg, s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& s, 
@@ -727,7 +809,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& s, 
@@ -735,7 +818,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination1_->typed_array(s, tag, context, ec);
+        destination1_->typed_array(s, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
@@ -743,13 +827,15 @@ private:
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        return destination1_->begin_multi_dim(shape, tag, context, ec);
+        destination1_->begin_multi_dim(shape, tag, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
-        return destination1_->end_multi_dim(context, ec);
+        destination1_->end_multi_dim(context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
 };
