@@ -215,8 +215,8 @@ public:
         {
             if (index_ != 0)
             {
-                more = event().send_json_event(visitor, context, ec);
-                while (more && is_typed_array())
+                event().send_json_event(visitor, context, ec);
+                while (more)
                 {
                     if (index_ < data_.size())
                     {
@@ -279,7 +279,7 @@ public:
                     }
                     else
                     {
-                        more = visitor.end_array();
+                        more = false;
                         state_ = staj_cursor_state();
                         data_ = typed_array_view();
                         index_ = 0;
@@ -361,121 +361,121 @@ private:
         return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object, length, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array, length, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_array);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::key);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& s, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& s, 
+    bool visit_byte_string(const byte_string_view& s, 
                            semantic_tag tag,
                            const ser_context&,
                            std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& s, 
+    bool visit_byte_string(const byte_string_view& s, 
                            uint64_t ext_tag,
                            const ser_context&,
                            std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, ext_tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                   semantic_tag tag,
                   const ser_context&,
                   std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
+    bool visit_half(uint16_t value, 
                  semantic_tag tag,
                  const ser_context&,
                  std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(half_arg, value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
+    bool visit_double(double value, 
                    semantic_tag tag, 
                    const ser_context&,
                    std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& v, 
+    bool visit_typed_array(const jsoncons::span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -486,7 +486,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -497,7 +497,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -508,7 +508,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -519,7 +519,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int8_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -530,7 +530,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -541,7 +541,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -552,7 +552,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -563,7 +563,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, const jsoncons::span<const uint16_t>& data, 
+    bool visit_typed_array(half_arg_t, const jsoncons::span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -574,7 +574,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& data, 
+    bool visit_typed_array(const jsoncons::span<const float>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -585,7 +585,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& data, 
+    bool visit_typed_array(const jsoncons::span<const double>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -596,15 +596,15 @@ private:
         return this->begin_array(tag, context, ec);
     }
 /*
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float128_type>&, 
+    bool visit_typed_array(const jsoncons::span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
     {
-        JSONCONS_VISITOR_RETURN
+        return true;
     }
 */
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
+    bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -614,7 +614,7 @@ private:
         return this->begin_array(2, tag, context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
+    bool visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
         return this->end_array(context, ec);
