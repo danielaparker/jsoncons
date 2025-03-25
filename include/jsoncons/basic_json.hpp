@@ -4468,31 +4468,25 @@ namespace jsoncons {
                     break;
                 case json_storage_kind::object:
                 {
-                    bool more = visitor.begin_object(size(), tag(), context, ec);
+                    visitor.begin_object(size(), tag(), context, ec);
                     const object& o = cast<object_storage>().value();
-                    for (auto it = o.begin(); more && it != o.end(); ++it)
+                    for (auto it = o.begin(); it != o.end(); ++it)
                     {
                         visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
                         (*it).value().dump_noflush(visitor, ec);
                     }
-                    if (more)
-                    {
-                        visitor.end_object(context, ec);
-                    }
+                    visitor.end_object(context, ec);
                     break;
                 }
                 case json_storage_kind::array:
                 {
-                    bool more = visitor.begin_array(size(), tag(), context, ec);
+                    visitor.begin_array(size(), tag(), context, ec);
                     const array& o = cast<array_storage>().value();
-                    for (const_array_iterator it = o.begin(); more && it != o.end(); ++it)
+                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         (*it).dump_noflush(visitor, ec);
                     }
-                    if (more)
-                    {
-                        visitor.end_array(context, ec);
-                    }
+                    visitor.end_array(context, ec);
                     break;
                 }
                 case json_storage_kind::json_const_reference:
