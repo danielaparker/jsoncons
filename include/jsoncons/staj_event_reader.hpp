@@ -214,83 +214,103 @@ namespace jsoncons {
             }
         }
 
-        bool dump(basic_item_event_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
+        void dump(basic_item_event_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
-            bool more = true;
             if (is_typed_array())
             {
                 if (index_ != 0)
                 {
-                    more = event().send_value_event(visitor, context, ec);
-                    while (more && is_typed_array())
+                    event().send_value_event(visitor, context, ec);
+                    const std::size_t len = data_.size();
+                    switch (data_.type())
                     {
-                        if (index_ < data_.size())
+                        case typed_array_type::uint8_value:
                         {
-                            switch (data_.type())
+                            for (auto i = index_; i < len; ++i) 
                             {
-                                case typed_array_type::uint8_value:
-                                {
-                                    more = visitor.uint64_value(data_.data(uint8_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::uint16_value:
-                                {
-                                    more = visitor.uint64_value(data_.data(uint16_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::uint32_value:
-                                {
-                                    more = visitor.uint64_value(data_.data(uint32_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::uint64_value:
-                                {
-                                    more = visitor.uint64_value(data_.data(uint64_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::int8_value:
-                                {
-                                    more = visitor.int64_value(data_.data(int8_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::int16_value:
-                                {
-                                    more = visitor.int64_value(data_.data(int16_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::int32_value:
-                                {
-                                    more = visitor.int64_value(data_.data(int32_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::int64_value:
-                                {
-                                    more = visitor.int64_value(data_.data(int64_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::float_value:
-                                {
-                                    more = visitor.double_value(data_.data(float_array_arg)[index_]);
-                                    break;
-                                }
-                                case typed_array_type::double_value:
-                                {
-                                    more = visitor.double_value(data_.data(double_array_arg)[index_]);
-                                    break;
-                                }
-                                default:
-                                    break;
+                                visitor.uint64_value(data_.data(uint8_array_arg)[i]);
                             }
-                            ++index_;
+                            break;
                         }
-                        else
+                        case typed_array_type::uint16_value:
                         {
-                            more = visitor.end_array();
-                            state_ = item_event_reader_state();
-                            data_ = typed_array_view();
-                            index_ = 0;
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.uint64_value(data_.data(uint16_array_arg)[i]);
+                            }
+                            break;
                         }
+                        case typed_array_type::uint32_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.uint64_value(data_.data(uint32_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::uint64_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.uint64_value(data_.data(uint64_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::int8_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.int64_value(data_.data(int8_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::int16_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.int64_value(data_.data(int16_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::int32_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.int64_value(data_.data(int32_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::int64_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.int64_value(data_.data(int64_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::float_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.double_value(data_.data(float_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        case typed_array_type::double_value:
+                        {
+                            for (auto i = index_; i < len; ++i) 
+                            {
+                                visitor.double_value(data_.data(double_array_arg)[i]);
+                            }
+                            break;
+                        }
+                        default:
+                            break;
                     }
+
+                    state_ = item_event_reader_state();
+                    data_ = typed_array_view();
+                    index_ = 0;
                 }
                 else
                 {
@@ -298,52 +318,52 @@ namespace jsoncons {
                     {
                         case typed_array_type::uint8_value:
                         {
-                            more = visitor.typed_array(data_.data(uint8_array_arg));
+                            visitor.typed_array(data_.data(uint8_array_arg));
                             break;
                         }
                         case typed_array_type::uint16_value:
                         {
-                            more = visitor.typed_array(data_.data(uint16_array_arg));
+                            visitor.typed_array(data_.data(uint16_array_arg));
                             break;
                         }
                         case typed_array_type::uint32_value:
                         {
-                            more = visitor.typed_array(data_.data(uint32_array_arg));
+                            visitor.typed_array(data_.data(uint32_array_arg));
                             break;
                         }
                         case typed_array_type::uint64_value:
                         {
-                            more = visitor.typed_array(data_.data(uint64_array_arg));
+                            visitor.typed_array(data_.data(uint64_array_arg));
                             break;
                         }
                         case typed_array_type::int8_value:
                         {
-                            more = visitor.typed_array(data_.data(int8_array_arg));
+                            visitor.typed_array(data_.data(int8_array_arg));
                             break;
                         }
                         case typed_array_type::int16_value:
                         {
-                            more = visitor.typed_array(data_.data(int16_array_arg));
+                            visitor.typed_array(data_.data(int16_array_arg));
                             break;
                         }
                         case typed_array_type::int32_value:
                         {
-                            more = visitor.typed_array(data_.data(int32_array_arg));
+                            visitor.typed_array(data_.data(int32_array_arg));
                             break;
                         }
                         case typed_array_type::int64_value:
                         {
-                            more = visitor.typed_array(data_.data(int64_array_arg));
+                            visitor.typed_array(data_.data(int64_array_arg));
                             break;
                         }
                         case typed_array_type::float_value:
                         {
-                            more = visitor.typed_array(data_.data(float_array_arg));
+                            visitor.typed_array(data_.data(float_array_arg));
                             break;
                         }
                         case typed_array_type::double_value:
                         {
-                            more = visitor.typed_array(data_.data(double_array_arg));
+                            visitor.typed_array(data_.data(double_array_arg));
                             break;
                         }
                         default:
@@ -356,9 +376,8 @@ namespace jsoncons {
             }
             else
             {
-                more = event().send_value_event(visitor, context, ec);
+                event().send_value_event(visitor, context, ec);
             }
-            return more;
         }
 
     private:

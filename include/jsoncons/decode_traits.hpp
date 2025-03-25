@@ -38,8 +38,8 @@ namespace jsoncons {
     {
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>& decoder, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             decoder.reset();
             cursor.read_to(decoder, ec);
@@ -66,8 +66,8 @@ namespace jsoncons {
     {
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>&, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>&, 
+            std::error_code& ec)
         {
             T v = cursor.current().template get<T>(ec);
             return v;
@@ -84,8 +84,8 @@ namespace jsoncons {
     {
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>&, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>&, 
+            std::error_code& ec)
         {
             T v = cursor.current().template get<T>(ec);
             return v;
@@ -100,8 +100,8 @@ namespace jsoncons {
     {
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>&, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>&, 
+            std::error_code& ec)
         {
             auto val = cursor.current().template get<std::basic_string<CharT>>(ec);
             T s;
@@ -120,8 +120,8 @@ namespace jsoncons {
     {
         template <typename Json,typename TempAllocator >
         static std::pair<T1, T2> decode(basic_staj_cursor<CharT>& cursor,
-                                        json_decoder<Json, TempAllocator>& decoder,
-                                        std::error_code& ec)
+            json_decoder<Json, TempAllocator>& decoder,
+            std::error_code& ec)
         {
             using value_type = std::pair<T1, T2>;
             cursor.array_expected(ec);
@@ -170,8 +170,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>& decoder, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             T v;
 
@@ -206,13 +206,13 @@ namespace jsoncons {
         using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(false,conv_errc::not_vector), v_(v), level_(0)
+            : default_json_visitor(), v_(v), level_(0)
         {
         }
     private:
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, 
-                               const ser_context&, 
-                               std::error_code& ec) override
+            const ser_context&, 
+            std::error_code& ec) override
         {      
             if (++level_ != 1)
             {
@@ -223,9 +223,9 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t size, 
-                            semantic_tag, 
-                            const ser_context&, 
-                            std::error_code& ec) override
+            semantic_tag, 
+            const ser_context&, 
+            std::error_code& ec) override
         {
             if (++level_ != 1)
             {
@@ -240,7 +240,7 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
-                          std::error_code& ec) override
+            std::error_code& ec) override
         {
             if (level_ != 1)
             {
@@ -251,27 +251,27 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
-                             semantic_tag, 
-                             const ser_context&,
-                             std::error_code&) override
+            semantic_tag, 
+            const ser_context&,
+            std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
             JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
-                            semantic_tag,
-                            const ser_context&,
-                            std::error_code&) override
+            semantic_tag,
+            const ser_context&,
+            std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
             JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
-                           semantic_tag,
-                           const ser_context&,
-                           std::error_code&) override
+            semantic_tag,
+            const ser_context&,
+            std::error_code&) override
         {
             return visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
         }
@@ -289,18 +289,18 @@ namespace jsoncons {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
-                             semantic_tag,
-                             const ser_context&,
-                             std::error_code&) override
+            semantic_tag,
+            const ser_context&,
+            std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
             JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const value_type>& data,  
-                            semantic_tag,
-                            const ser_context&,
-                            std::error_code&) override
+            semantic_tag,
+            const ser_context&,
+            std::error_code&) override
         {
             v_ = std::vector<value_type>(data.begin(),data.end());
             return false;
@@ -330,8 +330,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>&, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>&, 
+            std::error_code& ec)
         {
             cursor.array_expected(ec);
             if (ec)
@@ -404,8 +404,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>&, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>&, 
+            std::error_code& ec)
         {
             cursor.array_expected(ec);
             if (ec)
@@ -456,8 +456,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>& decoder, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             T v;
 
@@ -506,8 +506,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static std::array<T, N> decode(basic_staj_cursor<CharT>& cursor, 
-                                       json_decoder<Json,TempAllocator>& decoder, 
-                                       std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             std::array<T,N> v;
             cursor.array_expected(ec);
@@ -550,8 +550,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>& decoder, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
@@ -609,8 +609,8 @@ namespace jsoncons {
 
         template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
-                        json_decoder<Json,TempAllocator>& decoder, 
-                        std::error_code& ec)
+            json_decoder<Json,TempAllocator>& decoder, 
+            std::error_code& ec)
         {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
