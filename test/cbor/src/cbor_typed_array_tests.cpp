@@ -54,7 +54,7 @@ private:
     {
         //std::cout << "visit_typed_array size: " << data.size() << "\n";
         v = std::vector<double>(data.begin(),data.end());
-        return false;
+        JSONCONS_VISITOR_RETURN
     }
 };
 

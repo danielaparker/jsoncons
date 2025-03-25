@@ -188,29 +188,39 @@ namespace detail {
         parse_event& operator=(const parse_event&) = default;
         parse_event& operator=(parse_event&&) = default;
 
-        bool replay(basic_json_visitor<CharT>& visitor) const
+        void replay(basic_json_visitor<CharT>& visitor) const
         {
             switch (event_type)
             {
                 case staj_event_type::begin_array:
-                    return visitor.begin_array(tag, ser_context());
+                    visitor.begin_array(tag, ser_context());
+                    break;
                 case staj_event_type::end_array:
-                    return visitor.end_array(ser_context());
+                    visitor.end_array(ser_context());
+                    break;
                 case staj_event_type::string_value:
-                    return visitor.string_value(string_value, tag, ser_context());
+                    visitor.string_value(string_value, tag, ser_context());
+                    break;
                 case staj_event_type::byte_string_value:
+                    visitor.byte_string_value(byte_string_value, tag, ser_context());
+                    break;
                 case staj_event_type::null_value:
-                    return visitor.null_value(tag, ser_context());
+                    visitor.null_value(tag, ser_context());
+                    break;
                 case staj_event_type::bool_value:
-                    return visitor.bool_value(bool_value, tag, ser_context());
+                    visitor.bool_value(bool_value, tag, ser_context());
+                    break;
                 case staj_event_type::int64_value:
-                    return visitor.int64_value(int64_value, tag, ser_context());
+                    visitor.int64_value(int64_value, tag, ser_context());
+                    break;
                 case staj_event_type::uint64_value:
-                    return visitor.uint64_value(uint64_value, tag, ser_context());
+                    visitor.uint64_value(uint64_value, tag, ser_context());
+                    break;
                 case staj_event_type::double_value:
-                    return visitor.double_value(double_value, tag, ser_context());
+                    visitor.double_value(double_value, tag, ser_context());
+                    break;
                 default:
-                    return false;
+                    break;
             }
         }
     };
@@ -373,13 +383,13 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
@@ -411,7 +421,7 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override

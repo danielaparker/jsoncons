@@ -217,7 +217,7 @@ namespace jsoncons {
             if (++level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             JSONCONS_VISITOR_RETURN
         }
@@ -230,7 +230,7 @@ namespace jsoncons {
             if (++level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
             if (size > 0)
             {
@@ -245,9 +245,9 @@ namespace jsoncons {
             if (level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                return false;
+                JSONCONS_VISITOR_RETURN
             }
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
@@ -303,7 +303,7 @@ namespace jsoncons {
             std::error_code&) override
         {
             v_ = std::vector<value_type>(data.begin(),data.end());
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
 
         static

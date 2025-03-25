@@ -280,7 +280,7 @@ private:
         if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = csv_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         } 
         
         // legacy        
@@ -331,7 +331,7 @@ private:
             default: // error
                 //std::cout << "visit_begin_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
-                return false;
+                JSONCONS_VISITOR_RETURN
         }
         JSONCONS_VISITOR_RETURN
     }
@@ -477,7 +477,7 @@ private:
             default:
                 //std::cout << "visit_end_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
-                return false;
+                JSONCONS_VISITOR_RETURN
         }
         stack_.pop_back();
         if (!stack_.empty())
@@ -504,7 +504,7 @@ private:
         if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = csv_errc::max_nesting_depth_exceeded;
-            return false;
+            JSONCONS_VISITOR_RETURN
         }
         // legacy        
         if (has_column_names_ && stack_.back().count_ == 0)
@@ -613,7 +613,7 @@ private:
             default: // error
                 //std::cout << "visit_begin_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
-                return false;
+                JSONCONS_VISITOR_RETURN
         }
         JSONCONS_VISITOR_RETURN
     }
@@ -739,7 +739,7 @@ private:
             default:
                 //std::cout << "visit_end_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
-                return false;
+                JSONCONS_VISITOR_RETURN
         }
         stack_.pop_back();
 
@@ -1062,7 +1062,7 @@ private:
                 write_double_value(val, context, value_buffer_, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
-                    return false;
+                    JSONCONS_VISITOR_RETURN
                 }
                 sink_.append(value_buffer_.data(), value_buffer_.size());
                 break;

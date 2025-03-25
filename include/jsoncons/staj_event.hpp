@@ -529,40 +529,53 @@ public:
         }
     }
     
-    bool send_value_event(basic_item_event_visitor<CharT>& visitor,
+    void send_value_event(basic_item_event_visitor<CharT>& visitor,
         const ser_context& context,
         std::error_code& ec) const
     {
         switch (event_type())
         {
             case staj_event_type::key:
-                return visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+                visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+                break;
             case staj_event_type::begin_array:
-                return visitor.begin_array(tag(), context);
+                visitor.begin_array(tag(), context);
+                break;
             case staj_event_type::end_array:
-                return visitor.end_array(context);
+                visitor.end_array(context);
+                break;
             case staj_event_type::begin_object:
-                return visitor.begin_object(tag(), context, ec);
+                visitor.begin_object(tag(), context, ec);
+                break;
             case staj_event_type::end_object:
-                return visitor.end_object(context, ec);
+                visitor.end_object(context, ec);
+                break;
             case staj_event_type::string_value:
-                return visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+                visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+                break;
             case staj_event_type::byte_string_value:
-                return visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
+                visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
+                break;
             case staj_event_type::null_value:
-                return visitor.null_value(tag(), context);
+                visitor.null_value(tag(), context);
+                break;
             case staj_event_type::bool_value:
-                return visitor.bool_value(value_.bool_value_, tag(), context);
+                visitor.bool_value(value_.bool_value_, tag(), context);
+                break;
             case staj_event_type::int64_value:
-                return visitor.int64_value(value_.int64_value_, tag(), context);
+                visitor.int64_value(value_.int64_value_, tag(), context);
+                break;
             case staj_event_type::uint64_value:
-                return visitor.uint64_value(value_.uint64_value_, tag(), context);
+                visitor.uint64_value(value_.uint64_value_, tag(), context);
+                break;
             case staj_event_type::half_value:
-                return visitor.half_value(value_.half_value_, tag(), context);
+                visitor.half_value(value_.half_value_, tag(), context);
+                break;
             case staj_event_type::double_value:
-                return visitor.double_value(value_.double_value_, tag(), context);
+                visitor.double_value(value_.double_value_, tag(), context);
+                break;
             default:
-                return false;
+                break;
         }
     }
 
