@@ -208,83 +208,113 @@ public:
         }
     }
 
-    bool dump(basic_json_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
+    void dump(basic_json_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
     {
-        bool more = true;
         if (is_typed_array())
         {
             if (index_ != 0)
             {
                 event().send_json_event(visitor, context, ec);
-                while (more)
+                const std::size_t len = data_.size();
+                switch (data_.type())
                 {
-                    if (index_ < data_.size())
+                    case typed_array_type::uint8_value:
                     {
-                        switch (data_.type())
+                        while (index_ < len)
                         {
-                            case typed_array_type::uint8_value:
-                            {
-                                more = visitor.uint64_value(data_.data(uint8_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::uint16_value:
-                            {
-                                more = visitor.uint64_value(data_.data(uint16_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::uint32_value:
-                            {
-                                more = visitor.uint64_value(data_.data(uint32_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::uint64_value:
-                            {
-                                more = visitor.uint64_value(data_.data(uint64_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::int8_value:
-                            {
-                                more = visitor.int64_value(data_.data(int8_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::int16_value:
-                            {
-                                more = visitor.int64_value(data_.data(int16_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::int32_value:
-                            {
-                                more = visitor.int64_value(data_.data(int32_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::int64_value:
-                            {
-                                more = visitor.int64_value(data_.data(int64_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::float_value:
-                            {
-                                more = visitor.double_value(data_.data(float_array_arg)[index_]);
-                                break;
-                            }
-                            case typed_array_type::double_value:
-                            {
-                                more = visitor.double_value(data_.data(double_array_arg)[index_]);
-                                break;
-                            }
-                            default:
-                                break;
+                            visitor.uint64_value(data_.data(uint8_array_arg)[index_]);
+                            ++index_;
                         }
-                        ++index_;
+                        break;
                     }
-                    else
+                    case typed_array_type::uint16_value:
                     {
-                        more = false;
-                        state_ = staj_cursor_state();
-                        data_ = typed_array_view();
-                        index_ = 0;
+                        while (index_ < len)
+                        {
+                            visitor.uint64_value(data_.data(uint16_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
                     }
+                    case typed_array_type::uint32_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.uint64_value(data_.data(uint32_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::uint64_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.uint64_value(data_.data(uint64_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::int8_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.int64_value(data_.data(int8_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::int16_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.int64_value(data_.data(int16_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::int32_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.int64_value(data_.data(int32_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::int64_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.int64_value(data_.data(int64_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::float_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.double_value(data_.data(float_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    case typed_array_type::double_value:
+                    {
+                        while (index_ < len)
+                        {
+                            visitor.double_value(data_.data(double_array_arg)[index_]);
+                            ++index_;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
                 }
+                
+                state_ = staj_cursor_state();
+                data_ = typed_array_view();
+                index_ = 0;
             }
             else
             {
@@ -292,52 +322,52 @@ public:
                 {
                     case typed_array_type::uint8_value:
                     {
-                        more = visitor.typed_array(data_.data(uint8_array_arg));
+                        visitor.typed_array(data_.data(uint8_array_arg));
                         break;
                     }
                     case typed_array_type::uint16_value:
                     {
-                        more = visitor.typed_array(data_.data(uint16_array_arg));
+                        visitor.typed_array(data_.data(uint16_array_arg));
                         break;
                     }
                     case typed_array_type::uint32_value:
                     {
-                        more = visitor.typed_array(data_.data(uint32_array_arg));
+                        visitor.typed_array(data_.data(uint32_array_arg));
                         break;
                     }
                     case typed_array_type::uint64_value:
                     {
-                        more = visitor.typed_array(data_.data(uint64_array_arg));
+                        visitor.typed_array(data_.data(uint64_array_arg));
                         break;
                     }
                     case typed_array_type::int8_value:
                     {
-                        more = visitor.typed_array(data_.data(int8_array_arg));
+                        visitor.typed_array(data_.data(int8_array_arg));
                         break;
                     }
                     case typed_array_type::int16_value:
                     {
-                        more = visitor.typed_array(data_.data(int16_array_arg));
+                        visitor.typed_array(data_.data(int16_array_arg));
                         break;
                     }
                     case typed_array_type::int32_value:
                     {
-                        more = visitor.typed_array(data_.data(int32_array_arg));
+                        visitor.typed_array(data_.data(int32_array_arg));
                         break;
                     }
                     case typed_array_type::int64_value:
                     {
-                        more = visitor.typed_array(data_.data(int64_array_arg));
+                        visitor.typed_array(data_.data(int64_array_arg));
                         break;
                     }
                     case typed_array_type::float_value:
                     {
-                        more = visitor.typed_array(data_.data(float_array_arg));
+                        visitor.typed_array(data_.data(float_array_arg));
                         break;
                     }
                     case typed_array_type::double_value:
                     {
-                        more = visitor.typed_array(data_.data(double_array_arg));
+                        visitor.typed_array(data_.data(double_array_arg));
                         break;
                     }
                     default:
@@ -350,9 +380,8 @@ public:
         }
         else
         {
-            more = event().send_json_event(visitor, context, ec);
+            event().send_json_event(visitor, context, ec);
         }
-        return more;
     }
 
 private:
