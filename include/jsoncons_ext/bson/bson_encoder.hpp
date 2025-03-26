@@ -460,11 +460,11 @@ private:
                 }
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
-                JSONCONS_VISITOR_RETURN
+                break;
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val,std::back_inserter(buffer_));
-                JSONCONS_VISITOR_RETURN
+                break;
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
@@ -472,7 +472,7 @@ private:
                     val /= nanos_in_milli;
                 }
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-                JSONCONS_VISITOR_RETURN
+                break;
             default:
             {
                 if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
@@ -485,9 +485,10 @@ private:
                     before_value(jsoncons::bson::bson_type::int64_type);
                     binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 }
-                JSONCONS_VISITOR_RETURN
+                break;
             }
         }
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
@@ -544,8 +545,8 @@ private:
                 }
                 break;
             }
-            JSONCONS_VISITOR_RETURN
         }
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
