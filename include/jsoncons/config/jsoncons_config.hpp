@@ -228,13 +228,13 @@ namespace jsoncons {
 #define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_WIDEN(Str))
 
 
-#if defined(JSONCONS_VISITOR_NO_RETURN) 
+#if defined(JSONCONS_VISITOR_VOID_RETURN) 
 #define JSONCONS_VISITOR_RET_TYPE void 
 #else 
 #define JSONCONS_VISITOR_RET_TYPE bool  
 #endif
 
-#if defined(JSONCONS_VISITOR_NO_RETURN) 
+#if defined(JSONCONS_VISITOR_VOID_RETURN) 
 #define JSONCONS_VISITOR_RET_STAT return
 #else 
 #define JSONCONS_VISITOR_RET_STAT return true 

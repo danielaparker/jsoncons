@@ -3766,7 +3766,7 @@ namespace detail {
             }
 
             Json evaluate(reference doc, 
-                const std::vector<std::pair<std::string,Json>>& params) const
+                const std::map<string_type,Json>& params) const
             {
                 if (output_stack_.empty())
                 {
@@ -3793,7 +3793,7 @@ namespace detail {
             }
 
             Json evaluate(reference doc, 
-                const std::vector<std::pair<std::string,Json>>& params,
+                const std::map<string_type,Json>& params,
                 std::error_code& ec) const
             {
                 if (output_stack_.empty())
@@ -3806,7 +3806,7 @@ namespace detail {
                 {
                     context.set_variable(param.first, param.second);
                 }
-                
+
                 return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
             }
         };

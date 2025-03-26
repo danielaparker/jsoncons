@@ -7,17 +7,31 @@ template <typename Json>
 class jmespath_expression
 ```
 
+#### Member types
+
+Type                       |Definition
+---------------------------|------------------------------
+char_type                  |Json::char_type
+string_type                |std::basic_json<char_type>
+
 #### Member functions
 
     Json evaluate(reference doc) const;                                    (1)
 
     Json evaluate(reference doc, 
-        const std::vector<std::pair<std::string,Json>>& params) const;     (2)
+        const std::vector<std::pair<std::string,Json>>& params) const;           (until 1.3.1)  
+                                                                           (2)
+    Json evaluate(reference doc, 
+        const std::map<string_type,Json>& params) const;                         (since 1.3.1) 
                                                             
     Json evaluate(reference doc, std::error_code& ec) const;               (3)
                                                             
     Json evaluate(reference doc, 
-        const std::vector<std::pair<std::string,Json>>& params,            (4)
+        const std::vector<std::pair<std::string,Json>>& params,                  (until 1.3.1)
+        std::error_code& ec) const;    
+                                                                           (4)
+    Json evaluate(reference doc, 
+        const std::map<string_type,Json>& params,                                (since 1.3.1)
         std::error_code& ec) const;    
 
 #### Parameters
