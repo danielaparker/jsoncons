@@ -235,7 +235,7 @@ namespace jsoncons {
 #endif
 
 #if !defined(JSONCONS_VISITOR_NO_RETURN) 
-#define JSONCONS_VISITOR_RETURN 
+#define JSONCONS_VISITOR_RETURN return;
 #else 
 #define JSONCONS_VISITOR_RETURN return true; 
 #endif
