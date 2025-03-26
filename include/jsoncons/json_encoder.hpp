@@ -1366,9 +1366,9 @@ namespace detail {
                     {
                         write_bigint_value(sv);
                         break;
-            }
-            JSONCONS_FALLTHROUGH;
-        }
+                    }
+                    JSONCONS_FALLTHROUGH;
+                }
                 default:
                 {
                     sink_.push_back('\"');

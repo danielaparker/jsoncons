@@ -916,12 +916,12 @@ private:
             case semantic_tag::bigdec:
             {
                 write_decimal_value(sv, context, ec);
-                JSONCONS_VISITOR_RETURN
+                break;
             }
             case semantic_tag::bigfloat:
             {
                 write_hexfloat_value(sv, context, ec);
-                JSONCONS_VISITOR_RETURN
+                break;
             }
             case semantic_tag::datetime:
             {
