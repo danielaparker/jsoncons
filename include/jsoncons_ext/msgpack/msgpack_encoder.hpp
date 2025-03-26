@@ -252,7 +252,8 @@ namespace msgpack {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
         {
-            return visit_string(name, semantic_tag::none, context, ec);
+            visit_string(name, semantic_tag::none, context, ec);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) final
@@ -404,9 +405,9 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                               semantic_tag, 
-                               const ser_context&,
-                               std::error_code&) final
+            semantic_tag, 
+            const ser_context&,
+            std::error_code&) final
         {
 
             const std::size_t length = b.size();
@@ -439,9 +440,9 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                               uint64_t ext_tag, 
-                               const ser_context&,
-                               std::error_code&) final
+            uint64_t ext_tag, 
+            const ser_context&,
+            std::error_code&) final
         {
             const std::size_t length = b.size();
             switch (length)
@@ -498,9 +499,9 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
-                             semantic_tag,
-                             const ser_context&,
-                             std::error_code&) final
+            semantic_tag,
+            const ser_context&,
+            std::error_code&) final
         {
             float valf = (float)val;
             if ((double)valf == val)
@@ -523,9 +524,9 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, 
-                         semantic_tag tag, 
-                         const ser_context&,
-                         std::error_code&) final
+            semantic_tag tag, 
+            const ser_context&,
+            std::error_code&) final
         {
             switch (tag)
             {
@@ -644,9 +645,9 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
-                          semantic_tag tag, 
-                          const ser_context&,
-                          std::error_code&) final
+            semantic_tag tag, 
+            const ser_context&,
+            std::error_code&) final
         {
             switch (tag)
             {

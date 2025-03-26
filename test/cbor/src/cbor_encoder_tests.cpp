@@ -312,72 +312,72 @@ TEST_CASE("Too many and too few items in CBOR map or array")
 
     SECTION("Too many items in array")
     {
-        CHECK(encoder.begin_array(3));
-        CHECK(encoder.bool_value(true));
-        CHECK(encoder.bool_value(false));
-        CHECK(encoder.null_value());
-        CHECK(encoder.begin_array(2));
-        CHECK(encoder.string_value("cat"));
-        CHECK(encoder.string_value("feline"));
-        CHECK(encoder.end_array());
+        encoder.begin_array(3);
+        encoder.bool_value(true);
+        encoder.bool_value(false);
+        encoder.null_value();
+        encoder.begin_array(2);
+        encoder.string_value("cat");
+        encoder.string_value("feline");
+        encoder.end_array();
         REQUIRE_THROWS_WITH(encoder.end_array(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in array")
     {
-        CHECK(encoder.begin_array(5));
-        CHECK(encoder.bool_value(true));
-        CHECK(encoder.bool_value(false));
-        CHECK(encoder.null_value());
-        CHECK(encoder.begin_array(2));
-        CHECK(encoder.string_value("cat"));
-        CHECK(encoder.string_value("feline"));
-        CHECK(encoder.end_array());
+        encoder.begin_array(5);
+        encoder.bool_value(true);
+        encoder.bool_value(false);
+        encoder.null_value();
+        encoder.begin_array(2);
+        encoder.string_value("cat");
+        encoder.string_value("feline");
+        encoder.end_array();
         REQUIRE_THROWS_WITH(encoder.end_array(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_few_items).c_str());
         encoder.flush();
     }
     SECTION("Too many items in map")
     {
-        CHECK(encoder.begin_object(3));
-        CHECK(encoder.key("a"));
-        CHECK(encoder.bool_value(true));
-        CHECK(encoder.key("b"));
-        CHECK(encoder.bool_value(false));
-        CHECK(encoder.key("c"));
-        CHECK(encoder.null_value());
-        CHECK(encoder.key("d"));
-        CHECK(encoder.begin_array(2));
-        CHECK(encoder.string_value("cat"));
-        CHECK(encoder.string_value("feline"));
-        CHECK(encoder.end_array());
+        encoder.begin_object(3);
+        encoder.key("a");
+        encoder.bool_value(true);
+        encoder.key("b");
+        encoder.bool_value(false);
+        encoder.key("c");
+        encoder.null_value();
+        encoder.key("d");
+        encoder.begin_array(2);
+        encoder.string_value("cat");
+        encoder.string_value("feline");
+        encoder.end_array();
         REQUIRE_THROWS_WITH(encoder.end_object(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in map")
     {
-        CHECK(encoder.begin_object(5));
-        CHECK(encoder.key("a"));
-        CHECK(encoder.bool_value(true));
-        CHECK(encoder.key("b"));
-        CHECK(encoder.bool_value(false));
-        CHECK(encoder.key("c"));
-        CHECK(encoder.null_value());
-        CHECK(encoder.key("d"));
-        CHECK(encoder.begin_array(2));
-        CHECK(encoder.string_value("cat"));
-        CHECK(encoder.string_value("feline"));
-        CHECK(encoder.end_array());
+        encoder.begin_object(5);
+        encoder.key("a");
+        encoder.bool_value(true);
+        encoder.key("b");
+        encoder.bool_value(false);
+        encoder.key("c");
+        encoder.null_value();
+        encoder.key("d");
+        encoder.begin_array(2);
+        encoder.string_value("cat");
+        encoder.string_value("feline");
+        encoder.end_array();
         REQUIRE_THROWS_WITH(encoder.end_object(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_few_items).c_str());
         encoder.flush();
     }
     SECTION("Just enough items")
     {
-        CHECK(encoder.begin_array(4)); // a fixed length array
-        CHECK(encoder.string_value("foo"));
-        CHECK(encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'})); // no suggested conversion
-        CHECK(encoder.string_value("-18446744073709551617", semantic_tag::bigint));
-        CHECK(encoder.string_value("273.15", semantic_tag::bigdec));
-        CHECK(encoder.end_array());
+        encoder.begin_array(4); // a fixed length array
+        encoder.string_value("foo");
+        encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
+        encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+        encoder.string_value("273.15", semantic_tag::bigdec);
+        encoder.end_array();
         CHECK_FALSE(ec);
         encoder.flush();
     }

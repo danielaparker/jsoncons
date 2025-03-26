@@ -443,7 +443,7 @@ namespace detail {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = json_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -534,7 +534,7 @@ namespace detail {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = json_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -693,7 +693,7 @@ namespace detail {
             JSONCONS_VISITOR_RETURN
         }
 
-        bool write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
+        void write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
         {
             switch (tag)
             {
@@ -706,10 +706,10 @@ namespace detail {
                     if (options_.bignum_format() == bignum_format_kind::raw)
                     {
                         write_bigint_value(sv);
-                break;
-            }
-            JSONCONS_FALLTHROUGH;
-        }
+                        break;
+                    }
+                    JSONCONS_FALLTHROUGH;
+                }
                 default:
                 {
                     sink_.push_back('\"');
@@ -719,8 +719,6 @@ namespace detail {
                     break;
                 }
             }
-
-            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
@@ -1200,7 +1198,7 @@ namespace detail {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = json_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1233,7 +1231,7 @@ namespace detail {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = json_errc::max_nesting_depth_exceeded;
-                return false;
+                JSONCONS_VISITOR_RETURN
             } 
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1387,7 +1385,7 @@ namespace detail {
             JSONCONS_VISITOR_RETURN
         }
 
-        bool write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
+        void write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
         {
             switch (tag)
             {
@@ -1401,9 +1399,9 @@ namespace detail {
                     {
                         write_bigint_value(sv);
                         break;
-            }
-            JSONCONS_FALLTHROUGH;
-        }
+                    }
+                    JSONCONS_FALLTHROUGH;
+                }
                 default:
                 {
                     sink_.push_back('\"');
@@ -1412,7 +1410,6 @@ namespace detail {
                     break;
                 }
             }
-            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 

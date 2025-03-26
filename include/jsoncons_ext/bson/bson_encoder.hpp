@@ -377,9 +377,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                           semantic_tag, 
-                           const ser_context&,
-                           std::error_code& ec) override
+        semantic_tag, 
+        const ser_context&,
+        std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -405,9 +405,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                           uint64_t ext_tag, 
-                           const ser_context&,
-                           std::error_code& ec) override
+        uint64_t ext_tag, 
+        const ser_context&,
+        std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -433,9 +433,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, 
-                     semantic_tag tag, 
-                     const ser_context&,
-                     std::error_code& ec) override
+        semantic_tag tag, 
+        const ser_context&,
+        std::error_code& ec) override
     {
         static constexpr int64_t min_value_div_1000 = (std::numeric_limits<int64_t>::min)() / 1000;
         static constexpr int64_t max_value_div_1000 = (std::numeric_limits<int64_t>::max)() / 1000;
@@ -491,9 +491,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
-                      semantic_tag tag, 
-                      const ser_context&,
-                      std::error_code& ec) override
+        semantic_tag tag, 
+        const ser_context&,
+        std::error_code& ec) override
     {
         static constexpr uint64_t max_value_div_1000 = (std::numeric_limits<uint64_t>::max)() / 1000;
         if (stack_.empty())
@@ -543,17 +543,17 @@ private:
                 else
                 {
                     ec = bson_errc::number_too_large;
-                    more = false;
+                    JSONCONS_VISITOR_RETURN;
                 }
-                return more;
+                JSONCONS_VISITOR_RETURN;
             }
         }
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
-                      semantic_tag,
-                      const ser_context&,
-                      std::error_code& ec) override
+        semantic_tag,
+        const ser_context&,
+        std::error_code& ec) override
     {
         if (stack_.empty())
         {

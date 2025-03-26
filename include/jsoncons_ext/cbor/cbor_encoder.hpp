@@ -431,7 +431,8 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
     {
-        return visit_string(name, semantic_tag::none, context, ec);
+        visit_string(name, semantic_tag::none, context, ec);
+        JSONCONS_VISITOR_RETURN
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
@@ -1151,7 +1152,8 @@ private:
         {
             case semantic_tag::epoch_milli:
             case semantic_tag::epoch_nano:
-                return visit_double(static_cast<double>(value), tag, context, ec);
+                visit_double(static_cast<double>(value), tag, context, ec);
+                break;
             case semantic_tag::epoch_second:
                 write_tag(1);
                 break;
@@ -1172,7 +1174,8 @@ private:
         {
             case semantic_tag::epoch_milli:
             case semantic_tag::epoch_nano:
-                return visit_double(static_cast<double>(value), tag, context, ec);
+                visit_double(static_cast<double>(value), tag, context, ec);
+                break;
             case semantic_tag::epoch_second:
                 write_tag(1);
                 break;

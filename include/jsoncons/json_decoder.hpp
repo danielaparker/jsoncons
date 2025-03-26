@@ -255,9 +255,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                           uint64_t ext_tag, 
-                           const ser_context&,
-                           std::error_code&) override
+        uint64_t ext_tag, 
+        const ser_context&,
+        std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -274,9 +274,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
-                        semantic_tag tag, 
-                        const ser_context&,
-                        std::error_code&) override
+        semantic_tag tag, 
+        const ser_context&,
+        std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -293,9 +293,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
-                         semantic_tag tag, 
-                         const ser_context&,
-                         std::error_code&) override
+        semantic_tag tag, 
+        const ser_context&,
+        std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -312,9 +312,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
-                       semantic_tag tag,   
-                       const ser_context&,
-                       std::error_code&) override
+        semantic_tag tag,   
+        const ser_context&,
+        std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -331,9 +331,9 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
-                         semantic_tag tag,   
-                         const ser_context&,
-                         std::error_code&) override
+        semantic_tag tag,   
+        const ser_context&,
+        std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {

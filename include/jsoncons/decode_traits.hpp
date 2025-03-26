@@ -273,19 +273,18 @@ namespace jsoncons {
             const ser_context&,
             std::error_code&) override
         {
-            return visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+            visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+            JSONCONS_VISITOR_RETURN
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_half_(std::true_type, uint16_t value)
+        void visit_half_(std::true_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(value));
-            JSONCONS_VISITOR_RETURN
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_half_(std::false_type, uint16_t value)
+        void visit_half_(std::false_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(binary::decode_half(value)));
-            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 

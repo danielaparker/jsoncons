@@ -49,7 +49,7 @@ namespace {
             return aNormalizedPath;
         }
 
-        bool custom_visit(const ser_context& context)
+        void custom_visit(const ser_context& context)
         {
             if (check)
             {
@@ -74,7 +74,6 @@ namespace {
                 positions_.push_back(context.position());
             }
             alreadyUpdated = false;
-            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
@@ -133,7 +132,8 @@ namespace {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type&, jsoncons::semantic_tag, const jsoncons::ser_context& context, std::error_code&) override
         {
-            return custom_visit(context);
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
@@ -143,22 +143,26 @@ namespace {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, semantic_tag, const ser_context& context, std::error_code&) override
         {
-            return custom_visit(context);
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t, semantic_tag, const ser_context& context, std::error_code&) override
         {
-            return custom_visit(context);
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double, semantic_tag, const ser_context& context, std::error_code&) override
         {
-            return custom_visit(context);
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool, semantic_tag, const ser_context& context, std::error_code&) override
         {
-            return custom_visit(context);
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN
         }
     };
 
