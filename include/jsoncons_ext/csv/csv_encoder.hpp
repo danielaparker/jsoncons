@@ -307,7 +307,7 @@ private:
                 break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
-                JSONCONS_VISITOR_RETURN
+                break;
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object);
                 break;
