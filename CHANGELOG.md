@@ -4,7 +4,7 @@
 - API Change
 
     - In JMESPath evaluation, 1.3.0 introduced late binding of variables to an initial (global) scope via parameters.
-      The parameter type has been changed from `std::vector<std::pair<std::string,Json>>` to `std::map<Json::char_type,Json>`.
+      The parameter type has been changed from `std::vector<std::pair<string_type,Json>>` to `std::map<string_type,Json>`.
 
 1.3.0
 -----
