@@ -161,7 +161,7 @@ TEST_CASE("m_columns_test")
     json_decoder<ojson> decoder;
     auto options = csv::csv_options{}
         .assume_header(true)
-           .mapping_kind(csv::csv_mapping_kind::m_columns);
+        .mapping_kind(csv::csv_mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
     csv::csv_stream_reader reader(is, decoder, options);
@@ -190,8 +190,8 @@ TEST_CASE("csv ignore_empty_value")
         json_decoder<ojson> decoder;
         auto options = csv::csv_options{}
             .assume_header(true)
-               .ignore_empty_values(true)
-               .mapping_kind(csv::csv_mapping_kind::m_columns);
+            .ignore_empty_values(true)
+            .mapping_kind(csv::csv_mapping_kind::m_columns);
 
         std::istringstream is(bond_yields);
         csv::csv_stream_reader reader(is, decoder, options);
@@ -1622,3 +1622,24 @@ TEST_CASE("csv_parser number detection")
     }
 }
 
+TEST_CASE("csv_parser edge cases")
+{
+    SECTION("\r first line")
+    {
+        json_decoder<json> decoder;
+        std::string input = { 0x0D,0x20 };
+
+        auto options = csv::csv_options{}
+            .assume_header(true)
+            .mapping_kind(csv::csv_mapping_kind::n_rows);
+        csv::csv_string_reader reader(input, decoder, options);
+        
+        std::error_code ec;
+        reader.read(ec);
+        REQUIRE_FALSE(ec);
+        auto j = decoder.get_result();
+        REQUIRE(1 == j.size());
+        REQUIRE(1 == j[0].size());
+        CHECK(" " == j[0][0].as_string());
+    }
+}
