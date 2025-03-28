@@ -1624,7 +1624,7 @@ TEST_CASE("csv_parser number detection")
 
 TEST_CASE("csv_parser edge cases")
 {
-    SECTION("\r first line")
+    SECTION("\r first line, n_rows")
     {
         json_decoder<json> decoder;
         std::string input = { 0x0D,0x20 };
@@ -1642,10 +1642,10 @@ TEST_CASE("csv_parser edge cases")
         REQUIRE(1 == j[0].size());
         CHECK(" " == j[0][0].as_string());
     }
-    SECTION("\n first line")
+    SECTION("\n first line, n_rows")
     {
         json_decoder<json> decoder;
-        std::string input = { 0x0D,0x20 };
+        std::string input = { '\n',0x20 };
 
         auto options = csv::csv_options{}
             .assume_header(true)
@@ -1660,10 +1660,10 @@ TEST_CASE("csv_parser edge cases")
         REQUIRE(1 == j[0].size());
         CHECK(" " == j[0][0].as_string());
     }
-    SECTION("\r\n first line")
+    SECTION("\r\n first line, n_rows")
     {
         json_decoder<json> decoder;
-        std::string input = { 0x0D,0x20 };
+        std::string input = { '\r', '\n' ,0x20 };
 
         auto options = csv::csv_options{}
             .assume_header(true)
@@ -1677,5 +1677,23 @@ TEST_CASE("csv_parser edge cases")
         REQUIRE(1 == j.size());
         REQUIRE(1 == j[0].size());
         CHECK(" " == j[0][0].as_string());
+    }
+    SECTION("\r first line, n_objects")
+    {
+        json_decoder<json> decoder;
+        std::string input = { 0x0D,0x20 };
+
+        auto options = csv::csv_options{}
+            .assume_header(true)
+            .mapping_kind(csv::csv_mapping_kind::n_objects);
+        csv::csv_string_reader reader(input, decoder, options);
+
+        std::error_code ec;
+        reader.read(ec);
+        REQUIRE_FALSE(ec);
+        auto j = decoder.get_result();
+        REQUIRE(j.is_array());
+        REQUIRE(1 == j.size());
+        REQUIRE(j[0].empty());
     }
 }
