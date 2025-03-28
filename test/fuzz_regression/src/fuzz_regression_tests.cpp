@@ -796,8 +796,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK_FALSE(ec); //-V521
-
+        CHECK_FALSE(ec);
         //std::cout << visitor.get_result() << "" << '\n';
     }
 }
