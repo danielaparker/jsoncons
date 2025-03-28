@@ -661,7 +661,7 @@ TEST_CASE("oss-fuzz issues")
             }
         }
     }
-#endif
+
     // Fuzz target: fuzz_csv_encoder
     // Issue: Failed throw
     // Resolution: 
@@ -687,7 +687,6 @@ TEST_CASE("oss-fuzz issues")
     }
 }
 
-#if 0
 TEST_CASE("Fuzz target: fuzz_ubjson_encoder")
 {
     // Issue: Timeout
@@ -777,7 +776,30 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
             std::cout << e.what() << "" << '\n';
         }
     }
-}
 #endif
+
+    // Fuzz target: fuzz_csv
+    // Issue: abort
+    SECTION("Issue 406331596")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_csv-4925110364733440";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        json_decoder<json> visitor;
+
+        auto options = csv::csv_options{}
+            .assume_header(true)
+            .mapping_kind(csv::csv_mapping_kind::n_rows);
+        csv::csv_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK_FALSE(ec); //-V521
+
+        //std::cout << visitor.get_result() << "" << '\n';
+    }
+}
 
 

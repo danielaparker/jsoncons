@@ -36,9 +36,9 @@ TEST_CASE("csv subfield delimiter tests")
 
        auto options = csv::csv_options{}
            .assume_header(true)
-              .subfield_delimiter(';')
-              .quote_style(csv::quote_style_kind::nonnumeric)
-              .mapping_kind(csv::csv_mapping_kind::n_objects);
+           .subfield_delimiter(';')
+           .quote_style(csv::quote_style_kind::nonnumeric)
+           .mapping_kind(csv::csv_mapping_kind::n_objects);
 
        std::string output;
        csv::encode_csv(j, output, options);
