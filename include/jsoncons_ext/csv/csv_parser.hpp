@@ -576,10 +576,10 @@ private:
     const CharT* input_ptr_{nullptr};
     bool more_{true};
     std::size_t header_line_{1};
-    std::size_t comment_lines_{0};
     bool cursor_mode_{false};
     bool actual_cursor_mode_{false};
     int mark_level_{0};
+    std::size_t header_line_offset_{0};
 
     detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
@@ -966,7 +966,7 @@ public:
                             ++line_;
                             if (stack_.back() == csv_mode::header)
                             {
-                                ++comment_lines_;
+                                ++header_line_offset_;
                             }
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
@@ -976,7 +976,7 @@ public:
                             ++line_;
                             if (stack_.back() == csv_mode::header)
                             {
-                                ++comment_lines_;
+                                ++header_line_offset_;
                             }
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
@@ -1469,7 +1469,7 @@ private:
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }
-                if (line_ == (header_line_+comment_lines_))
+                if (line_ == (header_line_+header_line_offset_))
                 {
                     column_names_.push_back(buffer_);
                     if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows)
@@ -1502,7 +1502,7 @@ private:
     {
         offset_ = 0;
 
-        if (stack_.back() == csv_mode::header && line_ > (options_.header_lines()+comment_lines_))
+        if (stack_.back() == csv_mode::header && line_ > (options_.header_lines()+header_line_offset_))
         {
             stack_.back() = csv_mode::data;
         }
@@ -1512,7 +1512,7 @@ private:
                 switch (options_.mapping_kind())
                 {
                     case csv_mapping_kind::n_rows:
-                        if (options_.assume_header() && line_ == (header_line_+comment_lines_))
+                        if (options_.assume_header() && line_ == (header_line_+header_line_offset_))
                         {
                             visitor.begin_array(semantic_tag::none, *this, ec);
                             more_ = !cursor_mode_;
