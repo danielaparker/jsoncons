@@ -46,8 +46,8 @@ namespace cbor {
 
         template <typename Sourceable>
         cbor_event_reader(Sourceable&& source,
-                          const cbor_decode_options& options = cbor_decode_options(),
-                          const Allocator& alloc = Allocator())
+            const cbor_decode_options& options = cbor_decode_options(),
+            const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc)
         {
             parser_.cursor_mode(true);
@@ -60,31 +60,30 @@ namespace cbor {
         // Constructors that set parse error codes
 
         template <typename Sourceable>
-        cbor_event_reader(Sourceable&& source, 
-                          std::error_code& ec)
+        cbor_event_reader(Sourceable&& source, std::error_code& ec)
             : cbor_event_reader(std::allocator_arg, Allocator(),
-                                std::forward<Sourceable>(source), 
-                                cbor_decode_options(), 
-                                ec)
+                  std::forward<Sourceable>(source), 
+                  cbor_decode_options(), 
+                  ec)
         {
         }
 
         template <typename Sourceable>
         cbor_event_reader(Sourceable&& source, 
-                          const cbor_decode_options& options,
-                          std::error_code& ec)
+            const cbor_decode_options& options,
+            std::error_code& ec)
             : cbor_event_reader(std::allocator_arg, Allocator(),
-                                std::forward<Sourceable>(source), 
-                                options, 
-                                ec)
+                  std::forward<Sourceable>(source), 
+                  options, 
+                  ec)
         {
         }
 
         template <typename Sourceable>
         cbor_event_reader(std::allocator_arg_t, const Allocator& alloc, 
-                          Sourceable&& source,
-                          const cbor_decode_options& options,
-                          std::error_code& ec)
+            Sourceable&& source,
+            const cbor_decode_options& options,
+            std::error_code& ec)
            : parser_(std::forward<Sourceable>(source), options, alloc),
              eof_(false)
         {
@@ -171,8 +170,8 @@ namespace cbor {
             }
         }
 
-        void read_to(basic_item_event_visitor<char_type>& visitor,
-                     std::error_code& ec) override
+        void read_to(basic_item_event_visitor<char_type>& visitor, 
+            std::error_code& ec) override
         {
             if (is_typed_array())
             {
@@ -242,7 +241,7 @@ namespace cbor {
 
         friend
         staj2_filter_view operator|(cbor_event_reader& cursor, 
-                                   std::function<bool(const item_event&, const ser_context&)> pred)
+            std::function<bool(const item_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
         }

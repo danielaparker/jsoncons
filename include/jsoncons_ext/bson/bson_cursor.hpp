@@ -49,8 +49,8 @@ public:
 
     template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
-                      const bson_decode_options& options = bson_decode_options(),
-                      const Allocator& alloc = Allocator())
+        const bson_decode_options& options = bson_decode_options(),
+        const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc)
     {
         parser_.cursor_mode(true);
@@ -64,30 +64,30 @@ public:
 
     template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
-                      std::error_code& ec)
+        std::error_code& ec)
         : basic_bson_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Sourceable>(source), 
-                            bson_decode_options(), 
-                            ec)
+              std::forward<Sourceable>(source), 
+              bson_decode_options(), 
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
-                      const bson_decode_options& options,
-                      std::error_code& ec)
+        const bson_decode_options& options,
+        std::error_code& ec)
         : basic_bson_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Sourceable>(source), 
-                            options, 
-                            ec)
+              std::forward<Sourceable>(source), 
+              options, 
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Sourceable&& source,
-                      const bson_decode_options& options,
-                      std::error_code& ec)
+        Sourceable&& source,
+        const bson_decode_options& options,
+        std::error_code& ec)
        : parser_(std::forward<Sourceable>(source), options, alloc)
     {
         parser_.cursor_mode(true);
@@ -247,7 +247,7 @@ public:
 
     friend
     staj_filter_view operator|(basic_bson_cursor& cursor, 
-                               std::function<bool(const staj_event&, const ser_context&)> pred)
+        std::function<bool(const staj_event&, const ser_context&)> pred)
     {
         return staj_filter_view(cursor, pred);
     }

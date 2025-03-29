@@ -119,7 +119,7 @@ namespace jmespath {
         using pointer = typename Json::pointer;
     public:
         std::vector<std::unique_ptr<Json>>& temp_storage_;
-        std::map<std::string,const Json*> variables_;
+        std::map<string_type,const Json*> variables_;
 
     public:
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage)
@@ -128,19 +128,19 @@ namespace jmespath {
         }
 
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage, 
-            const std::map<std::string,const Json*>& variables)
+            const std::map<string_type,const Json*>& variables)
             : temp_storage_(temp_storage), variables_(variables)
         {
         }
         
         ~eval_context() noexcept = default;
         
-        void set_variable(const std::string& key, const Json& value)
+        void set_variable(const string_type& key, const Json& value)
         {
             variables_[key] = std::addressof(value);
         }
         
-        const Json& get_variable(const std::string& key, std::error_code& ec) const
+        const Json& get_variable(const string_type& key, std::error_code& ec) const
         {
             auto it = variables_.find(key);
             if (it == variables_.end())
@@ -304,11 +304,6 @@ namespace jmespath {
         }
 
         virtual void add_expression(expr_base_impl* expressions) = 0;
-
-        virtual std::string to_string(std::size_t = 0) const
-        {
-            return std::string("to_string not implemented");
-        }
     };  
 
     // parameter
@@ -483,11 +478,6 @@ namespace jmespath {
         {
             return false;
         }
-        
-        virtual std::string to_string(std::size_t = 0) const
-        {
-            return std::string("to_string not implemented");
-        }
     };  
 
     template <typename Json>
@@ -615,17 +605,6 @@ namespace detail {
         }
 
         virtual reference evaluate(reference lhs, reference rhs, eval_context<Json>&, std::error_code& ec) const = 0;
-
-        virtual std::string to_string(std::size_t indent = 0) const
-        {
-            std::string s;
-            for (std::size_t i = 0; i <= indent; ++i)
-            {
-                s.push_back(' ');
-            }
-            s.append("to_string not implemented\n");
-            return s;
-        }
     };
 
     enum class token_kind 
@@ -981,7 +960,7 @@ namespace detail {
             construct(other);
         }
 
-        token(const std::string& variable_ref, expr_base_impl<Json>* expression) noexcept
+        token(const string_type& variable_ref, expr_base_impl<Json>* expression) noexcept
             : type_(token_kind::variable), 
               key_(variable_ref), 
               expression_(expression)
@@ -1187,66 +1166,6 @@ namespace detail {
                     break;
             }
         }
-
-        std::string to_string(std::size_t indent = 0) const
-        {
-            switch(type_)
-            {
-                case token_kind::expression:
-                    return expression_->to_string(indent);
-                    break;
-                case token_kind::unary_operator:
-                    return std::string("unary_operator");
-                    break;
-                case token_kind::binary_operator:
-                    return binary_operator_->to_string(indent);
-                    break;
-                case token_kind::current_node:
-                    return std::string("current_node");
-                    break;
-                case token_kind::end_function:
-                    return std::string("end_function");
-                    break;
-                case token_kind::separator:
-                    return std::string("separator");
-                    break;
-                case token_kind::literal:
-                    return std::string("literal");
-                    break;
-                case token_kind::key:
-                    return std::string("key") + key_;
-                    break;
-                case token_kind::begin_multi_select_hash:
-                    return std::string("begin_multi_select_hash");
-                    break;
-                case token_kind::begin_multi_select_list:
-                    return std::string("begin_multi_select_list");
-                    break;
-                case token_kind::begin_filter:
-                    return std::string("begin_filter");
-                    break;
-                case token_kind::pipe:
-                    return std::string("pipe");
-                    break;
-                case token_kind::lparen:
-                    return std::string("lparen");
-                    break;
-                case token_kind::function:
-                    return function_->to_string();
-                case token_kind::argument:
-                    return std::string("argument");
-                    break;
-                case token_kind::begin_expression_type:
-                    return std::string("begin_expression_type");
-                    break;
-                case token_kind::end_expression_type:
-                    return std::string("end_expression_type");
-                    break;
-                default:
-                    return std::string("default");
-                    break;
-            }
-        }
     };
      
     enum class expr_state 
@@ -1312,8 +1231,10 @@ namespace detail {
     template <typename Json>
     struct expression_context
     {
+        using string_type = std::basic_string<typename Json::char_type>;
+
         std::size_t end_index{0};
-        std::string variable_ref;
+        string_type variable_ref;
         
         expression_context() = default;
     };
@@ -1874,11 +1795,6 @@ namespace detail {
 
                 return *result;
             }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("map_function\n");
-            }
         };
 
         class min_function : public function_base<Json>
@@ -2201,11 +2117,6 @@ namespace detail {
                 });
                 return ec ? context.null_value() : *v;
             }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("sort_by_function\n");
-            }
         };
 
         class keys_function final : public function_base<Json>
@@ -2439,11 +2350,6 @@ namespace detail {
                     return *result;
                 }
             }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("to_array_function\n");
-            }
         };
 
         class to_number_function final : public function_base<Json>
@@ -2502,11 +2408,6 @@ namespace detail {
                         return context.null_value();
                 }
             }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("to_number_function\n");
-            }
         };
 
         class to_string_function final : public function_base<Json>
@@ -2530,11 +2431,6 @@ namespace detail {
                 reference arg0 = args[0].value();
                 return *context.create_json(arg0.template as<string_type>());
             }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("to_string_function\n");
-            }
         };
 
         class not_null_function final : public function_base<Json>
@@ -2555,11 +2451,6 @@ namespace detail {
                     }
                 }
                 return context.null_value();
-            }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                return std::string("to_string_function\n");
             }
         };
 
@@ -2722,17 +2613,6 @@ namespace detail {
                     return rhs;
                 }
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("or_operator\n");
-                return s;
-            }
         };
 
         class and_operator final : public binary_operator<Json>
@@ -2754,17 +2634,6 @@ namespace detail {
                     return lhs;
                 }
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("and_operator\n");
-                return s;
-            }
         };
 
         class eq_operator final : public binary_operator<Json>
@@ -2779,17 +2648,6 @@ namespace detail {
             {
                 return lhs == rhs ? context.true_value() : context.false_value();
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("eq_operator\n");
-                return s;
-            }
         };
 
         class ne_operator final : public binary_operator<Json>
@@ -2803,17 +2661,6 @@ namespace detail {
             reference evaluate(reference lhs, reference rhs, eval_context<Json>& context, std::error_code&) const override 
             {
                 return lhs != rhs ? context.true_value() : context.false_value();
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("ne_operator\n");
-                return s;
             }
         };
 
@@ -2833,17 +2680,6 @@ namespace detail {
                 }
                 return lhs < rhs ? context.true_value() : context.false_value();
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("lt_operator\n");
-                return s;
-            }
         };
 
         class lte_operator final : public binary_operator<Json>
@@ -2861,17 +2697,6 @@ namespace detail {
                     return context.null_value();
                 }
                 return lhs <= rhs ? context.true_value() : context.false_value();
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("lte_operator\n");
-                return s;
             }
         };
 
@@ -2891,17 +2716,6 @@ namespace detail {
                 }
                 return lhs > rhs ? context.true_value() : context.false_value();
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("gt_operator\n");
-                return s;
-            }
         };
 
         class gte_operator final : public binary_operator<Json>
@@ -2919,17 +2733,6 @@ namespace detail {
                     return context.null_value();
                 }
                 return lhs >= rhs ? context.true_value() : context.false_value();
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("gte_operator\n");
-                return s;
             }
         };
 
@@ -2969,18 +2772,6 @@ namespace detail {
                     return context.null_value();
                 }
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("identifier_selector ");
-                s.append(identifier_);
-                return s;
-            }
         };
 
         class current_node final : public basic_expression
@@ -2993,17 +2784,6 @@ namespace detail {
             reference evaluate(reference val, eval_context<Json>&, std::error_code&) const override
             {
                 return val;
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("current_node ");
-                return s;
             }
         };
 
@@ -3037,18 +2817,6 @@ namespace detail {
                 {
                     return context.null_value();
                 }
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("index_selector ");
-                s.append(std::to_string(index_));
-                return s;
             }
         };
 
@@ -3117,23 +2885,6 @@ namespace detail {
                 }
                 return *result;
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("object_projection\n");
-                for (auto& expr : this->expressions_)
-                {
-                    std::string sss = expr->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
-            }
         };
 
         class list_projection final : public projection_base
@@ -3164,23 +2915,6 @@ namespace detail {
                     }
                 }
                 return *result;
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("list_projection\n");
-                for (auto& expr : this->expressions_)
-                {
-                    std::string sss = expr->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
             }
         };
 
@@ -3252,23 +2986,6 @@ namespace detail {
 
                 return *result;
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("slice_projection\n");
-                for (auto& expr : this->expressions_)
-                {
-                    std::string sss = expr->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
-            }
         };
 
         class filter_expression final : public projection_base
@@ -3302,23 +3019,6 @@ namespace detail {
                     }
                 }
                 return *result;
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("filter_expression\n");
-                for (auto& item : token_list_)
-                {
-                    std::string sss = item.to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
             }
         };
 
@@ -3368,23 +3068,6 @@ namespace detail {
                 }
                 return *result;
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("flatten_projection\n");
-                for (auto& expr : this->expressions_)
-                {
-                    std::string sss = expr->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
-            }
         };
 
         class multi_select_list final : public basic_expression
@@ -3412,27 +3095,6 @@ namespace detail {
                 }
                 return *result;
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("multi_select_list\n");
-                for (auto& list : token_lists_)
-                {
-                    for (auto& item : list)
-                    {
-                        std::string sss = item.to_string(indent+2);
-                        s.insert(s.end(), sss.begin(), sss.end());
-                        s.push_back('\n');
-                    }
-                    s.append("---\n");
-                }
-                return s;
-            }
         };
 
         class variable_expression final : public basic_expression
@@ -3449,13 +3111,6 @@ namespace detail {
                 eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
                 auto ptr = evaluate_tokens(val, tokens_, new_context, ec);
                 return *ptr;
-            }
-
-            std::string to_string(std::size_t = 0) const override
-            {
-                std::string s;
-                s.append("variable_expression\n");
-                return s;
             }
         };
 
@@ -3496,17 +3151,6 @@ namespace detail {
 
                 return *resultp;
             }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("multi_select_list\n");
-                return s;
-            }
         };
 
         class function_expression final : public basic_expression
@@ -3523,27 +3167,6 @@ namespace detail {
             {
                 eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
                 return *evaluate_tokens(val, toks_, new_context, ec);
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("function_expression\n");
-                for (auto& tok : toks_)
-                {
-                    for (std::size_t i = 0; i <= indent+2; ++i)
-                    {
-                        s.push_back(' ');
-                    }
-                    std::string sss = tok.to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }
-                return s;
             }
         };
 
@@ -3843,7 +3466,7 @@ namespace detail {
             std::vector<expression_context<Json>> context_stack;
             std::vector<expr_state> state_stack;
             std::vector<token<Json>> output_stack;
-            std::string key_buffer;
+            string_type key_buffer;
 
             state_stack.push_back(expr_state::start);
 

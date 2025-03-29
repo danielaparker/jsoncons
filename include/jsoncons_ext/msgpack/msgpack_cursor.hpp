@@ -49,8 +49,8 @@ public:
 
     template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
-                         const msgpack_decode_options& options = msgpack_decode_options(),
-                         const Allocator& alloc = Allocator())
+        const msgpack_decode_options& options = msgpack_decode_options(),
+        const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc),
           cursor_handler_adaptor_(cursor_visitor_, alloc)
     {
@@ -64,31 +64,30 @@ public:
     // Constructors that set parse error codes
 
     template <typename Sourceable>
-    basic_msgpack_cursor(Sourceable&& source,
-                         std::error_code& ec)
+    basic_msgpack_cursor(Sourceable&& source, std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Sourceable>(source), 
-                              msgpack_decode_options(), 
-                              ec)
+             std::forward<Sourceable>(source), 
+             msgpack_decode_options(), 
+             ec)
     {
     }
 
     template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
-                         const msgpack_decode_options& options,
-                         std::error_code& ec)
+        const msgpack_decode_options& options,
+        std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Sourceable>(source), 
-                              options, 
-                              ec)
+             std::forward<Sourceable>(source), 
+             options, 
+             ec)
     {
     }
 
     template <typename Sourceable>
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                         Sourceable&& source,
-                         const msgpack_decode_options& options,
-                         std::error_code& ec)
+        Sourceable&& source,
+        const msgpack_decode_options& options,
+        std::error_code& ec)
        : parser_(std::forward<Sourceable>(source), options, alloc),
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
@@ -176,7 +175,7 @@ public:
     }
 
     void read_to(basic_json_visitor<char_type>& visitor,
-                std::error_code& ec) override
+        std::error_code& ec) override
     {
         if (is_begin_container(current().event_type()))
         {
@@ -242,7 +241,7 @@ public:
 
     friend
     staj_filter_view operator|(basic_msgpack_cursor& cursor, 
-                               std::function<bool(const staj_event&, const ser_context&)> pred)
+        std::function<bool(const staj_event&, const ser_context&)> pred)
     {
         return staj_filter_view(cursor, pred);
     }

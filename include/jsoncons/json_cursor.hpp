@@ -51,10 +51,10 @@ public:
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator(),
-                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
+        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+        const Allocator& alloc = Allocator(),
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc)
     {
@@ -79,10 +79,10 @@ public:
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator(),
-                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
+        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+        const Allocator& alloc = Allocator(),
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc)
     {
@@ -93,48 +93,47 @@ public:
 
     // Constructors that set parse error codes
     template <typename Sourceable>
-    basic_json_cursor(Sourceable&& source, 
-                      std::error_code& ec)
+    basic_json_cursor(Sourceable&& source, std::error_code& ec)
         : basic_json_cursor(std::allocator_arg, Allocator(), 
-                            std::forward<Sourceable>(source),
-                            basic_json_decode_options<CharT>(),
-                            default_json_parsing(),
-                            ec)
+              std::forward<Sourceable>(source),
+              basic_json_decode_options<CharT>(),
+              default_json_parsing(),
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec)
+        const basic_json_decode_options<CharT>& options,
+        std::error_code& ec)
         : basic_json_cursor(std::allocator_arg, Allocator(), 
-                            std::forward<Sourceable>(source),
-                            options,
-                            default_json_parsing(),
-                            ec)
+              std::forward<Sourceable>(source),
+              options,
+              default_json_parsing(),
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec)
+        const basic_json_decode_options<CharT>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler,
+        std::error_code& ec)
         : basic_json_cursor(std::allocator_arg, Allocator(), 
-                            std::forward<Sourceable>(source),
-                            options,
-                            err_handler,
-                            ec)
+              std::forward<Sourceable>(source),
+              options,
+              err_handler,
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
-                      Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler,
+        std::error_code& ec,
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc)
     {
@@ -160,11 +159,11 @@ public:
 
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
-                      Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler,
+        std::error_code& ec,
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc)
     {

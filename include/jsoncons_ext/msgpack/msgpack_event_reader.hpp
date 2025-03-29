@@ -44,8 +44,8 @@ namespace msgpack {
 
         template <typename Sourceable>
         msgpack_event_reader(Sourceable&& source,
-                             const msgpack_decode_options& options = msgpack_decode_options(),
-                             const Allocator& alloc = Allocator())
+            const msgpack_decode_options& options = msgpack_decode_options(),
+            const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc)
         {
             parser_.cursor_mode(true);
@@ -63,30 +63,30 @@ namespace msgpack {
 
         template <typename Sourceable>
         msgpack_event_reader(Sourceable&& source,
-                             std::error_code& ec)
+            std::error_code& ec)
            : msgpack_event_reader(std::allocator_arg, Allocator(),
-                                  std::forward<Sourceable>(source), 
-                                  msgpack_decode_options(), 
-                                  ec)
+                 std::forward<Sourceable>(source), 
+                 msgpack_decode_options(), 
+                 ec)
         {
         }
 
         template <typename Sourceable>
         msgpack_event_reader(Sourceable&& source,
-                             const msgpack_decode_options& options,
-                             std::error_code& ec)
+            const msgpack_decode_options& options,
+            std::error_code& ec)
            : msgpack_event_reader(std::allocator_arg, Allocator(),
-                                  std::forward<Sourceable>(source), 
-                                  options, 
-                                  ec)
+                 std::forward<Sourceable>(source), 
+                 options, 
+                 ec)
         {
         }
 
         template <typename Sourceable>
         msgpack_event_reader(std::allocator_arg_t, const Allocator& alloc, 
-                             Sourceable&& source,
-                             const msgpack_decode_options& options,
-                             std::error_code& ec)
+            Sourceable&& source,
+            const msgpack_decode_options& options,
+            std::error_code& ec)
            : parser_(std::forward<Sourceable>(source), options, alloc),
              eof_(false)
         {
@@ -169,7 +169,7 @@ namespace msgpack {
         }
 
         void read_to(basic_item_event_visitor<char_type>& visitor,
-                    std::error_code& ec) override
+            std::error_code& ec) override
         {
             if (is_begin_container(current().event_type()))
             {
@@ -235,7 +235,7 @@ namespace msgpack {
 
         friend
         staj2_filter_view operator|(msgpack_event_reader& cursor, 
-                                   std::function<bool(const item_event&, const ser_context&)> pred)
+            std::function<bool(const item_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
         }

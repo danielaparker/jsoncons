@@ -54,10 +54,10 @@ public:
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
-                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
-                     const Allocator& alloc = Allocator(),
-                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
+        std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+        const Allocator& alloc = Allocator(),
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc)
     {
@@ -70,10 +70,10 @@ public:
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
-                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
-                     const Allocator& alloc = Allocator(),
-                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
+        std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+        const Allocator& alloc = Allocator(),
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options,err_handler,alloc)
     {
@@ -85,48 +85,47 @@ public:
 
     // Constructors that set parse error codes
     template <typename Sourceable>
-    basic_csv_cursor(Sourceable&& source, 
-                     std::error_code& ec)
+    basic_csv_cursor(Sourceable&& source, std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Sourceable>(source),
-                           basic_csv_decode_options<CharT>(),
-                           default_csv_parsing(),
-                           ec)
+              std::forward<Sourceable>(source),
+              basic_csv_decode_options<CharT>(),
+              default_csv_parsing(),
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec)
+        const basic_csv_decode_options<CharT>& options,
+        std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Sourceable>(source),
-                           options,
-                           default_csv_parsing(),
-                           ec)
+              std::forward<Sourceable>(source),
+              options,
+              default_csv_parsing(),
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec)
+        const basic_csv_decode_options<CharT>& options,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Sourceable>(source),
-                           options,
-                           err_handler,
-                           ec)
+              std::forward<Sourceable>(source),
+              options,
+              err_handler,
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                     Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec,
-                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        std::error_code& ec,
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc)
     {
@@ -139,11 +138,11 @@ public:
 
     template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                     Sourceable&& source, 
-                     const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec,
-                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        std::error_code& ec,
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options,err_handler,alloc)
     {
@@ -222,8 +221,7 @@ public:
         }
     }
 
-    void read_to(basic_json_visitor<CharT>& visitor,
-                std::error_code& ec) override
+    void read_to(basic_json_visitor<CharT>& visitor, std::error_code& ec) override
     {
         if (is_begin_container(current().event_type()))
         {
@@ -289,7 +287,7 @@ public:
 
     friend
     basic_staj_filter_view<CharT> operator|(basic_csv_cursor& cursor, 
-                                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+        std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
     {
         return basic_staj_filter_view<CharT>(cursor, pred);
     }

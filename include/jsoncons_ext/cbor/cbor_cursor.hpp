@@ -47,8 +47,8 @@ public:
 
     template <typename Sourceable>
     basic_cbor_cursor(Sourceable&& source,
-                      const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator& alloc = Allocator())
+        const cbor_decode_options& options = cbor_decode_options(),
+        const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc), 
           cursor_handler_adaptor_(cursor_visitor_, alloc)
     {
@@ -63,30 +63,30 @@ public:
 
     template <typename Sourceable>
     basic_cbor_cursor(Sourceable&& source, 
-                      std::error_code& ec)
+        std::error_code& ec)
         : basic_cbor_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Sourceable>(source), 
-                            cbor_decode_options(), 
-                            ec)
+              std::forward<Sourceable>(source), 
+              cbor_decode_options(), 
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_cbor_cursor(Sourceable&& source, 
-                      const cbor_decode_options& options,
-                      std::error_code& ec)
+        const cbor_decode_options& options,
+        std::error_code& ec)
         : basic_cbor_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Sourceable>(source), 
-                            options, 
-                            ec)
+              std::forward<Sourceable>(source), 
+              options, 
+              ec)
     {
     }
 
     template <typename Sourceable>
     basic_cbor_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Sourceable&& source,
-                      const cbor_decode_options& options,
-                      std::error_code& ec)
+        Sourceable&& source,
+        const cbor_decode_options& options,
+        std::error_code& ec)
        : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
@@ -184,7 +184,7 @@ public:
     }
 
     void read_to(basic_json_visitor<char_type>& visitor,
-                 std::error_code& ec) override
+        std::error_code& ec) override
     {
         if (is_typed_array())
         {
@@ -254,7 +254,7 @@ public:
 
     friend
     staj_filter_view operator|(basic_cbor_cursor& cursor, 
-                               std::function<bool(const staj_event&, const ser_context&)> pred)
+        std::function<bool(const staj_event&, const ser_context&)> pred)
     {
         return staj_filter_view(cursor, pred);
     }
