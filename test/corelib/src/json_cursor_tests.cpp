@@ -590,6 +590,7 @@ TEST_CASE("staj event as object")
 
         json_decoder<json> decoder;
         cursor.read_to(decoder);
+        CHECK(staj_event_type::end_object == cursor.current().event_type());
         json j0 = decoder.get_result();
         CHECK((j0 == document[0]));
 
@@ -597,6 +598,7 @@ TEST_CASE("staj event as object")
 
         json_decoder<json> decoder2;
         cursor.read_to(decoder2);
+        CHECK(staj_event_type::end_object == cursor.current().event_type());
         json j1 = decoder2.get_result();
         CHECK((j1 == document[1]));
     }

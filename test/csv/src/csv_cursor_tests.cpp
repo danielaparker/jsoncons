@@ -49,61 +49,61 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -116,59 +116,59 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
         jsoncons::json_decoder<jsoncons::json> decoder;
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.read_to(decoder);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -183,51 +183,51 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -293,57 +293,57 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             }
         }*/
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
-        cursor.next();
-
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
-        cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
-        cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
-        cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
-        cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
+        cursor.next();
+
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -410,70 +410,70 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             }
         }
 */
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::double_value);
+        REQUIRE(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -544,130 +544,130 @@ NY,LON,TOR;LON
         } 
         */ 
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done()); 
 
@@ -685,18 +685,18 @@ TEST_CASE("csv_cursor n_rows, no header test")
             .assume_header(false);
 
         csv::csv_string_cursor cursor(data, options);
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("b"));
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done()); 
     }
@@ -713,22 +713,22 @@ TEST_CASE("csv_cursor n_objects, header test")
 
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("4"));
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -746,30 +746,30 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
             .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::string_value);
+        REQUIRE(staj_event_type::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::uint64_value);
+        REQUIRE(staj_event_type::uint64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == 4);
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::int64_value);
+        REQUIRE(staj_event_type::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -781,28 +781,28 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
             .subfield_delimiter(';');
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+        REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::key);
+        REQUIRE(staj_event_type::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+        REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::uint64_value);
+        REQUIRE(staj_event_type::uint64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == 4);
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::int64_value);
+        REQUIRE(staj_event_type::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        REQUIRE(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+        REQUIRE(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -994,29 +994,29 @@ void check_csv_cursor_table(std::string info, CursorType& cursor,
     INFO(info);
 
     REQUIRE_FALSE(cursor.done());
-    REQUIRE(cursor.current().event_type() == staj_event_type::begin_array);
+    REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
+    REQUIRE(staj_event_type::begin_object == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(cursor.current().event_type() == staj_event_type::key);
+    REQUIRE(staj_event_type::key == cursor.current().event_type());
     CHECK(cursor.current().template get<std::string>() == expected_key);
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(cursor.current().event_type() == staj_event_type::uint64_value);
+    REQUIRE(staj_event_type::uint64_value == cursor.current().event_type());
     CHECK(cursor.current().template get<unsigned>() == expected_value);
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+    REQUIRE(staj_event_type::end_object == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(cursor.current().event_type() == staj_event_type::end_array);
+    REQUIRE(staj_event_type::end_array == cursor.current().event_type());
 
     cursor.next();
     CHECK(cursor.done());
