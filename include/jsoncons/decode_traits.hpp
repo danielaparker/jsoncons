@@ -210,19 +210,19 @@ namespace jsoncons {
         {
         }
     private:
-        JSONCONS_VISITOR_RET_TYPE visit_begin_array(semantic_tag, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, 
             const ser_context&, 
             std::error_code& ec) override
         {      
             if (++level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                JSONCONS_VISITOR_RET_STAT;
+                JSONCONS_VISITOR_RETURN;
             }
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_begin_array(std::size_t size, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t size, 
             semantic_tag, 
             const ser_context&, 
             std::error_code& ec) override
@@ -230,51 +230,51 @@ namespace jsoncons {
             if (++level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                JSONCONS_VISITOR_RET_STAT;
+                JSONCONS_VISITOR_RETURN;
             }
             if (size > 0)
             {
                 reserve_storage(typename std::integral_constant<bool, extension_traits::has_reserve<T>::value>::type(), v_, size);
             }
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_end_array(const ser_context&, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
             std::error_code& ec) override
         {
             if (level_ != 1)
             {
                 ec = conv_errc::not_vector;
-                JSONCONS_VISITOR_RET_STAT;
+                JSONCONS_VISITOR_RETURN;
             }
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_uint64(uint64_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
             semantic_tag, 
             const ser_context&,
             std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_int64(int64_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
             semantic_tag,
             const ser_context&,
             std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_half(uint16_t value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
             semantic_tag,
             const ser_context&,
             std::error_code&) override
         {
             visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
         void visit_half_(std::true_type, uint16_t value)
@@ -287,22 +287,22 @@ namespace jsoncons {
             v_.push_back(static_cast<value_type>(binary::decode_half(value)));
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_double(double value, 
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
             semantic_tag,
             const ser_context&,
             std::error_code&) override
         {
             v_.push_back(static_cast<value_type>(value));
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RET_TYPE visit_typed_array(const jsoncons::span<const value_type>& data,  
+        JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const value_type>& data,  
             semantic_tag,
             const ser_context&,
             std::error_code&) override
         {
             v_ = std::vector<value_type>(data.begin(),data.end());
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
 
         static

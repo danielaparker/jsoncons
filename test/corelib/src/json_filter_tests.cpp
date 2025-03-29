@@ -34,7 +34,7 @@ public:
     }
 
 private:
-    JSONCONS_VISITOR_RET_TYPE visit_key(const string_view_type& name,
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
         const ser_context& context,
         std::error_code& ec) override
     {
@@ -42,15 +42,15 @@ private:
         if (member_name_ != "name")
         {
             this->destination().key(name, context, ec);
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
         else
         {
-            JSONCONS_VISITOR_RET_STAT;
+            JSONCONS_VISITOR_RETURN;
         }
     }
 
-    JSONCONS_VISITOR_RET_TYPE visit_string(const string_view_type& s,
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s,
         semantic_tag tag,
         const ser_context& context,
         std::error_code&) override
@@ -79,7 +79,7 @@ private:
         {
             this->destination().string_value(s, tag, context);
         }
-        JSONCONS_VISITOR_RET_STAT;
+        JSONCONS_VISITOR_RETURN;
     }
 };
 
