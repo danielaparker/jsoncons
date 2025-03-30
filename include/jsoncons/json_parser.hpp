@@ -293,16 +293,17 @@ public:
             {
                 case parse_state::cr:
                     ++line_;
-                    ++position_;
-                    mark_position_ = position_;
+                    //++position_;
                     switch (*input_ptr_)
                     {
                         case '\n':
                             ++input_ptr_;
                             ++position_;
+                            mark_position_ = position_;
                             state_ = pop_state();
                             break;
                         default:
+                            mark_position_ = position_;
                             state_ = pop_state();
                             break;
                     }
@@ -631,7 +632,6 @@ public:
                     break;
                 case parse_state::cr:
                     ++line_;
-                    mark_position_ = position_;
                     switch (*input_ptr_)
                     {
                         case '\n':
@@ -643,6 +643,7 @@ public:
                             state_ = pop_state();
                             break;
                     }
+                    mark_position_ = position_;
                     break;
                 case parse_state::start: 
                     {

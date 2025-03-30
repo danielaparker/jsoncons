@@ -321,3 +321,28 @@ TEST_CASE("test_diagnostics_visitor", "")
     }
 }
 
+TEST_CASE("json_parser skip space tests")
+{
+    SECTION("test 1")
+    {
+        jsoncons::json_decoder<json> decoder;
+        json_parser parser;
+        
+        std::string line1 = "[false\r";
+        std::string line2 = ",true]";
+
+        parser.update(line1.data(), line1.size());
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+        parser.update(line2.data(), line2.size());
+        parser.parse_some(decoder);
+        
+        //std::cout << "position:" << parser.position() << "line:" << parser.line() << "column:" << parser.column() << "\n";
+        
+        CHECK(12 == parser.position());
+        CHECK(2 == parser.line());
+        CHECK(7 == parser.column());
+    }
+}
+
