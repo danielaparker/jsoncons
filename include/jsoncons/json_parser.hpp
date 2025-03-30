@@ -2617,33 +2617,46 @@ private:
         const char_type* local_input_end = end_input_;
         const char_type* cur = *ptr;
 
-        while (cur != local_input_end) 
+        while (cur < local_input_end) 
         {
-            switch (*cur)
+            if (*cur == ' ' || *cur == '\t')
             {
-                case ' ':
-                case '\t':
-                    ++cur;
-                    ++position_;
-                    break;
-                case '\r': 
+                ++cur;
+                ++position_;
+                continue;
+            }
+            if (*cur == '\n')
+            {
+                ++cur;
+                ++line_;
+                ++position_;
+                mark_position_ = position_;
+                continue;
+            }
+            if (*cur == '\r')
+            {
+                ++cur;
+                ++position_;
+                if (cur < local_input_end)
+                {
+                    ++line_;
+                    if (*cur == '\n')
+                    {
+                        ++cur;
+                        ++position_;
+                    }
+                    mark_position_ = position_;
+                }
+                else
+                {
                     push_state(state_);
-                    ++cur;
-                    ++position_;
                     state_ = parse_state::cr;
                     *ptr = cur;
                     return; 
-                case '\n': 
-                    ++cur;
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    *ptr = cur;
-                    return; 
-                default:
-                    *ptr = cur;
-                    return; 
+                }
+                continue;
             }
+            break;
         }
         *ptr = cur;
     }
