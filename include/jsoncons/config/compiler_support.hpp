@@ -320,6 +320,16 @@
 #endif
 #endif // __CUDA_ARCH__
 
+#ifndef JSONCONS_FORCE_INLINE
+# ifdef _MSC_VER
+#  define JSONCONS_FORCE_INLINE __forceinline
+# elif defined(__GNUC__) || defined(__clang__)
+#  define JSONCONS_FORCE_INLINE inline __attribute__((always_inline))
+# else
+#  define JSONCONS_FORCE_INLINE inline
+# endif
+#endif // JSONCONS_FORCE_INLINE
+ 
 // Follows boost config/detail/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
 namespace jsoncons{

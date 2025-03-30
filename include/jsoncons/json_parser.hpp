@@ -283,36 +283,6 @@ public:
         return end_input_;
     }
 
-    void skip_space()
-    {
-        const char_type* local_input_end = end_input_;
-        while (input_ptr_ != local_input_end) 
-        {
-            switch (*input_ptr_)
-            {
-                case ' ':
-                case '\t':
-                    ++input_ptr_;
-                    ++position_;
-                    break;
-                case '\r': 
-                    push_state(state_);
-                    ++input_ptr_;
-                    ++position_;
-                    state_ = parse_state::cr;
-                    return; 
-                case '\n': 
-                    ++input_ptr_;
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    return;   
-                default:
-                    return;
-            }
-        }
-    }
-
     void skip_whitespace()
     {
         const char_type* local_input_end = end_input_;
@@ -345,7 +315,7 @@ public:
                         case '\t':
                         case '\n':
                         case '\r':
-                            skip_space();
+                            skip_space(&input_ptr_);
                             break;
                         default:
                             return;
@@ -699,7 +669,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -822,7 +792,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/':
                                 ++input_ptr_;
@@ -902,7 +872,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/':
                                 ++input_ptr_;
@@ -978,7 +948,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -1063,7 +1033,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/': 
                                 push_state(state_);
@@ -1117,7 +1087,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/': 
                                 push_state(state_);
@@ -1273,7 +1243,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(&input_ptr_);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -1858,7 +1828,7 @@ zero:
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                skip_space();
+                skip_space(&input_ptr_);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
@@ -1932,7 +1902,7 @@ integer:
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                skip_space();
+                skip_space(&input_ptr_);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
@@ -2025,7 +1995,7 @@ fraction2:
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                skip_space();
+                skip_space(&input_ptr_);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
@@ -2147,7 +2117,7 @@ exp3:
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                skip_space();
+                skip_space(&input_ptr_);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
@@ -2641,6 +2611,42 @@ escape_u8:
         return input_ptr_ - begin_input_;
     }
 private:
+
+    void skip_space(char_type const ** ptr)
+    {
+        const char_type* local_input_end = end_input_;
+        const char_type* cur = *ptr;
+
+        while (cur != local_input_end) 
+        {
+            switch (*cur)
+            {
+                case ' ':
+                case '\t':
+                    ++cur;
+                    ++position_;
+                    break;
+                case '\r': 
+                    push_state(state_);
+                    ++cur;
+                    ++position_;
+                    state_ = parse_state::cr;
+                    *ptr = cur;
+                    return; 
+                case '\n': 
+                    ++cur;
+                    ++line_;
+                    ++position_;
+                    mark_position_ = position_;
+                    *ptr = cur;
+                    return; 
+                default:
+                    *ptr = cur;
+                    return; 
+            }
+        }
+        *ptr = cur;
+    }
 
     void end_integer_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
