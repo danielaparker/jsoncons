@@ -4,9 +4,9 @@
 #include <jsoncons_ext/csv/csv_cursor.hpp>
 
 template<
-    class CharT,
-    class Source=jsoncons::stream_source<CharT>,
-    class Allocator=std::allocator<char>> basic_csv_cursor;
+    typename CharT,
+    typename Source=jsoncons::stream_source<CharT>,
+    typename Allocator=std::allocator<char>> basic_csv_cursor;
 ```
 
 A pull parser for reporting CSV parse events. A typical application will 

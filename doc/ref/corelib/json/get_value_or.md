@@ -1,7 +1,7 @@
 ### jsoncons::basic_json::get_value_or
 
 ```cpp
-template <typename T,class U>
+template <typename T,typename U>
 T get_value_or(const string_view_type& name, U&& default_value) const; 
 ```
 

@@ -25,12 +25,12 @@ template <typename T,typename InputIt>
 T decode_cbor(InputIt first, InputIt last,
     const cbor_decode_options& options = cbor_decode_options());        (3) (since 0.153.0)
 
-template <typename T,typename Source,class Allocator,class TempAllocator>
+template <typename T,typename Source,typename Allocator,typename TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& source,
     const cbor_decode_options& options = cbor_decode_options());        (4) (since 0.171.0)
 
-template <typename T,class Allocator,class TempAllocator>
+template <typename T,typename Allocator,typename TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
     const cbor_decode_options& options = cbor_decode_options());        (5) (since 0.171.0)

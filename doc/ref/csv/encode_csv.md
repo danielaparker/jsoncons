@@ -5,7 +5,7 @@ Encodes a C++ data structure into the CSV data format.
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <typename T,class CharContainer>
+template <typename T,typename CharContainer>
 void encode_csv(const T& val, CharContainer& cont, 
     const basic_csv_encode_options<CharContainer::value_type>& options 
         = basic_csv_encode_options<CharContainer::value_type>());           (1)
@@ -15,7 +15,7 @@ void encode_csv(const T& val, std::basic_ostream<CharT>& os,
     const basic_csv_encode_options<CharT>& options 
         = basic_csv_encode_options<CharT>());                               (2)
 
-template <typename T,class CharContainer>
+template <typename T,typename CharContainer>
 void encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const T& val, CharContainer& cont, 
     const basic_csv_encode_options<CharContainer::value_type>& options 

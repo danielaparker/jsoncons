@@ -4,13 +4,13 @@
 #include <jsoncons/json_encoder.hpp>
 
 template<
-    class CharT,
-    class Sink>
+    typename CharT,
+    typename Sink>
 > basic_json_encoder : public jsoncons::basic_json_visitor<CharT>
 
 template<
-    class CharT,
-    class Sink>
+    typename CharT,
+    typename Sink>
 > basic_compact_json_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 

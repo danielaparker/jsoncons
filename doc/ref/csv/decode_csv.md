@@ -5,15 +5,15 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <typename T,class Source>
+template <typename T,typename Source>
 T decode_csv(const Source& s, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (1)
 
-template <typename T,class CharT>
+template <typename T,typename CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (2)
 
-template <typename T,class InputIt>
+template <typename T,typename InputIt>
 T decode_csv(InputIt first, InputIt last,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (3) (since 0.153.0)
 

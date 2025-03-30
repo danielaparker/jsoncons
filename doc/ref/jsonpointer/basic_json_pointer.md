@@ -98,19 +98,19 @@ URI fragment identifier (starts with `#`).
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);
 Concatenates a JSON Pointer pointer and a string. Effectively returns basic_json_pointer<CharT>(lhs) /= s.
 
-    template <typename CharT,class IntegerType>
+    template <typename CharT,typename IntegerType>
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, IntegerType index);
 Concatenates a JSON Pointer pointer and an index. Effectively returns basic_json_pointer<CharT>(lhs) /= index.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
 
-    template <typename CharT,class IntegerType>
+    template <typename CharT,typename IntegerType>
     basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs );
 Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lhs) += rhs.
 
-    template <typename CharT,class IntegerType>
+    template <typename CharT,typename IntegerType>
     bool operator==(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
-    template <typename CharT,class IntegerType>
+    template <typename CharT,typename IntegerType>
     bool operator!=(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
     std::string to_string(const json_pointer& ptr);      (since 0.172.0)

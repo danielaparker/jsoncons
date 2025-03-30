@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons/json_decoder.hpp>
 
-template <typename Json,class TempAllocator>
+template <typename Json,typename TempAllocator>
 json_decoder
 ```
 

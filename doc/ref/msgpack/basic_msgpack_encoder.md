@@ -4,7 +4,7 @@
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 
 template<
-    class Sink>
+    typename Sink>
 > class basic_msgpack_encoder : public jsoncons::json_visitor
 ```
 

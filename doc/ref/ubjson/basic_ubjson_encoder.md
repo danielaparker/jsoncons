@@ -4,7 +4,7 @@
 #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 
 template<
-    class Sink>
+    typename Sink>
 > class basic_ubjson_encoder : public jsoncons::json_visitor
 ```
 

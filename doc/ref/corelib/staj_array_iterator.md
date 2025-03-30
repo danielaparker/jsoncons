@@ -4,8 +4,8 @@
 #include <jsoncons/staj_iterator.hpp>
 
 template<
-    class T,
-    class Json
+    typename T,
+    typename Json
     >
 class staj_array_iterator
 ```
@@ -61,7 +61,7 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-    template <typename class T,typename Json>
+    template <typename T,typename Json>
     bool operator==(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
     template <typename Json,typename T>

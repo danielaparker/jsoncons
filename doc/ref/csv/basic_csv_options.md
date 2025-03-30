@@ -4,7 +4,7 @@
 #include <jsoncons_ext/csv/csv_options.hpp>
 
 template< 
-    class CharT
+    typename CharT
 > class basic_csv_options;
 ```
 

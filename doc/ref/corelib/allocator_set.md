@@ -4,7 +4,7 @@
 #include <jsoncons/allocator_set.hpp>
 
 template< 
-    class Allocator,class TempAllocator
+    typename Allocator,typename TempAllocator
 > allocator_set;
 ```
 
@@ -36,7 +36,7 @@ Returns an allocator object for for temporary allocations
 
 #### Helper functions
 
-    template <typename Allocator,class TempAllocator>
+    template <typename Allocator,typename TempAllocator>
     allocator_set<Allocator,TempAllocator> combine_allocators(
         const Allocator& alloc, const TempAllocator& temp_alloc);
 

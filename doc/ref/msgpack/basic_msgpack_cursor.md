@@ -4,8 +4,8 @@
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 
 template<
-    class Source=jsoncons::binary_stream_source,
-    class Allocator=std::allocator<char>>
+    typename Source=jsoncons::binary_stream_source,
+    typename Allocator=std::allocator<char>>
 class basic_msgpack_cursor;
 ```
 

@@ -38,7 +38,7 @@ static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc
     std::basic_istream<char_type>& is, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (9) (since 0.171.0)
 
-template <typename InputIt,class TempAllocator>
+template <typename InputIt,typename TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (10) (since 0.171.0)

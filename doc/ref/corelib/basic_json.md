@@ -4,9 +4,9 @@
 #include <jsoncons/basic_json.hpp>
 
 template< 
-    class CharT,
+    typename CharT,
     class Policy = sorted_policy,
-    class Allocator = std::allocator<char>
+    typename Allocator = std::allocator<char>
 > class basic_json;
 
 namespace pmr {

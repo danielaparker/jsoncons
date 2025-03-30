@@ -4,7 +4,7 @@
 #include <jsoncons/json_visitor.hpp>
 
 template <
-    class CharT
+    typename CharT
 > class basic_json_visitor
 ```
 

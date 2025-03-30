@@ -4,7 +4,7 @@
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 template<
-    class Sink>
+    typename Sink>
 > class basic_cbor_encoder final : public json_visitor
 ```
 

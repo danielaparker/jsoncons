@@ -21,12 +21,12 @@ template <typename T,typename InputIt>
 T decode_ubjson(InputIt first, InputIt last,
     const bson_decode_options& options = bson_decode_options());           (3)
 
-template <typename T,typename Source,class Allocator,class TempAllocator>
+template <typename T,typename Source,typename Allocator,typename TempAllocator>
 T decode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& source,
     const ubjson_decode_options& options = ubjson_decode_options());       (4) (since 0.171.0)
 
-template <typename T,class Allocator,class TempAllocator>
+template <typename T,typename Allocator,typename TempAllocator>
 T decode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
     const ubjson_decode_options& options = ubjson_decode_options());       (5) (since 0.171.0)

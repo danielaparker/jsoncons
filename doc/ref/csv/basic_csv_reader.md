@@ -4,9 +4,9 @@
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 template<
-    class CharT,
-    class Source=jsoncons::stream_source<CharT>,
-    class TempAllocator=std::allocator<char>>
+    typename CharT,
+    typename Source=jsoncons::stream_source<CharT>,
+    typename TempAllocator=std::allocator<char>>
 class basic_csv_reader 
 ```
 

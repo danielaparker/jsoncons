@@ -4,9 +4,9 @@
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
 template<
-    class CharT,
-    class Sink,
-    class Allocator=std::allocator<CharT>=std::allocator<CharT>>
+    typename CharT,
+    typename Sink,
+    typename Allocator=std::allocator<CharT>=std::allocator<CharT>>
 > class basic_csv_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 

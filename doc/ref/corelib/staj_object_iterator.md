@@ -4,9 +4,9 @@
 #include <jsoncons/staj_iterator.hpp>
 
 template<
-    class Key,
-    class T,
-    class Json
+    typename Key,
+    typename T,
+    typename Json
     > class staj_object_iterator
 ```
 

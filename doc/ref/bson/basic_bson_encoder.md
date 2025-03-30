@@ -4,7 +4,7 @@
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 
 template<
-    class Sink>
+    typename Sink>
 > class basic_bson_encoder : public jsoncons::json_visitor
 ```
 
