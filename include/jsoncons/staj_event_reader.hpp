@@ -47,7 +47,6 @@ namespace jsoncons {
         using char_type = CharT;
         using typename super_type::string_view_type;
     private:
-        std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred_;
         basic_staj_event<CharT> event_;
 
         item_event_reader_state state_;
@@ -56,13 +55,7 @@ namespace jsoncons {
         std::size_t index_;
     public:
         basic_item_event_receiver()
-            : pred_(accept), event_(staj_event_type::null_value),
-              state_(), data_(), shape_(), index_(0)
-        {
-        }
-
-        basic_item_event_receiver(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
-            : pred_(pred), event_(staj_event_type::null_value),
+            : event_(staj_event_type::null_value),
               state_(), data_(), shape_(), index_(0)
         {
         }
@@ -381,10 +374,6 @@ namespace jsoncons {
         }
 
     private:
-        static constexpr bool accept(const basic_staj_event<CharT>&, const ser_context&) 
-        {
-            return true;
-        }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
         {
