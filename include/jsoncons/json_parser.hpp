@@ -1394,7 +1394,7 @@ public:
                             ++input_ptr_;
                             ++position_;
                             visitor.bool_value(false, semantic_tag::none, *this, ec);
-                            if (parent() == parse_state::root)
+                            if (level_ == 0)
                             {
                                 state_ = parse_state::accept;
                             }
@@ -2680,53 +2680,53 @@ private:
         }
         switch (parent())
         {
-        case parse_state::member_name:
-            visitor.key(sv, *this, ec);
-            more_ = !cursor_mode_;
-            pop_state();
-            state_ = parse_state::expect_colon;
-            break;
-        case parse_state::object:
-        case parse_state::array:
-        {
-            auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
-            if (it != string_double_map_.end())
-            {
-                visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+            case parse_state::member_name:
+                visitor.key(sv, *this, ec);
                 more_ = !cursor_mode_;
-            }
-            else
+                pop_state();
+                state_ = parse_state::expect_colon;
+                break;
+            case parse_state::object:
+            case parse_state::array:
             {
-                visitor.string_value(sv, semantic_tag::none, *this, ec);
-                more_ = !cursor_mode_;
+                auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
+                if (it != string_double_map_.end())
+                {
+                    visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
+                }
+                else
+                {
+                    visitor.string_value(sv, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
+                }
+                state_ = parse_state::expect_comma_or_end;
+                break;
             }
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        }
-        case parse_state::root:
-        {
-            auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
-            if (it != string_double_map_.end())
+            case parse_state::root:
             {
-                visitor.double_value((*it).second, semantic_tag::none, *this, ec);
-                more_ = !cursor_mode_;
+                auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
+                if (it != string_double_map_.end())
+                {
+                    visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
+                }
+                else
+                {
+                    visitor.string_value(sv, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
+                }
+                state_ = parse_state::accept;
+                break;
             }
-            else
-            {
-                visitor.string_value(sv, semantic_tag::none, *this, ec);
-                more_ = !cursor_mode_;
-            }
-            state_ = parse_state::accept;
-            break;
-        }
-        default:
-            more_ = err_handler_(json_errc::syntax_error, *this);
-            if (!more_)
-            {
-                ec = json_errc::syntax_error;
-                return;
-            }
-            break;
+            default:
+                more_ = err_handler_(json_errc::syntax_error, *this);
+                if (!more_)
+                {
+                    ec = json_errc::syntax_error;
+                    return;
+                }
+                break;
         }
     }
 
@@ -2734,22 +2734,22 @@ private:
     {
         switch (parent())
         {
-        case parse_state::object:
-            state_ = parse_state::expect_member_name;
-            break;
-        case parse_state::array:
-            state_ = parse_state::expect_value;
-            break;
-        case parse_state::root:
-            break;
-        default:
-            more_ = err_handler_(json_errc::syntax_error, *this);
-            if (!more_)
-            {
-                ec = json_errc::syntax_error;
-                return;
-            }
-            break;
+            case parse_state::object:
+                state_ = parse_state::expect_member_name;
+                break;
+            case parse_state::array:
+                state_ = parse_state::expect_value;
+                break;
+            case parse_state::root:
+                break;
+            default:
+                more_ = err_handler_(json_errc::syntax_error, *this);
+                if (!more_)
+                {
+                    ec = json_errc::syntax_error;
+                    return;
+                }
+                break;
         }
     }
 
@@ -2757,21 +2757,21 @@ private:
     {
         switch (parent())
         {
-        case parse_state::array:
-        case parse_state::object:
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        case parse_state::root:
-            state_ = parse_state::accept;
-            break;
-        default:
-            more_ = err_handler_(json_errc::syntax_error, *this);
-            if (!more_)
-            {
-                ec = json_errc::syntax_error;
-                return;
-            }
-            break;
+            case parse_state::array:
+            case parse_state::object:
+                state_ = parse_state::expect_comma_or_end;
+                break;
+            case parse_state::root:
+                state_ = parse_state::accept;
+                break;
+            default:
+                more_ = err_handler_(json_errc::syntax_error, *this);
+                if (!more_)
+                {
+                    ec = json_errc::syntax_error;
+                    return;
+                }
+                break;
         }
     }
 
