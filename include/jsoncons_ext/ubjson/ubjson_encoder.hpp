@@ -85,7 +85,7 @@ private:
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
-    int nesting_depth_;
+    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -103,8 +103,7 @@ public:
                                   const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
          options_(options),
-         alloc_(alloc),
-         nesting_depth_(0)
+         alloc_(alloc)
     {
     }
 

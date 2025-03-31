@@ -49,13 +49,12 @@ namespace detail {
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     private:
-        pointer data_;
-        size_type size_;
+        pointer data_{nullptr};
+        size_type size_{0};
     public:
         static constexpr std::size_t extent = Extent;
 
         constexpr span() noexcept
-            : data_(nullptr), size_(0)
         {
         }
         constexpr span(pointer data, size_type size)

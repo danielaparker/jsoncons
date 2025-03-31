@@ -226,16 +226,16 @@ namespace detail {
         class encoding_context
         {
             container_type type_;
-            std::size_t count_{0};
             line_split_kind line_splits_;
             bool indent_before_;
             bool new_line_after_;
             std::size_t begin_pos_{0};
             std::size_t data_pos_{0};
+            std::size_t count_{0};
         public:
             encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
                              std::size_t begin_pos, std::size_t data_pos) noexcept
-               : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
+               : type_(type), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
                  begin_pos_(begin_pos), data_pos_(data_pos)
             {
             }
@@ -319,15 +319,15 @@ namespace detail {
         jsoncons::detail::write_double fp_;
 
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
-        int indent_amount_;
-        std::size_t column_;
+        int indent_amount_{0};
+        std::size_t column_{0};
         std::basic_string<CharT> colon_str_;
         std::basic_string<CharT> comma_str_;
         std::basic_string<CharT> open_object_brace_str_;
         std::basic_string<CharT> close_object_brace_str_;
         std::basic_string<CharT> open_array_bracket_str_;
         std::basic_string<CharT> close_array_bracket_str_;
-        int nesting_depth_;
+        int nesting_depth_{0};
     public:
 
         // Noncopyable and nonmoveable
@@ -346,10 +346,7 @@ namespace detail {
            : sink_(std::forward<Sink>(sink)), 
              options_(options),
              fp_(options.float_format(), options.precision()),
-             stack_(alloc),
-             indent_amount_(0), 
-             column_(0),
-             nesting_depth_(0)
+             stack_(alloc)
         {
             switch (options.spaces_around_colon())
             {
@@ -1108,10 +1105,10 @@ namespace detail {
         class encoding_context
         {
             container_type type_;
-            std::size_t count_;
+            std::size_t count_{0};
         public:
             encoding_context(container_type type) noexcept
-               : type_(type), count_(0)
+               : type_(type)
             {
             }
 

@@ -70,11 +70,11 @@ namespace jsoncons {
             const float* float_data_;
             const double* double_data_;
         } data_;
-        std::size_t size_;
+        std::size_t size_{0};
     public:
 
         typed_array_view()
-            : type_(), data_(), size_(0)
+            : type_(), data_()
         {
         }
 

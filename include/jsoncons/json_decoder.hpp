@@ -61,22 +61,20 @@ private:
 
     Json result_;
 
-    std::size_t index_;
+    std::size_t index_{0};
     key_type name_;
     std::vector<index_key_value<Json>,stack_item_allocator_type> item_stack_;
     std::vector<structure_info,structure_info_allocator_type> structure_stack_;
-    bool is_valid_;
+    bool is_valid_{false};
 
 public:
     json_decoder(const allocator_type& alloc = allocator_type(), 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
         : allocator_(alloc),
           result_(),
-          index_(0),
           name_(alloc),
           item_stack_(alloc),
-          structure_stack_(temp_alloc),
-          is_valid_(false)
+          structure_stack_(temp_alloc)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -87,11 +85,9 @@ public:
         const temp_allocator_type& temp_alloc = temp_allocator_type())
         : allocator_(),
           result_(),
-          index_(0),
           name_(),
           item_stack_(),
-          structure_stack_(temp_alloc),
-          is_valid_(false)
+          structure_stack_(temp_alloc)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);

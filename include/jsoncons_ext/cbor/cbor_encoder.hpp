@@ -108,7 +108,7 @@ private:
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
-    int nesting_depth_;
+    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -128,8 +128,7 @@ public:
          alloc_(alloc),
          stack_(alloc),
          stringref_map_(alloc),
-         bytestringref_map_(alloc),
-         nesting_depth_(0)        
+         bytestringref_map_(alloc)
     {
         if (options.pack_strings())
         {

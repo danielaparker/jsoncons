@@ -150,20 +150,20 @@ namespace jsoncons {
 
     class ser_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_;
-        std::size_t column_number_;
+        std::size_t line_number_{0};
+        std::size_t column_number_{0};
         mutable std::string what_;
     public:
         ser_error(std::error_code ec)
-            : std::system_error(ec), line_number_(0), column_number_(0)
+            : std::system_error(ec)
         {
         }
         ser_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+            : std::system_error(ec, what_arg)
         {
         }
         ser_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec), line_number_(0), column_number_(position)
+            : std::system_error(ec), column_number_(position)
         {
         }
         ser_error(std::error_code ec, std::size_t line, std::size_t column)

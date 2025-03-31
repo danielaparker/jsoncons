@@ -126,7 +126,10 @@ private:
     static constexpr std::size_t initial_string_buffer_capacity = 256;
     static constexpr int default_initial_stack_capacity = 66;
 
-    basic_json_decode_options<char_type> options_;
+    int max_nesting_depth_;
+    bool allow_trailing_comma_;
+    bool allow_comments_;    
+    bool lossless_number_;    
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int level_{0};
@@ -146,7 +149,7 @@ private:
     bool done_{false};
     bool cursor_mode_{false};
     int mark_level_{0};
-
+    
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
     jsoncons::detail::chars_to to_double_;
 
@@ -178,7 +181,10 @@ public:
     basic_json_parser(const basic_json_decode_options<char_type>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& temp_alloc = TempAllocator())
-       : options_(options),
+       : max_nesting_depth_(options.max_nesting_depth()),
+         allow_trailing_comma_(options.allow_trailing_comma()),
+         allow_comments_(options.allow_comments()),
+         lossless_number_(options.lossless_number()),
          err_handler_(err_handler),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc)
@@ -189,17 +195,17 @@ public:
         state_stack_.reserve(initial_stack_capacity );
         push_state(parse_state::root);
 
-        if (options_.enable_str_to_nan())
+        if (options.enable_str_to_nan())
         {
-            string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
+            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
         }
-        if (options_.enable_str_to_inf())
+        if (options.enable_str_to_inf())
         {
-            string_double_map_.emplace_back(options_.inf_to_str(),std::numeric_limits<double>::infinity());
+            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
         }
-        if (options_.enable_str_to_neginf())
+        if (options.enable_str_to_neginf())
         {
-            string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
+            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
     }
     
@@ -328,7 +334,7 @@ public:
 
     void begin_object(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++level_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++level_ > max_nesting_depth_))
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -391,7 +397,7 @@ public:
 
     void begin_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (++level_ > options_.max_nesting_depth())
+        if (++level_ > max_nesting_depth_)
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -932,7 +938,7 @@ public:
                             saved_position_ = position_;
                             ++input_ptr_;
                             ++position_;
-                            if (!options_.allow_trailing_comma())
+                            if (!allow_trailing_comma_)
                             {
                                 more_ = err_handler_(json_errc::extra_comma, *this);
                                 if (!more_)
@@ -1110,7 +1116,7 @@ public:
                             ++position_;
                             if (parent() == parse_state::array)
                             {
-                                if (!options_.allow_trailing_comma())
+                                if (!allow_trailing_comma_)
                                 {
                                     more_ = err_handler_(json_errc::extra_comma, *this);
                                     if (!more_)
@@ -1470,7 +1476,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case '*':
-                            if (!options_.allow_comments())
+                            if (!allow_comments_)
                             {
                                 ec = json_errc::illegal_comment;
                                 return;
@@ -1484,7 +1490,7 @@ public:
                             state_ = parse_state::slash_star;
                             break;
                         case '/':
-                            if (!options_.allow_comments())
+                            if (!allow_comments_)
                             {
                                 ec = json_errc::illegal_comment;
                                 return;
@@ -2641,7 +2647,7 @@ private:
     {
         JSONCONS_TRY
         {
-            if (options_.lossless_number())
+            if (lossless_number_)
             {
                 visitor.string_value(string_buffer_, semantic_tag::bigdec, *this, ec);
                 more_ = !cursor_mode_;
@@ -2778,7 +2784,7 @@ private:
     void push_state(parse_state state)
     {
         state_stack_.push_back(state);
-        //std::cout << "max_nesting_depth: " << options_.max_nesting_depth() << ", capacity: " << state_stack_.capacity() << ", nesting_depth: " << level_ << ", stack size: " << state_stack_.size() << "\n";
+        //std::cout << "max_nesting_depth: " << max_nesting_depth_ << ", capacity: " << state_stack_.capacity() << ", nesting_depth: " << level_ << ", stack size: " << state_stack_.size() << "\n";
     }
 
     parse_state pop_state()

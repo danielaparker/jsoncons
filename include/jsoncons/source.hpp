@@ -625,9 +625,9 @@ namespace jsoncons {
 
         IteratorT current_;
         IteratorT end_;
-        std::size_t position_;
+        std::size_t position_{0};
         std::vector<value_type> buffer_;
-        std::size_t buffer_length_;
+        std::size_t buffer_length_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -639,7 +639,7 @@ namespace jsoncons {
         binary_iterator_source(binary_iterator_source&& other) = default;
 
         binary_iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
-            : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
+            : current_(first), end_(last), buffer_(buf_size)
         {
         }
 

@@ -332,8 +332,8 @@ namespace detail {
     // byte_string_view
     class byte_string_view
     {
-        const uint8_t* data_;
-        std::size_t size_; 
+        const uint8_t* data_{nullptr};
+        std::size_t size_{0}; 
     public:
         using traits_type = byte_traits;
 
@@ -348,7 +348,6 @@ namespace detail {
         using const_pointer = const uint8_t*;
 
         constexpr byte_string_view() noexcept
-            : data_(nullptr), size_(0)
         {
         }
 
@@ -370,7 +369,6 @@ namespace detail {
         constexpr byte_string_view(const byte_string_view&) = default;
 
         JSONCONS_CPP14_CONSTEXPR byte_string_view(byte_string_view&& other) noexcept
-            : data_(nullptr), size_(0)
         {
             const_pointer temp_data = data_;
             data_ = other.data_;

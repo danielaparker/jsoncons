@@ -33,7 +33,7 @@ namespace jsoncons {
         {
         }
         conv_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec), line_number_(0), column_number_(position)
+            : std::system_error(ec), column_number_(position)
         {
         }
         conv_error(std::error_code ec, std::size_t line, std::size_t column)

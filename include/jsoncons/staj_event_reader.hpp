@@ -52,11 +52,11 @@ namespace jsoncons {
         item_event_reader_state state_;
         typed_array_view data_;
         jsoncons::span<const size_t> shape_;
-        std::size_t index_;
+        std::size_t index_{0};
     public:
         basic_item_event_receiver()
             : event_(staj_event_type::null_value),
-              state_(), data_(), shape_(), index_(0)
+              state_(), data_(), shape_()
         {
         }
 

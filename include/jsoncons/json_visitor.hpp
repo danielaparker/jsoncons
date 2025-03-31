@@ -846,7 +846,7 @@ namespace jsoncons {
 
         stream_type& output_;
         string_type indentation_;
-        long level_;
+        long level_{0};
 
     public:
         // If CharT is char, then enable the default constructor which binds to
@@ -871,8 +871,7 @@ namespace jsoncons {
             stream_type& output,
             string_type indentation = string_type())
             : output_(output),
-              indentation_(std::move(indentation)),
-              level_(0)
+              indentation_(std::move(indentation))
         {
         }
 

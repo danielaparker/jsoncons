@@ -201,12 +201,12 @@ namespace jsoncons {
     struct typed_array_visitor : public default_json_visitor
     {
         T& v_;
-        int level_;
+        int level_{0};
     public:
         using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(), v_(v), level_(0)
+            : default_json_visitor(), v_(v)
         {
         }
     private:
