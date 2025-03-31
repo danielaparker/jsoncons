@@ -344,5 +344,47 @@ TEST_CASE("json_parser skip space tests")
         CHECK(2 == parser.line());
         CHECK(7 == parser.column());
     }
+    SECTION("test 2")
+    {
+        jsoncons::json_decoder<json> decoder;
+        json_parser parser;
+
+        std::string line1 = "[false\r";
+        std::string line2 = "\n,true]";
+
+        parser.update(line1.data(), line1.size());
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+        parser.update(line2.data(), line2.size());
+        parser.parse_some(decoder);
+
+        //std::cout << "position:" << parser.position() << "line:" << parser.line() << "column:" << parser.column() << "\n";
+
+        CHECK(13 == parser.position());
+        CHECK(2 == parser.line());
+        CHECK(7 == parser.column());
+    }
+    SECTION("test 3")
+    {
+        jsoncons::json_decoder<json> decoder;
+        json_parser parser;
+
+        std::string line1 = "[false\n";
+        std::string line2 = ",true]";
+
+        parser.update(line1.data(), line1.size());
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+        parser.update(line2.data(), line2.size());
+        parser.parse_some(decoder);
+
+        //std::cout << "position:" << parser.position() << "line:" << parser.line() << "column:" << parser.column() << "\n";
+
+        CHECK(12 == parser.position());
+        CHECK(2 == parser.line());
+        CHECK(7 == parser.column());
+    }
 }
 
