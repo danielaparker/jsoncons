@@ -373,7 +373,13 @@ public:
             return;
         }
 
-        if (parent() == parse_state::root)
+        more_ = !cursor_mode_;
+        if (level_ == mark_level_)
+        {
+            more_ = false;
+        }
+        --level_;
+        if (level_ == 0)
         {
             state_ = parse_state::accept;
         }
@@ -381,12 +387,6 @@ public:
         {
             state_ = parse_state::expect_comma_or_end;
         }
-        more_ = !cursor_mode_;
-        if (level_ == mark_level_)
-        {
-            more_ = false;
-        }
-        --level_;
     }
 
     void begin_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
@@ -436,14 +436,6 @@ public:
             more_ = false;
             return;
         }
-        if (parent() == parse_state::root)
-        {
-            state_ = parse_state::accept;
-        }
-        else
-        {
-            state_ = parse_state::expect_comma_or_end;
-        }
 
         more_ = !cursor_mode_;
         if (level_ == mark_level_)
@@ -451,6 +443,15 @@ public:
             more_ = false;
         }
         --level_;
+
+        if (level_ == 0)
+        {
+            state_ = parse_state::accept;
+        }
+        else
+        {
+            state_ = parse_state::expect_comma_or_end;
+        }
     }
 
     void reinitialize()
@@ -1396,7 +1397,7 @@ public:
                             ++input_ptr_;
                             ++position_;
                             visitor.bool_value(true,  semantic_tag::none, *this, ec);
-                            if (parent() == parse_state::root)
+                            if (level_ == 0)
                             {
                                 state_ = parse_state::accept;
                             }
@@ -1518,7 +1519,7 @@ public:
                     {
                     case 'l':
                         visitor.null_value(semantic_tag::none, *this, ec);
-                        if (parent() == parse_state::root)
+                        if (level_ == 0)
                         {
                             state_ = parse_state::accept;
                         }
@@ -1655,7 +1656,7 @@ public:
                 input_ptr_ += 4;
                 position_ += 4;
                 visitor.bool_value(true, semantic_tag::none, *this, ec);
-                if (parent() == parse_state::root)
+                if (level_ == 0)
                 {
                     state_ = parse_state::accept;
                 }
@@ -1692,7 +1693,7 @@ public:
                 position_ += 4;
                 visitor.null_value(semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
-                if (parent() == parse_state::root)
+                if (level_ == 0)
                 {
                     state_ = parse_state::accept;
                 }
@@ -1728,7 +1729,7 @@ public:
                 position_ += 5;
                 visitor.bool_value(false, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
-                if (parent() == parse_state::root)
+                if (level_ == 0)
                 {
                     state_ = parse_state::accept;
                 }
