@@ -31,6 +31,11 @@ public:
         return 0;
     }
 
+    virtual size_t begin_position() const
+    {
+        return 0;
+    }
+
     virtual size_t end_position() const
     {
         return 0;

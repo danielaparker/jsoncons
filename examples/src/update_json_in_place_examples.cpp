@@ -18,8 +18,8 @@ public:
     using jsoncons::default_json_visitor::string_view_type;
 
     string_locator(char* data, std::size_t length,
-                   const std::vector<std::string>& path,
-                   const std::string& from)
+        const std::vector<std::string>& path,
+        const std::string& from)
         : data_(data), length_(length),
           path_(path), from_(from)
     {
@@ -49,9 +49,9 @@ private:
     }
 
     bool visit_string(const string_view_type& value,
-                      jsoncons::semantic_tag,
-                      const jsoncons::ser_context& context,
-                      std::error_code&) override
+        jsoncons::semantic_tag,
+        const jsoncons::ser_context& context,
+        std::error_code&) override
     {
         if (path_.size() <= current_.size() && std::equal(path_.rbegin(), path_.rend(), current_.rbegin()))
         {
@@ -66,9 +66,9 @@ private:
 };
 
 void update_json_in_place(std::string& input,
-                     const std::vector<std::string>& path,
-                     const std::string& from,
-                     const std::string& to)
+    const std::vector<std::string>& path,
+    const std::string& from,
+    const std::string& to)
 {
     if (input.size() > 0)
     {

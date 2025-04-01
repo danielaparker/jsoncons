@@ -12,10 +12,14 @@
     - Fixed an edge case in `basic_csv_parser`, detected by Google fuzz, where the first line in the input file contains an empty line
     and the `csv_mapping_kind` is `n_rows`.
 
-- API Change
+- API Changes
 
     - In JMESPath evaluation, 1.3.0 introduced late binding of variables to an initial (global) scope via parameters.
       The parameters type has been changed from `std::vector<std::pair<string_type,Json>>` to `std::map<string_type,Json>`.
+
+    - Added a member function `begin_position()` to `ser_context`. `begin_position()` should
+      be preferred to `position()` when [using filters to update JSON in place](https://github.com/danielaparker/jsoncons/blob/master/examples/src/update_json_in_place_examples.cpp).
+      Currently the two accessors return the same value, but that may change in a future release. 
 
 1.3.0
 -----

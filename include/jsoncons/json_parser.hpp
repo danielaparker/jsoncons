@@ -138,7 +138,7 @@ private:
     std::size_t line_{1};
     std::size_t position_{0};
     std::size_t mark_position_{0};
-    std::size_t saved_position_{0};
+    std::size_t begin_position_{0};
     const char_type* begin_input_{nullptr};
     const char_type* end_input_{nullptr};
     const char_type* input_ptr_{nullptr};
@@ -318,10 +318,7 @@ public:
                 default:
                     switch (*input_ptr_)
                     {
-                        case ' ':
-                        case '\t':
-                        case '\n':
-                        case '\r':
+                        case ' ':case '\t':case '\n':case '\r':
                             skip_space(&input_ptr_);
                             break;
                         default:
@@ -465,7 +462,7 @@ public:
         reset();
         cp_ = 0;
         cp2_ = 0;
-        saved_position_ = 0;
+        begin_position_ = 0;
         begin_input_ = nullptr;
         end_input_ = nullptr;
         input_ptr_ = nullptr;
@@ -654,11 +651,6 @@ public:
                     break;
                 case parse_state::start: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -669,6 +661,9 @@ public:
                                 return;
                             }
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/': 
                             ++input_ptr_;
                             ++position_;
@@ -676,14 +671,14 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_object(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '[':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_array(visitor, ec);
@@ -692,7 +687,7 @@ public:
                         case '\"':
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             string_buffer_.clear();
@@ -702,7 +697,7 @@ public:
                         case '-':
                             string_buffer_.clear();
                             string_buffer_.push_back('-');
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -715,7 +710,7 @@ public:
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = parse_state::number;
                             number_state_ = parse_number_state::zero;
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             parse_number(visitor, ec);
@@ -724,7 +719,7 @@ public:
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             string_buffer_.clear();
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -764,11 +759,6 @@ public:
                 }
                 case parse_state::expect_comma_or_end: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -781,6 +771,9 @@ public:
                             ++input_ptr_;
                             ++position_;
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/':
                             ++input_ptr_;
                             ++position_;
@@ -788,14 +781,14 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '}':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             end_object(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case ']':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             end_array(visitor, ec);
@@ -834,7 +827,6 @@ public:
                 }
                 case parse_state::expect_member_name_or_end: 
                 {
-                    skip_space(&input_ptr_);
                     if (input_ptr_ >= local_input_end)
                     {
                         return;
@@ -851,6 +843,9 @@ public:
                             ++input_ptr_;
                             ++position_;
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/':
                             ++input_ptr_;
                             ++position_;
@@ -858,14 +853,14 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '}':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             end_object(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             push_state(parse_state::member_name);
@@ -900,11 +895,6 @@ public:
                 }
                 case parse_state::expect_member_name: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -917,6 +907,9 @@ public:
                             ++input_ptr_;
                             ++position_;
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/': 
                             ++input_ptr_;
                             ++position_;
@@ -924,7 +917,7 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '\"':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             push_state(parse_state::member_name);
@@ -935,7 +928,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '}':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             if (!allow_trailing_comma_)
@@ -975,11 +968,6 @@ public:
                 }
                 case parse_state::expect_colon: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -991,6 +979,9 @@ public:
                             }
                             ++input_ptr_;
                             ++position_;
+                            break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
                             break;
                         case '/': 
                             push_state(state_);
@@ -1018,11 +1009,6 @@ public:
                 }
                 case parse_state::expect_value: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -1035,6 +1021,9 @@ public:
                             ++input_ptr_;
                             ++position_;
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/': 
                             push_state(state_);
                             ++input_ptr_;
@@ -1042,21 +1031,21 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_object(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '[':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_array(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::string;
@@ -1068,7 +1057,7 @@ public:
                         case '-':
                             string_buffer_.clear();
                             string_buffer_.push_back('-');
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1079,7 +1068,7 @@ public:
                         case '0': 
                             string_buffer_.clear();
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1090,7 +1079,7 @@ public:
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             string_buffer_.clear();
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1111,7 +1100,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case ']':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             if (parent() == parse_state::array)
@@ -1164,11 +1153,6 @@ public:
                 }
                 case parse_state::expect_value_or_end: 
                 {
-                    skip_space(&input_ptr_);
-                    if (input_ptr_ >= local_input_end)
-                    {
-                        return;
-                    }
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -1181,6 +1165,9 @@ public:
                             ++input_ptr_;
                             ++position_;
                             break;
+                        case ' ':case '\t':case '\n':case '\r':
+                            skip_space(&input_ptr_);
+                            break;
                         case '/': 
                             ++input_ptr_;
                             ++position_;
@@ -1188,28 +1175,28 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_object(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '[':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_array(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case ']':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             end_array(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::string;
@@ -1221,7 +1208,7 @@ public:
                         case '-':
                             string_buffer_.clear();
                             string_buffer_.push_back('-');
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1232,7 +1219,7 @@ public:
                         case '0': 
                             string_buffer_.clear();
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1243,7 +1230,7 @@ public:
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             string_buffer_.clear();
                             string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                            saved_position_ = position_;
+                            begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             state_ = parse_state::number;
@@ -1582,7 +1569,7 @@ public:
 
     void parse_true(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        saved_position_ = position_;
+        begin_position_ = position_;
         if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
@@ -1618,7 +1605,7 @@ public:
 
     void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        saved_position_ = position_;
+        begin_position_ = position_;
         if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
@@ -1654,7 +1641,7 @@ public:
 
     void parse_false(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        saved_position_ = position_;
+        begin_position_ = position_;
         if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 5))
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
@@ -2532,9 +2519,14 @@ escape_u8:
         return (position_ - mark_position_) + 1;
     }
 
+    std::size_t begin_position() const override
+    {
+        return begin_position_;
+    }
+
     std::size_t position() const override
     {
-        return saved_position_;
+        return begin_position_;
     }
 
     std::size_t end_position() const override
