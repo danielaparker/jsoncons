@@ -71,7 +71,7 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 [Get started with HealthImaging image sets and image frames using an AWS SDK](https://docs.aws.amazon.com/healthimaging/latest/devguide/example_medical-imaging_Scenario_ImageSetsAndFrames_section.html)
 
-[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://cran.rstudio.com/web/packages/rjsoncons/index.html)
+[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://mtmorgan.github.io/rjsoncons/);[CoppeliaSim](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
 
 ## Get jsoncons
 
@@ -235,13 +235,13 @@ namespace ns {
         std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,
-                       hiking_experience assertion,
-                       const std::string& rated,
-                       double rating,
-                       const std::optional<std::chrono::seconds>& generated = 
-                           std::optional<std::chrono::seconds>(),
-                       const std::optional<std::chrono::seconds>& expires = 
-                           std::optional<std::chrono::seconds>())
+            hiking_experience assertion,
+            const std::string& rated,
+            double rating,
+            const std::optional<std::chrono::seconds>& generated = 
+                std::optional<std::chrono::seconds>(),
+            const std::optional<std::chrono::seconds>& expires = 
+                std::optional<std::chrono::seconds>())
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
               generated_(generated), expires_(expires)
         {
@@ -273,7 +273,7 @@ namespace ns {
         std::vector<hiking_reputon> reputons_;
     public:
         hiking_reputation(const std::string& application, 
-                          const std::vector<hiking_reputon>& reputons)
+            const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
