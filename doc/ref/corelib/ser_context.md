@@ -17,11 +17,14 @@ Line numbers (if available) start at 1. The default implementation returns 0.
 Returns the column number to the end of the text being parsed.
 Column numbers (if available) start at 1. The default implementation returns 0.
 
-    virtual size_t position() const;
+    virtual size_t begin_position() const;                                             (since 1.3.1)
 `position()` is defined for all JSON elements reported to the visitor, and indicates
 the position of the character at the beginning of the element, e.g. '"' for a string
 or the first digit for a positive number.
 Currently only supported for the JSON parser.
+
+    virtual size_t position() const;
+Currently returns the same value as `begin_position()`. Since 1.3.1, prefer `begin_position()`. 
 
     virtual size_t end_position() const;
 `end_position()` is defined for all JSON elements reported to the visitor, and indicates
