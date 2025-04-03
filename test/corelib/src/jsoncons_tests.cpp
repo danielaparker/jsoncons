@@ -221,7 +221,6 @@ TEST_CASE("test_multiline_comments")
     json j = json::parse(is);
 
     CHECK(j.is_array());
-    CHECK(j.is_array());
     CHECK(0 == j.size());
 } 
 

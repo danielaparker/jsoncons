@@ -1318,7 +1318,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
-        REQUIRE(3 == (j.is_array() && j.size()));
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_ACGN>());
         CHECK_FALSE(j[0].is<ns::Triangle_ACGN>());
         CHECK_FALSE(j[0].is<ns::Circle_ACGN>());
@@ -1381,7 +1382,8 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
-        REQUIRE(3 == (j.is_array() && j.size()));
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_AGSN>());
         CHECK_FALSE(j[0].is<ns::Triangle_AGSN>());
         CHECK_FALSE(j[0].is<ns::Circle_AGSN>());
@@ -1444,7 +1446,8 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
-        REQUIRE(3 == (j.is_array() && j.size()));
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_NGSN>());
         CHECK_FALSE(j[0].is<ns::Triangle_NGSN>());
         CHECK_FALSE(j[0].is<ns::Circle_NGSN>());
@@ -1507,7 +1510,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
-        REQUIRE(3 == (j.is_array() && j.size()));
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_AMN>());
         CHECK_FALSE(j[0].is<ns::Triangle_AMN>());
         CHECK_FALSE(j[0].is<ns::Circle_AMN>());
@@ -1570,7 +1574,8 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
-        REQUIRE(3 == (j.is_array() && j.size()));
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_NMN>());
         CHECK_FALSE(j[0].is<ns::Triangle_NMN>());
         CHECK_FALSE(j[0].is<ns::Circle_NMN>());
