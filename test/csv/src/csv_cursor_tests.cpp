@@ -948,8 +948,10 @@ TEST_CASE("csv_cursor with filter tests")
 TEST_CASE("test_csv_parser_reinitialization")
 {
     json_decoder<json> decoder;
-    csv::csv_parser parser(csv::csv_options().assume_header(true)
-                                             .max_lines(2));
+    auto options = csv::csv_options()
+        .assume_header(true)
+        .max_lines(2);
+    csv::csv_parser parser(options);
 
     parser.reinitialize();
     std::string input = "h1,h2\n"

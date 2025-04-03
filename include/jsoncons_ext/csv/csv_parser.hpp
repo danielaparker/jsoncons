@@ -45,7 +45,6 @@ enum class csv_parse_state
 {
     start,
     cr, 
-    column_labels,
     expect_comment_or_record,
     expect_record,
     end_record,
@@ -629,19 +628,21 @@ public:
          state_stack_(alloc),
          buffer_(alloc)
     {
-        if (options_.enable_str_to_nan())
+        if (options.enable_str_to_nan())
         {
-            string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
+            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
         }
-        if (options_.enable_str_to_inf())
+        if (options.enable_str_to_inf())
         {
-            string_double_map_.emplace_back(options_.inf_to_str(),std::numeric_limits<double>::infinity());
+            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
         }
-        if (options_.enable_str_to_neginf())
+        if (options.enable_str_to_neginf())
         {
-            string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
+            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
 
+        jsoncons::csv::detail::parse_column_types(options_.column_types(), column_types_);
+        jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
         initialize();
     }
 
@@ -713,8 +714,6 @@ public:
         m_columns_filter_.reset();
         stack_.clear();
         column_names_.clear();
-        column_types_.clear();
-        column_defaults_.clear();
         state_stack_.clear();
         buffer_.clear();
 
@@ -921,8 +920,7 @@ public:
                     }
                     if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
-                        column_index_ = 0;
-                        //state_ = csv_parse_state::column_labels;
+                        column_index_ = 0; 
                         local_visitor.begin_array(semantic_tag::none, *this, ec);
                         ++level_;
                         more_ = !cursor_mode_;
@@ -931,31 +929,6 @@ public:
                     else
                     {
                         state_ = csv_parse_state::expect_comment_or_record;
-                    }
-                    break;
-                case csv_parse_state::column_labels:
-                    if (column_index_ < column_names_.size())
-                    {
-                        local_visitor.string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
-                        more_ = !cursor_mode_;
-                        ++column_index_;
-                    }
-                    else
-                    {
-                        local_visitor.end_array(*this, ec);
-                        more_ = !cursor_mode_;
-                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
-                        {
-                            if (level() == mark_level_)
-                            {
-                                more_ = false;
-                            }
-                        }
-                        --level_;
-                        
-                        state_ = csv_parse_state::expect_comment_or_record; 
-                        //stack_.back() = csv_mode::data;
-                        column_index_ = 0;
                     }
                     break;
                 case csv_parse_state::comment: 
@@ -1449,13 +1422,10 @@ private:
     void initialize()
     {
         jsoncons::csv::detail::parse_column_names(options_.column_names(), column_names_);
-        jsoncons::csv::detail::parse_column_types(options_.column_types(), column_types_);
-        jsoncons::csv::detail::parse_column_names(options_.column_defaults(), column_defaults_);
 
         stack_.reserve(default_depth);
         stack_.push_back(csv_mode::initial);
-        stack_.push_back((options_.header_lines() > 0) ? csv_mode::header
-                                                       : csv_mode::data);
+        stack_.push_back((options_.header_lines() > 0) ? csv_mode::header : csv_mode::data);
     }
 
     // name
