@@ -21,6 +21,12 @@
       be preferred to `position()` when [using filters to update JSON in place](https://github.com/danielaparker/jsoncons/blob/master/examples/src/update_json_in_place_examples.cpp).
       Currently the two accessors return the same value, but that may change in a future release. 
 
+    - Added macros **JSONCONS_VISITOR_RETURN_TYPE** and **JSONCONS_VISITOR_RETURN** that are
+      #define'd to `bool` and `return true` respectively. For users that have implemented 
+      classes that derive from `basic_json_filter`, and that have overridden `visit_xxx` functions,
+      it is recommended to use these macros for the return type and return value rather than
+      `bool` and `return true`. This is for forward compatability.      
+
 1.3.0
 -----
 
