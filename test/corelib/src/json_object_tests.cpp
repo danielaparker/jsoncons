@@ -21,7 +21,7 @@ TEST_CASE("json(json_object_arg, first, last)")
 
         json j(json_object_arg, m.begin(),m.end());
 
-        REQUIRE(j.size() == 3);
+        REQUIRE(3 == j.size());
         auto it = j.object_range().begin();
         CHECK(it++->key() == "a");
         CHECK(it++->key() == "b");
@@ -42,7 +42,7 @@ TEST_CASE("json insert(first,last) test")
 
         //std::cout << j << "\n";
 
-        REQUIRE(j.size() == 6);
+        REQUIRE(6 == j.size());
         auto it = j.object_range().begin();
         CHECK(it++->key() == "a");
         CHECK(it++->key() == "b");
@@ -65,7 +65,7 @@ TEST_CASE("json insert(first,last) test")
 
         //std::cout << j << "\n";
 
-        REQUIRE(j.size() == 6);
+        REQUIRE(6 == j.size());
         auto it = j.object_range().begin();
         CHECK(it++->key() == "a");
         CHECK(it++->key() == "b");
@@ -129,9 +129,9 @@ TEST_CASE("test_erase_member")
     json o;
     o["key"] = "Hello";
 
-    CHECK(o.size() == 1);
+    CHECK(1 == o.size());
     o.erase("key");
-    CHECK(o.size() == 0);
+    CHECK(0 == o.size());
 
     json a;
     json b(json_object_arg);
@@ -165,7 +165,7 @@ TEST_CASE("test_object_erase_range")
 TEST_CASE("test_empty_object")
 {
     json a;
-    CHECK(a.size() == 0);
+    CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
@@ -178,7 +178,7 @@ TEST_CASE("test_empty_object")
     }
 
     a["key"] = "Hello";
-    CHECK(a.size() == 1);
+    CHECK(1 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 }
@@ -186,7 +186,7 @@ TEST_CASE("test_empty_object")
 TEST_CASE("test_const_empty_object")
 {
     const json b;
-    CHECK(b.size() == 0);
+    CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
 
@@ -202,13 +202,13 @@ TEST_CASE("test_const_empty_object")
 TEST_CASE("test_empty_object_reserve")
 {
     json c;
-    CHECK(c.size() == 0);
+    CHECK(0 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
     c.reserve(100);
     CHECK(c.capacity() == 100);
     c["key"] = "Hello";
-    CHECK(c.size() == 1);
+    CHECK(1 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
     CHECK(c.capacity() == 100);
@@ -217,12 +217,12 @@ TEST_CASE("test_empty_object_reserve")
 TEST_CASE("test_empty_object_copy")
 {
     json a;
-    CHECK(a.size() == 0);
+    CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
     json b = a;
-    CHECK(b.size() == 0);
+    CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
 }
@@ -230,12 +230,12 @@ TEST_CASE("test_empty_object_copy")
 TEST_CASE("test_empty_object_move")
 {
     json a;
-    CHECK(a.size() == 0);
+    CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
     json b = std::move(a);
-    CHECK(b.size() == 0);
+    CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
 }
@@ -243,7 +243,7 @@ TEST_CASE("test_empty_object_move")
 TEST_CASE("test_empty_object_copy_assignment")
 {
     json a;
-    CHECK(a.size() == 0);
+    CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
@@ -253,17 +253,17 @@ TEST_CASE("test_empty_object_copy_assignment")
     CHECK(b.is_array());
 
     b = a;
-    CHECK(b.size() == 0);
+    CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
 
     json c;
     c["key"] = "value";
-    CHECK(c.size() == 1);
+    CHECK(1 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
     c = a;
-    CHECK(c.size() == 0);
+    CHECK(0 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
 }
@@ -271,7 +271,7 @@ TEST_CASE("test_empty_object_copy_assignment")
 TEST_CASE("test_empty_object_move_assignment")
 {
     json a;
-    CHECK(a.size() == 0);
+    CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
@@ -281,18 +281,18 @@ TEST_CASE("test_empty_object_move_assignment")
     CHECK(b.is_array());
 
     b = std::move(a);
-    CHECK(b.size() == 0);
+    CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
 
     json c;
     c["key"] = "value";
-    CHECK(c.size() == 1);
+    CHECK(1 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
 
     c = std::move(b);
-    CHECK(c.size() == 0);
+    CHECK(0 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
 }
@@ -683,11 +683,11 @@ TEST_CASE("test_as")
     int int_val = obj["field2"].as<int>();
     CHECK(1 == int_val);
     int short_val = obj["field2"].as<short>();
-    CHECK(short_val == 1);
+    CHECK(1 == short_val);
     int ushort_val = obj["field2"].as<unsigned short>();
     CHECK(ushort_val == static_cast<unsigned short>(1));
     char char_val = obj["field2"].as<char>();
-    CHECK(int(char_val) == 1);
+    CHECK(1 == int(char_val));
 
     CHECK(obj["char_field"].is<char>());
     CHECK_FALSE(obj["string_field"].is<char>());
@@ -697,9 +697,9 @@ TEST_CASE("test_as")
     s = parent["child"]["field1"].as<std::string>();
     CHECK(s == std::string("10"));
     int_val = parent["child"]["field2"].as<int>();
-    CHECK(int_val == 1);
+    CHECK(1 == int_val);
     short_val = parent["child"]["field2"].as<short>();
-    CHECK(short_val == 1);
+    CHECK(1 == short_val);
 
     //json::object x = parent["child"].as<json::object>();
     // Compile time error, "as<Json::object> not supported"
@@ -970,9 +970,9 @@ TEST_CASE("test json_object erase with iterator")
             }
         }
 
-        CHECK(j.size() == 1);
-        CHECK(j.at("b") == 2);
-        CHECK(j["b"] == 2);
+        CHECK(1 == j.size());
+        CHECK(2 == j.at("b"));
+        CHECK(2 == j["b"]);
     }
     SECTION("json erase with iterator 2")
     {
@@ -995,9 +995,9 @@ TEST_CASE("test json_object erase with iterator")
             }
         }
 
-        CHECK(j.size() == 1);
-        CHECK(j.at("c") == 3);
-        CHECK(j["c"] == 3);
+        CHECK(1 == j.size());
+        CHECK(3 == j.at("c"));
+        CHECK(3 == j["c"]);
     }
 }
 

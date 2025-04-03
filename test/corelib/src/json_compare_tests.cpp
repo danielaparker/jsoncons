@@ -109,9 +109,9 @@ TEST_CASE("basic_json object == basic_json object")
         CHECK(jsoncons::extension_traits::is_basic_json<decltype(o1.at("a"))>::value);
         CHECK(jsoncons::extension_traits::is_basic_json<const json&>::value);
 
-        CHECK((o1.at("a") == 1)); // basic_json == int
+        CHECK(1 == (o1.at("a"))); // basic_json == int
         CHECK((1 == o1.at("a"))); // int == basic_json
-        CHECK((o1["a"] == 1));    // proxy == int
+        CHECK(1 == (o1["a"]));    // proxy == int
         CHECK((1 == o1["a"]));    // int == proxy
 
         CHECK((o1.at("b") != 1)); // basic_json == int

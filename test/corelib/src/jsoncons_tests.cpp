@@ -32,13 +32,13 @@ TEST_CASE("test_assignment")
     CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
 
     CHECK(double_2.as<double>() == Approx(7.0).epsilon(0.000001));
-    CHECK(double_2.as<int>() == 7);
+    CHECK(7 == double_2.as<int>());
     CHECK(root["myobject"]["bool_2"].as<bool>());
-    CHECK(root["myobject"]["int_2"].as<int64_t>() == 0);
+    CHECK(0 == root["myobject"]["int_2"].as<int64_t>());
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
     CHECK(root["myobject"]["bool_2"].as<bool>());
-    CHECK(root["myobject"]["int_2"].as<long long>() == 0);
+    CHECK(0 == root["myobject"]["int_2"].as<long long>());
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 }
 
@@ -103,7 +103,7 @@ TEST_CASE("test_array")
 
     root["addresses"] = addresses;
 
-    CHECK(root["addresses"].size() == 2);
+    CHECK(2 == root["addresses"].size());
 
 }
 
@@ -183,7 +183,7 @@ TEST_CASE("test_uHHHH")
     json arr = json::parse(inputStr);
 
     std::string s = arr[0].as<std::string>();
-    REQUIRE(s.length() == 6);
+    REQUIRE(6 == s.length());
     CHECK(static_cast<uint8_t>(s[0]) == 0x7f);
     CHECK(static_cast<uint8_t>(s[1]) == 0xdf);
     CHECK(static_cast<uint8_t>(s[2]) == 0xbf);
@@ -199,7 +199,7 @@ TEST_CASE("test_uHHHH")
 
     json arr2 = json::parse(outputStr);
     std::string s2 = arr2[0].as<std::string>();
-    REQUIRE(s2.length() == 6);
+    REQUIRE(6 == s2.length());
     CHECK(static_cast<uint8_t>(s2[0]) == 0x7f);
     CHECK(static_cast<uint8_t>(s2[1]) == 0xdf);
     CHECK(static_cast<uint8_t>(s2[2]) == 0xbf);
@@ -222,6 +222,6 @@ TEST_CASE("test_multiline_comments")
 
     CHECK(j.is_array());
     CHECK(j.is_array());
-    CHECK(j.size() == 0);
+    CHECK(0 == j.size());
 } 
 

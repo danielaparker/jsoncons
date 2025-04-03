@@ -47,7 +47,7 @@ TEST_CASE("jsonpath flatten test")
         json result = jsonpath::flatten(input);
 
         REQUIRE(result.is_object()); //-V521
-        REQUIRE(result.size() == 9); //-V521
+        REQUIRE(9 == result.size()); //-V521
 
         //std::cout << pretty_print(result) << "\n";
 

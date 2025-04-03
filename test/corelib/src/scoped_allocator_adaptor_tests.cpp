@@ -50,7 +50,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
         j.try_emplace(key1, cust_json{});
         j.try_emplace(std::move(key2), long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j.at("foo") == cust_json{});
         CHECK(j.at("bar").as_string_view() == long_string);
     }
@@ -62,7 +62,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
         j.insert_or_assign("foo", cust_json{});
         j.insert_or_assign("bar", long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j.at("foo") == cust_json{});
         CHECK(j.at("bar").as_string_view() == long_string);
     }
@@ -73,8 +73,8 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
         j.emplace_back(1);
         j.emplace_back(long_string);
 
-        CHECK(j.size() == 2);
-        CHECK(j.at(0) == 1);
+        CHECK(2 == j.size());
+        CHECK(1 == j.at(0));
         CHECK(j.at(1).as<std::string>() == long_string);
     }
 
@@ -84,8 +84,8 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
         j.push_back(1);
         j.push_back(long_string);
 
-        CHECK(j.size() == 2);
-        CHECK(j.at(0) == 1);
+        CHECK(2 == j.size());
+        CHECK(1 == j.at(0));
         CHECK(j.at(1).as<std::string>() == long_string);
     }
 
@@ -96,7 +96,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
         j.insert(j.array_range().end(), cust_json{});
         j.insert(j.array_range().end(), long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j[0] == cust_json{});
         CHECK(j[1].as_string_view() == long_string);
     }
@@ -142,7 +142,7 @@ TEST_CASE("scoped allocator adaptor parse tests")
         CHECK(j.contains("foo"));
 
         cust_json& a = j.at("foo");
-        CHECK(a.size() == 1);
+        CHECK(1 == a.size());
         cust_json& b = a[0];
 
         CHECK(b.at("double").as<double>() == Approx(1000.1).epsilon(0.001));

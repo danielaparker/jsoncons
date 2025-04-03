@@ -20,11 +20,11 @@ TEST_CASE("jsonpath json_location_parser tests")
         std::vector<jsonpath::path_element> location = parser.parse(R"($['foo'][3]["bar"])", ec);
         REQUIRE_FALSE(ec);
 
-        CHECK(location.size() == 3);
+        CHECK(3 == location.size());
         CHECK(location[0].has_name());
         CHECK(location[0].name() == "foo");
         CHECK(location[1].has_index());
-        CHECK(location[1].index() == 3);
+        CHECK(3 == location[1].index());
         CHECK(location[2].has_name());
         CHECK(location[2].name() == "bar");
     }
@@ -36,11 +36,11 @@ TEST_CASE("jsonpath json_location_parser tests")
         std::vector<jsonpath::path_element> location = parser.parse(R"($.'foo'.3.bar)", ec);
         REQUIRE_FALSE(ec);
 
-        CHECK(location.size() == 3);
+        CHECK(3 == location.size());
         CHECK(location[0].has_name());
         CHECK(location[0].name() == "foo");
         CHECK(location[1].has_index());
-        CHECK(location[1].index() == 3);
+        CHECK(3 == location[1].index());
         CHECK(location[2].has_name());
         CHECK(location[2].name() == "bar");
     }

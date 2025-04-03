@@ -167,9 +167,9 @@ TEST_CASE("byte_string_view constructors")
 
         byte_string_view moved(std::move(bstr));
         CHECK(bstr.data() == nullptr);
-        CHECK(bstr.size() == 0);
+        CHECK(0 == bstr.size());
 
-        REQUIRE(moved.size() == 6);
+        REQUIRE(6 == moved.size());
         CHECK(moved[0] == 'f');
         CHECK(moved[1] == 'o');
         CHECK(moved[2] == 'o');

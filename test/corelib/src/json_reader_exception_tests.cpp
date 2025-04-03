@@ -239,6 +239,6 @@ TEST_CASE("test_exception")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        CHECK((e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column() == 8));
+        CHECK(8 == (e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column()));
     }
 }

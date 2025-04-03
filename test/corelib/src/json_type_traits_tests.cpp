@@ -137,9 +137,9 @@ TEST_CASE("jsoncons::json_type_traits<optional>")
     std::vector<jsoncons::optional<int>> v = { 0,1,jsoncons::optional<int>{} };
     json j = v;
 
-    REQUIRE(j.size() == 3);
-    CHECK(j[0].as<int>() == 0);
-    CHECK(j[1].as<int>() == 1);
+    REQUIRE(3 == j.size());
+    CHECK(0 == j[0].as<int>());
+    CHECK(1 == j[1].as<int>());
     CHECK(j[2].is_null());
 
     CHECK(j[0].is<jsoncons::optional<int>>());
@@ -156,7 +156,7 @@ TEST_CASE("jsoncons::json_type_traits<shared_ptr>")
                                                    std::shared_ptr<std::string>()};
     json j{v};
 
-    REQUIRE(j.size() == 3);
+    REQUIRE(3 == j.size());
     CHECK(j[0].as<std::string>() == std::string("Hello"));
     CHECK(j[1].as<std::string>() == std::string("World"));
     CHECK(j[2].is_null());
@@ -178,7 +178,7 @@ TEST_CASE("jsoncons::json_type_traits<unique_ptr>")
 
     json j{ v };
 
-    REQUIRE(j.size() == 3);
+    REQUIRE(3 == j.size());
     CHECK(j[0].as<std::string>() == std::string("Hello"));
     CHECK(j[1].as<std::string>() == std::string("World"));
     CHECK(j[2].is_null());
@@ -332,11 +332,11 @@ TEST_CASE("json_type_traits for std::variant")
         auto v4 = jsoncons::decode_json<variant_type>(buffer4);
         auto v5 = jsoncons::decode_json<variant_type>(buffer5);
 
-        CHECK(v1.index() == 0);
-        CHECK(v2.index() == 1);
-        CHECK(v3.index() == 2);
-        CHECK(v4.index() == 3);
-        CHECK(v5.index() == 3);
+        CHECK(0 == v1.index());
+        CHECK(1 == v2.index());
+        CHECK(2 == v3.index());
+        CHECK(3 == v4.index());
+        CHECK(3 == v5.index());
 
         CHECK(std::get<0>(v1) == 100);
         CHECK(std::get<1>(v2) == 10.1);
@@ -372,11 +372,11 @@ TEST_CASE("json_type_traits for std::variant")
         auto v4 = jsoncons::decode_json<variant_type>(buffer4);
         auto v5 = jsoncons::decode_json<variant_type>(buffer5);
 
-        CHECK(v1.index() == 0);
-        CHECK(v2.index() == 1);
-        CHECK(v3.index() == 2);
-        CHECK(v4.index() == 4);
-        CHECK(v5.index() == 3);
+        CHECK(0 == v1.index());
+        CHECK(1 == v2.index());
+        CHECK(2 == v3.index());
+        CHECK(4 == v4.index());
+        CHECK(3 == v5.index());
 
         CHECK(std::get<0>(v1) == 100);
         CHECK(std::get<1>(v2) == 10.1);

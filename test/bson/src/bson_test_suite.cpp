@@ -282,7 +282,7 @@ TEST_CASE("bson c test suite")
         auto doc_size = binary::little_to_native<int32_t>(buf, sizeof(buf));
         REQUIRE(doc_size == 16);
 
-        REQUIRE(source.read(&b, 1) == 1);
+        REQUIRE(1 == source.read(&b, 1));
         REQUIRE(b == 0x12); // 64-bit integer
         std::string s;
         while (source.read(&b, 1) == 1 && b != 0)
@@ -293,8 +293,8 @@ TEST_CASE("bson c test suite")
         source.read(buf, sizeof(int64_t));
         auto val = binary::little_to_native<int64_t>(buf, sizeof(int64_t));
         CHECK(val == 100000000000000ULL);
-        REQUIRE(source.read(&b, 1) == 1);
-        CHECK(b == 0);
+        REQUIRE(1 == source.read(&b, 1));
+        CHECK(0 == b);
         CHECK(source.eof());
 
         std::vector<char> bytes2;

@@ -483,7 +483,7 @@ private:
     bool infer_types_:1;
     bool lossless_number_:1;
     char_type comment_starter_{'\0'};
-    csv_mapping_kind mapping_{};
+    csv_mapping_kind mapping_kind_{};
     std::size_t header_lines_{0};
     std::size_t max_lines_{(std::numeric_limits<std::size_t>::max)()};
     string_type column_types_;
@@ -517,7 +517,7 @@ public:
           infer_types_(other.infer_types_),
           lossless_number_(other.lossless_number_),
           comment_starter_(other.comment_starter_),
-          mapping_(other.mapping_),
+          mapping_kind_(other.mapping_kind_),
           header_lines_(other.header_lines_),
           max_lines_(other.max_lines_),
           column_types_(std::move(other.column_types_)),
@@ -601,7 +601,7 @@ public:
 
     csv_mapping_kind mapping_kind() const 
     {
-        return mapping_ != csv_mapping_kind() ? mapping_ : (assume_header() || this->column_names().size() > 0 ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
+        return mapping_kind_ != csv_mapping_kind() ? mapping_kind_ : (assume_header() || this->column_names().size() > 0 ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
     }
 
     std::size_t max_lines() const 
@@ -905,7 +905,7 @@ public:
 
     basic_csv_options& mapping_kind(csv_mapping_kind value)
     {
-        this->mapping_ = value;
+        this->mapping_kind_ = value;
         return *this;
     }
 

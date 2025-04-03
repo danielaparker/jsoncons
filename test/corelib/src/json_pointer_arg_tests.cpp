@@ -158,7 +158,7 @@ TEST_CASE("json_reference object tests")
     {
         json v(json_pointer_arg, &j);
         REQUIRE(v.is_object());
-        CHECK(v.size() == 3);
+        CHECK(3 == v.size());
         CHECK_FALSE(v.empty());
     }
 
@@ -184,10 +184,10 @@ TEST_CASE("json_reference object tests")
         REQUIRE(v.is_object());
         REQUIRE_NOTHROW(v.at("two"));
         CHECK(v.contains("two"));
-        CHECK(v.count("two") == 1);
+        CHECK(1 == v.count("two"));
 
-        CHECK(v.get_value_or<int>("three", 0) == 3);
-        CHECK(v.get_value_or<int>("four", 4) == 4);
+        CHECK(3 == v.get_value_or<int>("three", 0));
+        CHECK(4 == v.get_value_or<int>("four", 4));
         
         v.at("one") = "first";
         CHECK("first" == v.at("one"));
@@ -200,10 +200,10 @@ TEST_CASE("json_reference object tests")
         REQUIRE(v.is_object());
         REQUIRE_NOTHROW(v.at("two"));
         CHECK(v.contains("two"));
-        CHECK(v.count("two") == 1);
+        CHECK(1 == v.count("two"));
 
-        CHECK(v.get_value_or<int>("three", 0) == 3);
-        CHECK(v.get_value_or<int>("four", 4) == 4);
+        CHECK(3 == v.get_value_or<int>("three", 0));
+        CHECK(4 == v.get_value_or<int>("four", 4));
 
         v.insert_or_assign("four", 4);
         v.insert_or_assign("three", "third");
@@ -217,10 +217,10 @@ TEST_CASE("json_reference object tests")
         REQUIRE(v.is_object());
         REQUIRE_NOTHROW(v.at("two"));
         CHECK(v.contains("two"));
-        CHECK(v.count("two") == 1);
+        CHECK(1 == v.count("two"));
 
-        CHECK(v.get_value_or<int>("three", 0) == 3);
-        CHECK(v.get_value_or<int>("four", 4) == 4);
+        CHECK(3 == v.get_value_or<int>("three", 0));
+        CHECK(4 == v.get_value_or<int>("four", 4));
 
         v.try_emplace("four", 4);
         v.try_emplace("three", "third"); // does nothing

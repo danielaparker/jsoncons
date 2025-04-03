@@ -183,10 +183,10 @@ TEST_CASE("convert vector of vector test")
     for (const auto& item : result)
     {
         REQUIRE(item.size() == u.size());
-        CHECK(item[0] == 1);
-        CHECK(item[1] == 2);
-        CHECK(item[2] == 3);
-        CHECK(item[3] == 4);
+        CHECK(1 == item[0]);
+        CHECK(2 == item[1]);
+        CHECK(3 == item[2]);
+        CHECK(4 == item[3]);
     }
 }
 
@@ -206,7 +206,7 @@ TEST_CASE("convert_tuple_test")
 
     json j = json::parse(s);
     REQUIRE(j.is_object());
-    REQUIRE(j.size() == 2);
+    REQUIRE(2 == j.size());
     CHECK(j.contains("John Smith"));
     CHECK(j.contains("Jane Doe"));
 
@@ -328,10 +328,10 @@ TEST_CASE("decode_json with work allocator")
         for (const auto& item : result)
         {
             REQUIRE(item.size() == u.size());
-            CHECK(item[0] == 1);
-            CHECK(item[1] == 2);
-            CHECK(item[2] == 3);
-            CHECK(item[3] == 4);
+            CHECK(1 == item[0]);
+            CHECK(2 == item[1]);
+            CHECK(3 == item[2]);
+            CHECK(4 == item[3]);
         }
     }
 

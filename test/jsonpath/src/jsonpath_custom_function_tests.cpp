@@ -54,14 +54,14 @@ TEST_CASE("jsonpath custom function test")
         auto expr = jsonpath::make_expression<json>("divide(@.foo, @.bar)", functions);
         auto r = expr.evaluate(root);
         REQUIRE(!r.empty());
-        CHECK(r[0] == json(6));
+        CHECK(json(6) == r[0]);
     }
 
     SECTION("test 2")
     {
         auto r = jsonpath::json_query(root, "divide($.foo, $.bar)", jsonpath::result_options(), functions);
         REQUIRE(!r.empty());
-        CHECK(r[0] == json(6));
+        CHECK(json(6) == r[0]);
     }
 
     SECTION("test 3")
@@ -70,7 +70,7 @@ TEST_CASE("jsonpath custom function test")
         jsonpath::json_query(root, "divide($.foo, $.bar)", 
             [&](const std::string&, const json& val) {r = val; },
                              jsonpath::result_options(), functions);
-        CHECK(r == json(6));
+        CHECK(json(6) == r);
     }
 }
 

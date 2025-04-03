@@ -411,8 +411,8 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
 
         json j = decode_json<json>(s);
         CHECK(j["some-string"].as<std::string>() == val.someString);
-        CHECK(j["type-content"][0].as<int>() == 1);
-        CHECK(j["type-content"][1].as<int>() == 2);        
+        CHECK(1 == j["type-content"][0].as<int>());
+        CHECK(2 == j["type-content"][1].as<int>());        
         //std::cout << pretty_print(j) << "\n";
  
         auto val2 = decode_json<value_type>(s);
@@ -435,7 +435,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
         encode_json(val, s, indenting::indent);
 
         json j = decode_json<json>(s);
-        CHECK(j["a-t1"].as<int>() == 1);
+        CHECK(1 == j["a-t1"].as<int>());
         CHECK(j["a-t2"].as<double>() == 2.0);
         //std::cout << pretty_print(j) << "\n";
 

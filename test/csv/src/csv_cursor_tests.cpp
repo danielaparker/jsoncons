@@ -760,7 +760,7 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(staj_event_type::uint64_value == cursor.current().event_type());
-        CHECK(cursor.current().get<int>() == 4);
+        CHECK(4 == cursor.current().get<int>());
         cursor.next();
         REQUIRE(staj_event_type::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);
@@ -792,7 +792,7 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         REQUIRE(staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(staj_event_type::uint64_value == cursor.current().event_type());
-        CHECK(cursor.current().get<int>() == 4);
+        CHECK(4 == cursor.current().get<int>());
         cursor.next();
         REQUIRE(staj_event_type::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);

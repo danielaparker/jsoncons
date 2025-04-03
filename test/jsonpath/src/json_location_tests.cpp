@@ -18,11 +18,11 @@ TEST_CASE("json_location tests")
         jsonpath::json_location loc;
         loc.append("foo").append(1);
 
-        CHECK(loc.size() == 2);
+        CHECK(2 == loc.size());
         CHECK(loc[0].has_name());
         CHECK(loc[0].name() == "foo");
         CHECK(loc[1].has_index());
-        CHECK(loc[1].index() == 1);
+        CHECK(1 == loc[1].index());
     }
 }
 
@@ -73,13 +73,13 @@ TEST_CASE("json_location remove tests")
         loc.append("store").append("book").append(1);
 
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][1]["author"].as<std::string>() == "Evelyn Waugh");
 
         std::size_t count = jsonpath::remove(doc, loc);
 
-        CHECK(count == 1);
-        CHECK(doc["store"]["book"].size() == 2);
+        CHECK(1 == count);
+        CHECK(2 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][1]["author"].as<std::string>() == "Herman Melville");
     }
 
@@ -89,13 +89,13 @@ TEST_CASE("json_location remove tests")
         loc.append("store").append("book").append(2);
 
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
 
         std::size_t count = jsonpath::remove(doc, loc);
 
-        CHECK(count == 1);
-        CHECK(doc["store"]["book"].size() == 2);
+        CHECK(1 == count);
+        CHECK(2 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][1]["author"].as<std::string>() == "Evelyn Waugh");
     }
 
@@ -106,12 +106,12 @@ TEST_CASE("json_location remove tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(3);
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
 
         std::size_t count = jsonpath::remove(doc, loc);
 
-        CHECK(count == 0);
+        CHECK(0 == count);
         CHECK(doc == orig);
     }
 
@@ -121,8 +121,8 @@ TEST_CASE("json_location remove tests")
         loc.append("store");
 
         std::size_t count = jsonpath::remove(doc, loc);
-        CHECK(count == 1);
-        CHECK(doc.size() == 0);
+        CHECK(1 == count);
+        CHECK(0 == doc.size());
     }
 
     SECTION("store book")
@@ -130,10 +130,10 @@ TEST_CASE("json_location remove tests")
         jsonpath::json_location loc;
         loc.append("store").append("book");
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         std::size_t count = jsonpath::remove(doc, loc);
-        CHECK(count == 1);
-        CHECK(doc["store"]["book"].size() == 0);
+        CHECK(1 == count);
+        CHECK(0 == doc["store"]["book"].size());
     }
 
     SECTION("store lost&found")
@@ -143,9 +143,9 @@ TEST_CASE("json_location remove tests")
         jsonpath::json_location loc;
         loc.append("store").append("lost&found");
 
-        CHECK(doc["store"].size() == 1);
+        CHECK(1 == doc["store"].size());
         std::size_t count = jsonpath::remove(doc, loc);
-        CHECK(count == 0);
+        CHECK(0 == count);
         CHECK(doc == orig);
     }
 
@@ -154,14 +154,14 @@ TEST_CASE("json_location remove tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(2).append("price");
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
         CHECK(doc["store"]["book"][2].contains("price"));
 
         std::size_t count = jsonpath::remove(doc, loc);
 
-        CHECK(count == 1);
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(1 == count);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
         CHECK_FALSE(doc["store"]["book"][2].contains("price"));
     }
@@ -173,12 +173,12 @@ TEST_CASE("json_location remove tests")
         jsonpath::json_location loc;
         loc.append("store").append(0);
 
-        CHECK(doc["store"]["book"].size() == 3);
+        CHECK(3 == doc["store"]["book"].size());
         CHECK(doc["store"]["book"][2].contains("price"));
 
         std::size_t count = jsonpath::remove(doc, loc);
 
-        CHECK(count == 0);
+        CHECK(0 == count);
         CHECK(doc == orig);
     }
 }

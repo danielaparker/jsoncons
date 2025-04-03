@@ -359,10 +359,10 @@ TEST_CASE("json constructor with scoped_allocator")
 
         /*cust_json j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator());
-        REQUIRE(j1.size() == 3);
-        CHECK(j1.at("a") == 3);
-        CHECK(j1.at("b") == 2);
-        CHECK(j1.at("c") == 1);
+        REQUIRE(3 == j1.size());
+        CHECK(3 == j1.at("a"));
+        CHECK(2 == j1.at("b"));
+        CHECK(1 == j1.at("c"));
 
         cust_json j2{std::move(j1)};
         REQUIRE(alloc1 == j2.get_allocator()); 
@@ -398,53 +398,53 @@ TEST_CASE("json constructor tests")
     {
         json j1(json_object_arg, {{"one",1}});
         REQUIRE(j1.is_object());
-        REQUIRE(j1.size() == 1);
-        CHECK(j1.at("one").as<int>() == 1);
+        REQUIRE(1 == j1.size());
+        CHECK(1 == j1.at("one").as<int>());
 
         json j2(json_object_arg, {{"one",1},{"two",2}});
         REQUIRE(j2.is_object());
-        REQUIRE(j2.size() == 2);
-        CHECK(j2.at("one").as<int>() == 1);
-        CHECK(j2.at("two").as<int>() == 2);
+        REQUIRE(2 == j2.size());
+        CHECK(1 == j2.at("one").as<int>());
+        CHECK(2 == j2.at("two").as<int>());
     }
     SECTION("json json_array_arg")
     {
         json j1(json_array_arg, {1});
         REQUIRE(j1.is_array());
-        REQUIRE(j1.size() == 1);
-        CHECK(j1[0].as<int>() == 1);
+        REQUIRE(1 == j1.size());
+        CHECK(1 == j1[0].as<int>());
 
         json j2(json_array_arg, {1,2});
         REQUIRE(j2.is_array());
-        REQUIRE(j2.size() == 2);
-        CHECK(j2[0].as<int>() == 1);
-        CHECK(j2[1].as<int>() == 2);
+        REQUIRE(2 == j2.size());
+        CHECK(1 == j2[0].as<int>());
+        CHECK(2 == j2[1].as<int>());
     }
     SECTION("ojson json_object_arg")
     {
         ojson j1(json_object_arg, {{"one",1}});
         REQUIRE(j1.is_object());
-        REQUIRE(j1.size() == 1);
-        CHECK(j1.at("one").as<int>() == 1);
+        REQUIRE(1 == j1.size());
+        CHECK(1 == j1.at("one").as<int>());
 
         ojson j2(json_object_arg, {{"one",1},{"two",2}});
         REQUIRE(j2.is_object());
-        REQUIRE(j2.size() == 2);
-        CHECK(j2.at("one").as<int>() == 1);
-        CHECK(j2.at("two").as<int>() == 2);
+        REQUIRE(2 == j2.size());
+        CHECK(1 == j2.at("one").as<int>());
+        CHECK(2 == j2.at("two").as<int>());
     }
     SECTION("ojson json_array_arg")
     {
         ojson j1(json_array_arg, {1});
         REQUIRE(j1.is_array());
-        REQUIRE(j1.size() == 1);
-        CHECK(j1[0].as<int>() == 1);
+        REQUIRE(1 == j1.size());
+        CHECK(1 == j1[0].as<int>());
 
         ojson j2(json_array_arg, {1,2});
         REQUIRE(j2.is_array());
-        REQUIRE(j2.size() == 2);
-        CHECK(j2[0].as<int>() == 1);
-        CHECK(j2[1].as<int>() == 2);
+        REQUIRE(2 == j2.size());
+        CHECK(1 == j2[0].as<int>());
+        CHECK(2 == j2[1].as<int>());
     }
 }
 TEST_CASE("json(string_view)")

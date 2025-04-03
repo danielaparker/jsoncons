@@ -42,7 +42,7 @@ TEST_CASE("cbor_event_reader reputon test")
         cbor::cbor_event_reader<bytes_source> reader(data);
 
         CHECK(reader.current().event_type() == staj_event_type::begin_object);
-        CHECK(reader.current().size() == 2);
+        CHECK(2 == reader.current().size());
         reader.next();
         CHECK(reader.current().event_type() == staj_event_type::string_value);  // key
         reader.next();
@@ -51,7 +51,7 @@ TEST_CASE("cbor_event_reader reputon test")
         CHECK(reader.current().event_type() == staj_event_type::string_value);  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_event_type::begin_array);
-        CHECK(reader.current().size() == 1);
+        CHECK(1 == reader.current().size());
         reader.next();
         CHECK(reader.current().event_type() == staj_event_type::begin_object);
         reader.next();

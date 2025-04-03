@@ -26,7 +26,7 @@ TEST_CASE("ojson insert(first,last) test")
 
         //std::cout << doc << "\n";
 
-        REQUIRE(doc.size() == 6);
+        REQUIRE(6 == doc.size());
         auto it = doc.object_range().begin();
         CHECK(it++->key() == "d");
         CHECK(it++->key() == "e");
@@ -90,11 +90,11 @@ TEST_CASE("ojson object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("b") == 2);
+        CHECK(1 == doc.size());
+        CHECK(2 == doc.at("b"));
         CHECK(doc.at("b") == 2.0);
         CHECK(doc.at("b") == 2.0f);
-        CHECK(doc["b"] == 2);
+        CHECK(2 == doc["b"]);
     }
 
     SECTION("ojson erase with iterator 2")
@@ -118,9 +118,9 @@ TEST_CASE("ojson object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("c") == 3);
-        CHECK(doc["c"] == 3);
+        CHECK(1 == doc.size());
+        CHECK(3 == doc.at("c"));
+        CHECK(3 == doc["c"]);
     }
 
     SECTION("ojson erase with iterator 3")
@@ -144,9 +144,9 @@ TEST_CASE("ojson object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("a") == 3);
-        CHECK(doc["a"] == 3);
+        CHECK(1 == doc.size());
+        CHECK(3 == doc.at("a"));
+        CHECK(3 == doc["a"]);
     }
 }
 
@@ -416,9 +416,9 @@ TEST_CASE("cust_json object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("b") == 2);
-        CHECK(doc["b"] == 2);
+        CHECK(1 == doc.size());
+        CHECK(2 == doc.at("b"));
+        CHECK(2 == doc["b"]);
     }
 
     SECTION("cust_json erase with iterator 2")
@@ -442,9 +442,9 @@ TEST_CASE("cust_json object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("c") == 3);
-        CHECK(doc["c"] == 3);
+        CHECK(1 == doc.size());
+        CHECK(3 == doc.at("c"));
+        CHECK(3 == doc["c"]);
     }
 
     SECTION("cust_json erase with iterator 3")
@@ -468,9 +468,9 @@ TEST_CASE("cust_json object erase with iterator")
             }
         }
 
-        CHECK(doc.size() == 1);
-        CHECK(doc.at("a") == 3);
-        CHECK(doc["a"] == 3);
+        CHECK(1 == doc.size());
+        CHECK(3 == doc.at("a"));
+        CHECK(3 == doc["a"]);
     }
 }
 

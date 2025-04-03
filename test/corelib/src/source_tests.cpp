@@ -30,58 +30,58 @@ TEST_CASE("string_source tests")
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value == '0');
-        CHECK(source.position() == 0);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(0 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '0');
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value == '1');
-        CHECK(source.position() == 1);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(1 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '1');
-        CHECK(source.position() == 2);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(2 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '2');
-        CHECK(source.position() == 3);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(3 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '3');
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value == '4');
-        CHECK(source.position() == 4);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(4 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '4');
-        CHECK(source.position() == 5);
+        CHECK(5 == source.position());
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value == '5');
-        CHECK(source.position() == 5);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(5 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '5');
-        CHECK(source.position() == 6);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(6 == source.position());
+        CHECK(1 == source.read(&b,1));
 
         CHECK_FALSE(source.eof());
         CHECK(b == '6');
-        CHECK(source.position() == 7);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(7 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '7');
-        CHECK(source.position() == 8);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(8 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK(source.eof());
         CHECK(b == '8');
-        CHECK(source.position() == 9);
-        CHECK(source.read(&b,1) == 0);
+        CHECK(9 == source.position());
+        CHECK(0 == source.read(&b,1));
         CHECK(source.eof());
     }
 
@@ -89,9 +89,9 @@ TEST_CASE("string_source tests")
     {
         auto s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 9);
+        CHECK(9 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }
 
@@ -107,58 +107,58 @@ TEST_CASE("byte_source tests")
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value == '0');
-        CHECK(source.position() == 0);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(0 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '0');
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value == '1');
-        CHECK(source.position() == 1);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(1 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '1');
-        CHECK(source.position() == 2);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(2 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '2');
-        CHECK(source.position() == 3);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(3 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '3');
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value == '4');
-        CHECK(source.position() == 4);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(4 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '4');
-        CHECK(source.position() == 5);
+        CHECK(5 == source.position());
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value == '5');
-        CHECK(source.position() == 5);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(5 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '5');
-        CHECK(source.position() == 6);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(6 == source.position());
+        CHECK(1 == source.read(&b,1));
 
         CHECK_FALSE(source.eof());
         CHECK(b == '6');
-        CHECK(source.position() == 7);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(7 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '7');
-        CHECK(source.position() == 8);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(8 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK(source.eof());
         CHECK(b == '8');
-        CHECK(source.position() == 9);
-        CHECK(source.read(&b,1) == 0);
+        CHECK(9 == source.position());
+        CHECK(0 == source.read(&b,1));
         CHECK(source.eof());
     }
 
@@ -166,9 +166,9 @@ TEST_CASE("byte_source tests")
     {
         auto s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 9);
+        CHECK(9 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }
 
@@ -185,58 +185,58 @@ TEST_CASE("stream_source tests")
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value == '0');
-        CHECK(source.position() == 0);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(0 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '0');
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value == '1');
-        CHECK(source.position() == 1);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(1 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '1');
-        CHECK(source.position() == 2);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(2 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '2');
-        CHECK(source.position() == 3);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(3 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '3');
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value == '4');
-        CHECK(source.position() == 4);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(4 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '4');
-        CHECK(source.position() == 5);
+        CHECK(5 == source.position());
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value == '5');
-        CHECK(source.position() == 5);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(5 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '5');
-        CHECK(source.position() == 6);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(6 == source.position());
+        CHECK(1 == source.read(&b,1));
 
         CHECK_FALSE(source.eof());
         CHECK(b == '6');
-        CHECK(source.position() == 7);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(7 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '7');
-        CHECK(source.position() == 8);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(8 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK(source.eof());
         CHECK(b == '8');
-        CHECK(source.position() == 9);
-        CHECK(source.read(&b,1) == 0);
+        CHECK(9 == source.position());
+        CHECK(0 == source.read(&b,1));
         CHECK(source.eof());
     }
 }
@@ -261,59 +261,59 @@ TEST_CASE("binary_stream_source tests")
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value == '0');
-        CHECK(source.position() == 0);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(0 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '0');
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value == '1');
-        CHECK(source.position() == 1);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(1 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '1');
-        CHECK(source.position() == 2);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(2 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '2');
-        CHECK(source.position() == 3);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(3 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '3');
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value == '4');
-        CHECK(source.position() == 4);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(4 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '4');
-        CHECK(source.position() == 5);
+        CHECK(5 == source.position());
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value == '5');
-        CHECK(source.position() == 5);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(5 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '5');
-        CHECK(source.position() == 6);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(6 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '6');
-        CHECK(source.position() == 7);
-        CHECK(source.read(&b,1) == 1);
+        CHECK(7 == source.position());
+        CHECK(1 == source.read(&b,1));
         CHECK_FALSE(source.eof());
         CHECK(b == '7');
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
 
         jsoncons::binary_stream_source source2(std::move(source));
-        CHECK(source2.read(&b,1) == 1);
+        CHECK(1 == source2.read(&b,1));
         CHECK(source2.eof());
         CHECK(b == '8');
-        CHECK(source2.position() == 9);
-        CHECK(source2.read(&b,1) == 0);
+        CHECK(9 == source2.position());
+        CHECK(0 == source2.read(&b,1));
         CHECK(source2.eof());
     }
 
@@ -321,17 +321,17 @@ TEST_CASE("binary_stream_source tests")
     {
         source.ignore(1);
         CHECK_FALSE(source.eof());
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value == '1');
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
         source.ignore(7);
         CHECK_FALSE(source.eof());
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
         source.ignore(2);
         CHECK(source.eof());
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 
     SECTION("read 1, read1")
@@ -341,15 +341,15 @@ TEST_CASE("binary_stream_source tests")
 
         std::size_t len = source.read(v.data(),1);
         CHECK_FALSE(source.eof());
-        CHECK(len == 1);
+        CHECK(1 == len);
         CHECK(std::equal(expected.begin(),expected.begin()+1,v.begin()));
-        CHECK(source.position() == 1);
+        CHECK(1 == source.position());
 
         len = source.read(v.data(),1);
         CHECK_FALSE(source.eof());
-        CHECK(len == 1);
+        CHECK(1 == len);
         CHECK(std::equal(expected.begin()+1,expected.begin()+2,v.begin()));
-        CHECK(source.position() == 2);
+        CHECK(2 == source.position());
     }
 
     SECTION("read 3, read 4, read 3")
@@ -359,21 +359,21 @@ TEST_CASE("binary_stream_source tests")
 
         std::size_t len = source.read(v.data(),3);
         CHECK_FALSE(source.eof());
-        CHECK(len == 3);
+        CHECK(3 == len);
         CHECK(std::equal(expected.begin(),expected.begin()+3,v.begin()));
-        CHECK(source.position() == 3);
+        CHECK(3 == source.position());
 
         len = source.read(v.data(),4);
         CHECK_FALSE(source.eof());
-        CHECK(len == 4);
+        CHECK(4 == len);
         CHECK(std::equal(expected.begin()+3,expected.begin()+7,v.begin()));
-        CHECK(source.position() == 7);
+        CHECK(7 == source.position());
 
         len = source.read(v.data(),3);
         CHECK(source.eof());
-        CHECK(len == 2);
+        CHECK(2 == len);
         CHECK(std::equal(expected.begin()+7,expected.begin()+9,v.begin()));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 
     SECTION("read 9")
@@ -383,9 +383,9 @@ TEST_CASE("binary_stream_source tests")
 
         std::size_t len = source.read(v.data(),9);
         CHECK_FALSE(source.eof());
-        CHECK(len == 9);
+        CHECK(9 == len);
         CHECK(std::equal(expected.begin(),expected.end(),v.begin()));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 
     SECTION("read 10")
@@ -395,30 +395,30 @@ TEST_CASE("binary_stream_source tests")
 
         std::size_t len = source.read(v.data(), 10);
         CHECK(source.eof());
-        CHECK(len == 9);
+        CHECK(9 == len);
         CHECK(std::equal(expected.begin(), expected.end(), v.begin()));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 
     SECTION("read_buffer")
     {
         auto s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
 
         s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 1);
+        CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }
 
@@ -433,28 +433,28 @@ TEST_CASE("random access iterator iterator_stream source tests")
         source.read(v.data(), 3);
         CHECK_FALSE(source.eof());
         CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
-        CHECK(source.position() == 3);
+        CHECK(3 == source.position());
     }
 
     SECTION("read_buffer")
     {
         auto s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
 
         s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 1);
+        CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }
 
@@ -471,28 +471,28 @@ TEST_CASE("forward iterator iterator_stream source tests")
         source.read(v.data(), 3);
         CHECK_FALSE(source.eof());
         CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
-        CHECK(source.position() == 3);
+        CHECK(3 == source.position());
     }
 
     SECTION("read_buffer")
     {
         auto s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
 
         s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 1);
+        CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }
 
@@ -507,27 +507,27 @@ TEST_CASE("binary_iterator_stream source tests")
         source.read(v.data(), 3);
         CHECK_FALSE(source.eof());
         CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
-        CHECK(source.position() == 3);
+        CHECK(3 == source.position());
     }
 
     SECTION("read_buffer")
     {
         auto s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
-        CHECK(source.position() == 4);
+        CHECK(4 == source.position());
 
         s = source.read_buffer();
         CHECK_FALSE(source.eof());
-        CHECK(s.size() == 4);
+        CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
-        CHECK(source.position() == 8);
+        CHECK(8 == source.position());
 
         s = source.read_buffer();
         CHECK(source.eof());
-        CHECK(s.size() == 1);
+        CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
-        CHECK(source.position() == 9);
+        CHECK(9 == source.position());
     }
 }

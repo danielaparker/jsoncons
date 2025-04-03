@@ -139,7 +139,7 @@ TEST_CASE("decode msgpack from source")
 
         json j = msgpack::decode_msgpack<json>(s);
 
-        REQUIRE(j.size() == 1);
+        REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));
     }
     SECTION("from string iterator pair")
@@ -149,7 +149,7 @@ TEST_CASE("decode msgpack from source")
 
         json j = msgpack::decode_msgpack<json>(s.begin(), s.end());
 
-        REQUIRE(j.size() == 1);
+        REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));
     }
 }

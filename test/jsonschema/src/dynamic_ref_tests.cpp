@@ -262,7 +262,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
                 return jsonschema::walk_result::advance;
             };
             compiled.validate(data, reporter);
-            CHECK(error_count == 0);
+            CHECK(0 == error_count);
             //std::cout << "error_count: " << error_count << "\n";
         }
         catch (const std::exception& e)

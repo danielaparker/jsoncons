@@ -351,7 +351,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     encoder.flush();
     json j = cbor::decode_cbor<json>(v);
 
-    CHECK(j.size() == 2);
+    CHECK(2 == j.size());
 
     auto it2 = j.array_range().begin();
     CHECK_FALSE((it2 == j.array_range().end()));
@@ -392,8 +392,8 @@ TEST_CASE("cbor array comparison test")
     SECTION("operator== test")
     {
         CHECK(j2 == j1);
-        REQUIRE(j1.size() == 2);
-        REQUIRE(j2.size() == 2);
+        REQUIRE(2 == j1.size());
+        REQUIRE(2 == j2.size());
         CHECK(j1[0] == j2[0]);
         CHECK(j1[1] == j2[1]);
     }
@@ -401,7 +401,7 @@ TEST_CASE("cbor array comparison test")
     SECTION("element operator== test")
     {
         CHECK_FALSE(j1 == j3);
-        REQUIRE(j1.size() == 2);
+        REQUIRE(2 == j1.size());
         REQUIRE(j1.size() == j3.size());
         CHECK(j1[0] == j3[0]);
         CHECK_FALSE(j1[1] == j3[1]);
@@ -425,7 +425,7 @@ TEST_CASE("cbor object comparison")
 
     //std::cout << pretty_print(j1) << "\n";
  
-    REQUIRE(j1.size() == 3);
+    REQUIRE(3 == j1.size());
 
     std::vector<uint8_t> buf2;
     cbor::cbor_bytes_encoder serializer2(buf2);
@@ -477,7 +477,7 @@ TEST_CASE("cbor object comparison")
 
     SECTION("size")
     {
-        CHECK(j1.size() == 3);
+        CHECK(3 == j1.size());
     }
 
     SECTION("operator==")
@@ -535,7 +535,7 @@ TEST_CASE("cbor member tests")
 
     SECTION("size")
     {
-        CHECK(j.size() == 7);
+        CHECK(7 == j.size());
     }
 }
 
@@ -554,12 +554,12 @@ TEST_CASE("cbor conversion tests")
     encoder.flush();
 
     json j = cbor::decode_cbor<json>(v);
-    REQUIRE(j.size() == 1);
+    REQUIRE(1 == j.size());
 
     auto range1 = j.array_range();
     auto it = range1.begin();
     const json& inner_array = *it++;
-    REQUIRE(inner_array.size() == 4);
+    REQUIRE(4 == inner_array.size());
     REQUIRE((it == range1.end()));
 
     auto range2 = inner_array.array_range();
@@ -629,7 +629,7 @@ TEST_CASE("cbor array as<> test")
 
     json j = cbor::decode_cbor<json>(v); // a non-owning view of the CBOR v
 
-    CHECK(j.size() == 8);
+    CHECK(8 == j.size());
 
     SECTION("j[0].is<T>()")
     {

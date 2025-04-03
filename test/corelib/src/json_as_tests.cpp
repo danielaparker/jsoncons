@@ -37,7 +37,7 @@ TEST_CASE("json integer as string")
     SECTION("0x0")
     {
         jsoncons::json doc("0x0");
-        CHECK(doc.as<int>() == 0);
+        CHECK(0 == doc.as<int>());
     }
     SECTION("0777")
     {
@@ -47,12 +47,12 @@ TEST_CASE("json integer as string")
     SECTION("0b1001")
     {
         jsoncons::json doc("0b1001");
-        CHECK(doc.as<int>() == 9);
+        CHECK(9 == doc.as<int>());
     }
     SECTION("0B1001")
     {
         jsoncons::json doc("0B1001");
-        CHECK(doc.as<int>() == 9);
+        CHECK(9 == doc.as<int>());
     }
 }
 

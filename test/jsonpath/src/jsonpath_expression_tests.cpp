@@ -73,7 +73,7 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 
         expr.evaluate(root, op);
 
-        CHECK(count == 1);
+        CHECK(1 == count);
         CHECK(root == original);
     }
 
@@ -98,7 +98,7 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 
         expr.evaluate(root, op);
 
-        CHECK(count == 1);
+        CHECK(1 == count);
         CHECK(root == original);
     }
 
@@ -131,7 +131,7 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 
         expr.evaluate(root, op);
 
-        CHECK(count == 1);
+        CHECK(1 == count);
     }
 }
 
@@ -187,7 +187,7 @@ TEST_CASE("jsonpath_expression::select tests")
 
         expr.select(root, op);
 
-        CHECK(count == 1);
+        CHECK(1 == count);
     }
 }
 
@@ -232,7 +232,7 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
-        REQUIRE(paths.size() == 4);
+        REQUIRE(4 == paths.size());
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
         CHECK(jsonpath::to_string(paths[1]) == "$['books'][1]");
         CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]");
@@ -247,7 +247,7 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
-        REQUIRE(paths.size() == 8);
+        REQUIRE(8 == paths.size());
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
         CHECK(jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
         CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
@@ -271,7 +271,7 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
-        REQUIRE(paths.size() == 8);
+        REQUIRE(8 == paths.size());
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
         CHECK(jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
         CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
@@ -381,7 +381,7 @@ TEST_CASE("jsonpath_expression::update tests")
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
-        REQUIRE(paths.size() == 4);
+        REQUIRE(4 == paths.size());
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
         CHECK(jsonpath::to_string(paths[1]) == "$['books'][1]");
         CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]");
@@ -406,11 +406,11 @@ TEST_CASE("jsonpath_expression::update tests")
 
         expr.update(root, callback2);
 
-        REQUIRE(path_nodes.size() == 4);
-        CHECK(path_nodes[0].index() == 3);
-        CHECK(path_nodes[1].index() == 2);
-        CHECK(path_nodes[2].index() == 1);
-        CHECK(path_nodes[3].index() == 0);
+        REQUIRE(4 == path_nodes.size());
+        CHECK(3 == path_nodes[0].index());
+        CHECK(2 == path_nodes[1].index());
+        CHECK(1 == path_nodes[2].index());
+        CHECK(0 == path_nodes[3].index());
     }
 }
 
@@ -457,8 +457,8 @@ TEST_CASE("jsonpath_expression remove")
 
         std::size_t n = jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
 
-        CHECK(n == 3);
-        REQUIRE(doc.at("books").size() == 1);
+        CHECK(3 == n);
+        REQUIRE(1 == doc.at("books").size());
         CHECK(expected == doc);
     }
 }

@@ -357,13 +357,13 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
     std::error_code ec;
 
     jsonpointer::add( oj, "/test", ojson(), ec );
-    CHECK(oj.size() == 1);
+    CHECK(1 == oj.size());
 
     jsonpointer::remove( oj, "/test", ec );
-    CHECK(oj.size() == 0);
+    CHECK(0 == oj.size());
 
     jsonpointer::add( oj, "/t", ojson(), ec );
-    CHECK(oj.size() == 1);
+    CHECK(1 == oj.size());
 }
 
 TEST_CASE("[jsonpointer] create_if_missing")

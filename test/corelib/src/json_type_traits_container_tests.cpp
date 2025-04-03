@@ -26,7 +26,7 @@ TEST_CASE("test_json_as_pair")
     json j(json_array_arg, {false,1});
     auto t = j.as<std::pair<bool,int>>();
     CHECK(std::get<0>(t) == false);
-    CHECK(std::get<1>(t) == 1);
+    CHECK(1 == std::get<1>(t));
 }
 
 TEST_CASE("test_tuple_to_json")
@@ -35,7 +35,7 @@ TEST_CASE("test_tuple_to_json")
     json j(t);
 
     REQUIRE(j.is_array());
-    REQUIRE(j.size() == 3);
+    REQUIRE(3 == j.size());
     CHECK(false == j[0].as<bool>());
     CHECK(1 == j[1].as<int>());
     CHECK(std::string("foo") == j[2].as<std::string>());
@@ -48,7 +48,7 @@ TEST_CASE("test_json_as_tuple")
     auto t = j.as<std::tuple<bool,int,std::string>>();
 
     CHECK(std::get<0>(t) == false);
-    CHECK(std::get<1>(t) == 1);
+    CHECK(1 == std::get<1>(t));
     CHECK(std::get<2>(t) == std::string("foo"));
 }
 
@@ -81,11 +81,11 @@ TEST_CASE("test_as_vector")
     json a(json_array_arg, {0,1,2,3,4}); 
     std::vector<int> v = a.as<std::vector<int>>();
 
-    CHECK(v[0] == 0);
-    CHECK(v[1] == 1);
-    CHECK(v[2] == 2);
-    CHECK(v[3] == 3);
-    CHECK(v[4] == 4);
+    CHECK(0 == v[0]);
+    CHECK(1 == v[1]);
+    CHECK(2 == v[2]);
+    CHECK(3 == v[3]);
+    CHECK(4 == v[4]);
 }
 
 TEST_CASE("test_assign_vector")
@@ -93,11 +93,11 @@ TEST_CASE("test_assign_vector")
     std::vector<int> v {0,1,2,3,4}; 
     json a = v;
 
-    CHECK(a[0] == json(0));
-    CHECK(a[1] == json(1));
-    CHECK(a[2] == json(2));
-    CHECK(a[3] == json(3));
-    CHECK(a[4] == json(4));
+    CHECK(json(0) == a[0]);
+    CHECK(json(1) == a[1]);
+    CHECK(json(2) == a[2]);
+    CHECK(json(3) == a[3]);
+    CHECK(json(4) == a[4]);
 }
 
 TEST_CASE("test_as_vector_of_bool")
@@ -162,11 +162,11 @@ TEST_CASE("test_as_valarray")
     json a(json_array_arg, {0,1,2,3,4}); 
     std::valarray<int> v = a.as<std::valarray<int>>();
 
-    CHECK(v[0] == 0);
-    CHECK(v[1] == 1);
-    CHECK(v[2] == 2);
-    CHECK(v[3] == 3);
-    CHECK(v[4] == 4);
+    CHECK(0 == v[0]);
+    CHECK(1 == v[1]);
+    CHECK(2 == v[2]);
+    CHECK(3 == v[3]);
+    CHECK(4 == v[4]);
 }
 
 TEST_CASE("test_assign_valarray")
@@ -174,11 +174,11 @@ TEST_CASE("test_assign_valarray")
     std::valarray<int> v {0,1,2,3,4}; 
     json a = v;
 
-    CHECK(a[0] == json(0));
-    CHECK(a[1] == json(1));
-    CHECK(a[2] == json(2));
-    CHECK(a[3] == json(3));
-    CHECK(a[4] == json(4));
+    CHECK(json(0) == a[0]);
+    CHECK(json(1) == a[1]);
+    CHECK(json(2) == a[2]);
+    CHECK(json(3) == a[3]);
+    CHECK(json(4) == a[4]);
 }
 
 TEST_CASE("test_is_json_map")
@@ -380,7 +380,7 @@ TEST_CASE("own_vector json_type_traits")
     json j(json_object_arg,{ {"1",2},{"3",4} });
     REQUIRE(j.is<own_vector>());
     auto v = j.as<own_vector>();
-    REQUIRE(v.size() == 4);
+    REQUIRE(4 == v.size());
     json j2 = v;
     CHECK(j2 == j);
 }
@@ -397,20 +397,20 @@ TEST_CASE("map with integer key")
         CHECK_FALSE(!j.is<std::map<std::string, int>>());
 
         REQUIRE(j.is_object());
-        REQUIRE(j.size() == 2);
-        CHECK(j["1"] == 1);
-        CHECK(j["2"] == 2);
+        REQUIRE(2 == j.size());
+        CHECK(1 == j["1"]);
+        CHECK(2 == j["2"]);
 
         std::map<uint64_t, int> other = j.as<std::map<uint64_t, int>>();
-        REQUIRE(other.size() == 2);
-        CHECK(other[1] == 1);
-        CHECK(other[2] == 2);
+        REQUIRE(2 == other.size());
+        CHECK(1 == other[1]);
+        CHECK(2 == other[2]);
 
         json other_j{ other };
         REQUIRE(other_j.is_object());
-        REQUIRE(other_j.size() == 2);
-        CHECK(other_j["1"] == 1);
-        CHECK(other_j["2"] == 2);
+        REQUIRE(2 == other_j.size());
+        CHECK(1 == other_j["1"]);
+        CHECK(2 == other_j["2"]);
     }
 }
 

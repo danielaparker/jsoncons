@@ -138,7 +138,7 @@ TEST_CASE("n_objects_test")
     reader1.read();
     ojson val1 = decoder.get_result();
     //std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
-    CHECK(val1.size() == 4);
+    CHECK(4 == val1.size());
 
     options.assume_header(true);
     options.mapping_kind(csv::csv_mapping_kind::n_objects);
@@ -146,7 +146,7 @@ TEST_CASE("n_objects_test")
     reader2.read();
     ojson val2 = decoder.get_result();
     //std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
-    REQUIRE(val2.size() == 3);
+    REQUIRE(3 == val2.size());
     CHECK("2017-01-09" == val2[0]["Date"].as<std::string>());
 }
 
@@ -382,11 +382,11 @@ TEST_CASE("csv_test1_array_1col_skip1_a")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
-    CHECK(val[0][0]==json(1));
-    CHECK(val[1][0]==json(4));
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
+    CHECK(json(1) == val[0][0]);
+    CHECK(json(4) == val[1][0]);
 }
 
 TEST_CASE("csv_test1_array_1col_skip1_b")
@@ -404,9 +404,9 @@ TEST_CASE("csv_test1_array_1col_skip1_b")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
     CHECK(val[0][0]==json("1"));
     CHECK(val[1][0]==json("4"));
 }
@@ -425,11 +425,11 @@ TEST_CASE("csv_test1_array_1col_a")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
-    CHECK(val[0][0]==json(1));
-    CHECK(val[1][0]==json(4));
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
+    CHECK(json(1) == val[0][0]);
+    CHECK(json(4) == val[1][0]);
 }
 
 TEST_CASE("csv_test1_array_1col_b")
@@ -447,9 +447,9 @@ TEST_CASE("csv_test1_array_1col_b")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
     CHECK(val[0][0]==json("1"));
     CHECK(val[1][0]==json("4"));
 }
@@ -468,19 +468,19 @@ TEST_CASE("csv_test1_array_3cols")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
     CHECK(val[0][0]==json("a"));
     CHECK(val[0][1]==json("b"));
     CHECK(val[0][2]==json("c"));
-    CHECK(val[1][0]==json(1));
-    CHECK(val[1][1]==json(2));
-    CHECK(val[1][2]==json(3));
-    CHECK(val[2][0]==json(4));
-    CHECK(val[2][1]==json(5));
-    CHECK(val[2][2]==json(6));
+    CHECK(json(1) == val[1][0]);
+    CHECK(json(2) == val[1][1]);
+    CHECK(json(3) == val[1][2]);
+    CHECK(json(4) == val[2][0]);
+    CHECK(json(5) == val[2][1]);
+    CHECK(json(6) == val[2][2]);
 }
 TEST_CASE("csv_test1_array_3cols_trim_leading")
 {
@@ -497,16 +497,16 @@ TEST_CASE("csv_test1_array_3cols_trim_leading")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
     CHECK(val[0][0]==json("a "));
     CHECK(val[0][1]==json("b "));
     CHECK(val[0][2]==json("c "));
-    CHECK(val[1][0]==json(1));
-    CHECK(val[1][1]==json(2));
-    CHECK(val[1][2]==json(3));
+    CHECK(json(1) == val[1][0]);
+    CHECK(json(2) == val[1][1]);
+    CHECK(json(3) == val[1][2]);
     CHECK(val[2][0]==json("4 "));
     CHECK(val[2][1]==json("5 "));
     CHECK(val[2][2]==json("6 "));
@@ -527,10 +527,10 @@ TEST_CASE("csv_test1_array_3cols_trim_trailing")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
     CHECK(val[0][0]==json("a"));
     CHECK(val[0][1]==json("b"));
     CHECK(val[0][2]==json("c"));
@@ -558,19 +558,19 @@ TEST_CASE("csv_test1_array_3cols_trim")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
     CHECK(val[0][0]==json("a"));
     CHECK(val[0][1]==json::null());
     CHECK(val[0][2]==json::null());
-    CHECK(val[1][0]==json(1));
-    CHECK(val[1][1]==json(2));
-    CHECK(val[1][2]==json(3));
-    CHECK(val[2][0]==json(4));
-    CHECK(val[2][1]==json(5));
-    CHECK(val[2][2]==json(6));
+    CHECK(json(1) == val[1][0]);
+    CHECK(json(2) == val[1][1]);
+    CHECK(json(3) == val[1][2]);
+    CHECK(json(4) == val[2][0]);
+    CHECK(json(5) == val[2][1]);
+    CHECK(json(6) == val[2][2]);
 }
 
 TEST_CASE("csv_test1_array_3cols_comment")
@@ -587,15 +587,15 @@ TEST_CASE("csv_test1_array_3cols_comment")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
     CHECK(val[0][0]==json("a"));
     CHECK(val[0][1]==json("b"));
     CHECK(val[0][2]==json("c"));
-    CHECK(val[1][0]==json(4));
-    CHECK(val[1][1]==json(5));
-    CHECK(val[1][2]==json(6));
+    CHECK(json(4) == val[1][0]);
+    CHECK(json(5) == val[1][1]);
+    CHECK(json(6) == val[1][2]);
 }
 
 TEST_CASE("csv comment header line")
@@ -609,10 +609,10 @@ TEST_CASE("csv comment header line")
     auto j = csv::decode_csv<ojson>(data, options);
 
     REQUIRE(j.is_array());
-    REQUIRE(j.size() == 1);
-    REQUIRE(j[0]["A"].as<int>() == 1);
-    REQUIRE(j[0]["B"].as<int>() == 2);
-    REQUIRE(j[0]["C"].as<int>() == 3);
+    REQUIRE(1 == j.size());
+    REQUIRE(1 == j[0]["A"].as<int>());
+    REQUIRE(2 == j[0]["B"].as<int>());
+    REQUIRE(3 == j[0]["C"].as<int>());
 }
 
 TEST_CASE("csv_test1_object_1col")
@@ -629,11 +629,11 @@ TEST_CASE("csv_test1_object_1col")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
-    CHECK(val[0]["a"]==json(1));
-    CHECK(val[1]["a"]==json(4));
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
+    CHECK(json(1) == val[0]["a"]);
+    CHECK(json(4) == val[1]["a"]);
 }
 
 TEST_CASE("csv_test1_object_3cols")
@@ -650,15 +650,15 @@ TEST_CASE("csv_test1_object_3cols")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[0]["a"]==json(1));
-    CHECK(val[0]["b"]==json(2));
-    CHECK(val[0]["c"]==json(3));
-    CHECK(val[1]["a"]==json(4));
-    CHECK(val[1]["b"]==json(5));
-    CHECK(val[1]["c"]==json(6));
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(json(1) == val[0]["a"]);
+    CHECK(json(2) == val[0]["b"]);
+    CHECK(json(3) == val[0]["c"]);
+    CHECK(json(4) == val[1]["a"]);
+    CHECK(json(5) == val[1]["b"]);
+    CHECK(json(6) == val[1]["c"]);
 }
 
 TEST_CASE("csv_test1_object_3cols_header")
@@ -676,15 +676,15 @@ TEST_CASE("csv_test1_object_3cols_header")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[0]["x"]==json(1));
-    CHECK(val[0]["y"]==json(2));
-    CHECK(val[0]["z"]==json(3));
-    CHECK(val[1]["x"]==json(4));
-    CHECK(val[1]["y"]==json(5));
-    CHECK(val[1]["z"]==json(6));
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(json(1) == val[0]["x"]);
+    CHECK(json(2) == val[0]["y"]);
+    CHECK(json(3) == val[0]["z"]);
+    CHECK(json(4) == val[1]["x"]);
+    CHECK(json(5) == val[1]["y"]);
+    CHECK(json(6) == val[1]["z"]);
 }
 
 TEST_CASE("csv_test1_object_3cols_bool")
@@ -703,9 +703,9 @@ TEST_CASE("csv_test1_object_3cols_bool")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
     CHECK(val[0]["x"]==json(true));
     CHECK(val[0]["y"]==json(false));
     CHECK(val[0]["z"]==json(true));
@@ -728,9 +728,9 @@ TEST_CASE("csv_test1_object_1col_quoted")
     reader.read();
     json val = decoder.get_result();
 
-    REQUIRE(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
+    REQUIRE(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
     CHECK(val[0]["a"]==json("1"));
     CHECK(val[1]["a"]==json("4"));
 }
@@ -749,14 +749,14 @@ TEST_CASE("csv_test1_object_3cols_quoted")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
     CHECK(val[0]["a"]==json("1"));
     CHECK(val[0]["b"]==json("2"));
     CHECK(val[0]["c"]==json("3"));
-    CHECK(val[1]["a"]==json(4));
-    CHECK(val[1]["b"]==json(5));
+    CHECK(json(4) == val[1]["a"]);
+    CHECK(json(5) == val[1]["b"]);
     CHECK(val[1]["c"]==json("6"));
 }
 
@@ -774,11 +774,11 @@ TEST_CASE("csv_test1_array_1col_crlf")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
-    CHECK(val[0][0]==json(1));
-    CHECK(val[1][0]==json(4));
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
+    CHECK(json(1) == val[0][0]);
+    CHECK(json(4) == val[1][0]);
 }
 
 TEST_CASE("csv_test1_array_3cols_crlf")
@@ -795,19 +795,19 @@ TEST_CASE("csv_test1_array_3cols_crlf")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
     CHECK(val[0][0]==json("a"));
     CHECK(val[0][1]==json("b"));
     CHECK(val[0][2]==json("c"));
-    CHECK(val[1][0]==json(1));
-    CHECK(val[1][1]==json(2));
-    CHECK(val[1][2]==json(3));
-    CHECK(val[2][0]==json(4));
-    CHECK(val[2][1]==json(5));
-    CHECK(val[2][2]==json(6));
+    CHECK(json(1) == val[1][0]);
+    CHECK(json(2) == val[1][1]);
+    CHECK(json(3) == val[1][2]);
+    CHECK(json(4) == val[2][0]);
+    CHECK(json(5) == val[2][1]);
+    CHECK(json(6) == val[2][2]);
 }
 
 TEST_CASE("csv_test1_object_1col_crlf")
@@ -824,11 +824,11 @@ TEST_CASE("csv_test1_object_1col_crlf")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==1);
-    CHECK(val[1].size()==1);
-    CHECK(val[0]["a"]==json(1));
-    CHECK(val[1]["a"]==json(4));
+    CHECK(2 == val.size());
+    CHECK(1 == val[0].size());
+    CHECK(1 == val[1].size());
+    CHECK(json(1) == val[0]["a"]);
+    CHECK(json(4) == val[1]["a"]);
 }
 
 TEST_CASE("csv_test1_object_3cols_crlf")
@@ -845,15 +845,15 @@ TEST_CASE("csv_test1_object_3cols_crlf")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[0]["a"]==json(1));
-    CHECK(val[0]["b"]==json(2));
-    CHECK(val[0]["c"]==json(3));
-    CHECK(val[1]["a"]==json(4));
-    CHECK(val[1]["b"]==json(5));
-    CHECK(val[1]["c"]==json(6));
+    CHECK(2 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(json(1) == val[0]["a"]);
+    CHECK(json(2) == val[0]["b"]);
+    CHECK(json(3) == val[0]["c"]);
+    CHECK(json(4) == val[1]["a"]);
+    CHECK(json(5) == val[1]["b"]);
+    CHECK(json(6) == val[1]["c"]);
 }
 
 TEST_CASE("read_comma_delimited_file")
@@ -1013,19 +1013,19 @@ TEST_CASE("csv_test1_array_3cols_grouped1")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==3);
-    CHECK(val[0].size()==3);
-    CHECK(val[1].size()==3);
-    CHECK(val[2].size()==3);
-    CHECK(val[0][0].as<int>() == 1);
-    CHECK(val[0][1].as<int>() == 2);
-    CHECK(val[0][2].as<int>() == 3);
-    CHECK(val[1][0].as<int>() == 4);
-    CHECK(val[1][1].as<int>() == 5);
-    CHECK(val[1][2].as<int>() == 6);
-    CHECK(val[2][0].as<int>() == 7);
-    CHECK(val[2][1].as<int>() == 8);
-    CHECK(val[2][2].as<int>() == 9); 
+    CHECK(3 == val.size());
+    CHECK(3 == val[0].size());
+    CHECK(3 == val[1].size());
+    CHECK(3 == val[2].size());
+    CHECK(1 == val[0][0].as<int>());
+    CHECK(2 == val[0][1].as<int>());
+    CHECK(3 == val[0][2].as<int>());
+    CHECK(4 == val[1][0].as<int>());
+    CHECK(5 == val[1][1].as<int>());
+    CHECK(6 == val[1][2].as<int>());
+    CHECK(7 == val[2][0].as<int>());
+    CHECK(8 == val[2][1].as<int>());
+    CHECK(9 == val[2][2].as<int>()); 
 }
 
 TEST_CASE("csv_test1_array_3cols_grouped2")
@@ -1045,15 +1045,15 @@ TEST_CASE("csv_test1_array_3cols_grouped2")
 
     //std::cout << val << '\n';
 /*
-    REQUIRE(options.column_types().size() == 4);
+    REQUIRE(4 == options.column_types().size());
     CHECK(options.column_types()[0].first == csv::csv_column_type::integer_t);
-    CHECK(options.column_types()[0].second == 0);
+    CHECK(0 == options.column_types()[0].second);
     CHECK(options.column_types()[1].first == csv::csv_column_type::integer_t);
-    CHECK(options.column_types()[1].second == 1);
+    CHECK(1 == options.column_types()[1].second);
     CHECK(options.column_types()[2].first == csv::csv_column_type::integer_t);
-    CHECK(options.column_types()[2].second == 1);
+    CHECK(1 == options.column_types()[2].second);
     CHECK(options.column_types()[3].first == csv::csv_column_type::repeat_t);
-    CHECK(options.column_types()[3].second == 2);
+    CHECK(2 == options.column_types()[3].second);
 */
 }
 
@@ -1067,41 +1067,41 @@ TEST_CASE("csv_test1_repeat")
 
     std::vector<csv::csv_type_info> result;
     jsoncons::csv::detail::parse_column_types(std::string("string,float*"), result);
-    REQUIRE(result.size() == 3);
+    REQUIRE(3 == result.size());
     CHECK(result[0].col_type == csv::csv_column_type::string_t);
-    CHECK(result[0].level == 0);
+    CHECK(0 == result[0].level);
     CHECK(0 == result[0].rep_count);
     CHECK(result[1].col_type == csv::csv_column_type::float_t);
-    CHECK(result[1].level == 0);
+    CHECK(0 == result[1].level);
     CHECK(0 == result[1].rep_count);
     CHECK(result[2].col_type == csv::csv_column_type::repeat_t);
-    CHECK(result[2].level == 0);
+    CHECK(0 == result[2].level);
     CHECK(1 == result[2].rep_count);
 
     std::vector<csv::csv_type_info> result2;
     jsoncons::csv::detail::parse_column_types(std::string("string,[float*]"), result2);
-    REQUIRE(result2.size() == 3);
+    REQUIRE(3 == result2.size());
     CHECK(result2[0].col_type == csv::csv_column_type::string_t);
-    CHECK(result2[0].level == 0);
+    CHECK(0 == result2[0].level);
     CHECK(0 == result2[0].rep_count);
     CHECK(result2[1].col_type == csv::csv_column_type::float_t);
-    CHECK(result2[1].level == 1);
+    CHECK(1 == result2[1].level);
     CHECK(0 == result2[1].rep_count);
     CHECK(result2[2].col_type == csv::csv_column_type::repeat_t);
-    CHECK(result2[2].level == 1); //-V521
+    CHECK(1 == result2[2].level); //-V521
     CHECK(1 == result2[2].rep_count); //-V521
 
     std::vector<csv::csv_type_info> result3;
     jsoncons::csv::detail::parse_column_types(std::string("string,[float]*"), result3);
-    REQUIRE(result3.size() == 3); //-V521
+    REQUIRE(3 == result3.size()); //-V521
     CHECK(result3[0].col_type == csv::csv_column_type::string_t); //-V521
-    CHECK(result3[0].level == 0); //-V521
+    CHECK(0 == result3[0].level); //-V521
     CHECK(0 == result3[0].rep_count); //-V521
     CHECK(result3[1].col_type == csv::csv_column_type::float_t); //-V521
-    CHECK(result3[1].level == 1); //-V521
+    CHECK(1 == result3[1].level); //-V521
     CHECK(0 == result3[1].rep_count); //-V521
     CHECK(result3[2].col_type == csv::csv_column_type::repeat_t); //-V521
-    CHECK(result3[2].level == 0); //-V521
+    CHECK(0 == result3[2].level); //-V521
     CHECK(1 == result3[2].rep_count); //-V521
 }
 
@@ -1135,7 +1135,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 4); //-V521
+    REQUIRE(4 == j.size()); //-V521
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
     CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF")); //-V521
@@ -1171,7 +1171,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     json j = decoder.get_result();
 
     //std::cout << pretty_print(j) << "\n";
-    REQUIRE(j.size() == 5); //-V521
+    REQUIRE(5 == j.size()); //-V521
 
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
@@ -1204,7 +1204,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 5); //-V521
+    REQUIRE(5 == j.size()); //-V521
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
     CHECK(j[1]["country_code"].as<std::string>() == std::string(" ")); // ok, one space, no delimiter //-V521
@@ -1239,7 +1239,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 4); //-V521
+    REQUIRE(4 == j.size()); //-V521
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
     CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF")); //-V521
@@ -1262,7 +1262,7 @@ TEST_CASE("Test decode_csv, terminating newline")
             .assume_header(true);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_array()); //-V521
-        REQUIRE(j.size() == 2); //-V521
+        REQUIRE(2 == j.size()); //-V521
         CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
         CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1275,7 +1275,7 @@ TEST_CASE("Test decode_csv, terminating newline")
             .assume_header(true);
         auto j = csv::decode_csv<json>(is,options);
         REQUIRE(j.is_array()); //-V521
-        REQUIRE(j.size() == 2); //-V521
+        REQUIRE(2 == j.size()); //-V521
         CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
         CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1287,7 +1287,7 @@ TEST_CASE("Test decode_csv, terminating newline")
             .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
-        REQUIRE(j.size() == 1); //-V521
+        REQUIRE(1 == j.size()); //-V521
         CHECK(j["some label"][0].as<std::string>() == std::string("some value")); //-V521
         CHECK(j["some label"][1].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1303,7 +1303,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
             .assume_header(true);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_array()); //-V521
-        REQUIRE(j.size() == 2); //-V521
+        REQUIRE(2 == j.size()); //-V521
         CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
         CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1316,7 +1316,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
             .assume_header(true);
         auto j = csv::decode_csv<json>(is,options);
         REQUIRE(j.is_array()); //-V521
-        REQUIRE(j.size() == 2); //-V521
+        REQUIRE(2 == j.size()); //-V521
         CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
         CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1328,7 +1328,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
             .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
-        REQUIRE(j.size() == 1); //-V521
+        REQUIRE(1 == j.size()); //-V521
         CHECK(j["some label"][0].as<std::string>() == std::string("some value")); //-V521
         CHECK(j["some label"][1].as<std::string>() == std::string("another value")); //-V521
     }
@@ -1349,9 +1349,9 @@ TEST_CASE("test encode_csv")
         auto j2 = csv::decode_csv<json>(ss, options);
 
         REQUIRE(j2.is_array()); //-V521
-        REQUIRE(j2.size() == 1); //-V521
-        CHECK(j2[0]["a"].as<int>() == 1); //-V521
-        CHECK(j2[0]["b"].as<int>() == 2); //-V521
+        REQUIRE(1 == j2.size()); //-V521
+        CHECK(1 == j2[0]["a"].as<int>()); //-V521
+        CHECK(2 == j2[0]["b"].as<int>()); //-V521
     }
 }
 
@@ -1467,7 +1467,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         .lossless_number(true);
 
     ojson j = csv::decode_csv<ojson>(input,options);
-    REQUIRE(j.size() == 3); //-V521
+    REQUIRE(3 == j.size()); //-V521
     CHECK(j[0]["rate"].tag() == semantic_tag::bigdec); //-V521
     CHECK((j[0]["rate"].as<std::string>() == "0.0000214")); //-V521
     CHECK(j[1]["rate"].tag() == semantic_tag::bigdec); //-V521
@@ -1487,7 +1487,7 @@ TEST_CASE("csv detect bom")
     
     std::istringstream is(input);
     ojson j = csv::decode_csv<ojson>(is, options);
-    REQUIRE(j.size() == 1); //-V521
+    REQUIRE(1 == j.size()); //-V521
     ojson station = j[0];
     
     JSONCONS_TRY {
@@ -1532,7 +1532,7 @@ TEST_CASE("csv_reader constructors")
         reader.read();
 
         cust_json j = decoder.get_result();
-        CHECK(j.size() == 3); //-V521
+        CHECK(3 == j.size()); //-V521
         //std::cout << pretty_print(j) << "\n";
     }
 }

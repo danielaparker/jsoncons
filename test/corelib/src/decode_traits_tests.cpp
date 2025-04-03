@@ -41,7 +41,7 @@ TEST_CASE("decode_traits primitive")
         json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
-        REQUIRE(val.size() == 3);
+        REQUIRE(3 == val.size());
         CHECK(val[0] == 1000);
         CHECK(val[1] == 1001);
         CHECK(val[2] == 1002);
@@ -95,7 +95,7 @@ TEST_CASE("decode_traits std::pair")
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
         REQUIRE_FALSE(ec);
 
-        REQUIRE(val.size() == 2);
+        REQUIRE(2 == val.size());
         CHECK((val[0] == test_type::value_type("first","second")));
         CHECK((val[1] == test_type::value_type("one","two")));
     }
@@ -112,7 +112,7 @@ TEST_CASE("decode_traits std::pair")
 
         REQUIRE_FALSE(ec);
 
-        REQUIRE(val.size() == 2);
+        REQUIRE(2 == val.size());
         REQUIRE(val.count("foo") > 0);
         REQUIRE(val.count("bar") > 0);
         CHECK(val["foo"].first == 100);

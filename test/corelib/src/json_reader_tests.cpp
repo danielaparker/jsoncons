@@ -47,7 +47,7 @@ TEST_CASE("test json_reader buffered read")
         auto j = json::parse(is);
 
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
+        REQUIRE(2 == j.size());
         CHECK(j[1].as<double>() == -123456789.123456789);
     }
 
@@ -66,7 +66,7 @@ TEST_CASE("test json_reader buffered read")
 
         auto j = json::parse(is);
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
+        REQUIRE(2 == j.size());
         CHECK_FALSE(j[1].as<bool>());
     }
 
@@ -85,7 +85,7 @@ TEST_CASE("test json_reader buffered read")
 
         auto j = json::parse(is);
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
+        REQUIRE(2 == j.size());
         CHECK(j[1].as<bool>());
     }
 
@@ -104,7 +104,7 @@ TEST_CASE("test json_reader buffered read")
 
         auto j = json::parse(is);
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
+        REQUIRE(2 == j.size());
         CHECK(j[1].is_null());
     }
 }
@@ -310,11 +310,11 @@ TEST_CASE("json_reader read from string test")
     json j = decoder.get_result();
 
     REQUIRE(j.is_object());
-    REQUIRE(j.size() == 1);
+    REQUIRE(1 == j.size());
     REQUIRE(j[0].is_object());
-    REQUIRE(j[0].size() == 1);
+    REQUIRE(1 == j[0].size());
     REQUIRE(j[0][0].is_array());
-    REQUIRE(j[0][0].size() == 2);
+    REQUIRE(2 == j[0][0].size());
     CHECK(j[0][0][0]["category"].as<std::string>() == std::string("reference"));
     CHECK(j[0][0][1]["author"].as<std::string>() == std::string("Brent Weeks"));
 }

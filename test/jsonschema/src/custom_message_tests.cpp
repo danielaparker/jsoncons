@@ -76,7 +76,7 @@ TEST_CASE("jsonschema custom message tests")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 3);
+        REQUIRE(3 == messages.size());
         CHECK("Type of `bar` must be string" == messages[0]);
         CHECK("Date format must be YYYY-MM-DD" == messages[1]);
         CHECK("Only numbers are allowed in 'foo'" == messages[2]);
@@ -101,7 +101,7 @@ TEST_CASE("jsonschema custom message tests")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 1);
+        REQUIRE(1 == messages.size());
         CHECK("Only numbers are allowed in 'foo'" == messages[0]);
     }
 
@@ -124,7 +124,7 @@ TEST_CASE("jsonschema custom message tests")
         };
         compiled.validate(data, reporter);
         
-        REQUIRE(messages.size() == 2);
+        REQUIRE(2 == messages.size());
         CHECK("Type of `bar` must be string" == messages[0]);
         CHECK("Only numbers are allowed in 'foo'" == messages[1]);
     }
@@ -148,7 +148,7 @@ TEST_CASE("jsonschema custom message tests")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 3);
+        REQUIRE(3 == messages.size());
         CHECK("Type of `bar` must be string" == messages[0]);
         CHECK("Only numbers are allowed in 'foo'" == messages[1]);
         CHECK("At most 3 numbers are allowed in 'foo'" == messages[2]);
@@ -203,7 +203,7 @@ TEST_CASE("jsonschema custom message with format keyword")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 2);
+        REQUIRE(2 == messages.size());
         CHECK("Date format must be YYYY-MM-DD" == messages[0]);
         CHECK("Date-time format must be YYYY-MM-DDThh:mmTZD" == messages[1]);
     }

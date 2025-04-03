@@ -204,27 +204,27 @@ TEST_CASE("json_parser position")
             std::vector<std::size_t> positions;
 
             update_in_place(input1, "$['Parent']['Child']['Test']", positions);
-            REQUIRE(positions.size() == 1);
+            REQUIRE(1 == positions.size());
             CHECK(input1.substr(positions.back(),16) == std::string("4444333322221111"));
 
             positions.clear();
             update_in_place(input2, "$['Parent']['Child']['Test']", positions);
-            REQUIRE(positions.size() == 1);
+            REQUIRE(1 == positions.size());
             CHECK(input2.substr(positions.back(),18) == std::string("\"4444333322221111\""));
 
             positions.clear();
             update_in_place(input1, "$['Parent']['Child']['NegativeInt']", positions);
-            REQUIRE(positions.size() == 1);
+            REQUIRE(1 == positions.size());
             CHECK(input1.substr(positions.back(),17) == std::string("-4444333322221111"));
 
             positions.clear();
             update_in_place(input1, "$['Parent']['Child']['Double']", positions);
-            REQUIRE(positions.size() == 1);
+            REQUIRE(1 == positions.size());
             CHECK(input1.substr(positions.back(),10) == std::string("12345.6789"));
 
             positions.clear();
             update_in_place(input1, "$['Parent']['Child']['NegativeDouble']", positions);
-            REQUIRE(positions.size() == 1);
+            REQUIRE(1 == positions.size());
             CHECK(input1.substr(positions.back(),11) == std::string("-12345.6789"));
         }
         catch (std::exception& e)

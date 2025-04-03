@@ -921,7 +921,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
     SECTION("decode vector of shared_ptr test")
     {
         auto v = jsoncons::decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
-        REQUIRE(v.size() == 2);
+        REQUIRE(2 == v.size());
         CHECK(v[0]->firstName() == firstName0);
         CHECK(v[0]->lastName() == lastName0);
         CHECK(v[0]->calculatePay() == pay0);
@@ -934,7 +934,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
     {
 
         auto v = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
-        REQUIRE(v.size() == 2);
+        REQUIRE(2 == v.size());
         CHECK(v[0]->firstName() == firstName0);
         CHECK(v[0]->lastName() == lastName0);
         CHECK(v[0]->calculatePay() == pay0);

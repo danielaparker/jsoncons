@@ -64,7 +64,7 @@ TEST_CASE("jsonpath stateful allocator test")
         auto expr = jsoncons::jsonpath::make_expression<cust_json>(combine_allocators(myAlloc), p);  
         auto result = expr.evaluate(j);
 
-        CHECK(result.size() == 2);
+        CHECK(2 == result.size());
         CHECK(result[0].as_string_view() == "Sword of Honour");
         CHECK(result[1].as_string_view() == "Moby Dick");
     }
@@ -83,7 +83,7 @@ TEST_CASE("jsonpath stateful allocator test")
         auto result = jsoncons::jsonpath::json_query(combine_allocators(myAlloc), 
             j,"$..book[?(@.category == 'fiction')].title");
 
-        CHECK(result.size() == 2);
+        CHECK(2 == result.size());
         CHECK(result[0].as_string_view() == "Sword of Honour");
         CHECK(result[1].as_string_view() == "Moby Dick");
     }

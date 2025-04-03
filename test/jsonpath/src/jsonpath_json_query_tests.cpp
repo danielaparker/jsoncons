@@ -86,12 +86,12 @@ TEST_CASE("jsonpath normalized path test")
 
    const std::string path = R"($['\\'])";
    auto paths = jsonpath::json_query(j, path, jsonpath::result_options::path);
-   CHECK(paths.size() == 1);
+   CHECK(1 == paths.size());
 
    auto result = jsonpath::json_query(j, paths[0].as_string_view());
 
-   CHECK(result.size() == 1);
-   CHECK(result[0].as<int>() == 0);
+   CHECK(1 == result.size());
+   CHECK(0 == result[0].as<int>());
 }
 
 TEST_CASE("jsonpath json_query wjson test")

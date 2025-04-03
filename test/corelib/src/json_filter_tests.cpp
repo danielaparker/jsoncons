@@ -167,10 +167,10 @@ TEST_CASE("test_chained_filters")
 
     j.dump(filter1);
     ojson j2 = decoder.get_result();
-    CHECK(j2.size() == 4);
-    CHECK(j2["first"] == 1);
-    CHECK(j2["second"] == 2);
-    CHECK(j2["third"] == 3);
-    CHECK(j2["fourth"] == 4);
+    CHECK(4 == j2.size());
+    CHECK(1 == j2["first"]);
+    CHECK(2 == j2["second"]);
+    CHECK(3 == j2["third"]);
+    CHECK(4 == j2["fourth"]);
 }
 

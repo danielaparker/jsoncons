@@ -135,7 +135,7 @@ TEST_CASE("flatten test")
         json result = jsonpointer::flatten(input);
 
         REQUIRE(result.is_object());
-        REQUIRE(result.size() == 9);
+        REQUIRE(9 == result.size());
 
         CHECK(result["/application"].as<std::string>() == std::string("hiking"));
         CHECK(result["/reputons/0/assertion"].as<std::string>() == std::string("advanced"));

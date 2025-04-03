@@ -49,18 +49,18 @@ TEST_CASE("optional constructor tests")
 
         json* p = x.operator->();
         REQUIRE(p);
-        REQUIRE(p->size() == 3);
+        REQUIRE(3 == p->size());
         json& ref = x.value();
-        REQUIRE(ref.size() == 3);
+        REQUIRE(3 == ref.size());
 
         const auto& cref = *x;
-        REQUIRE(cref.size() == 3);
+        REQUIRE(3 == cref.size());
 
         x = j[1];
         REQUIRE(x.has_value());
         const auto& cref2 = *x;
         REQUIRE(cref2.is_object());
-        REQUIRE(cref2.size() == 4);
+        REQUIRE(4 == cref2.size());
         CHECK(cref2["firstName"].as<std::string>() == std::string("Catherine"));
     }
     SECTION("optional<T>(int64_t) from const")

@@ -91,7 +91,7 @@ TEST_CASE("Test polymorhic allocator")
         j.try_emplace("baz", an_object1);
         j.try_emplace("qux", std::move(an_object1_copy));
 
-        CHECK(j.size() == 4);
+        CHECK(4 == j.size());
         CHECK(j.at("foo") == pmr_json{});
         CHECK(j.at("bar").as_string_view() == a_long_string);
         CHECK(j.at("baz") == an_object1);
@@ -105,7 +105,7 @@ TEST_CASE("Test polymorhic allocator")
         j.try_emplace(key1, pmr_ojson{});
         j.try_emplace(std::move(key2), a_long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j.at("foo") == pmr_ojson{});
         CHECK(j.at("bar").as_string_view() == a_long_string);
     }
@@ -117,7 +117,7 @@ TEST_CASE("Test polymorhic allocator")
         j.insert_or_assign("foo", pmr_json{});
         j.insert_or_assign("bar", a_long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j.at("foo") == pmr_json{});
         CHECK(j.at("bar").as_string_view() == a_long_string);
     }
@@ -129,7 +129,7 @@ TEST_CASE("Test polymorhic allocator")
         j.insert_or_assign("foo", pmr_ojson{});
         j.insert_or_assign("bar", a_long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j.at("foo") == pmr_ojson{});
         CHECK(j.at("bar").as_string_view() == a_long_string);
     }
@@ -140,8 +140,8 @@ TEST_CASE("Test polymorhic allocator")
         j.emplace_back(1);
         j.emplace_back(a_long_string);
 
-        CHECK(j.size() == 2);
-        CHECK(j.at(0) == 1);
+        CHECK(2 == j.size());
+        CHECK(1 == j.at(0));
         CHECK(j.at(1).as<std::string>() == a_long_string);
     }
 
@@ -151,8 +151,8 @@ TEST_CASE("Test polymorhic allocator")
         j.push_back(1);
         j.push_back(a_long_string);
 
-        CHECK(j.size() == 2);
-        CHECK(j.at(0) == 1);
+        CHECK(2 == j.size());
+        CHECK(1 == j.at(0));
         CHECK(j.at(1).as<std::string>() == a_long_string);
     }
 
@@ -163,7 +163,7 @@ TEST_CASE("Test polymorhic allocator")
         j.insert(j.array_range().end(), pmr_json{});
         j.insert(j.array_range().end(), a_long_string);
 
-        CHECK(j.size() == 2);
+        CHECK(2 == j.size());
         CHECK(j[0] == pmr_json{});
         CHECK(j[1].as_string_view() == a_long_string);
     }

@@ -18,9 +18,9 @@ TEST_CASE("string_view tests")
         map.emplace(key2, 2);
 
         CHECK(map.find(key1) != map.end());
-        CHECK(map[key1] == 1);
+        CHECK(1 == map[key1]);
         CHECK(map.find(key2) != map.end());
-        CHECK(map[key2] == 2);
+        CHECK(2 == map[key2]);
     }
 }
 

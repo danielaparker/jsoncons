@@ -65,11 +65,11 @@ TEST_CASE("jmespath_expression tests")
 
         auto expr1 = jmespath::make_expression<json>("group.value");
         json result1 = expr1.evaluate(doc);
-        CHECK(result1 == json(1));
+        CHECK(json(1) == result1);
 
         auto expr2 = jmespath::make_expression<json>("array[0].value");
         json result2 = expr2.evaluate(doc);
-        CHECK(result2 == json(2));
+        CHECK(json(2) == result2);
 
         auto expr3 = jmespath::make_expression<json>("nullable.value");
         json result3 = expr3.evaluate(doc);

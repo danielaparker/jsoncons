@@ -26,7 +26,7 @@ TEST_CASE("test csv_reader buffered read")
         reader.read();
         auto val = decoder.get_result();
         //std::cout << jsoncons::pretty_print(val) << "\n";
-        CHECK(val.size() == 4);
+        CHECK(4 == val.size());
     }
 }
 
