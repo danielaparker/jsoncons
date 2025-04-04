@@ -750,7 +750,6 @@ public:
         header_line_ = 1;
         m_columns_filter_.reset();
         stack_.clear();
-        auto start = column_names_.begin() + min_column_names_;
         column_names_.erase(column_names_.begin() + min_column_names_, column_names_.end());
         state_stack_.clear();
         buffer_.clear();
