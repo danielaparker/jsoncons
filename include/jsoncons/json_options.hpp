@@ -210,26 +210,12 @@ public:
 
     string_type nan_to_str() const
     {
-        if (enable_nan_to_str_)
-        {
-            return nan_to_str_;
-        }
-        else
-        {
-            return nan_to_str_; // empty string
-        }
+        return nan_to_str_;
     }
 
     string_type inf_to_str() const
     {
-        if (enable_inf_to_str_)
-        {
-            return inf_to_str_;
-        }
-        else
-        {
-            return inf_to_str_; // empty string
-        }
+        return inf_to_str_;
     }
 
     string_type neginf_to_str() const
