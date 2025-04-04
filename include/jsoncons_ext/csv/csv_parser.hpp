@@ -1474,7 +1474,7 @@ private:
                 {
                     trim_string_buffer(trim_leading_inside_quotes_,trim_trailing_inside_quotes_);
                 }
-                if (line_ == (header_line_+header_line_offset_))
+                if (line_ == (header_line_+header_line_offset_) && column_index_ >= min_column_names_)
                 {
                     column_names_.push_back(buffer_);
                     if (assume_header_ && mapping_kind_ == csv_mapping_kind::n_rows)

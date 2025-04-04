@@ -663,28 +663,56 @@ TEST_CASE("csv_test1_object_3cols")
 
 TEST_CASE("csv_test1_object_3cols_header")
 {
-    std::string text = "a,b,c\n1,2,3\n4,5,6";
-    std::istringstream is(text);
+    SECTION("test 1")
+    {
+        std::string text = "a,b,c\n1,2,3\n4,5,6";
+        std::istringstream is(text);
 
-    json_decoder<json> decoder;
+        json_decoder<json> decoder;
 
-    auto options = csv::csv_options{}
-        .column_names("x,y,z")
-        .header_lines(1);
+        auto options = csv::csv_options{}
+            .column_names("x,y,z")
+            .header_lines(1);
 
-    csv::csv_stream_reader reader(is,decoder,options);
-    reader.read();
-    json val = decoder.get_result();
+        csv::csv_stream_reader reader(is,decoder,options);
+        reader.read();
+        json val = decoder.get_result();
 
-    CHECK(2 == val.size());
-    CHECK(3 == val[0].size());
-    CHECK(3 == val[1].size());
-    CHECK(json(1) == val[0]["x"]);
-    CHECK(json(2) == val[0]["y"]);
-    CHECK(json(3) == val[0]["z"]);
-    CHECK(json(4) == val[1]["x"]);
-    CHECK(json(5) == val[1]["y"]);
-    CHECK(json(6) == val[1]["z"]);
+        CHECK(2 == val.size());
+        CHECK(3 == val[0].size());
+        CHECK(3 == val[1].size());
+        CHECK(json(1) == val[0]["x"]);
+        CHECK(json(2) == val[0]["y"]);
+        CHECK(json(3) == val[0]["z"]);
+        CHECK(json(4) == val[1]["x"]);
+        CHECK(json(5) == val[1]["y"]);
+        CHECK(json(6) == val[1]["z"]);
+    }
+    SECTION("test 2")
+    {
+        std::string text = "a,b,c\n1,2,3\n4,5,6";
+        std::istringstream is(text);
+
+        json_decoder<json> decoder;
+
+        auto options = csv::csv_options{}
+            .column_names("x,y")
+            .header_lines(1);
+
+        csv::csv_stream_reader reader(is,decoder,options);
+        reader.read();
+        json val = decoder.get_result();
+
+        CHECK(2 == val.size());
+        CHECK(3 == val[0].size());
+        CHECK(3 == val[1].size());
+        CHECK(json(1) == val[0]["x"]);
+        CHECK(json(2) == val[0]["y"]);
+        CHECK(json(3) == val[0]["c"]);
+        CHECK(json(4) == val[1]["x"]);
+        CHECK(json(5) == val[1]["y"]);
+        CHECK(json(6) == val[1]["c"]);
+    }
 }
 
 TEST_CASE("csv_test1_object_3cols_bool")
