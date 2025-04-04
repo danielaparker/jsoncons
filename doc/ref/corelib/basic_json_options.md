@@ -16,12 +16,12 @@ Specifies options for reading and writing JSON text.
 
 Option|Reading|Writing|Default
 ------|-------|-------|-------
-nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON|Not enabled
-inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON|Not enabled
-neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON|Not enabled
-nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Not enabled
-inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Not enabled
-neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Not enabled
+nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON|Unenabled
+inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON|Unenabled
+neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON|Unenabled
+nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled
+inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled
+neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.| |`false`
 allow_comments (since 1.3.0)|If 'true', allow (and ignore) comments when parsing JSON| |`true`
