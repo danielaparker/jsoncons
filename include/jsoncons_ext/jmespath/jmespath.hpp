@@ -4004,6 +4004,8 @@ namespace detail {
                     case expr_state::argument:
                         push_token(argument_arg, resources, output_stack, ec);
                         if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                        push_token(lparen_arg, resources, output_stack, ec);
+                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back();
                         break;
 
@@ -5371,8 +5373,11 @@ namespace detail {
                     break;
                 case token_kind::key:
                 case token_kind::pipe:
-                case token_kind::argument:
                 case token_kind::begin_expression_type:
+                    output_stack.push_back(std::move(tok));
+                    break;
+                case token_kind::argument:
+                    unwind_rparen(output_stack, ec);
                     output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::lparen:

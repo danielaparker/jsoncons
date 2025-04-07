@@ -79,48 +79,93 @@ TEST_CASE("jmespath_expression tests")
 
 TEST_CASE("jmespath issue") 
 {
-    std::string jtext = R"(
+    SECTION("issue 1")
     {
-      "locations": [
-        {"name": "Seattle", "state": "WA"},
-        {"name": "New York", "state": "NY"},
-        {"name": "Bellevue", "state": "WA"},
-        {"name": "Olympia", "state": "WA"}
-      ]
-    }        
-    )";
-
-    std::string expr = R"(
-    {
-        name: locations[].name,
-        state: locations[].state
-    }
-    )";
-
-    auto doc = ojson::parse(jtext);
-
-    auto result = jmespath::search(doc, expr);
-
-    //std::cout << pretty_print(result) << "\n\n";
-}
-
-TEST_CASE("jmespath parentheses issue") 
-{
-    auto doc = jsoncons::json::parse(R"(
-{"foo" : [[0, 1], [2, 3], [4, 5]]}
-    )");
-    
-        SECTION("test 1")
+        std::string jtext = R"(
         {
-            auto expected = jsoncons::json::parse(R"(
-    [0, 1]
-            )");
+          "locations": [
+            {"name": "Seattle", "state": "WA"},
+            {"name": "New York", "state": "NY"},
+            {"name": "Bellevue", "state": "WA"},
+            {"name": "Olympia", "state": "WA"}
+          ]
+        }        
+        )";
 
-            std::string query = R"((foo[*])[0])";
-            auto expr = jmespath::make_expression<jsoncons::json>(query);
-
-            jsoncons::json result = expr.evaluate(doc);
-            //std::cout << pretty_print(result) << "\n";
-            CHECK(expected == result);
+        std::string expr = R"(
+        {
+            name: locations[].name,
+            state: locations[].state
         }
+        )";
+
+        auto doc = ojson::parse(jtext);
+
+        auto result = jmespath::search(doc, expr);
+
+        //std::cout << pretty_print(result) << "\n\n";
+    }
+    SECTION("parentheses issue")
+    {
+        auto doc = jsoncons::json::parse(R"(
+    {"foo" : [[0, 1], [2, 3], [4, 5]]}
+        )");
+
+        auto expected = jsoncons::json::parse(R"([0, 1])");
+
+        std::string query = R"((foo[*])[0])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        //std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }
 }
+
+TEST_CASE("jmespath issue 605")
+{
+    SECTION("function with 1 arg")
+    {
+        std::string query = R"(
+to_array("gw:GWallInfo"."gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGroup" || 
+    "gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGroup")
+)";
+
+        auto expr = jsoncons::jmespath::make_expression<json>(query);
+        json j;
+        j["gw:DocumentStatistics"]["gw:ContentGroups"]["gw:ContentGroup"] = 9;
+        auto result = expr.evaluate(j);
+        REQUIRE(result.is_array());
+        REQUIRE_FALSE(result.empty());
+        CHECK(9 == result[0]);
+
+        //std::cout << pretty_print(result) << "\n\n";
+    }
+    SECTION("function with 2 args")
+    {
+        std::string query = R"(starts_with(B || A,null || 'a'))";
+
+        auto expr = jsoncons::jmespath::make_expression<json>(query);
+        json j;
+        j["A"] = "ab";
+        //auto result = jsoncons::jmespath::search(j, expr);
+        auto result = expr.evaluate(j);
+        //std::cout << result << "\n";
+
+        CHECK(result.as<bool>());
+    }
+    SECTION("function with 2 args (2)")
+    {
+        std::string query = R"(starts_with(A || B,null || 'a'))";
+
+        auto expr = jsoncons::jmespath::make_expression<json>(query);
+        json j;
+        j["A"] = "ab";
+        //auto result = jsoncons::jmespath::search(j, expr);
+        auto result = expr.evaluate(j);
+        //std::cout << result << "\n";
+
+        CHECK(result.as<bool>());
+    }
+}
+
