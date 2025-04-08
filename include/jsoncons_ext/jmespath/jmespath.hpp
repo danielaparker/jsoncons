@@ -5061,7 +5061,7 @@ namespace detail {
             }
             ++it;
             operator_stack_.erase(it.base(),operator_stack_.end());
-            if (output_stack.back().is_expression())
+            if (output_stack.back().is_projection())
             {
                 output_stack.push_back(token<Json>(pipe_arg));
             }
