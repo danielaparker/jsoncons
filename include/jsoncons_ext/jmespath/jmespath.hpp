@@ -3772,9 +3772,10 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '&':
+                                state_stack.back() = expr_state::argument;
                                 push_token(token<Json>(begin_expression_type_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
-                                state_stack.back() = expr_state::expression_type;
+                                state_stack.push_back(expr_state::expression_type);
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 context_stack.push_back(expression_context<Json>{});
@@ -4010,8 +4011,6 @@ namespace detail {
                         break;
 
                     case expr_state::expression_type:
-                        push_token(argument_arg, resources, output_stack, ec); // CHECK
-                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         push_token(end_expression_type_arg, resources, output_stack, ec);
                         if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         state_stack.pop_back();
