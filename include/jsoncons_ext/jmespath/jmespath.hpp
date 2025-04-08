@@ -3773,6 +3773,7 @@ namespace detail {
                                 break;
                             case '&':
                                 state_stack.back() = expr_state::argument;
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 push_token(token<Json>(begin_expression_type_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::expression_type);
@@ -3784,6 +3785,7 @@ namespace detail {
                                 break;
                             default:
                                 state_stack.back() = expr_state::argument;
+                                if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 context_stack.push_back(expression_context<Json>{});
@@ -3943,6 +3945,7 @@ namespace detail {
                                 }
                                 if (!is_no_args_func)
                                 {
+                                    push_token(lparen_arg, resources, output_stack, ec);
                                     state_stack.push_back(expr_state::expression_or_expression_type);
                                 }
                                 ++p_;
@@ -3982,6 +3985,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
+                                push_token(lparen_arg, resources, output_stack, ec);
                                 push_token(token<Json>(current_node_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::expression_or_expression_type);
@@ -4004,8 +4008,6 @@ namespace detail {
 
                     case expr_state::argument:
                         push_token(argument_arg, resources, output_stack, ec);
-                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
-                        push_token(lparen_arg, resources, output_stack, ec);
                         if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                         state_stack.pop_back();
                         break;
