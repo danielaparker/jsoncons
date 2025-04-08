@@ -4010,9 +4010,10 @@ namespace detail {
                         break;
 
                     case expr_state::expression_type:
+                        push_token(argument_arg, resources, output_stack, ec); // CHECK
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         push_token(end_expression_type_arg, resources, output_stack, ec);
-                        push_token(argument_arg, resources, output_stack, ec);
-                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         state_stack.pop_back();
                         break;
 
