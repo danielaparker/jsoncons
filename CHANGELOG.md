@@ -27,7 +27,7 @@
       #define'd to `bool` and `return true` respectively. For users that have implemented 
       classes that derive from `basic_json_filter`, and that have overridden `visit_xxx` functions,
       it is recommended to use these macros for the return type and return value rather than
-      `bool` and `return true`. This is for forward compatability.      
+      `bool` and `return true`. This is for forward compatibility.      
 
 1.3.0
 -----
@@ -1814,7 +1814,7 @@ Deprecated `basic_csv_options` functions removed:
 
 Defect fixes:
 
-- Fixes GCC 9.2 warning: �class jsoncons::json_exception� 
+- Fixes GCC 9.2 warning: class jsoncons::json_exception 
   has virtual functions and accessible non-virtual destructor,
   contributed by KonstantinPlotnikov.
     
@@ -3631,7 +3631,7 @@ Changes to extensions:
 - Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)
 - Reorganized header files, removing unnecessary includes. 
 - Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.
-- Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error
+- Incorporates fix contributed by Milan Burda for âSwitch case is in protected scopeâ clang build error
 
 0.97 Release
 ------------
@@ -3992,7 +3992,7 @@ For consistency the json::make_array notation is now favored in the documentatio
 0.70
 -------------
 
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (Ã¢â¬Ë.Ã¢â¬â¢) is now always used as the decimal point, non English locales are ignored.
 
 - The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.
 
