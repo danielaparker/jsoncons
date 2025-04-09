@@ -439,7 +439,7 @@ int main()
 
     auto expr = jmespath::make_expression<json>("results[*].[name, uuid, $hostname]");
 
-    std::map<std::string, json> params{ {"hostname", "localhost"} };   // (since 1.3.1)  
+    std::map<std::string, json> params{ {"hostname", "localhost"} };   // (since 1.4.0)  
 
     auto result = expr.evaluate(doc, params);
 

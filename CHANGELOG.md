@@ -1,4 +1,4 @@
-1.3.1 (preview)
+1.4.0 
 -----
 
 - Fixed bugs:
@@ -14,7 +14,7 @@
     - Fixed an edge case in `basic_csv_parser`, detected by Google fuzz, where the first line in the input file contains an empty line
     and the `csv_mapping_kind` is `n_rows`.
 
-- API Changes
+- API Changes:   
 
     - In JMESPath evaluation, 1.3.0 introduced late binding of variables to an initial (global) scope via parameters.
       The parameters type has been changed from `std::vector<std::pair<string_type,Json>>` to `std::map<string_type,Json>`.
