@@ -439,7 +439,9 @@ int main()
 
     auto expr = jmespath::make_expression<json>("results[*].[name, uuid, $hostname]");
 
-    auto result = expr.evaluate(doc, {{"hostname", json{"localhost"}}});
+    std::map<std::string, json> params{ {"hostname", "localhost"} };   // (since 1.3.1)  
+
+    auto result = expr.evaluate(doc, params);
 
     auto options = jsoncons::json_options{}
         .array_array_line_splits(jsoncons::line_split_kind::same_line);

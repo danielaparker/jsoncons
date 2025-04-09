@@ -5,6 +5,8 @@
 
     - Git Issue #601: Removed the space before the suffix in the user-defined literal operators `_json` and `_ojson`
 
+    - Git Issue #605: Fixed bug when parsing a JMESPath expression that has a function that is passed a binary expression argument, e.g. A || B. 
+
     - In cursors, after a call to `read_to` following a `begin_object` event, the cursor `event_type()` function returned 
     `staj_event_type::begin_object`, even though the effective state of the cursor had changed to `staj_event_type::end_object`.
     This is fixed. The state of the cursor after a call to `next` is the same as before. 

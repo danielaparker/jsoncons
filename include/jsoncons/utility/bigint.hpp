@@ -89,6 +89,8 @@ public:
     static constexpr uint64_t r_mask = (uint64_t(1) << basic_type_halfBits) - 1;
     static constexpr uint64_t l_mask = max_basic_type - r_mask;
     static constexpr uint64_t l_bit = max_basic_type - (max_basic_type >> 1);
+    static constexpr uint64_t max_uint64_div_10 = (std::numeric_limits<uint64_t>::max)()/10u ;
+    static constexpr uint64_t max_uint64_div_16 = (std::numeric_limits<uint64_t>::max)()/16u ;
 
 private:
 
@@ -404,7 +406,7 @@ public:
             switch (c)
             {
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    v = (v * 10) + (uint64_t)(c - '0');
+                    v = (v * 10u) + (uint64_t)(c - '0');
                     break;
                 default:
                     JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
@@ -422,7 +424,7 @@ public:
     template <typename CharT>
     static basic_bigint<Allocator> from_string_radix(const CharT* data, size_type length, uint8_t radix)
     {
-        if (!(radix >= 2 && radix <= 16))
+        if (!(radix >= 2 && radix <= 16u))
         {
             JSONCONS_THROW(std::runtime_error("Unsupported radix"));
         }
@@ -450,10 +452,10 @@ public:
                     d = (uint64_t)(c - '0');
                     break;
                 case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                    d = (uint64_t)(c - ('a' - 10));
+                    d = (uint64_t)(c - ('a' - 10u));
                     break;
                 case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                    d = (uint64_t)(c - ('A' - 10));
+                    d = (uint64_t)(c - ('A' - 10u));
                     break;
                 default:
                     JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in radix ") + std::to_string(radix) + ": \'" + (char)c + "\'"));
@@ -931,7 +933,7 @@ public:
        int64_t x = 0;
        if ( length() > 0 )
        {
-           x = data() [0];
+           x = static_cast<int64_t>(data()[0]);
        }
 
        return is_negative() ? -x : x;
@@ -1034,9 +1036,9 @@ public:
             uint64_t r;
             if ( p10 == 1 )
             {
-                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/10 )
+                while ( p10 <= max_uint64_div_10)
                 {
-                    p10 *= 10;
+                    p10 *= 10u;
                     ip10++;
                 }
             }                     
@@ -1050,8 +1052,8 @@ public:
                 r = (R.length() ? R.data()[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
-                    data.push_back(char(r % 10 + '0'));
-                    r /= 10;
+                    data.push_back(char(r % 10u + '0'));
+                    r /= 10u;
                     if ( r + v.length() == 0 )
                         break;
                 }
@@ -1092,9 +1094,9 @@ public:
             uint64_t r;
             if ( p10 == 1 )
             {
-                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/16 )
+                while ( p10 <= max_uint64_div_16)
                 {
-                    p10 *= 16;
+                    p10 *= 16u;
                     ip10++;
                 }
             }                     // p10 is max unsigned power of 16
@@ -1106,9 +1108,9 @@ public:
                 r = (R.length() ? R.data()[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
-                    uint8_t c = r % 16;
-                    data.push_back((c < 10) ? ('0' + c) : ('A' - 10 + c));
-                    r /= 16;
+                    uint8_t c = r % 16u;
+                    data.push_back((c < 10u) ? ('0' + c) : ('A' - 10u + c));
+                    r /= 16u;
                     if ( r + v.length() == 0 )
                         break;
                 }
@@ -1630,12 +1632,12 @@ private:
  
     static uint64_t next_power_of_two(uint64_t n) {
         n = n - 1;
-        n |= n >> 1;
-        n |= n >> 2;
-        n |= n >> 4;
-        n |= n >> 8;
-        n |= n >> 16;
-        n |= n >> 32;
+        n |= n >> 1u;
+        n |= n >> 2u;
+        n |= n >> 4u;
+        n |= n >> 8u;
+        n |= n >> 16u;
+        n |= n >> 32u;
         return n + 1;
     }
 };
