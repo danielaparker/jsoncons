@@ -776,7 +776,6 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
             std::cout << e.what() << "" << '\n';
         }
     }
-#endif
 
     // Fuzz target: fuzz_csv
     // Issue: abort
@@ -798,6 +797,25 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK_FALSE(ec);
         //std::cout << visitor.get_result() << "" << '\n';
+    }
+#endif
+
+    // Fuzz target: fuzz_msgpack_encoder
+    // Issue: Integer-overflow
+    SECTION("Issue 388873483")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_msgpack_encoder-5091553277706240";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> buf;
+        msgpack::msgpack_bytes_encoder visitor(buf);
+
+        msgpack::msgpack_stream_reader reader(is,visitor);
+        std::error_code ec;
+
+        REQUIRE_NOTHROW(reader.read(ec));
     }
 }
 
