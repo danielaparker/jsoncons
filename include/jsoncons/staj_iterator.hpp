@@ -394,6 +394,7 @@ namespace jsoncons {
         using char_type = typename Json::char_type;
         using iterator = staj_object_iterator<Key,T,Json>;
         using key_type = std::basic_string<char_type>;
+        using mapped_type = Json;
         using value_type = std::pair<key_type,T>;
     private:
         basic_staj_cursor<char_type>* cursor_;

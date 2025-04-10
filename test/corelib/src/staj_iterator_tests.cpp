@@ -134,6 +134,26 @@ TEST_CASE("object_iterator test")
         CHECK(p4.second.as<int>() == 55);
         ++it;
         CHECK((it == end));
+        CHECK_NOTHROW(cursor.check_done());
+    }
+
+    SECTION("nested")
+    {
+        std::string str = R"({ "prop": { "nested": 123} })";
+        std::istringstream is(str);
+        json_stream_cursor cursor(is);
+        auto view = staj_object<std::string, json>(cursor);
+
+        auto it = view.begin();
+        auto end = view.end();
+        CHECK_FALSE((it == end));
+
+        const auto& p1 = *it;
+        std::cout << p1.first << ": " << p1.second << "\n";
+        //CHECK(p1.second.as<int>() == 100);
+        ++it;
+        CHECK((it == end));
+        CHECK_NOTHROW(cursor.check_done());
     }
 }
 
