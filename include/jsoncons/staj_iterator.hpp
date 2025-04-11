@@ -280,11 +280,11 @@ namespace jsoncons {
             else if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next(ec);
-                if (JSONCONS_UNLIKELY(ec)) {done_ == true;}
+                if (JSONCONS_UNLIKELY(ec)) {done_ = true;}
             }
             else
             {
-                done_ == true;
+                done_ = true;
             }
         }
 
