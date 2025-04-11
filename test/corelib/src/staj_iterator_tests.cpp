@@ -40,7 +40,7 @@ TEST_CASE("jtaj_array_view tests")
         }
     ]
     )";
-
+    
     SECTION("test 1")
     {
         json_string_cursor cursor(s);
@@ -49,18 +49,23 @@ TEST_CASE("jtaj_array_view tests")
 
         auto it = view.begin();
         auto end = view.end();
+        CHECK_FALSE((it == end));
 
         const auto& j1 = *it;
         REQUIRE(j1.is_object());
         CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
         ++it;
+        CHECK_FALSE((it == end));
+
         const auto& j2 = *it;
         CHECK(j2["firstName"].as<std::string>() == std::string("Catherine"));
         ++it;
+        CHECK_FALSE((it == end));
         const auto& j3 = *it;
         CHECK(j3["firstName"].as<std::string>() == std::string("William"));
         ++it;
         CHECK((it == end));
+        CHECK_NOTHROW(cursor.check_done());
     }
 
     SECTION("filter test")
@@ -120,16 +125,20 @@ TEST_CASE("object_iterator test")
 
         auto it = view.begin();
         auto end = view.end();
+        CHECK_FALSE((it == end));
 
         const auto& p1 = *it;
         CHECK(p1.second.as<int>() == 100);
         ++it;
+        CHECK_FALSE((it == end));
         const auto& p2 = *it;
         CHECK(p2.second.as<std::string>() == std::string("Tom"));
         ++it;
+        CHECK_FALSE((it == end));
         const auto& p3 = *it;
         CHECK(p3.second.as<std::string>() == std::string("Cochrane"));
         ++it;
+        CHECK_FALSE((it == end));
         const auto& p4 = *it;
         CHECK(p4.second.as<int>() == 55);
         ++it;
@@ -148,8 +157,8 @@ TEST_CASE("object_iterator test")
         auto end = view.end();
         CHECK_FALSE((it == end));
 
-        const auto& p1 = *it;
-        std::cout << p1.first << ": " << p1.second << "\n";
+        //const auto& p1 = *it;
+        //std::cout << p1.first << ": " << p1.second << "\n";
         //CHECK(p1.second.as<int>() == 100);
         ++it;
         CHECK((it == end));

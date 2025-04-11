@@ -1,3 +1,10 @@
+1.3.2 
+-----
+
+- Fixed bugs:
+
+    - Git Issue #607: Fixed isue with `staj_object_view` and `staj_array_view` iterators introduced in 1.3.1
+
 1.3.1 
 -----
 

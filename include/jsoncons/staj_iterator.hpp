@@ -26,6 +26,8 @@
 
 namespace jsoncons {
 
+    // staj_array_view
+
     template <typename T,typename Json>
     class staj_array_view;
 
@@ -33,50 +35,59 @@ namespace jsoncons {
     class staj_array_iterator
     {
         using char_type = typename Json::char_type;
-
-        staj_array_view<T, Json>* view_{nullptr};
-        std::exception_ptr eptr_;
-
-    public:
         using value_type = T;
         using difference_type = std::ptrdiff_t;
         using pointer = T*;
         using reference = T&;
         using iterator_category = std::input_iterator_tag;
+        
+    private:
+        staj_array_view<T, Json>* view_{nullptr};
+        bool done_{false};
+        std::exception_ptr eptr_;
+    public:
 
-        staj_array_iterator() noexcept = default;
+        staj_array_iterator() noexcept
+            : done_(true)
+        {
+        }
 
         staj_array_iterator(staj_array_view<T, Json>& view)
             : view_(std::addressof(view))
         {
-            if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+            }
+            else if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next();
             }
             else
             {
-                view_->cursor_ = nullptr;
+                done_ = true;
             }
         }
 
-        staj_array_iterator(staj_array_view<T, Json>& view,
-                            std::error_code& ec)
+        staj_array_iterator(staj_array_view<T, Json>& view, std::error_code& ec)
             : view_(std::addressof(view))
         {
-            if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+            }
+            else if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next(ec);
-                if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
+                if (JSONCONS_UNLIKELY(ec)) {done_ = true;}
             }
             else
             {
-                view_ = nullptr;
+                done_ = true;
             }
         }
 
-        ~staj_array_iterator() noexcept
-        {
-        }
+        ~staj_array_iterator() noexcept = default;
 
         bool has_value() const
         {
@@ -85,26 +96,20 @@ namespace jsoncons {
 
         const T& operator*() const
         {
-            if (eptr_)
+            if (JSONCONS_UNLIKELY(eptr_))
             {
                  std::rethrow_exception(eptr_);
             }
-            else
-            {
-                return *view_->value_;
-            }
+            return *view_->value_;
         }
 
         const T* operator->() const
         {
-            if (eptr_)
+            if (JSONCONS_UNLIKELY(eptr_))
             {
                  std::rethrow_exception(eptr_);
             }
-            else
-            {
-                return view_->value_.operator->();
-            }
+            return view_->value_.operator->();
         }
 
         staj_array_iterator& operator++()
@@ -116,7 +121,7 @@ namespace jsoncons {
         staj_array_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
+            if (JSONCONS_UNLIKELY(ec)) {done_ = true;}
             return *this;
         }
 
@@ -129,9 +134,7 @@ namespace jsoncons {
 
         friend bool operator==(const staj_array_iterator& a, const staj_array_iterator& b)
         {
-            return (!a.view_ && !b.view_)
-                   || (!a.view_ && b.done())
-                   || (!b.view_ && a.done());
+            return (a.done() && b.done());
         }
 
         friend bool operator!=(const staj_array_iterator& a, const staj_array_iterator& b)
@@ -143,11 +146,15 @@ namespace jsoncons {
 
         bool done() const
         {
-            return view_->cursor_->done() || view_->cursor_->current().event_type() == staj_event_type::end_array;
+            return done_;
         }
 
         void next()
         {
+            if (JSONCONS_UNLIKELY(done_))
+            {
+                return;
+            }
             std::error_code ec;
             next(ec);
             if (JSONCONS_UNLIKELY(ec))
@@ -158,29 +165,68 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
-            if (!done())
+            if (JSONCONS_UNLIKELY(done_))
             {
-                view_->cursor_->next(ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                if (!done())
-                {
-                    eptr_ = std::exception_ptr();
-                    JSONCONS_TRY
-                    {
-                        view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
-                    }
-                    JSONCONS_CATCH(const conv_error&)
-                    {
-                        eptr_ = std::current_exception();
-                    }
-                }
+                return;
             }
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+                return;
+            }
+            view_->cursor_->next(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                done_ = true;
+                return;
+            }
+            if (JSONCONS_UNLIKELY(view_->cursor_->current().event_type() == staj_event_type::end_array))
+            {
+                done_ = true;
+                return;
+            }
+            eptr_ = std::exception_ptr();
+            JSONCONS_TRY
+            {
+                view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
+            }
+            JSONCONS_CATCH(const conv_error&)
+            {
+                eptr_ = std::current_exception();
+            }           
+        }            
+    };
+
+    template <typename T,typename Json>
+    class staj_array_view
+    {
+        friend class staj_array_iterator<T, Json>;
+    public:
+        using char_type = typename Json::char_type;
+        using iterator = staj_array_iterator<T, Json>;
+    private:
+        basic_staj_cursor<char_type>* cursor_;
+        json_decoder<Json> decoder_;
+        jsoncons::optional<T> value_;
+    public:
+        staj_array_view(basic_staj_cursor<char_type>& cursor) 
+            : cursor_(std::addressof(cursor))
+        {
+        }
+
+        iterator begin()
+        {
+            return staj_array_iterator<T, Json>(*this);
+        }
+
+        iterator end()
+        {
+            return staj_array_iterator<T, Json>();
         }
     };
 
+    // staj_object_view
+    
     template <typename Key,typename Json,typename T=Json>
     class staj_object_view;
 
@@ -224,7 +270,7 @@ namespace jsoncons {
         }
 
         staj_object_iterator(staj_object_view<Key, T, Json>& view, 
-                             std::error_code& ec)
+            std::error_code& ec)
             : view_(std::addressof(view))
         {
             if (view_->cursor_->done())
@@ -242,9 +288,7 @@ namespace jsoncons {
             }
         }
 
-        ~staj_object_iterator() noexcept
-        {
-        }
+        ~staj_object_iterator() noexcept = default;
 
         bool has_value() const
         {
@@ -253,19 +297,16 @@ namespace jsoncons {
 
         const value_type& operator*() const
         {
-            if (eptr_)
+            if (JSONCONS_UNLIKELY(eptr_))
             {
                  std::rethrow_exception(eptr_);
             }
-            else
-            {
-                return *view_->key_value_;
-            }
+            return *view_->key_value_;
         }
 
         const value_type* operator->() const
         {
-            if (eptr_)
+            if (JSONCONS_UNLIKELY(eptr_))
             {
                  std::rethrow_exception(eptr_);
             }
@@ -284,10 +325,7 @@ namespace jsoncons {
         staj_object_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                done_ = true;
-            }
+            if (JSONCONS_UNLIKELY(ec)){done_ = true;}
             return *this;
         }
 
@@ -312,12 +350,12 @@ namespace jsoncons {
 
         bool done() const
         {
-            return view_ == nullptr || done_ /*|| view_->cursor_->current().event_type() == staj_event_type::end_object*/;
+            return done_;
         }
 
         void next()
         {
-            if (done_)
+            if (JSONCONS_UNLIKELY(done_))
             {
                 return;
             }
@@ -331,7 +369,7 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
-            if (done_)
+            if (JSONCONS_UNLIKELY(done_))
             {
                 return;
             }
@@ -344,66 +382,31 @@ namespace jsoncons {
             view_->cursor_->next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
+                done_ = true;
                 return;
             }
-            if (view_->cursor_->current().event_type() == staj_event_type::end_object)
+            if (JSONCONS_UNLIKELY(view_->cursor_->current().event_type() == staj_event_type::end_object))
             {
                 done_ = true;
                 return;
             }
-            if (!done_)
+            JSONCONS_ASSERT(view_->cursor_->current().event_type() == staj_event_type::key);
+            auto key = view_->cursor_->current(). template get<key_type>();
+            view_->cursor_->next(ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                JSONCONS_ASSERT(view_->cursor_->current().event_type() == staj_event_type::key);
-                auto key = view_->cursor_->current(). template get<key_type>();
-                view_->cursor_->next(ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    done_ = true;
-                    return;
-                }
-                if (!done_)
-                {
-                    eptr_ = std::exception_ptr();
-                    JSONCONS_TRY
-                    {
-                        view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
-                    }
-                    JSONCONS_CATCH(const conv_error&)
-                    {
-                        eptr_ = std::current_exception();
-                    }
-                }
+                done_ = true;
+                return;
             }
-        }
-    };
-
-    // staj_array_view
-
-    template <typename T,typename Json>
-    class staj_array_view
-    {
-        friend class staj_array_iterator<T, Json>;
-    public:
-        using char_type = typename Json::char_type;
-        using iterator = staj_array_iterator<T, Json>;
-    private:
-        basic_staj_cursor<char_type>* cursor_;
-        json_decoder<Json> decoder_;
-        jsoncons::optional<T> value_;
-    public:
-        staj_array_view(basic_staj_cursor<char_type>& cursor) 
-            : cursor_(std::addressof(cursor))
-        {
-        }
-
-        iterator begin()
-        {
-            return staj_array_iterator<T, Json>(*this);
-        }
-
-        iterator end()
-        {
-            return staj_array_iterator<T, Json>();
+            eptr_ = std::exception_ptr();
+            JSONCONS_TRY
+            {
+                view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
+            }
+            JSONCONS_CATCH(const conv_error&)
+            {
+                eptr_ = std::current_exception();
+            }
         }
     };
 
