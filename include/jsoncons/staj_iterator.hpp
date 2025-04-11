@@ -130,8 +130,8 @@ namespace jsoncons {
         friend bool operator==(const staj_array_iterator& a, const staj_array_iterator& b)
         {
             return (!a.view_ && !b.view_)
-                || (!a.view_ && b.done())
-                || (!b.view_ && a.done());
+                   || (!a.view_ && b.done())
+                   || (!b.view_ && a.done());
         }
 
         friend bool operator!=(const staj_array_iterator& a, const staj_array_iterator& b)
@@ -188,10 +188,6 @@ namespace jsoncons {
     class staj_object_iterator
     {
         using char_type = typename Json::char_type;
-
-        staj_object_view<Key, T, Json>* view_{nullptr};
-        std::exception_ptr eptr_;
-    public:
         using key_type = std::basic_string<char_type>;
         using value_type = std::pair<key_type,T>;
         using difference_type = std::ptrdiff_t;
@@ -199,20 +195,31 @@ namespace jsoncons {
         using reference = value_type&;
         using iterator_category = std::input_iterator_tag;
 
+    private:
+        staj_object_view<Key, T, Json>* view_{nullptr};
+        bool done_{false};
+        std::exception_ptr eptr_;
     public:
 
-        staj_object_iterator() noexcept = default;
+        staj_object_iterator() noexcept
+            : done_(true)
+        {
+        }
 
         staj_object_iterator(staj_object_view<Key, T, Json>& view)
             : view_(std::addressof(view))
         {
-            if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+            }
+            else if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next();
             }
             else
             {
-                view_ = nullptr;
+                done_ = true;
             }
         }
 
@@ -220,14 +227,18 @@ namespace jsoncons {
                              std::error_code& ec)
             : view_(std::addressof(view))
         {
-            if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+            }
+            else if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next(ec);
-                if (JSONCONS_UNLIKELY(ec)) {view_ = nullptr;}
+                if (JSONCONS_UNLIKELY(ec)) {done_ == true;}
             }
             else
             {
-                view_ = nullptr;
+                done_ == true;
             }
         }
 
@@ -275,7 +286,7 @@ namespace jsoncons {
             next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
-                view_ = nullptr;
+                done_ = true;
             }
             return *this;
         }
@@ -289,9 +300,7 @@ namespace jsoncons {
 
         friend bool operator==(const staj_object_iterator& a, const staj_object_iterator& b)
         {
-            return (!a.view_ && !b.view_)
-                   || (!a.view_ && b.done())
-                   || (!b.view_ && a.done());
+            return (a.done() && b.done());
         }
 
         friend bool operator!=(const staj_object_iterator& a, const staj_object_iterator& b)
@@ -303,11 +312,15 @@ namespace jsoncons {
 
         bool done() const
         {
-            return view_->cursor_->done() || view_->cursor_->current().event_type() == staj_event_type::end_object;
+            return view_ == nullptr || done_ /*|| view_->cursor_->current().event_type() == staj_event_type::end_object*/;
         }
 
         void next()
         {
+            if (done_)
+            {
+                return;
+            }
             std::error_code ec;
             next(ec);
             if (JSONCONS_UNLIKELY(ec))
@@ -318,21 +331,37 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
+            if (done_)
+            {
+                return;
+            }
+            if (view_->cursor_->done())
+            {
+                done_ = true;
+                return;
+            }
+            
             view_->cursor_->next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
-            if (!done())
+            if (view_->cursor_->current().event_type() == staj_event_type::end_object)
+            {
+                done_ = true;
+                return;
+            }
+            if (!done_)
             {
                 JSONCONS_ASSERT(view_->cursor_->current().event_type() == staj_event_type::key);
                 auto key = view_->cursor_->current(). template get<key_type>();
                 view_->cursor_->next(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
+                    done_ = true;
                     return;
                 }
-                if (!done())
+                if (!done_)
                 {
                     eptr_ = std::exception_ptr();
                     JSONCONS_TRY
