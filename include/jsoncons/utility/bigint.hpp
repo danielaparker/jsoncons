@@ -193,16 +193,13 @@ private:
 
         uint8_t is_dynamic_:1; 
         uint8_t is_negative_:1; 
-        size_type length_;
-        size_type capacity_;
-        pointer data_;
+        size_type length_{0};
+        size_type capacity_{0};
+        pointer data_{nullptr};
 
         dynamic_storage()
             : is_dynamic_(true), 
-              is_negative_(false),
-              length_(0),
-              capacity_(0),
-              data_(nullptr)
+              is_negative_(false)
         {
         }
 
@@ -210,8 +207,7 @@ private:
             : is_dynamic_(true), 
               is_negative_(stor.is_negative_),
               length_(stor.length_),
-              capacity_(round_up(stor.length_)),
-              data_(nullptr)
+              capacity_(round_up(stor.length_))
         {
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
             JSONCONS_TRY

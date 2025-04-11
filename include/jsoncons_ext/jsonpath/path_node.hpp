@@ -32,16 +32,15 @@ namespace jsonpath {
         using char_type = CharT;
     private:
 
-        const basic_path_node* parent_;
-        std::size_t size_;
+        const basic_path_node* parent_{nullptr};
+        std::size_t size_{1};
         path_node_kind node_kind_;
         string_view_type name_;
         std::size_t index_{0};
 
     public:
-        basic_path_node()
-            : parent_(nullptr), size_(1),
-              node_kind_(path_node_kind::root)
+        basic_path_node() noexcept
+            : node_kind_(path_node_kind::root)
         {
         }
 

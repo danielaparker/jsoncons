@@ -127,9 +127,9 @@ namespace detail {
         allocator_type alloc_;
         std::size_t line_{1};
         std::size_t column_{1};
-        const char_type* begin_input_;
-        const char_type* end_input_;
-        const char_type* p_;
+        const char_type* begin_input_{nullptr};
+        const char_type* end_input_{nullptr};
+        const char_type* p_{nullptr};
 
         using argument_type = std::vector<pointer>;
         std::vector<argument_type> function_stack_;
@@ -139,17 +139,13 @@ namespace detail {
 
     public:
         jsonpath_evaluator(const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), 
-              begin_input_(nullptr), end_input_(nullptr),
-              p_(nullptr)
+            : alloc_(alloc)
         {
         }
 
         jsonpath_evaluator(std::size_t line, std::size_t column, 
             const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), line_(line), column_(column),
-              begin_input_(nullptr), end_input_(nullptr),
-              p_(nullptr)
+            : alloc_(alloc), line_(line), column_(column)
         {
         }
 

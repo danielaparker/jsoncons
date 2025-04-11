@@ -289,11 +289,10 @@ namespace jsonpath {
         using reference = const Json&;
         using pointer = const Json*;
     private:
-        value_or_pointer<Json,reference> data_;
+        value_or_pointer<Json,reference> data_{nullptr};
     public:
         template <typename JsonReference>
         parameter(value_or_pointer<Json,JsonReference>&& data) noexcept
-            : data_(nullptr)
         {
             data_.is_value_ = data.is_value_;
             if (data.is_value_)

@@ -205,14 +205,13 @@ namespace jsoncons {
         using value_type = typename StringT::value_type;
         using container_type = StringT;
     private:
-        container_type* buf_ptr;
+        container_type* buf_ptr{nullptr};
     public:
 
         // Noncopyable
         string_sink(const string_sink&) = delete;
 
         string_sink(string_sink&& other) noexcept
-            : buf_ptr(nullptr)
         {
             std::swap(buf_ptr,other.buf_ptr);
         }

@@ -156,24 +156,20 @@ namespace jsonpath {
         private:
 
             allocator_type alloc_;
-            std::size_t line_;
-            std::size_t column_;
-            const char_type* end_input_;
-            const char_type* p_;
+            std::size_t line_{1};
+            std::size_t column_{1};
+            const char_type* end_input_{nullptr};
+            const char_type* p_{nullptr};
 
         public:
             json_location_parser(const allocator_type& alloc = allocator_type())
-                : alloc_(alloc), line_(1), column_(1),
-                  end_input_(nullptr),
-                  p_(nullptr)
+                : alloc_(alloc)
             {
             }
 
             json_location_parser(std::size_t line, std::size_t column, 
                 const allocator_type& alloc = allocator_type())
-                : alloc_(alloc), line_(line), column_(column),
-                  end_input_(nullptr),
-                  p_(nullptr)
+                : alloc_(alloc), line_(line), column_(column)
             {
             }
 

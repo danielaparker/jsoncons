@@ -25,7 +25,7 @@ namespace detail {
     class basic_string_view
     {
     private:
-        const CharT* data_;
+        const CharT* data_{nullptr};
         std::size_t length_{0};
     public:
         using value_type = CharT;
@@ -37,10 +37,8 @@ namespace detail {
         using iterator = const CharT*;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        constexpr basic_string_view() noexcept
-            : data_(nullptr)
-        {
-        }
+        constexpr basic_string_view() noexcept = default;
+
         constexpr basic_string_view(const CharT* data, std::size_t length)
             : data_(data), length_(length)
         {

@@ -34,7 +34,7 @@ namespace jsoncons {
     {
         using char_type = typename Json::char_type;
 
-        staj_array_view<T, Json>* view_;
+        staj_array_view<T, Json>* view_{nullptr};
         std::exception_ptr eptr_;
 
     public:
@@ -44,10 +44,7 @@ namespace jsoncons {
         using reference = T&;
         using iterator_category = std::input_iterator_tag;
 
-        staj_array_iterator() noexcept
-            : view_(nullptr)
-        {
-        }
+        staj_array_iterator() noexcept = default;
 
         staj_array_iterator(staj_array_view<T, Json>& view)
             : view_(std::addressof(view))
@@ -192,7 +189,7 @@ namespace jsoncons {
     {
         using char_type = typename Json::char_type;
 
-        staj_object_view<Key, T, Json>* view_;
+        staj_object_view<Key, T, Json>* view_{nullptr};
         std::exception_ptr eptr_;
     public:
         using key_type = std::basic_string<char_type>;
@@ -204,10 +201,7 @@ namespace jsoncons {
 
     public:
 
-        staj_object_iterator() noexcept
-            : view_(nullptr)
-        {
-        }
+        staj_object_iterator() noexcept = default;
 
         staj_object_iterator(staj_object_view<Key, T, Json>& view)
             : view_(std::addressof(view))

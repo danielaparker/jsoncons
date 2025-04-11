@@ -227,12 +227,11 @@ namespace jsonschema {
         using schema_validator_ptr_type = std::unique_ptr<schema_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        const schema_validator<Json> *tentative_target_; 
+        const schema_validator<Json> *tentative_target_{nullptr}; 
 
     public:
         recursive_ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message) 
-            : keyword_validator<Json>("$recursiveRef", schema, schema_location, custom_message),
-              tentative_target_(nullptr)
+            : keyword_validator<Json>("$recursiveRef", schema, schema_location, custom_message)
         {}
 
         uri get_base_uri() const
@@ -324,12 +323,11 @@ namespace jsonschema {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri_wrapper value_;
-        const schema_validator<Json>* tentative_target_;
+        const schema_validator<Json>* tentative_target_{nullptr};
 
     public:
         dynamic_ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const uri_wrapper& value) 
-            : keyword_validator<Json>("$dynamicRef", schema, schema_location, custom_message), value_(value),
-            tentative_target_(nullptr)
+            : keyword_validator<Json>("$dynamicRef", schema, schema_location, custom_message), value_(value)
         {
             //std::cout << "dynamic_ref_validator path: " << schema_location.string() << ", value: " << value.string() << "\n";
         }

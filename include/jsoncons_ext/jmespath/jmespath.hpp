@@ -241,12 +241,10 @@ namespace jmespath {
         using reference = const Json&;
         using pointer = const Json*;
     private:
-        const expr_base<Json>* expr_;
+        const expr_base<Json>* expr_{nullptr};
     public:
-        expr_wrapper()
-            : expr_(nullptr)
-        {
-        }
+        expr_wrapper() noexcept = default;
+
         expr_wrapper(const expr_base<Json>& expr)
             : expr_(std::addressof(expr))
         {

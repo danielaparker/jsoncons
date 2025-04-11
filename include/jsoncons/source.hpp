@@ -312,14 +312,11 @@ namespace jsoncons {
         using value_type = CharT;
         using string_view_type = jsoncons::basic_string_view<value_type>;
     private:
-        const value_type* data_;
-        const value_type* current_;
-        const value_type* end_;
+        const value_type* data_{nullptr};
+        const value_type* current_{nullptr};
+        const value_type* end_{nullptr};
     public:
-        string_source()
-            : data_(nullptr), current_(nullptr), end_(nullptr)
-        {
-        }
+        string_source() noexcept = default;
 
         // Noncopyable 
         string_source(const string_source&) = delete;
@@ -527,14 +524,11 @@ namespace jsoncons {
     public:
         typedef uint8_t value_type;
     private:
-        const value_type* data_;
-        const value_type* current_;
-        const value_type* end_;
+        const value_type* data_{nullptr};
+        const value_type* current_{nullptr};
+        const value_type* end_{nullptr};
     public:
-        bytes_source()
-            : data_(nullptr), current_(nullptr), end_(nullptr)
-        {
-        }
+        bytes_source() noexcept = default;
 
         // Noncopyable 
         bytes_source(const bytes_source&) = delete;

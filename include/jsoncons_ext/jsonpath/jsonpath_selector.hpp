@@ -143,7 +143,7 @@ namespace detail {
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
 
-        supertype* tail_;
+        supertype* tail_{nullptr};
     public:
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
@@ -156,12 +156,12 @@ namespace detail {
         using selector_type = typename supertype::selector_type;
 
         base_selector()
-            : supertype(true, 11), tail_(nullptr)
+            : supertype(true, 11)
         {
         }
 
         base_selector(bool is_path, std::size_t precedence_level)
-            : supertype(is_path, precedence_level), tail_(nullptr)
+            : supertype(is_path, precedence_level)
         {
         }
 
@@ -854,10 +854,10 @@ namespace detail {
         using selector_type = typename supertype::selector_type;
     private:
         std::vector<selector_type*> selectors_;
-        selector_type* tail_;
+        selector_type* tail_{nullptr};
     public:
         union_selector(std::vector<selector_type*>&& selectors)
-            : supertype(true, 11), selectors_(std::move(selectors)), tail_(nullptr)
+            : supertype(true, 11), selectors_(std::move(selectors))
         {
         }
 
