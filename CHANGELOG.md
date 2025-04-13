@@ -3,8 +3,8 @@
 
 - Fixed bug:
 
-    - Git Issue #607: Fixed isue with `staj_object_view` and `staj_array_view` iterators that got introduced 
-    as a consequnece of a change in 1.3.1
+    - Git Issue #607: Fixed issue with `staj_object_view` and `staj_array_view` iterators that got introduced 
+    as a consequence of a change in 1.3.1
 
 1.3.1 
 -----
