@@ -25,7 +25,7 @@ enum class semantic_tag : uint8_t
     base16 = 6,                // 00000110
     base64 = 7,                // 00000111
     base64url = 8,             // 00001000
-    uri = 9,
+    uri = 9,                   //   
     multi_dim_row_major = 10,
     multi_dim_column_major = 11,
     bigint = 12,                // 00001100

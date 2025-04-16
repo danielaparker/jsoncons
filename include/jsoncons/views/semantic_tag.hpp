@@ -15,25 +15,26 @@ namespace jsoncons {
 enum class semantic_tag : uint8_t 
 {
     none = 0,               // 00000000 
-    noesc = 1,              // 00000001
-    datetime = 2,           // 00000010
-    epoch_seconds = 3,      // 00000011
-    epoch_millis = 4,       // 00000100
-    epoch_nanos = 5,        // 00000101
-    base16 = 6,             // 00000110
-    base64 = 7,             // 00000111
-    base64url = 8,          // 00001000
-    bigint = 12,            // 00001100
-    bignum = 13,            // 00001101
-    bigdec = 14,            // 00001110
-    float128 = 15           // 00001111
+    noesc = 1,              // 00000010
+    bigint = 2,             // 00000001
+    bignum = 3,             // 00000011
+    bigdec = 10,            // 00001010
+    float128 = 11,          // 00001011
+    datetime = 4,           // 00000111
+    epoch_seconds = 5,      // 00001000
+    epoch_millis = 6,       // 00001001
+    epoch_nanos = 7,        // 00001010 
+    base16 = 8,             // 00000100
+    base64 = 9,             // 00000101
+    base64url = 10          // 00000110
 };
 
 inline constexpr bool is_number_tag(semantic_tag tag) noexcept
 {
-    constexpr uint8_t mask{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
+    constexpr uint8_t mask1{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
         & uint8_t(semantic_tag::bignum) & uint8_t(semantic_tag::float128) };
-    return (uint8_t(tag) & mask) == mask;
+    constexpr uint8_t mask2{ (uint8_t)~mask1};
+    return (uint8_t(tag) & mask1) == mask1 && (uint8_t)(~(uint8_t)tag & mask2) == mask2;
 }
 
 JSONCONS_FORCE_INLINE

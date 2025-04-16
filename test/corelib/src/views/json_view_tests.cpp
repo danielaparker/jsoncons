@@ -52,7 +52,7 @@ TEST_CASE("json_view test")
     REQUIRE(root.at("books").size() == 4);
 
 }
-#if 0
+
 TEST_CASE("json_view type test")
 {
     std::string str = R"(
@@ -144,7 +144,7 @@ TEST_CASE("json_view type test")
         REQUIRE(object["key5"].is_null());
     }
 }
-
+#if 0
 TEST_CASE("test json_view inf and nan")
 {
     std::string str = R"(
