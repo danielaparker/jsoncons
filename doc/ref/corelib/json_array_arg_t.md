@@ -1,6 +1,6 @@
 ### jsoncons::json_array_arg_t 
 
-#include <jsoncons/tag_type.hpp`__
+#include <jsoncons/semantic_tag.hpp`__
 
 ```cpp
 struct json_array_arg_t {explicit json_array_arg_t() = default;};

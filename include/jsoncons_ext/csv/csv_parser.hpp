@@ -20,13 +20,13 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/staj_event.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>

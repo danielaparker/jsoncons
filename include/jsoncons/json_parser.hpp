@@ -21,12 +21,12 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \

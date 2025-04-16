@@ -1,7 +1,7 @@
 ### jsoncons::ser_error
 
 ```cpp
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 ```
 
 <br>

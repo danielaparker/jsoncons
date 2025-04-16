@@ -15,7 +15,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>

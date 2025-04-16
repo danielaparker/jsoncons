@@ -20,13 +20,13 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

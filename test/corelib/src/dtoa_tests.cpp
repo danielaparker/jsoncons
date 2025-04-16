@@ -7,7 +7,7 @@
 #include <catch/catch.hpp>
 
 #include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 
 using namespace jsoncons;
 

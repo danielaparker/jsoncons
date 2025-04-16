@@ -18,7 +18,7 @@
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 namespace jsoncons {
 

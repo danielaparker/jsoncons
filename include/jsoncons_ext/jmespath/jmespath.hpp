@@ -27,7 +27,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>

@@ -14,10 +14,10 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {

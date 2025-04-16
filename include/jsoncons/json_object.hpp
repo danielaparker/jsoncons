@@ -24,7 +24,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_array.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 

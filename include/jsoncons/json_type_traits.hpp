@@ -30,7 +30,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/value_converter.hpp>

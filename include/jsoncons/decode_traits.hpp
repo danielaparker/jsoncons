@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
@@ -27,7 +27,7 @@
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 namespace jsoncons {
 

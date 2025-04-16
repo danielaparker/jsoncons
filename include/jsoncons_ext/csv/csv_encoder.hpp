@@ -18,7 +18,7 @@
 
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons_ext/csv/csv_error.hpp>

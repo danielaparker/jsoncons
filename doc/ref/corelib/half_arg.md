@@ -1,7 +1,7 @@
 ### jsoncons::half_arg
 
 ```cpp
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 constexpr half_arg_t half_arg{};
 ```

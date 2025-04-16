@@ -21,11 +21,11 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 

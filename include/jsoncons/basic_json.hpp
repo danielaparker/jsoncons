@@ -32,7 +32,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_options.hpp>
@@ -42,7 +42,7 @@
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

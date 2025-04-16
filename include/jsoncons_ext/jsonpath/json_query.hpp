@@ -11,7 +11,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/token_evaluator.hpp>

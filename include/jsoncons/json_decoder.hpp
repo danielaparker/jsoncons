@@ -17,7 +17,7 @@
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 namespace jsoncons {
 

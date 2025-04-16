@@ -11,7 +11,7 @@
 #include <system_error>
 #include <type_traits>
 
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 

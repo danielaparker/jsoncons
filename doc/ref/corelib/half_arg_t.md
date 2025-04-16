@@ -1,7 +1,7 @@
 ### jsoncons::half_arg_t 
 
 ```cpp
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 struct half_arg_t {explicit half_arg_t() = default;};
 ```

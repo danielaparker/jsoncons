@@ -1,7 +1,7 @@
 ### jsoncons::json_array_arg
 
 ```cpp
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 
 constexpr json_array_arg_t json_array_arg{};
 ```

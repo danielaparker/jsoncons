@@ -20,7 +20,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/decode_traits.hpp>
-#include <jsoncons/jsoncons_except.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
 

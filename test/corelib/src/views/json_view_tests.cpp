@@ -144,7 +144,7 @@ TEST_CASE("json_view type test")
         REQUIRE(object["key5"].is_null());
     }
 }
-#if 0
+
 TEST_CASE("test json_view inf and nan")
 {
     std::string str = R"(
@@ -216,4 +216,4 @@ TEST_CASE("test json_view inf and nan")
         CHECK(root.get_string_view() == "inf");
     }
 }
-#endif
+

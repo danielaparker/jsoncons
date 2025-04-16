@@ -22,11 +22,11 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/jsoncons_except.hpp> // jsoncons::ser_error
+#include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/tag_type.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
