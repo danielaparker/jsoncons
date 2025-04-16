@@ -4,11 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_CONFIG_COMPILER_SUPPORT_HPP
-#define JSONCONS2_CONFIG_COMPILER_SUPPORT_HPP
+#ifndef JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#define JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
 
 #if defined (__clang__)
-#define JSONCONS2_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#define JSONCONS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
 /*==============================================================================
@@ -282,87 +282,87 @@
 #endif
 
 #if defined(__clang__)
-#  define JSONCONS2_FALLTHROUGH [[clang::fallthrough]]
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
 #elif defined(__GNUC__) && ((__GNUC__ >= 7))
-#  define JSONCONS2_FALLTHROUGH __attribute__((fallthrough))
+#  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
 #elif defined (__GNUC__)
-#  define JSONCONS2_FALLTHROUGH // FALLTHRU
+#  define JSONCONS_FALLTHROUGH // FALLTHRU
 #else
-#  define JSONCONS2_FALLTHROUGH
+#  define JSONCONS_FALLTHROUGH
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#define JSONCONS2_LIKELY(x) __builtin_expect(!!(x), 1)
-#define JSONCONS2_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#define JSONCONS2_UNREACHABLE() __builtin_unreachable()
+#define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
+#define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define JSONCONS_UNREACHABLE() __builtin_unreachable()
 #elif defined(_MSC_VER)
-#define JSONCONS2_LIKELY(x) x
-#define JSONCONS2_UNLIKELY(x) x
-#define JSONCONS2_UNREACHABLE() __assume(0)
+#define JSONCONS_LIKELY(x) x
+#define JSONCONS_UNLIKELY(x) x
+#define JSONCONS_UNREACHABLE() __assume(0)
 #else
-#define JSONCONS2_LIKELY(x) x
-#define JSONCONS2_UNLIKELY(x) x
-#define JSONCONS2_UNREACHABLE() do {} while (0)
+#define JSONCONS_LIKELY(x) x
+#define JSONCONS_UNLIKELY(x) x
+#define JSONCONS_UNREACHABLE() do {} while (0)
 #endif
 
 // Deprecated symbols markup
 #if (defined(__cplusplus) && __cplusplus >= 201402L)
-#define JSONCONS2_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
 #endif
 
-#if !defined(JSONCONS2_DEPRECATED_MSG) && defined(__GNUC__) && defined(__has_extension)
+#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__GNUC__) && defined(__has_extension)
 #if __has_extension(attribute_deprecated_with_message)
-#define JSONCONS2_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
 #endif
 #endif
 
-#if !defined(JSONCONS2_DEPRECATED_MSG) && defined(_MSC_VER)
+#if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
 #if (_MSC_VER) >= 1920
-#define JSONCONS2_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
 #else
-#define JSONCONS2_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+#define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
 #endif
 #endif
 
 // Following boost/atomic/detail/config.hpp
-#if !defined(JSONCONS2_DEPRECATED_MSG) && (\
+#if !defined(JSONCONS_DEPRECATED_MSG) && (\
     (defined(__GNUC__) && ((__GNUC__ + 0) * 100 + (__GNUC_MINOR__ + 0)) >= 405) ||\
     (defined(__SUNPRO_CC) && (__SUNPRO_CC + 0) >= 0x5130))
-    #define JSONCONS2_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+    #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
 #endif
 
-#if !defined(JSONCONS2_DEPRECATED_MSG) && defined(__clang__) && defined(__has_extension)
+#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__clang__) && defined(__has_extension)
     #if __has_extension(attribute_deprecated_with_message)
-        #define JSONCONS2_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+        #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
     #else
-        #define JSONCONS2_DEPRECATED_MSG(msg) __attribute__((deprecated))
+        #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated))
     #endif
 #endif
 
-#if !defined(JSONCONS2_DEPRECATED_MSG)
-#define JSONCONS2_DEPRECATED_MSG(msg)
+#if !defined(JSONCONS_DEPRECATED_MSG)
+#define JSONCONS_DEPRECATED_MSG(msg)
 #endif
 
-#if !defined(JSONCONS2_NO_EXCEPTIONS)
+#if !defined(JSONCONS_NO_EXCEPTIONS)
 
 #if defined(__GNUC__) && !defined(__EXCEPTIONS)
-# define JSONCONS2_NO_EXCEPTIONS 1
+# define JSONCONS_NO_EXCEPTIONS 1
 #elif defined(_MSC_VER)
 #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
-# define JSONCONS2_NO_EXCEPTIONS 1
+# define JSONCONS_NO_EXCEPTIONS 1
 #elif !defined(_CPPUNWIND)
-# define JSONCONS2_NO_EXCEPTIONS 1
+# define JSONCONS_NO_EXCEPTIONS 1
 #endif
 #endif
 #endif
 
-#ifndef JSONCONS2_FORCEINLINE
+#ifndef JSONCONS_FORCEINLINE
 # ifdef _MSC_VER
-#  define JSONCONS2_FORCEINLINE __forceinline
+#  define JSONCONS_FORCEINLINE __forceinline
 # elif defined(__GNUC__) || defined(__clang__)
-#  define JSONCONS2_FORCEINLINE inline __attribute__((always_inline))
+#  define JSONCONS_FORCEINLINE inline __attribute__((always_inline))
 # else
-#  define JSONCONS2_FORCEINLINE inline
+#  define JSONCONS_FORCEINLINE inline
 # endif
 #endif
 

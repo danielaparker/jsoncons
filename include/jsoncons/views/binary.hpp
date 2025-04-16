@@ -1,5 +1,5 @@
-#ifndef JSONCONS2_UTILITY_BINARY_HPP
-#define JSONCONS2_UTILITY_BINARY_HPP
+#ifndef JSONCONS_UTILITY_BINARY_HPP
+#define JSONCONS_UTILITY_BINARY_HPP
 
 #include <jsoncons/views/jsoncons_config.hpp>
 
@@ -300,4 +300,4 @@ static inline uint32_t byte_load_4(const void *src) {
 } // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS2_UTILITY_BINARY_HPP
+#endif // JSONCONS_UTILITY_BINARY_HPP

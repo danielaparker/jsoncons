@@ -1,5 +1,5 @@
-#ifndef JSONCONS2_UTILITY_MORE_CONCEPTS_HPP
-#define JSONCONS2_UTILITY_MORE_CONCEPTS_HPP
+#ifndef JSONCONS_UTILITY_MORE_CONCEPTS_HPP
+#define JSONCONS_UTILITY_MORE_CONCEPTS_HPP
 
 #include <jsoncons/views/jsoncons_config.hpp>
 #include <jsoncons/views/more_type_traits.hpp>
@@ -50,4 +50,4 @@ concept trivially_copyable = std::is_trivially_copyable_v<T>;
 } // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS2_JSON_ELEMENT_HPP
+#endif // JSONCONS_JSON_ELEMENT_HPP

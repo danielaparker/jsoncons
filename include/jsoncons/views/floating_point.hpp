@@ -1,5 +1,5 @@
-#ifndef JSONCONS2_UTILITY_FLOATING_POINT_HPP
-#define JSONCONS2_UTILITY_FLOATING_POINT_HPP
+#ifndef JSONCONS_UTILITY_FLOATING_POINT_HPP
+#define JSONCONS_UTILITY_FLOATING_POINT_HPP
 
 #include <jsoncons/views/jsoncons_config.hpp>
 #include <jsoncons/views/binary.hpp>
@@ -219,7 +219,7 @@ __extension__ typedef unsigned __int128 u128;
  *============================================================================*/
 
 /** Convert raw binary to double. */
-JSONCONS2_FORCEINLINE double f64_from_raw(uint64_t u) {
+JSONCONS_FORCEINLINE double f64_from_raw(uint64_t u) {
     /* use memcpy to avoid violating the strict aliasing rule */
     double f;
     memcpy(&f, &u, 8);
@@ -227,7 +227,7 @@ JSONCONS2_FORCEINLINE double f64_from_raw(uint64_t u) {
 }
 
 /** Convert double to raw binary. */
-JSONCONS2_FORCEINLINE uint64_t f64_to_raw(double f) {
+JSONCONS_FORCEINLINE uint64_t f64_to_raw(double f) {
     /* use memcpy to avoid violating the strict aliasing rule */
     uint64_t u;
     memcpy(&u, &f, 8);
@@ -235,7 +235,7 @@ JSONCONS2_FORCEINLINE uint64_t f64_to_raw(double f) {
 }
 
 /** Get raw 'infinity' with sign. */
-JSONCONS2_FORCEINLINE constexpr double f64_raw_get_inf(bool sign) 
+JSONCONS_FORCEINLINE constexpr double f64_raw_get_inf(bool sign) 
 {
     if (std::numeric_limits<double>::is_iec559)
     {
@@ -255,7 +255,7 @@ JSONCONS2_FORCEINLINE constexpr double f64_raw_get_inf(bool sign)
 }
 
 /** Get raw 'nan' with sign. */
-JSONCONS2_FORCEINLINE uint64_t f64_raw_get_nan(bool sign) {
+JSONCONS_FORCEINLINE uint64_t f64_raw_get_nan(bool sign) {
 #if YYJSON_HAS_IEEE_754
     return F64_RAW_NAN | ((uint64_t)sign << 63);
 #elif defined(NAN)
@@ -272,7 +272,7 @@ JSONCONS2_FORCEINLINE uint64_t f64_raw_get_nan(bool sign) {
  number from uint64_t to double. This function will first convert uint64_t to int64_t and then
  to double, with `to nearest` rounding mode.
  */
-JSONCONS2_FORCEINLINE double normalized_u64_to_f64(uint64_t val) {
+JSONCONS_FORCEINLINE double normalized_u64_to_f64(uint64_t val) {
 #if YYJSON_U64_TO_F64_NO_IMPL
     int64_t sig = (int64_t)((val >> 1) | (val & 1));
     return ((double)sig) * (double)2.0;
@@ -287,7 +287,7 @@ JSONCONS2_FORCEINLINE double normalized_u64_to_f64(uint64_t val) {
  *============================================================================*/
 
 /** Returns the number of leading 0-bits in value (input should not be 0). */
-JSONCONS2_FORCEINLINE uint32_t u64_lz_bits(uint64_t v) {
+JSONCONS_FORCEINLINE uint32_t u64_lz_bits(uint64_t v) {
 #if GCC_HAS_CLZLL
     return (uint32_t)__builtin_clzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -322,7 +322,7 @@ JSONCONS2_FORCEINLINE uint32_t u64_lz_bits(uint64_t v) {
 }
 
 /** Returns the number of trailing 0-bits in value (input should not be 0). */
-JSONCONS2_FORCEINLINE uint32_t u64_tz_bits(uint64_t v) {
+JSONCONS_FORCEINLINE uint32_t u64_tz_bits(uint64_t v) {
 #if GCC_HAS_CTZLL
     return (uint32_t)__builtin_ctzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -359,7 +359,7 @@ JSONCONS2_FORCEINLINE uint32_t u64_tz_bits(uint64_t v) {
 
 /** Multiplies two 64-bit unsigned integers (a * b),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS2_FORCEINLINE void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCEINLINE void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     u128 m = (u128)a * b;
     *hi = (uint64_t)(m >> 64);
@@ -382,7 +382,7 @@ JSONCONS2_FORCEINLINE void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64
 
 /** Multiplies two 64-bit unsigned integers and add a value (a * b + c),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS2_FORCEINLINE void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCEINLINE void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     u128 m = (u128)a * b + c;
     *hi = (uint64_t)(m >> 64);
@@ -1098,7 +1098,7 @@ inline constexpr uint64_t pow10_sig_table[] = {
  @param hi    The highest 64 bits of pow(10, e).
  @param lo    The lower 64 bits after `hi`.
  */
-JSONCONS2_FORCEINLINE void pow10_table_get_sig(int32_t exp10, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCEINLINE void pow10_table_get_sig(int32_t exp10, uint64_t *hi, uint64_t *lo) {
     int32_t idx = exp10 - (POW10_SIG_TABLE_MIN_EXP);
     *hi = pow10_sig_table[idx * 2];
     *lo = pow10_sig_table[idx * 2 + 1];
@@ -1107,7 +1107,7 @@ JSONCONS2_FORCEINLINE void pow10_table_get_sig(int32_t exp10, uint64_t *hi, uint
 /**
  Get the exponent (base 2) for highest 64 bits significand in pow10_sig_table.
  */
-JSONCONS2_FORCEINLINE void pow10_table_get_exp(int32_t exp10, int32_t *exp2) {
+JSONCONS_FORCEINLINE void pow10_table_get_exp(int32_t exp10, int32_t *exp2) {
     /* e2 = floor(log2(pow(10, e))) - 64 + 1 */
     /*    = floor(e * log2(10) - 63)         */
     *exp2 = (exp10 * 217706 - 4128768) >> 16;
@@ -1156,14 +1156,14 @@ typedef struct bigint {
  @param big A big number (can be 0).
  @param val An unsigned integer (can be 0).
  */
-JSONCONS2_FORCEINLINE void bigint_add_u64(bigint *big, uint64_t val) {
+JSONCONS_FORCEINLINE void bigint_add_u64(bigint *big, uint64_t val) {
     uint32_t idx, max;
     uint64_t num = big->bits[0];
     uint64_t add = num + val;
     big->bits[0] = add;
-    if (JSONCONS2_LIKELY((add >= num) || (add >= val))) return;
+    if (JSONCONS_LIKELY((add >= num) || (add >= val))) return;
     for ((void)(idx = 1), max = big->used; idx < max; idx++) {
-        if (JSONCONS2_LIKELY(big->bits[idx] != U64_MAX)) {
+        if (JSONCONS_LIKELY(big->bits[idx] != U64_MAX)) {
             big->bits[idx] += 1;
             return;
         }
@@ -1177,7 +1177,7 @@ JSONCONS2_FORCEINLINE void bigint_add_u64(bigint *big, uint64_t val) {
  @param big A big number (can be 0).
  @param val An unsigned integer (cannot be 0).
  */
-JSONCONS2_FORCEINLINE void bigint_mul_u64(bigint *big, uint64_t val) {
+JSONCONS_FORCEINLINE void bigint_mul_u64(bigint *big, uint64_t val) {
     uint32_t idx = 0, max = big->used;
     uint64_t hi, lo, carry = 0;
     for (; idx < max; idx++) {
@@ -1196,11 +1196,11 @@ JSONCONS2_FORCEINLINE void bigint_mul_u64(bigint *big, uint64_t val) {
  @param big A big number (can be 0).
  @param exp An exponent integer (can be 0).
  */
-JSONCONS2_FORCEINLINE void bigint_mul_pow2(bigint *big, uint32_t exp) {
+JSONCONS_FORCEINLINE void bigint_mul_pow2(bigint *big, uint32_t exp) {
     uint32_t shft = exp % 64;
     uint32_t move = exp / 64;
     uint32_t idx = big->used;
-    if (JSONCONS2_UNLIKELY(shft == 0)) {
+    if (JSONCONS_UNLIKELY(shft == 0)) {
         for (; idx > 0; idx--) {
             big->bits[idx + move - 1] = big->bits[idx - 1];
         }
@@ -1224,7 +1224,7 @@ JSONCONS2_FORCEINLINE void bigint_mul_pow2(bigint *big, uint32_t exp) {
  @param big A big number (can be 0).
  @param exp An exponent integer (cannot be 0).
  */
-JSONCONS2_FORCEINLINE void bigint_mul_pow10(bigint *big, int32_t exp) {
+JSONCONS_FORCEINLINE void bigint_mul_pow10(bigint *big, int32_t exp) {
     for (; exp >= U64_POW10_MAX_EXP; exp -= U64_POW10_MAX_EXP) {
         bigint_mul_u64(big, u64_pow10_table[U64_POW10_MAX_EXP]);
     }
@@ -1237,7 +1237,7 @@ JSONCONS2_FORCEINLINE void bigint_mul_pow10(bigint *big, int32_t exp) {
  Compare two bigint.
  @return -1 if 'a < b', +1 if 'a > b', 0 if 'a == b'.
  */
-JSONCONS2_FORCEINLINE constexpr int32_t bigint_cmp(bigint *a, bigint *b) {
+JSONCONS_FORCEINLINE constexpr int32_t bigint_cmp(bigint *a, bigint *b) {
     uint32_t idx = a->used;
     if (a->used < b->used) return -1;
     if (a->used > b->used) return +1;
@@ -1255,16 +1255,16 @@ JSONCONS2_FORCEINLINE constexpr int32_t bigint_cmp(bigint *a, bigint *b) {
  @param big A big number (can be 0).
  @param val An unsigned integer (can be 0).
  */
-JSONCONS2_FORCEINLINE constexpr void bigint_set_u64(bigint *big, uint64_t val) {
+JSONCONS_FORCEINLINE constexpr void bigint_set_u64(bigint *big, uint64_t val) {
     big->used = 1;
     big->bits[0] = val;
 }
 
 /** Set a bigint with floating point number string. */
-JSONCONS2_FORCEINLINE constexpr void bigint_set_buf(bigint *big, uint64_t sig, int32_t *exp,
+JSONCONS_FORCEINLINE constexpr void bigint_set_buf(bigint *big, uint64_t sig, int32_t *exp,
                                     uint8_t *sig_cut, uint8_t *sig_end, uint8_t *dot_pos) {
     
-    if (JSONCONS2_UNLIKELY(!sig_cut)) {
+    if (JSONCONS_UNLIKELY(!sig_cut)) {
         /* no digit cut, set significant part only */
         bigint_set_u64(big, sig);
         return;
@@ -1291,10 +1291,10 @@ JSONCONS2_FORCEINLINE constexpr void bigint_set_buf(bigint *big, uint64_t sig, i
         big->used = 1;
         big->bits[0] = sig;
         while (cur < sig_end) {
-            if (JSONCONS2_LIKELY(cur != dot_pos)) {
+            if (JSONCONS_LIKELY(cur != dot_pos)) {
                 val = val * 10 + (uint8_t)(*cur++ - '0');
                 len++;
-                if (JSONCONS2_UNLIKELY(cur == sig_end && dig_big_cut)) {
+                if (JSONCONS_UNLIKELY(cur == sig_end && dig_big_cut)) {
                     /* The last digit must be non-zero,    */
                     /* set it to '1' for correct rounding. */
                     val = val - (val % 10) + 1;
@@ -1325,7 +1325,7 @@ typedef struct diy_fp {
 
 /** Get cached rounded diy_fp with pow(10, e) The input value must in range
     [POW10_SIG_TABLE_MIN_EXP, POW10_SIG_TABLE_MAX_EXP]. */
-JSONCONS2_FORCEINLINE diy_fp diy_fp_get_cached_pow10(int32_t exp10) {
+JSONCONS_FORCEINLINE diy_fp diy_fp_get_cached_pow10(int32_t exp10) {
     diy_fp fp;
     uint64_t sig_ext;
     pow10_table_get_sig(exp10, &fp.sig, &sig_ext);
@@ -1335,7 +1335,7 @@ JSONCONS2_FORCEINLINE diy_fp diy_fp_get_cached_pow10(int32_t exp10) {
 }
 
 /** Returns fp * fp2. */
-JSONCONS2_FORCEINLINE diy_fp diy_fp_mul(diy_fp fp, diy_fp fp2) {
+JSONCONS_FORCEINLINE diy_fp diy_fp_mul(diy_fp fp, diy_fp fp2) {
     uint64_t hi, lo;
     u128_mul(fp.sig, fp2.sig, &hi, &lo);
     fp.sig = hi + (lo >> 63);
@@ -1344,11 +1344,11 @@ JSONCONS2_FORCEINLINE diy_fp diy_fp_mul(diy_fp fp, diy_fp fp2) {
 }
 
 /** Convert diy_fp to IEEE-754 raw value. */
-JSONCONS2_FORCEINLINE uint64_t diy_fp_to_ieee_raw(diy_fp fp) {
+JSONCONS_FORCEINLINE uint64_t diy_fp_to_ieee_raw(diy_fp fp) {
     uint64_t sig = fp.sig;
     int32_t exp = fp.exp;
     uint32_t lz_bits;
-    if (JSONCONS2_UNLIKELY(fp.sig == 0)) return 0;
+    if (JSONCONS_UNLIKELY(fp.sig == 0)) return 0;
     
     lz_bits = u64_lz_bits(sig);
     sig <<= lz_bits;
@@ -1357,14 +1357,14 @@ JSONCONS2_FORCEINLINE uint64_t diy_fp_to_ieee_raw(diy_fp fp) {
     exp += F64_BITS - F64_SIG_FULL_BITS;
     exp += F64_SIG_BITS;
     
-    if (JSONCONS2_UNLIKELY(exp >= F64_MAX_BIN_EXP)) {
+    if (JSONCONS_UNLIKELY(exp >= F64_MAX_BIN_EXP)) {
         /* overflow */
         return F64_RAW_INF;
-    } else if (JSONCONS2_LIKELY(exp >= F64_MIN_BIN_EXP - 1)) {
+    } else if (JSONCONS_LIKELY(exp >= F64_MIN_BIN_EXP - 1)) {
         /* normal */
         exp += F64_EXP_BIAS;
         return ((uint64_t)exp << F64_SIG_BITS) | (sig & F64_SIG_MASK);
-    } else if (JSONCONS2_LIKELY(exp >= F64_MIN_BIN_EXP - F64_SIG_FULL_BITS)) {
+    } else if (JSONCONS_LIKELY(exp >= F64_MIN_BIN_EXP - F64_SIG_FULL_BITS)) {
         /* subnormal */
         return sig >> (F64_MIN_BIN_EXP - exp - 1);
     } else {
@@ -1391,4 +1391,4 @@ inline constexpr double f64_pow10_table[] = {
 } // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS2_FLOATING_POINT_HPP
+#endif // JSONCONS_FLOATING_POINT_HPP

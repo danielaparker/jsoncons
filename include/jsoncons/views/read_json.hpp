@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_READ_JSON_HPP
-#define JSONCONS2_READ_JSON_HPP
+#ifndef JSONCONS_READ_JSON_HPP
+#define JSONCONS_READ_JSON_HPP
 
 #include <jsoncons/views/json_ref.hpp>
 #include <string_view>
@@ -35,44 +35,44 @@ enum class read_json_flags : uint32_t
     bignum_as_raw = 1 << 7
 };
 
-JSONCONS2_FORCEINLINE read_json_flags operator!(read_json_flags a)
+JSONCONS_FORCEINLINE read_json_flags operator!(read_json_flags a)
 {
     return static_cast<read_json_flags>(!static_cast<uint32_t>(a));
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator~(read_json_flags a)
+JSONCONS_FORCEINLINE read_json_flags operator~(read_json_flags a)
 {
     return static_cast<read_json_flags>(~static_cast<uint32_t>(a));
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator&(read_json_flags a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator&(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator^(read_json_flags a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator^(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator|(read_json_flags a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator|(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator&=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator&=(read_json_flags& a, read_json_flags b)
 {
     a = a & b;
     return a;
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator^=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator^=(read_json_flags& a, read_json_flags b)
 {
     a = a ^ b;
     return a;
 }
 
-JSONCONS2_FORCEINLINE read_json_flags operator|=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCEINLINE read_json_flags operator|=(read_json_flags& a, read_json_flags b)
 {
     a = a | b;
     return a;
@@ -192,5 +192,5 @@ struct read_json_result
 
 } // namespace jsoncons
 
-#endif // JSONCONS2_READ_JSON_HPP
+#endif // JSONCONS_READ_JSON_HPP
 

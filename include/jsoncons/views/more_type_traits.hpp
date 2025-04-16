@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_MORE_TYPE_TRAITS_HPP
-#define JSONCONS2_MORE_TYPE_TRAITS_HPP
+#ifndef JSONCONS_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_MORE_TYPE_TRAITS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -56,7 +56,7 @@ namespace utility {
     template <typename T, typename Enable=void>
     struct is_int128_type : std::false_type {};
 
-#if defined(JSONCONS2_HAS_INT128)
+#if defined(JSONCONS_HAS_INT128)
     template <typename T>
     struct is_int128_type<T, typename std::enable_if<std::is_same<T,int128_type>::value>::type> : std::true_type {};
 #endif
@@ -66,7 +66,7 @@ namespace utility {
     template <typename T, typename Enable=void>
     struct is_uint128_type : std::false_type {};
 
-#if defined (JSONCONS2_HAS_INT128)
+#if defined (JSONCONS_HAS_INT128)
     template <typename T>
     struct is_uint128_type<T, typename std::enable_if<std::is_same<T,uint128_type>::value>::type> : std::true_type {};
 #endif
@@ -365,7 +365,7 @@ namespace utility {
     template <typename T>
     struct make_unsigned_impl {using type = typename std::make_unsigned<T>::type;};
 
-    #if defined(JSONCONS2_HAS_INT128)
+    #if defined(JSONCONS_HAS_INT128)
     template <> 
     struct make_unsigned_impl<int128_type> {using type = uint128_type;};
     template <> 

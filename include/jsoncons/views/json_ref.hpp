@@ -26,8 +26,8 @@
  @author YaoYuan
  */
 
-#ifndef JSONCONS2_JSON_ELEMENT_HPP
-#define JSONCONS2_JSON_ELEMENT_HPP
+#ifndef JSONCONS_JSON_ELEMENT_HPP
+#define JSONCONS_JSON_ELEMENT_HPP
 
 #include <jsoncons/views/jsoncons_config.hpp>
 #include <jsoncons/views/read_json_error.hpp>
@@ -234,7 +234,7 @@ namespace jsoncons {
                     auto result = jsoncons::utility::to_integer(sv.data(), sv.length(), val);
                     if (!result)
                     {
-                        JSONCONS2_THROW(std::system_error(result.error_code()));
+                        JSONCONS_THROW(std::system_error(result.error_code()));
                     }
                     return val;
                 }
@@ -262,7 +262,7 @@ namespace jsoncons {
                     auto result = std::from_chars(sv.data(), sv.data()+sv.length(), val);
                     if (result.ec != std::errc{})
                     {
-                        JSONCONS2_THROW(std::system_error(read_json_errc::not_a_number));
+                        JSONCONS_THROW(std::system_error(read_json_errc::not_a_number));
                     }
                     return val;
                 }
@@ -363,7 +363,7 @@ namespace jsoncons {
 
         constexpr bool equal_string(const char* str, std::size_t len) const noexcept
         {
-            if (JSONCONS2_LIKELY(type() == json_type::string))
+            if (JSONCONS_LIKELY(type() == json_type::string))
             {
                 return size() == len && memcmp(uni.str_val, str, len) == 0;
             }

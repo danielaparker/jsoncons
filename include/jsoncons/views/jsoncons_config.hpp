@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_CONFIG_JSONCONS2_CONFIG_HPP
-#define JSONCONS2_CONFIG_JSONCONS2_CONFIG_HPP
+#ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
+#define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 #include <jsoncons/views/compiler_support.hpp>
 #include <stdexcept>
@@ -33,26 +33,26 @@
 
 #if defined(__GNUC__)
 #if (__GNUC__ * 100 + __GNUC_MINOR__ >= 403) || (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
-#  define JSONCONS2_BYTE_SWAP_64 __builtin_bswap64
-#  define JSONCONS2_BYTE_SWAP_32 __builtin_bswap32
+#  define JSONCONS_BYTE_SWAP_64 __builtin_bswap64
+#  define JSONCONS_BYTE_SWAP_32 __builtin_bswap32
 #    ifdef __INTEL_COMPILER
-#      define JSONCONS2_BYTE_SWAP_16 _bswap16
+#      define JSONCONS_BYTE_SWAP_16 _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
-#      define JSONCONS2_BYTE_SWAP_16    __builtin_bswap16
+#      define JSONCONS_BYTE_SWAP_16    __builtin_bswap16
 #  endif
 #endif
 #elif defined(__sun)
 #  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
 // MSVC, which implies sizeof(long) == 4 
-#  define JSONCONS2_BYTE_SWAP_64       _byteswap_uint64
-#  define JSONCONS2_BYTE_SWAP_32       _byteswap_ulong
-#  define JSONCONS2_BYTE_SWAP_16       _byteswap_ushort
+#  define JSONCONS_BYTE_SWAP_64       _byteswap_uint64
+#  define JSONCONS_BYTE_SWAP_32       _byteswap_ulong
+#  define JSONCONS_BYTE_SWAP_16       _byteswap_ushort
 #endif
 
-#define JSONCONS2_EXPAND(X) X    
-#define JSONCONS2_QUOTE(Prefix, A) JSONCONS2_EXPAND(Prefix ## #A)
-#define JSONCONS2_WIDEN(A) JSONCONS2_EXPAND(L ## A)
+#define JSONCONS_EXPAND(X) X    
+#define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
+#define JSONCONS_WIDEN(A) JSONCONS_EXPAND(L ## A)
 
 namespace jsoncons {
 namespace binary {
@@ -63,7 +63,7 @@ namespace binary {
         uint64_t hi;
     };
 
-    JSONCONS2_FORCEINLINE static bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
+    JSONCONS_FORCEINLINE static bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
     {
     #if ((defined(__GNUC__) && (__GNUC__ >= 5)) && !defined(__INTEL_COMPILER)) || __has_builtin(__builtin_add_overflow)
         return __builtin_add_overflow(v1, v2, r);
@@ -78,7 +78,7 @@ namespace binary {
     #define APPLE_MISSING_INTRINSICS 1
     #endif
 
-    JSONCONS2_FORCEINLINE 
+    JSONCONS_FORCEINLINE 
     uint16_t encode_half(double val)
     {
     #if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
@@ -116,7 +116,7 @@ namespace binary {
     }
 
     /* this function was copied & adapted from RFC 7049 Appendix D */
-    JSONCONS2_FORCEINLINE 
+    JSONCONS_FORCEINLINE 
     double decode_half(uint16_t half)
     {
     #if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
@@ -154,8 +154,8 @@ namespace binary {
     typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint16_t),T>::type
     byte_swap(T val)
     {
-    #if defined(JSONCONS2_BYTE_SWAP_16)
-        return JSONCONS2_BYTE_SWAP_16(val);
+    #if defined(JSONCONS_BYTE_SWAP_16)
+        return JSONCONS_BYTE_SWAP_16(val);
     #else
         return (static_cast<uint16_t>(val) >> 8) | (static_cast<uint16_t>(val) << 8);
     #endif
@@ -165,8 +165,8 @@ namespace binary {
     typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
     byte_swap(T val)
     {
-    #if defined(JSONCONS2_BYTE_SWAP_32)
-        return JSONCONS2_BYTE_SWAP_32(val);
+    #if defined(JSONCONS_BYTE_SWAP_32)
+        return JSONCONS_BYTE_SWAP_32(val);
     #else
         uint32_t tmp = ((static_cast<uint32_t>(val) << 8) & 0xff00ff00) | ((static_cast<uint32_t>(val) >> 8) & 0xff00ff);
         return (tmp << 16) | (tmp >> 16);
@@ -177,8 +177,8 @@ namespace binary {
     typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
     byte_swap(T val)
     {
-    #if defined(JSONCONS2_BYTE_SWAP_64)
-        return JSONCONS2_BYTE_SWAP_64(val);
+    #if defined(JSONCONS_BYTE_SWAP_64)
+        return JSONCONS_BYTE_SWAP_64(val);
     #else
         uint64_t tmp = ((static_cast<uint64_t>(val) & 0x00000000ffffffffull) << 32) | ((static_cast<uint64_t>(val) & 0xffffffff00000000ull) >> 32);
         tmp = ((tmp & 0x0000ffff0000ffffull) << 16) | ((tmp & 0xffff0000ffff0000ull) >> 16);
@@ -361,31 +361,31 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // allow to disable exceptions
-#if !defined(JSONCONS2_NO_EXCEPTIONS)
-    #define JSONCONS2_THROW(exception) throw exception
-    #define JSONCONS2_RETHROW throw
-    #define JSONCONS2_TRY try
-    #define JSONCONS2_CATCH(exception) catch(exception)
+#if !defined(JSONCONS_NO_EXCEPTIONS)
+    #define JSONCONS_THROW(exception) throw exception
+    #define JSONCONS_RETHROW throw
+    #define JSONCONS_TRY try
+    #define JSONCONS_CATCH(exception) catch(exception)
 #else
-    #define JSONCONS2_THROW(exception) std::terminate()
-    #define JSONCONS2_RETHROW std::terminate()
-    #define JSONCONS2_TRY if (true)
-    #define JSONCONS2_CATCH(exception) if (false)
+    #define JSONCONS_THROW(exception) std::terminate()
+    #define JSONCONS_RETHROW std::terminate()
+    #define JSONCONS_TRY if (true)
+    #define JSONCONS_CATCH(exception) if (false)
 #endif
 
-#define JSONCONS2_STR2(x)  #x
-#define JSONCONS2_STR(x)  JSONCONS2_STR2(x)
+#define JSONCONS_STR2(x)  #x
+#define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
 #ifdef _DEBUG
-#define JSONCONS2_ASSERT(x) if (!(x)) { \
-    JSONCONS2_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
-            JSONCONS2_STR(__LINE__))); }
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__))); }
 #else
-#define JSONCONS2_ASSERT(x) if (!(x)) { \
-    JSONCONS2_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
-            JSONCONS2_STR( 0 ))); }
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
+            JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
 
-#endif // JSONCONS2_CONFIG_JSONCONS2_CONFIG_HPP
+#endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 

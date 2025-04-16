@@ -97,7 +97,7 @@ namespace jsoncons {
  *============================================================================*/
 
 /** Returns the number of leading 0-bits in value (input should not be 0). */
-JSONCONS2_FORCEINLINE static uint32_t u64_lz_bits(uint64_t v) {
+JSONCONS_FORCEINLINE static uint32_t u64_lz_bits(uint64_t v) {
 #if GCC_HAS_CLZLL
     return (uint32_t)__builtin_clzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -132,7 +132,7 @@ JSONCONS2_FORCEINLINE static uint32_t u64_lz_bits(uint64_t v) {
 }
 
 /** Returns the number of trailing 0-bits in value (input should not be 0). */
-JSONCONS2_FORCEINLINE static uint32_t u64_tz_bits(uint64_t v) {
+JSONCONS_FORCEINLINE static uint32_t u64_tz_bits(uint64_t v) {
 #if GCC_HAS_CTZLL
     return (uint32_t)__builtin_ctzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -169,7 +169,7 @@ JSONCONS2_FORCEINLINE static uint32_t u64_tz_bits(uint64_t v) {
 
 /** Multiplies two 64-bit unsigned integers (a * b),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS2_FORCEINLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCEINLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     utility::u128 m = (utility::u128)a * b;
     *hi = (uint64_t)(m >> 64);
@@ -192,7 +192,7 @@ JSONCONS2_FORCEINLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi,
 
 /** Multiplies two 64-bit unsigned integers and add a value (a * b + c),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS2_FORCEINLINE static void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCEINLINE static void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     utility::u128 m = (utility::u128)a * b + c;
     *hi = (uint64_t)(m >> 64);
@@ -259,37 +259,37 @@ static constexpr digi_type digi_table[256] = {
 };
 
 /** Match a character with specified type. */
-JSONCONS2_FORCEINLINE static bool digi_is_type(uint8_t d, digi_type type) {
+JSONCONS_FORCEINLINE static bool digi_is_type(uint8_t d, digi_type type) {
     return (digi_table[d] & type) != 0;
 }
 
 /** Match a sign: '+', '-' */
-JSONCONS2_FORCEINLINE static bool digi_is_sign(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_sign(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_POS | DIGI_TYPE_NEG));
 }
 
 /** Match a none zero digit: [1-9] */
-JSONCONS2_FORCEINLINE static bool digi_is_nonzero(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_nonzero(uint8_t d) {
     return digi_is_type(d, (digi_type)DIGI_TYPE_NONZERO);
 }
 
 /** Match a digit: [0-9] */
-JSONCONS2_FORCEINLINE static bool digi_is_digit(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_digit(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_ZERO | DIGI_TYPE_NONZERO));
 }
 
 /** Match an exponent sign: 'e', 'E'. */
-JSONCONS2_FORCEINLINE static bool digi_is_exp(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_exp(uint8_t d) {
     return digi_is_type(d, (digi_type)DIGI_TYPE_EXP);
 }
 
 /** Match a floating point indicator: '.', 'e', 'E'. */
-JSONCONS2_FORCEINLINE static bool digi_is_fp(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_fp(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_DOT | DIGI_TYPE_EXP));
 }
 
 /** Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. */
-JSONCONS2_FORCEINLINE static bool digi_is_digit_or_fp(uint8_t d) {
+JSONCONS_FORCEINLINE static bool digi_is_digit_or_fp(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_ZERO | DIGI_TYPE_NONZERO |
                                        DIGI_TYPE_DOT | DIGI_TYPE_EXP));
 }
@@ -346,7 +346,7 @@ static constexpr uint8_t hex_conv_table[256] = {
  
  This requires the string has 4-byte zero padding.
  */
-JSONCONS2_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val) {
+JSONCONS_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val) {
     uint16_t c0, c1, c2, c3, t0, t1;
     c0 = hex_conv_table[cur[0]];
     c1 = hex_conv_table[cur[1]];
@@ -366,7 +366,7 @@ JSONCONS2_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val
  *============================================================================*/
 
 /** Read a JSON number as raw string. */
-JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
+JSONCONS_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
     read_json_flags flags,
     json_ref* val) 
 {
@@ -377,7 +377,7 @@ JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
     cur += (*cur == '-');
     
     /* read first digit, check leading zero */
-    if (JSONCONS2_UNLIKELY(!digi_is_digit(*cur))) {
+    if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
         if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) {
             auto result = read_inf_or_nan(*hdr == '-', cur, flags, val);
             cur = result.ptr;
@@ -393,7 +393,7 @@ JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
     /* read integral part */
     if (*cur == '0') {
         cur++;
-        if (JSONCONS2_UNLIKELY(digi_is_digit(*cur))) {
+        if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
         if (!digi_is_fp(*cur)) 
@@ -457,9 +457,9 @@ JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
  2. This function support uint64/int64/double number. If an integer number
     cannot fit in uint64/int64, it will returns as a double number. If a double
     number is infinite, the return value is based on flag.
- 3. This function (with JSONCONS2_FORCEINLINE attribute) may generate a lot of instructions.
+ 3. This function (with JSONCONS_FORCEINLINE attribute) may generate a lot of instructions.
  */
-JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
+JSONCONS_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     read_json_flags flags,
     json_ref* val) 
 {
@@ -528,7 +528,7 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     bool sign;
     
     /* read number as raw string if has `read_json_flags::number_as_raw` flag */
-    if (JSONCONS2_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
+    if (JSONCONS_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
         auto result = read_number_raw(cur, flags, val);
         return result;
     }
@@ -537,8 +537,8 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     cur += sign;
     
     /* begin with a leading zero or non-digit */
-    if (JSONCONS2_UNLIKELY(!digi_is_nonzero(*cur))) { /* 0 or non-digit char */
-        if (JSONCONS2_UNLIKELY(*cur != '0')) { /* non-digit char */
+    if (JSONCONS_UNLIKELY(!digi_is_nonzero(*cur))) { /* 0 or non-digit char */
+        if (JSONCONS_UNLIKELY(*cur != '0')) { /* non-digit char */
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
                 auto result = read_inf_or_nan(sign, cur, flags, val);
@@ -551,26 +551,26 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
             return read_json_result(cur, read_json_errc::no_digit_after_minus_sign);
         }
         /* begin with 0 */
-        if (JSONCONS2_LIKELY(!digi_is_digit_or_fp(*++cur))) return_0();
-        if (JSONCONS2_LIKELY(*cur == '.')) {
+        if (JSONCONS_LIKELY(!digi_is_digit_or_fp(*++cur))) return_0();
+        if (JSONCONS_LIKELY(*cur == '.')) {
             dot_pos = cur++;
-            if (JSONCONS2_UNLIKELY(!digi_is_digit(*cur))) {
+            if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
                 return read_json_result(cur, read_json_errc::no_digit_after_decimal_point);
             }
-            while (JSONCONS2_UNLIKELY(*cur == '0')) cur++;
-            if (JSONCONS2_LIKELY(digi_is_digit(*cur))) {
+            while (JSONCONS_UNLIKELY(*cur == '0')) cur++;
+            if (JSONCONS_LIKELY(digi_is_digit(*cur))) {
                 /* first non-zero digit after decimal point */
                 sig = (uint64_t)(*cur - '0'); /* read first digit */
                 cur--;
                 goto digi_frac_1; /* continue read fraction part */
             }
         }
-        if (JSONCONS2_UNLIKELY(digi_is_digit(*cur))) {
+        if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
-        if (JSONCONS2_UNLIKELY(digi_is_exp(*cur))) { /* 0 with any exponent is still 0 */
+        if (JSONCONS_UNLIKELY(digi_is_exp(*cur))) { /* 0 with any exponent is still 0 */
             cur += (std::size_t)1 + digi_is_sign(cur[1]);
-            if (JSONCONS2_UNLIKELY(!digi_is_digit(*cur))) {
+            if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
                 return read_json_result(cur, read_json_errc::no_digit_after_exponent_sign);
             }
             while (digi_is_digit(*++cur));
@@ -591,7 +591,7 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
          }
      */
 #define expr_intg(i) \
-    if (JSONCONS2_LIKELY((num = (uint64_t)(cur[i] - (uint8_t)'0')) <= 9)) sig = num + sig * 10; \
+    if (JSONCONS_LIKELY((num = (uint64_t)(cur[i] - (uint8_t)'0')) <= 9)) sig = num + sig * 10; \
     else { goto digi_sepr_##i; }
     repeat_in_1_18(expr_intg)
 #undef expr_intg
@@ -612,9 +612,9 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     /* process first non-digit character */
 #define expr_sepr(i) \
     digi_sepr_##i: \
-    if (JSONCONS2_LIKELY(!digi_is_fp(cur[i]))) { cur += i; return_i64(sig); } \
+    if (JSONCONS_LIKELY(!digi_is_fp(cur[i]))) { cur += i; return_i64(sig); } \
     dot_pos = cur + i; \
-    if (JSONCONS2_LIKELY(cur[i] == '.')) goto digi_frac_##i; \
+    if (JSONCONS_LIKELY(cur[i] == '.')) goto digi_frac_##i; \
     cur += i; sig_end = cur; goto digi_exp_more;
     repeat_in_1_18(expr_sepr)
 #undef expr_sepr
@@ -623,7 +623,7 @@ JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     /* read fraction part */
 #define expr_frac(i) \
     digi_frac_##i: \
-    if (JSONCONS2_LIKELY((num = (uint64_t)(cur[i + 1] - (uint8_t)'0')) <= 9)) \
+    if (JSONCONS_LIKELY((num = (uint64_t)(cur[i + 1] - (uint8_t)'0')) <= 9)) \
         sig = num + sig * 10; \
     else { goto digi_stop_##i; }
     repeat_in_1_18(expr_frac)
@@ -711,13 +711,13 @@ digi_frac_more:
     
     /* fraction part end */
 digi_frac_end:
-    if (JSONCONS2_UNLIKELY(dot_pos + 1 == cur)) {
+    if (JSONCONS_UNLIKELY(dot_pos + 1 == cur)) {
         return read_json_result(cur, read_json_errc::no_digit_after_decimal_point);
     }
     sig_end = cur;
     exp_sig = -(int64_t)((uint64_t)(cur - dot_pos) - 1);
-    if (JSONCONS2_LIKELY(!digi_is_exp(*cur))) {
-        if (JSONCONS2_UNLIKELY(exp_sig < F64_MIN_DEC_EXP - 19)) {
+    if (JSONCONS_LIKELY(!digi_is_exp(*cur))) {
+        if (JSONCONS_UNLIKELY(exp_sig < F64_MIN_DEC_EXP - 19)) {
             return_f64_bin(0); /* underflow */
         }
         exp = (int32_t)exp_sig;
@@ -731,7 +731,7 @@ digi_frac_end:
 digi_exp_more:
     exp_sign = (*++cur == '-');
     cur += digi_is_sign(*cur);
-    if (JSONCONS2_UNLIKELY(!digi_is_digit(*cur))) {
+    if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
         return read_json_result(cur, read_json_errc::no_digit_after_exponent_sign);
     }
     while (*cur == '0') cur++;
@@ -741,7 +741,7 @@ digi_exp_more:
     while (digi_is_digit(*cur)) {
         exp_lit = (int64_t)((uint8_t)(*cur++ - '0') + (uint64_t)exp_lit * 10);
     }
-    if (JSONCONS2_UNLIKELY(cur - tmp >= U64_SAFE_DIG)) {
+    if (JSONCONS_UNLIKELY(cur - tmp >= U64_SAFE_DIG)) {
         if (exp_sign) {
             return_f64_bin(0); /* underflow */
         } else {
@@ -753,10 +753,10 @@ digi_exp_more:
     
     /* validate exponent value */
 digi_exp_finish:
-    if (JSONCONS2_UNLIKELY(exp_sig < F64_MIN_DEC_EXP - 19)) {
+    if (JSONCONS_UNLIKELY(exp_sig < F64_MIN_DEC_EXP - 19)) {
         return_f64_bin(0); /* underflow */
     }
-    if (JSONCONS2_UNLIKELY(exp_sig > F64_MAX_DEC_EXP)) {
+    if (JSONCONS_UNLIKELY(exp_sig > F64_MAX_DEC_EXP)) {
         return_inf(); /* overflow */
     }
     exp = (int32_t)exp_sig;
@@ -797,7 +797,7 @@ digi_finish:
      To keep it simple, we only accept normal number here,
      let the slow path to handle subnormal and infinity number.
      */
-    if (JSONCONS2_LIKELY(!sig_cut &&
+    if (JSONCONS_LIKELY(!sig_cut &&
                exp > -F64_MAX_DEC_EXP + 1 &&
                exp < +F64_MAX_DEC_EXP - 20)) {
         /*
@@ -981,7 +981,7 @@ digi_finish:
         
         /* effective significand */
         order_of_magnitude = DIY_SIG_BITS + fp.exp;
-        if (JSONCONS2_LIKELY(order_of_magnitude >= EXP_SUBNORMAL + F64_SIG_FULL_BITS)) {
+        if (JSONCONS_LIKELY(order_of_magnitude >= EXP_SUBNORMAL + F64_SIG_FULL_BITS)) {
             effective_significand_size = F64_SIG_FULL_BITS;
         } else if (order_of_magnitude <= EXP_SUBNORMAL) {
             effective_significand_size = 0;
@@ -991,7 +991,7 @@ digi_finish:
         
         /* precision digits count */
         precision_digits_count = DIY_SIG_BITS - effective_significand_size;
-        if (JSONCONS2_UNLIKELY(precision_digits_count + ERR_ULP_LOG >= DIY_SIG_BITS)) {
+        if (JSONCONS_UNLIKELY(precision_digits_count + ERR_ULP_LOG >= DIY_SIG_BITS)) {
             int32_t shr = (precision_digits_count + ERR_ULP_LOG) - DIY_SIG_BITS + 1;
             fp.sig >>= shr;
             fp.exp += shr;
@@ -1012,8 +1012,8 @@ digi_finish:
         
         /* get IEEE double raw value */
         raw = diy_fp_to_ieee_raw(fp);
-        if (JSONCONS2_UNLIKELY(raw == F64_RAW_INF)) return_inf();
-        if (JSONCONS2_LIKELY(precision_bits <= half_way - fp_err ||
+        if (JSONCONS_UNLIKELY(raw == F64_RAW_INF)) return_inf();
+        if (JSONCONS_LIKELY(precision_bits <= half_way - fp_err ||
                    precision_bits >= half_way + fp_err)) {
             return_f64_bin(raw); /* number is accurate */
         }
@@ -1046,7 +1046,7 @@ digi_finish:
             bigint_mul_pow2(&big_full, (uint32_t)-fp_upper.exp);
         }
         cmp = bigint_cmp(&big_full, &big_comp);
-        if (JSONCONS2_LIKELY(cmp != 0)) {
+        if (JSONCONS_LIKELY(cmp != 0)) {
             /* round down or round up */
             raw += (cmp > 0);
         } else {
@@ -1054,7 +1054,7 @@ digi_finish:
             raw += (raw & 1);
         }
         
-        if (JSONCONS2_UNLIKELY(raw == F64_RAW_INF)) return_inf();
+        if (JSONCONS_UNLIKELY(raw == F64_RAW_INF)) return_inf();
         return_f64_bin(raw);
     }
     
@@ -1131,7 +1131,7 @@ read_json_result read_number(uint8_t* ptr,
     bool sign;
     
     /* read number as raw string if has `read_json_flags::number_as_raw` flag */
-    if (JSONCONS2_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
+    if (JSONCONS_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
         auto result = read_number_raw(cur, flags, val);
         return result;
     }
@@ -1141,7 +1141,7 @@ read_json_result read_number(uint8_t* ptr,
     sig = (uint8_t)(*cur - '0');
     
     /* read first digit, check leading zero */
-    if (JSONCONS2_UNLIKELY(!digi_is_digit(*cur))) {
+    if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
         if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) {
             auto result = read_inf_or_nan(sign, cur, flags, val);
             if (result)
@@ -1154,7 +1154,7 @@ read_json_result read_number(uint8_t* ptr,
     }
     if (*cur == '0') {
         cur++;
-        if (JSONCONS2_UNLIKELY(digi_is_digit(*cur))) {
+        if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
         if (!digi_is_fp(*cur)) return_0();
@@ -1163,7 +1163,7 @@ read_json_result read_number(uint8_t* ptr,
     
     /* read continuous digits, up to 19 characters */
 #define expr_intg(i) \
-    if (JSONCONS2_LIKELY((num = (uint64_t)(cur[i] - (uint8_t)'0')) <= 9)) sig = num + sig * 10; \
+    if (JSONCONS_LIKELY((num = (uint64_t)(cur[i] - (uint8_t)'0')) <= 9)) sig = num + sig * 10; \
     else { cur += i; goto intg_end; }
     repeat_in_1_18(expr_intg)
 #undef expr_intg
@@ -1239,7 +1239,7 @@ read_double:
     if (ec != std::errc{}) {
         return read_json_result(cur, read_json_errc::invalid_number);
     }
-    if (JSONCONS2_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
+    if (JSONCONS_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
         return_inf();
     }
     std::construct_at(val, value);
@@ -1275,7 +1275,7 @@ read_double:
  @param msg The error message pointer.
  @return Whether success.
  */
-JSONCONS2_FORCEINLINE read_json_result read_string(uint8_t* ptr,
+JSONCONS_FORCEINLINE read_json_result read_string(uint8_t* ptr,
     uint8_t *lst,
     bool inv,
     json_ref* val) 
@@ -1296,12 +1296,12 @@ skip_ascii_begin:
      like this: https://godbolt.org/z/8vjsYq
      
          while (true) repeat16({
-            if (JSONCONS2_LIKELY(!(char_is_ascii_stop(*src)))) src++;
+            if (JSONCONS_LIKELY(!(char_is_ascii_stop(*src)))) src++;
             else break;
          })
      */
 #define expr_jump(i) \
-    if (JSONCONS2_LIKELY(!char_is_ascii_stop(src[i]))) {} \
+    if (JSONCONS_LIKELY(!char_is_ascii_stop(src[i]))) {} \
     else goto skip_ascii_stop##i;
     
 #define expr_stop(i) \
@@ -1330,7 +1330,7 @@ skip_ascii_end:
 #if YYJSON_IS_REAL_GCC
     __asm__ volatile("":"=m"(*src));
 #endif
-    if (JSONCONS2_LIKELY(*src == '"')) {
+    if (JSONCONS_LIKELY(*src == '"')) {
         std::construct_at(val, noesc_arg, (const char *)cur, (std::size_t)(src - cur));
         *src = '\0';
         return read_json_result{src+1, read_json_errc{}};
@@ -1339,7 +1339,7 @@ skip_ascii_end:
 skip_utf8:
     if (*src & 0x80) { /* non-ASCII character */
         /*
-         Non-ASCII character appears here, which means that the text is JSONCONS2_LIKELY
+         Non-ASCII character appears here, which means that the text is JSONCONS_LIKELY
          to be written in non-English or emoticons. According to some common
          data set statistics, byte sequences of the same length may appear
          consecutively. We process the byte sequences of the same length in each
@@ -1348,16 +1348,16 @@ skip_utf8:
         pos = src;
 #if YYJSON_DISABLE_UTF8_VALIDATION
         while (true) repeat8({
-            if (JSONCONS2_LIKELY((*src & 0xF0) == 0xE0)) src += 3;
+            if (JSONCONS_LIKELY((*src & 0xF0) == 0xE0)) src += 3;
             else break;
         })
         if (*src < 0x80) goto skip_ascii;
         while (true) repeat8({
-            if (JSONCONS2_LIKELY((*src & 0xE0) == 0xC0)) src += 2;
+            if (JSONCONS_LIKELY((*src & 0xE0) == 0xC0)) src += 2;
             else break;
         })
         while (true) repeat8({
-            if (JSONCONS2_LIKELY((*src & 0xF8) == 0xF0)) src += 4;
+            if (JSONCONS_LIKELY((*src & 0xF8) == 0xF0)) src += 4;
             else break;
         })
 #else
@@ -1376,7 +1376,7 @@ skip_utf8:
             uni = utility::byte_load_4(src);
         }
 #endif
-        if (JSONCONS2_UNLIKELY(pos == src)) {
+        if (JSONCONS_UNLIKELY(pos == src)) {
             if (!inv) return read_json_result(src, read_json_errc::invalid_utf8);
             ++src;
         }
@@ -1386,7 +1386,7 @@ skip_utf8:
     /* The escape character appears, we need to copy it. */
     dst = src;
 copy_escape:
-    if (JSONCONS2_LIKELY(*src == '\\')) {
+    if (JSONCONS_LIKELY(*src == '\\')) {
         switch (*++src) {
             case '"':  *dst++ = '"';  src++; break;
             case '\\': *dst++ = '\\'; src++; break;
@@ -1397,11 +1397,11 @@ copy_escape:
             case 'r':  *dst++ = '\r'; src++; break;
             case 't':  *dst++ = '\t'; src++; break;
             case 'u':
-                if (JSONCONS2_UNLIKELY(!read_hex_u16(++src, &hi))) {
+                if (JSONCONS_UNLIKELY(!read_hex_u16(++src, &hi))) {
                     return read_json_result(src - 2, read_json_errc::invalid_escaped_sequence);
                 }
                 src += 4;
-                if (JSONCONS2_LIKELY((hi & 0xF800) != 0xD800)) {
+                if (JSONCONS_LIKELY((hi & 0xF800) != 0xD800)) {
                     /* a BMP character */
                     if (hi >= 0x800) {
                         *dst++ = (uint8_t)(0xE0 | (hi >> 12));
@@ -1415,16 +1415,16 @@ copy_escape:
                     }
                 } else {
                     /* a non-BMP character, represented as a surrogate pair */
-                    if (JSONCONS2_UNLIKELY((hi & 0xFC00) != 0xD800)) {
+                    if (JSONCONS_UNLIKELY((hi & 0xFC00) != 0xD800)) {
                         return read_json_result(src - 6, read_json_errc::invalid_high_surrogate);
                     }
-                    if (JSONCONS2_UNLIKELY(!utility::byte_match_2(src, "\\u"))) {
+                    if (JSONCONS_UNLIKELY(!utility::byte_match_2(src, "\\u"))) {
                         return read_json_result(src, read_json_errc::no_low_surrogate);
                     }
-                    if (JSONCONS2_UNLIKELY(!read_hex_u16(src + 2, &lo))) {
+                    if (JSONCONS_UNLIKELY(!read_hex_u16(src + 2, &lo))) {
                         return read_json_result(src, read_json_errc::invalid_escaped_character);
                     }
-                    if (JSONCONS2_UNLIKELY((lo & 0xFC00) != 0xDC00)) {
+                    if (JSONCONS_UNLIKELY((lo & 0xFC00) != 0xDC00)) {
                         return read_json_result(src, read_json_errc::invalid_low_surrogate);
                     }
                     uni = ((((uint32_t)hi - 0xD800) << 10) |
@@ -1438,7 +1438,7 @@ copy_escape:
                 break;
             default: return read_json_result(src, read_json_errc::invalid_escaped_character);
         }
-    } else if (JSONCONS2_LIKELY(*src == '"')) {
+    } else if (JSONCONS_LIKELY(*src == '"')) {
         std::construct_at(val, (const char *)cur, std::size_t(dst - cur));
         *dst = '\0';
         return read_json_result{src+1, read_json_errc{}};
@@ -1453,17 +1453,17 @@ copy_ascii:
      Copy continuous ASCII, loop unrolling, same as the following code:
      
          while (true) repeat16({
-            if (JSONCONS2_UNLIKELY(char_is_ascii_stop(*src))) break;
+            if (JSONCONS_UNLIKELY(char_is_ascii_stop(*src))) break;
             *dst++ = *src++;
          })
      */
 #if YYJSON_IS_REAL_GCC
 #   define expr_jump(i) \
-    if (JSONCONS2_LIKELY(!(char_is_ascii_stop(src[i])))) {} \
+    if (JSONCONS_LIKELY(!(char_is_ascii_stop(src[i])))) {} \
     else { __asm__ volatile("":"=m"(src[i])); goto copy_ascii_stop_##i; }
 #else
 #   define expr_jump(i) \
-    if (JSONCONS2_LIKELY(!(char_is_ascii_stop(src[i])))) {} \
+    if (JSONCONS_LIKELY(!(char_is_ascii_stop(src[i])))) {} \
     else { goto copy_ascii_stop_##i; }
 #endif
     repeat16_incr(expr_jump)
@@ -1617,7 +1617,7 @@ copy_utf8:
             uni = utility::byte_load_4(src);
         }
 #endif
-        if (JSONCONS2_UNLIKELY(pos == src)) {
+        if (JSONCONS_UNLIKELY(pos == src)) {
             if (!inv) return read_json_result(src, read_json_errc::invalid_utf8);
             goto copy_ascii_stop_1;
         }
@@ -1641,7 +1641,7 @@ json_reader::json_reader(std::string_view input, std::error_code& ec)
     inv_ = (flags_ & read_json_flags::allow_invalid_unicode) == read_json_flags::allow_invalid_unicode;
     pre_ = raw_ ? &raw_end_ : nullptr;
     
-    if (JSONCONS2_UNLIKELY(length_ >= max_buffer_size - buffer_padding_size)) 
+    if (JSONCONS_UNLIKELY(length_ >= max_buffer_size - buffer_padding_size)) 
     {
         ec = read_json_errc::memory_allocation;
         return;
@@ -1656,7 +1656,7 @@ json_reader::json_reader(std::string_view input, std::error_code& ec)
     stack_.push_back(stack_item{json_event_kind::none, true});
     
     /* skip empty contents before json document */
-    if (JSONCONS2_UNLIKELY(char_is_space_or_comment(*ptr_))) 
+    if (JSONCONS_UNLIKELY(char_is_space_or_comment(*ptr_))) 
     {
         if ((flags_ & read_json_flags::allow_comments) == read_json_flags::allow_comments) 
         {
@@ -1670,12 +1670,12 @@ json_reader::json_reader(std::string_view input, std::error_code& ec)
         } 
         else 
         {
-            if (JSONCONS2_LIKELY(char_is_space(*ptr_))) 
+            if (JSONCONS_LIKELY(char_is_space(*ptr_))) 
             {
                 while (char_is_space(*++ptr_));
             }
         }
-        if (JSONCONS2_UNLIKELY(ptr_ >= end_)) 
+        if (JSONCONS_UNLIKELY(ptr_ >= end_)) 
         {
             ec = read_json_errc::empty_content;
             return;
@@ -1886,7 +1886,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     {
         auto result = jsoncons::read_string(ptr_, end_, inv_, &val);
         ptr_ = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1899,7 +1899,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     {
         auto result = jsoncons::read_true(ptr_, &val);
         ptr_ = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1912,7 +1912,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     {
         auto result = jsoncons::read_false(ptr_, &val);
         ptr_ = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1925,7 +1925,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     {
         auto result = jsoncons::read_null(ptr_, &val);
         ptr_ = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1937,7 +1937,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     
 doc_end:
     /* check invalid contents after json document */
-    if (JSONCONS2_UNLIKELY(ptr_ < end_) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
+    if (JSONCONS_UNLIKELY(ptr_ < end_) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = jsoncons::skip_spaces_and_comments(ptr_);
             if (!result)
@@ -1949,7 +1949,7 @@ doc_end:
         } else {
             while (char_is_space(*ptr_)) ptr_++;
         }
-        //if (JSONCONS2_UNLIKELY(ptr_ < end_)) goto fail_garbage;
+        //if (JSONCONS_UNLIKELY(ptr_ < end_)) goto fail_garbage;
     }
     
     if (pre_ && *pre_) **pre_ = '\0';
@@ -1986,12 +1986,12 @@ static constexpr std::size_t YYJSON_ALC_DYN_MIN_SIZE = 0x1000;
  *============================================================================*/
 
 /** Returns whether the size is power of 2 (size should not be 0). */
-JSONCONS2_FORCEINLINE static bool size_is_pow2(std::size_t size) {
+JSONCONS_FORCEINLINE static bool size_is_pow2(std::size_t size) {
     return (size & (size - 1)) == 0;
 }
 
 /** Align size upwards (may overflow). */
-JSONCONS2_FORCEINLINE static std::size_t size_align_up(std::size_t size, std::size_t align) {
+JSONCONS_FORCEINLINE static std::size_t size_align_up(std::size_t size, std::size_t align) {
     if (size_is_pow2(align)) {
         return (size + (align - 1)) & ~(align - 1);
     } else {
@@ -2000,7 +2000,7 @@ JSONCONS2_FORCEINLINE static std::size_t size_align_up(std::size_t size, std::si
 }
 
 /** Align size downwards. */
-JSONCONS2_FORCEINLINE static std::size_t size_align_down(std::size_t size, std::size_t align) {
+JSONCONS_FORCEINLINE static std::size_t size_align_down(std::size_t size, std::size_t align) {
     if (size_is_pow2(align)) {
         return size & ~(align - 1);
     } else {
@@ -2009,7 +2009,7 @@ JSONCONS2_FORCEINLINE static std::size_t size_align_down(std::size_t size, std::
 }
 
 /** Align address upwards (may overflow). */
-JSONCONS2_FORCEINLINE static void *mem_align_up(void *mem, std::size_t align) {
+JSONCONS_FORCEINLINE static void *mem_align_up(void *mem, std::size_t align) {
     std::size_t size;
     memcpy(&size, &mem, sizeof(std::size_t));
     size = size_align_up(size, align);
@@ -2056,7 +2056,7 @@ std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
 // json_container
 
 /** Read single value JSON document. */
-JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_single(uint8_t *hdr,
+JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_single(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2095,7 +2095,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     if (*cur == '"') {
         auto result = read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
@@ -2104,7 +2104,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     if (*cur == 't') {
         auto result = jsoncons::read_true(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2114,7 +2114,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     if (*cur == 'f') {
         auto result = jsoncons::read_false(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2124,7 +2124,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     if (*cur == 'n') {
         auto result = jsoncons::read_null(cur, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
@@ -2152,7 +2152,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     
 doc_end:
     /* check invalid contents after json document */
-    if (JSONCONS2_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
+    if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = jsoncons::skip_spaces_and_comments(cur);
             if (!result)
@@ -2163,7 +2163,7 @@ doc_end:
         } else {
             while (char_is_space(*cur)) cur++;
         }
-        if (JSONCONS2_UNLIKELY(cur < end)) goto fail_garbage;
+        if (JSONCONS_UNLIKELY(cur < end)) goto fail_garbage;
     }
     
     //if (pre && *pre) **pre = '\0';
@@ -2181,7 +2181,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for minify). */
-JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_minify(uint8_t *hdr,
+JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_minify(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2197,7 +2197,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     
 #define val_incr() do { \
     val++; \
-    if (JSONCONS2_UNLIKELY(val >= val_end)) { \
+    if (JSONCONS_UNLIKELY(val >= val_end)) { \
         std::size_t alc_old = alc_len; \
         alc_len += alc_len / 2; \
         if ((sizeof(std::size_t) < 8) && (alc_len >= alc_max)) goto fail_alloc; \
@@ -2236,7 +2236,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     alc_len = (std::min)(alc_len, alc_max);
     
     val_hdr = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); 
-    if (JSONCONS2_UNLIKELY(!val_hdr)) goto fail_alloc;
+    if (JSONCONS_UNLIKELY(!val_hdr)) goto fail_alloc;
     val_end = val_hdr + (alc_len - 2); /* padding for key-value pair reading */
     val = val_hdr;
     ctn = val;
@@ -2295,7 +2295,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
@@ -2306,7 +2306,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_true(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2318,7 +2318,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_false(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2330,7 +2330,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_null(cur, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
@@ -2347,7 +2347,7 @@ arr_val_begin:
     }
     if (*cur == ']') {
         cur++;
-        if (JSONCONS2_LIKELY(ctn_len == 0)) goto arr_end;
+        if (JSONCONS_LIKELY(ctn_len == 0)) goto arr_end;
         if ((flags & read_json_flags::allow_trailing_commas) != read_json_flags{}) goto arr_end;
         while (*cur != ',') cur--;
         goto fail_trailing_comma;
@@ -2411,7 +2411,7 @@ arr_end:
     /* save the next sibling value offset */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
     ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array);
-    if (JSONCONS2_UNLIKELY(ctn == ctn_parent)) goto doc_end;
+    if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     
     /* pop parent as current container */
     ctn = ctn_parent;
@@ -2434,20 +2434,20 @@ obj_begin:
     ctn_len = 0;
 
 obj_key_begin:
-    if (JSONCONS2_LIKELY(*cur == '"')) {
+    if (JSONCONS_LIKELY(*cur == '"')) {
         val_incr();
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
         goto obj_key_end;
     }
-    if (JSONCONS2_LIKELY(*cur == '}')) {
+    if (JSONCONS_LIKELY(*cur == '}')) {
         cur++;
-        if (JSONCONS2_LIKELY(ctn_len == 0)) goto obj_end;
+        if (JSONCONS_LIKELY(ctn_len == 0)) goto obj_end;
         if ((flags & read_json_flags::allow_trailing_commas) != read_json_flags{}) goto obj_end;
         while (*cur != ',') cur--;
         goto fail_trailing_comma;
@@ -2493,7 +2493,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
@@ -2523,7 +2523,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_true(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2535,7 +2535,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_false(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2547,7 +2547,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_null(cur, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
@@ -2590,11 +2590,11 @@ obj_val_begin:
     goto fail_character;
     
 obj_val_end:
-    if (JSONCONS2_LIKELY(*cur == ',')) {
+    if (JSONCONS_LIKELY(*cur == ',')) {
         cur++;
         goto obj_key_begin;
     }
-    if (JSONCONS2_LIKELY(*cur == '}')) {
+    if (JSONCONS_LIKELY(*cur == '}')) {
         cur++;
         goto obj_end;
     }
@@ -2620,7 +2620,7 @@ obj_end:
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
     ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object);
 
-    if (JSONCONS2_UNLIKELY(ctn == ctn_parent)) goto doc_end;
+    if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
     if ((ctn->info & type_mask) == uint8_t(json_type::object)) {
@@ -2631,7 +2631,7 @@ obj_end:
     
 doc_end:
     /* check invalid contents after json document */
-    if (JSONCONS2_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
+    if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = skip_spaces_and_comments(cur);
             if (!result)
@@ -2642,7 +2642,7 @@ doc_end:
         } else {
             while (char_is_space(*cur)) cur++;
         }
-        if (JSONCONS2_UNLIKELY(cur < end)) goto fail_garbage;
+        if (JSONCONS_UNLIKELY(cur < end)) goto fail_garbage;
     }
     
     //if (pre && *pre) **pre = '\0';
@@ -2666,7 +2666,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for pretty). */
-JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_pretty(uint8_t *hdr,
+JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_pretty(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2683,7 +2683,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     
 #define val_incr() { \
     val++; \
-    if (JSONCONS2_UNLIKELY(val >= val_end)) { \
+    if (JSONCONS_UNLIKELY(val >= val_end)) { \
         std::size_t alc_old = alc_len; \
         alc_len += alc_len / 2; \
         if ((sizeof(std::size_t) < 8) && (alc_len >= alc_max)) goto fail_alloc; \
@@ -2723,7 +2723,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_ro
     alc_len = (std::min)(alc_len, alc_max);
     
     val_hdr = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); 
-    if (JSONCONS2_UNLIKELY(!val_hdr)) goto fail_alloc;
+    if (JSONCONS_UNLIKELY(!val_hdr)) goto fail_alloc;
     val_end = val_hdr + (alc_len - 2); /* padding for key-value pair reading */
     val = val_hdr;
     ctn = val;
@@ -2768,7 +2768,7 @@ arr_val_begin:
     })
 #else
     while (true) repeat16({
-        if (JSONCONS2_LIKELY(utility::byte_match_2(cur, "  "))) cur += 2;
+        if (JSONCONS_LIKELY(utility::byte_match_2(cur, "  "))) cur += 2;
         else break;
     })
 #endif
@@ -2797,7 +2797,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
@@ -2808,7 +2808,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_true(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2820,7 +2820,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_false(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2832,7 +2832,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_null(cur, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
@@ -2849,7 +2849,7 @@ arr_val_begin:
     }
     if (*cur == ']') {
         cur++;
-        if (JSONCONS2_LIKELY(ctn_len == 0)) goto arr_end;
+        if (JSONCONS_LIKELY(ctn_len == 0)) goto arr_end;
         if ((flags & read_json_flags::allow_trailing_commas) != read_json_flags{}) goto arr_end;
         while (*cur != ',') cur--;
         goto fail_trailing_comma;
@@ -2916,7 +2916,7 @@ arr_end:
     /* save the next sibling value offset */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
     ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array);
-    if (JSONCONS2_UNLIKELY(ctn == ctn_parent)) goto doc_end;
+    if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     
     /* pop parent as current container */
     ctn = ctn_parent;
@@ -2948,24 +2948,24 @@ obj_key_begin:
     })
 #else
     while (true) repeat16({
-        if (JSONCONS2_LIKELY(utility::byte_match_2(cur, "  "))) cur += 2;
+        if (JSONCONS_LIKELY(utility::byte_match_2(cur, "  "))) cur += 2;
         else break;
     })
 #endif
-    if (JSONCONS2_LIKELY(*cur == '"')) {
+    if (JSONCONS_LIKELY(*cur == '"')) {
         val_incr();
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
         goto obj_key_end;
     }
-    if (JSONCONS2_LIKELY(*cur == '}')) {
+    if (JSONCONS_LIKELY(*cur == '}')) {
         cur++;
-        if (JSONCONS2_LIKELY(ctn_len == 0)) goto obj_end;
+        if (JSONCONS_LIKELY(ctn_len == 0)) goto obj_end;
         if ((flags & read_json_flags::allow_trailing_commas) != read_json_flags{}) goto obj_end;
         while (*cur != ',') cur--;
         goto fail_trailing_comma;
@@ -3015,7 +3015,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             return_err(cur, result.ec, "");
         }
@@ -3045,7 +3045,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_true(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -3057,7 +3057,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_false(cur, val);
         cur = result.ptr;       
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -3069,7 +3069,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_null(cur, val);
         cur = result.ptr;
-        if (JSONCONS2_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(!result))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
@@ -3116,11 +3116,11 @@ obj_val_end:
         cur += 2;
         goto obj_key_begin;
     }
-    if (JSONCONS2_LIKELY(*cur == ',')) {
+    if (JSONCONS_LIKELY(*cur == ',')) {
         cur++;
         goto obj_key_begin;
     }
-    if (JSONCONS2_LIKELY(*cur == '}')) {
+    if (JSONCONS_LIKELY(*cur == '}')) {
         cur++;
         goto obj_end;
     }
@@ -3145,7 +3145,7 @@ obj_end:
     /* point to the next value */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
     ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object);
-    if (JSONCONS2_UNLIKELY(ctn == ctn_parent)) goto doc_end;
+    if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
     if (*cur == '\n') cur++;
@@ -3157,7 +3157,7 @@ obj_end:
     
 doc_end:
     /* check invalid contents after json document */
-    if (JSONCONS2_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
+    if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = skip_spaces_and_comments(cur);
             if (!result)
@@ -3168,7 +3168,7 @@ doc_end:
         } else {
             while (char_is_space(*cur)) cur++;
         }
-        if (JSONCONS2_UNLIKELY(cur < end)) goto fail_garbage;
+        if (JSONCONS_UNLIKELY(cur < end)) goto fail_garbage;
     }
     
     //if (pre && *pre) **pre = '\0';
@@ -3204,10 +3204,10 @@ deserialize_result<json_container> json_container::parse(char *dat,
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
     
-    if (JSONCONS2_UNLIKELY(!dat)) {
+    if (JSONCONS_UNLIKELY(!dat)) {
         return_err(0, read_json_errc::invalid_parameter, "input data is nullptr");
     }
-    if (JSONCONS2_UNLIKELY(!len)) {
+    if (JSONCONS_UNLIKELY(!len)) {
         return_err(0, read_json_errc::invalid_parameter, "input length is 0");
     }
     
@@ -3217,7 +3217,7 @@ deserialize_result<json_container> json_container::parse(char *dat,
         end = (uint8_t *)dat + len;
         cur = (uint8_t *)dat;
     } else {
-        if (JSONCONS2_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
+        if (JSONCONS_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
             return_err(0, read_json_errc::memory_allocation, "memory allocation failed");
         }
         hdr_capacity = len + buffer_padding_size;
@@ -3229,7 +3229,7 @@ deserialize_result<json_container> json_container::parse(char *dat,
     }
     
     /* skip empty contents before json document */
-    if (JSONCONS2_UNLIKELY(char_is_space_or_comment(*cur))) {
+    if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = skip_spaces_and_comments(cur);
             if (!result)
@@ -3238,17 +3238,17 @@ deserialize_result<json_container> json_container::parse(char *dat,
             }
             cur = result.ptr;
         } else {
-            if (JSONCONS2_LIKELY(char_is_space(*cur))) {
+            if (JSONCONS_LIKELY(char_is_space(*cur))) {
                 while (char_is_space(*++cur));
             }
         }
-        if (JSONCONS2_UNLIKELY(cur >= end)) {
+        if (JSONCONS_UNLIKELY(cur >= end)) {
             return_err(0, read_json_errc::empty_content, "input data is empty");
         }
     }
     
     /* read json document */
-    if (JSONCONS2_LIKELY(char_is_container(*cur))) {
+    if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
             return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc, element_alloc);
         } else {
@@ -3260,7 +3260,7 @@ deserialize_result<json_container> json_container::parse(char *dat,
     
     #if 0
     /* check result */
-    if (JSONCONS2_UNLIKELY(!doc)) 
+    if (JSONCONS_UNLIKELY(!doc)) 
         /* RFC 8259: JSON text MUST be encoded using UTF-8 */
         if (err->pos == 0 && err->code != read_json_errc::memory_allocation) {
             if ((hdr[0] == 0xEF && hdr[1] == 0xBB && hdr[2] == 0xBF)) {
@@ -3299,10 +3299,10 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
     
-    if (JSONCONS2_UNLIKELY(!dat)) {
+    if (JSONCONS_UNLIKELY(!dat)) {
         return_err(0, read_json_errc::invalid_parameter, "input data is nullptr");
     }
-    if (JSONCONS2_UNLIKELY(!len)) {
+    if (JSONCONS_UNLIKELY(!len)) {
         return_err(0, read_json_errc::invalid_parameter, "input length is 0");
     }
     
@@ -3312,7 +3312,7 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
         end = (uint8_t *)dat + len;
         cur = (uint8_t *)dat;
     } else {
-        if (JSONCONS2_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
+        if (JSONCONS_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
             return_err(0, read_json_errc::memory_allocation, "memory allocation failed");
         }
         hdr = std::allocator_traits<allocator_type>::allocate(alloc, hdr_capacity);
@@ -3323,7 +3323,7 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     }
     
     /* skip empty contents before json document */
-    if (JSONCONS2_UNLIKELY(char_is_space_or_comment(*cur))) {
+    if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = skip_spaces_and_comments(cur);
             if (!result)
@@ -3332,17 +3332,17 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
             }
             cur = result.ptr;
         } else {
-            if (JSONCONS2_LIKELY(char_is_space(*cur))) {
+            if (JSONCONS_LIKELY(char_is_space(*cur))) {
                 while (char_is_space(*++cur));
             }
         }
-        if (JSONCONS2_UNLIKELY(cur >= end)) {
+        if (JSONCONS_UNLIKELY(cur >= end)) {
             return_err(0, read_json_errc::empty_content, "input data is empty");
         }
     }
     
     /* read json document */
-    if (JSONCONS2_LIKELY(char_is_container(*cur))) {
+    if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
             return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc, element_alloc);
         } else {
@@ -3353,7 +3353,7 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     }
 #if 0    
     /* check result */
-    if (JSONCONS2_UNLIKELY(&doc)) {
+    if (JSONCONS_UNLIKELY(&doc)) {
         /* RFC 8259: JSON text MUST be encoded using UTF-8 */
         if (err->pos == 0 && err->code != read_json_errc::memory_allocation) {
             if ((hdr[0] == 0xEF && hdr[1] == 0xBB && hdr[2] == 0xBF)) {
@@ -3386,10 +3386,10 @@ deserialize_result<json_container> json_container::yyjson_read_file(const char *
     
     FILE *file;
     
-    if (JSONCONS2_UNLIKELY(!path)) return_err(read_json_errc::invalid_parameter, "input path is nullptr");
+    if (JSONCONS_UNLIKELY(!path)) return_err(read_json_errc::invalid_parameter, "input path is nullptr");
     
     file = utility::fopen_readonly(path);
-    if (JSONCONS2_UNLIKELY(!file)) return_err(read_json_errc::file_open, "file opening failed");
+    if (JSONCONS_UNLIKELY(!file)) return_err(read_json_errc::file_open, "file opening failed");
     
     auto doc = yyjson_read_fp(file, flags, alloc, element_alloc);
     fclose(file);
@@ -3411,7 +3411,7 @@ deserialize_result<json_container> json_container::yyjson_read_fp(FILE *file,
     std::size_t buf_size = 0;
     
     /* validate input parameters */
-    if (JSONCONS2_UNLIKELY(!file)) return_err(read_json_errc::invalid_parameter, "input file is nullptr");
+    if (JSONCONS_UNLIKELY(!file)) return_err(read_json_errc::invalid_parameter, "input file is nullptr");
     
     /* get current position */
     file_pos = ftell(file);

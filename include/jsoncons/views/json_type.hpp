@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_JSON_TYPE_HPP
-#define JSONCONS2_JSON_TYPE_HPP
+#ifndef JSONCONS_JSON_TYPE_HPP
+#define JSONCONS_JSON_TYPE_HPP
 
 namespace jsoncons {
 
@@ -77,4 +77,4 @@ struct noesc_arg_t
 
 } // namespace jsoncons
 
-#endif // JSONCONS2_JSON_TYPE_HPP
+#endif // JSONCONS_JSON_TYPE_HPP

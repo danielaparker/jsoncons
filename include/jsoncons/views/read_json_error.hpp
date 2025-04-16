@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_READ_JSON_ERROR_HPP
-#define JSONCONS2_READ_JSON_ERROR_HPP
+#ifndef JSONCONS_READ_JSON_ERROR_HPP
+#define JSONCONS_READ_JSON_ERROR_HPP
 
 #include <system_error>
 #include <jsoncons/views/jsoncons_config.hpp>
@@ -140,14 +140,14 @@ namespace jsoncons {
         }
     };
 
-    JSONCONS2_FORCEINLINE
+    JSONCONS_FORCEINLINE
     const std::error_category& json_read_error_category()
     {
       static json_read_error_category_impl instance;
       return instance;
     }
 
-    JSONCONS2_FORCEINLINE 
+    JSONCONS_FORCEINLINE 
     std::error_code make_error_code(read_json_errc result)
     {
         return std::error_code(static_cast<int>(result),json_read_error_category());

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_JSON_DOCUMENT_HPP
-#define JSONCONS2_JSON_DOCUMENT_HPP
+#ifndef JSONCONS_JSON_DOCUMENT_HPP
+#define JSONCONS_JSON_DOCUMENT_HPP
 
 #include <jsoncons/views/json_view.hpp>
 #include <jsoncons/views/read_json.hpp>

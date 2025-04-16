@@ -26,8 +26,8 @@
  @author YaoYuan
  */
 
-#ifndef JSONCONS2_JSON_VIEW_HPP
-#define JSONCONS2_JSON_VIEW_HPP
+#ifndef JSONCONS_JSON_VIEW_HPP
+#define JSONCONS_JSON_VIEW_HPP
 
 #include <jsoncons/views/json_ref.hpp>
 #include <jsoncons/views/write_json.hpp>
@@ -443,7 +443,7 @@ public:
     constexpr json_view at(std::size_t index) const
     {
         const json_ref* val = unsafe_get(index);
-        if (JSONCONS2_LIKELY(val))
+        if (JSONCONS_LIKELY(val))
         {
             return json_view(val);
         }
@@ -453,7 +453,7 @@ public:
     constexpr json_view operator[](std::size_t index) const
     {
         const json_ref* val = unsafe_get(index);
-        if (JSONCONS2_LIKELY(val))
+        if (JSONCONS_LIKELY(val))
         {
             return json_view(val);
         }
@@ -463,7 +463,7 @@ public:
     constexpr json_view at(std::string_view name) const
     {
         const json_ref* val = unsafe_object_get(name);
-        if (JSONCONS2_LIKELY(val))
+        if (JSONCONS_LIKELY(val))
         {
             return json_view(val);
         }
@@ -473,7 +473,7 @@ public:
     constexpr json_view operator[](std::string_view key) const
     {
         const json_ref* val = unsafe_object_get(key);
-        if (JSONCONS2_LIKELY(val))
+        if (JSONCONS_LIKELY(val))
         {
             return json_view(val);
         }
@@ -618,7 +618,7 @@ public:
         switch (type())
         {
             case json_type::array:
-                if (JSONCONS2_LIKELY(size() > 0)) 
+                if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     return json_view(const_array_iter<json_view>::unsafe_get_first(element_));
                 }
@@ -628,7 +628,7 @@ public:
                 }
                 break;
             case json_type::object:
-                if (JSONCONS2_LIKELY(size() > 0)) 
+                if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);
                     return json_view(first + 1);
@@ -649,7 +649,7 @@ public:
         switch (type())
         {
             case json_type::array:
-                if (JSONCONS2_LIKELY(size() > 0)) 
+                if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_array_iter<json_view>::unsafe_get_first(element_);
                     if (is_flat()) 
@@ -671,7 +671,7 @@ public:
                 }
                 break;
             case json_type::object:
-                if (JSONCONS2_LIKELY(size() > 0)) 
+                if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);
                     if (is_flat()) 
@@ -700,7 +700,7 @@ public:
     
     constexpr bool contains(std::string_view key) const noexcept
     {
-        if (JSONCONS2_LIKELY(is_object() && !empty()))
+        if (JSONCONS_LIKELY(is_object() && !empty()))
         {
             auto it = find(key);
             return it != object_range().end() ? true : false; 
@@ -718,13 +718,13 @@ public:
 
     constexpr const_object_iterator find(const_object_iterator iter, std::string_view name) const noexcept
     {
-        if (JSONCONS2_LIKELY(is_object() && !empty()))
+        if (JSONCONS_LIKELY(is_object() && !empty()))
         {
             auto end = object_range().end();
             const char* key = name.data();
             std::size_t key_len = name.size();
             size_t index = iter.index_;
-            if (JSONCONS2_UNLIKELY(index == iter.size_)) 
+            if (JSONCONS_UNLIKELY(index == iter.size_)) 
             {
                 index = 0;
                 iter = object_range().begin();
@@ -784,7 +784,7 @@ private:
     
     constexpr const json_ref* unsafe_get(std::size_t index) const
     {
-        if (JSONCONS2_LIKELY(size() > index)) 
+        if (JSONCONS_LIKELY(size() > index)) 
         {
             const json_ref *val = const_array_iter<json_view>::unsafe_get_first(element_);
             if (is_flat()) 
@@ -835,4 +835,4 @@ private:
 
 } // jsoncons
 
-#endif // JSONCONS2_JSON_VIEW_HPP
+#endif // JSONCONS_JSON_VIEW_HPP

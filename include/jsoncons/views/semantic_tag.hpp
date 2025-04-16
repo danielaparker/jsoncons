@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_SEMANTIC_TAG_HPP
-#define JSONCONS2_SEMANTIC_TAG_HPP
+#ifndef JSONCONS_SEMANTIC_TAG_HPP
+#define JSONCONS_SEMANTIC_TAG_HPP
 
 #include <ostream>
 #include <jsoncons/views/jsoncons_config.hpp>
@@ -36,7 +36,7 @@ inline constexpr bool is_number_tag(semantic_tag tag) noexcept
     return (uint8_t(tag) & mask) == mask;
 }
 
-JSONCONS2_FORCEINLINE
+JSONCONS_FORCEINLINE
 std::ostream& operator<<(std::ostream& os, semantic_tag tag)
 {
     switch (tag)

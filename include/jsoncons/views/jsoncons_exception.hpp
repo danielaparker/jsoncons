@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_JSON_EXCEPTION_HPP
-#define JSONCONS2_JSON_EXCEPTION_HPP
+#ifndef JSONCONS_JSON_EXCEPTION_HPP
+#define JSONCONS_JSON_EXCEPTION_HPP
 
 #include <string> // std::string
 #include <sstream> // std::ostringstream
@@ -38,7 +38,7 @@ namespace jsoncons {
         {
             if (what_.empty())
             {
-                JSONCONS2_TRY
+                JSONCONS_TRY
                 {
                     what_.append(std::out_of_range::what());
                     what_.append(": '");
@@ -46,7 +46,7 @@ namespace jsoncons {
                     what_.append("'");
                     return what_.c_str();
                 }
-                JSONCONS2_CATCH(...)
+                JSONCONS_CATCH(...)
                 {
                     return std::out_of_range::what();
                 }
@@ -75,7 +75,7 @@ namespace jsoncons {
         {
             if (what_.empty())
             {
-                JSONCONS2_TRY
+                JSONCONS_TRY
                 {
                     what_.append(std::runtime_error::what());
                     what_.append(": '");
@@ -83,7 +83,7 @@ namespace jsoncons {
                     what_.append("'");
                     return what_.c_str();
                 }
-                JSONCONS2_CATCH(...)
+                JSONCONS_CATCH(...)
                 {
                     return std::runtime_error::what();
                 }
@@ -125,7 +125,7 @@ namespace jsoncons {
         {
             if (what_.empty())
             {
-                JSONCONS2_TRY
+                JSONCONS_TRY
                 {
                     what_.append(std::system_error::what());
                     if (line_number_ != 0 && column_number_ != 0)
@@ -142,7 +142,7 @@ namespace jsoncons {
                     }
                     return what_.c_str();
                 }
-                JSONCONS2_CATCH(...)
+                JSONCONS_CATCH(...)
                 {
                     return std::system_error::what();
                 }

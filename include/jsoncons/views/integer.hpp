@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_UTILITY_INTEGER_HPP
-#define JSONCONS2_UTILITY_INTEGER_HPP
+#ifndef JSONCONS_UTILITY_INTEGER_HPP
+#define JSONCONS_UTILITY_INTEGER_HPP
 
 #include <system_error>
 #include <stdexcept>
@@ -271,7 +271,7 @@ to_integer_result<T> decimal_to_integer(const char* s, std::size_t length, T& n)
                 break;
             }
             default:
-                JSONCONS2_UNREACHABLE();
+                JSONCONS_UNREACHABLE();
                 break;
         }
     }
@@ -506,7 +506,7 @@ to_integer_result<T> to_integer(const char* s, std::size_t length, T& n)
                 break;
             }
             default:
-                JSONCONS2_UNREACHABLE();
+                JSONCONS_UNREACHABLE();
                 break;
         }
     }
@@ -584,7 +584,7 @@ requires unsigned_extended_integral<T>
 to_integer_result<T> unsafe_to_integer(const char* s, std::size_t length, T& n)
 {
     static_assert(utility::integer_limits<T>::is_specialized, "Integer type not specialized");
-    JSONCONS2_ASSERT(length > 0);
+    JSONCONS_ASSERT(length > 0);
 
     n = 0;
     const char* end = s + length; 
@@ -645,7 +645,7 @@ requires signed_extended_integral<T>
 to_integer_result<T> unsafe_to_integer(const char* s, std::size_t length, T& n)
 {
     static_assert(utility::integer_limits<T>::is_specialized, "Integer type not specialized");
-    JSONCONS2_ASSERT(length > 0);
+    JSONCONS_ASSERT(length > 0);
 
     n = 0;
 
@@ -702,7 +702,7 @@ requires signed_extended_integral<T>
 to_integer_result<T> hex_to_integer(const char* s, std::size_t length, T& n)
 {
     static_assert(utility::integer_limits<T>::is_specialized, "Integer type not specialized");
-    JSONCONS2_ASSERT(length > 0);
+    JSONCONS_ASSERT(length > 0);
 
     n = 0;
 
@@ -786,7 +786,7 @@ requires unsigned_extended_integral<T>
 to_integer_result<T> hex_to_integer(const char* s, std::size_t length, T& n)
 {
     static_assert(utility::integer_limits<T>::is_specialized, "Integer type not specialized");
-    JSONCONS2_ASSERT(length > 0);
+    JSONCONS_ASSERT(length > 0);
 
     n = 0;
     const char* end = s + length; 
@@ -866,7 +866,7 @@ std::size_t integer_to_decimal(Integer value, Result& result)
         }
         while ((value /= 10) && (p < last));
     }
-    JSONCONS2_ASSERT(p != last);
+    JSONCONS_ASSERT(p != last);
 
     std::size_t count = (p - buf);
     if (is_negative)
@@ -913,7 +913,7 @@ std::size_t integer_to_hex(Integer value, Result& result)
         }
         while ((value /= 16) && (p < last));
     }
-    JSONCONS2_ASSERT(p != last);
+    JSONCONS_ASSERT(p != last);
 
     std::size_t count = (p - buf);
     if (is_negative)

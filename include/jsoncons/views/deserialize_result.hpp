@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_DESERIALIZE_RESULT_HPP
-#define JSONCONS2_DESERIALIZE_RESULT_HPP
+#ifndef JSONCONS_DESERIALIZE_RESULT_HPP
+#define JSONCONS_DESERIALIZE_RESULT_HPP
 
 #include <system_error>
 #include <type_traits>
@@ -245,7 +245,7 @@ namespace jsoncons {
             {
                 return get();
             }
-            JSONCONS2_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
         }
 
         std::error_code error() &
@@ -254,7 +254,7 @@ namespace jsoncons {
             {
                 return this->error_;
             }
-            JSONCONS2_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
         }
 
         constexpr const T& value() const &
@@ -263,7 +263,7 @@ namespace jsoncons {
             {
                 return get();
             }
-            JSONCONS2_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
         }
 
         template <typename U>

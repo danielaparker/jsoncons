@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS2_WRITE_JSON_HPP
-#define JSONCONS2_WRITE_JSON_HPP
+#ifndef JSONCONS_WRITE_JSON_HPP
+#define JSONCONS_WRITE_JSON_HPP
 
 //#include <jsoncons/json_reader.hpp>
 #include <jsoncons/views/binary.hpp>
@@ -26,39 +26,39 @@ enum class write_json_flags : uint32_t
     newline_at_end = 1 << 7
 };
 
-JSONCONS2_FORCEINLINE write_json_flags operator~(write_json_flags a)
+JSONCONS_FORCEINLINE write_json_flags operator~(write_json_flags a)
 {
     return static_cast<write_json_flags>(~static_cast<uint32_t>(a));
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator&(write_json_flags a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator&(write_json_flags a, write_json_flags b)
 {
     return static_cast<write_json_flags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator^(write_json_flags a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator^(write_json_flags a, write_json_flags b)
 {
     return static_cast<write_json_flags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator|(write_json_flags a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator|(write_json_flags a, write_json_flags b)
 {
     return static_cast<write_json_flags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator&=(write_json_flags& a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator&=(write_json_flags& a, write_json_flags b)
 {
     a = a & b;
     return a;
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator^=(write_json_flags& a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator^=(write_json_flags& a, write_json_flags b)
 {
     a = a ^ b;
     return a;
 }
 
-JSONCONS2_FORCEINLINE write_json_flags operator|=(write_json_flags& a, write_json_flags b)
+JSONCONS_FORCEINLINE write_json_flags operator|=(write_json_flags& a, write_json_flags b)
 {
     a = a | b;
     return a;
@@ -109,14 +109,14 @@ public:
     }
 };
 
-JSONCONS2_FORCEINLINE
+JSONCONS_FORCEINLINE
 const std::error_category& write_json_error_category()
 {
   static write_json_error_category_impl instance;
   return instance;
 }
 
-JSONCONS2_FORCEINLINE 
+JSONCONS_FORCEINLINE 
 std::error_code make_error_code(write_json_errc result)
 {
     return std::error_code(static_cast<int>(result),write_json_error_category());
