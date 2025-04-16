@@ -153,12 +153,12 @@ namespace jsoncons {
         {
         }
 
-        constexpr json_ref(array_arg_t) noexcept
+        constexpr json_ref(json_array_arg_t) noexcept
             : info(uint8_t(json_type::array_value))
         {
         }
 
-        constexpr json_ref(object_arg_t) noexcept
+        constexpr json_ref(json_object_arg_t) noexcept
             : info(uint8_t(json_type::object_value))
         {
         }

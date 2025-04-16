@@ -14,62 +14,6 @@
 
 namespace jsoncons {
 
-struct null_type
-{
-    explicit null_type() = default; 
-};
-
-constexpr null_type null_arg{};
-
-struct temp_allocator_arg_t
-{
-    explicit temp_allocator_arg_t() = default; 
-};
-
-constexpr temp_allocator_arg_t temp_allocator_arg{};
-
-struct half_arg_t
-{
-    explicit half_arg_t() = default; 
-};
-
-constexpr half_arg_t half_arg{};
-
-struct json_array_arg_t
-{
-    explicit json_array_arg_t() = default; 
-};
-
-constexpr json_array_arg_t json_array_arg{};
-
-struct json_object_arg_t
-{
-    explicit json_object_arg_t() = default; 
-};
-
-constexpr json_object_arg_t json_object_arg{};
-
-struct byte_string_arg_t
-{
-    explicit byte_string_arg_t() = default; 
-};
-
-constexpr byte_string_arg_t byte_string_arg{};
-
-struct json_const_pointer_arg_t
-{
-    explicit json_const_pointer_arg_t() = default; 
-};
-
-constexpr json_const_pointer_arg_t json_const_pointer_arg{};
-
-struct json_pointer_arg_t
-{
-    explicit json_pointer_arg_t() = default; 
-};
-
-constexpr json_pointer_arg_t json_pointer_arg{};
- 
 enum class semantic_tag : uint8_t 
 {
     none = 0,                  // 00000000     

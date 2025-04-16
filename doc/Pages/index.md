@@ -492,7 +492,7 @@ image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 
 Or, use an object initializer-list:
 ```cpp
-json file_settings(json::object_arg, {
+json file_settings(json::json_object_arg, {
     {"Image Format", "JPEG"},
     {"Color Space", "sRGB"},
     {"Limit File Size", true},

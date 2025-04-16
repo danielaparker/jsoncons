@@ -12,10 +12,10 @@ namespace jsoncons {
 enum class json_type : uint8_t
 {
     null_value = 1,      // ____0001
-    bool_value = 2,   // ____0010
+    bool_value = 2,      // ____0010
     uint64_value = 3,    // ____0011
     int64_value = 4,     // ____0100
-    double_value = 5,   // ____0101
+    double_value = 5,    // ____0101
     string_value = 6,    // ____0110
     array_value = 14,    // ____1110
     object_value = 15    // ____1111
@@ -47,19 +47,19 @@ struct half_float_arg_t
 
 inline constexpr half_float_arg_t half_float_arg{};
 
-struct array_arg_t
+struct json_array_arg_t
 {
-    explicit array_arg_t() = default; 
+    explicit json_array_arg_t() = default; 
 };
 
-inline constexpr array_arg_t array_arg{};
+inline constexpr json_array_arg_t json_array_arg{};
 
-struct object_arg_t
+struct json_object_arg_t
 {
-    explicit object_arg_t() = default; 
+    explicit json_object_arg_t() = default; 
 };
 
-inline constexpr object_arg_t object_arg{};
+inline constexpr json_object_arg_t json_object_arg{};
 
 struct raw_json_arg_t
 {
