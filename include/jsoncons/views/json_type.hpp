@@ -2,12 +2,12 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_JSON_TYPE_HPP
 #define JSONCONS2_JSON_TYPE_HPP
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 enum class json_type : uint8_t
 {
@@ -75,6 +75,6 @@ struct noesc_arg_t
 };
 
 
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_JSON_TYPE_HPP

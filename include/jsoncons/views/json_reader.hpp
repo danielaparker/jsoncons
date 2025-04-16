@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_JSON_READER_HPP
 #define JSONCONS2_JSON_READER_HPP
@@ -16,7 +16,7 @@
 #include <cmath>
 #include <vector>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
     inline constexpr std::size_t max_buffer_size = (std::numeric_limits<std::size_t>::max)();
 
@@ -113,7 +113,7 @@ namespace jsoncons2 {
         json_ref read_element(std::error_code& ec);
     };
 
-} // jsoncons2
+} // jsoncons
 
 #endif
 

@@ -20,7 +20,7 @@
                             x(9)  x(10) x(11) x(12) x(13) x(14) x(15) x(16) \
                             x(17) x(18) }
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
 /* endian */
 #if yyjson_has_include(<sys/types.h>)
@@ -298,6 +298,6 @@ static inline uint32_t byte_load_4(const void *src) {
 
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_UTILITY_BINARY_HPP

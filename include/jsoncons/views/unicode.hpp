@@ -3,7 +3,7 @@
 
 #include <jsoncons/views/jsoncons_config.hpp>
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
     /*
      Each unicode code point is encoded as 1 to 4 bytes in UTF-8 encoding,
@@ -88,6 +88,6 @@ JSONCONS2_FORCEINLINE constexpr bool is_valid_seq_4(std::uint32_t uni)
 }
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_JSON_ELEMENT_HPP

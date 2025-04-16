@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_UTILITY_INTEGER_HPP
 #define JSONCONS2_UTILITY_INTEGER_HPP
@@ -22,7 +22,7 @@
 #include <jsoncons/views/more_concepts.hpp>
 #include <cctype>
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
     // to_integer
 
@@ -34,7 +34,7 @@ namespace jsoncons2 { namespace utility {
     public:
         const char* name() const noexcept override
         {
-            return "jsoncons2/unsafe_to_integer";
+            return "jsoncons/unsafe_to_integer";
         }
         std::string message(int ev) const override
         {
@@ -66,16 +66,16 @@ namespace jsoncons2 { namespace utility {
     }
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons2::utility::to_integer_errc> : public true_type
+    struct is_error_code_enum<jsoncons::utility::to_integer_errc> : public true_type
     {
     };
 }
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
 template <typename T>
 struct to_integer_result
@@ -930,6 +930,6 @@ std::size_t integer_to_hex(Integer value, Result& result)
 }
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif

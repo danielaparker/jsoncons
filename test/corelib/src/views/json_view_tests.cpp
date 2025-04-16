@@ -2,11 +2,11 @@
 #include <jsoncons/views/json_container.hpp>
 #include <iostream>
 
-using jsoncons2::json_container;
-using jsoncons2::json_view;
-using jsoncons2::json_type;
-using jsoncons2::semantic_tag;
-using jsoncons2::read_json_flags;
+using jsoncons::json_container;
+using jsoncons::json_view;
+using jsoncons::json_type;
+using jsoncons::semantic_tag;
+using jsoncons::read_json_flags;
 
 TEST_CASE("json_view test")
 {

@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_SEMANTIC_TAG_HPP
 #define JSONCONS2_SEMANTIC_TAG_HPP
@@ -10,7 +10,7 @@
 #include <ostream>
 #include <jsoncons/views/jsoncons_config.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
  
 enum class semantic_tag : uint8_t 
 {
@@ -70,6 +70,6 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
     return os;
 }
 
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif

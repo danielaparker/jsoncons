@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_READ_JSON_ERROR_HPP
 #define JSONCONS2_READ_JSON_ERROR_HPP
@@ -10,7 +10,7 @@
 #include <system_error>
 #include <jsoncons/views/jsoncons_config.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
     enum class read_json_errc
     {
@@ -58,7 +58,7 @@ namespace jsoncons2 {
     public:
         const char* name() const noexcept final
         {
-            return "jsoncons2/read_json";
+            return "jsoncons/read_json";
         }
         std::string message(int ev) const final
         {
@@ -153,11 +153,11 @@ namespace jsoncons2 {
         return std::error_code(static_cast<int>(result),json_read_error_category());
     }
 
-} // jsoncons2
+} // jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons2::read_json_errc> : public true_type
+    struct is_error_code_enum<jsoncons::read_json_errc> : public true_type
     {
     };
 }

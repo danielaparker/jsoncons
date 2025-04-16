@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_UTILITY_FILEIO_HPP
 #define JSONCONS2_UTILITY_FILEIO_HPP
@@ -19,7 +19,7 @@
 #   endif
 #endif
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
 FILE *fopen_safe(const char *path, const char *mode);
 
@@ -30,6 +30,6 @@ FILE *fopen_writeonly(const char *path);
 std::size_t fread_safe(void *buf, std::size_t size, FILE *file);
  
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif

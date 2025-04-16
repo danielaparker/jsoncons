@@ -27,7 +27,7 @@
 #include <jsoncons/views/floating_point.hpp>
 #include <jsoncons/views/fileio.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 /*==============================================================================
  * Warning Suppress
@@ -53,4 +53,4 @@ namespace jsoncons2 {
 #   pragma warning(disable:4706) /* assignment within conditional expression */
 #endif
 
-} // namespace jsoncons2
+} // namespace jsoncons

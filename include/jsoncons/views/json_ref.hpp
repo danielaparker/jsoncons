@@ -47,7 +47,7 @@
 #include <charconv>
 #include <iostream>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 /*==============================================================================
  * Compile Hint Begin
@@ -216,7 +216,7 @@ namespace jsoncons2 {
         constexpr json_ref& operator=(const json_ref& other) noexcept = default;
         
         template <typename T>
-        requires jsoncons2::utility::extended_integral<T>
+        requires jsoncons::utility::extended_integral<T>
         constexpr T cast() const
         {
             switch (type())
@@ -231,7 +231,7 @@ namespace jsoncons2 {
                 {
                     auto sv = get_string_view();
                     T val;
-                    auto result = jsoncons2::utility::to_integer(sv.data(), sv.length(), val);
+                    auto result = jsoncons::utility::to_integer(sv.data(), sv.length(), val);
                     if (!result)
                     {
                         JSONCONS2_THROW(std::system_error(result.error_code()));
@@ -390,7 +390,7 @@ namespace jsoncons2 {
         }
     };
 
-} // jsoncons2
+} // jsoncons
 
 /*==============================================================================
  * Compiler Hint End

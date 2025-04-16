@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_CONFIG_JSONCONS2_CONFIG_HPP
 #define JSONCONS2_CONFIG_JSONCONS2_CONFIG_HPP
@@ -54,7 +54,7 @@
 #define JSONCONS2_QUOTE(Prefix, A) JSONCONS2_EXPAND(Prefix ## #A)
 #define JSONCONS2_WIDEN(A) JSONCONS2_EXPAND(L ## A)
 
-namespace jsoncons2 {
+namespace jsoncons {
 namespace binary {
 
     struct uint128_holder
@@ -341,9 +341,9 @@ namespace binary {
     }
 
 } // binary
-} // jsoncons2
+} // jsoncons
 
-namespace jsoncons2 {
+namespace jsoncons {
 
     class assertion_error : public std::runtime_error
     {
@@ -358,7 +358,7 @@ namespace jsoncons2 {
         }
     };
 
-} // namespace jsoncons2
+} // namespace jsoncons
 
 // allow to disable exceptions
 #if !defined(JSONCONS2_NO_EXCEPTIONS)
@@ -378,11 +378,11 @@ namespace jsoncons2 {
 
 #ifdef _DEBUG
 #define JSONCONS2_ASSERT(x) if (!(x)) { \
-    JSONCONS2_THROW(jsoncons2::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
+    JSONCONS2_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS2_STR(__LINE__))); }
 #else
 #define JSONCONS2_ASSERT(x) if (!(x)) { \
-    JSONCONS2_THROW(jsoncons2::assertion_error("assertion '" #x "' failed at  <> :" \
+    JSONCONS2_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
             JSONCONS2_STR( 0 ))); }
 #endif // _DEBUG
 

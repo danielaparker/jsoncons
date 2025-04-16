@@ -6,7 +6,7 @@
 #include <concepts>
 #include <span>
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
 template <typename T>
 concept boolean = std::is_same_v<T,bool>;    
@@ -48,6 +48,6 @@ template <typename T>
 concept trivially_copyable = std::is_trivially_copyable_v<T>;
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_JSON_ELEMENT_HPP

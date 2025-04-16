@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_MORE_TYPE_TRAITS_HPP
 #define JSONCONS2_MORE_TYPE_TRAITS_HPP
@@ -21,7 +21,7 @@
 #include <jsoncons/views/compiler_support.hpp>
 #include <memory_resource> 
 
-namespace jsoncons2 {
+namespace jsoncons {
 namespace utility {
 
     // is_char8
@@ -824,6 +824,6 @@ namespace impl {
     > : std::true_type{};
 
 } // utility
-} // jsoncons2
+} // jsoncons
 
 #endif

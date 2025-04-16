@@ -2,15 +2,15 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_WRITE_JSON_HPP
 #define JSONCONS2_WRITE_JSON_HPP
 
-//#include <jsoncons2/json_reader.hpp>
+//#include <jsoncons/json_reader.hpp>
 #include <jsoncons/views/binary.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 
 enum class write_json_flags : uint32_t
@@ -83,7 +83,7 @@ class write_json_error_category_impl
 public:
     const char* name() const noexcept final
     {
-        return "jsoncons2/write_json";
+        return "jsoncons/write_json";
     }
     std::string message(int ev) const final
     {
@@ -180,7 +180,7 @@ inline constexpr uint8_t *write_indent(uint8_t *cur, std::size_t level, std::siz
     return cur;
 }
 
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif
 

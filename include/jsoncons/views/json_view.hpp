@@ -32,7 +32,7 @@
 #include <jsoncons/views/json_ref.hpp>
 #include <jsoncons/views/write_json.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 class json_view;
 
@@ -128,20 +128,20 @@ public:
     }
 };
 
-} // jsoncons2
+} // jsoncons
 
 namespace std
 {
     template <typename T>
-    class tuple_size<jsoncons2::key_value_pair<T>>
+    class tuple_size<jsoncons::key_value_pair<T>>
         : public std::integral_constant<std::size_t, 2> {};
 
-    template <typename T> struct tuple_element<0, jsoncons2::key_value_pair<T>> { using type = std::string_view; };
-    template <typename T> struct tuple_element<1, jsoncons2::key_value_pair<T>> { using type = T; };
+    template <typename T> struct tuple_element<0, jsoncons::key_value_pair<T>> { using type = std::string_view; };
+    template <typename T> struct tuple_element<1, jsoncons::key_value_pair<T>> { using type = T; };
 
 }  // namespace std
 
-namespace jsoncons2 {
+namespace jsoncons {
 
 template <class IteratorT, typename ConstIteratorT>
 class range 
@@ -833,6 +833,6 @@ private:
     }
 };
 
-} // jsoncons2
+} // jsoncons
 
 #endif // JSONCONS2_JSON_VIEW_HPP

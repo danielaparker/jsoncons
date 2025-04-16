@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_DESERIALIZE_RESULT_HPP
 #define JSONCONS2_DESERIALIZE_RESULT_HPP
@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <jsoncons/views/jsoncons_config.hpp>
 
-namespace jsoncons2 {
+namespace jsoncons {
     template <typename T>
     class deserialize_result;
 

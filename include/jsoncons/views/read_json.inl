@@ -2,7 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS2_READ_JSON_INL
 #define JSONCONS2_READ_JSON_INL
@@ -18,7 +18,7 @@
 #include <cmath>
 #include <vector>
 
-namespace jsoncons2 {
+namespace jsoncons {
 
     /*==============================================================================
      * Compile-time Options
@@ -460,7 +460,7 @@ JSONCONS2_FORCEINLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, 
     return result? result : read_nan(sign, ptr, flags, val);
 }
 
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_READ_JSON_HPP
 

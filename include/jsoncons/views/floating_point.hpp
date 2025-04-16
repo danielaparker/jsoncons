@@ -29,7 +29,7 @@
 #undef  USIZE_SAFE_DIG
 #define USIZE_SAFE_DIG  (sizeof(std::size_t) == 8 ? U64_SAFE_DIG : U32_SAFE_DIG)
 
-namespace jsoncons2 { namespace utility {
+namespace jsoncons { namespace utility {
 
 /*==============================================================================
  * Flags
@@ -1389,6 +1389,6 @@ inline constexpr double f64_pow10_table[] = {
 #endif // 
 
 } // namespace utility
-} // namespace jsoncons2
+} // namespace jsoncons
 
 #endif // JSONCONS2_FLOATING_POINT_HPP
