@@ -7,7 +7,7 @@
 #ifndef JSONCONS2_READ_JSON_INL
 #define JSONCONS2_READ_JSON_INL
 
-#include <jsoncons/views/json_element.hpp>
+#include <jsoncons/views/json_ref.hpp>
 #include <jsoncons/views/read_json.hpp>
 #include <jsoncons/views/binary.hpp>
 #include <jsoncons/views/floating_point.hpp>
@@ -365,7 +365,7 @@ JSONCONS2_FORCEINLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t 
  */
 
 /** Read 'true' literal, '*cur' should be 't'. */
-JSONCONS2_FORCEINLINE read_json_result read_true(uint8_t* ptr, json_element* val) 
+JSONCONS2_FORCEINLINE read_json_result read_true(uint8_t* ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS2_LIKELY(utility::byte_match_4(cur, "true"))) {
@@ -378,7 +378,7 @@ JSONCONS2_FORCEINLINE read_json_result read_true(uint8_t* ptr, json_element* val
 }
 
 /** Read 'false' literal, '*cur' should be 'f'. */
-JSONCONS2_FORCEINLINE read_json_result read_false(uint8_t *ptr, json_element* val) 
+JSONCONS2_FORCEINLINE read_json_result read_false(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS2_LIKELY(utility::byte_match_4(cur + 1, "alse"))) {
@@ -391,7 +391,7 @@ JSONCONS2_FORCEINLINE read_json_result read_false(uint8_t *ptr, json_element* va
 }
 
 /** Read 'null' literal, '*cur' should be 'n'. */
-JSONCONS2_FORCEINLINE read_json_result read_null(uint8_t *ptr, json_element* val) 
+JSONCONS2_FORCEINLINE read_json_result read_null(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS2_LIKELY(utility::byte_match_4(cur, "null"))) {
@@ -403,7 +403,7 @@ JSONCONS2_FORCEINLINE read_json_result read_null(uint8_t *ptr, json_element* val
 }
 
 /** Read 'Inf' or 'Infinity' literal (ignoring case). */
-JSONCONS2_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_element* val) {
+JSONCONS2_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'I' || cur[0] == 'i') &&
@@ -431,7 +431,7 @@ JSONCONS2_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_js
 }
 
 /** Read 'NaN' literal (ignoring case). */
-JSONCONS2_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_element* val) {
+JSONCONS2_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'N' || cur[0] == 'n') &&
@@ -454,7 +454,7 @@ JSONCONS2_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_js
 }
 
 /** Read 'Inf', 'Infinity' or 'NaN' literal (ignoring case). */
-JSONCONS2_FORCEINLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_element* val) 
+JSONCONS2_FORCEINLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) 
 {
     auto result = read_inf(sign, ptr, flags, val);
     return result? result : read_nan(sign, ptr, flags, val);

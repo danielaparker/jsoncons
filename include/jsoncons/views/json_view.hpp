@@ -21,7 +21,7 @@
  *============================================================================*/
 
 /** 
- @file json_element.hpp
+ @file json_ref.hpp
  @date 2019-03-09
  @author YaoYuan
  */
@@ -29,7 +29,7 @@
 #ifndef JSONCONS2_JSON_VIEW_HPP
 #define JSONCONS2_JSON_VIEW_HPP
 
-#include <jsoncons/views/json_element.hpp>
+#include <jsoncons/views/json_ref.hpp>
 #include <jsoncons/views/write_json.hpp>
 
 namespace jsoncons2 {
@@ -46,7 +46,7 @@ public:
 private:
 
     std::string_view key_;
-    const json_element* value_ptr_;
+    const json_ref* value_ptr_;
 public:
     template <std::size_t N>
     decltype(auto) get() const {
@@ -58,7 +58,7 @@ public:
     {
     }
 
-    constexpr key_value_pair(const json_element* key, const json_element* value) noexcept
+    constexpr key_value_pair(const json_ref* key, const json_ref* value) noexcept
         : key_(key->get_string_view()), value_ptr_(value)
     {
     }
@@ -206,17 +206,17 @@ public:
     using pointer = const value_type*;
     using reference = value_type;
 private:
-    const json_element* obj_; 
+    const json_ref* obj_; 
     std::size_t size_;
     std::size_t index_; 
-    const json_element* current_;
+    const json_ref* current_;
 
 public:
     constexpr const_object_iter() noexcept : obj_(nullptr), size_(0), index_(0), current_(nullptr) 
     { 
     }
 
-    constexpr explicit const_object_iter(const json_element* obj, bool end = false) noexcept
+    constexpr explicit const_object_iter(const json_ref* obj, bool end = false) noexcept
         : obj_(obj), index_(0) 
     {
         size_ = obj_->size();
@@ -282,12 +282,12 @@ public:
         return !(*this == rhs);
     }
 private:
-    static constexpr const json_element* unsafe_get_first(const json_element* obj) 
+    static constexpr const json_ref* unsafe_get_first(const json_ref* obj) 
     {
         return obj + 1;
     }
 
-    static constexpr const json_element* unsafe_get_next(const json_element* val)
+    static constexpr const json_ref* unsafe_get_next(const json_ref* val)
     {
         size_t index = val->is_container() ? val->uni.index : 1;
         return val + index;
@@ -307,10 +307,10 @@ public:
     using reference = JsonView;
 
 private:
-    const json_element* arr_; 
+    const json_ref* arr_; 
     std::size_t size_;
     std::size_t index_; 
-    const json_element* current_;
+    const json_ref* current_;
 
 public:
 
@@ -328,7 +328,7 @@ public:
     { 
     }
 
-    explicit constexpr const_array_iter(const json_element* root, bool end = false) noexcept
+    explicit constexpr const_array_iter(const json_ref* root, bool end = false) noexcept
         : arr_(root), index_(0), current_(nullptr)
     {
         size_ = arr_->size();
@@ -384,12 +384,12 @@ public:
     
 private:
 
-    static constexpr const json_element* unsafe_get_first(const json_element* obj) noexcept
+    static constexpr const json_ref* unsafe_get_first(const json_ref* obj) noexcept
     {
         return obj + 1;
     }
 
-    static constexpr const json_element* unsafe_get_next(const json_element* val) noexcept
+    static constexpr const json_ref* unsafe_get_next(const json_ref* val) noexcept
     {
         size_t index = val->is_container() ? val->uni.index : 1;
         return val + index;
@@ -399,7 +399,7 @@ private:
 class json_view 
 {   
 public:
-    const json_element* element_;
+    const json_ref* element_;
 
     using reference = json_view;
     using const_reference = json_view;
@@ -416,7 +416,7 @@ public:
         : element_(other.element_) 
     {
     }
-    constexpr json_view(const json_element* element) noexcept
+    constexpr json_view(const json_ref* element) noexcept
         : element_(element)
     {
     }
@@ -442,7 +442,7 @@ public:
 
     constexpr json_view at(std::size_t index) const
     {
-        const json_element* val = unsafe_get(index);
+        const json_ref* val = unsafe_get(index);
         if (JSONCONS2_LIKELY(val))
         {
             return json_view(val);
@@ -452,7 +452,7 @@ public:
     
     constexpr json_view operator[](std::size_t index) const
     {
-        const json_element* val = unsafe_get(index);
+        const json_ref* val = unsafe_get(index);
         if (JSONCONS2_LIKELY(val))
         {
             return json_view(val);
@@ -462,7 +462,7 @@ public:
 
     constexpr json_view at(std::string_view name) const
     {
-        const json_element* val = unsafe_object_get(name);
+        const json_ref* val = unsafe_object_get(name);
         if (JSONCONS2_LIKELY(val))
         {
             return json_view(val);
@@ -472,7 +472,7 @@ public:
 
     constexpr json_view operator[](std::string_view key) const
     {
-        const json_element* val = unsafe_object_get(key);
+        const json_ref* val = unsafe_object_get(key);
         if (JSONCONS2_LIKELY(val))
         {
             return json_view(val);
@@ -630,7 +630,7 @@ public:
             case json_type::object:
                 if (JSONCONS2_LIKELY(size() > 0)) 
                 {
-                    const json_element* first = const_object_iter<json_view>::unsafe_get_first(element_);
+                    const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);
                     return json_view(first + 1);
                 }
                 else
@@ -651,7 +651,7 @@ public:
             case json_type::array:
                 if (JSONCONS2_LIKELY(size() > 0)) 
                 {
-                    const json_element* first = const_array_iter<json_view>::unsafe_get_first(element_);
+                    const json_ref* first = const_array_iter<json_view>::unsafe_get_first(element_);
                     if (is_flat()) 
                     {
                         return json_view(first + (size() - 1));
@@ -673,7 +673,7 @@ public:
             case json_type::object:
                 if (JSONCONS2_LIKELY(size() > 0)) 
                 {
-                    const json_element* first = const_object_iter<json_view>::unsafe_get_first(element_);
+                    const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);
                     if (is_flat()) 
                     {
                         return json_view(first + 2*(size() - 1));
@@ -782,11 +782,11 @@ public:
 private:
     bool equal(const json_view& other) const; 
     
-    constexpr const json_element* unsafe_get(std::size_t index) const
+    constexpr const json_ref* unsafe_get(std::size_t index) const
     {
         if (JSONCONS2_LIKELY(size() > index)) 
         {
-            const json_element *val = const_array_iter<json_view>::unsafe_get_first(element_);
+            const json_ref *val = const_array_iter<json_view>::unsafe_get_first(element_);
             if (is_flat()) 
             {
                 return val + index;
@@ -800,12 +800,12 @@ private:
         return nullptr;
     }
 
-    constexpr const json_element* unsafe_object_get(std::string_view name) const
+    constexpr const json_ref* unsafe_object_get(std::string_view name) const
     {
         size_t len = size();
         const char* name_data = name.data();
         std::size_t name_len = name.size();
-        const json_element* key = const_object_iter<json_view>::unsafe_get_first(element_);
+        const json_ref* key = const_object_iter<json_view>::unsafe_get_first(element_);
         while (len-- > 0) {
             if (key->equal_string(name_data, name_len)) 
             {

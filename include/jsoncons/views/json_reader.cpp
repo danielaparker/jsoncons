@@ -22,7 +22,7 @@
 
 
 #include <iostream>
-#include <jsoncons/views/json_document.hpp>
+#include <jsoncons/views/json_container.hpp>
 #include <jsoncons/views/json_reader.hpp>
 #include <jsoncons/views/read_json.inl>
 #include <jsoncons/views/binary.hpp>
@@ -368,7 +368,7 @@ JSONCONS2_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val
 /** Read a JSON number as raw string. */
 JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
     read_json_flags flags,
-    json_element* val) 
+    json_ref* val) 
 {
     
     uint8_t* hdr = cur;
@@ -461,7 +461,7 @@ JSONCONS2_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
  */
 JSONCONS2_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     read_json_flags flags,
-    json_element* val) 
+    json_ref* val) 
 {
    
 #define return_0() do { \
@@ -1075,7 +1075,7 @@ digi_finish:
  */
 read_json_result read_number(uint8_t* ptr,
     read_json_flags flags,
-    json_element* val) 
+    json_ref* val) 
 {
     
 #define return_0() do { \
@@ -1278,7 +1278,7 @@ read_double:
 JSONCONS2_FORCEINLINE read_json_result read_string(uint8_t* ptr,
     uint8_t *lst,
     bool inv,
-    json_element* val) 
+    json_ref* val) 
 {   
     uint8_t *cur = ptr;
     uint8_t *src = ++cur, *dst, *pos;
@@ -1849,7 +1849,7 @@ void json_reader::next(std::error_code& ec)
     ptr_ = result.ptr;
 }
 
-json_element json_reader::read_element(std::error_code& ec) 
+json_ref json_reader::read_element(std::error_code& ec) 
 {
     
 #define return_err(_pos, _code, _msg) do { \
@@ -1858,7 +1858,7 @@ json_element json_reader::read_element(std::error_code& ec)
     } else { \
         ec = _msg; \
     } \
-    return json_element{}; \
+    return json_ref{}; \
 } while (false)
       
     read_json_flags flags = flags_;
@@ -1867,7 +1867,7 @@ json_element json_reader::read_element(std::error_code& ec)
     uint8_t *raw_end; /* raw end_ for null-terminator */
     uint8_t **pre; /* previous raw end_ pointer */
     
-    json_element val;
+    json_ref val;
     
     if (char_is_number(*ptr_)) 
     {
@@ -1880,7 +1880,7 @@ json_element json_reader::read_element(std::error_code& ec)
         }
         event_kind_ = json_event_kind::none;
         ec = result.ec;
-        return json_element{};
+        return json_ref{};
     }
     if (*ptr_ == '"') 
     {
@@ -1890,7 +1890,7 @@ json_element json_reader::read_element(std::error_code& ec)
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
-            return json_element{};
+            return json_ref{};
         }
         event_kind_ = json_event_kind::string;
         goto doc_end;
@@ -1903,7 +1903,7 @@ json_element json_reader::read_element(std::error_code& ec)
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
-            return json_element{};
+            return json_ref{};
         }
         event_kind_ = json_event_kind::boolean;
         goto doc_end;
@@ -1916,7 +1916,7 @@ json_element json_reader::read_element(std::error_code& ec)
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
-            return json_element{};
+            return json_ref{};
         }
         event_kind_ = json_event_kind::boolean;
         goto doc_end;
@@ -1929,7 +1929,7 @@ json_element json_reader::read_element(std::error_code& ec)
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
-            return json_element{};
+            return json_ref{};
         }
         event_kind_ = json_event_kind::null;
         goto doc_end;
@@ -1943,7 +1943,7 @@ doc_end:
             if (!result)
             {
                 ec = result.ec;
-                return json_element{};
+                return json_ref{};
             }
             ptr_ = result.ptr;
         } else {
@@ -2053,10 +2053,10 @@ std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
 
 }
 
-// json_document
+// json_container
 
 /** Read single value JSON document. */
-JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root_single(uint8_t *hdr,
+JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_single(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2067,8 +2067,8 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<element_allocator_type>::deallocate(element_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_document>{read_json_errc::unexpected_end_of_input} : \
-        deserialize_result<json_document>{_code}; \
+    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_container>{read_json_errc::unexpected_end_of_input} : \
+        deserialize_result<json_container>{_code}; \
 } while (false)
       
     std::error_code ec{};
@@ -2080,8 +2080,8 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     bool inv = (flags & read_json_flags::allow_invalid_unicode) != read_json_flags{};
     uint8_t *raw_end = nullptr;
     uint8_t** pre = raw ? &raw_end : nullptr;
-    json_element* val_hdr = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); 
-    json_element* val = val_hdr;
+    json_ref* val_hdr = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); 
+    json_ref* val = val_hdr;
 
     if (char_is_number(*cur)) {
         auto result = read_number(cur, flags, val);
@@ -2167,7 +2167,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_document{ val_hdr, alc_len, (std::size_t)(cur - hdr), 1,
+    return json_container{ val_hdr, alc_len, (std::size_t)(cur - hdr), 1,
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc, element_alloc };
     
 fail_comment:
@@ -2181,7 +2181,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for minify). */
-JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root_minify(uint8_t *hdr,
+JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_minify(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2191,8 +2191,8 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<element_allocator_type>::deallocate(element_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_document>{read_json_errc::unexpected_end_of_input} : \
-        deserialize_result<json_document>{_code}; \
+    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_container>{read_json_errc::unexpected_end_of_input} : \
+        deserialize_result<json_container>{_code}; \
 } while (false)
     
 #define val_incr() do { \
@@ -2202,7 +2202,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
         alc_len += alc_len / 2; \
         if ((sizeof(std::size_t) < 8) && (alc_len >= alc_max)) goto fail_alloc; \
         val_tmp = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); \
-        if (alc_old > 0) memcpy(val_tmp, val_hdr, alc_old*sizeof(json_element)); \
+        if (alc_old > 0) memcpy(val_tmp, val_hdr, alc_old*sizeof(json_ref)); \
         if (val_hdr) std::allocator_traits<element_allocator_type>::deallocate(element_alloc, val_hdr, alc_old); \
         if ((!val_tmp)) goto fail_alloc; \
         val = val_tmp + (std::size_t)(val - val_hdr); \
@@ -2216,12 +2216,12 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     std::size_t alc_len; /* value count allocated */
     std::size_t alc_max; /* maximum value count for allocator */
     std::size_t ctn_len; /* the number of elements in current container */
-    json_element *val_hdr; /* the head of allocated values */
-    json_element *val_end; /* the end of allocated values */
-    json_element *val_tmp; /* temporary pointer for realloc */
-    json_element *val; /* current JSON value */
-    json_element *ctn; /* current container */
-    json_element *ctn_parent; /* parent of current container */
+    json_ref *val_hdr; /* the head of allocated values */
+    json_ref *val_end; /* the end of allocated values */
+    json_ref *val_tmp; /* temporary pointer for realloc */
+    json_ref *val; /* current JSON value */
+    json_ref *ctn; /* current container */
+    json_ref *ctn_parent; /* parent of current container */
     const char *msg; /* error message */
     std::error_code ec{};
     
@@ -2231,7 +2231,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     uint8_t **pre; /* previous raw end pointer */
     
     dat_len = (flags & read_json_flags::stop_when_done) != read_json_flags{} ? 256 : (std::size_t)(end - cur);
-    alc_max = USIZE_MAX / sizeof(json_element);
+    alc_max = USIZE_MAX / sizeof(json_ref);
     alc_len = (dat_len / read_estimated_minify_ratio) + 4;
     alc_len = (std::min)(alc_len, alc_max);
     
@@ -2647,7 +2647,7 @@ doc_end:
     
     //if (pre && *pre) **pre = '\0';
 
-    return json_document{ val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - (val_hdr)) + 1),
+    return json_container{ val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - (val_hdr)) + 1),
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc, element_alloc};
     
 fail_alloc:
@@ -2666,7 +2666,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for pretty). */
-JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root_pretty(uint8_t *hdr,
+JSONCONS2_FORCEINLINE deserialize_result<json_container> json_container::read_root_pretty(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2677,8 +2677,8 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<element_allocator_type>::deallocate(element_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_document>{read_json_errc::unexpected_end_of_input} : \
-        deserialize_result<json_document>{_code}; \
+    return is_truncated_end(hdr, _pos, end, _code, flags) ? deserialize_result<json_container>{read_json_errc::unexpected_end_of_input} : \
+        deserialize_result<json_container>{_code}; \
 } while (false)
     
 #define val_incr() { \
@@ -2688,7 +2688,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
         alc_len += alc_len / 2; \
         if ((sizeof(std::size_t) < 8) && (alc_len >= alc_max)) goto fail_alloc; \
         val_tmp = std::allocator_traits<element_allocator_type>::allocate(element_alloc, alc_len); \
-        if (alc_old > 0) memcpy(val_tmp, val_hdr, alc_old*sizeof(json_element)); \
+        if (alc_old > 0) memcpy(val_tmp, val_hdr, alc_old*sizeof(json_ref)); \
         if (val_hdr) std::allocator_traits<element_allocator_type>::deallocate(element_alloc, val_hdr, alc_old); \
         if ((!val_tmp)) goto fail_alloc; \
         val = val_tmp + (std::size_t)(val - val_hdr); \
@@ -2703,12 +2703,12 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     std::size_t alc_len; /* value count allocated */
     std::size_t alc_max; /* maximum value count for allocator */
     std::size_t ctn_len; /* the number of elements in current container */
-    json_element *val_hdr; /* the head of allocated values */
-    json_element *val_end; /* the end of allocated values */
-    json_element *val_tmp; /* temporary pointer for realloc */
-    json_element *val; /* current JSON value */
-    json_element *ctn; /* current container */
-    json_element *ctn_parent; /* parent of current container */
+    json_ref *val_hdr; /* the head of allocated values */
+    json_ref *val_end; /* the end of allocated values */
+    json_ref *val_tmp; /* temporary pointer for realloc */
+    json_ref *val; /* current JSON value */
+    json_ref *ctn; /* current container */
+    json_ref *ctn_parent; /* parent of current container */
     const char *msg; /* error message */
     std::error_code ec{};
     
@@ -2718,7 +2718,7 @@ JSONCONS2_FORCEINLINE deserialize_result<json_document> json_document::read_root
     uint8_t **pre; /* previous raw end pointer */
     
     dat_len = (flags & read_json_flags::stop_when_done) != read_json_flags{} ? 256 : (std::size_t)(end - cur);
-    alc_max = USIZE_MAX / sizeof(json_element);
+    alc_max = USIZE_MAX / sizeof(json_ref);
     alc_len = (dat_len / read_estimated_pretty_ratio) + 4;
     alc_len = (std::min)(alc_len, alc_max);
     
@@ -3172,7 +3172,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_document{val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - val_hdr)) - 1, 
+    return json_container{val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - val_hdr)) - 1, 
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc, element_alloc};
     
 fail_alloc:
@@ -3190,17 +3190,17 @@ fail_garbage:
 #undef return_err
 }
 
-deserialize_result<json_document> json_document::parse(char *dat,
+deserialize_result<json_container> json_container::parse(char *dat,
     std::size_t len,
     read_json_flags flags,
     allocator_type& alloc, element_allocator_type& element_alloc) {
     
 #define return_err(_pos, _code, _msg) do { \
     if (!(flags & read_json_flags::insitu) != read_json_flags{} && hdr) std::allocator_traits<allocator_type>::deallocate(alloc, hdr, hdr_capacity); \
-    return deserialize_result<json_document>{_code}; \
+    return deserialize_result<json_container>{_code}; \
 } while (false)
     
-    json_document doc;
+    json_container doc;
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
     
@@ -3285,17 +3285,17 @@ deserialize_result<json_document> json_document::parse(char *dat,
 #undef return_err
 }
 
-deserialize_result<json_document> json_document::yyjson_read_opts(char *dat,
+deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     std::size_t len,
     read_json_flags flags,
     allocator_type& alloc, element_allocator_type& element_alloc) {
     
 #define return_err(_pos, _code, _msg) do { \
     if (hdr) std::allocator_traits<allocator_type>::deallocate(alloc, hdr, hdr_capacity); \
-    return deserialize_result<json_document>{_code}; \
+    return deserialize_result<json_container>{_code}; \
 } while (false)
     
-    json_document doc;
+    json_container doc;
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
     
@@ -3377,11 +3377,11 @@ deserialize_result<json_document> json_document::yyjson_read_opts(char *dat,
 #undef return_err
 }
 
-deserialize_result<json_document> json_document::yyjson_read_file(const char *path,
+deserialize_result<json_container> json_container::yyjson_read_file(const char *path,
     read_json_flags flags,
     allocator_type& alloc, element_allocator_type& element_alloc) {
 #define return_err(_code, _msg) do { \
-    return deserialize_result<json_document>{_code}; \
+    return deserialize_result<json_container>{_code}; \
 } while (false)
     
     FILE *file;
@@ -3398,12 +3398,12 @@ deserialize_result<json_document> json_document::yyjson_read_file(const char *pa
 #undef return_err
 }
 
-deserialize_result<json_document> json_document::yyjson_read_fp(FILE *file,
+deserialize_result<json_container> json_container::yyjson_read_fp(FILE *file,
     read_json_flags flags,
     allocator_type& alloc, element_allocator_type& element_alloc) {
 #define return_err(_code, _msg) do { \
     if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size); \
-    return deserialize_result<json_document>{_code}; \
+    return deserialize_result<json_container>{_code}; \
 } while (false)
     
     long file_size = 0, file_pos;
@@ -3504,7 +3504,7 @@ bool json_view::equal(const json_view& other) const
                     ++it1;
                 }
             }
-            // json_element allows duplicate keys, so the check may be inaccurate
+            // json_ref allows duplicate keys, so the check may be inaccurate
             return true;
         }
 

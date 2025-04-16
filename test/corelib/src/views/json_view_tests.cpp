@@ -1,8 +1,8 @@
 #include <catch/catch.hpp>
-#include <jsoncons/views/json_document.hpp>
+#include <jsoncons/views/json_container.hpp>
 #include <iostream>
 
-using jsoncons2::json_document;
+using jsoncons2::json_container;
 using jsoncons2::json_view;
 using jsoncons2::json_type;
 using jsoncons2::semantic_tag;
@@ -41,7 +41,7 @@ TEST_CASE("json_view test")
 }
     )";
     
-    auto doc = json_document::parse(str);
+    auto doc = json_container::parse(str);
 
     json_view root = doc->root();
     
@@ -72,7 +72,7 @@ TEST_CASE("json_view type test")
     )";
     SECTION("default")
     {
-        auto doc = json_document::parse(str);
+        auto doc = json_container::parse(str);
 
         json_view root = doc->root();
 
@@ -107,7 +107,7 @@ TEST_CASE("json_view type test")
     }
     SECTION("raw number")
     {
-        auto doc = json_document::parse(str, read_json_flags::number_as_raw);
+        auto doc = json_container::parse(str, read_json_flags::number_as_raw);
 
         json_view root = doc->root();
 
@@ -152,7 +152,7 @@ TEST_CASE("test json_view inf and nan")
     )";
     SECTION("regular number")
     {
-        auto result = json_document::parse(str, read_json_flags::allow_inf_and_nan);
+        auto result = json_container::parse(str, read_json_flags::allow_inf_and_nan);
 
         json_view root = result->root();
 
@@ -165,7 +165,7 @@ TEST_CASE("test json_view inf and nan")
     }
     SECTION("raw number")
     {
-        auto result = json_document::parse(str, read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
+        auto result = json_container::parse(str, read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
 
         json_view root = result->root();
 
@@ -181,7 +181,7 @@ TEST_CASE("test json_view inf and nan")
     }
     SECTION("single nan")
     {
-        auto result = json_document::parse("nan", read_json_flags::allow_inf_and_nan);
+        auto result = json_container::parse("nan", read_json_flags::allow_inf_and_nan);
 
         json_view root = result->root();
 
@@ -189,7 +189,7 @@ TEST_CASE("test json_view inf and nan")
     }
     SECTION("raw single nan")
     {
-        auto result = json_document::parse("nan", read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
+        auto result = json_container::parse("nan", read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
 
         json_view root = result->root();
 
@@ -199,7 +199,7 @@ TEST_CASE("test json_view inf and nan")
     }
     SECTION("single inf")
     {
-        auto result = json_document::parse("inf", read_json_flags::allow_inf_and_nan);
+        auto result = json_container::parse("inf", read_json_flags::allow_inf_and_nan);
 
         json_view root = result->root();
 
@@ -207,7 +207,7 @@ TEST_CASE("test json_view inf and nan")
     }
     SECTION("raw single inf")
     {
-        auto result = json_document::parse("inf", read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
+        auto result = json_container::parse("inf", read_json_flags::allow_inf_and_nan | read_json_flags::number_as_raw);
 
         json_view root = result->root();
 

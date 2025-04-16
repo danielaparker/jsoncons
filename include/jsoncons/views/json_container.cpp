@@ -20,7 +20,7 @@
  SOFTWARE.
  *============================================================================*/
 
-#include <jsoncons/views/json_document.hpp>
+#include <jsoncons/views/json_container.hpp>
 #include <jsoncons/views/read_json.inl>
 #include <jsoncons/views/unicode.hpp>
 #include <jsoncons/views/binary.hpp>

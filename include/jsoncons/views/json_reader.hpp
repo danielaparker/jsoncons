@@ -7,7 +7,7 @@
 #ifndef JSONCONS2_JSON_READER_HPP
 #define JSONCONS2_JSON_READER_HPP
 
-#include <jsoncons/views/json_element.hpp>
+#include <jsoncons/views/json_ref.hpp>
 #include <jsoncons/views/read_json.hpp>
 #include <string_view>
 #include <iterator>
@@ -62,7 +62,7 @@ namespace jsoncons2 {
         uint8_t** pre_;
         // Allocator used by document (nonnull)
         json_event_kind event_kind_;
-        json_element current_;
+        json_ref current_;
         std::vector<stack_item> stack_;       
 
     public:
@@ -110,7 +110,7 @@ namespace jsoncons2 {
         
         void next(std::error_code& ec);
                 
-        json_element read_element(std::error_code& ec);
+        json_ref read_element(std::error_code& ec);
     };
 
 } // jsoncons2

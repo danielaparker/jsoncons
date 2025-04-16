@@ -7,7 +7,7 @@
 #ifndef JSONCONS2_READ_JSON_HPP
 #define JSONCONS2_READ_JSON_HPP
 
-#include <jsoncons/views/json_element.hpp>
+#include <jsoncons/views/json_ref.hpp>
 #include <string_view>
 #include <iterator>
 #include <stdexcept>

@@ -21,7 +21,7 @@
  *============================================================================*/
 
 /** 
- @file json_element.hpp
+ @file json_ref.hpp
  @date 2019-03-09
  @author YaoYuan
  */
@@ -143,31 +143,31 @@ namespace jsoncons2 {
     inline constexpr noesc_arg_t noesc_arg{};
 
     class json_view;
-    class json_element
+    class json_ref
     {
         friend class json_view;
     public:
         uint64_t info; /**< type and length */
         yyjson_val_uni uni; /**< payload */
     public:
-        constexpr json_element() noexcept
+        constexpr json_ref() noexcept
             : info(uint8_t(json_type::null))
         {
         }
 
-        constexpr json_element(array_arg_t) noexcept
+        constexpr json_ref(array_arg_t) noexcept
             : info(uint8_t(json_type::array))
         {
         }
 
-        constexpr json_element(object_arg_t) noexcept
+        constexpr json_ref(object_arg_t) noexcept
             : info(uint8_t(json_type::object))
         {
         }
 
         template <typename T>
         requires std::signed_integral<T>
-        constexpr json_element(T val) noexcept
+        constexpr json_ref(T val) noexcept
             : info(uint8_t(json_type::int64))
         {
             uni.i64_val = val;
@@ -175,45 +175,45 @@ namespace jsoncons2 {
 
         template <typename T>
         requires std::unsigned_integral<T>
-        constexpr json_element(T val) noexcept
+        constexpr json_ref(T val) noexcept
             : info(uint8_t(json_type::uint64))
         {
             uni.u64_val = val;
         }
 
-        constexpr json_element(double val) noexcept
+        constexpr json_ref(double val) noexcept
             : info(uint8_t(json_type::float64))
         {
             uni.f64_val = val;
         }
 
-        constexpr json_element(bool val)
+        constexpr json_ref(bool val)
             : info(uint8_t(json_type::boolean))
         {
             uni.bool_val = val;
         }
 
-        constexpr json_element(noesc_arg_t, const char* str, std::size_t length)
+        constexpr json_ref(noesc_arg_t, const char* str, std::size_t length)
         {
             info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string) | (uint8_t(semantic_tag::noesc) << type_bit)); 
             uni.str_val = str;
         }
 
-        constexpr json_element(raw_json_arg_t, const char* str, std::size_t length, semantic_tag subtype = semantic_tag::bignum)
+        constexpr json_ref(raw_json_arg_t, const char* str, std::size_t length, semantic_tag subtype = semantic_tag::bignum)
         {
             info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string) | (uint8_t(subtype) << type_bit)); 
             uni.str_val = str;
         }
 
-        constexpr json_element(const char* str, std::size_t length)
+        constexpr json_ref(const char* str, std::size_t length)
         {
             info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string)); 
             uni.str_val = str;
         }
 
-        constexpr json_element(const json_element& other) noexcept = default;
+        constexpr json_ref(const json_ref& other) noexcept = default;
 
-        constexpr json_element& operator=(const json_element& other) noexcept = default;
+        constexpr json_ref& operator=(const json_ref& other) noexcept = default;
         
         template <typename T>
         requires jsoncons2::utility::extended_integral<T>
@@ -373,7 +373,7 @@ namespace jsoncons2 {
             }
         }
 
-        constexpr bool equal_num(const json_element& rhs) const noexcept 
+        constexpr bool equal_num(const json_ref& rhs) const noexcept 
         {
             const yyjson_val_uni* luni = &(uni);
             const yyjson_val_uni* runi = &(rhs.uni);
