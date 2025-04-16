@@ -7,7 +7,7 @@
 #ifndef JSONCONS_UTILITY_FILEIO_HPP
 #define JSONCONS_UTILITY_FILEIO_HPP
 
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <cstdio>
 #include <cstdlib>
 

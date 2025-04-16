@@ -492,62 +492,62 @@ public:
     
     constexpr bool is_null() const noexcept
     {
-        return type() == json_type::null;
+        return type() == json_type::null_value;
     }
 
     constexpr bool is_true() const noexcept
     {
-        return type() == json_type::boolean && element_->get_bool();
+        return type() == json_type::bool_value && element_->get_bool();
     }
 
     constexpr bool is_false() const noexcept
     {
-        return type() == json_type::boolean && !element_->get_bool();
+        return type() == json_type::bool_value && !element_->get_bool();
     }
 
     constexpr bool is_bool() const noexcept
     {
-        return type() == json_type::boolean;
+        return type() == json_type::bool_value;
     }
 
     constexpr bool is_uint64() const noexcept
     {
-        return type() == json_type::uint64;
+        return type() == json_type::uint64_value;
     }
 
     constexpr bool is_int64() const noexcept
     {
-        return type() == json_type::int64;
+        return type() == json_type::int64_value;
     }
 
     constexpr bool is_double() const noexcept
     {
-        return type() == json_type::float64;
+        return type() == json_type::double_value;
     }
 
     constexpr bool is_number() const noexcept
     {
-        return type() == json_type::uint64 || type() == json_type::int64 || type() == json_type::float64;
+        return type() == json_type::uint64_value || type() == json_type::int64_value || type() == json_type::double_value;
     }
 
     constexpr bool is_integer() const noexcept
     {
-        return type() == json_type::uint64 || type() == json_type::int64;
+        return type() == json_type::uint64_value || type() == json_type::int64_value;
     }
     
     constexpr bool is_string() const noexcept
     {
-        return type() == json_type::string;
+        return type() == json_type::string_value;
     }
 
     constexpr bool is_array() const noexcept
     {
-        return type() == json_type::array;
+        return type() == json_type::array_value;
     }
 
     constexpr bool is_object() const noexcept
     {
-        return type() == json_type::object;
+        return type() == json_type::object_value;
     }
     
     constexpr bool is_container() const noexcept
@@ -564,7 +564,7 @@ public:
     {
         switch (type())
         {
-            case json_type::object:
+            case json_type::object_value:
                 return const_object_range_type(const_object_iterator(element_), const_object_iterator(element_, true));
             default:
                 throw std::domain_error("Not an object");
@@ -575,7 +575,7 @@ public:
     {
         switch (type())
         {
-            case json_type::array:
+            case json_type::array_value:
                 return const_array_range_type(const_array_iterator(element_), const_array_iterator(element_, true));
             default:
                 throw std::domain_error("Not an array");
@@ -617,7 +617,7 @@ public:
     {
         switch (type())
         {
-            case json_type::array:
+            case json_type::array_value:
                 if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     return json_view(const_array_iter<json_view>::unsafe_get_first(element_));
@@ -627,7 +627,7 @@ public:
                     throw std::out_of_range("Out of range");
                 }
                 break;
-            case json_type::object:
+            case json_type::object_value:
                 if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);
@@ -648,7 +648,7 @@ public:
     {
         switch (type())
         {
-            case json_type::array:
+            case json_type::array_value:
                 if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_array_iter<json_view>::unsafe_get_first(element_);
@@ -670,7 +670,7 @@ public:
                     throw std::out_of_range("Out of range");
                 }
                 break;
-            case json_type::object:
+            case json_type::object_value:
                 if (JSONCONS_LIKELY(size() > 0)) 
                 {
                     const json_ref* first = const_object_iter<json_view>::unsafe_get_first(element_);

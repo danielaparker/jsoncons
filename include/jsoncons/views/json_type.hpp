@@ -11,15 +11,14 @@ namespace jsoncons {
 
 enum class json_type : uint8_t
 {
-    none = 0,      // ____0000 
-    null = 1,      // ____0001
-    boolean = 2,   // ____0010
-    uint64 = 3,    // ____0011
-    int64 = 4,     // ____0100
-    float64 = 5,   // ____0101
-    string = 6,    // ____0110
-    array = 14,    // ____1110
-    object = 15    // ____1111
+    null_value = 1,      // ____0001
+    bool_value = 2,   // ____0010
+    uint64_value = 3,    // ____0011
+    int64_value = 4,     // ____0100
+    double_value = 5,   // ____0101
+    string_value = 6,    // ____0110
+    array_value = 14,    // ____1110
+    object_value = 15    // ____1111
 };    
 
 struct null_type

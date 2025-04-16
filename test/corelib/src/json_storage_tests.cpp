@@ -1,7 +1,7 @@
 // Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 #include <new>

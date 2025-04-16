@@ -20,7 +20,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>

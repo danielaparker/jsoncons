@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_EXCEPTION_HPP
-#define JSONCONS_JSON_EXCEPTION_HPP
+#ifndef JSONCONS_JSONCONS_EXCEPT_HPP
+#define JSONCONS_JSONCONS_EXCEPT_HPP
 
 #include <cstddef>
 #include <exception>
@@ -53,6 +53,11 @@ namespace jsoncons {
         {
             return Base::what();
         }
+    };
+
+    class bad_cast : public std::runtime_error
+    {
+        using std::runtime_error::runtime_error;
     };
 
     class key_not_found : public std::out_of_range, public virtual json_exception
@@ -220,4 +225,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif // JSONCONS_JSON_EXCEPTION_HPP
+#endif // JSONCONS_JSONCONS_EXCEPT_HPP

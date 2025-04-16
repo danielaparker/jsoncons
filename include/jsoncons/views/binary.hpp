@@ -1,7 +1,7 @@
 #ifndef JSONCONS_UTILITY_BINARY_HPP
 #define JSONCONS_UTILITY_BINARY_HPP
 
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 // Macros used for loop unrolling and other purpose
 #define repeat2(x)  { x x }
@@ -23,14 +23,14 @@
 namespace jsoncons { namespace utility {
 
 /* endian */
-#if yyjson_has_include(<sys/types.h>)
+#if JSONCONS_HAS_INCLUDE(<sys/types.h>)
 #    include <sys/types.h> /* POSIX */
 #endif
-#if yyjson_has_include(<endian.h>)
+#if JSONCONS_HAS_INCLUDE(<endian.h>)
 #    include <endian.h> /* Linux */
-#elif yyjson_has_include(<sys/endian.h>)
+#elif JSONCONS_HAS_INCLUDE(<sys/endian.h>)
 #    include <sys/endian.h> /* BSD, Android */
-#elif yyjson_has_include(<machine/endian.h>)
+#elif JSONCONS_HAS_INCLUDE(<machine/endian.h>)
 #    include <machine/endian.h> /* BSD, Darwin */
 #endif
 

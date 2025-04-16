@@ -10,7 +10,7 @@
 #include <ostream>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>

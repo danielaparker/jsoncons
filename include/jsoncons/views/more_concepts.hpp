@@ -1,7 +1,7 @@
 #ifndef JSONCONS_UTILITY_MORE_CONCEPTS_HPP
 #define JSONCONS_UTILITY_MORE_CONCEPTS_HPP
 
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/views/more_type_traits.hpp>
 #include <concepts>
 #include <span>

@@ -15,7 +15,7 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/encode_traits.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

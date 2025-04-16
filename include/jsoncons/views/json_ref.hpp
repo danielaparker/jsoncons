@@ -29,10 +29,10 @@
 #ifndef JSONCONS_JSON_ELEMENT_HPP
 #define JSONCONS_JSON_ELEMENT_HPP
 
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/views/read_json_error.hpp>
 #include <jsoncons/views/more_concepts.hpp>
-#include <jsoncons/views/integer.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/views/semantic_tag.hpp>
 #include <jsoncons/views/json_type.hpp>
 #include <float.h>
@@ -90,8 +90,6 @@ namespace jsoncons {
 /** The version string of yyjson. */
 #define YYJSON_VERSION_STRING "0.9.0"
 
-/** The version of yyjson in hex, same as `YYJSON_VERSION_HEX`. */
-    yyjson_api uint32_t yyjson_version(void);
 
     /** Subtype of a JSON value (2 bit). */
 
@@ -151,24 +149,24 @@ namespace jsoncons {
         yyjson_val_uni uni; /**< payload */
     public:
         constexpr json_ref() noexcept
-            : info(uint8_t(json_type::null))
+            : info(uint8_t(json_type::null_value))
         {
         }
 
         constexpr json_ref(array_arg_t) noexcept
-            : info(uint8_t(json_type::array))
+            : info(uint8_t(json_type::array_value))
         {
         }
 
         constexpr json_ref(object_arg_t) noexcept
-            : info(uint8_t(json_type::object))
+            : info(uint8_t(json_type::object_value))
         {
         }
 
         template <typename T>
         requires std::signed_integral<T>
         constexpr json_ref(T val) noexcept
-            : info(uint8_t(json_type::int64))
+            : info(uint8_t(json_type::int64_value))
         {
             uni.i64_val = val;
         }
@@ -176,38 +174,38 @@ namespace jsoncons {
         template <typename T>
         requires std::unsigned_integral<T>
         constexpr json_ref(T val) noexcept
-            : info(uint8_t(json_type::uint64))
+            : info(uint8_t(json_type::uint64_value))
         {
             uni.u64_val = val;
         }
 
         constexpr json_ref(double val) noexcept
-            : info(uint8_t(json_type::float64))
+            : info(uint8_t(json_type::double_value))
         {
             uni.f64_val = val;
         }
 
         constexpr json_ref(bool val)
-            : info(uint8_t(json_type::boolean))
+            : info(uint8_t(json_type::bool_value))
         {
             uni.bool_val = val;
         }
 
         constexpr json_ref(noesc_arg_t, const char* str, std::size_t length)
         {
-            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string) | (uint8_t(semantic_tag::noesc) << type_bit)); 
+            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string_value) | (uint8_t(semantic_tag::noesc) << type_bit)); 
             uni.str_val = str;
         }
 
         constexpr json_ref(raw_json_arg_t, const char* str, std::size_t length, semantic_tag subtype = semantic_tag::bignum)
         {
-            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string) | (uint8_t(subtype) << type_bit)); 
+            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string_value) | (uint8_t(subtype) << type_bit)); 
             uni.str_val = str;
         }
 
         constexpr json_ref(const char* str, std::size_t length)
         {
-            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string)); 
+            info = uint64_t(length << tag_bit) | uint64_t(uint8_t(json_type::string_value)); 
             uni.str_val = str;
         }
 
@@ -221,17 +219,17 @@ namespace jsoncons {
         {
             switch (type())
             {
-                case json_type::int64:
+                case json_type::int64_value:
                     return static_cast<T>(uni.i64_val);
-                case json_type::uint64:
+                case json_type::uint64_value:
                     return static_cast<T>(uni.u64_val);
-                case json_type::float64:
+                case json_type::double_value:
                     return static_cast<T>(uni.f64_val);
-                case json_type::string:
+                case json_type::string_value:
                 {
                     auto sv = get_string_view();
                     T val;
-                    auto result = jsoncons::utility::to_integer(sv.data(), sv.length(), val);
+                    auto result = jsoncons::detail::decimal_to_integer(sv.data(), sv.length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(std::system_error(result.error_code()));
@@ -249,13 +247,13 @@ namespace jsoncons {
         {
             switch (type())
             {
-                case json_type::int64:
+                case json_type::int64_value:
                     return static_cast<T>(uni.i64_val);
-                case json_type::uint64:
+                case json_type::uint64_value:
                     return static_cast<T>(uni.u64_val);
-                case json_type::float64:
+                case json_type::double_value:
                     return static_cast<T>(uni.f64_val);
-                case json_type::string:
+                case json_type::string_value:
                 {
                     T val;
                     auto sv = get_string_view();
@@ -287,7 +285,7 @@ namespace jsoncons {
         }
         constexpr bool is_container() const noexcept
         {
-            constexpr uint8_t mask{ uint8_t(json_type::array) & uint8_t(json_type::object) };
+            constexpr uint8_t mask{ uint8_t(json_type::array_value) & uint8_t(json_type::object_value) };
             return ((info & tag_mask) & mask) == mask;
         }
 
@@ -300,7 +298,7 @@ namespace jsoncons {
         {
             switch (type())
             {
-            case json_type::boolean:
+            case json_type::bool_value:
                 return uni.bool_val;
             default:
                 return false;
@@ -311,7 +309,7 @@ namespace jsoncons {
         {
             switch (type())
             {
-                case json_type::string:
+                case json_type::string_value:
                     return std::string_view(uni.str_val, size());
                 default:
                     return std::string_view{};
@@ -322,7 +320,7 @@ namespace jsoncons {
         {
             switch (type())
             {
-                case json_type::string:
+                case json_type::string_value:
                     return uni.str_val;
                 default:
                     return nullptr;
@@ -333,7 +331,7 @@ namespace jsoncons {
         {
             switch (type())
             {
-            case json_type::float64:
+            case json_type::double_value:
                 return uni.f64_val;
             default:
                 return 0;
@@ -344,11 +342,11 @@ namespace jsoncons {
         {
             switch (type())
             {
-            case json_type::float64:
+            case json_type::double_value:
                 return uni.f64_val;
-            case json_type::uint64:
+            case json_type::uint64_value:
                 return static_cast<double>(uni.u64_val);
-            case json_type::int64:
+            case json_type::int64_value:
                 return static_cast<double>(uni.i64_val);
             default:
                 return 0;
@@ -363,7 +361,7 @@ namespace jsoncons {
 
         constexpr bool equal_string(const char* str, std::size_t len) const noexcept
         {
-            if (JSONCONS_LIKELY(type() == json_type::string))
+            if (JSONCONS_LIKELY(type() == json_type::string_value))
             {
                 return size() == len && memcmp(uni.str_val, str, len) == 0;
             }
@@ -380,10 +378,10 @@ namespace jsoncons {
             json_type lt = type();
             json_type rt = rhs.type();
             if (lt == rt) return luni->u64_val == runi->u64_val;
-            if (lt == json_type::int64 && rt == json_type::uint64) {
+            if (lt == json_type::int64_value && rt == json_type::uint64_value) {
                 return luni->i64_val >= 0 && luni->u64_val == runi->u64_val;
             }
-            if (lt == json_type::uint64 && rt == json_type::int64) {
+            if (lt == json_type::uint64_value && rt == json_type::int64_value) {
                 return runi->i64_val >= 0 && luni->u64_val == runi->u64_val;
             }
             return false;

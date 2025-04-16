@@ -160,43 +160,43 @@ inline constexpr uint8_t char_table[256] = {
 };
 
 /** Match a character with specified type. */
-JSONCONS_FORCEINLINE bool char_is_type(uint8_t c, uint8_t type) {
+JSONCONS_FORCE_INLINE bool char_is_type(uint8_t c, uint8_t type) {
     return (char_table[c] & type) != 0;
 }
 
 /** Match a whitespace: ' ', '\\t', '\\n', '\\r'. */
-JSONCONS_FORCEINLINE bool char_is_space(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_space(uint8_t c) {
     return char_is_type(c, (uint8_t)char_type_space);
 }
 
 /** Match a whitespace or comment: ' ', '\\t', '\\n', '\\r', '/'. */
-JSONCONS_FORCEINLINE bool char_is_space_or_comment(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_space_or_comment(uint8_t c) {
     return char_is_type(c, (uint8_t)(char_type_space | char_type_comment));
 }
 
 /** Match a JSON number: '-', [0-9]. */
-JSONCONS_FORCEINLINE bool char_is_number(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_number(uint8_t c) {
     return char_is_type(c, (uint8_t)char_type_number);
 }
 
 /** Match a JSON container: '{', '['. */
-JSONCONS_FORCEINLINE bool char_is_container(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_container(uint8_t c) {
     return char_is_type(c, (uint8_t)char_type_container);
 }
 
 /** Match a stop character in ASCII string: '"', '\', [0x00-0x1F,0x80-0xFF]. */
-JSONCONS_FORCEINLINE bool char_is_ascii_stop(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_ascii_stop(uint8_t c) {
     return char_is_type(c, (uint8_t)(char_type_esc_ascii |
                                        char_type_non_ascii));
 }
 
 /** Match a line end character: '\\n', '\\r', '\0'. */
-JSONCONS_FORCEINLINE bool char_is_line_end(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_line_end(uint8_t c) {
     return char_is_type(c, (uint8_t)char_type_line_end);
 }
 
 /** Match a hexadecimal numeric character: [0-9a-fA-F]. */
-JSONCONS_FORCEINLINE bool char_is_hex(uint8_t c) {
+JSONCONS_FORCE_INLINE bool char_is_hex(uint8_t c) {
     return char_is_type(c, (uint8_t)char_type_hex);
 }
 
@@ -209,7 +209,7 @@ JSONCONS_FORCEINLINE bool char_is_hex(uint8_t c) {
        of this comment block.
  */
 
-JSONCONS_FORCEINLINE read_json_result skip_spaces_and_comments(uint8_t* hdr) 
+JSONCONS_FORCE_INLINE read_json_result skip_spaces_and_comments(uint8_t* hdr) 
 {
     uint8_t *cur = hdr;
     while (true) {
@@ -247,7 +247,7 @@ JSONCONS_FORCEINLINE read_json_result skip_spaces_and_comments(uint8_t* hdr)
  Check truncated string.
  Returns true if `cur` match `str` but is truncated.
  */
-JSONCONS_FORCEINLINE bool is_truncated_str(uint8_t *cur, uint8_t *end,
+JSONCONS_FORCE_INLINE bool is_truncated_str(uint8_t *cur, uint8_t *end,
     const char *str,
     bool case_sensitive) 
 {
@@ -268,7 +268,7 @@ JSONCONS_FORCEINLINE bool is_truncated_str(uint8_t *cur, uint8_t *end,
  Check truncated JSON on parsing errors.
  Returns true if the input is valid but truncated.
  */
-JSONCONS_FORCEINLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t *end,
+JSONCONS_FORCE_INLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t *end,
     read_json_errc code,
     read_json_flags flags) 
 {
@@ -365,12 +365,12 @@ JSONCONS_FORCEINLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t *
  */
 
 /** Read 'true' literal, '*cur' should be 't'. */
-JSONCONS_FORCEINLINE read_json_result read_true(uint8_t* ptr, json_ref* val) 
+JSONCONS_FORCE_INLINE read_json_result read_true(uint8_t* ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "true"))) {
         std::construct_at(val, true);
-        //val.info = uint8_t(json_type::boolean);
+        //val.info = uint8_t(json_type::bool_value);
         //val.uni.bool_val = true; 
         return read_json_result{cur + 4, read_json_errc{}};
     }
@@ -378,12 +378,12 @@ JSONCONS_FORCEINLINE read_json_result read_true(uint8_t* ptr, json_ref* val)
 }
 
 /** Read 'false' literal, '*cur' should be 'f'. */
-JSONCONS_FORCEINLINE read_json_result read_false(uint8_t *ptr, json_ref* val) 
+JSONCONS_FORCE_INLINE read_json_result read_false(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur + 1, "alse"))) {
         std::construct_at(val, false);
-        //val.info = uint8_t(json_type::boolean);
+        //val.info = uint8_t(json_type::bool_value);
         //val.uni.bool_val = false; 
         return read_json_result{cur + 5, read_json_errc{}};
     }
@@ -391,19 +391,19 @@ JSONCONS_FORCEINLINE read_json_result read_false(uint8_t *ptr, json_ref* val)
 }
 
 /** Read 'null' literal, '*cur' should be 'n'. */
-JSONCONS_FORCEINLINE read_json_result read_null(uint8_t *ptr, json_ref* val) 
+JSONCONS_FORCE_INLINE read_json_result read_null(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "null"))) {
         std::construct_at(val);
-        //val.info = uint8_t(json_type::null);
+        //val.info = uint8_t(json_type::null_value);
         return read_json_result{cur + 4, read_json_errc{}};
     }
     return read_json_result{cur, read_json_errc::invalid_literal};
 }
 
 /** Read 'Inf' or 'Infinity' literal (ignoring case). */
-JSONCONS_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val) {
+JSONCONS_FORCE_INLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'I' || cur[0] == 'i') &&
@@ -422,7 +422,7 @@ JSONCONS_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_jso
             std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
         } else {
             std::construct_at(val, utility::f64_raw_get_inf(sign)); 
-            //val.info = uint8_t(json_type::float64);
+            //val.info = uint8_t(json_type::double_value);
             //val.uni.f64_val = utility::f64_raw_get_inf(sign);
         }
         return read_json_result{ cur, read_json_errc{} };
@@ -431,7 +431,7 @@ JSONCONS_FORCEINLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_jso
 }
 
 /** Read 'NaN' literal (ignoring case). */
-JSONCONS_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) {
+JSONCONS_FORCE_INLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'N' || cur[0] == 'n') &&
@@ -445,7 +445,7 @@ JSONCONS_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_jso
         else 
         {
             std::construct_at(val, std::nan("")); 
-            //val.info = uint8_t(json_type::float64);
+            //val.info = uint8_t(json_type::double_value);
             //val.uni.f64_val = std::nan("");
         }
         return read_json_result{ cur, read_json_errc{} };
@@ -454,7 +454,7 @@ JSONCONS_FORCEINLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_jso
 }
 
 /** Read 'Inf', 'Infinity' or 'NaN' literal (ignoring case). */
-JSONCONS_FORCEINLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) 
+JSONCONS_FORCE_INLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) 
 {
     auto result = read_inf(sign, ptr, flags, val);
     return result? result : read_nan(sign, ptr, flags, val);

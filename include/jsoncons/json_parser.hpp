@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>

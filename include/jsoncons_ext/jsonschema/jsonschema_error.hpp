@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <system_error>
 
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 
 namespace jsoncons {
 namespace jsonschema {

@@ -1,7 +1,7 @@
 #ifndef JSONCONS_UTILITY_UNICODE_HPP
 #define JSONCONS_UTILITY_UNICODE_HPP
 
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace utility {
 
@@ -65,23 +65,23 @@ namespace jsoncons { namespace utility {
     inline constexpr uint32_t b4_err0 = (0x00 <<0) | (0x00<<8) | (0x00<<16) | ((uint32_t)0x04<<24);
     inline constexpr uint32_t b4_err1 = (0x00 <<0) | (0x00<<8) | (0x30<<16) | ((uint32_t)0x03<<24);
     
-JSONCONS_FORCEINLINE constexpr bool is_valid_seq_1(std::uint32_t uni) 
+JSONCONS_FORCE_INLINE constexpr bool is_valid_seq_1(std::uint32_t uni) 
 {
     return ((uni & b1_mask) == b1_patt);
 }
 
-JSONCONS_FORCEINLINE constexpr bool is_valid_seq_2(std::uint32_t uni) 
+JSONCONS_FORCE_INLINE constexpr bool is_valid_seq_2(std::uint32_t uni) 
 {
     return ((uni & b2_mask) == b2_patt) && ((uni & b2_requ));
 }
     
-JSONCONS_FORCEINLINE constexpr bool is_valid_seq_3(std::uint32_t uni) 
+JSONCONS_FORCE_INLINE constexpr bool is_valid_seq_3(std::uint32_t uni) 
 {
     uint32_t tmp;
     return ((uni & b3_mask) == b3_patt) && ((tmp = (uni & b3_requ))) && ((tmp != b3_erro));
 }
     
-JSONCONS_FORCEINLINE constexpr bool is_valid_seq_4(std::uint32_t uni) 
+JSONCONS_FORCE_INLINE constexpr bool is_valid_seq_4(std::uint32_t uni) 
 {
     uint32_t tmp;
     return ((uni & b4_mask) == b4_patt) && ((tmp = (uni & b4_requ))) && ((tmp & b4_err0) == 0 || (tmp & b4_err1) == 0);

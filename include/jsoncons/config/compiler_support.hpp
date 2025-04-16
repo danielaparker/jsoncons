@@ -330,6 +330,67 @@
 # endif
 #endif // JSONCONS_FORCE_INLINE
  
+
+/** compiler builtin check (since gcc 10.0, clang 2.6, icc 2021) */
+#ifndef JSONCONS_HAS_BUILTIN
+#   ifdef __has_builtin
+#       define JSONCONS_HAS_BUILTIN(x) __has_builtin(x)
+#   else
+#       define JSONCONS_HAS_BUILTIN(x) 0
+#   endif
+#endif
+
+/** compiler attribute check (since gcc 5.0, clang 2.9, icc 17) */
+#ifndef JSONCONS_HAS_ATTRIBUTE
+#   ifdef __has_attribute
+#       define JSONCONS_HAS_ATTRIBUTE(x) __has_attribute(x)
+#   else
+#       define JSONCONS_HAS_ATTRIBUTE(x) 0
+#   endif
+#endif
+
+/** compiler feature check (since clang 2.6, icc 17) */
+#ifndef JSONCONS_HAS_FEATURE
+#   ifdef __has_feature
+#       define JSONCONS_HAS_FEATURE(x) __has_feature(x)
+#   else
+#       define JSONCONS_HAS_FEATURE(x) 0
+#   endif
+#endif
+
+/** include check (since gcc 5.0, clang 2.7, icc 16, msvc 2017 15.3) */
+#ifndef JSONCONS_HAS_INCLUDE
+#   ifdef __has_include
+#       define JSONCONS_HAS_INCLUDE(x) __has_include(x)
+#   else
+#       define JSONCONS_HAS_INCLUDE(x) 0
+#   endif
+#endif
+
+/** noinline for compiler */
+#ifndef JSONCONS_NOINLINE
+#   if YYJSON_MSC_VER >= 1400
+#       define JSONCONS_NOINLINE __declspec(noinline)
+#   elif JSONCONS_HAS_ATTRIBUTE(noinline) || YYJSON_GCC_VER >= 4
+#       define JSONCONS_NOINLINE __attribute__((noinline))
+#   else
+#       define JSONCONS_NOINLINE
+#   endif
+#endif
+
+/** align for compiler */
+#ifndef JSONCONS_ALIGN
+#   if YYJSON_MSC_VER >= 1300
+#       define JSONCONS_ALIGN(x) __declspec(align(x))
+#   elif JSONCONS_HAS_ATTRIBUTE(aligned) || defined(__GNUC__)
+#       define JSONCONS_ALIGN(x) __attribute__((aligned(x)))
+#   elif YYJSON_CPP_VER >= 201103L
+#       define JSONCONS_ALIGN(x) alignas(x)
+#   else
+#       define JSONCONS_ALIGN(x)
+#   endif
+#endif
+
 // Follows boost config/detail/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
 namespace jsoncons{

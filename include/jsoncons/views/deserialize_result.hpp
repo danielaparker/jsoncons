@@ -9,7 +9,7 @@
 
 #include <system_error>
 #include <type_traits>
-#include <jsoncons/views/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
     template <typename T>

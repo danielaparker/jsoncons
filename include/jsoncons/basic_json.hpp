@@ -32,7 +32,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_options.hpp>

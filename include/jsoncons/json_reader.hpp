@@ -16,7 +16,7 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/jsoncons_except.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>

@@ -20,7 +20,7 @@
  SOFTWARE.
  *============================================================================*/
 
-
+#include <bit>
 #include <iostream>
 #include <jsoncons/views/json_container.hpp>
 #include <jsoncons/views/json_reader.hpp>
@@ -97,7 +97,7 @@ namespace jsoncons {
  *============================================================================*/
 
 /** Returns the number of leading 0-bits in value (input should not be 0). */
-JSONCONS_FORCEINLINE static uint32_t u64_lz_bits(uint64_t v) {
+JSONCONS_FORCE_INLINE static uint32_t u64_lz_bits(uint64_t v) {
 #if GCC_HAS_CLZLL
     return (uint32_t)__builtin_clzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -132,7 +132,7 @@ JSONCONS_FORCEINLINE static uint32_t u64_lz_bits(uint64_t v) {
 }
 
 /** Returns the number of trailing 0-bits in value (input should not be 0). */
-JSONCONS_FORCEINLINE static uint32_t u64_tz_bits(uint64_t v) {
+JSONCONS_FORCE_INLINE static uint32_t u64_tz_bits(uint64_t v) {
 #if GCC_HAS_CTZLL
     return (uint32_t)__builtin_ctzll(v);
 #elif MSC_HAS_BIT_SCAN_64
@@ -169,7 +169,7 @@ JSONCONS_FORCEINLINE static uint32_t u64_tz_bits(uint64_t v) {
 
 /** Multiplies two 64-bit unsigned integers (a * b),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS_FORCEINLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCE_INLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     utility::u128 m = (utility::u128)a * b;
     *hi = (uint64_t)(m >> 64);
@@ -192,7 +192,7 @@ JSONCONS_FORCEINLINE static void u128_mul(uint64_t a, uint64_t b, uint64_t *hi, 
 
 /** Multiplies two 64-bit unsigned integers and add a value (a * b + c),
     returns the 128-bit result as 'hi' and 'lo'. */
-JSONCONS_FORCEINLINE static void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
+JSONCONS_FORCE_INLINE static void u128_mul_add(uint64_t a, uint64_t b, uint64_t c, uint64_t *hi, uint64_t *lo) {
 #if YYJSON_HAS_INT128
     utility::u128 m = (utility::u128)a * b + c;
     *hi = (uint64_t)(m >> 64);
@@ -259,37 +259,37 @@ static constexpr digi_type digi_table[256] = {
 };
 
 /** Match a character with specified type. */
-JSONCONS_FORCEINLINE static bool digi_is_type(uint8_t d, digi_type type) {
+JSONCONS_FORCE_INLINE static bool digi_is_type(uint8_t d, digi_type type) {
     return (digi_table[d] & type) != 0;
 }
 
 /** Match a sign: '+', '-' */
-JSONCONS_FORCEINLINE static bool digi_is_sign(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_sign(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_POS | DIGI_TYPE_NEG));
 }
 
 /** Match a none zero digit: [1-9] */
-JSONCONS_FORCEINLINE static bool digi_is_nonzero(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_nonzero(uint8_t d) {
     return digi_is_type(d, (digi_type)DIGI_TYPE_NONZERO);
 }
 
 /** Match a digit: [0-9] */
-JSONCONS_FORCEINLINE static bool digi_is_digit(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_digit(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_ZERO | DIGI_TYPE_NONZERO));
 }
 
 /** Match an exponent sign: 'e', 'E'. */
-JSONCONS_FORCEINLINE static bool digi_is_exp(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_exp(uint8_t d) {
     return digi_is_type(d, (digi_type)DIGI_TYPE_EXP);
 }
 
 /** Match a floating point indicator: '.', 'e', 'E'. */
-JSONCONS_FORCEINLINE static bool digi_is_fp(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_fp(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_DOT | DIGI_TYPE_EXP));
 }
 
 /** Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. */
-JSONCONS_FORCEINLINE static bool digi_is_digit_or_fp(uint8_t d) {
+JSONCONS_FORCE_INLINE static bool digi_is_digit_or_fp(uint8_t d) {
     return digi_is_type(d, (digi_type)(DIGI_TYPE_ZERO | DIGI_TYPE_NONZERO |
                                        DIGI_TYPE_DOT | DIGI_TYPE_EXP));
 }
@@ -346,7 +346,7 @@ static constexpr uint8_t hex_conv_table[256] = {
  
  This requires the string has 4-byte zero padding.
  */
-JSONCONS_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val) {
+JSONCONS_FORCE_INLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val) {
     uint16_t c0, c1, c2, c3, t0, t1;
     c0 = hex_conv_table[cur[0]];
     c1 = hex_conv_table[cur[1]];
@@ -366,7 +366,7 @@ JSONCONS_FORCEINLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val)
  *============================================================================*/
 
 /** Read a JSON number as raw string. */
-JSONCONS_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
+JSONCONS_FORCE_INLINE static read_json_result read_number_raw(uint8_t* cur,
     read_json_flags flags,
     json_ref* val) 
 {
@@ -457,9 +457,9 @@ JSONCONS_FORCEINLINE static read_json_result read_number_raw(uint8_t* cur,
  2. This function support uint64/int64/double number. If an integer number
     cannot fit in uint64/int64, it will returns as a double number. If a double
     number is infinite, the return value is based on flag.
- 3. This function (with JSONCONS_FORCEINLINE attribute) may generate a lot of instructions.
+ 3. This function (with JSONCONS_FORCE_INLINE attribute) may generate a lot of instructions.
  */
-JSONCONS_FORCEINLINE read_json_result read_number(uint8_t* ptr,
+JSONCONS_FORCE_INLINE read_json_result read_number(uint8_t* ptr,
     read_json_flags flags,
     json_ref* val) 
 {
@@ -489,7 +489,7 @@ JSONCONS_FORCEINLINE read_json_result read_number(uint8_t* ptr,
     
 #define return_f64_bin(_v) do { \
     std::construct_at(val, std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(_v))); \
-    /*val.info = uint8_t(json_type::float64);*/ \
+    /*val.info = uint8_t(json_type::double_value);*/ \
     /*val.uni.u64_val = ((uint64_t)sign << 63) | (uint64_t)(_v);*/ \
     return read_json_result{cur, read_json_errc{}}; \
 } while (false)
@@ -1103,7 +1103,7 @@ read_json_result read_number(uint8_t* ptr,
     
 #define return_f64_bin(_v) do { \
     std::construct_at(val, std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(_v))); \
-    /*val.info = uint8_t(json_type::float64);*/ \
+    /*val.info = uint8_t(json_type::double_value);*/ \
     /*val.uni.u64_val = ((uint64_t)sign << 63) | (uint64_t)(_v);*/ \
     return read_json_result{cur, read_json_errc{}}; \
 } while (false)
@@ -1275,7 +1275,7 @@ read_double:
  @param msg The error message pointer.
  @return Whether success.
  */
-JSONCONS_FORCEINLINE read_json_result read_string(uint8_t* ptr,
+JSONCONS_FORCE_INLINE read_json_result read_string(uint8_t* ptr,
     uint8_t *lst,
     bool inv,
     json_ref* val) 
@@ -1986,12 +1986,12 @@ static constexpr std::size_t YYJSON_ALC_DYN_MIN_SIZE = 0x1000;
  *============================================================================*/
 
 /** Returns whether the size is power of 2 (size should not be 0). */
-JSONCONS_FORCEINLINE static bool size_is_pow2(std::size_t size) {
+JSONCONS_FORCE_INLINE static bool size_is_pow2(std::size_t size) {
     return (size & (size - 1)) == 0;
 }
 
 /** Align size upwards (may overflow). */
-JSONCONS_FORCEINLINE static std::size_t size_align_up(std::size_t size, std::size_t align) {
+JSONCONS_FORCE_INLINE static std::size_t size_align_up(std::size_t size, std::size_t align) {
     if (size_is_pow2(align)) {
         return (size + (align - 1)) & ~(align - 1);
     } else {
@@ -2000,7 +2000,7 @@ JSONCONS_FORCEINLINE static std::size_t size_align_up(std::size_t size, std::siz
 }
 
 /** Align size downwards. */
-JSONCONS_FORCEINLINE static std::size_t size_align_down(std::size_t size, std::size_t align) {
+JSONCONS_FORCE_INLINE static std::size_t size_align_down(std::size_t size, std::size_t align) {
     if (size_is_pow2(align)) {
         return size & ~(align - 1);
     } else {
@@ -2009,7 +2009,7 @@ JSONCONS_FORCEINLINE static std::size_t size_align_down(std::size_t size, std::s
 }
 
 /** Align address upwards (may overflow). */
-JSONCONS_FORCEINLINE static void *mem_align_up(void *mem, std::size_t align) {
+JSONCONS_FORCE_INLINE static void *mem_align_up(void *mem, std::size_t align) {
     std::size_t size;
     memcpy(&size, &mem, sizeof(std::size_t));
     size = size_align_up(size, align);
@@ -2026,13 +2026,13 @@ JSONCONS_FORCEINLINE static void *mem_align_up(void *mem, std::size_t align) {
 namespace utility {
 
 FILE *fopen_safe(const char *path, const char *mode) {
-#if YYJSON_MSC_VER >= 1400
+//#if YYJSON_MSC_VER >= 1400
     FILE *file = nullptr;
     if (fopen_s(&file, path, mode) != 0) return nullptr;
     return file;
-#else
-    return fopen(path, mode);
-#endif
+//#else
+//    return fopen(path, mode);
+//#endif
 }
 
 FILE *fopen_readonly(const char *path) {
@@ -2056,7 +2056,7 @@ std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
 // json_container
 
 /** Read single value JSON document. */
-JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_single(uint8_t *hdr,
+JSONCONS_FORCE_INLINE deserialize_result<json_container> json_container::read_root_single(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2181,7 +2181,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for minify). */
-JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_minify(uint8_t *hdr,
+JSONCONS_FORCE_INLINE deserialize_result<json_container> json_container::read_root_minify(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2247,11 +2247,11 @@ JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_roo
     pre = raw ? &raw_end : nullptr;
     
     if (*cur++ == '{') {
-        ctn->info = uint8_t(json_type::object);
+        ctn->info = uint8_t(json_type::object_value);
         ctn->uni.index = 0;
         goto obj_key_begin;
     } else {
-        ctn->info = uint8_t(json_type::array);
+        ctn->info = uint8_t(json_type::array_value);
         ctn->uni.index = 0;
         goto arr_val_begin;
     }
@@ -2263,7 +2263,7 @@ arr_begin:
     
     /* create a new array value, save parent container offset */
     val_incr();
-    val->info = uint8_t(json_type::array);
+    val->info = uint8_t(json_type::array_value);
     val->uni.index = std::size_t(val - ctn);
     
     /* push the new array value as current container */
@@ -2410,13 +2410,13 @@ arr_end:
     
     /* save the next sibling value offset */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
-    ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array);
+    ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array_value);
     if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     
     /* pop parent as current container */
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
-    if ((ctn->info & type_mask) == uint8_t(json_type::object)) {
+    if ((ctn->info & type_mask) == uint8_t(json_type::object_value)) {
         goto obj_val_end;
     } else {
         goto arr_val_end;
@@ -2427,7 +2427,7 @@ obj_begin:
     ctn->info = (((uint64_t)ctn_len + 1) << tag_bit) |
                (ctn->info & tag_mask);
     val_incr();
-    val->info = uint8_t(json_type::object);
+    val->info = uint8_t(json_type::object_value);
     /* offset to the parent */
     val->uni.index = (std::size_t)(val - ctn);
     ctn = val;
@@ -2618,12 +2618,12 @@ obj_end:
     ctn_parent = ctn - ctn->uni.index;
     /* point to the next value */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
-    ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object);
+    ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object_value);
 
     if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
-    if ((ctn->info & type_mask) == uint8_t(json_type::object)) {
+    if ((ctn->info & type_mask) == uint8_t(json_type::object_value)) {
         goto obj_val_end;
     } else {
         goto arr_val_end;
@@ -2666,7 +2666,7 @@ fail_garbage:
 }
 
 /** Read JSON document (accept all style, but optimized for pretty). */
-JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_root_pretty(uint8_t *hdr,
+JSONCONS_FORCE_INLINE deserialize_result<json_container> json_container::read_root_pretty(uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
     uint8_t *end,
@@ -2734,12 +2734,12 @@ JSONCONS_FORCEINLINE deserialize_result<json_container> json_container::read_roo
     pre = raw ? &raw_end : nullptr;
     
     if (*cur++ == '{') {
-        ctn->info = uint8_t(json_type::object);
+        ctn->info = uint8_t(json_type::object_value);
         ctn->uni.index = 0;
         if (*cur == '\n') cur++;
         goto obj_key_begin;
     } else {
-        ctn->info = uint8_t(json_type::array);
+        ctn->info = uint8_t(json_type::array_value);
         ctn->uni.index = 0;
         if (*cur == '\n') cur++;
         goto arr_val_begin;
@@ -2752,7 +2752,7 @@ arr_begin:
     
     /* create a new array value, save parent container offset */
     val_incr();
-    val->info = uint8_t(json_type::array);
+    val->info = uint8_t(json_type::array_value);
     val->uni.index = (std::size_t)(val - ctn);
     
     /* push the new array value as current container */
@@ -2915,14 +2915,14 @@ arr_end:
     
     /* save the next sibling value offset */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
-    ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array);
+    ctn->info = ((ctn_len) << tag_bit) | uint8_t(json_type::array_value);
     if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     
     /* pop parent as current container */
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
     if (*cur == '\n') cur++;
-    if ((ctn->info & type_mask) == uint8_t(json_type::object)) {
+    if ((ctn->info & type_mask) == uint8_t(json_type::object_value)) {
         goto obj_val_end;
     } else {
         goto arr_val_end;
@@ -2933,7 +2933,7 @@ obj_begin:
     ctn->info = (((uint64_t)ctn_len + 1) << tag_bit) |
                (ctn->info & tag_mask);
     val_incr();
-    val->info = uint8_t(json_type::object);
+    val->info = uint8_t(json_type::object_value);
     /* offset to the parent */
     val->uni.index = (std::size_t)(val - ctn);
     ctn = val;
@@ -3144,12 +3144,12 @@ obj_end:
     ctn_parent = ctn - ctn->uni.index;
     /* point to the next value */
     ctn->uni.index = (std::size_t)(val - ctn) + 1;
-    ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object);
+    ctn->info = (ctn_len << (tag_bit - 1)) | uint8_t(json_type::object_value);
     if (JSONCONS_UNLIKELY(ctn == ctn_parent)) goto doc_end;
     ctn = ctn_parent;
     ctn_len = (std::size_t)(ctn->info >> tag_bit);
     if (*cur == '\n') cur++;
-    if ((ctn->info & type_mask) == uint8_t(json_type::object)) {
+    if ((ctn->info & type_mask) == uint8_t(json_type::object_value)) {
         goto obj_val_end;
     } else {
         goto arr_val_end;
@@ -3484,7 +3484,7 @@ bool json_view::equal(const json_view& other) const
     if (type != other.type()) return false;
 
     switch (type) {
-        case json_type::object: 
+        case json_type::object_value: 
         {
             std::size_t len = size();
             if (len != other.size()) return false;
@@ -3508,7 +3508,7 @@ bool json_view::equal(const json_view& other) const
             return true;
         }
 
-        case json_type::array: 
+        case json_type::array_value: 
          {
             std::size_t len = size();
             if (len != other.size()) return false;
@@ -3530,19 +3530,19 @@ bool json_view::equal(const json_view& other) const
             return true;
         }
 
-        case json_type::float64:
-        case json_type::uint64:
-        case json_type::int64:
+        case json_type::double_value:
+        case json_type::uint64_value:
+        case json_type::int64_value:
             return this->equal_num(other);
 
-        case json_type::string:
+        case json_type::string_value:
         {
             return other.equal_string(this->get_string_view());
         }
 
-        case json_type::null:
+        case json_type::null_value:
             return this->element_->info == other.element_->info;
-        case json_type::boolean:
+        case json_type::bool_value:
             return this->element_->type() == other.element_->type() && this->element_->get_bool() == other.element_->get_bool();
 
         default:

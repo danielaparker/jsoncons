@@ -126,7 +126,7 @@ TEST_CASE("json_view type test")
         REQUIRE(array[6].is_string());
         REQUIRE(array[6].get_string_view() == "test");
         REQUIRE(array[6].get_cstring() == std::string("test"));
-        REQUIRE(array[7].type() == json_type::string);
+        REQUIRE(array[7].type() == json_type::string_value);
         REQUIRE(array[7].get_double() == 123.456);
         REQUIRE(array[8].is_bool());
         REQUIRE(array[8].get_bool() == true);

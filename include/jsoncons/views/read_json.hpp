@@ -35,44 +35,44 @@ enum class read_json_flags : uint32_t
     bignum_as_raw = 1 << 7
 };
 
-JSONCONS_FORCEINLINE read_json_flags operator!(read_json_flags a)
+JSONCONS_FORCE_INLINE read_json_flags operator!(read_json_flags a)
 {
     return static_cast<read_json_flags>(!static_cast<uint32_t>(a));
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator~(read_json_flags a)
+JSONCONS_FORCE_INLINE read_json_flags operator~(read_json_flags a)
 {
     return static_cast<read_json_flags>(~static_cast<uint32_t>(a));
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator&(read_json_flags a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator&(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator^(read_json_flags a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator^(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator|(read_json_flags a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator|(read_json_flags a, read_json_flags b)
 {
     return static_cast<read_json_flags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator&=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator&=(read_json_flags& a, read_json_flags b)
 {
     a = a & b;
     return a;
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator^=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator^=(read_json_flags& a, read_json_flags b)
 {
     a = a ^ b;
     return a;
 }
 
-JSONCONS_FORCEINLINE read_json_flags operator|=(read_json_flags& a, read_json_flags b)
+JSONCONS_FORCE_INLINE read_json_flags operator|=(read_json_flags& a, read_json_flags b)
 {
     a = a | b;
     return a;

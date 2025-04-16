@@ -18,7 +18,7 @@
 #include <cstddef> // std::byte
 #include <utility> // std::declval
 #include <climits> // CHAR_BIT
-#include <jsoncons/views/compiler_support.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <memory_resource> 
 
 namespace jsoncons {
