@@ -34,7 +34,7 @@
 #include <jsoncons/views/more_concepts.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/views/json_type.hpp>
+#include <jsoncons/json_type.hpp>
 #include <float.h>
 #include <iterator>
 #include <limits.h>
