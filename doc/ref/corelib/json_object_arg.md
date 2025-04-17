@@ -1,7 +1,7 @@
 ### jsoncons::json_object_arg
 
 ```cpp
-#include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/json_type.hpp>
 
 constexpr json_object_arg_t json_object_arg{};  (inline if at least C++17)
 ```

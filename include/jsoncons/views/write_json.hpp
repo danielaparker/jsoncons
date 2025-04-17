@@ -110,14 +110,14 @@ public:
 };
 
 JSONCONS_FORCE_INLINE
-const std::error_category& write_json_error_category()
+const std::error_category& write_json_error_category() noexcept
 {
   static write_json_error_category_impl instance;
   return instance;
 }
 
 JSONCONS_FORCE_INLINE 
-std::error_code make_error_code(write_json_errc result)
+std::error_code make_error_code(write_json_errc result) noexcept
 {
     return std::error_code(static_cast<int>(result),write_json_error_category());
 }

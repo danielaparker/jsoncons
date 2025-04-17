@@ -75,14 +75,14 @@ public:
 };
 
 inline
-const std::error_category& cbor_error_category()
+const std::error_category& cbor_error_category() noexcept
 {
   static cbor_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(cbor_errc e)
+std::error_code make_error_code(cbor_errc e) noexcept
 {
     return std::error_code(static_cast<int>(e),cbor_error_category());
 }

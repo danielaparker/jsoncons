@@ -1,7 +1,7 @@
 ### jsoncons::byte_string_arg
 
 ```cpp
-#include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/json_type.hpp>
 
 constexpr byte_string_arg_t byte_string_arg{};  (inline if at least C++17)
 ```

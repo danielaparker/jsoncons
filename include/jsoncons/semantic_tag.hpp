@@ -40,7 +40,7 @@ enum class semantic_tag : uint8_t
     code = 21
 };
 
-inline constexpr bool is_number_tag(semantic_tag tag) noexcept
+inline bool is_number_tag(semantic_tag tag) noexcept
 {
     constexpr uint8_t mask1{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
         & uint8_t(semantic_tag::bigfloat) & uint8_t(semantic_tag::float128) };

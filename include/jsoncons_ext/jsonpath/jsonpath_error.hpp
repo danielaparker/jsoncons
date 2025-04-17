@@ -156,14 +156,14 @@ namespace jsoncons { namespace jsonpath {
     };
 
     inline
-    const std::error_category& jsonpath_error_category()
+    const std::error_category& jsonpath_error_category() noexcept
     {
       static jsonpath_error_category_impl instance;
       return instance;
     }
 
     inline 
-    std::error_code make_error_code(jsonpath_errc result)
+    std::error_code make_error_code(jsonpath_errc result) noexcept
     {
         return std::error_code(static_cast<int>(result),jsonpath_error_category());
     }

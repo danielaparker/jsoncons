@@ -270,14 +270,14 @@ namespace jsoncons { namespace unicode_traits {
     };
 
     inline
-    const std::error_category& unicode_traits_error_category()
+    const std::error_category& unicode_traits_error_category() noexcept
     {
       static Unicode_traits_error_category_impl_ instance;
       return instance;
     }
 
     inline 
-    std::error_code make_error_code(conv_errc result)
+    std::error_code make_error_code(conv_errc result) noexcept
     {
         return std::error_code(static_cast<int>(result),unicode_traits_error_category());
     }

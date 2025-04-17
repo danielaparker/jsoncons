@@ -205,14 +205,14 @@ namespace detail {
 } // namespace detail
 
 extern inline
-const std::error_category& conv_error_category()
+const std::error_category& conv_error_category() noexcept
 {
   static detail::conv_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(conv_errc result)
+std::error_code make_error_code(conv_errc result) noexcept
 {
     return std::error_code(static_cast<int>(result),conv_error_category());
 }

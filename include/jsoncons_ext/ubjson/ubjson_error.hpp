@@ -78,14 +78,14 @@ public:
 };
 
 inline
-const std::error_category& ubjson_error_category()
+const std::error_category& ubjson_error_category() noexcept
 {
   static ubjson_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(ubjson_errc e)
+std::error_code make_error_code(ubjson_errc e) noexcept
 {
     return std::error_code(static_cast<int>(e),ubjson_error_category());
 }

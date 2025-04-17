@@ -51,14 +51,14 @@ namespace jsoncons { namespace detail {
     };
 
     inline
-    const std::error_category& to_integer_error_category()
+    const std::error_category& to_integer_error_category() noexcept
     {
       static to_integer_error_category_impl instance;
       return instance;
     }
 
     inline 
-    std::error_code make_error_code(to_integer_errc e)
+    std::error_code make_error_code(to_integer_errc e) noexcept
     {
         return std::error_code(static_cast<int>(e),to_integer_error_category());
     }

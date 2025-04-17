@@ -98,14 +98,14 @@ public:
 };
 
 inline
-const std::error_category& jsonpointer_error_category()
+const std::error_category& jsonpointer_error_category() noexcept
 {
   static jsonpointer_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(jsonpointer_errc result)
+std::error_code make_error_code(jsonpointer_errc result) noexcept
 {
     return std::error_code(static_cast<int>(result),jsonpointer_error_category());
 }
