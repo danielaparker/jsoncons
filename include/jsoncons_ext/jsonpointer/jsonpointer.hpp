@@ -18,7 +18,6 @@
 
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>

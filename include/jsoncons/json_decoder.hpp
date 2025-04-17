@@ -15,9 +15,10 @@
 #include <vector>
 
 #include <jsoncons/json_object.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/ser_context.hpp>
 #include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/ser_context.hpp>
 
 namespace jsoncons {
 

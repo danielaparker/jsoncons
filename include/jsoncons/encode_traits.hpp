@@ -20,6 +20,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>

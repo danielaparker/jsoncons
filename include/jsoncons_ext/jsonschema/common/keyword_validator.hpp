@@ -20,10 +20,11 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/uri.hpp>
 

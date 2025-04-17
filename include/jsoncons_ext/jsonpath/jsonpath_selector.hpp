@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 
 #include <jsoncons_ext/jsonpath/token_evaluator.hpp>

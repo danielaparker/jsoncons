@@ -7,7 +7,7 @@
 #ifndef JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
 #define JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
 
-#include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/json_type.hpp>
 
 namespace jsoncons { 
 namespace mergepatch {

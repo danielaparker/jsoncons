@@ -17,10 +17,11 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 

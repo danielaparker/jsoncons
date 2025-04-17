@@ -25,7 +25,6 @@
 #include <vector>
 
 #include <jsoncons/allocator_set.hpp>
-#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_array.hpp>
@@ -40,10 +39,11 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/heap_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>

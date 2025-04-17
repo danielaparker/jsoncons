@@ -15,10 +15,11 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/allocator_set.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/token_evaluator.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>

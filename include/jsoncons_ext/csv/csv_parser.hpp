@@ -23,10 +23,11 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/staj_event.hpp>
-#include <jsoncons/semantic_tag.hpp>
 
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
