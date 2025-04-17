@@ -492,9 +492,6 @@ namespace ext_traits {
                                              is_detected<container_npos_t,T>::value
     >::type> : std::true_type {};
 
-    template <typename T>
-    constexpr bool is_string_or_string_view_v = is_string_or_string_view<T>::value;    
-
     // is_string
 
     template <typename T,typename Enable=void>
@@ -506,9 +503,6 @@ namespace ext_traits {
                                              has_allocator_type<T>::value
     >::type> : std::true_type {};
 
-    template <typename T>
-    constexpr bool is_string_v = is_string<T>::value;
-
     // is_string_view
 
     template <typename T,typename Enable=void>
@@ -519,9 +513,6 @@ namespace ext_traits {
                           typename std::enable_if<is_string_or_string_view<T>::value &&
                                                   !is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
-
-    template <typename T>
-    constexpr bool is_string_view_v = is_string_view<T>::value;
 
     // is_map_like
 
