@@ -229,7 +229,7 @@ namespace jsoncons {
                 {
                     auto sv = get_string_view();
                     T val;
-                    auto result = jsoncons::detail::decimal_to_integer(sv.data(), sv.length(), val);
+                    auto result = jsoncons::detail::dec_to_integer(sv.data(), sv.length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(std::system_error(result.error_code()));

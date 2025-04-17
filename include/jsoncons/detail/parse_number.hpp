@@ -208,7 +208,7 @@ bool is_base16(const CharT* s, std::size_t length)
 
 template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-decimal_to_integer(const CharT* s, std::size_t length, T& n)
+dec_to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
 
@@ -278,7 +278,7 @@ decimal_to_integer(const CharT* s, std::size_t length, T& n)
 
 template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-decimal_to_integer(const CharT* s, std::size_t length, T& n)
+dec_to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
 
@@ -297,7 +297,7 @@ decimal_to_integer(const CharT* s, std::size_t length, T& n)
     using U = typename extension_traits::make_unsigned<T>::type;
 
     U u;
-    auto ru = decimal_to_integer(s, length, u);
+    auto ru = dec_to_integer(s, length, u);
     if (ru.ec != to_integer_errc())
     {
         return to_integer_result<T,CharT>(ru.ptr, ru.ec);
