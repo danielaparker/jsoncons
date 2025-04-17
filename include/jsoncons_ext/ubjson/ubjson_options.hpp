@@ -9,7 +9,8 @@
 
 #include <cwchar>
 
-namespace jsoncons { namespace ubjson {
+namespace jsoncons { 
+namespace ubjson {
 
 class ubjson_options;
 

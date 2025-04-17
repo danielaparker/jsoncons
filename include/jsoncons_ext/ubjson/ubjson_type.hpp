@@ -11,7 +11,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace ubjson { 
+namespace jsoncons { 
+namespace ubjson { 
 
     namespace ubjson_type
     {

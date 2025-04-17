@@ -30,7 +30,8 @@
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>
 #include <jsoncons_ext/ubjson/ubjson_type.hpp>
 
-namespace jsoncons { namespace ubjson {
+namespace jsoncons { 
+namespace ubjson {
 
 enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 

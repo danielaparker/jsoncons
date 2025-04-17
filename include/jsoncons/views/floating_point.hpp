@@ -29,7 +29,8 @@
 #undef  USIZE_SAFE_DIG
 #define USIZE_SAFE_DIG  (sizeof(std::size_t) == 8 ? U64_SAFE_DIG : U32_SAFE_DIG)
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
+namespace utility {
 
 /*==============================================================================
  * Flags

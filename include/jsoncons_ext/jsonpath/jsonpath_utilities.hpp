@@ -9,7 +9,8 @@
 
 #include <cstddef>
 
-namespace jsoncons { namespace jsonpath {
+namespace jsoncons { 
+namespace jsonpath {
 
     template <typename CharT,typename Sink>
     std::size_t escape_string(const CharT* s, std::size_t length, Sink& sink)

@@ -9,7 +9,8 @@
 
 #include <cstdint>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
     namespace msgpack_type
     {

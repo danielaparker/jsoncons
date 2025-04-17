@@ -19,7 +19,8 @@
 #   endif
 #endif
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
+namespace utility {
 
 FILE *fopen_safe(const char *path, const char *mode);
 

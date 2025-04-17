@@ -11,7 +11,8 @@
 #include <system_error>
 #include <type_traits>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
 enum class msgpack_errc
 {

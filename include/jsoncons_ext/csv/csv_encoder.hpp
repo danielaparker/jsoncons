@@ -25,7 +25,8 @@
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jsoncons { namespace csv {
+namespace jsoncons { 
+namespace csv {
 
 template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
 class basic_csv_encoder final : public basic_json_visitor<CharT>

@@ -20,7 +20,8 @@
                             x(9)  x(10) x(11) x(12) x(13) x(14) x(15) x(16) \
                             x(17) x(18) }
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
+namespace utility {
 
 /* endian */
 #if JSONCONS_HAS_INCLUDE(<sys/types.h>)

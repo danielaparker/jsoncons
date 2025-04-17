@@ -11,7 +11,8 @@
 #include <system_error>
 #include <type_traits>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
 enum class bson_errc
 {

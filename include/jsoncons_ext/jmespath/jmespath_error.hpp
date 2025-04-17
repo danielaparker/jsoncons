@@ -15,7 +15,8 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons { namespace jmespath {
+namespace jsoncons { 
+namespace jmespath {
 
     class jmespath_error : public std::system_error, public virtual json_exception
     {

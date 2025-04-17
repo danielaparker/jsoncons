@@ -29,7 +29,8 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { 
+namespace cbor {
 
 enum class parse_mode {root,accept,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 

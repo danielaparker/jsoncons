@@ -20,7 +20,8 @@
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
-namespace jsoncons { namespace jsonpath {
+namespace jsoncons { 
+namespace jsonpath {
 
     template <typename Json>
     void flatten_(const typename Json::string_type& parent_key,

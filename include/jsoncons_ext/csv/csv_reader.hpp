@@ -26,7 +26,8 @@
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 
-namespace jsoncons { namespace csv {
+namespace jsoncons { 
+namespace csv {
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
     class basic_csv_reader 

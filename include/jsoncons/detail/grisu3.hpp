@@ -41,7 +41,8 @@ minor modifications.
 #include <cstring> // std::memmove
 #include <stdlib.h>
 
-namespace jsoncons { namespace detail {
+namespace jsoncons { 
+namespace detail {
 
 // diy_fp
 

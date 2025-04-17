@@ -9,7 +9,8 @@
 
 #include <cstdint>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
     namespace bson_type
     {

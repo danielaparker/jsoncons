@@ -13,7 +13,8 @@
 
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons { namespace jsonpointer {
+namespace jsoncons { 
+namespace jsonpointer {
 
 class jsonpointer_error : public std::system_error, public virtual json_exception
 {

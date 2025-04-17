@@ -22,7 +22,8 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
-namespace jsoncons { namespace detail {
+namespace jsoncons { 
+namespace detail {
 
     enum class to_integer_errc : uint8_t {success=0, overflow, invalid_digit, invalid_number};
 
@@ -73,7 +74,8 @@ namespace std {
     };
 } // namespace std
 
-namespace jsoncons { namespace detail {
+namespace jsoncons { 
+namespace detail {
 
 template <typename T,typename CharT>
 struct to_integer_result

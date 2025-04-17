@@ -9,7 +9,8 @@
 
 #include <cwchar>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
 class bson_options;
 

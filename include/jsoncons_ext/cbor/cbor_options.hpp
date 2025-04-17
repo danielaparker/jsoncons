@@ -11,7 +11,8 @@
 
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { 
+namespace cbor {
 
 class cbor_options;
 

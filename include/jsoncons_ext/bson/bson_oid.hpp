@@ -35,7 +35,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
     class oid_t
     {

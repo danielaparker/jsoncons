@@ -17,7 +17,8 @@
 
 #include <jsoncons/json_options.hpp>
 
-namespace jsoncons { namespace csv {
+namespace jsoncons { 
+namespace csv {
 
 enum class csv_column_type : uint8_t 
 {

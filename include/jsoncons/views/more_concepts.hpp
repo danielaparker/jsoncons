@@ -6,7 +6,8 @@
 #include <concepts>
 #include <span>
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
+namespace utility {
 
 template <typename T>
 concept boolean = std::is_same_v<T,bool>;    

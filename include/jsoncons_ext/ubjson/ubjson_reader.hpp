@@ -20,7 +20,8 @@
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>
 #include <jsoncons_ext/ubjson/ubjson_type.hpp>
 
-namespace jsoncons { namespace ubjson {
+namespace jsoncons { 
+namespace ubjson {
 
 template <typename Source,typename Allocator=std::allocator<char>>
 class basic_ubjson_reader

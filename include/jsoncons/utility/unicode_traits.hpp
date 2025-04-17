@@ -28,7 +28,8 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
-namespace jsoncons { namespace unicode_traits {
+namespace jsoncons { 
+namespace unicode_traits {
 
     enum class encoding_kind {undetected,utf8,utf16le,utf16be,utf32le,utf32be};
 
@@ -292,7 +293,8 @@ namespace std {
     };
 } // namespace std
 
-namespace jsoncons { namespace unicode_traits {
+namespace jsoncons { 
+namespace unicode_traits {
 
     // utf8
 

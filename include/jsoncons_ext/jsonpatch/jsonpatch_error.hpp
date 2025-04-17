@@ -13,7 +13,8 @@
 
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons { namespace jsonpatch {
+namespace jsoncons { 
+namespace jsonpatch {
 
     enum class jsonpatch_errc 
     {
@@ -83,7 +84,8 @@ namespace std {
     };
 } // namespace std
 
-namespace jsoncons { namespace jsonpatch {
+namespace jsoncons { 
+namespace jsonpatch {
 
 // allow to disable exceptions
 #if !defined(JSONCONS_NO_EXCEPTIONS)

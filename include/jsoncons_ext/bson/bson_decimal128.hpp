@@ -43,7 +43,8 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
     struct decimal128_to_chars_result 
     {

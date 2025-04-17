@@ -20,7 +20,8 @@
 
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
 template <typename Source,typename Allocator=std::allocator<char>>
 class basic_msgpack_reader

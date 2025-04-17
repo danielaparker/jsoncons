@@ -30,7 +30,8 @@
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons_ext/msgpack/msgpack_type.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
 enum class parse_mode {root,accept,array,map_key,map_value};
 

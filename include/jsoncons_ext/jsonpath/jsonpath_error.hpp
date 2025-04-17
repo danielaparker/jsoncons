@@ -15,7 +15,8 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons { namespace jsonpath {
+namespace jsoncons { 
+namespace jsonpath {
 
     enum class jsonpath_errc 
     {
@@ -178,7 +179,8 @@ namespace std {
     };
 } // namespace std
 
-namespace jsoncons { namespace jsonpath {
+namespace jsoncons { 
+namespace jsonpath {
 
     class jsonpath_error : public std::system_error, public virtual json_exception
     {

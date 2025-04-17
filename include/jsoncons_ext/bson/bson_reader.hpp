@@ -18,7 +18,8 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
 template <typename Source,typename TempAllocator =std::allocator<char>>
 class basic_bson_reader 

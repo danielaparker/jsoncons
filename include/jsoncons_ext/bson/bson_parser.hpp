@@ -30,7 +30,8 @@
 #include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_type.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
 enum class parse_mode {root,accept,document,array,value};
 

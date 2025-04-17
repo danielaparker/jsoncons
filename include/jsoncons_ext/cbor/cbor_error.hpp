@@ -13,7 +13,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { 
+namespace cbor {
 
 enum class cbor_errc
 {

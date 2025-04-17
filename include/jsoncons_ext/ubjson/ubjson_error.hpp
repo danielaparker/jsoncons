@@ -13,7 +13,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace ubjson {
+namespace jsoncons { 
+namespace ubjson {
 
 enum class ubjson_errc
 {

@@ -19,7 +19,8 @@
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jsoncons { namespace jsonpatch {
+namespace jsoncons { 
+namespace jsonpatch {
 
 namespace detail {
 

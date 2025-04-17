@@ -20,7 +20,9 @@
 #define JSONCONS_EXT_CBOR_ARRAY_TAGS \
     0x40:case 0x41:case 0x42:case 0x43:case 0x44:case 0x45:case 0x46:case 0x47:case 0x48:case 0x49:case 0x4a:case 0x4b:case 0x4c:case 0x4d:case 0x4e:case 0x4f:case 0x50:case 0x51:case 0x52:case 0x53:case 0x54:case 0x55:case 0x56:case 0x57    
 
-namespace jsoncons { namespace cbor { namespace detail {
+namespace jsoncons { 
+namespace cbor { 
+namespace detail {
 
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_010_mask = 0xE0;
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_f_mask = 0x10;

@@ -11,7 +11,8 @@
 #include <system_error>
 #include <type_traits>
 
-namespace jsoncons { namespace csv {
+namespace jsoncons { 
+namespace csv {
 
     enum class csv_errc : int
     {

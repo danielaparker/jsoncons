@@ -33,7 +33,8 @@
 #include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_type.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { 
+namespace bson {
 
 template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_bson_encoder final : public basic_json_visitor<char>

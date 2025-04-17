@@ -31,7 +31,8 @@
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 
-namespace jsoncons { namespace csv {
+namespace jsoncons { 
+namespace csv {
 
 enum class csv_mode 
 {

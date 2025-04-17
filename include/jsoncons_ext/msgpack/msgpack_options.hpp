@@ -9,7 +9,8 @@
 
 #include <cwchar>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
 class msgpack_options;
 

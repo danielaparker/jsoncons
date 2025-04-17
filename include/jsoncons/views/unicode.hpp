@@ -3,7 +3,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
+namespace utility {
 
     /*
      Each unicode code point is encoded as 1 to 4 bytes in UTF-8 encoding,

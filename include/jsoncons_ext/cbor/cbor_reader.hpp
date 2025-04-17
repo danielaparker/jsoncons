@@ -21,7 +21,8 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { 
+namespace cbor {
 
 template <typename Source,typename Allocator=std::allocator<char>>
 class basic_cbor_reader 
