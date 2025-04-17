@@ -156,9 +156,11 @@
 #if defined(JSONCONS_HAS_2017)
     #define JSONCONS_NODISCARD [[nodiscard]]
     #define JSONCONS_IF_CONSTEXPR if constexpr
+    #define JSONCONS_INLINE_CONSTEXPR inline constexpr
 #else
     #define JSONCONS_NODISCARD
     #define JSONCONS_IF_CONSTEXPR if 
+    #define JSONCONS_INLINE_CONSTEXPR constexpr
 #endif
 
 #if !defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)

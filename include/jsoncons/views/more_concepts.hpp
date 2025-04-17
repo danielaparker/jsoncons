@@ -50,4 +50,4 @@ concept trivially_copyable = std::is_trivially_copyable_v<T>;
 } // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS_JSON_ELEMENT_HPP
+#endif // JSONCONS_UTILITY_MORE_CONCEPTS_HPP

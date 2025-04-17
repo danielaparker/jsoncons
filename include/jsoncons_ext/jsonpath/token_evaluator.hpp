@@ -54,109 +54,109 @@ namespace jsonpath {
     {
         explicit reference_arg_t() = default;
     };
-    constexpr reference_arg_t reference_arg{};
+    JSONCONS_INLINE_CONSTEXPR reference_arg_t reference_arg{};
 
     struct const_reference_arg_t
     {
         explicit const_reference_arg_t() = default;
     };
-    constexpr const_reference_arg_t const_reference_arg{};
+    JSONCONS_INLINE_CONSTEXPR const_reference_arg_t const_reference_arg{};
 
     struct literal_arg_t
     {
         explicit literal_arg_t() = default;
     };
-    constexpr literal_arg_t literal_arg{};
+    JSONCONS_INLINE_CONSTEXPR literal_arg_t literal_arg{};
 
     struct end_of_expression_arg_t
     {
         explicit end_of_expression_arg_t() = default;
     };
-    constexpr end_of_expression_arg_t end_of_expression_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_of_expression_arg_t end_of_expression_arg{};
 
     struct separator_arg_t
     {
         explicit separator_arg_t() = default;
     };
-    constexpr separator_arg_t separator_arg{};
+    JSONCONS_INLINE_CONSTEXPR separator_arg_t separator_arg{};
 
     struct lparen_arg_t
     {
         explicit lparen_arg_t() = default;
     };
-    constexpr lparen_arg_t lparen_arg{};
+    JSONCONS_INLINE_CONSTEXPR lparen_arg_t lparen_arg{};
 
     struct rparen_arg_t
     {
         explicit rparen_arg_t() = default;
     };
-    constexpr rparen_arg_t rparen_arg{};
+    JSONCONS_INLINE_CONSTEXPR rparen_arg_t rparen_arg{};
 
     struct begin_union_arg_t
     {
         explicit begin_union_arg_t() = default;
     };
-    constexpr begin_union_arg_t begin_union_arg{};
+    JSONCONS_INLINE_CONSTEXPR begin_union_arg_t begin_union_arg{};
 
     struct end_union_arg_t
     {
         explicit end_union_arg_t() = default;
     };
-    constexpr end_union_arg_t end_union_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_union_arg_t end_union_arg{};
 
     struct begin_filter_arg_t
     {
         explicit begin_filter_arg_t() = default;
     };
-    constexpr begin_filter_arg_t begin_filter_arg{};
+    JSONCONS_INLINE_CONSTEXPR begin_filter_arg_t begin_filter_arg{};
 
     struct end_filter_arg_t
     {
         explicit end_filter_arg_t() = default;
     };
-    constexpr end_filter_arg_t end_filter_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_filter_arg_t end_filter_arg{};
 
     struct begin_expression_arg_t
     {
         explicit begin_expression_arg_t() = default;
     };
-    constexpr begin_expression_arg_t begin_expression_arg{};
+    JSONCONS_INLINE_CONSTEXPR begin_expression_arg_t begin_expression_arg{};
 
     struct end_index_expression_arg_t
     {
         explicit end_index_expression_arg_t() = default;
     };
-    constexpr end_index_expression_arg_t end_index_expression_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_index_expression_arg_t end_index_expression_arg{};
 
     struct end_argument_expression_arg_t
     {
         explicit end_argument_expression_arg_t() = default;
     };
-    constexpr end_argument_expression_arg_t end_argument_expression_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_argument_expression_arg_t end_argument_expression_arg{};
 
     struct current_node_arg_t
     {
         explicit current_node_arg_t() = default;
     };
-    constexpr current_node_arg_t current_node_arg{};
+    JSONCONS_INLINE_CONSTEXPR current_node_arg_t current_node_arg{};
 
     struct root_node_arg_t
     {
         explicit root_node_arg_t() = default;
     };
-    constexpr root_node_arg_t root_node_arg{};
+    JSONCONS_INLINE_CONSTEXPR root_node_arg_t root_node_arg{};
 
     struct end_function_arg_t
     {
         explicit end_function_arg_t() = default;
     };
-    constexpr end_function_arg_t end_function_arg{};
+    JSONCONS_INLINE_CONSTEXPR end_function_arg_t end_function_arg{};
 
     struct argument_arg_t
     {
         explicit argument_arg_t() = default;
     };
-    constexpr argument_arg_t argument_arg{};
+    JSONCONS_INLINE_CONSTEXPR argument_arg_t argument_arg{};
 
     enum class result_options {value=0, nodups=1, sort=2, sort_descending=4, path=8};
 
