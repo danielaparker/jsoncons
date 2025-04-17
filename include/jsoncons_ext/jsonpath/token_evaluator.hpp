@@ -160,42 +160,39 @@ namespace jsonpath {
 
     enum class result_options {value=0, nodups=1, sort=2, sort_descending=4, path=8};
 
-    inline result_options operator~(result_options a)
+    inline constexpr result_options operator~(result_options a)
     {
         return static_cast<result_options>(~static_cast<unsigned int>(a));
     }
 
-    inline result_options operator&(result_options a, result_options b)
+    inline constexpr result_options operator&(result_options a, result_options b)
     {
         return static_cast<result_options>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
     }
 
-    inline result_options operator^(result_options a, result_options b)
+    inline constexpr result_options operator^(result_options a, result_options b)
     {
         return static_cast<result_options>(static_cast<unsigned int>(a) ^ static_cast<unsigned int>(b));
     }
 
-    inline result_options operator|(result_options a, result_options b)
+    inline constexpr result_options operator|(result_options a, result_options b)
     {
         return static_cast<result_options>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
     }
 
-    inline result_options operator&=(result_options& a, result_options b)
+    inline constexpr result_options operator&=(result_options& a, result_options b)
     {
-        a = a & b;
-        return a;
+        return (a = a & b);
     }
 
-    inline result_options operator^=(result_options& a, result_options b)
+    inline constexpr result_options operator^=(result_options& a, result_options b)
     {
-        a = a ^ b;
-        return a;
+        return (a = a ^ b);
     }
 
-    inline result_options operator|=(result_options& a, result_options b)
+    inline constexpr result_options operator|=(result_options& a, result_options b)
     {
-        a = a | b;
-        return a;
+        return (a = a | b);
     }
 
     template <typename Json>
@@ -2055,8 +2052,7 @@ namespace detail {
         binary_operator
     };
 
-    inline
-    std::string to_string(jsonpath_token_kind kind)
+    inline JSONCONS_CPP14_CONSTEXPR std::string to_string(jsonpath_token_kind kind)
     {
         switch (kind)
         {

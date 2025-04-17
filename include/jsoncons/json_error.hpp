@@ -128,15 +128,13 @@ namespace jsoncons {
         }
     };
 
-    inline
-    const std::error_category& json_error_category() noexcept
+    inline const std::error_category& json_error_category() noexcept
     {
       static json_error_category_impl instance;
       return instance;
     }
 
-    inline 
-    std::error_code make_error_code(json_errc result) noexcept
+    inline std::error_code make_error_code(json_errc result) noexcept
     {
         return std::error_code(static_cast<int>(result),json_error_category());
     }
