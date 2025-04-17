@@ -24,7 +24,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
@@ -3175,7 +3175,7 @@ namespace detail {
         }
 
         template <typename Callback>
-        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
+        typename std::enable_if<ext_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
         evaluate(eval_context<Json,JsonReference>& context, 
             reference root,
             const path_node_type& path, 

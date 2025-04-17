@@ -14,7 +14,7 @@
 #include <system_error> // std::error_code
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
 namespace jsoncons {
@@ -38,7 +38,7 @@ namespace jsoncons {
     template <typename Base>
     class json_runtime_error<Base,
                              typename std::enable_if<std::is_convertible<Base*,std::exception*>::value &&
-                                                     extension_traits::is_constructible_from_string<Base>::value>::type> 
+                                                     ext_traits::is_constructible_from_string<Base>::value>::type> 
         : public Base, public virtual json_exception
     {
     public:

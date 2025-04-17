@@ -15,7 +15,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp> // from_integer
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
@@ -31,7 +31,7 @@ namespace jsoncons {
     class value_converter_base
     {
     public:
-        using allocator_type = typename std::conditional<extension_traits::has_allocator_type<Into>::value,typename Into::allocator_type, std::allocator<char>>::type;
+        using allocator_type = typename std::conditional<ext_traits::has_allocator_type<Into>::value,typename Into::allocator_type, std::allocator<char>>::type;
     private:
         allocator_type alloc_;
 
@@ -50,14 +50,14 @@ namespace jsoncons {
     // From any byte sequence, Into string
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_byte_sequence<From>::value && !extension_traits::is_string_or_string_view<From>::value &&
-            extension_traits::is_string<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_byte_sequence<From>::value && !ext_traits::is_string_or_string_view<From>::value &&
+            ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
 
         template <typename CharT = typename Into::value_type>
-        typename std::enable_if<extension_traits::is_narrow_character<CharT>::value,Into>::type
+        typename std::enable_if<ext_traits::is_narrow_character<CharT>::value,Into>::type
         convert(const From& value, semantic_tag tag, std::error_code&)
         {
             Into s(this->get_allocator());
@@ -76,7 +76,7 @@ namespace jsoncons {
             return s;
         }
         template <typename CharT = typename Into::value_type>
-        typename std::enable_if<extension_traits::is_wide_character<CharT>::value,Into>::type
+        typename std::enable_if<ext_traits::is_wide_character<CharT>::value,Into>::type
         convert(const From& value, semantic_tag tag, std::error_code& ec)
         {
             std::string s;
@@ -107,10 +107,10 @@ namespace jsoncons {
     // From byte string, Into byte string
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_byte_sequence<From>::value && 
-            !extension_traits::is_string_or_string_view<From>::value &&
-            !extension_traits::is_string_or_string_view<Into>::value && 
-            extension_traits::is_back_insertable_byte_container<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_byte_sequence<From>::value && 
+            !ext_traits::is_string_or_string_view<From>::value &&
+            !ext_traits::is_string_or_string_view<Into>::value && 
+            ext_traits::is_back_insertable_byte_container<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
@@ -125,8 +125,8 @@ namespace jsoncons {
     // From string or string_view, Into string, same character type
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_string_or_string_view<From>::value &&
-            extension_traits::is_string<Into>::value && 
+        typename std::enable_if<ext_traits::is_string_or_string_view<From>::value &&
+            ext_traits::is_string<Into>::value && 
             std::is_same<typename From::value_type,typename Into::value_type>::value>::type> : value_converter_base<Into>
     {
     public:
@@ -141,8 +141,8 @@ namespace jsoncons {
     // From string or string_view, Into string, different character type
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_string_or_string_view<From>::value &&
-            extension_traits::is_string<Into>::value && 
+        typename std::enable_if<ext_traits::is_string_or_string_view<From>::value &&
+            ext_traits::is_string<Into>::value && 
             !std::is_same<typename From::value_type,typename Into::value_type>::value>::type> : value_converter_base<Into>
     {
     public:
@@ -164,15 +164,15 @@ namespace jsoncons {
     // From string, Into byte_string
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_char_sequence<From>::value &&
-            !extension_traits::is_string_or_string_view<Into>::value && 
-            extension_traits::is_back_insertable_byte_container<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_char_sequence<From>::value &&
+            !ext_traits::is_string_or_string_view<Into>::value && 
+            ext_traits::is_back_insertable_byte_container<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
 
         template <typename CharT = typename From::value_type>
-        typename std::enable_if<extension_traits::is_narrow_character<CharT>::value,Into>::type
+        typename std::enable_if<ext_traits::is_narrow_character<CharT>::value,Into>::type
         convert(const From& value, semantic_tag tag, std::error_code& ec)
         {
             Into bytes(this->get_allocator());
@@ -207,7 +207,7 @@ namespace jsoncons {
         }
 
         template <typename CharT = typename From::value_type>
-        typename std::enable_if<extension_traits::is_wide_character<CharT>::value,Into>::type
+        typename std::enable_if<ext_traits::is_wide_character<CharT>::value,Into>::type
         convert(const From& value, semantic_tag tag, std::error_code& ec)
         {
             Into bytes(this->get_allocator());
@@ -252,8 +252,8 @@ namespace jsoncons {
     // From integer, Into string
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_integer<From>::value &&
-            extension_traits::is_string<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_integer<From>::value &&
+            ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
@@ -270,7 +270,7 @@ namespace jsoncons {
     template <typename From,typename Into>
     class value_converter<From, Into, 
         typename std::enable_if<std::is_floating_point<From>::value &&
-            extension_traits::is_string<Into>::value>::type> : value_converter_base<Into>
+            ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
@@ -287,7 +287,7 @@ namespace jsoncons {
     // From half, Into string
     template <typename Into>
     class value_converter<half_arg_t, Into,
-        typename std::enable_if<extension_traits::is_string<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
@@ -305,8 +305,8 @@ namespace jsoncons {
     // From bool, Into string
     template <typename From,typename Into>
     class value_converter<From, Into, 
-        typename std::enable_if<extension_traits::is_bool<From>::value &&
-            extension_traits::is_string<Into>::value>::type> : value_converter_base<Into>
+        typename std::enable_if<ext_traits::is_bool<From>::value &&
+            ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;

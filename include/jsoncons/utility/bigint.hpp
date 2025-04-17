@@ -212,7 +212,7 @@ private:
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
             JSONCONS_TRY
             {
-                std::allocator_traits<real_allocator_type>::construct(alloc, extension_traits::to_plain_pointer(data_));
+                std::allocator_traits<real_allocator_type>::construct(alloc, ext_traits::to_plain_pointer(data_));
             }
             JSONCONS_CATCH(...)
             {
@@ -241,7 +241,7 @@ private:
             {
                 real_allocator_type alloc(a);
 
-                std::allocator_traits<real_allocator_type>::destroy(alloc, extension_traits::to_plain_pointer(data_));
+                std::allocator_traits<real_allocator_type>::destroy(alloc, ext_traits::to_plain_pointer(data_));
                 std::allocator_traits<real_allocator_type>::deallocate(alloc, data_,capacity_);
             }
         }

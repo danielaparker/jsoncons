@@ -24,7 +24,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -38,7 +38,7 @@ namespace detail {
     // from_integer
 
     template <typename Integer,typename Result>
-    typename std::enable_if<extension_traits::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
     from_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
@@ -85,7 +85,7 @@ namespace detail {
     // integer_to_hex
 
     template <typename Integer,typename Result>
-    typename std::enable_if<extension_traits::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
     integer_to_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;

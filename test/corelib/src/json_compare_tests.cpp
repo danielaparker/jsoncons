@@ -106,8 +106,8 @@ TEST_CASE("basic_json object == basic_json object")
         CHECK_FALSE((o2 != o1));
 
         CHECK(std::is_convertible<decltype(o1.at("a")),json>::value);
-        CHECK(jsoncons::extension_traits::is_basic_json<decltype(o1.at("a"))>::value);
-        CHECK(jsoncons::extension_traits::is_basic_json<const json&>::value);
+        CHECK(jsoncons::ext_traits::is_basic_json<decltype(o1.at("a"))>::value);
+        CHECK(jsoncons::ext_traits::is_basic_json<const json&>::value);
 
         CHECK(1 == (o1.at("a"))); // basic_json == int
         CHECK((1 == o1.at("a"))); // int == basic_json

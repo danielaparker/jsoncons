@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UTILITY_EXTENSION_TRAITS_HPP
-#define JSONCONS_UTILITY_EXTENSION_TRAITS_HPP
+#ifndef JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
@@ -26,7 +26,7 @@
 #endif
 
 namespace jsoncons {
-namespace extension_traits {
+namespace ext_traits {
 
     // is_char8
     template <typename CharT,typename Enable=void>
@@ -917,7 +917,7 @@ namespace impl {
     > : std::true_type{};
 
     
-} // extension_traits
+} // ext_traits
 } // namespace jsoncons
 
-#endif // JSONCONS_UTILITY_EXTENSION_TRAITS_HPP
+#endif // JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP

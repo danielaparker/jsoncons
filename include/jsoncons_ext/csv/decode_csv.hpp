@@ -25,8 +25,8 @@ namespace jsoncons {
 namespace csv {
 
     template <typename T,typename Source>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type 
     decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
         using char_type = typename Source::value_type;
@@ -43,8 +43,8 @@ namespace csv {
     }
 
     template <typename T,typename Source>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_char_sequence<Source>::value,T>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_char_sequence<Source>::value,T>::type 
     decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
         using char_type = typename Source::value_type;
@@ -62,7 +62,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type 
     decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
         using char_type = CharT;
@@ -79,7 +79,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type 
     decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
         basic_csv_cursor<CharT> cursor(is, options);
@@ -95,7 +95,7 @@ namespace csv {
     }
 
     template <typename T,typename InputIt>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type
     decode_csv(InputIt first, InputIt last,
                 const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                     basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -113,7 +113,7 @@ namespace csv {
     }
 
     template <typename T,typename InputIt>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type
     decode_csv(InputIt first, InputIt last,
                const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                     basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -134,8 +134,8 @@ namespace csv {
     // With leading allocator_set parameter
 
     template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type 
     decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const Source& s, 
                const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
@@ -154,8 +154,8 @@ namespace csv {
     }
 
     template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_char_sequence<Source>::value,T>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_char_sequence<Source>::value,T>::type 
     decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const Source& s, 
                const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
@@ -175,7 +175,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type 
     decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                std::basic_istream<CharT>& is, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
@@ -194,7 +194,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type 
     decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                std::basic_istream<CharT>& is, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())

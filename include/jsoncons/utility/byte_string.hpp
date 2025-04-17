@@ -23,7 +23,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
 
@@ -92,7 +92,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename F,typename Container>
-    typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
                           F f,
@@ -207,7 +207,7 @@ namespace detail {
     // decode
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -235,7 +235,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -263,7 +263,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
@@ -358,7 +358,7 @@ namespace detail {
     
         template <typename Container>
         constexpr explicit byte_string_view(const Container& cont,
-                          typename std::enable_if<extension_traits::is_byte_sequence<Container>::value,int>::type = 0) 
+                          typename std::enable_if<ext_traits::is_byte_sequence<Container>::value,int>::type = 0) 
             : data_(reinterpret_cast<const uint8_t*>(cont.data())), size_(cont.size())
         {
         }
@@ -786,7 +786,7 @@ namespace detail {
 
     using byte_string = basic_byte_string<std::allocator<uint8_t>>;
 
-    namespace extension_traits {
+    namespace ext_traits {
 
         template <typename T>
         struct is_basic_byte_string
@@ -798,7 +798,7 @@ namespace detail {
         : std::true_type
         {};
 
-    } // namespace extension_traits
+    } // namespace ext_traits
 
 } // namespace jsoncons
 

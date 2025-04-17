@@ -24,8 +24,8 @@ namespace jsoncons {
     // decode_json
 
     template <typename T,typename Source>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
@@ -42,8 +42,8 @@ namespace jsoncons {
     }
 
     template <typename T,typename Source>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_char_sequence<Source>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_char_sequence<Source>::value,T>::type
     decode_json(const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
@@ -61,7 +61,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -76,7 +76,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -93,7 +93,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename InputIt>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type
     decode_json(InputIt first, InputIt last,
                 const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -111,7 +111,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename InputIt>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type
     decode_json(InputIt first, InputIt last,
                 const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -132,8 +132,8 @@ namespace jsoncons {
     // With leading allocator_set parameter
 
     template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         const Source& s,
         const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
@@ -152,8 +152,8 @@ namespace jsoncons {
     }
 
     template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_char_sequence<Source>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_char_sequence<Source>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         const Source& s,
         const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
@@ -173,7 +173,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -190,7 +190,7 @@ namespace jsoncons {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())

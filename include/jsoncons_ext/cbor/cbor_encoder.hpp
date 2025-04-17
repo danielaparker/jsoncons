@@ -220,7 +220,7 @@ public:
 
     template <typename ByteStringLike>
     void byte_string_value_with_tag(const ByteStringLike& value, uint64_t raw_tag,
-        typename std::enable_if<extension_traits::is_byte_sequence<ByteStringLike>::value,int>::type = 0) 
+        typename std::enable_if<ext_traits::is_byte_sequence<ByteStringLike>::value,int>::type = 0) 
     {
         write_tag(raw_tag);
         write_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(value.data()),value.size()));

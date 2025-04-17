@@ -18,7 +18,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
@@ -686,7 +686,7 @@ namespace jsonpath {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             append(IntegerType val)
         {
             elements_.emplace_back(static_cast<std::size_t>(val));
@@ -701,7 +701,7 @@ namespace jsonpath {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             operator/=(IntegerType val)
         {
             elements_.emplace_back(static_cast<std::size_t>(val));

@@ -12,7 +12,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
@@ -24,8 +24,8 @@ namespace jsoncons {
 namespace csv {
 
     template <typename T,typename CharContainer>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_char_container<CharContainer>::value>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_char_container<CharContainer>::value>::type 
     encode_csv(const T& j, CharContainer& cont, const basic_csv_encode_options<typename CharContainer::value_type>& options = basic_csv_encode_options<typename CharContainer::value_type>())
     {
         using char_type = typename CharContainer::value_type;
@@ -34,8 +34,8 @@ namespace csv {
     }
 
     template <typename T,typename CharContainer>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_char_container<CharContainer>::value>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_char_container<CharContainer>::value>::type 
     encode_csv(const T& val, CharContainer& cont, const basic_csv_encode_options<typename CharContainer::value_type>& options = basic_csv_encode_options<typename CharContainer::value_type>())
     {
         using char_type = typename CharContainer::value_type;
@@ -49,7 +49,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
         using char_type = CharT;
@@ -58,7 +58,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
         using char_type = CharT;
@@ -74,8 +74,8 @@ namespace csv {
     // with alloc_set.get_temp_allocator()ator_arg_t
 
     template <typename T,typename CharContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_char_container<CharContainer>::value>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_char_container<CharContainer>::value>::type 
     encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const T& j, CharContainer& cont, const basic_csv_encode_options<typename CharContainer::value_type>& options = basic_csv_encode_options<typename CharContainer::value_type>())
     {
@@ -85,8 +85,8 @@ namespace csv {
     }
 
     template <typename T,typename CharContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_char_container<CharContainer>::value>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_char_container<CharContainer>::value>::type 
     encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const T& val, CharContainer& cont, const basic_csv_encode_options<typename CharContainer::value_type>& options = basic_csv_encode_options<typename CharContainer::value_type>())
     {
@@ -101,7 +101,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
@@ -111,7 +111,7 @@ namespace csv {
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
                const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {

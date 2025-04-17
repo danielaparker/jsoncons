@@ -24,8 +24,8 @@ namespace cbor {
     // to bytes 
 
     template <typename T,typename ByteContainer>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(const T& j, 
                 ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -37,8 +37,8 @@ namespace cbor {
     }
 
     template <typename T,typename ByteContainer>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(const T& val, ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
@@ -54,7 +54,7 @@ namespace cbor {
     // stream
 
     template <typename T>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const T& j, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -66,7 +66,7 @@ namespace cbor {
     }
 
     template <typename T>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const T& val, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -85,8 +85,8 @@ namespace cbor {
     // to bytes 
 
     template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& j, 
                 ByteContainer& cont, 
@@ -99,8 +99,8 @@ namespace cbor {
     }
 
     template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& val, 
                 ByteContainer& cont, 
@@ -118,7 +118,7 @@ namespace cbor {
     // stream
 
     template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& j, 
                 std::ostream& os, 
@@ -131,7 +131,7 @@ namespace cbor {
     }
 
     template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& val, 
                 std::ostream& os, 

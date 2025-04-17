@@ -1,7 +1,7 @@
 // Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/value_converter.hpp>
 #include <vector>
 #include <catch/catch.hpp>

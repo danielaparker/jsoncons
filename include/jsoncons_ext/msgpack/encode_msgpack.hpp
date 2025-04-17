@@ -12,7 +12,7 @@
 #include <type_traits> 
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/encode_traits.hpp>
@@ -27,8 +27,8 @@ namespace jsoncons {
 namespace msgpack {
 
     template <typename T,typename ByteContainer>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_msgpack(const T& j, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -40,8 +40,8 @@ namespace msgpack {
     }
 
     template <typename T,typename ByteContainer>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_msgpack(const T& val, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -56,7 +56,7 @@ namespace msgpack {
     }
 
     template <typename T>
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_msgpack(const T& j, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -68,7 +68,7 @@ namespace msgpack {
     }
 
     template <typename T>
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_msgpack(const T& val, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -85,8 +85,8 @@ namespace msgpack {
     // with temp_allocator_arg_t
 
     template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set, const T& j, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -98,8 +98,8 @@ namespace msgpack {
     }
 
     template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set, 
                    const T& val, ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -114,7 +114,7 @@ namespace msgpack {
     }
 
     template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
     encode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set, 
                    const T& j, 
                    std::ostream& os, 
@@ -127,7 +127,7 @@ namespace msgpack {
     }
 
     template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
     encode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set, 
                    const T& val, 
                    std::ostream& os, 

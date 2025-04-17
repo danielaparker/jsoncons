@@ -19,7 +19,7 @@
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
@@ -242,7 +242,7 @@ namespace jsoncons { namespace jsonpointer {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         append(IntegerType val)
         {
             string_type s;
@@ -259,7 +259,7 @@ namespace jsoncons { namespace jsonpointer {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         operator/=(IntegerType val)
         {
             string_type s;
@@ -369,7 +369,7 @@ namespace jsoncons { namespace jsonpointer {
     };
 
     template <typename CharT,typename IntegerType>
-    typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
+    typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
     operator/(const basic_json_pointer<CharT>& lhs, IntegerType rhs)
     {
         basic_json_pointer<CharT> p(lhs);

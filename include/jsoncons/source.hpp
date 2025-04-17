@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/byte_string.hpp> // jsoncons::byte_traits
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
 
@@ -325,7 +325,7 @@ namespace jsoncons {
 
         template <typename Sourceable>
         string_source(const Sourceable& s,
-                      typename std::enable_if<extension_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
+                      typename std::enable_if<ext_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
             : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
         {
         }
@@ -537,7 +537,7 @@ namespace jsoncons {
 
         template <typename Sourceable>
         bytes_source(const Sourceable& source,
-                     typename std::enable_if<extension_traits::is_byte_sequence<Sourceable>::value,int>::type = 0)
+                     typename std::enable_if<ext_traits::is_byte_sequence<Sourceable>::value,int>::type = 0)
             : data_(reinterpret_cast<const value_type*>(source.data())), 
               current_(data_), 
               end_(data_+source.size())
@@ -730,8 +730,8 @@ namespace jsoncons {
         template <typename Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                extension_traits::has_reserve<Container>::value &&
-                                extension_traits::has_data_exact<value_type*,Container>::value 
+                                ext_traits::has_reserve<Container>::value &&
+                                ext_traits::has_data_exact<value_type*,Container>::value 
      , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
@@ -753,8 +753,8 @@ namespace jsoncons {
         template <typename Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                extension_traits::has_reserve<Container>::value &&
-                                !extension_traits::has_data_exact<value_type*, Container>::value 
+                                ext_traits::has_reserve<Container>::value &&
+                                !ext_traits::has_data_exact<value_type*, Container>::value 
      , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {

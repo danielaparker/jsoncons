@@ -8,7 +8,7 @@
 
 #include <catch/catch.hpp>
 
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 

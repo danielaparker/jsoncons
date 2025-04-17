@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
 
@@ -256,7 +256,7 @@ namespace jsoncons {
     };
 
     template <typename Container>
-    class bytes_sink<Container,typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value>::type> 
+    class bytes_sink<Container,typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value>::type> 
     {
     public:
         using container_type = Container;

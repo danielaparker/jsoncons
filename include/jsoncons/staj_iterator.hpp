@@ -443,13 +443,13 @@ namespace jsoncons {
         }
     };
 
-    template <typename T,typename CharT,typename Json=typename std::conditional<extension_traits::is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    template <typename T,typename CharT,typename Json=typename std::conditional<ext_traits::is_basic_json<T>::value,T,basic_json<CharT>>::type>
     staj_array_view<T, Json> staj_array(basic_staj_cursor<CharT>& cursor)
     {
         return staj_array_view<T, Json>(cursor);
     }
 
-    template <typename Key,typename T,typename CharT,typename Json=typename std::conditional<extension_traits::is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    template <typename Key,typename T,typename CharT,typename Json=typename std::conditional<ext_traits::is_basic_json<T>::value,T,basic_json<CharT>>::type>
     staj_object_view<Key, T, Json> staj_object(basic_staj_cursor<CharT>& cursor)
     {
         return staj_object_view<Key, T, Json>(cursor);
