@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_TAG_TYPE_HPP
-#define JSONCONS_TAG_TYPE_HPP
+#ifndef JSONCONS_SEMANTIC_TYPE_HPP
+#define JSONCONS_SEMANTIC_TYPE_HPP
 
 #include <cstdint>
 #include <ostream>
@@ -17,8 +17,8 @@ namespace jsoncons {
 enum class semantic_tag : uint8_t 
 {
     none = 0,               // 00000000 
-    noesc = 1,              // 00000010
-    bigint = 2,             // 00000001
+    noesc = 1,              // 00000001
+    bigint = 2,             // 00000010
     bigdec = 3,             // 00000011
     datetime = 4,           // 00000111
     epoch_second = 5,       // 00001000
@@ -44,8 +44,10 @@ inline constexpr bool is_number_tag(semantic_tag tag) noexcept
 {
     constexpr uint8_t mask1{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
         & uint8_t(semantic_tag::bigfloat) & uint8_t(semantic_tag::float128) };
-    constexpr uint8_t mask2{ (uint8_t)~mask1};
-    return (uint8_t(tag) & mask1) == mask1 && (uint8_t)(~(uint8_t)tag & mask2) == mask2;
+    constexpr uint8_t mask2{ uint8_t(~uint8_t(semantic_tag::bigint) & ~uint8_t(semantic_tag::bigdec) 
+        & ~uint8_t(semantic_tag::bigfloat) & ~uint8_t(semantic_tag::float128)) };
+
+    return (uint8_t(tag) & mask1) == mask1 && (uint8_t(~(uint8_t)tag) & mask2) == mask2;
 }
 
 template <typename CharT>
@@ -186,4 +188,4 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
 
 } // namespace jsoncons
 
-#endif // JSONCONS_TAG_TYPE_HPP
+#endif // JSONCONS_SEMANTIC_TYPE_HPP
