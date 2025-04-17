@@ -54,6 +54,7 @@ template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_tag tag)
 {
     static constexpr const CharT* na_name = JSONCONS_CSTRING_CONSTANT(CharT, "n/a");
+    static constexpr const CharT* noesc_name = JSONCONS_CSTRING_CONSTANT(CharT, "unescaped");
     static constexpr const CharT* undefined_name = JSONCONS_CSTRING_CONSTANT(CharT, "undefined");
     static constexpr const CharT* datetime_name = JSONCONS_CSTRING_CONSTANT(CharT, "datetime");
     static constexpr const CharT* epoch_second_name = JSONCONS_CSTRING_CONSTANT(CharT, "epoch-second");
@@ -80,6 +81,11 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         case semantic_tag::none:
         {
             os << na_name;
+            break;
+        }
+        case semantic_tag::noesc:
+        {
+            os << noesc_name;
             break;
         }
         case semantic_tag::undefined:

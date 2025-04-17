@@ -2052,7 +2052,7 @@ namespace detail {
         binary_operator
     };
 
-    inline JSONCONS_CPP14_CONSTEXPR std::string to_string(jsonpath_token_kind kind)
+    inline std::string to_string(jsonpath_token_kind kind)
     {
         switch (kind)
         {
