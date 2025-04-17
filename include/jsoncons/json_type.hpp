@@ -159,7 +159,7 @@ namespace jsoncons {
         explicit raw_json_arg_t() = default; 
     };
     
-    inline constexpr raw_json_arg_t raw_json_arg{};
+    constexpr raw_json_arg_t raw_json_arg{};
     
     struct noesc_arg_t
     {
