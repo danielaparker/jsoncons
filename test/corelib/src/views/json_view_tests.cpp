@@ -174,7 +174,7 @@ TEST_CASE("test json_view inf and nan")
         for (const auto& item : root.array_range())
         {
             CHECK(item.is_string());
-            CHECK(item.tag() == semantic_tag::bignum);
+            CHECK(item.tag() == semantic_tag::bigdec);
         }
         CHECK(root[0].get_string_view() == "NAN");
         CHECK(root[1].get_string_view() == "NaN");
@@ -194,7 +194,7 @@ TEST_CASE("test json_view inf and nan")
         json_view root = result->root();
 
         REQUIRE(root.is_string());
-        CHECK(root.tag() == semantic_tag::bignum);
+        CHECK(root.tag() == semantic_tag::bigdec);
         CHECK(root.get_string_view() == "nan");
     }
     SECTION("single inf")
@@ -212,7 +212,7 @@ TEST_CASE("test json_view inf and nan")
         json_view root = result->root();
 
         REQUIRE(root.is_string());
-        CHECK(root.tag() == semantic_tag::bignum);
+        CHECK(root.tag() == semantic_tag::bigdec);
         CHECK(root.get_string_view() == "inf");
     }
 }
