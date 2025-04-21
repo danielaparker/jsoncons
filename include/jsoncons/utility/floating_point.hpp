@@ -1,0 +1,6 @@
+#ifndef JSONCONS_UTILITY_FLOATING_POINT_HPP
+#define JSONCONS_UTILITY_FLOATING_POINT_HPP
+
+#include <jsoncons/config/jsoncons_config.hpp>
+ 
+#endif // JSONCONS_UTILITY_FLOATING_POINT_HPP
