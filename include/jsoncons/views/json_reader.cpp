@@ -388,13 +388,16 @@ inline read_json_result read_number_raw(uint8_t* cur,
                 return read_json_result{cur, read_json_errc{}}; 
             }
         }
+        ec = read_json_errc::no_digit_after_minus_sign;
         return read_json_result{cur, read_json_errc::no_digit_after_minus_sign};
     }
     
     /* read integral part */
     if (*cur == '0') {
         cur++;
-        if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
+        if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) 
+        {
+            ec = read_json_errc::leading_zero;
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
         if (!digi_is_fp(*cur)) 
@@ -414,7 +417,9 @@ inline read_json_result read_number_raw(uint8_t* cur,
     /* read fraction part */
     if (*cur == '.') {
         cur++;
-        if (!digi_is_digit(*cur++)) {
+        if (!digi_is_digit(*cur++)) 
+        {
+            ec = read_json_errc::no_digit_after_decimal_point;
             return read_json_result(cur, read_json_errc::no_digit_after_decimal_point);
         }
         while (digi_is_digit(*cur)) cur++;
@@ -424,6 +429,7 @@ inline read_json_result read_number_raw(uint8_t* cur,
     if (digi_is_exp(*cur)) {
         cur += 1 + digi_is_sign(cur[1]);
         if (!digi_is_digit(*cur++)) {
+            ec = read_json_errc::no_digit_after_exponent_sign;
             return read_json_result(cur, read_json_errc::no_digit_after_exponent_sign);
         }
         while (digi_is_digit(*cur)) cur++;
@@ -494,7 +500,7 @@ read_json_result read_number(uint8_t* ptr,
 #define return_inf() do { \
     if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw(); \
     if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) return_f64_bin(F64_RAW_INF); \
-    else return read_json_result(hdr, read_json_errc::inf_or_nan); \
+    else {ec = read_json_errc::inf_or_nan; return read_json_result(hdr, read_json_errc::inf_or_nan);} \
 } while (false)
     
 #define return_raw() do { \
@@ -533,11 +539,13 @@ read_json_result read_number(uint8_t* ptr,
                 return result;
             }
         }
+        ec = read_json_errc::no_digit_after_minus_sign;
         return read_json_result(cur, read_json_errc::no_digit_after_minus_sign);
     }
     if (*cur == '0') {
         cur++;
         if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
+            ec = read_json_errc::leading_zero;
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
         if (!digi_is_fp(*cur)) return_0();
@@ -590,6 +598,7 @@ read_double:
         dot = cur;
         cur++;
         if (!digi_is_digit(*cur)) {
+            ec = read_json_errc::no_digit_after_decimal_point;
             return read_json_result(cur, read_json_errc::no_digit_after_decimal_point);
         }
         cur++;
@@ -599,6 +608,7 @@ read_double:
         /* skip exponent part */
         cur += 1 + digi_is_sign(cur[1]);
         if (!digi_is_digit(*cur)) {
+            ec = read_json_errc::no_digit_after_exponent_sign;
             return read_json_result(cur, read_json_errc::no_digit_after_exponent_sign);
         }
         cur++;
@@ -619,7 +629,9 @@ read_double:
      */
     double value;
     auto [tmpp, ec2] = std::from_chars((const char *)hdr, (const char *)cur, value);
-    if (ec2 != std::errc{}) {
+    if (ec2 != std::errc{}) 
+    {
+        ec = read_json_errc::invalid_number;
         return read_json_result(cur, read_json_errc::invalid_number);
     }
     if (JSONCONS_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
@@ -658,7 +670,8 @@ read_double:
 JSONCONS_FORCE_INLINE read_json_result read_string(uint8_t* ptr,
     uint8_t *lst,
     bool inv,
-    json_ref* val) 
+    json_ref* val,
+    std::error_code& ec) 
 {   
     uint8_t *cur = ptr;
     uint8_t *src = ++cur, *dst, *pos;
@@ -757,6 +770,7 @@ skip_utf8:
         }
 #endif
         if (JSONCONS_UNLIKELY(pos == src)) {
+            ec = read_json_errc::invalid_utf8;
             if (!inv) return read_json_result(src, read_json_errc::invalid_utf8);
             ++src;
         }
@@ -778,6 +792,7 @@ copy_escape:
             case 't':  *dst++ = '\t'; src++; break;
             case 'u':
                 if (JSONCONS_UNLIKELY(!read_hex_u16(++src, &hi))) {
+                    ec = read_json_errc::invalid_escaped_sequence;
                     return read_json_result(src - 2, read_json_errc::invalid_escaped_sequence);
                 }
                 src += 4;
@@ -796,15 +811,19 @@ copy_escape:
                 } else {
                     /* a non-BMP character, represented as a surrogate pair */
                     if (JSONCONS_UNLIKELY((hi & 0xFC00) != 0xD800)) {
+                        ec = read_json_errc::invalid_high_surrogate;
                         return read_json_result(src - 6, read_json_errc::invalid_high_surrogate);
                     }
                     if (JSONCONS_UNLIKELY(!utility::byte_match_2(src, "\\u"))) {
+                        ec = read_json_errc::no_low_surrogate;
                         return read_json_result(src, read_json_errc::no_low_surrogate);
                     }
                     if (JSONCONS_UNLIKELY(!read_hex_u16(src + 2, &lo))) {
+                        ec = read_json_errc::invalid_escaped_character;
                         return read_json_result(src, read_json_errc::invalid_escaped_character);
                     }
                     if (JSONCONS_UNLIKELY((lo & 0xFC00) != 0xDC00)) {
+                        ec = read_json_errc::invalid_low_surrogate;
                         return read_json_result(src, read_json_errc::invalid_low_surrogate);
                     }
                     uni = ((((uint32_t)hi - 0xD800) << 10) |
@@ -816,14 +835,18 @@ copy_escape:
                     src += 6;
                 }
                 break;
-            default: return read_json_result(src, read_json_errc::invalid_escaped_character);
+            default: 
+                ec = read_json_errc::invalid_escaped_character;
+                return read_json_result(src, read_json_errc::invalid_escaped_character);
         }
     } else if (JSONCONS_LIKELY(*src == '"')) {
         std::construct_at(val, (const char *)cur, std::size_t(dst - cur));
         *dst = '\0';
         return read_json_result{src+1, read_json_errc{}};
     } else {
+        ec = read_json_errc::unexpected_control_character;
         if (!inv) return read_json_result(src, read_json_errc::unexpected_control_character);
+        ec = read_json_errc::unclosed_string;
         if (src >= lst) return read_json_result(src, read_json_errc::unclosed_string);
         *dst++ = *src++;
     }
@@ -998,6 +1021,7 @@ copy_utf8:
         }
 #endif
         if (JSONCONS_UNLIKELY(pos == src)) {
+            ec = read_json_errc::invalid_utf8;
             if (!inv) return read_json_result(src, read_json_errc::invalid_utf8);
             goto copy_ascii_stop_1;
         }
@@ -1197,7 +1221,7 @@ void json_reader::next(std::error_code& ec)
                 }
                 else
                 {
-                    auto result = read_string(ptr_, end_, false, &current_);
+                    auto result = read_string(ptr_, end_, false, &current_, ec);
                     ptr_ = result.ptr;
                     if (!result)
                     {
@@ -1264,7 +1288,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     }
     if (*ptr_ == '"') 
     {
-        auto result = jsoncons::read_string(ptr_, end_, inv_, &val);
+        auto result = jsoncons::read_string(ptr_, end_, inv_, &val, ec);
         ptr_ = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -1473,7 +1497,7 @@ inline deserialize_result<json_container> json_container::read_root_single(uint8
         return_err(cur, result.ec, "");
     }
     if (*cur == '"') {
-        auto result = read_string(cur, end, inv, val);
+        auto result = read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -1673,7 +1697,7 @@ arr_val_begin:
     if (*cur == '"') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -1817,7 +1841,7 @@ obj_key_begin:
     if (JSONCONS_LIKELY(*cur == '"')) {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -1871,7 +1895,7 @@ obj_val_begin:
     if (*cur == '"') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -2175,7 +2199,7 @@ arr_val_begin:
     if (*cur == '"') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -2335,7 +2359,7 @@ obj_key_begin:
     if (JSONCONS_LIKELY(*cur == '"')) {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
@@ -2393,7 +2417,7 @@ obj_val_begin:
     if (*cur == '"') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_string(cur, end, inv, val);
+        auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
         if (JSONCONS_UNLIKELY(!result))
         {
