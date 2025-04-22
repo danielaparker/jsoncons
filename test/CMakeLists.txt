@@ -50,7 +50,7 @@ set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_TESTS_DIR}/thirdparty)
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(catch INTERFACE)
 
-if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
+if (CMAKE_VERSION VERSION_LESS "3.8.0")
     target_compile_features(catch INTERFACE cxx_range_for)  # for C++11 - flags
 else()
     target_compile_features(catch INTERFACE cxx_std_11)
@@ -198,7 +198,7 @@ add_executable(unit_tests
                corelib/src/testmain.cpp
 )              
 
-if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
+if (CMAKE_VERSION VERSION_LESS "3.8.0")
     target_compile_features(unit_tests INTERFACE cxx_range_for)  # for C++11 - flags
 else()
     target_compile_features(unit_tests INTERFACE cxx_std_11)
