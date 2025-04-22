@@ -380,7 +380,7 @@ inline read_json_result read_number_raw(uint8_t* cur,
     /* read first digit, check leading zero */
     if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
         if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) {
-            auto result = read_inf_or_nan(*hdr == '-', cur, flags, val);
+            auto result = read_inf_or_nan(*hdr == '-', cur, flags, val, ec);
             cur = result.ptr;
             if (result)
             {
@@ -532,7 +532,7 @@ read_json_result read_number(uint8_t* ptr,
     /* read first digit, check leading zero */
     if (JSONCONS_UNLIKELY(!digi_is_digit(*cur))) {
         if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) {
-            auto result = read_inf_or_nan(sign, cur, flags, val);
+            auto result = read_inf_or_nan(sign, cur, flags, val, ec);
             if (result)
             {
                 cur = result.ptr;
@@ -1064,10 +1064,9 @@ json_reader::json_reader(std::string_view input, std::error_code& ec)
     {
         if ((flags_ & read_json_flags::allow_comments) == read_json_flags::allow_comments) 
         {
-            auto result = jsoncons::skip_spaces_and_comments(ptr_);
-            if (!result)
+            auto result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                ec = result.ec;
                 return;
             }
             ptr_ = result.ptr;
@@ -1112,7 +1111,7 @@ void json_reader::next(std::error_code& ec)
             return;
         default:
             current_ = read_element(ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -1130,10 +1129,9 @@ void json_reader::next(std::error_code& ec)
             if (*ptr_ == ',')
             {
                 ++ptr_;
-                auto result = jsoncons::skip_spaces_and_comments(ptr_);
-                if (!result)
+                auto result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+                if (JSONCONS_UNLIKELY(ec))
                 {
-                    ec = result.ec;
                     return;
                 }
                 ptr_ = result.ptr;
@@ -1162,7 +1160,7 @@ void json_reader::next(std::error_code& ec)
                 return;
             default:
                 current_ = read_element(ec);
-                if (ec)
+                if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
@@ -1180,10 +1178,9 @@ void json_reader::next(std::error_code& ec)
             if (*ptr_ == ',')
             {
                 ++ptr_;
-                auto result = jsoncons::skip_spaces_and_comments(ptr_);
-                if (!result)
+                auto result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+                if (JSONCONS_UNLIKELY(ec))
                 {
-                    ec = result.ec;
                     return;
                 }
                 ptr_ = result.ptr;
@@ -1214,7 +1211,7 @@ void json_reader::next(std::error_code& ec)
                 if (event_kind_ == json_event_kind::key)
                 {
                     current_ = read_element(ec);
-                    if (ec)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
@@ -1223,13 +1220,13 @@ void json_reader::next(std::error_code& ec)
                 {
                     auto result = read_string(ptr_, end_, false, &current_, ec);
                     ptr_ = result.ptr;
-                    if (!result)
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         ec = result.ec;
                         return;
                     }
-                    result = jsoncons::skip_spaces_and_comments(ptr_);
-                    if (!result)
+                    result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+                    if (JSONCONS_UNLIKELY(ec))
                     {
                         ec = result.ec;
                         return;
@@ -1244,8 +1241,8 @@ void json_reader::next(std::error_code& ec)
                 break;
         }
     }
-    auto result = jsoncons::skip_spaces_and_comments(ptr_);
-    if (!result)
+    auto result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
         ec = result.ec;
         return;
@@ -1290,7 +1287,7 @@ json_ref json_reader::read_element(std::error_code& ec)
     {
         auto result = jsoncons::read_string(ptr_, end_, inv_, &val, ec);
         ptr_ = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1301,9 +1298,9 @@ json_ref json_reader::read_element(std::error_code& ec)
     }
     if (*ptr_ == 't') 
     {
-        auto result = jsoncons::read_true(ptr_, &val);
+        auto result = jsoncons::read_true(ptr_, &val, ec);
         ptr_ = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1314,9 +1311,9 @@ json_ref json_reader::read_element(std::error_code& ec)
     }
     if (*ptr_ == 'f') 
     {
-        auto result = jsoncons::read_false(ptr_, &val);
+        auto result = jsoncons::read_false(ptr_, &val, ec);
         ptr_ = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1327,9 +1324,9 @@ json_ref json_reader::read_element(std::error_code& ec)
     }
     if (*ptr_ == 'n') 
     {
-        auto result = jsoncons::read_null(ptr_, &val);
+        auto result = jsoncons::read_null(ptr_, &val, ec);
         ptr_ = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             event_kind_ = json_event_kind::none;
             ec = result.ec;
@@ -1343,8 +1340,8 @@ doc_end:
     /* check invalid contents after json document */
     if (JSONCONS_UNLIKELY(ptr_ < end_) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = jsoncons::skip_spaces_and_comments(ptr_);
-            if (!result)
+            auto result = jsoncons::skip_spaces_and_comments(ptr_, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 ec = result.ec;
                 return json_ref{};
@@ -1499,16 +1496,16 @@ inline deserialize_result<json_container> json_container::read_root_single(uint8
     if (*cur == '"') {
         auto result = read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
         goto doc_end;
     }
     if (*cur == 't') {
-        auto result = jsoncons::read_true(cur, val);
+        auto result = jsoncons::read_true(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1516,9 +1513,9 @@ inline deserialize_result<json_container> json_container::read_root_single(uint8
         goto doc_end;
     }
     if (*cur == 'f') {
-        auto result = jsoncons::read_false(cur, val);
+        auto result = jsoncons::read_false(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1526,13 +1523,13 @@ inline deserialize_result<json_container> json_container::read_root_single(uint8
         goto doc_end;
     }
     if (*cur == 'n') {
-        auto result = jsoncons::read_null(cur, val);
+        auto result = jsoncons::read_null(cur, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
-                auto result2 = read_nan(false, cur, flags, val);
+                auto result2 = read_nan(false, cur, flags, val, ec);
                 cur = result2.ptr;
                 if (result2)
                 {
@@ -1545,7 +1542,7 @@ inline deserialize_result<json_container> json_container::read_root_single(uint8
     }
     if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
     {
-        auto result = read_inf_or_nan(false, cur, flags, val);
+        auto result = read_inf_or_nan(false, cur, flags, val, ec);
         cur = result.ptr;
         if (result)
         {
@@ -1558,8 +1555,8 @@ doc_end:
     /* check invalid contents after json document */
     if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = jsoncons::skip_spaces_and_comments(cur);
-            if (!result)
+            auto result = jsoncons::skip_spaces_and_comments(cur, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return_err(cur, result.ec, "unclosed multiline comment");
             }
@@ -1699,7 +1696,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -1708,9 +1705,9 @@ arr_val_begin:
     if (*cur == 't') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_true(cur, val);
+        auto result = jsoncons::read_true(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1720,9 +1717,9 @@ arr_val_begin:
     if (*cur == 'f') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_false(cur, val);
+        auto result = jsoncons::read_false(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1732,13 +1729,13 @@ arr_val_begin:
     if (*cur == 'n') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_null(cur, val);
+        auto result = jsoncons::read_null(cur, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
-                auto result2 = read_nan(false, cur, flags, val);
+                auto result2 = read_nan(false, cur, flags, val, ec);
                 cur = result2.ptr;
                 if (result2)
                 {
@@ -1764,7 +1761,7 @@ arr_val_begin:
         (*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         val_incr();
         ctn_len++;
-        auto result = read_inf_or_nan(false, cur, flags, val);
+        auto result = read_inf_or_nan(false, cur, flags, val, ec);
         cur = result.ptr;
         if (result)
         {
@@ -1774,8 +1771,8 @@ arr_val_begin:
         goto fail_character;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = jsoncons::skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = jsoncons::skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -1798,8 +1795,8 @@ arr_val_end:
         goto arr_val_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -1843,7 +1840,7 @@ obj_key_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -1861,8 +1858,8 @@ obj_key_begin:
         goto obj_key_begin;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -1881,8 +1878,8 @@ obj_key_end:
         goto obj_key_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -1897,7 +1894,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -1925,9 +1922,9 @@ obj_val_begin:
     if (*cur == 't') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_true(cur, val);
+        auto result = jsoncons::read_true(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1937,9 +1934,9 @@ obj_val_begin:
     if (*cur == 'f') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_false(cur, val);
+        auto result = jsoncons::read_false(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -1949,13 +1946,13 @@ obj_val_begin:
     if (*cur == 'n') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_null(cur, val);
+        auto result = jsoncons::read_null(cur, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
-                auto result2 = read_nan(false, cur, flags, val);
+                auto result2 = read_nan(false, cur, flags, val, ec);
                 cur = result2.ptr;
                 if (result2)
                 {
@@ -1974,7 +1971,7 @@ obj_val_begin:
         (*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         val++;
         ctn_len++;
-        auto result = read_inf_or_nan(false, cur, flags, val);
+        auto result = read_inf_or_nan(false, cur, flags, val, ec);
         cur = result.ptr;
         if (result)
         {
@@ -1983,8 +1980,8 @@ obj_val_begin:
         goto fail_character;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2007,8 +2004,8 @@ obj_val_end:
         goto obj_val_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2037,8 +2034,8 @@ doc_end:
     /* check invalid contents after json document */
     if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = skip_spaces_and_comments(cur);
-            if (!result)
+            auto result = skip_spaces_and_comments(cur, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return_err(cur, result.ec, "unclosed multiline comment");
             }
@@ -2201,7 +2198,7 @@ arr_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -2210,9 +2207,9 @@ arr_val_begin:
     if (*cur == 't') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_true(cur, val);
+        auto result = jsoncons::read_true(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2222,9 +2219,9 @@ arr_val_begin:
     if (*cur == 'f') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_false(cur, val);
+        auto result = jsoncons::read_false(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2234,13 +2231,13 @@ arr_val_begin:
     if (*cur == 'n') {
         val_incr();
         ctn_len++;
-        auto result = jsoncons::read_null(cur, val);
+        auto result = jsoncons::read_null(cur, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
-                auto result2 = read_nan(false, cur, flags, val);
+                auto result2 = read_nan(false, cur, flags, val, ec);
                 cur = result2.ptr;
                 if (result2)
                 {
@@ -2266,7 +2263,7 @@ arr_val_begin:
         (*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         val_incr();
         ctn_len++;
-        auto result = read_inf_or_nan(false, cur, flags, val);
+        auto result = read_inf_or_nan(false, cur, flags, val, ec);
         cur = result.ptr;
         if (result)
         {
@@ -2275,8 +2272,8 @@ arr_val_begin:
         goto fail_character;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2303,8 +2300,8 @@ arr_val_end:
         goto arr_val_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2361,7 +2358,7 @@ obj_key_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -2379,8 +2376,8 @@ obj_key_begin:
         goto obj_key_begin;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2403,8 +2400,8 @@ obj_key_end:
         goto obj_key_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2419,7 +2416,7 @@ obj_val_begin:
         ctn_len++;
         auto result = jsoncons::read_string(cur, end, inv, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "");
         }
@@ -2447,9 +2444,9 @@ obj_val_begin:
     if (*cur == 't') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_true(cur, val);
+        auto result = jsoncons::read_true(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2459,9 +2456,9 @@ obj_val_begin:
     if (*cur == 'f') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_false(cur, val);
+        auto result = jsoncons::read_false(cur, val, ec);
         cur = result.ptr;       
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             ec = result.ec;
             return_err(cur, result.ec, "");
@@ -2471,13 +2468,13 @@ obj_val_begin:
     if (*cur == 'n') {
         val++;
         ctn_len++;
-        auto result = jsoncons::read_null(cur, val);
+        auto result = jsoncons::read_null(cur, val, ec);
         cur = result.ptr;
-        if (JSONCONS_UNLIKELY(!result))
+        if (JSONCONS_UNLIKELY(ec))
         {
             if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
             {
-                auto result2 = read_nan(false, cur, flags, val);
+                auto result2 = read_nan(false, cur, flags, val, ec);
                 cur = result2.ptr;
                 if (result2)
                 {
@@ -2496,7 +2493,7 @@ obj_val_begin:
         (*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         val++;
         ctn_len++;
-        auto result = read_inf_or_nan(false, cur, flags, val);
+        auto result = read_inf_or_nan(false, cur, flags, val, ec);
         cur = result.ptr;
         if (result)
         {
@@ -2505,8 +2502,8 @@ obj_val_begin:
         goto fail_character;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2533,8 +2530,8 @@ obj_val_end:
         goto obj_val_end;
     }
     if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-        auto result = skip_spaces_and_comments(cur);
-        if (!result)
+        auto result = skip_spaces_and_comments(cur, ec);
+        if (JSONCONS_UNLIKELY(ec))
         {
             return_err(cur, result.ec, "unclosed multiline comment");
         }
@@ -2563,8 +2560,8 @@ doc_end:
     /* check invalid contents after json document */
     if (JSONCONS_UNLIKELY(cur < end) && (flags & read_json_flags::stop_when_done) == read_json_flags{} ) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = skip_spaces_and_comments(cur);
-            if (!result)
+            auto result = skip_spaces_and_comments(cur, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return_err(cur, result.ec, "unclosed multiline comment");
             }
@@ -2604,6 +2601,7 @@ deserialize_result<json_container> json_container::parse(char *dat,
     return deserialize_result<json_container>{_code}; \
 } while (false)
     
+    std::error_code ec;
     json_container doc;
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
@@ -2635,8 +2633,8 @@ deserialize_result<json_container> json_container::parse(char *dat,
     /* skip empty contents before json document */
     if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = skip_spaces_and_comments(cur);
-            if (!result)
+            auto result = skip_spaces_and_comments(cur, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return_err(cur, result.ec, "unclosed multiline comment");
             }
@@ -2699,6 +2697,7 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     return deserialize_result<json_container>{_code}; \
 } while (false)
     
+    std::error_code ec;
     json_container doc;
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
@@ -2729,8 +2728,8 @@ deserialize_result<json_container> json_container::yyjson_read_opts(char *dat,
     /* skip empty contents before json document */
     if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = skip_spaces_and_comments(cur);
-            if (!result)
+            auto result = skip_spaces_and_comments(cur, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return_err(cur, result.ec, "unclosed multiline comment");
             }
