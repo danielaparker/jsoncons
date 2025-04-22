@@ -3,7 +3,7 @@
 # jsoncons examples CMake file
 #
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 3.5...3.14)
 
 # load global config
 include (../../build/cmake/Config.cmake)
@@ -27,7 +27,7 @@ foreach(example_file ${Example_sources})
     # Create an executable with the example name and file
     add_executable(${example_name} ${example_file})
 
-    if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+    if ((CMAKE_SYSTEM_NAME STREQUAL "Linux") AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
       # special link option on Linux because llvm stl rely on GNU stl
       target_link_libraries(${example_name} -Wl,-lstdc++)
     endif()
