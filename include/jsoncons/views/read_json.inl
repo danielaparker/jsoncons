@@ -209,7 +209,7 @@ JSONCONS_FORCE_INLINE bool char_is_hex(uint8_t c) {
        of this comment block.
  */
 
-inline read_json_result skip_spaces_and_comments(uint8_t* hdr, std::error_code& ec) 
+inline read_json_result skip_spaces_and_comments(uint8_t* hdr, jsoncons::read_json_errc& ec) 
 {
     uint8_t *cur = hdr;
     while (true) {
@@ -366,7 +366,7 @@ JSONCONS_FORCE_INLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t 
 
 /** Read 'true' literal, '*cur' should be 't'. */
 inline read_json_result read_true(uint8_t* ptr, json_ref* val, 
-    std::error_code& ec) 
+    jsoncons::read_json_errc& ec) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "true"))) {
@@ -381,7 +381,7 @@ inline read_json_result read_true(uint8_t* ptr, json_ref* val,
 
 /** Read 'false' literal, '*cur' should be 'f'. */
 inline read_json_result read_false(uint8_t *ptr, json_ref* val,
-    std::error_code& ec) 
+    jsoncons::read_json_errc& ec) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur + 1, "alse"))) {
@@ -396,7 +396,7 @@ inline read_json_result read_false(uint8_t *ptr, json_ref* val,
 
 /** Read 'null' literal, '*cur' should be 'n'. */
 inline read_json_result read_null(uint8_t *ptr, json_ref* val,
-    std::error_code& ec) 
+    jsoncons::read_json_errc& ec) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "null"))) {
@@ -410,7 +410,7 @@ inline read_json_result read_null(uint8_t *ptr, json_ref* val,
 
 /** Read 'Inf' or 'Infinity' literal (ignoring case). */
 inline read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val,
-    std::error_code& ec) {
+    jsoncons::read_json_errc& ec) {
     
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
@@ -441,7 +441,7 @@ inline read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags,
 
 /** Read 'NaN' literal (ignoring case). */
 inline read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val,
-    std::error_code& ec) 
+    jsoncons::read_json_errc& ec) 
 {
 
     uint8_t *hdr = ptr - sign;
@@ -468,7 +468,7 @@ inline read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags,
 
 /** Read 'Inf', 'Infinity' or 'NaN' literal (ignoring case). */
 inline read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val,
-    std::error_code& ec) 
+    jsoncons::read_json_errc& ec) 
 {
     auto result = read_inf(sign, ptr, flags, val, ec);
     return result? result : read_nan(sign, ptr, flags, val, ec);

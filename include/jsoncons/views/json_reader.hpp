@@ -35,7 +35,7 @@ namespace jsoncons {
         end_object,
         key
     };
-
+#if 0
     class json_reader
     {
     public:
@@ -112,7 +112,7 @@ namespace jsoncons {
                 
         json_ref read_element(std::error_code& ec);
     };
-
+#endif
 } // jsoncons
 
 #endif
