@@ -209,7 +209,7 @@ JSONCONS_FORCE_INLINE bool char_is_hex(uint8_t c) {
        of this comment block.
  */
 
-inline read_json_result skip_spaces_and_comments(uint8_t* hdr, jsoncons::read_json_errc& ec) 
+JSONCONS_FORCE_INLINE read_json_result skip_spaces_and_comments(uint8_t* hdr) 
 {
     uint8_t *cur = hdr;
     while (true) {
@@ -365,8 +365,7 @@ JSONCONS_FORCE_INLINE bool is_truncated_end(uint8_t *hdr, uint8_t *cur, uint8_t 
  */
 
 /** Read 'true' literal, '*cur' should be 't'. */
-inline read_json_result read_true(uint8_t* ptr, json_ref* val, 
-    jsoncons::read_json_errc& ec) 
+JSONCONS_FORCE_INLINE read_json_result read_true(uint8_t* ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "true"))) {
@@ -375,13 +374,11 @@ inline read_json_result read_true(uint8_t* ptr, json_ref* val,
         //val.uni.bool_val = true; 
         return read_json_result{cur + 4, read_json_errc{}};
     }
-    ec = read_json_errc::invalid_literal;
     return read_json_result{cur, read_json_errc::invalid_literal};
 }
 
 /** Read 'false' literal, '*cur' should be 'f'. */
-inline read_json_result read_false(uint8_t *ptr, json_ref* val,
-    jsoncons::read_json_errc& ec) 
+JSONCONS_FORCE_INLINE read_json_result read_false(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur + 1, "alse"))) {
@@ -390,13 +387,11 @@ inline read_json_result read_false(uint8_t *ptr, json_ref* val,
         //val.uni.bool_val = false; 
         return read_json_result{cur + 5, read_json_errc{}};
     }
-    ec = read_json_errc::invalid_literal;
     return read_json_result{cur, read_json_errc::invalid_literal};
 }
 
 /** Read 'null' literal, '*cur' should be 'n'. */
-inline read_json_result read_null(uint8_t *ptr, json_ref* val,
-    jsoncons::read_json_errc& ec) 
+JSONCONS_FORCE_INLINE read_json_result read_null(uint8_t *ptr, json_ref* val) 
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "null"))) {
@@ -404,14 +399,11 @@ inline read_json_result read_null(uint8_t *ptr, json_ref* val,
         //val.info = uint8_t(json_type::null_value);
         return read_json_result{cur + 4, read_json_errc{}};
     }
-    ec = read_json_errc::invalid_literal;
     return read_json_result{cur, read_json_errc::invalid_literal};
 }
 
 /** Read 'Inf' or 'Infinity' literal (ignoring case). */
-inline read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val,
-    jsoncons::read_json_errc& ec) {
-    
+JSONCONS_FORCE_INLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'I' || cur[0] == 'i') &&
@@ -435,15 +427,11 @@ inline read_json_result read_inf(bool sign, uint8_t *ptr, read_json_flags flags,
         }
         return read_json_result{ cur, read_json_errc{} };
     }
-    ec = read_json_errc::no_digit_after_minus_sign;
     return read_json_result{ptr, read_json_errc::no_digit_after_minus_sign}; 
 }
 
 /** Read 'NaN' literal (ignoring case). */
-inline read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val,
-    jsoncons::read_json_errc& ec) 
-{
-
+JSONCONS_FORCE_INLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) {
     uint8_t *hdr = ptr - sign;
     uint8_t *cur = ptr;
     if ((cur[0] == 'N' || cur[0] == 'n') &&
@@ -462,16 +450,14 @@ inline read_json_result read_nan(bool sign, uint8_t* ptr, read_json_flags flags,
         }
         return read_json_result{ cur, read_json_errc{} };
     }
-    ec = read_json_errc::no_digit_after_minus_sign;
     return read_json_result{ptr, read_json_errc::no_digit_after_minus_sign}; 
 }
 
 /** Read 'Inf', 'Infinity' or 'NaN' literal (ignoring case). */
-inline read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val,
-    jsoncons::read_json_errc& ec) 
+JSONCONS_FORCE_INLINE read_json_result read_inf_or_nan(bool sign, uint8_t* ptr, read_json_flags flags, json_ref* val) 
 {
-    auto result = read_inf(sign, ptr, flags, val, ec);
-    return result? result : read_nan(sign, ptr, flags, val, ec);
+    auto result = read_inf(sign, ptr, flags, val);
+    return result? result : read_nan(sign, ptr, flags, val);
 }
 
 } // namespace jsoncons
