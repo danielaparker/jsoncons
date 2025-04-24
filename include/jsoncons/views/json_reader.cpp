@@ -365,7 +365,7 @@ JSONCONS_FORCE_INLINE static bool read_hex_u16(const uint8_t *cur, uint16_t *val
  *============================================================================*/
 
 /** Read a JSON number as raw string. */
-inline read_json_result read_number_raw(uint8_t* cur,
+inline uint8_t* read_number_raw(uint8_t* cur,
     read_json_flags flags,
     json_ref* val,
     jsoncons::read_json_errc& ec) 
@@ -384,11 +384,11 @@ inline read_json_result read_number_raw(uint8_t* cur,
             if (result)
             {
                 std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr));
-                return read_json_result{cur, read_json_errc{}}; 
+                return cur; 
             }
         }
         ec = read_json_errc::no_digit_after_minus_sign;
-        return read_json_result{cur, read_json_errc::no_digit_after_minus_sign};
+        return cur;
     }
     
     /* read integral part */
@@ -397,19 +397,19 @@ inline read_json_result read_number_raw(uint8_t* cur,
         if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) 
         {
             ec = read_json_errc::leading_zero;
-            return read_json_result(cur - 1, read_json_errc::leading_zero);
+            return cur - 1;
         }
         if (!digi_is_fp(*cur)) 
         {
             std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
-            return read_json_result{cur, read_json_errc{}}; 
+            return cur; 
         }
     } else {
         while (digi_is_digit(*cur)) cur++;
         if (!digi_is_fp(*cur)) 
         {
             std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
-            return read_json_result{cur, read_json_errc{}}; 
+            return cur; 
         }
     }
     
@@ -419,7 +419,7 @@ inline read_json_result read_number_raw(uint8_t* cur,
         if (!digi_is_digit(*cur++)) 
         {
             ec = read_json_errc::no_digit_after_decimal_point;
-            return read_json_result(cur, read_json_errc::no_digit_after_decimal_point);
+            return cur;
         }
         while (digi_is_digit(*cur)) cur++;
     }
@@ -429,13 +429,13 @@ inline read_json_result read_number_raw(uint8_t* cur,
         cur += 1 + digi_is_sign(cur[1]);
         if (!digi_is_digit(*cur++)) {
             ec = read_json_errc::no_digit_after_exponent_sign;
-            return read_json_result(cur, read_json_errc::no_digit_after_exponent_sign);
+            return cur;
         }
         while (digi_is_digit(*cur)) cur++;
     }
     
     std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
-    return read_json_result{cur, read_json_errc{}}; 
+    return cur; 
 }
 
 /**
@@ -521,7 +521,7 @@ read_json_result read_number(uint8_t* ptr,
     /* read number as raw string if has `read_json_flags::number_as_raw` flag */
     if (JSONCONS_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
         auto result = read_number_raw(cur, flags, val, ec);
-        return result;
+        return read_json_result{result, read_json_errc{}};
     }
     
     sign = (*hdr == '-');
