@@ -465,14 +465,13 @@ read_json_result read_number(uint8_t* ptr,
 } while (false)
     
 #define return_inf() do { \
-    if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw(); \
+    if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) \
+    { \
+        ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
+        return read_json_result{cur, read_json_errc{}}; \
+    } \
     if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) return_f64_bin(F64_RAW_INF); \
     else return read_json_result(hdr, read_json_errc::inf_or_nan); \
-} while (false)
-    
-#define return_raw() do { \
-    ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
-    return read_json_result{cur, read_json_errc{}}; \
 } while (false)
     
 #define return_raw_bigint() do { \
@@ -539,7 +538,11 @@ read_json_result read_number(uint8_t* ptr,
             cur++;
             if (sign) 
             {
-                if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw();
+                if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{}))
+                {
+                    ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
+                    return read_json_result{cur, read_json_errc{}}; 
+                }
                 ::new(val) json_ref(-utility::normalized_u64_to_f64(sig)); 
                 return read_json_result{cur, read_json_errc{}}; 
             }
@@ -553,7 +556,11 @@ intg_end:
     if (!digi_is_digit_or_fp(*cur)) {
         /* this number is an integer consisting of 1 to 19 digits */
         if (sign && (sig > ((uint64_t)1 << 63))) {
-            if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw();
+            if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{}))
+            {
+                ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
+                return read_json_result{cur, read_json_errc{}}; 
+            }
             ::new(val) json_ref(-utility::normalized_u64_to_f64(sig));
             return read_json_result{cur, read_json_errc{}}; \
         }
@@ -572,7 +579,8 @@ read_double:
     /* this number should be read as double */
     while (digi_is_digit(*cur)) cur++;
     if (!digi_is_fp(*cur) && ((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) {
-        return_raw(); /* it's a large integer */
+        ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); // it's a large integer
+        return read_json_result{cur, read_json_errc{}}; 
     }
     if (*cur == '.') {
         /* skip fraction part */
@@ -619,7 +627,6 @@ read_double:
     
 #undef return_f64_bin
 #undef return_inf
-#undef return_raw
 }
 
 /**
