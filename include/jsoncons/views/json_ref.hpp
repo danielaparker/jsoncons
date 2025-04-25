@@ -163,6 +163,12 @@ namespace jsoncons {
         {
         }
 
+        constexpr json_ref(zero_arg_t) noexcept
+            : info(uint8_t(json_type::uint64_value))
+        {
+            uni.u64_val = 0;
+        }
+
         template <typename T>
         requires std::signed_integral<T>
         constexpr json_ref(T val) noexcept

@@ -118,6 +118,13 @@ namespace jsoncons {
     };
     
     JSONCONS_INLINE_CONSTEXPR half_arg_t half_arg{};
+
+    struct zero_arg_t
+    {
+        explicit zero_arg_t() = default; 
+    };
+
+    JSONCONS_INLINE_CONSTEXPR zero_arg_t zero_arg{};
     
     struct json_array_arg_t
     {

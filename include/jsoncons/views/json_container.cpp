@@ -382,7 +382,7 @@ JSONCONS_FORCE_INLINE static read_json_result read_number_raw(uint8_t* cur,
             cur = result.ptr;
             if (result)
             {
-                std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr));
+                ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr));
                 return read_json_result{cur, read_json_errc{}}; 
             }
         }
@@ -397,14 +397,14 @@ JSONCONS_FORCE_INLINE static read_json_result read_number_raw(uint8_t* cur,
         }
         if (!digi_is_fp(*cur)) 
         {
-            std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
+            ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
             return read_json_result{cur, read_json_errc{}}; 
         }
     } else {
         while (digi_is_digit(*cur)) cur++;
         if (!digi_is_fp(*cur)) 
         {
-            std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
+            ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr), semantic_tag::bigint); 
             return read_json_result{cur, read_json_errc{}}; 
         }
     }
@@ -427,7 +427,7 @@ JSONCONS_FORCE_INLINE static read_json_result read_number_raw(uint8_t* cur,
         while (digi_is_digit(*cur)) cur++;
     }
     
-    std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
+    ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
     return read_json_result{cur, read_json_errc{}}; 
 }
 
@@ -457,31 +457,8 @@ read_json_result read_number(uint8_t* ptr,
     json_ref* val) 
 {
     
-#define return_0() do { \
-    std::construct_at(val, uint64_t(0)); \
-    return read_json_result{cur, read_json_errc{}}; \
-} while (false)
-
-#define return_i64(_v) do { \
-    /*std::construct_at(val, sign ? -std::bit_cast<int64_t,uint64_t>(_v) : std::bit_cast<int64_t,uint64_t>(_v));*/ \
-    if (!sign) \
-    { \
-        std::construct_at(val, _v); \
-    } \
-    else \
-    { \
-        std::construct_at(val, -std::bit_cast<int64_t,uint64_t>(_v)); \
-    } \
-    return read_json_result{cur, read_json_errc{}}; \
-} while (false)
-    
-#define return_f64(_v) do { \
-    std::construct_at(val, sign ? -double(_v) : double(_v)); \
-    return read_json_result{cur, read_json_errc{}}; \
-} while (false)
-    
 #define return_f64_bin(_v) do { \
-    std::construct_at(val, std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(_v))); \
+    ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(_v))); \
     /*val.info = uint8_t(json_type::double_value);*/ \
     /*val.uni.u64_val = ((uint64_t)sign << 63) | (uint64_t)(_v);*/ \
     return read_json_result{cur, read_json_errc{}}; \
@@ -494,12 +471,12 @@ read_json_result read_number(uint8_t* ptr,
 } while (false)
     
 #define return_raw() do { \
-    std::construct_at(val, raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
+    ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
     return read_json_result{cur, read_json_errc{}}; \
 } while (false)
     
 #define return_raw_bigint() do { \
-    std::construct_at(val, raw_json_arg, (const char *)hdr, std::size_t(cur - hdr), semantic_tag::bigint); \
+    ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr), semantic_tag::bigint); \
     return read_json_result{cur, read_json_errc{}}; \
 } while (false)
     
@@ -536,7 +513,11 @@ read_json_result read_number(uint8_t* ptr,
         if (JSONCONS_UNLIKELY(digi_is_digit(*cur))) {
             return read_json_result(cur - 1, read_json_errc::leading_zero);
         }
-        if (!digi_is_fp(*cur)) return_0();
+        if (!digi_is_fp(*cur))
+        {
+            ::new(val) json_ref(zero_arg); 
+            return read_json_result{cur, read_json_errc{}}; 
+        }
         goto read_double;
     }
     
@@ -556,11 +537,14 @@ read_json_result read_number(uint8_t* ptr,
             (sig == (U64_MAX / 10) && num <= (U64_MAX % 10))) {
             sig = num + sig * 10;
             cur++;
-            if (sign) {
+            if (sign) 
+            {
                 if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw();
-                return_f64(utility::normalized_u64_to_f64(sig));
+                ::new(val) json_ref(-utility::normalized_u64_to_f64(sig)); 
+                return read_json_result{cur, read_json_errc{}}; 
             }
-            return_i64(sig);
+            ::new(val) json_ref(sig);
+            return read_json_result{cur, read_json_errc{}}; 
         }
     }
     
@@ -570,9 +554,18 @@ intg_end:
         /* this number is an integer consisting of 1 to 19 digits */
         if (sign && (sig > ((uint64_t)1 << 63))) {
             if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) return_raw();
-            return_f64(utility::normalized_u64_to_f64(sig));
+            ::new(val) json_ref(-utility::normalized_u64_to_f64(sig));
+            return read_json_result{cur, read_json_errc{}}; \
         }
-        return_i64(sig);
+        if (!sign) 
+        { 
+            ::new(val) json_ref(sig); 
+        } 
+        else 
+        { 
+            ::new(val) json_ref(-std::bit_cast<int64_t,uint64_t>(sig)); 
+        } 
+        return read_json_result{cur, read_json_errc{}}; \
     }
     
 read_double:
@@ -621,12 +614,9 @@ read_double:
     if (JSONCONS_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
         return_inf();
     }
-    std::construct_at(val, value);
+    ::new(val) json_ref(value);
     return read_json_result{cur, read_json_errc{}}; 
     
-#undef return_0
-#undef return_i64
-#undef return_f64
 #undef return_f64_bin
 #undef return_inf
 #undef return_raw
@@ -707,7 +697,7 @@ skip_ascii_end:
     __asm__ volatile("":"=m"(*src));
 #endif
     if (JSONCONS_LIKELY(*src == '"')) {
-        std::construct_at(val, noesc_arg, (const char *)cur, (std::size_t)(src - cur));
+        ::new(val) json_ref(noesc_arg, (const char *)cur, (std::size_t)(src - cur));
         *src = '\0';
         return read_json_result{src+1, read_json_errc{}};
     }
@@ -815,7 +805,7 @@ copy_escape:
             default: return read_json_result(src, read_json_errc::invalid_escaped_character);
         }
     } else if (JSONCONS_LIKELY(*src == '"')) {
-        std::construct_at(val, (const char *)cur, std::size_t(dst - cur));
+        ::new(val) json_ref((const char *)cur, std::size_t(dst - cur));
         *dst = '\0';
         return read_json_result{src+1, read_json_errc{}};
     } else {
