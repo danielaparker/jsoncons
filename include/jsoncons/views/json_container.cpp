@@ -457,26 +457,18 @@ read_json_result read_number(uint8_t* ptr,
     json_ref* val) 
 {
     
-#define return_f64_bin(_v) do { \
-    ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(_v))); \
-    /*val.info = uint8_t(json_type::double_value);*/ \
-    /*val.uni.u64_val = ((uint64_t)sign << 63) | (uint64_t)(_v);*/ \
-    return read_json_result{cur, read_json_errc{}}; \
-} while (false)
-    
 #define return_inf() do { \
     if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) \
     { \
         ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
         return read_json_result{cur, read_json_errc{}}; \
     } \
-    if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) return_f64_bin(F64_RAW_INF); \
+    if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) \
+    { \
+        ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(F64_RAW_INF))); \
+        return read_json_result{cur, read_json_errc{}}; \
+    } \
     else return read_json_result(hdr, read_json_errc::inf_or_nan); \
-} while (false)
-    
-#define return_raw_bigint() do { \
-    ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr), semantic_tag::bigint); \
-    return read_json_result{cur, read_json_errc{}}; \
 } while (false)
     
     uint64_t sig, num;
@@ -625,7 +617,6 @@ read_double:
     ::new(val) json_ref(value);
     return read_json_result{cur, read_json_errc{}}; 
     
-#undef return_f64_bin
 #undef return_inf
 }
 
