@@ -593,26 +593,29 @@ read_double:
      */
     double value;
     auto [tmpp, ec] = std::from_chars((const char *)hdr, (const char *)cur, value);
-    if (ec != std::errc{}) {
+    if (JSONCONS_UNLIKELY(ec != std::errc{})) 
+    {
+        if (ec == std::errc::result_out_of_range)
+        {
+            if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) 
+            { 
+                ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
+                return read_json_result{cur, read_json_errc{}}; 
+            } 
+            if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
+            { 
+                ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(F64_RAW_INF))); 
+                return read_json_result{cur, read_json_errc{}}; 
+            } 
+            else 
+            {
+                return read_json_result(hdr, read_json_errc::inf_or_nan);
+            }
+        }
         return read_json_result(cur, read_json_errc::invalid_number);
-    }
-    if (JSONCONS_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
-        if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) 
-        { 
-            ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
-            return read_json_result{cur, read_json_errc{}}; 
-        } 
-        if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
-        { 
-            ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(F64_RAW_INF))); 
-            return read_json_result{cur, read_json_errc{}}; 
-        } 
-        else return read_json_result(hdr, read_json_errc::inf_or_nan); 
     }
     ::new(val) json_ref(value);
     return read_json_result{cur, read_json_errc{}}; 
-    
-#undef return_inf
 }
 
 /**
