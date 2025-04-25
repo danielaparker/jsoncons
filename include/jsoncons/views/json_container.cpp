@@ -455,22 +455,7 @@ JSONCONS_FORCE_INLINE static read_json_result read_number_raw(uint8_t* cur,
 read_json_result read_number(uint8_t* ptr,
     read_json_flags flags,
     json_ref* val) 
-{
-    
-#define return_inf() do { \
-    if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) \
-    { \
-        ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); \
-        return read_json_result{cur, read_json_errc{}}; \
-    } \
-    if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) \
-    { \
-        ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(F64_RAW_INF))); \
-        return read_json_result{cur, read_json_errc{}}; \
-    } \
-    else return read_json_result(hdr, read_json_errc::inf_or_nan); \
-} while (false)
-    
+{   
     uint64_t sig, num;
     uint8_t *hdr = ptr;
     uint8_t *cur = ptr;
@@ -612,7 +597,17 @@ read_double:
         return read_json_result(cur, read_json_errc::invalid_number);
     }
     if (JSONCONS_UNLIKELY(value >= HUGE_VAL || value <= -HUGE_VAL)) {
-        return_inf();
+        if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{})) 
+        { 
+            ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
+            return read_json_result{cur, read_json_errc{}}; 
+        } 
+        if ((flags & read_json_flags::allow_inf_and_nan) != read_json_flags{}) 
+        { 
+            ::new(val) json_ref(std::bit_cast<double,uint64_t>(((uint64_t)sign << 63) | (uint64_t)(F64_RAW_INF))); 
+            return read_json_result{cur, read_json_errc{}}; 
+        } 
+        else return read_json_result(hdr, read_json_errc::inf_or_nan); 
     }
     ::new(val) json_ref(value);
     return read_json_result{cur, read_json_errc{}}; 
