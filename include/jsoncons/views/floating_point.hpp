@@ -266,22 +266,6 @@ JSONCONS_FORCE_INLINE uint64_t f64_raw_get_nan(bool sign) {
 #endif
 }
 
-/**
- Convert normalized uint64_t (highest bit is 1) to double.
- 
- Some compiler (such as Microsoft Visual C++ 6.0) do not support converting
- number from uint64_t to double. This function will first convert uint64_t to int64_t and then
- to double, with `to nearest` rounding mode.
- */
-JSONCONS_FORCE_INLINE double normalized_u64_to_f64(uint64_t val) {
-#if YYJSON_U64_TO_F64_NO_IMPL
-    int64_t sig = (int64_t)((val >> 1) | (val & 1));
-    return ((double)sig) * (double)2.0;
-#else
-    return (double)val;
-#endif
-}
-
 /*==============================================================================
  * Bits Utils
  * These functions are used by the floating-point number reader and writer.

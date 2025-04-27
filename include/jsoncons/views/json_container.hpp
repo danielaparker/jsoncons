@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_DOCUMENT_HPP
-#define JSONCONS_JSON_DOCUMENT_HPP
+#ifndef JSONCONS_VIEWS_JSON_CONTAINER_HPP
+#define JSONCONS_VIEWS_JSON_CONTAINER_HPP
 
 #include <jsoncons/views/json_view.hpp>
 #include <jsoncons/views/read_json.hpp>
@@ -13,6 +13,7 @@
 #include <string_view>
 #include <iterator>
 #include <stdexcept>
+#include <istream>
 
 namespace jsoncons {
 
@@ -95,6 +96,9 @@ namespace jsoncons {
             flg &= ~read_json_flags::insitu; /* const string cannot be modified */
             return parse(const_cast<char*>(sv.data()), sv.size(), flg, alloc, element_alloc);
         }
+        
+        static deserialize_result<json_container> parse(std::istream is,
+            read_json_flags flags);
 
         static deserialize_result<json_container> parse_file(std::string_view sv, read_json_flags flg = read_json_flags::none)
         {
@@ -154,5 +158,5 @@ namespace jsoncons {
 
 } // jsoncons
 
-#endif
+#endif // JSONCONS_VIEWS_JSON_CONTAINER_HPP
 

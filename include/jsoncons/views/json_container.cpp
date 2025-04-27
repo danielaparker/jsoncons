@@ -520,7 +520,7 @@ read_json_result read_number(uint8_t* ptr,
                     ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
                     return read_json_result{cur, read_json_errc{}}; 
                 }
-                ::new(val) json_ref(-utility::normalized_u64_to_f64(sig)); 
+                ::new(val) json_ref(-static_cast<int64_t>(sig)); 
                 return read_json_result{cur, read_json_errc{}}; 
             }
             ::new(val) json_ref(sig);
@@ -531,14 +531,14 @@ read_json_result read_number(uint8_t* ptr,
 intg_end:
     /* continuous digits ended */
     if (!digi_is_digit_or_fp(*cur)) {
-        /* this number is an integer consisting of 1 to 19 digits */
+        // this number is an integer consisting of 1 to 19 digits 
         if (sign && (sig > ((uint64_t)1 << 63))) {
             if (((flags & read_json_flags::bignum_as_raw) != read_json_flags{}))
             {
                 ::new(val) json_ref(raw_json_arg, (const char *)hdr, std::size_t(cur - hdr)); 
                 return read_json_result{cur, read_json_errc{}}; 
             }
-            ::new(val) json_ref(-utility::normalized_u64_to_f64(sig));
+            ::new(val) json_ref(-static_cast<double>(sig));
             return read_json_result{cur, read_json_errc{}}; \
         }
         if (!sign) 
@@ -579,18 +579,6 @@ read_double:
         while (digi_is_digit(*cur)) cur++;
     }
     
-    /*
-     libc's strtod() is used to parse the floating-point number.
-     
-     Note that the decimal point character used by strtod() is locale-dependent,
-     and the rounding direction may affected by fesetround().
-     
-     For currently known locales, (en, zh, ja, ko, am, he, hi) use '.' as the
-     decimal point, while other locales use ',' as the decimal point.
-     
-     Here strtod() is called twice for different locales, but if another thread
-     happens calls setlocale() between two strtod(), parsing may still fail.
-     */
     double value;
     auto [tmpp, ec] = std::from_chars((const char *)hdr, (const char *)cur, value);
     if (JSONCONS_UNLIKELY(ec != std::errc{})) 
@@ -2430,7 +2418,8 @@ deserialize_result<json_container> json_container::yyjson_read_file(const char *
 
 deserialize_result<json_container> json_container::yyjson_read_fp(FILE *file,
     read_json_flags flags,
-    allocator_type& alloc, element_allocator_type& element_alloc) {
+    allocator_type& alloc, element_allocator_type& element_alloc) 
+{
 #define return_err(_code, _msg) do { \
     if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size); \
     return deserialize_result<json_container>{_code}; \
@@ -2496,6 +2485,100 @@ deserialize_result<json_container> json_container::yyjson_read_fp(FILE *file,
     
     /* read JSON */
     memset((uint8_t *)buf + file_size, 0, buffer_padding_size);
+    flags |= read_json_flags::insitu;
+    auto doc = yyjson_read_opts((char *)buf, (std::size_t)file_size, flags, alloc, element_alloc);
+    if (doc) {
+        return doc;
+    } else {
+        if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, file_size); \
+        return doc;
+    }
+    
+#undef return_err
+}
+
+deserialize_result<json_container> json_container::parse(std::istream is,
+    read_json_flags flags) 
+{
+#define return_err(_code, _msg) do { \
+    if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size); \
+    return deserialize_result<json_container>{_code}; \
+} while (false)
+    
+    allocator_type alloc{};
+    element_allocator_type element_alloc{};
+
+    uint8_t *buf = nullptr;
+    std::size_t buf_size = 0;
+    
+    /* validate input parameters */
+    if (JSONCONS_UNLIKELY(!is)) 
+    {
+        return_err(read_json_errc::invalid_parameter, "input file is nullptr");
+    }
+
+    std::istream::pos_type file_size{ 0 };
+    // get current position 
+    std::istream::pos_type file_pos = is.tellg();
+    if (file_pos != std::istream::pos_type(-1))
+    {
+        // Get total file size, may fail
+        is.seekg (0, is.end);
+        file_size = is.tellg();
+        is.seekg (file_pos, is.end);
+        if (file_size > 0) 
+        {
+            file_size -= file_pos;
+        }
+    }
+
+    /* read file */
+    if (file_size > 0) {
+        /* read the entire file in one call */
+        buf_size = (std::size_t)file_size + buffer_padding_size;
+        buf = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
+        is.read((char*)buf, static_cast<std::size_t>(file_size));
+        if (!is) 
+        {
+            return_err(read_json_errc::file_read, "file reading failed");
+        }
+    } 
+    else 
+    {
+        // failed to get file size, read it as a stream 
+        /*std::size_t chunk_min = (std::size_t)64;
+        std::size_t chunk_max = (std::size_t)512 * 1024 * 1024;
+        std::size_t chunk_now = chunk_min;
+        std::size_t read_size;
+        uint8_t *tmp;
+        
+        buf_size = buffer_padding_size;
+        while (true) {
+            if (buf_size + chunk_now < buf_size) { // overflow 
+                return_err(read_json_errc::memory_allocation, "fail to alloc memory");
+            }
+            buf_size += chunk_now;
+            if (!buf) {
+                buf = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
+            } else {
+                tmp = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
+                memcpy(tmp, buf, buf_size - chunk_now);    
+                std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size - chunk_now); 
+                buf = tmp;
+            }
+            tmp = ((uint8_t *)buf) + buf_size - buffer_padding_size - chunk_now;
+            read_size = utility::fread_safe(tmp, chunk_now, file);
+            file_size += (long)read_size;
+            if (read_size != chunk_now) break;
+            
+            chunk_now *= 2;
+            if (chunk_now > chunk_max) chunk_now = chunk_max;
+        } 
+        */ 
+    }
+    
+    /* read JSON */
+    memset(buf + file_size, 0, static_cast<std::size_t>(buffer_padding_size));
     flags |= read_json_flags::insitu;
     auto doc = yyjson_read_opts((char *)buf, (std::size_t)file_size, flags, alloc, element_alloc);
     if (doc) {
