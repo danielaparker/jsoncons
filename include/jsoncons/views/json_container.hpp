@@ -20,6 +20,65 @@
 
 namespace jsoncons {
 
+template <class Allocator>
+class string_pool
+{    
+    using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t>;;
+
+    uint8_t* data_{nullptr};
+    std::size_t length_{0};
+    allocator_type alloc_;
+public:
+    string_pool() = default;
+    
+    string_pool(uint8_t* data, std::size_t length, const allocator_type& alloc)
+        : data_(data), length_(length), alloc_(alloc)
+    {
+    }
+
+    string_pool(const string_pool& other) = delete;
+    
+    string_pool(string_pool&& other) noexcept
+        : data_(other.data_), length_(other.length_), alloc_(other.alloc_)
+    {        
+        other.data_ = nullptr;
+        other.length_ = 0;
+    }
+
+    ~string_pool()
+    {
+        if (data_ != nullptr)
+        {
+            std::allocator_traits<allocator_type>::deallocate(alloc_, data_, length_);
+        }
+    }
+
+    string_pool& operator=(const string_pool& other) = delete;
+    string_pool& operator=(string_pool&& other) = delete;
+
+    void swap(string_pool& other)
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+        if (alloc_ != other.alloc_)
+        {
+            auto temp = alloc_;
+            alloc_ = other.alloc_;
+            other.alloc_ = temp;
+        }
+    }
+
+    uint8_t* data() 
+    {
+        return data_;
+    }
+    
+    std::size_t length() const
+    {
+        return length_;
+    }
+};
+
 template <typename Allocator = std::allocator<uint8_t>>
 class json_container
 {
@@ -33,9 +92,7 @@ private:
     
     json_ref* root_{nullptr};
     std::size_t root_capacity_{ 0 };
-    // The string pool used by JSON values (nullable). 
-    uint8_t* hdr_{nullptr};
-    std::size_t hdr_capacity_{0};
+    string_pool<Allocator> str_pool_;
     allocator_type alloc_;
 public:
     json_container() = default;
@@ -43,27 +100,19 @@ public:
     json_container(json_ref* root, std::size_t root_capacity,
         uint8_t* hdr, std::size_t hdr_capacity, 
         const allocator_type& alloc)
-        : root_(root), root_capacity_(root_capacity), hdr_(hdr), hdr_capacity_(0), 
+        : root_(root), root_capacity_(root_capacity), str_pool_{hdr, hdr_capacity, alloc}, 
         alloc_{alloc}
     {
     }
     json_container(const json_container& other) = delete;
     json_container(json_container&& other) noexcept
-        : root_(nullptr), hdr_(nullptr), hdr_capacity_(0)
+        : root_(other.root_), str_pool_(std::move(other.str_pool_))
     {
-        std::swap(root_, other.root_);
-        std::swap(hdr_, other.hdr_);
-        std::swap(hdr_capacity_, other.hdr_capacity_);
+        other.root_ = nullptr;
     }
 
     ~json_container()
     {
-        if (hdr_ != nullptr)
-        {
-            u8_allocator_type u8_alloc{ alloc_ };
-            std::allocator_traits<allocator_type>::deallocate(u8_alloc, (uint8_t*)hdr_, hdr_capacity_);
-            hdr_ = nullptr;
-        }
         if (root_ != nullptr)
         {
             view_allocator_type view_alloc{ alloc_ };
@@ -79,8 +128,7 @@ public:
         if (this != &other)
         {
             std::swap(root_, other.root_);
-            std::swap(hdr_, other.hdr_);
-            std::swap(hdr_capacity_, other.hdr_capacity_);
+            str_pool_.swap(other.str_pool_);;
         }
         return *this;
     }
