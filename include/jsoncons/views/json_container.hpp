@@ -29,7 +29,10 @@ class string_pool
     std::size_t length_{0};
     allocator_type alloc_;
 public:
-    string_pool() = default;
+    string_pool(const allocator_type& alloc = allocator_type{})
+        : alloc_(alloc)
+    {
+    }
     
     string_pool(uint8_t* data, std::size_t length, const allocator_type& alloc)
         : data_(data), length_(length), alloc_(alloc)
@@ -95,12 +98,10 @@ private:
     string_pool<Allocator> str_pool_;
     allocator_type alloc_;
 public:
-    json_container() = default;
-
     json_container(json_ref* root, std::size_t root_capacity,
-        uint8_t* hdr, std::size_t hdr_capacity, 
+        string_pool<Allocator>&& str_pool, 
         const allocator_type& alloc)
-        : root_(root), root_capacity_(root_capacity), str_pool_{hdr, hdr_capacity, alloc}, 
+        : root_(root), root_capacity_(root_capacity), str_pool_{std::move(str_pool)}, 
         alloc_{alloc}
     {
     }
@@ -172,22 +173,19 @@ private:
         read_json_flags flg,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_single(uint8_t *hdr,
-        std::size_t hdr_capacity,
+    static parse_json_result<json_container<Allocator>> read_root_single(string_pool<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_minify(uint8_t *hdr,
-        std::size_t hdr_capacity,
+    static parse_json_result<json_container<Allocator>> read_root_minify(string_pool<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_pretty(uint8_t *hdr,
-        std::size_t hdr_capacity,
+    static parse_json_result<json_container<Allocator>> read_root_pretty(string_pool<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
@@ -1676,9 +1674,7 @@ std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
 
 /** Read single value JSON document. */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single( 
-    uint8_t *hdr,
-    std::size_t hdr_capacity,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single(string_pool<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -1687,7 +1683,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::read_roo
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<view_allocator_type>::deallocate(view_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
+    return is_truncated_end(str_pool.data(), _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
         parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
     
@@ -1788,8 +1784,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_container{val_hdr, alc_len,
-        (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
+    return json_container{val_hdr, alc_len, std::move(str_pool), alloc};
     
 fail_comment:
     return_err(cur, read_json_errc::unclosed_multiline_comment, "unclosed multiline comment");
@@ -1803,9 +1798,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for minify). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify( 
-    uint8_t *hdr,
-    std::size_t hdr_capacity,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify(string_pool<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -1813,7 +1806,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::read_roo
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<view_allocator_type>::deallocate(view_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
+    return is_truncated_end(str_pool.data(), _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
         parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
     
@@ -2272,8 +2265,7 @@ doc_end:
     
     //if (pre && *pre) **pre = '\0';
 
-    return json_container{val_hdr, alc_len,
-        (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
+    return json_container{val_hdr, alc_len, std::move(str_pool), alloc};
     
 fail_alloc:
     return_err(cur, read_json_errc::memory_allocation, "memory allocation failed");
@@ -2292,9 +2284,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for pretty). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(
-    uint8_t *hdr,
-    std::size_t hdr_capacity,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(string_pool<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -2303,7 +2293,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::read_roo
     
 #define return_err(_pos, _code, _msg) do { \
     if (val_hdr) std::allocator_traits<view_allocator_type>::deallocate(view_alloc, val_hdr, alc_len); \
-    return is_truncated_end(hdr, _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
+    return is_truncated_end(str_pool.data(), _pos, end, _code, flags) ? parse_json_result<json_container<Allocator>>{read_json_errc::unexpected_end_of_input} : \
         parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
     
@@ -2798,8 +2788,7 @@ doc_end:
         if (JSONCONS_UNLIKELY(cur < end)) goto fail_garbage;
     }
     
-    return json_container{val_hdr, alc_len, 
-        (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
+    return json_container{val_hdr, alc_len, std::move(str_pool), alloc};
     
 fail_alloc:
     return_err(cur, read_json_errc::memory_allocation, "memory allocation failed");
@@ -2830,7 +2819,6 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(ch
     
     
     u8_allocator_type u8_alloc(alloc);
-    json_container doc;
     uint8_t *hdr = nullptr, *end, *cur;
     std::size_t hdr_capacity = 0;
     
@@ -2880,12 +2868,15 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(ch
     /* read json document */
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_pretty((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+                cur, end, flags, alloc);
         } else {
-            return read_root_minify(hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_minify((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+                cur, end, flags, alloc);
         }
     } else {
-        return read_root_single(hdr, hdr_capacity, cur, end, flags, alloc);
+        return read_root_single((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+            cur, end, flags, alloc);
     }
     
     #if 0
@@ -2976,12 +2967,15 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::yyjson_r
     /* read json document */
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_pretty((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+                cur, end, flags, alloc);
         } else {
-            return read_root_minify(hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_minify((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+                cur, end, flags, alloc);
         }
     } else {
-        return read_root_single(hdr, hdr_capacity, cur, end, flags, alloc);
+        return read_root_single((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
+            cur, end, flags, alloc);
     }
 #if 0    
     /* check result */
