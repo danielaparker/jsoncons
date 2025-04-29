@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DESERIALIZE_RESULT_HPP
-#define JSONCONS_DESERIALIZE_RESULT_HPP
+#ifndef JSONCONS_VIEWS_PARSE_JSON_RESULT_HPP
+#define JSONCONS_VIEWS_PARSE_JSON_RESULT_HPP
 
 #include <system_error>
 #include <type_traits>
@@ -13,31 +13,31 @@
 
 namespace jsoncons {
     template <typename T>
-    class deserialize_result;
+    class parse_json_result;
 
     template <typename T1, typename T2>
     struct is_constructible_or_convertible_from_optional
         : std::integral_constant<
-              bool, std::is_constructible<T1, deserialize_result<T2>&>::value ||
-                    std::is_constructible<T1, deserialize_result<T2>&&>::value ||
-                    std::is_constructible<T1, const deserialize_result<T2>&>::value ||
-                    std::is_constructible<T1, const deserialize_result<T2>&&>::value ||
-                    std::is_convertible<deserialize_result<T2>&, T1>::value ||
-                    std::is_convertible<deserialize_result<T2>&&, T1>::value ||
-                    std::is_convertible<const deserialize_result<T2>&, T1>::value ||
-                    std::is_convertible<const deserialize_result<T2>&&, T1>::value> {};
+              bool, std::is_constructible<T1, parse_json_result<T2>&>::value ||
+                    std::is_constructible<T1, parse_json_result<T2>&&>::value ||
+                    std::is_constructible<T1, const parse_json_result<T2>&>::value ||
+                    std::is_constructible<T1, const parse_json_result<T2>&&>::value ||
+                    std::is_convertible<parse_json_result<T2>&, T1>::value ||
+                    std::is_convertible<parse_json_result<T2>&&, T1>::value ||
+                    std::is_convertible<const parse_json_result<T2>&, T1>::value ||
+                    std::is_convertible<const parse_json_result<T2>&&, T1>::value> {};
 
     template <typename T1, typename T2>
     struct is_constructible_convertible_or_assignable_from_optional
         : std::integral_constant<
               bool, is_constructible_or_convertible_from_optional<T1, T2>::value ||
-                    std::is_assignable<T1&, deserialize_result<T2>&>::value ||
-                    std::is_assignable<T1&, deserialize_result<T2>&&>::value ||
-                    std::is_assignable<T1&, const deserialize_result<T2>&>::value ||
-                    std::is_assignable<T1&, const deserialize_result<T2>&&>::value> {};
+                    std::is_assignable<T1&, parse_json_result<T2>&>::value ||
+                    std::is_assignable<T1&, parse_json_result<T2>&&>::value ||
+                    std::is_assignable<T1&, const parse_json_result<T2>&>::value ||
+                    std::is_assignable<T1&, const parse_json_result<T2>&&>::value> {};
 
     template <typename T>
-    class deserialize_result
+    class parse_json_result
     {
     public:
         using value_type = T;
@@ -48,13 +48,13 @@ namespace jsoncons {
             T value_;
         };
     public:
-        deserialize_result(std::error_code ec) noexcept
+        parse_json_result(std::error_code ec) noexcept
             : has_value_(false), error_{ec}
         {
         }
         
         // copy constructors
-        deserialize_result(const deserialize_result<T>& other)
+        parse_json_result(const parse_json_result<T>& other)
             : has_value_(false), error_{other.error_}
         {
             if (other)
@@ -70,7 +70,7 @@ namespace jsoncons {
                                           std::is_convertible<const U&,T>::value &&
                                           !is_constructible_or_convertible_from_optional<T,U>::value &&
                                           std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-        deserialize_result(const deserialize_result<U>& other)
+        parse_json_result(const parse_json_result<U>& other)
             : has_value_(false), error_{other.error_}
         {
             if (other)
@@ -85,7 +85,7 @@ namespace jsoncons {
                                           !std::is_convertible<const U&,T>::value &&
                                           !is_constructible_or_convertible_from_optional<T,U>::value &&
                                           std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-        explicit deserialize_result(const deserialize_result<U>& other)
+        explicit parse_json_result(const parse_json_result<U>& other)
             : has_value_(false), error_{other.error_}
         {
             if (other)
@@ -96,7 +96,7 @@ namespace jsoncons {
 
         // move constructors
         template <class T2 = T>
-        deserialize_result(deserialize_result<T>&& other,
+        parse_json_result(parse_json_result<T>&& other,
                  typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
             : has_value_(false), error_{other.error_}
        {
@@ -108,7 +108,7 @@ namespace jsoncons {
 
         // converting 
         template <class U>
-        deserialize_result(deserialize_result<U>&& value,
+        parse_json_result(parse_json_result<U>&& value,
              typename std::enable_if<!std::is_same<T,U>::value &&
                                      std::is_constructible<T, U&&>::value &&
                                      !is_constructible_or_convertible_from_optional<T,U>::value &&
@@ -118,7 +118,7 @@ namespace jsoncons {
         }
 
         template <class U>
-        explicit deserialize_result(deserialize_result<U>&& value,
+        explicit parse_json_result(parse_json_result<U>&& value,
                          typename std::enable_if<!std::is_same<T,U>::value &&
                                                  std::is_constructible<T, U&&>::value &&
                                                  !is_constructible_or_convertible_from_optional<T,U>::value &&
@@ -130,8 +130,8 @@ namespace jsoncons {
 
         // value constructors
         template <class T2>
-        deserialize_result(T2&& value,
-             typename std::enable_if<!std::is_same<deserialize_result<T>, typename std::decay<T2>::type>::value &&
+        parse_json_result(T2&& value,
+             typename std::enable_if<!std::is_same<parse_json_result<T>, typename std::decay<T2>::type>::value &&
                                      std::is_constructible<T, T2>::value &&
                                      std::is_convertible<T2,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<T2>(value))
@@ -139,20 +139,20 @@ namespace jsoncons {
         }
 
         template <class T2>
-        explicit deserialize_result(T2&& value,
-                         typename std::enable_if<!std::is_same<deserialize_result<T>, typename std::decay<T2>::type>::value &&
+        explicit parse_json_result(T2&& value,
+                         typename std::enable_if<!std::is_same<parse_json_result<T>, typename std::decay<T2>::type>::value &&
                                                  std::is_constructible<T, T2>::value &&
                                                  !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<T2>(value))
         {
         }
 
-        ~deserialize_result() noexcept
+        ~parse_json_result() noexcept
         {
             destroy();
         }
 
-        deserialize_result& operator=(const deserialize_result& other)
+        parse_json_result& operator=(const parse_json_result& other)
         {
             if (other)
             {
@@ -165,7 +165,7 @@ namespace jsoncons {
             return *this;
         }
 
-        deserialize_result& operator=(deserialize_result&& other )
+        parse_json_result& operator=(parse_json_result&& other )
         {
             if (other)
             {
@@ -179,12 +179,12 @@ namespace jsoncons {
         }
 
         template <typename U>
-        typename std::enable_if<!std::is_same<deserialize_result<T>, U>::value &&
+        typename std::enable_if<!std::is_same<parse_json_result<T>, U>::value &&
                                 std::is_constructible<T, const U&>::value &&
                                !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, const U&>::value,
-            deserialize_result&>::type
-        operator=(const deserialize_result<U>& other)
+            parse_json_result&>::type
+        operator=(const parse_json_result<U>& other)
         {
             if (other) 
             {
@@ -198,12 +198,12 @@ namespace jsoncons {
         }
 
         template <typename U>
-        typename std::enable_if<!std::is_same<deserialize_result<T>, U>::value &&
+        typename std::enable_if<!std::is_same<parse_json_result<T>, U>::value &&
                                 std::is_constructible<T, U>::value &&
                                 !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, U>::value,
-            deserialize_result&>::type
-        operator=(deserialize_result<U>&& other)
+            parse_json_result&>::type
+        operator=(parse_json_result<U>&& other)
         {
             if (other) 
             {
@@ -218,11 +218,11 @@ namespace jsoncons {
 
         // value assignment
         template <typename T2>
-        typename std::enable_if<!std::is_same<deserialize_result<T>, typename std::decay<T2>::type>::value &&
+        typename std::enable_if<!std::is_same<parse_json_result<T>, typename std::decay<T2>::type>::value &&
                                 std::is_constructible<T, T2>::value &&
                                 std::is_assignable<T&, T2>::value &&
                                 !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<T2>::type>::value),
-            deserialize_result&>::type
+            parse_json_result&>::type
         operator=(T2&& v)
         {
             assign(std::forward<T2>(v));
@@ -245,7 +245,7 @@ namespace jsoncons {
             {
                 return get();
             }
-            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad parse_json_result access"));
         }
 
         std::error_code error() &
@@ -254,7 +254,7 @@ namespace jsoncons {
             {
                 return this->error_;
             }
-            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad parse_json_result access"));
         }
 
         constexpr const T& value() const &
@@ -263,7 +263,7 @@ namespace jsoncons {
             {
                 return get();
             }
-            JSONCONS_THROW(std::runtime_error("Bad deserialize_result access"));
+            JSONCONS_THROW(std::runtime_error("Bad parse_json_result access"));
         }
 
         template <typename U>
@@ -314,7 +314,7 @@ namespace jsoncons {
             destroy();
         }
 
-        void swap(deserialize_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+        void swap(parse_json_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                             std::is_nothrow_swappable<T>::value*/)
         {
             const bool contains_a_value = has_value();
@@ -328,9 +328,9 @@ namespace jsoncons {
             }
             else
             {
-                deserialize_result& source = contains_a_value ? *this : other;
-                deserialize_result& target = contains_a_value ? other : *this;
-                target = deserialize_result<T>(*source);
+                parse_json_result& source = contains_a_value ? *this : other;
+                parse_json_result& target = contains_a_value ? other : *this;
+                target = parse_json_result<T>(*source);
                 source.reset();
             }
         }
@@ -370,114 +370,114 @@ namespace jsoncons {
 
     template <typename T>
     typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-    swap(deserialize_result<T>& lhs, deserialize_result<T>& rhs) noexcept
+    swap(parse_json_result<T>& lhs, parse_json_result<T>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator==(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator==(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator!=(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator!=(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator<(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator<(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator>(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator>(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator<=(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator<=(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator>=(const deserialize_result<T1>& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator>=(const parse_json_result<T1>& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
     }
 
     template <class T1, typename T2>
-    constexpr bool operator==(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator==(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs == rhs : false;
     }
     template <class T1, typename T2>
-    constexpr bool operator==(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator==(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs == *rhs : false;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator!=(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator!=(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs != rhs : true;
     }
     template <class T1, typename T2>
-    constexpr bool operator!=(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator!=(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs != *rhs : true;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator<(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator<(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs < rhs : true;
     }
     template <class T1, typename T2>
-    constexpr bool operator<(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator<(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs < *rhs : false;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator<=(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator<=(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs <= rhs : true;
     }
     template <class T1, typename T2>
-    constexpr bool operator<=(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator<=(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs <= *rhs : false;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator>(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator>(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs > rhs : false;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator>(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator>(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs > *rhs : true;
     }
 
     template <class T1, typename T2>
-    constexpr bool operator>=(const deserialize_result<T1>& lhs, const T2& rhs) noexcept 
+    constexpr bool operator>=(const parse_json_result<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs >= rhs : false;
     }
     template <class T1, typename T2>
-    constexpr bool operator>=(const T1& lhs, const deserialize_result<T2>& rhs) noexcept 
+    constexpr bool operator>=(const T1& lhs, const parse_json_result<T2>& rhs) noexcept 
     {
         return rhs ? lhs >= *rhs : true;
     }
 
-}
+} // jsoncons
 
-#endif
+#endif // JSONCONS_VIEWS_PARSE_JSON_RESULT_HPP
