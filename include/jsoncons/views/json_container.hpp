@@ -143,7 +143,22 @@ public:
     {
         allocator_type alloc{};
         flg &= ~read_json_flags::insitu; /* const string cannot be modified */
-        return parse(const_cast<char*>(sv.data()), sv.size(), flg, alloc);
+
+        std::size_t len = sv.length();
+
+        if (JSONCONS_UNLIKELY(len >= USIZE_MAX - buffer_padding_size))
+        {
+            return parse_json_result<json_container<Allocator>>{read_json_errc::memory_allocation}; 
+        }
+
+        u8_allocator_type u8_alloc(alloc);
+        std::size_t hdr_capacity = len + buffer_padding_size;
+        uint8_t* hdr = std::allocator_traits<u8_allocator_type>::allocate(u8_alloc, hdr_capacity);
+        uint8_t* end = hdr + len;
+        memcpy(hdr, sv.data(), len);
+        memset(end, 0, buffer_padding_size);
+        
+        return parse(string_pool<Allocator>{hdr, hdr_capacity, u8_alloc}, (char*)hdr, len, flg, alloc);
     }
     
     static parse_json_result<json_container<Allocator>> parse(std::istream is,
@@ -157,8 +172,8 @@ public:
     }
 
 private:
-    static parse_json_result<json_container<Allocator>> parse(char* dat, size_t len, read_json_flags flg,
-        const allocator_type& alloc);
+    static parse_json_result<json_container<Allocator>> parse(string_pool<Allocator>&& str_pool, 
+        char* dat, size_t len, read_json_flags flg, const allocator_type& alloc);
 
     static parse_json_result<json_container<Allocator>> yyjson_read_opts(char* dat,
         std::size_t len,
@@ -2806,45 +2821,27 @@ fail_garbage:
 }
 
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(char *dat,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(string_pool<Allocator>&& str_pool,
+    char *data,
     std::size_t len,
     read_json_flags flags,
     const allocator_type& alloc) 
 {
     
 #define return_err(_pos, _code, _msg) do { \
-    if (!(flags & read_json_flags::insitu) != read_json_flags{} && hdr) std::allocator_traits<u8_allocator_type>::deallocate(u8_alloc, hdr, hdr_capacity); \
     return parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
-    
-    
-    u8_allocator_type u8_alloc(alloc);
-    uint8_t *hdr = nullptr, *end, *cur;
-    std::size_t hdr_capacity = 0;
-    
-    if (JSONCONS_UNLIKELY(!dat)) {
+          
+    if (JSONCONS_UNLIKELY(!data)) {
         return_err(0, read_json_errc::invalid_parameter, "input data is nullptr");
     }
     if (JSONCONS_UNLIKELY(!len)) {
         return_err(0, read_json_errc::invalid_parameter, "input length is 0");
     }
     
-    /* add 4-byte zero padding for input data if necessary */
-    if ((flags & read_json_flags::insitu) != read_json_flags{}) {
-        hdr = (uint8_t *)dat;
-        end = (uint8_t *)dat + len;
-        cur = (uint8_t *)dat;
-    } else {
-        if (JSONCONS_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
-            return_err(0, read_json_errc::memory_allocation, "memory allocation failed");
-        }
-        hdr_capacity = len + buffer_padding_size;
-        hdr = std::allocator_traits<allocator_type>::allocate(u8_alloc, hdr_capacity);
-        end = hdr + len;
-        cur = hdr;
-        memcpy(hdr, dat, len);
-        memset(end, 0, buffer_padding_size);
-    }
+    uint8_t* hdr = (uint8_t *)data;
+    uint8_t* end = hdr + len;
+    uint8_t* cur = hdr;
     
     /* skip empty contents before json document */
     if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
@@ -2868,15 +2865,12 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(ch
     /* read json document */
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-                cur, end, flags, alloc);
+            return read_root_pretty(std::move(str_pool), cur, end, flags, alloc);
         } else {
-            return read_root_minify((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-                cur, end, flags, alloc);
+            return read_root_minify(std::move(str_pool), cur, end, flags, alloc);
         }
     } else {
-        return read_root_single((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-            cur, end, flags, alloc);
+        return read_root_single(std::move(str_pool), cur, end, flags, alloc);
     }
     
     #if 0
