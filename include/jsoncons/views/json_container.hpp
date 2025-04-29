@@ -493,7 +493,7 @@ JSONCONS_FORCE_INLINE read_json_result read_true(uint8_t* ptr, json_ref* val)
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur, "true"))) {
-        std::construct_at(val, true);
+        ::new(val)json_ref(true);
         //val.info = uint8_t(json_type::bool_value);
         //val.uni.bool_val = true; 
         return read_json_result{cur + 4, read_json_errc{}};
@@ -506,7 +506,7 @@ JSONCONS_FORCE_INLINE read_json_result read_false(uint8_t *ptr, json_ref* val)
 {
     uint8_t *cur = ptr;
     if (JSONCONS_LIKELY(utility::byte_match_4(cur + 1, "alse"))) {
-        std::construct_at(val, false);
+        ::new(val) json_ref(false);
         //val.info = uint8_t(json_type::bool_value);
         //val.uni.bool_val = false; 
         return read_json_result{cur + 5, read_json_errc{}};
@@ -543,7 +543,7 @@ JSONCONS_FORCE_INLINE read_json_result read_inf(bool sign, uint8_t *ptr, read_js
             cur += 3;
         }
         if (JSONCONS_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) {
-            std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
+            ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
         } else {
             ::new(val)json_ref(utility::f64_raw_get_inf(sign)); 
             //val.info = uint8_t(json_type::double_value);
@@ -564,11 +564,11 @@ JSONCONS_FORCE_INLINE read_json_result read_nan(bool sign, uint8_t* ptr, read_js
         cur += 3;
         if (JSONCONS_UNLIKELY(((flags & read_json_flags::number_as_raw) != read_json_flags{}))) 
         {
-            std::construct_at(val, raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
+            ::new(val) json_ref(raw_json_arg, (const char *)hdr, (std::size_t)(cur - hdr)); 
         } 
         else 
         {
-            std::construct_at(val, std::nan("")); 
+            ::new(val) json_ref(std::nan("")); 
             //val.info = uint8_t(json_type::double_value);
             //val.uni.f64_val = std::nan("");
         }
