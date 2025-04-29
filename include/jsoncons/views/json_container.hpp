@@ -31,7 +31,6 @@ private:
     using view_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_ref>;
     using buffer_type = std::basic_string<char,std::char_traits<char>,char_allocator_type>;
     
-    buffer_type buf_;
     json_ref* root_{nullptr};
     std::size_t root_capacity_{ 0 };
     // The string pool used by JSON values (nullable). 
@@ -41,10 +40,10 @@ private:
 public:
     json_container() = default;
 
-    json_container(buffer_type&& buf, json_ref* root, std::size_t root_capacity,
+    json_container(json_ref* root, std::size_t root_capacity,
         uint8_t* hdr, std::size_t hdr_capacity, 
         const allocator_type& alloc)
-        : buf_(std::move(buf)), root_(root), root_capacity_(root_capacity), hdr_(hdr), hdr_capacity_(0), 
+        : root_(root), root_capacity_(root_capacity), hdr_(hdr), hdr_capacity_(0), 
         alloc_{alloc}
     {
     }
@@ -52,39 +51,38 @@ public:
     json_container(json_container&& other) noexcept
         : root_(nullptr), hdr_(nullptr), hdr_capacity_(0)
     {
-        std::swap(buf_, other.buf_);
         std::swap(root_, other.root_);
         std::swap(hdr_, other.hdr_);
         std::swap(hdr_capacity_, other.hdr_capacity_);
-    }
-    json_container& operator=(const json_container& other) = delete;
-
-    json_container& operator=(json_container&& other) noexcept
-    {
-        if (this != &other)
-        {
-            std::swap(buf_, other.buf_);
-            std::swap(root_, other.root_);
-            std::swap(hdr_, other.hdr_);
-            std::swap(hdr_capacity_, other.hdr_capacity_);
-        }
-        return *this;
     }
 
     ~json_container()
     {
         if (hdr_ != nullptr)
         {
-            u8_allocator_type u8_alloc{alloc_};
+            u8_allocator_type u8_alloc{ alloc_ };
             std::allocator_traits<allocator_type>::deallocate(u8_alloc, (uint8_t*)hdr_, hdr_capacity_);
             hdr_ = nullptr;
         }
         if (root_ != nullptr)
         {
-            view_allocator_type view_alloc{alloc_};
+            view_allocator_type view_alloc{ alloc_ };
             std::allocator_traits<view_allocator_type>::deallocate(view_alloc, root_, root_capacity_);
             root_ = nullptr;
         }
+    }
+
+    json_container& operator=(const json_container& other) = delete;
+
+    json_container& operator=(json_container&& other) noexcept
+    {
+        if (this != &other)
+        {
+            std::swap(root_, other.root_);
+            std::swap(hdr_, other.hdr_);
+            std::swap(hdr_capacity_, other.hdr_capacity_);
+        }
+        return *this;
     }
 
     json_view root()
@@ -126,21 +124,21 @@ private:
         read_json_flags flg,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_single(buffer_type&& buf, uint8_t *hdr,
+    static parse_json_result<json_container<Allocator>> read_root_single(uint8_t *hdr,
         std::size_t hdr_capacity,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_minify(buffer_type&& buf, uint8_t *hdr,
+    static parse_json_result<json_container<Allocator>> read_root_minify(uint8_t *hdr,
         std::size_t hdr_capacity,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_pretty(buffer_type&& buf, uint8_t *hdr,
+    static parse_json_result<json_container<Allocator>> read_root_pretty(uint8_t *hdr,
         std::size_t hdr_capacity,
         uint8_t *cur,
         uint8_t *end,
@@ -1630,7 +1628,7 @@ std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
 
 /** Read single value JSON document. */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single(buffer_type&& buf, 
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single( 
     uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
@@ -1742,7 +1740,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_container{std::move(buf), val_hdr, alc_len,
+    return json_container{val_hdr, alc_len,
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_comment:
@@ -1757,7 +1755,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for minify). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify(buffer_type&& buf, 
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify( 
     uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
@@ -2226,7 +2224,7 @@ doc_end:
     
     //if (pre && *pre) **pre = '\0';
 
-    return json_container{std::move(buf), val_hdr, alc_len,
+    return json_container{val_hdr, alc_len,
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_alloc:
@@ -2246,7 +2244,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for pretty). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(buffer_type&& buf, 
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(
     uint8_t *hdr,
     std::size_t hdr_capacity,
     uint8_t *cur,
@@ -2752,7 +2750,7 @@ doc_end:
         if (JSONCONS_UNLIKELY(cur < end)) goto fail_garbage;
     }
     
-    return json_container{std::move(buf), val_hdr, alc_len, 
+    return json_container{val_hdr, alc_len, 
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_alloc:
@@ -2831,17 +2829,15 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(ch
         }
     }
     
-    buffer_type buf{alloc};
-    
     /* read json document */
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc);
         } else {
-            return read_root_minify(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_minify(hdr, hdr_capacity, cur, end, flags, alloc);
         }
     } else {
-        return read_root_single(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+        return read_root_single(hdr, hdr_capacity, cur, end, flags, alloc);
     }
     
     #if 0
@@ -2929,17 +2925,15 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::yyjson_r
         }
     }
     
-    buffer_type buf{alloc};
-
     /* read json document */
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_pretty(hdr, hdr_capacity, cur, end, flags, alloc);
         } else {
-            return read_root_minify(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+            return read_root_minify(hdr, hdr_capacity, cur, end, flags, alloc);
         }
     } else {
-        return read_root_single(std::move(buf), hdr, hdr_capacity, cur, end, flags, alloc);
+        return read_root_single(hdr, hdr_capacity, cur, end, flags, alloc);
     }
 #if 0    
     /* check result */
