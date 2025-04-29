@@ -34,10 +34,6 @@ private:
     buffer_type buf_;
     json_ref* root_{nullptr};
     std::size_t root_capacity_{ 0 };
-    // The total number of bytes read when parsing JSON (nonzero). 
-    size_t dat_read_{0};
-    // The total number of value read when parsing JSON (nonzero). 
-    size_t val_read_{0};
     // The string pool used by JSON values (nullable). 
     uint8_t* hdr_{nullptr};
     std::size_t hdr_capacity_{0};
@@ -46,21 +42,18 @@ public:
     json_container() = default;
 
     json_container(buffer_type&& buf, json_ref* root, std::size_t root_capacity,
-        size_t dat_read, size_t val_read, uint8_t* hdr, std::size_t hdr_capacity, 
+        uint8_t* hdr, std::size_t hdr_capacity, 
         const allocator_type& alloc)
-        : buf_(std::move(buf)), root_(root), root_capacity_(root_capacity), dat_read_(dat_read),
-        val_read_(val_read), hdr_(hdr), hdr_capacity_(0), 
+        : buf_(std::move(buf)), root_(root), root_capacity_(root_capacity), hdr_(hdr), hdr_capacity_(0), 
         alloc_{alloc}
     {
     }
     json_container(const json_container& other) = delete;
     json_container(json_container&& other) noexcept
-        : root_(nullptr), dat_read_(0), val_read_(0), hdr_(nullptr), hdr_capacity_(0)
+        : root_(nullptr), hdr_(nullptr), hdr_capacity_(0)
     {
         std::swap(buf_, other.buf_);
         std::swap(root_, other.root_);
-        std::swap(dat_read_, other.dat_read_);
-        std::swap(val_read_, other.val_read_);
         std::swap(hdr_, other.hdr_);
         std::swap(hdr_capacity_, other.hdr_capacity_);
     }
@@ -72,8 +65,6 @@ public:
         {
             std::swap(buf_, other.buf_);
             std::swap(root_, other.root_);
-            std::swap(dat_read_, other.dat_read_);
-            std::swap(val_read_, other.val_read_);
             std::swap(hdr_, other.hdr_);
             std::swap(hdr_capacity_, other.hdr_capacity_);
         }
@@ -118,15 +109,6 @@ public:
         return yyjson_read_file(const_cast<char*>(sv.data()), flg, alloc);
     }
 
-    std::size_t read_size() const
-    {
-        return dat_read_;
-    }
-
-    std::size_t value_count() const
-    {
-        return val_read_;
-    }
 private:
     static parse_json_result<json_container<Allocator>> parse(char* dat, size_t len, read_json_flags flg,
         const allocator_type& alloc);
@@ -1761,7 +1743,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_container{std::move(buf), val_hdr, alc_len, (std::size_t)(cur - hdr), 1,
+    return json_container{std::move(buf), val_hdr, alc_len,
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_comment:
@@ -2246,7 +2228,7 @@ doc_end:
     
     //if (pre && *pre) **pre = '\0';
 
-    return json_container{std::move(buf), val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - (val_hdr)) + 1),
+    return json_container{std::move(buf), val_hdr, alc_len,
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_alloc:
@@ -2774,7 +2756,7 @@ doc_end:
     }
     
     //if (pre && *pre) **pre = '\0';
-    return json_container{std::move(buf), val_hdr, alc_len, (std::size_t)(cur - hdr), (std::size_t)((val - val_hdr)) - 1, 
+    return json_container{std::move(buf), val_hdr, alc_len, 
         (flags & read_json_flags::insitu) != read_json_flags{} ? nullptr : hdr, hdr_capacity, alloc};
     
 fail_alloc:
@@ -2803,6 +2785,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(ch
     if (!(flags & read_json_flags::insitu) != read_json_flags{} && hdr) std::allocator_traits<u8_allocator_type>::deallocate(u8_alloc, hdr, hdr_capacity); \
     return parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
+    
     
     u8_allocator_type u8_alloc(alloc);
     json_container doc;
