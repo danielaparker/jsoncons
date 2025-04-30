@@ -160,34 +160,19 @@ public:
         
         return parse(string_pool<Allocator>{hdr, hdr_capacity, u8_alloc}, (char*)hdr, len, flg, alloc);
     }
-    
-    static parse_json_result<json_container<Allocator>> parse(std::istream is,
-        read_json_flags flags, const allocator_type& alloc);
 
-    static parse_json_result<json_container<Allocator>> parse_file(std::string_view sv, read_json_flags flg = read_json_flags::none)
+    static parse_json_result<json_container<Allocator>> parse(std::istream& is)
     {
-        allocator_type alloc{};
-        flg &= ~read_json_flags::insitu; /* const string cannot be modified */
-        return yyjson_read_file(const_cast<char*>(sv.data()), flg, alloc);
+        return parse(is, read_json_flags{}, allocator_type{});
     }
+    
+    static parse_json_result<json_container<Allocator>> parse(std::istream& is,
+        read_json_flags flags, const allocator_type& alloc = allocator_type{});
 
 private:
     static parse_json_result<json_container<Allocator>> parse(string_pool<Allocator>&& str_pool, 
-        char* dat, size_t len, read_json_flags flg, const allocator_type& alloc);
+        char* data, size_t len, read_json_flags flg, const allocator_type& alloc);
 
-    static parse_json_result<json_container<Allocator>> yyjson_read_opts(char* dat,
-        std::size_t len,
-        read_json_flags flg,
-        const allocator_type& alloc);
-
-    static parse_json_result<json_container<Allocator>> yyjson_read_file(const char* path,
-        read_json_flags flg,
-        const allocator_type& alloc);
-
-    static parse_json_result<json_container<Allocator>> yyjson_read_fp(FILE* file,
-        read_json_flags flg,
-        const allocator_type& alloc);
-    
     static parse_json_result<json_container<Allocator>> read_root_single(string_pool<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
@@ -1649,42 +1634,6 @@ JSONCONS_FORCE_INLINE static void *mem_align_up(void *mem, std::size_t align) {
     return mem;
 }
 
-
-/*==============================================================================
- * File Utils
- * These functions are used to read and write JSON files.
- *============================================================================*/
-
-namespace utility {
-
-FILE *fopen_safe(const char *path, const char *mode) {
-//#if YYJSON_MSC_VER >= 1400
-    FILE *file = nullptr;
-    if (fopen_s(&file, path, mode) != 0) return nullptr;
-    return file;
-//#else
-//    return fopen(path, mode);
-//#endif
-}
-
-FILE *fopen_readonly(const char *path) {
-    return fopen_safe(path, "rb" YYJSON_FOPEN_EXT);
-}
-
-FILE *fopen_writeonly(const char *path) {
-    return fopen_safe(path, "wb" YYJSON_FOPEN_EXT);
-}
-
-std::size_t fread_safe(void *buf, std::size_t size, FILE *file) {
-#if YYJSON_MSC_VER >= 1400
-    return fread_s(buf, size, 1, size, file);
-#else
-    return fread(buf, 1, size, file);
-#endif
-}
-
-}
-
 // json_container
 
 /** Read single value JSON document. */
@@ -2901,228 +2850,23 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
 }
 
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::yyjson_read_opts(char *dat,
-    std::size_t len,
-    read_json_flags flags,
-    const allocator_type& alloc) {
-    
-#define return_err(_pos, _code, _msg) do { \
-    if (hdr) std::allocator_traits<allocator_type>::deallocate(alloc, hdr, hdr_capacity); \
-    return parse_json_result<json_container<Allocator>>{_code}; \
-} while (false)
-    
-    view_allocator_type view_alloc{ alloc };
-    json_container doc;
-    uint8_t *hdr = nullptr, *end, *cur;
-    std::size_t hdr_capacity = 0;
-    
-    if (JSONCONS_UNLIKELY(!dat)) {
-        return_err(0, read_json_errc::invalid_parameter, "input data is nullptr");
-    }
-    if (JSONCONS_UNLIKELY(!len)) {
-        return_err(0, read_json_errc::invalid_parameter, "input length is 0");
-    }
-    
-    /* add 4-byte zero padding for input data if necessary */
-    if ((flags & read_json_flags::insitu) != read_json_flags{}) {
-        hdr = (uint8_t *)dat;
-        end = (uint8_t *)dat + len;
-        cur = (uint8_t *)dat;
-    } else {
-        if (JSONCONS_UNLIKELY(len >= USIZE_MAX - buffer_padding_size)) {
-            return_err(0, read_json_errc::memory_allocation, "memory allocation failed");
-        }
-        hdr = std::allocator_traits<allocator_type>::allocate(alloc, hdr_capacity);
-        end = hdr + len;
-        cur = hdr;
-        memcpy(hdr, dat, len);
-        memset(end, 0, buffer_padding_size);
-    }
-    
-    /* skip empty contents before json document */
-    if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
-        if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
-            auto result = skip_spaces_and_comments(cur);
-            if (!result)
-            {
-                return_err(cur, result.ec, "unclosed multiline comment");
-            }
-            cur = result.ptr;
-        } else {
-            if (JSONCONS_LIKELY(char_is_space(*cur))) {
-                while (char_is_space(*++cur));
-            }
-        }
-        if (JSONCONS_UNLIKELY(cur >= end)) {
-            return_err(0, read_json_errc::empty_content, "input data is empty");
-        }
-    }
-    
-    /* read json document */
-    if (JSONCONS_LIKELY(char_is_container(*cur))) {
-        if (char_is_space(cur[1]) && char_is_space(cur[2])) {
-            return read_root_pretty((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-                cur, end, flags, alloc);
-        } else {
-            return read_root_minify((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-                cur, end, flags, alloc);
-        }
-    } else {
-        return read_root_single((flags & read_json_flags::insitu) != read_json_flags{} ? string_pool<Allocator>{alloc} : string_pool<Allocator>{hdr, hdr_capacity, alloc}, 
-            cur, end, flags, alloc);
-    }
-#if 0    
-    /* check result */
-    if (JSONCONS_UNLIKELY(&doc)) {
-        /* RFC 8259: JSON text MUST be encoded using UTF-8 */
-        if (err->pos == 0 && err->code != read_json_errc::memory_allocation) {
-            if ((hdr[0] == 0xEF && hdr[1] == 0xBB && hdr[2] == 0xBF)) {
-                err->msg = "byte order mark (BOM) is not supported";
-            } else if (len >= 4 &&
-                       ((hdr[0] == 0x00 && hdr[1] == 0x00 &&
-                         hdr[2] == 0xFE && hdr[3] == 0xFF) ||
-                        (hdr[0] == 0xFF && hdr[1] == 0xFE &&
-                         hdr[2] == 0x00 && hdr[3] == 0x00))) {
-                err->msg = "UTF-32 encoding is not supported";
-            } else if (len >= 2 &&
-                       ((hdr[0] == 0xFE && hdr[1] == 0xFF) ||
-                        (hdr[0] == 0xFF && hdr[1] == 0xFE))) {
-                err->msg = "UTF-16 encoding is not supported";
-            }
-        }
-        if (!(flags & read_json_flags::insitu) != read_json_flags{}) alc.free(alc.ctx, (void *)hdr);
-    }
-    return doc;
-#endif    
-#undef return_err
-}
-
-template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::yyjson_read_file(const char *path,
-    read_json_flags flags,
-    const allocator_type& alloc) {
-#define return_err(_code, _msg) do { \
-    return parse_json_result<json_container<Allocator>>{_code}; \
-} while (false)
-    
-    view_allocator_type view_alloc{ alloc };
-    FILE *file;
-    
-    if (JSONCONS_UNLIKELY(!path)) return_err(read_json_errc::invalid_parameter, "input path is nullptr");
-    
-    file = utility::fopen_readonly(path);
-    if (JSONCONS_UNLIKELY(!file)) return_err(read_json_errc::file_open, "file opening failed");
-    
-    auto doc = yyjson_read_fp(file, flags, alloc, view_alloc);
-    fclose(file);
-    return doc;
-    
-#undef return_err
-}
-
-template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::yyjson_read_fp(FILE *file,
-    read_json_flags flags,
-    const allocator_type& alloc) 
-{
-#define return_err(_code, _msg) do { \
-    if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size); \
-    return parse_json_result<json_container<Allocator>>{_code}; \
-} while (false)
-    
-    view_allocator_type view_alloc{ alloc };
-    long file_size = 0, file_pos;
-    uint8_t *buf = nullptr;
-    std::size_t buf_size = 0;
-    
-    /* validate input parameters */
-    if (JSONCONS_UNLIKELY(!file)) return_err(read_json_errc::invalid_parameter, "input file is nullptr");
-    
-    /* get current position */
-    file_pos = ftell(file);
-    if (file_pos != -1) {
-        /* get total file size, may fail */
-        if (fseek(file, 0, SEEK_END) == 0) file_size = ftell(file);
-        /* reset to original position, may fail */
-        if (fseek(file, file_pos, SEEK_SET) != 0) file_size = 0;
-        /* get file size from current postion to end */
-        if (file_size > 0) file_size -= file_pos;
-    }
-    
-    /* read file */
-    if (file_size > 0) {
-        /* read the entire file in one call */
-        buf_size = (std::size_t)file_size + buffer_padding_size;
-        buf = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
-        if (utility::fread_safe(buf, (std::size_t)file_size, file) != (std::size_t)file_size) {
-            return_err(read_json_errc::file_read, "file reading failed");
-        }
-    } else {
-        /* failed to get file size, read it as a stream */
-        std::size_t chunk_min = (std::size_t)64;
-        std::size_t chunk_max = (std::size_t)512 * 1024 * 1024;
-        std::size_t chunk_now = chunk_min;
-        std::size_t read_size;
-        uint8_t *tmp;
-        
-        buf_size = buffer_padding_size;
-        while (true) {
-            if (buf_size + chunk_now < buf_size) { /* overflow */
-                return_err(read_json_errc::memory_allocation, "fail to alloc memory");
-            }
-            buf_size += chunk_now;
-            if (!buf) {
-                buf = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
-            } else {
-                tmp = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
-                memcpy(tmp, buf, buf_size - chunk_now);    
-                std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size - chunk_now); 
-                buf = tmp;
-            }
-            tmp = ((uint8_t *)buf) + buf_size - buffer_padding_size - chunk_now;
-            read_size = utility::fread_safe(tmp, chunk_now, file);
-            file_size += (long)read_size;
-            if (read_size != chunk_now) break;
-            
-            chunk_now *= 2;
-            if (chunk_now > chunk_max) chunk_now = chunk_max;
-        }
-    }
-    
-    /* read JSON */
-    memset((uint8_t *)buf + file_size, 0, buffer_padding_size);
-    flags |= read_json_flags::insitu;
-    auto doc = yyjson_read_opts((char *)buf, (std::size_t)file_size, flags, alloc, view_alloc);
-    if (doc) {
-        return doc;
-    } else {
-        if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, file_size); \
-        return doc;
-    }
-    
-#undef return_err
-}
-
-template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(std::istream is,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(std::istream& is,
     read_json_flags flags, const allocator_type& alloc) 
 {
 #define return_err(_code, _msg) do { \
-    if (buf) std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size); \
     return parse_json_result<json_container<Allocator>>{_code}; \
 } while (false)
-    
-    u8_allocator_type u8_alloc{alloc};
-    view_allocator_type view_alloc{alloc};
 
-    uint8_t *buf = nullptr;
-    std::size_t buf_size = 0;
-    
-    /* validate input parameters */
+    // validate input parameters
     if (JSONCONS_UNLIKELY(!is)) 
     {
         return_err(read_json_errc::invalid_parameter, "input file is nullptr");
     }
+    
+    u8_allocator_type u8_alloc{alloc};
+
+    uint8_t *buf = nullptr;
+    std::size_t buf_size = 0;
 
     std::istream::pos_type file_size{ 0 };
     // get current position 
@@ -3137,6 +2881,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
         {
             file_size -= file_pos;
         }
+        is.seekg (file_pos, is.beg);
     }
 
     /* read file */
@@ -3153,7 +2898,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
     else 
     {
         // failed to get file size, read it as a stream 
-        /*std::size_t chunk_min = (std::size_t)64;
+        std::size_t chunk_min = (std::size_t)64;
         std::size_t chunk_max = (std::size_t)512 * 1024 * 1024;
         std::size_t chunk_now = chunk_min;
         std::size_t read_size;
@@ -3166,34 +2911,33 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
             }
             buf_size += chunk_now;
             if (!buf) {
-                buf = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
+                buf = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size); 
             } else {
-                tmp = std::allocator_traits<allocator_type>::allocate(alloc, buf_size); 
+                tmp = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size);
                 memcpy(tmp, buf, buf_size - chunk_now);    
-                std::allocator_traits<allocator_type>::deallocate(alloc, buf, buf_size - chunk_now); 
+                std::allocator_traits<allocator_type>::deallocate(u8_alloc, buf, buf_size - chunk_now);
                 buf = tmp;
             }
             tmp = ((uint8_t *)buf) + buf_size - buffer_padding_size - chunk_now;
-            read_size = utility::fread_safe(tmp, chunk_now, file);
+
+            is.read((char*)tmp, static_cast<std::size_t>(chunk_now));
+            if (!is)
+            {
+                return_err(read_json_errc::file_read, "file reading failed");
+            }
+            read_size = is.gcount();
             file_size += (long)read_size;
             if (read_size != chunk_now) break;
             
             chunk_now *= 2;
             if (chunk_now > chunk_max) chunk_now = chunk_max;
         } 
-        */ 
     }
     
     /* read JSON */
     memset(buf + file_size, 0, static_cast<std::size_t>(buffer_padding_size));
     flags |= read_json_flags::insitu;
-    auto doc = yyjson_read_opts((char *)buf, (std::size_t)file_size, flags, alloc);
-    if (doc) {
-        return doc;
-    } else {
-        if (buf) std::allocator_traits<allocator_type>::deallocate(u8_alloc, buf, file_size); \
-        return doc;
-    }
+    return parse(string_pool<Allocator>{buf, buf_size, u8_alloc}, (char *)buf, (std::size_t)file_size, flags, alloc);
     
 #undef return_err
 }

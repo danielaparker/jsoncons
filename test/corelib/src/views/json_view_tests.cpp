@@ -1,6 +1,7 @@
 #include <catch/catch.hpp>
 #include <jsoncons/views/json_container.hpp>
 #include <iostream>
+#include <sstream>
 
 using jsoncons::json_container;
 using jsoncons::json_view;
@@ -41,15 +42,34 @@ TEST_CASE("json_view test")
 }
     )";
     
-    auto doc = json_container<>::parse(str);
+    SECTION("from string")
+    {
+        auto doc = json_container<>::parse(str);
 
-    json_view root = doc->root();
+        json_view root = doc->root();
+
+        REQUIRE(root.is_object());
+        REQUIRE(root.size() == 1);
+        REQUIRE_FALSE(root.empty());   
+        REQUIRE(root["books"].size() == 4);
+        REQUIRE(root.at("books").size() == 4);
+    }
     
-    REQUIRE(root.is_object());
-    REQUIRE(root.size() == 1);
-    REQUIRE_FALSE(root.empty());   
-    REQUIRE(root["books"].size() == 4);
-    REQUIRE(root.at("books").size() == 4);
+    SECTION("from stream")
+    {
+        std::istringstream ss{str};
+
+        auto doc = json_container<>::parse(ss);
+
+        json_view root = doc->root();
+
+        REQUIRE(root.is_object());
+        REQUIRE(root.size() == 1);
+        REQUIRE_FALSE(root.empty());   
+        REQUIRE(root["books"].size() == 4);
+        REQUIRE(root.at("books").size() == 4);
+    }
+    
 
 }
 
