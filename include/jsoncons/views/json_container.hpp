@@ -19,6 +19,84 @@
 #include <istream>
 
 namespace jsoncons {
+template <class Allocator>
+class buffer
+{    
+    using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t>;;
+
+    uint8_t* data_{nullptr};
+    std::size_t length_{0};
+    allocator_type alloc_;
+public:
+    buffer(const allocator_type& alloc = allocator_type{})
+        : alloc_(alloc)
+    {
+    }
+    
+    buffer(std::size_t length, const allocator_type& alloc)
+        : length_(length), alloc_(alloc)
+    {
+        data_ = std::allocator_traits<allocator_type>::allocate(alloc_, length_); 
+    }
+
+    buffer(const buffer& other) = delete;
+    
+    buffer(buffer&& other) noexcept
+        : data_(other.data_), length_(other.length_), alloc_(other.alloc_)
+    {        
+        other.data_ = nullptr;
+        other.length_ = 0;
+    }
+
+    ~buffer()
+    {
+        if (data_ != nullptr)
+        {
+            std::allocator_traits<allocator_type>::deallocate(alloc_, data_, length_);
+        }
+    }
+
+    buffer& operator=(const buffer& other) = delete;
+    
+    buffer& operator=(buffer&& other) 
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+        if (alloc_ != other.alloc_)
+        {
+            auto temp = alloc_;
+            alloc_ = other.alloc_;
+            other.alloc_ = temp;
+        }
+    }
+
+    void swap(buffer& other)
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+        if (alloc_ != other.alloc_)
+        {
+            auto temp = alloc_;
+            alloc_ = other.alloc_;
+            other.alloc_ = temp;
+        }
+    }
+
+    bool empty() const
+    {
+        return length_ == 0;
+    }
+    
+    uint8_t* data() 
+    {
+        return data_;
+    }
+    
+    std::size_t length() const
+    {
+        return length_;
+    }
+};
 
 template <class Allocator>
 class string_pool
@@ -2884,9 +2962,10 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
         is.seekg (file_pos, is.beg);
     }
 
-    /* read file */
+    // read file 
+    file_size = 0;
     if (file_size > 0) {
-        /* read the entire file in one call */
+        // read the entire file in one call 
         buf_size = (std::size_t)file_size + buffer_padding_size;
         buf = std::allocator_traits<u8_allocator_type>::allocate(u8_alloc, buf_size); 
         is.read((char*)buf, static_cast<std::size_t>(file_size));
@@ -2895,8 +2974,10 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
             return_err(read_json_errc::file_read, "file reading failed");
         }
     } 
-    else 
+    else
     {
+        //buffer<Allocator> buf{};
+        
         // failed to get file size, read it as a stream 
         std::size_t chunk_min = (std::size_t)64;
         std::size_t chunk_max = (std::size_t)512 * 1024 * 1024;
@@ -2912,7 +2993,12 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
             buf_size += chunk_now;
             if (!buf) {
                 buf = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size); 
+                // buf = buffer{buf_size, u8_alloc};
             } else {
+                //buffer<Allocator> tmp{buf_size, u8_alloc};
+                //memcpy(tmp.data(), buf, buf_size - chunk_now);    
+                //buf = std::move(tmp);
+                
                 tmp = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size);
                 memcpy(tmp, buf, buf_size - chunk_now);    
                 std::allocator_traits<allocator_type>::deallocate(u8_alloc, buf, buf_size - chunk_now);
@@ -2921,7 +3007,7 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
             tmp = ((uint8_t *)buf) + buf_size - buffer_padding_size - chunk_now;
 
             is.read((char*)tmp, static_cast<std::size_t>(chunk_now));
-            if (!is)
+            if (is.bad())
             {
                 return_err(read_json_errc::file_read, "file reading failed");
             }
