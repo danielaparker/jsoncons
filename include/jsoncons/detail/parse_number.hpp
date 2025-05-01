@@ -1049,9 +1049,7 @@ public:
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    str_to_double(const CharT* s, std::size_t len) 
+    inline double str_to_double(const char* s, std::size_t len) 
     {
         double val = 0;
         const auto res = std::from_chars(s, s+len, val);
@@ -1069,9 +1067,7 @@ public:
         return val;
     }
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    str_to_double(const CharT* s, std::size_t len) 
+    inline double str_to_double(const wchar_t* s, std::size_t len) 
     {
         std::string input(len,'0');
         for (size_t i = 0; i < len; ++i)
@@ -1084,9 +1080,7 @@ public:
 
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    str_to_double(const CharT* s, std::size_t)
+    inline double str_to_double(const char* s, std::size_t)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -1099,9 +1093,7 @@ public:
         return val;
     }
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    str_to_double(const CharT* s, std::size_t)
+    inline double str_to_double(const wchar_t* s, std::size_t)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -1117,9 +1109,7 @@ public:
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    str_to_double(const CharT* s, std::size_t)
+    inline double str_to_double(const char* s, std::size_t)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
@@ -1132,9 +1122,7 @@ public:
         return val;
     }
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    str_to_double(const CharT* s, std::size_t)
+    inline double str_to_double(const wchar_t* s, std::size_t)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
@@ -1149,9 +1137,7 @@ public:
 
 #else
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    str_to_double(CharT* s, std::size_t length)
+    inline double str_to_double(char* s, std::size_t length)
     {
         CharT* cur = s+length;
         CharT *end = nullptr;
@@ -1173,9 +1159,7 @@ public:
         return val;
     }
 
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    str_to_double(CharT* s, std::size_t length)
+    inline double str_to_double(wchar_t* s, std::size_t length)
     {
         CharT* cur = s+length;
         CharT *end = nullptr;
