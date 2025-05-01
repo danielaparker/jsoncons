@@ -19,8 +19,9 @@
 #include <istream>
 
 namespace jsoncons {
+
 template <class Allocator>
-class buffer
+class uninitialized_buffer
 {    
     using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t>;;
 
@@ -28,105 +29,32 @@ class buffer
     std::size_t length_{0};
     allocator_type alloc_;
 public:
-    buffer(const allocator_type& alloc = allocator_type{})
+    uninitialized_buffer(const allocator_type& alloc = allocator_type{})
         : alloc_(alloc)
     {
     }
-    
-    buffer(std::size_t length, const allocator_type& alloc)
+
+    uninitialized_buffer(std::size_t length, const allocator_type& alloc)
         : length_(length), alloc_(alloc)
     {
         data_ = std::allocator_traits<allocator_type>::allocate(alloc_, length_); 
     }
-
-    buffer(const buffer& other) = delete;
     
-    buffer(buffer&& other) noexcept
-        : data_(other.data_), length_(other.length_), alloc_(other.alloc_)
-    {        
-        other.data_ = nullptr;
-        other.length_ = 0;
-    }
-
-    ~buffer()
-    {
-        if (data_ != nullptr)
-        {
-            std::allocator_traits<allocator_type>::deallocate(alloc_, data_, length_);
-        }
-    }
-
-    buffer& operator=(const buffer& other) = delete;
-    
-    buffer& operator=(buffer&& other) 
-    {
-        std::swap(data_, other.data_);
-        std::swap(length_, other.length_);
-        if (alloc_ != other.alloc_)
-        {
-            auto temp = alloc_;
-            alloc_ = other.alloc_;
-            other.alloc_ = temp;
-        }
-    }
-
-    void swap(buffer& other)
-    {
-        std::swap(data_, other.data_);
-        std::swap(length_, other.length_);
-        if (alloc_ != other.alloc_)
-        {
-            auto temp = alloc_;
-            alloc_ = other.alloc_;
-            other.alloc_ = temp;
-        }
-    }
-
-    bool empty() const
-    {
-        return length_ == 0;
-    }
-    
-    uint8_t* data() 
-    {
-        return data_;
-    }
-    
-    std::size_t length() const
-    {
-        return length_;
-    }
-};
-
-template <class Allocator>
-class string_pool
-{    
-    using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t>;;
-
-    uint8_t* data_{nullptr};
-    std::size_t length_{0};
-    allocator_type alloc_;
-public:
-    string_pool(const allocator_type& alloc = allocator_type{})
-        : alloc_(alloc)
-    {
-    }
-    
-    string_pool(uint8_t* data, std::size_t length, const allocator_type& alloc)
+    uninitialized_buffer(uint8_t* data, std::size_t length, const allocator_type& alloc)
         : data_(data), length_(length), alloc_(alloc)
     {
     }
 
-    string_pool(const string_pool& other) = delete;
+    uninitialized_buffer(const uninitialized_buffer& other) = delete;
     
-    string_pool(string_pool&& other) noexcept
+    uninitialized_buffer(uninitialized_buffer&& other) noexcept
         : data_(other.data_), length_(other.length_), alloc_(other.alloc_)
     {        
         other.data_ = nullptr;
         other.length_ = 0;
     }
 
-    ~string_pool()
+    ~uninitialized_buffer()
     {
         if (data_ != nullptr)
         {
@@ -134,10 +62,9 @@ public:
         }
     }
 
-    string_pool& operator=(const string_pool& other) = delete;
-    string_pool& operator=(string_pool&& other) = delete;
+    uninitialized_buffer& operator=(const uninitialized_buffer& other) = delete;
 
-    void swap(string_pool& other)
+    uninitialized_buffer& operator=(uninitialized_buffer&& other) 
     {
         std::swap(data_, other.data_);
         std::swap(length_, other.length_);
@@ -147,6 +74,24 @@ public:
             alloc_ = other.alloc_;
             other.alloc_ = temp;
         }
+        return *this;
+    }
+
+    void swap(uninitialized_buffer& other)
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+        if (alloc_ != other.alloc_)
+        {
+            auto temp = alloc_;
+            alloc_ = other.alloc_;
+            other.alloc_ = temp;
+        }
+    }
+    
+    bool empty() const
+    {
+        return length_ == 0;
     }
 
     uint8_t* data() 
@@ -173,11 +118,11 @@ private:
     
     json_ref* root_{nullptr};
     std::size_t root_capacity_{ 0 };
-    string_pool<Allocator> str_pool_;
+    uninitialized_buffer<Allocator> str_pool_;
     allocator_type alloc_;
 public:
     json_container(json_ref* root, std::size_t root_capacity,
-        string_pool<Allocator>&& str_pool, 
+        uninitialized_buffer<Allocator>&& str_pool, 
         const allocator_type& alloc)
         : root_(root), root_capacity_(root_capacity), str_pool_{std::move(str_pool)}, 
         alloc_{alloc}
@@ -220,7 +165,6 @@ public:
     static parse_json_result<json_container<Allocator>> parse(std::string_view sv, read_json_flags flg = read_json_flags::none)
     {
         allocator_type alloc{};
-        flg &= ~read_json_flags::insitu; /* const string cannot be modified */
 
         std::size_t len = sv.length();
 
@@ -236,7 +180,7 @@ public:
         memcpy(hdr, sv.data(), len);
         memset(end, 0, buffer_padding_size);
         
-        return parse(string_pool<Allocator>{hdr, hdr_capacity, u8_alloc}, (char*)hdr, len, flg, alloc);
+        return parse(uninitialized_buffer<Allocator>{hdr, hdr_capacity, u8_alloc}, (char*)hdr, len, flg, alloc);
     }
 
     static parse_json_result<json_container<Allocator>> parse(std::istream& is)
@@ -248,22 +192,22 @@ public:
         read_json_flags flags, const allocator_type& alloc = allocator_type{});
 
 private:
-    static parse_json_result<json_container<Allocator>> parse(string_pool<Allocator>&& str_pool, 
+    static parse_json_result<json_container<Allocator>> parse(uninitialized_buffer<Allocator>&& str_pool, 
         char* data, size_t len, read_json_flags flg, const allocator_type& alloc);
 
-    static parse_json_result<json_container<Allocator>> read_root_single(string_pool<Allocator>&& str_pool,
+    static parse_json_result<json_container<Allocator>> read_root_single(uninitialized_buffer<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_minify(string_pool<Allocator>&& str_pool,
+    static parse_json_result<json_container<Allocator>> read_root_minify(uninitialized_buffer<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
         const allocator_type& alloc);
     
-    static parse_json_result<json_container<Allocator>> read_root_pretty(string_pool<Allocator>&& str_pool,
+    static parse_json_result<json_container<Allocator>> read_root_pretty(uninitialized_buffer<Allocator>&& str_pool,
         uint8_t *cur,
         uint8_t *end,
         read_json_flags flags,
@@ -1716,7 +1660,7 @@ JSONCONS_FORCE_INLINE static void *mem_align_up(void *mem, std::size_t align) {
 
 /** Read single value JSON document. */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single(string_pool<Allocator>&& str_pool,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_single(uninitialized_buffer<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -1840,7 +1784,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for minify). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify(string_pool<Allocator>&& str_pool,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_minify(uninitialized_buffer<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -2326,7 +2270,7 @@ fail_garbage:
 
 /** Read JSON document (accept all style, but optimized for pretty). */
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(string_pool<Allocator>&& str_pool,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::read_root_pretty(uninitialized_buffer<Allocator>&& str_pool,
     uint8_t *cur,
     uint8_t *end,
     read_json_flags flags,
@@ -2848,35 +2792,30 @@ fail_garbage:
 }
 
 template <typename Allocator>
-parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(string_pool<Allocator>&& str_pool,
+parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(uninitialized_buffer<Allocator>&& str_pool,
     char *data,
     std::size_t len,
     read_json_flags flags,
     const allocator_type& alloc) 
-{
-    
-#define return_err(_pos, _code, _msg) do { \
-    return parse_json_result<json_container<Allocator>>{_code}; \
-} while (false)
-          
+{         
     if (JSONCONS_UNLIKELY(!data)) {
-        return_err(0, read_json_errc::invalid_parameter, "input data is nullptr");
+        return parse_json_result<json_container<Allocator>>{read_json_errc::invalid_parameter}; 
     }
     if (JSONCONS_UNLIKELY(!len)) {
-        return_err(0, read_json_errc::invalid_parameter, "input length is 0");
+        return parse_json_result<json_container<Allocator>>{read_json_errc::invalid_parameter}; 
     }
     
     uint8_t* hdr = (uint8_t *)data;
     uint8_t* end = hdr + len;
     uint8_t* cur = hdr;
     
-    /* skip empty contents before json document */
+    // skip empty contents before json document 
     if (JSONCONS_UNLIKELY(char_is_space_or_comment(*cur))) {
         if ((flags & read_json_flags::allow_comments) != read_json_flags{}) {
             auto result = skip_spaces_and_comments(cur);
             if (!result)
             {
-                return_err(cur, result.ec, "unclosed multiline comment");
+                return parse_json_result<json_container<Allocator>>{result.ec}; 
             }
             cur = result.ptr;
         } else {
@@ -2885,18 +2824,20 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
             }
         }
         if (JSONCONS_UNLIKELY(cur >= end)) {
-            return_err(0, read_json_errc::empty_content, "input data is empty");
+            return parse_json_result<json_container<Allocator>>{read_json_errc::empty_content}; 
         }
     }
     
-    /* read json document */
+    // read json document 
     if (JSONCONS_LIKELY(char_is_container(*cur))) {
         if (char_is_space(cur[1]) && char_is_space(cur[2])) {
             return read_root_pretty(std::move(str_pool), cur, end, flags, alloc);
         } else {
             return read_root_minify(std::move(str_pool), cur, end, flags, alloc);
         }
-    } else {
+    } 
+    else 
+    {
         return read_root_single(std::move(str_pool), cur, end, flags, alloc);
     }
     
@@ -2919,32 +2860,20 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
                 err->msg = "UTF-16 encoding is not supported";
             }
         }
-        if (!(flags & read_json_flags::insitu) != read_json_flags{}) alc.free(alc.ctx, (void *)hdr);
     }
     return doc;
 #endif
-    
-#undef return_err
 }
 
 template <typename Allocator>
 parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(std::istream& is,
-    read_json_flags flags, const allocator_type& alloc) 
+    read_json_flags flags, const allocator_type& alloc)
 {
-#define return_err(_code, _msg) do { \
-    return parse_json_result<json_container<Allocator>>{_code}; \
-} while (false)
-
     // validate input parameters
-    if (JSONCONS_UNLIKELY(!is)) 
+    if (JSONCONS_UNLIKELY(!is))
     {
-        return_err(read_json_errc::invalid_parameter, "input file is nullptr");
+        return parse_json_result<json_container<Allocator>>{read_json_errc::invalid_parameter}; 
     }
-    
-    u8_allocator_type u8_alloc{alloc};
-
-    uint8_t *buf = nullptr;
-    std::size_t buf_size = 0;
 
     std::istream::pos_type file_size{ 0 };
     // get current position 
@@ -2952,80 +2881,70 @@ parse_json_result<json_container<Allocator>> json_container<Allocator>::parse(st
     if (file_pos != std::istream::pos_type(-1))
     {
         // Get total file size, may fail
-        is.seekg (0, is.end);
+        is.seekg(0, is.end);
         file_size = is.tellg();
-        is.seekg (file_pos, is.end);
-        if (file_size > 0) 
+        is.seekg(file_pos, is.end);
+        if (file_size > 0)
         {
             file_size -= file_pos;
         }
-        is.seekg (file_pos, is.beg);
+        is.seekg(file_pos, is.beg);
     }
 
     // read file 
-    file_size = 0;
+    uninitialized_buffer<Allocator> buf{alloc};
     if (file_size > 0) {
-        // read the entire file in one call 
-        buf_size = (std::size_t)file_size + buffer_padding_size;
-        buf = std::allocator_traits<u8_allocator_type>::allocate(u8_alloc, buf_size); 
-        is.read((char*)buf, static_cast<std::size_t>(file_size));
-        if (!is) 
+        buf = uninitialized_buffer<Allocator>{ (std::size_t)file_size + buffer_padding_size, alloc };
+        is.read((char*)buf.data(), static_cast<std::size_t>(file_size));
+        if (is.bad())
         {
-            return_err(read_json_errc::file_read, "file reading failed");
+            return parse_json_result<json_container<Allocator>>{read_json_errc::file_read}; 
         }
-    } 
+    }
     else
     {
-        //buffer<Allocator> buf{};
-        
-        // failed to get file size, read it as a stream 
+        // failed to get file size, read in chunks
         std::size_t chunk_min = (std::size_t)64;
         std::size_t chunk_max = (std::size_t)512 * 1024 * 1024;
         std::size_t chunk_now = chunk_min;
         std::size_t read_size;
-        uint8_t *tmp;
-        
-        buf_size = buffer_padding_size;
+
+        std::size_t buf_size = buffer_padding_size;
         while (true) {
-            if (buf_size + chunk_now < buf_size) { // overflow 
-                return_err(read_json_errc::memory_allocation, "fail to alloc memory");
+            if (buf_size + chunk_now < buf_size) 
+            { // overflow
+                return parse_json_result<json_container<Allocator>>{read_json_errc::memory_allocation}; 
             }
             buf_size += chunk_now;
-            if (!buf) {
-                buf = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size); 
-                // buf = buffer{buf_size, u8_alloc};
-            } else {
-                //buffer<Allocator> tmp{buf_size, u8_alloc};
-                //memcpy(tmp.data(), buf, buf_size - chunk_now);    
-                //buf = std::move(tmp);
-                
-                tmp = std::allocator_traits<allocator_type>::allocate(u8_alloc, buf_size);
-                memcpy(tmp, buf, buf_size - chunk_now);    
-                std::allocator_traits<allocator_type>::deallocate(u8_alloc, buf, buf_size - chunk_now);
-                buf = tmp;
+            if (buf.empty()) 
+            {
+                buf = uninitialized_buffer<Allocator>{buf_size, alloc};
+            } 
+            else 
+            {
+                uninitialized_buffer<Allocator> tmp{buf_size, alloc};
+                memcpy(tmp.data(), buf.data(), buf_size - chunk_now);
+                buf.swap(tmp);
             }
-            tmp = ((uint8_t *)buf) + buf_size - buffer_padding_size - chunk_now;
+            uint8_t* ptr = ((uint8_t *)buf.data()) + buf_size - buffer_padding_size - chunk_now;
 
-            is.read((char*)tmp, static_cast<std::size_t>(chunk_now));
+            is.read((char*)ptr, static_cast<std::size_t>(chunk_now));
             if (is.bad())
             {
-                return_err(read_json_errc::file_read, "file reading failed");
+                return parse_json_result<json_container<Allocator>>{read_json_errc::file_read}; 
             }
             read_size = is.gcount();
             file_size += (long)read_size;
             if (read_size != chunk_now) break;
-            
+
             chunk_now *= 2;
             if (chunk_now > chunk_max) chunk_now = chunk_max;
-        } 
+        }
     }
-    
+
     /* read JSON */
-    memset(buf + file_size, 0, static_cast<std::size_t>(buffer_padding_size));
-    flags |= read_json_flags::insitu;
-    return parse(string_pool<Allocator>{buf, buf_size, u8_alloc}, (char *)buf, (std::size_t)file_size, flags, alloc);
-    
-#undef return_err
+    memset(buf.data() + file_size, 0, static_cast<std::size_t>(buffer_padding_size));
+    return parse(std::move(buf), (char*)buf.data(), (std::size_t)file_size, flags, alloc);
 }
 
 bool json_view::equal(const json_view& other) const
