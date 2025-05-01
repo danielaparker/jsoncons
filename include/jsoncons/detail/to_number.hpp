@@ -827,7 +827,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
     return to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(aJSONCONS_HAS_STD_FROM_CHARS)
 
 class chars_to
 {
