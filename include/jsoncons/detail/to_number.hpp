@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_PARSE_NUMBER_HPP
-#define JSONCONS_DETAIL_PARSE_NUMBER_HPP
+#ifndef JSONCONS_DETAIL_TO_NUMBER_HPP
+#define JSONCONS_DETAIL_TO_NUMBER_HPP
 
 #include <cctype>
 #include <cstddef>
@@ -1114,7 +1114,7 @@ public:
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
         char *end = nullptr;
-        double val = strtold_l(s, &end, locale);
+        double val = strtod_l(s, &end, locale);
         if (s == end)
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
@@ -1127,7 +1127,7 @@ public:
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
         wchar_t *end = nullptr;
-        double val = wcstold_l(s, &end, locale);
+        double val = wcstod_l(s, &end, locale);
         if (s == end)
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
@@ -1185,4 +1185,4 @@ public:
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_PARSE_NUMBER_HPP
+#endif // JSONCONS_DETAIL_TO_NUMBER_HPP

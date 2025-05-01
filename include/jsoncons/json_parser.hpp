@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/to_number.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -2166,7 +2166,7 @@ text:
                 case '\"':
                 {
                     position_ += (input_ptr_ - sb + 1);
-                    if (string_buffer_.length() == 0)
+                    if (string_buffer_.empty())
                     {
                         end_string_value(sb,input_ptr_-sb, visitor, ec);
                         if (JSONCONS_UNLIKELY(ec)) {return;}
@@ -2174,7 +2174,7 @@ text:
                     else
                     {
                         string_buffer_.append(sb,input_ptr_-sb);
-                        end_string_value(string_buffer_.data(),string_buffer_.length(), visitor, ec);
+                        end_string_value(&string_buffer_[0],string_buffer_.length(), visitor, ec);
                         if (JSONCONS_UNLIKELY(ec)) {return;}
                     }
                     ++input_ptr_;

@@ -1,7 +1,7 @@
 // Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/to_number.hpp>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

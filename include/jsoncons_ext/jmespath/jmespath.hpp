@@ -23,7 +23,7 @@
 #include <map>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/to_number.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>

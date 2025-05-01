@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/to_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -1707,7 +1707,7 @@ private:
                 switch (mapping_kind_)
                 {
                 case csv_mapping_kind::n_rows:
-                    if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                    if (unquoted_empty_value_is_null_ && buffer_.empty())
                     {
                         visitor.null_value(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
@@ -1722,7 +1722,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1734,7 +1734,7 @@ private:
                         }
                         else if (depth_ > 0)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1784,7 +1784,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1796,7 +1796,7 @@ private:
                         }
                         else if (depth_ > 0)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;

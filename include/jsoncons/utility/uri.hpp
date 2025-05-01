@@ -18,7 +18,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/to_number.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
 
