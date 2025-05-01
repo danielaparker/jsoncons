@@ -152,7 +152,6 @@ private:
     int mark_level_{0};
     
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
-    jsoncons::detail::chars_to to_double_;
 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
@@ -1769,7 +1768,7 @@ zero:
                 state_ = parse_state::expect_comma_or_end;
                 return;
             case '.':
-                string_buffer_.push_back(to_double_.get_decimal_point());
+                string_buffer_.push_back('.');
                 ++input_ptr_;
                 ++position_;
                 goto fraction1;
@@ -1848,7 +1847,7 @@ integer:
                 ++position_;
                 goto integer;
             case '.':
-                string_buffer_.push_back(to_double_.get_decimal_point());
+                string_buffer_.push_back('.');
                 ++input_ptr_;
                 ++position_;
                 goto fraction1;
@@ -2647,7 +2646,7 @@ private:
             }
             else
             {
-                double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
+                double d = jsoncons::detail::str_to_double(string_buffer_.c_str(), string_buffer_.length());
                 visitor.double_value(d, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }

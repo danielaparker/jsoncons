@@ -827,8 +827,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
     return to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-
-#if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
+#if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
 class chars_to
 {
@@ -1044,6 +1043,159 @@ public:
         return val;
     }
 };
+#endif
+
+// str_to_double
+
+#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    str_to_double(const CharT* s, std::size_t len) 
+    {
+        double val = 0;
+        const auto res = std::from_chars(s, s+len, val);
+        if (res.ec != std::errc())
+        {
+            if (res.ec == std::errc::result_out_of_range)
+            {
+                return val;
+            }
+            else
+            {
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert chars to double failed"));
+            }
+        }
+        return val;
+    }
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    str_to_double(const CharT* s, std::size_t len) 
+    {
+        std::string input(len,'0');
+        for (size_t i = 0; i < len; ++i)
+        {
+            input[i] = static_cast<char>(s[i]);
+        }
+        
+        return str_to_double(input.data(), len);
+    }
+
+#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    str_to_double(const CharT* s, std::size_t)
+    {
+        static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+        CharT *end = nullptr;
+        double val = _strtod_l(s, &end, locale);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
+        return val;
+    }
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    str_to_double(const CharT* s, std::size_t)
+    {
+        static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+        CharT *end = nullptr;
+        double val = _wcstod_l(s, &end, locale);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
+        return val;
+    }
+
+
+#elif defined(JSONCONS_HAS_STRTOLD_L)
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    str_to_double(const CharT* s, std::size_t)
+    {
+        locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+
+        char *end = nullptr;
+        double val = strtold_l(s, &end, locale);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
+        return val;
+    }
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    str_to_double(const CharT* s, std::size_t)
+    {
+        locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+
+        CharT *end = nullptr;
+        double val = wcstold_l(s, &end, locale);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
+        return val;
+    }
+
+#else
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    str_to_double(CharT* s, std::size_t length)
+    {
+        CharT* cur = s+length;
+        CharT *end = nullptr;
+        double val = strtod(s, &end);
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                CharT* dot_ptr = end;
+                *end = ',';
+                val = strtod(s, &end);
+                *end = '.';
+            }
+            if (JSONCONS_UNLIKELY(end != cur))
+            {
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+            }
+        }
+        return val;
+    }
+
+    template <typename CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    str_to_double(CharT* s, std::size_t length)
+    {
+        CharT* cur = s+length;
+        CharT *end = nullptr;
+        double val = wcstod(s, &end);
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                CharT* dot_ptr = end;
+                *end = ',';
+                val = wcstod(s, &end);
+                *end = '.';
+            }
+            if (JSONCONS_UNLIKELY(end != cur))
+            {
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+            }
+        }
+        return val;
+    }
 #endif
 
 } // namespace detail
