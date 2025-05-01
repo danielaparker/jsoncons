@@ -2174,7 +2174,7 @@ text:
                     else
                     {
                         string_buffer_.append(sb,input_ptr_-sb);
-                        end_string_value(&string_buffer_[0],string_buffer_.length(), visitor, ec);
+                        end_string_value(string_buffer_.data(), string_buffer_.length(), visitor, ec);
                         if (JSONCONS_UNLIKELY(ec)) {return;}
                     }
                     ++input_ptr_;
@@ -2646,7 +2646,7 @@ private:
             }
             else
             {
-                double d = jsoncons::detail::str_to_double(string_buffer_.data(), string_buffer_.length());
+                double d = jsoncons::detail::str_to_double(&string_buffer_[0], string_buffer_.length());
                 visitor.double_value(d, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }
