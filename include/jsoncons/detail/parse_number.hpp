@@ -1084,7 +1084,7 @@ public:
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-        CharT *end = nullptr;
+        char *end = nullptr;
         double val = _strtod_l(s, &end, locale);
         if (s == end)
         {
@@ -1097,7 +1097,7 @@ public:
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-        CharT *end = nullptr;
+        wchar_t* end = nullptr;
         double val = _wcstod_l(s, &end, locale);
         if (s == end)
         {
@@ -1126,7 +1126,7 @@ public:
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
-        CharT *end = nullptr;
+        wchar_t *end = nullptr;
         double val = wcstold_l(s, &end, locale);
         if (s == end)
         {
@@ -1139,17 +1139,17 @@ public:
 
     inline double str_to_double(char* s, std::size_t length)
     {
-        CharT* cur = s+length;
-        CharT *end = nullptr;
+        char* cur = s+length;
+        char *end = nullptr;
         double val = strtod(s, &end);
         if (JSONCONS_UNLIKELY(end < cur))
         {
             if (*end == '.')
             {
-                CharT* dot_ptr = end;
+                char* dot_ptr = end;
                 *end = ',';
                 val = strtod(s, &end);
-                *end = '.';
+                *dot_ptr = '.';
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
@@ -1161,17 +1161,17 @@ public:
 
     inline double str_to_double(wchar_t* s, std::size_t length)
     {
-        CharT* cur = s+length;
-        CharT *end = nullptr;
+        wchar_t* cur = s+length;
+        wchar_t *end = nullptr;
         double val = wcstod(s, &end);
         if (JSONCONS_UNLIKELY(end < cur))
         {
             if (*end == '.')
             {
-                CharT* dot_ptr = end;
+                wchar_t* dot_ptr = end;
                 *end = ',';
                 val = wcstod(s, &end);
-                *end = '.';
+                *dot_ptr = '.';
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
