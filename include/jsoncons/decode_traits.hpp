@@ -635,7 +635,7 @@ namespace jsoncons {
                 if (JSONCONS_UNLIKELY(ec)) {return val;}
                 key_type n{0};
                 auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
-                if (r.ec != jsoncons::detail::to_integer_errc())
+                if (r.ec != jsoncons::detail::to_number_errc())
                 {
                     ec = json_errc::invalid_number;
                     return val;

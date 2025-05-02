@@ -2260,7 +2260,7 @@ private:
                 if (is_negative)
                 {
                     int64_t val{ 0 };
-                    auto result = jsoncons::detail::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::detail::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2275,13 +2275,13 @@ private:
                 else
                 {
                     uint64_t val{ 0 };
-                    auto result = jsoncons::detail::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::detail::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.uint64_value(val, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
-                    else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
+                    else if (result.ec == jsoncons::detail::to_number_errc::overflow)
                     {
                         visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
                         more_ = !cursor_mode_;

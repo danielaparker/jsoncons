@@ -678,7 +678,7 @@ namespace bson {
                ++str_read;
            }
            auto result = jsoncons::detail::to_integer(str_read, last - str_read, exponent);
-           if (result.ec != jsoncons::detail::to_integer_errc()) 
+           if (result.ec != jsoncons::detail::to_number_errc()) 
            {
                dec = decimal128_limits::nan();
                return decimal128_from_chars_result{str_read,std::errc::invalid_argument};

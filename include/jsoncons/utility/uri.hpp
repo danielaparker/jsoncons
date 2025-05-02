@@ -710,7 +710,7 @@ namespace jsoncons {
                     auto hex = encoded.substr(i + 1, 2);
 
                     uint8_t n;
-                    jsoncons::detail::hex_to_integer(hex.data(), hex.size(), n);
+                    jsoncons::detail::hexstr_to_integer(hex.data(), hex.size(), n);
                     decoded.push_back((char)n);
                     i += 3;
                 }

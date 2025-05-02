@@ -1656,7 +1656,7 @@ namespace variant_detail
                     {
                         auto sv = j.as_string_view();
                         Rep n{0};
-                        auto result = jsoncons::detail::dec_to_integer(sv.data(), sv.size(), n);
+                        auto result = jsoncons::detail::decstr_to_integer(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();
