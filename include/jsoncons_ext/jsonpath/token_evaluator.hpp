@@ -1574,11 +1574,11 @@ namespace detail {
                     {
                         return value_type(sn, semantic_tag::none);
                     }
-                    const jsoncons::detail::chars_to to_double;
+                    const jsoncons::detail::chars_to to_double_func;
                     try
                     {
                         auto s = arg0.as_string();
-                        double d = to_double(s.c_str(), s.length());
+                        double d = to_double_func(s.c_str(), s.length());
                         return value_type(d, semantic_tag::none);
                     }
                     catch (const std::exception&)

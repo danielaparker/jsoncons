@@ -710,8 +710,8 @@ namespace jsoncons {
                     auto hex = encoded.substr(i + 1, 2);
 
                     uint8_t n;
-                    jsoncons::detail::hexstr_to_integer(hex.data(), hex.size(), n);
-                    decoded.push_back((char)n);
+                    auto result = jsoncons::detail::hexstr_to_integer<uint8_t>(hex.data(), hex.size(), n);
+                    decoded.push_back((char)result.value);
                     i += 3;
                 }
                 else
@@ -1667,7 +1667,7 @@ namespace jsoncons {
         static bool validate_port(string_view port)
         {
             uint16_t p;
-            auto result = jsoncons::detail::to_integer(port.data(), port.length(), p);
+            auto result = jsoncons::detail::to_integer<uint16_t>(port.data(), port.length(), p);
             return static_cast<bool>(result);
         }
         

@@ -1345,7 +1345,7 @@ namespace jsonpointer {
                 auto s = *it;
                 std::size_t n{0};
                 auto r = jsoncons::detail::decstr_to_integer(s.data(), s.size(), n);
-                if (r.ec == jsoncons::detail::to_number_errc() && (index++ == n))
+                if (r.ec == std::errc() && (index++ == n))
                 {
                     if (!part->is_array())
                     {

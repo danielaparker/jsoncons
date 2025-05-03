@@ -714,7 +714,7 @@ private:
             visit_int64(val, semantic_tag::none, context, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
-        else if (r.error_code() == jsoncons::detail::to_number_errc::overflow)
+        else if (r.error_code() == std::errc::result_out_of_range)
         {
             bigint n = bigint::from_string(s.data(), s.length());
             write_bignum(n);
@@ -889,7 +889,7 @@ private:
             visit_int64(val, semantic_tag::none, context, ec);
             if (JSONCONS_UNLIKELY(ec)) return;
         }
-        else if (r.error_code() == jsoncons::detail::to_number_errc::overflow)
+        else if (r.error_code() == std::errc::result_out_of_range)
         {
             bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);

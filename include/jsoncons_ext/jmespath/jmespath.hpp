@@ -2390,11 +2390,11 @@ namespace detail {
                         {
                             return *context.create_json(sval);
                         }
-                        const jsoncons::detail::chars_to to_double;
+                        const jsoncons::detail::chars_to to_double_func;
                         try
                         {
                             auto s = arg0.as_string();
-                            double d = to_double(s.c_str(), s.length());
+                            double d = to_double_func(s.c_str(), s.length());
                             return *context.create_json(d);
                         }
                         catch (const std::exception&)

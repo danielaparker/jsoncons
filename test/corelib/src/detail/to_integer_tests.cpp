@@ -14,7 +14,7 @@ TEST_CASE("detail::to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::invalid_number);
+        CHECK(result.ec == std::errc::invalid_argument);
     }
     SECTION("-")
     {
@@ -22,7 +22,7 @@ TEST_CASE("detail::to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::invalid_number);
+        CHECK(result.ec == std::errc::invalid_argument);
     }
     SECTION("min int64_t")
     {
@@ -54,7 +54,7 @@ TEST_CASE("detail::to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
     SECTION("max int64_t + 1")
     {
@@ -62,7 +62,7 @@ TEST_CASE("detail::to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("detail::decstr_to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::decstr_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::invalid_number);
+        CHECK(result.ec == std::errc::invalid_argument);
     }
     SECTION("-")
     {
@@ -82,7 +82,7 @@ TEST_CASE("detail::decstr_to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::decstr_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::invalid_number);
+        CHECK(result.ec == std::errc::invalid_argument);
     }
     SECTION("min int64_t")
     {
@@ -106,7 +106,7 @@ TEST_CASE("detail::decstr_to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::decstr_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
     SECTION("max int64_t + 1")
     {
@@ -114,7 +114,7 @@ TEST_CASE("detail::decstr_to_integer tests")
         int64_t val;
         auto result = jsoncons::detail::decstr_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
 }
 
@@ -150,7 +150,7 @@ TEST_CASE("detail::to_integer_unchecked tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer_unchecked(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
     SECTION("max int64_t + 1")
     {
@@ -158,7 +158,7 @@ TEST_CASE("detail::to_integer_unchecked tests")
         int64_t val;
         auto result = jsoncons::detail::to_integer_unchecked(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
-        CHECK(result.ec == jsoncons::detail::to_number_errc::overflow);
+        CHECK(result.ec == std::errc::result_out_of_range);
     }
 }
 

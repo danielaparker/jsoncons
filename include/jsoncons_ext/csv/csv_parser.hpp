@@ -2281,7 +2281,7 @@ private:
                         visitor.uint64_value(val, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
-                    else if (result.ec == jsoncons::detail::to_number_errc::overflow)
+                    else if (result.ec == std::errc::result_out_of_range)
                     {
                         visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
                         more_ = !cursor_mode_;

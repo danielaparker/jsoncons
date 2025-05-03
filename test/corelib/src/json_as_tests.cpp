@@ -110,7 +110,7 @@ TEST_CASE("json::as<__int128>()")
 
     __int128 n;
     auto result = jsoncons::detail::to_integer_unchecked(s1.data(),s1.size(), n);
-    REQUIRE(result.ec == jsoncons::detail::to_number_errc());
+    REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
 
@@ -132,7 +132,7 @@ TEST_CASE("json::as<unsigned __int128>()")
     unsigned __int128 n;
 
     auto result = jsoncons::detail::to_integer_unchecked(s1.data(),s1.size(), n);
-    REQUIRE(result.ec == jsoncons::detail::to_number_errc());
+    REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
 

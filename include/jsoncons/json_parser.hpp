@@ -2646,7 +2646,8 @@ private:
             }
             else
             {
-                double d = jsoncons::detail::str_to_double(&string_buffer_[0], string_buffer_.length());
+                double d{0};
+                jsoncons::detail::to_double(&string_buffer_[0], string_buffer_.length(), d);
                 visitor.double_value(d, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }

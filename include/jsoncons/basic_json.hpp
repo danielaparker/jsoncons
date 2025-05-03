@@ -3368,7 +3368,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -3423,7 +3423,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3468,7 +3468,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3491,9 +3491,9 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    const jsoncons::detail::chars_to to_double;
-                    // to_double() throws std::invalid_argument if conversion fails
-                    return to_double(as_cstring(), as_string_view().length());
+                    const jsoncons::detail::chars_to to_double_func;
+                    // to_double_func() throws std::invalid_argument if conversion fails
+                    return to_double_func(as_cstring(), as_string_view().length());
                 }
                 case json_storage_kind::half_float:
                     return binary::decode_half(cast<half_storage>().value());
