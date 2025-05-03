@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_TO_NUMBER_HPP
-#define JSONCONS_DETAIL_TO_NUMBER_HPP
+#ifndef JSONCONS_UTILITY_TO_NUMBER_HPP
+#define JSONCONS_UTILITY_TO_NUMBER_HPP
 
 #include <cctype>
 #include <cstddef>
@@ -23,7 +23,7 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
-namespace detail {
+namespace utility {
 
 template <typename CharT>
 struct to_number_result
@@ -1141,7 +1141,7 @@ public:
     }
 #endif
 
-} // namespace detail
+} // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_TO_NUMBER_HPP
+#endif // JSONCONS_UTILITY_TO_NUMBER_HPP

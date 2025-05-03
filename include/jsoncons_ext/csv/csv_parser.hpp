@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/to_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -589,7 +589,7 @@ private:
     int level_{0};
     std::size_t depth_{0};
     std::size_t offset_{0};
-    jsoncons::detail::chars_to to_double_; 
+    jsoncons::utility::chars_to to_double_; 
     const CharT* begin_input_{nullptr};
     const CharT* input_end_{nullptr};
     const CharT* input_ptr_{nullptr};
@@ -2260,7 +2260,7 @@ private:
                 if (is_negative)
                 {
                     int64_t val{ 0 };
-                    auto result = jsoncons::detail::decstr_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2275,7 +2275,7 @@ private:
                 else
                 {
                     uint64_t val{ 0 };
-                    auto result = jsoncons::detail::decstr_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.uint64_value(val, semantic_tag::none, *this, ec);

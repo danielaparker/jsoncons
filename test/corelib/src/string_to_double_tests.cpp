@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/detail/to_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -36,7 +36,7 @@ TEST_CASE("test_string_to_double")
 
 TEST_CASE("test_exponent")
 {
-    jsoncons::detail::chars_to reader;
+    jsoncons::utility::chars_to reader;
     const char* begin = "1.15507e-173";
     char* endptr = nullptr;
     const double value1 = 1.15507e-173;

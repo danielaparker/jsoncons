@@ -369,7 +369,7 @@ namespace jsoncons {
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 std::basic_string<typename Json::char_type> s;
-                jsoncons::detail::from_integer((*it).first,s);
+                jsoncons::utility::from_integer((*it).first,s);
                 encoder.key(s);
                 encode_traits<mapped_type,CharT>::encode((*it).second, encoder, proto, ec);
                 if (JSONCONS_UNLIKELY(ec)) {return;}

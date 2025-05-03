@@ -13,7 +13,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/detail/write_number.hpp> // from_integer
+#include <jsoncons/utility/write_number.hpp> // from_integer
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/byte_string.hpp>
@@ -261,7 +261,7 @@ namespace jsoncons {
         Into convert(From value, semantic_tag, std::error_code&)
         {
             Into s(this->get_allocator());
-            jsoncons::detail::from_integer(value, s);
+            jsoncons::utility::from_integer(value, s);
             return s;
         }
     };
@@ -278,7 +278,7 @@ namespace jsoncons {
         Into convert(From value, semantic_tag, std::error_code&)
         {
             Into s(this->get_allocator());
-            jsoncons::detail::write_double f{float_chars_format::general,0};
+            jsoncons::utility::write_double f{float_chars_format::general,0};
             f(value, s);
             return s;
         }
@@ -295,7 +295,7 @@ namespace jsoncons {
         Into convert(uint16_t value, semantic_tag, std::error_code&)
         {
             Into s(this->get_allocator());
-            jsoncons::detail::write_double f{float_chars_format::general,0};
+            jsoncons::utility::write_double f{float_chars_format::general,0};
             double x = binary::decode_half(value);
             f(x, s);
             return s;

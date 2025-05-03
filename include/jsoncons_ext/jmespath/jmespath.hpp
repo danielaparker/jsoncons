@@ -23,7 +23,7 @@
 #include <map>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/to_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
@@ -2379,18 +2379,18 @@ namespace detail {
                     {
                         auto sv = arg0.as_string_view();
                         uint64_t uval{ 0 };
-                        auto result1 = jsoncons::detail::to_integer(sv.data(), sv.length(), uval);
+                        auto result1 = jsoncons::utility::to_integer(sv.data(), sv.length(), uval);
                         if (result1)
                         {
                             return *context.create_json(uval);
                         }
                         int64_t sval{ 0 };
-                        auto result2 = jsoncons::detail::to_integer(sv.data(), sv.length(), sval);
+                        auto result2 = jsoncons::utility::to_integer(sv.data(), sv.length(), sval);
                         if (result2)
                         {
                             return *context.create_json(sval);
                         }
-                        const jsoncons::detail::chars_to to_double_func;
+                        const jsoncons::utility::chars_to to_double_func;
                         try
                         {
                             auto s = arg0.as_string();
@@ -4498,7 +4498,7 @@ namespace detail {
                                 else
                                 {
                                     int64_t val{ 0 };
-                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
+                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
@@ -4519,7 +4519,7 @@ namespace detail {
                                 if (!buffer.empty())
                                 {
                                     int64_t val{};
-                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
+                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
@@ -4544,7 +4544,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t val{ 0 };
-                            auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
+                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
@@ -4580,7 +4580,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t val{ 0 };
-                            auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
+                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;

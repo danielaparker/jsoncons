@@ -18,7 +18,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
@@ -389,7 +389,7 @@ public:
             case staj_event_type::string_value:
             {
                 IntegerType val;
-                auto result = jsoncons::detail::to_integer(value_.string_data_, length_, val);
+                auto result = jsoncons::utility::to_integer(value_.string_data_, length_, val);
                 if (!result)
                 {
                     ec = conv_errc::not_integer;
@@ -442,7 +442,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                jsoncons::detail::chars_to f;
+                jsoncons::utility::chars_to f;
                 return f(value_.string_data_, length_);
             }
             case staj_event_type::double_value:

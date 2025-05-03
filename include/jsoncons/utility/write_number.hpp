@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_WRITE_NUMBER_HPP
-#define JSONCONS_DETAIL_WRITE_NUMBER_HPP
+#ifndef JSONCONS_UTILITY_WRITE_NUMBER_HPP
+#define JSONCONS_UTILITY_WRITE_NUMBER_HPP
 
 #include <clocale>
 #include <cmath>
@@ -21,13 +21,13 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/grisu3.hpp>
-#include <jsoncons/detail/to_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
-namespace detail {
+namespace utility {
 
     inline
     char to_hex_character(uint8_t c)
@@ -163,7 +163,7 @@ namespace detail {
         }
         else
         {
-            jsoncons::detail::from_integer(K, result);
+            jsoncons::utility::from_integer(K, result);
         }
     }
 
@@ -299,7 +299,7 @@ namespace detail {
             return true;
         }
 
-        const jsoncons::detail::chars_to to_double_func;
+        const jsoncons::utility::chars_to to_double_func;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -332,7 +332,7 @@ namespace detail {
             return true;
         }
 
-        const jsoncons::detail::chars_to to_double_func;
+        const jsoncons::utility::chars_to to_double_func;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -379,7 +379,7 @@ namespace detail {
             }
             // min exp: -4 is consistent with sprintf
             // max exp: std::numeric_limits<double>::max_digits10
-            jsoncons::detail::prettify_string(buffer, length, k, -4, std::numeric_limits<double>::max_digits10, result);
+            jsoncons::utility::prettify_string(buffer, length, k, -4, std::numeric_limits<double>::max_digits10, result);
             return true;
         }
         else
@@ -399,7 +399,7 @@ namespace detail {
             return true;
         }
 
-        const jsoncons::detail::chars_to to_double_func;
+        const jsoncons::utility::chars_to to_double_func;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -444,7 +444,7 @@ namespace detail {
             {
                 result.push_back('-');
             }
-            jsoncons::detail::prettify_string(buffer, length, k, std::numeric_limits<int>::lowest(), (std::numeric_limits<int>::max)(), result);
+            jsoncons::utility::prettify_string(buffer, length, k, std::numeric_limits<int>::lowest(), (std::numeric_limits<int>::max)(), result);
             return true;
         }
         else
@@ -566,7 +566,7 @@ namespace detail {
         }
     };
 
-} // namespace detail
+} // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_WRITE_NUMBER_HPP
+#endif // JSONCONS_UTILITY_WRITE_NUMBER_HPP

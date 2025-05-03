@@ -12,8 +12,8 @@
 #include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/to_number.hpp>
-#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 
@@ -45,7 +45,7 @@ namespace jsonpath {
                     {
                         string_type key(parent_key);
                         key.push_back('[');
-                        jsoncons::detail::from_integer(i,key);
+                        jsoncons::utility::from_integer(i,key);
                         key.push_back(']');
                         flatten_(key, parent_value.at(i), result);
                     }
@@ -315,7 +315,7 @@ namespace jsonpath {
                             case ']':
                             {
                                 std::size_t n{0};
-                                auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
+                                auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
                                 if (r)
                                 {
                                     if (!part->is_array())

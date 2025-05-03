@@ -1221,7 +1221,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::detail::from_integer(val, str);
+                jsoncons::utility::from_integer(val, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1231,7 +1231,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::detail::from_integer(val, str);
+                jsoncons::utility::from_integer(val, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1296,11 +1296,11 @@ private:
             if (str[0] == '-')
             {
                 result.push_back('-');
-                jsoncons::detail::prettify_string(str.c_str()+1, str.size()-1, (int)exponent, -4, 17, result);
+                jsoncons::utility::prettify_string(str.c_str()+1, str.size()-1, (int)exponent, -4, 17, result);
             }
             else
             {
-                jsoncons::detail::prettify_string(str.c_str(), str.size(), (int)exponent, -4, 17, result);
+                jsoncons::utility::prettify_string(str.c_str(), str.size(), (int)exponent, -4, 17, result);
             }
         }
         else
@@ -1379,7 +1379,7 @@ private:
                 }
                 str.push_back('0');
                 str.push_back('x');
-                jsoncons::detail::integer_to_hex(val, str);
+                jsoncons::utility::integer_to_hex(val, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1392,7 +1392,7 @@ private:
                 str.push_back('-');
                 str.push_back('0');
                 str.push_back('x');
-                jsoncons::detail::integer_to_hex(static_cast<uint64_t>(-val), str);
+                jsoncons::utility::integer_to_hex(static_cast<uint64_t>(-val), str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1453,12 +1453,12 @@ private:
         str.push_back('p');
         if (exponent >=0)
         {
-            jsoncons::detail::integer_to_hex(static_cast<uint64_t>(exponent), str);
+            jsoncons::utility::integer_to_hex(static_cast<uint64_t>(exponent), str);
         }
         else
         {
             str.push_back('-');
-            jsoncons::detail::integer_to_hex(static_cast<uint64_t>(-exponent), str);
+            jsoncons::utility::integer_to_hex(static_cast<uint64_t>(-exponent), str);
         }
     }
 

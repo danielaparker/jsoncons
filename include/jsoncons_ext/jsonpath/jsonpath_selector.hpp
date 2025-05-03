@@ -269,7 +269,7 @@ namespace detail {
             else if (current.is_array())
             {
                 int64_t n{0};
-                auto r = jsoncons::detail::decstr_to_integer(identifier_.data(), identifier_.size(), n);
+                auto r = jsoncons::utility::decstr_to_integer(identifier_.data(), identifier_.size(), n);
                 if (r)
                 {
                     auto index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
@@ -322,7 +322,7 @@ namespace detail {
             if (current.is_array())
             {
                 int64_t n{0};
-                auto r = jsoncons::detail::decstr_to_integer(identifier_.data(), identifier_.size(), n);
+                auto r = jsoncons::utility::decstr_to_integer(identifier_.data(), identifier_.size(), n);
                 if (r)
                 {
                     auto index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);

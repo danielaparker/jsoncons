@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/to_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -2604,7 +2604,7 @@ private:
     void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         int64_t val;
-        auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
+        auto result = jsoncons::utility::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
             visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2621,7 +2621,7 @@ private:
     void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         uint64_t val;
-        auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
+        auto result = jsoncons::utility::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
             visitor.uint64_value(val, semantic_tag::none, *this, ec);
@@ -2647,7 +2647,7 @@ private:
             else
             {
                 double d{0};
-                jsoncons::detail::to_double(&string_buffer_[0], string_buffer_.length(), d);
+                jsoncons::utility::to_double(&string_buffer_[0], string_buffer_.length(), d);
                 visitor.double_value(d, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }
