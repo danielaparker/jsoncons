@@ -2288,7 +2288,7 @@ private:
                     }
                     else
                     {
-                        ec = result.ec;
+                        ec = csv_errc::source_error; // revisit
                         more_ = false;
                         return;
                     }
