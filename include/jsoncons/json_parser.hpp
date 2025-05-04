@@ -131,6 +131,7 @@ private:
     bool allow_trailing_comma_;
     bool allow_comments_;    
     bool lossless_number_;    
+    bool lossless_bignum_;    
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int level_{0};
@@ -185,6 +186,7 @@ public:
          allow_trailing_comma_(options.allow_trailing_comma()),
          allow_comments_(options.allow_comments()),
          lossless_number_(options.lossless_number()),
+         lossless_bignum_(options.lossless_bignum()),
          err_handler_(err_handler),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc)
@@ -2647,8 +2649,29 @@ private:
             else
             {
                 double d{0};
-                jsoncons::utility::to_double(&string_buffer_[0], string_buffer_.length(), d);
-                visitor.double_value(d, semantic_tag::none, *this, ec);
+                auto result = jsoncons::utility::to_double(&string_buffer_[0], string_buffer_.length(), d);
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    if (result.ec == std::errc::result_out_of_range)
+                    {
+                        if (lossless_bignum_)
+                        {
+                            visitor.string_value(string_buffer_, semantic_tag::bigdec, *this, ec);
+                        }
+                        else
+                        {
+                            visitor.double_value(string_buffer_.front() == '-' ? -HUGE_VAL : HUGE_VAL, semantic_tag::none, *this, ec);
+                        }
+                    }
+                    else
+                    {
+                        ec = json_errc::invalid_number;
+                    }
+                }
+                else
+                {
+                    visitor.double_value(d, semantic_tag::none, *this, ec);
+                }
                 more_ = !cursor_mode_;
             }
         }

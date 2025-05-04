@@ -1000,18 +1000,7 @@ public:
     inline to_number_result<char> to_double(const char* s, std::size_t len, double& val) 
     {
         const auto res = std::from_chars(s, s+len, val);
-        if (res.ec != std::errc())
-        {
-            if (res.ec == std::errc::result_out_of_range)
-            {
-                return to_number_result<char>{res.ptr,std::errc::result_out_of_range};
-            }
-            else
-            {
-                return to_number_result<char>{res.ptr,std::errc::invalid_argument};
-            }
-        }
-        return to_number_result<char>{res.ptr};
+        return to_number_result<char>{res.ptr,res.ec};
     }
 
     inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t len, double& val)
@@ -1023,18 +1012,7 @@ public:
         }
         
         const auto res = std::from_chars(input.data(), input.data()+len, val);
-        if (res.ec != std::errc())
-        {
-            if (res.ec == std::errc::result_out_of_range)
-            {
-                return to_number_result<wchar_t>{s+(res.ptr-input.data()),std::errc::result_out_of_range};
-            }
-            else
-            {
-                return to_number_result<wchar_t>{s+(res.ptr-input.data()),std::errc::invalid_argument};
-            }
-        }
-        return to_number_result<wchar_t>{s+(res.ptr-input.data())};
+        return to_number_result<wchar_t>{s+(res.ptr-input.data()),res.ec};
     }
 
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
