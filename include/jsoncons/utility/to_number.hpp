@@ -1074,19 +1074,26 @@ public:
 
 #else
 
-    inline to_number_result<char> to_double(char* s, std::size_t length, double& val)
+    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
     {
-        char* cur = s+length;
+        const char* cur = s+length;
         char *end = nullptr;
         val = strtod(s, &end);
         if (JSONCONS_UNLIKELY(end < cur))
         {
             if (*end == '.')
             {
-                char* dot_ptr = end;
-                *end = ',';
-                val = strtod(s, &end);
-                *dot_ptr = '.';
+                char buffer[34];
+                if (length >= sizeof(buffer))
+                {
+                    return to_number_result<char>{s,std::errc::invalid_argument};
+                }
+                memcpy(buffer, s, length);
+                s[length] = 0;
+                char* dot_ptr = buffer + (cur - end);
+                *dot_ptr = ',';
+                val = strtod(buffer, &end);
+                end = s + ((buffer + length) - end); 
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
@@ -1096,7 +1103,7 @@ public:
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
     {
         wchar_t* cur = s+length;
         wchar_t *end = nullptr;
@@ -1105,10 +1112,17 @@ public:
         {
             if (*end == '.')
             {
-                wchar_t* dot_ptr = end;
-                *end = ',';
-                val = wcstod(s, &end);
-                *dot_ptr = '.';
+                wchar_t buffer[34];
+                if (length >= sizeof(buffer))
+                {
+                    return to_number_result<wchar_t>{s,std::errc::invalid_argument};
+                }
+                memcpy(buffer, s, length*sizeof(wchar_t));
+                s[length] = 0;
+                wchar_t* dot_ptr = buffer + (cur - end);
+                *dot_ptr = ',';
+                val = wcstod(buffer, &end);
+                end = s + ((buffer + length) - end); 
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
@@ -1117,6 +1131,7 @@ public:
         }
         return to_number_result<wchar_t>{end};
     }
+
 #endif
 
 } // namespace utility

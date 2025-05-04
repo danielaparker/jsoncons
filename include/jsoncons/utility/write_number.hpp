@@ -299,8 +299,6 @@ namespace utility {
             return true;
         }
 
-        const jsoncons::utility::chars_to to_double_func;
-
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
         int length = snprintf(buffer, sizeof(buffer), "%1.*e", precision, val);
@@ -308,7 +306,9 @@ namespace utility {
         {
             return false;
         }
-        if (to_double_func(buffer, sizeof(buffer)) != val)
+        double x{0};
+        to_double(buffer, sizeof(buffer), x);
+        if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
             length = snprintf(buffer, sizeof(buffer), "%1.*e", precision2, val);
@@ -332,8 +332,6 @@ namespace utility {
             return true;
         }
 
-        const jsoncons::utility::chars_to to_double_func;
-
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
         int length = snprintf(buffer, sizeof(buffer), "%1.*g", precision, val);
@@ -341,7 +339,9 @@ namespace utility {
         {
             return false;
         }
-        if (to_double_func(buffer, sizeof(buffer)) != val)
+        double x{0};
+        to_double(buffer, sizeof(buffer), x);
+        if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
             length = snprintf(buffer, sizeof(buffer), "%1.*g", precision2, val);
@@ -399,8 +399,6 @@ namespace utility {
             return true;
         }
 
-        const jsoncons::utility::chars_to to_double_func;
-
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
         int length = snprintf(buffer, sizeof(buffer), "%1.*f", precision, val);
@@ -408,7 +406,9 @@ namespace utility {
         {
             return false;
         }
-        if (to_double_func(buffer, sizeof(buffer)) != val)
+        double x{0};
+        to_double(buffer, sizeof(buffer), x);
+        if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
             length = snprintf(buffer, sizeof(buffer), "%1.*f", precision2, val);
@@ -468,7 +468,6 @@ namespace utility {
     class write_double
     {
     private:
-        chars_to to_double_;
         float_chars_format float_format_;
         int precision_;
         char decimal_point_;

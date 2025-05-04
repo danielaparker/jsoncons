@@ -3491,9 +3491,13 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    const jsoncons::utility::chars_to to_double_func;
-                    // to_double_func() throws std::invalid_argument if conversion fails
-                    return to_double_func(as_cstring(), as_string_view().length());
+                    double x{0};
+                    auto result = jsoncons::utility::to_double(as_cstring(), as_string_view().length(), x);
+                    if (result.ec == std::errc::invalid_argument)
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                    }
+                    return x;
                 }
                 case json_storage_kind::half_float:
                     return binary::decode_half(cast<half_storage>().value());
