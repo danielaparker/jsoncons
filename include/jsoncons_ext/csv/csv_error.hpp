@@ -24,7 +24,8 @@ namespace csv {
         invalid_parse_state,
         invalid_escaped_char,
         unexpected_char_between_fields,
-        max_nesting_depth_exceeded
+        max_nesting_depth_exceeded,
+        invalid_number
     };
 
 class csv_error_category_impl
@@ -55,6 +56,8 @@ public:
                 return "Unexpected character between fields";
             case csv_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case csv_errc::invalid_number:
+                return "Invalid number";
             default:
                 return "Unknown CSV parser error";
         }

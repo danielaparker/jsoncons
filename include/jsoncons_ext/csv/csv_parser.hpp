@@ -2288,7 +2288,7 @@ private:
                     }
                     else
                     {
-                        ec = csv_errc::source_error; // revisit
+                        ec = csv_errc::invalid_number; 
                         more_ = false;
                         return;
                     }
