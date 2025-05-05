@@ -307,7 +307,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;
@@ -344,7 +344,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;
@@ -415,7 +415,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;
