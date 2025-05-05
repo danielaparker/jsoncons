@@ -3492,11 +3492,33 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     double x{0};
-                    auto result = jsoncons::utility::to_double(as_cstring(), as_string_view().length(), x);
-                    if (result.ec == std::errc::invalid_argument)
+                    const char_type* s = as_cstring();
+                    std::size_t len = as_string_view().length();
+                    if (JSONCONS_UNLIKELY(len > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
                     }
+                    else if (JSONCONS_UNLIKELY(len > 3 && s[0] == '-' && s[1] == '0' && (s[2] == 'x' || s[2] == 'X')))
+                    {
+                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
+                    }
+                    else
+                    {
+                        auto result = jsoncons::utility::to_double(as_cstring(), as_string_view().length(), x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
+                    }
+                    
                     return x;
                 }
                 case json_storage_kind::half_float:

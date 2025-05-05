@@ -984,6 +984,64 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #endif
 
+    inline to_number_result<char> hexstr_to_double(const char* s, std::size_t length, double& val)
+    {
+        const char* cur = s+length;
+        char *end = nullptr;
+        val = strtod(s, &end);
+        const char* str_end = end;
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                std::string buf{s, length};
+                char* dot_ptr = &buf[0] + (cur - end - 1);
+                *dot_ptr = ',';
+                end = nullptr;
+                val = strtod(buf.c_str(), &end);
+                str_end = s + (end - &buf[0]);
+            }
+            if (JSONCONS_UNLIKELY(str_end != cur))
+            {
+                return to_number_result<char>{str_end,std::errc::invalid_argument};
+            }
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+        {
+            return to_number_result<char>{str_end, std::errc::result_out_of_range};
+        }
+        return to_number_result<char>{str_end};
+    }
+
+    inline to_number_result<wchar_t> hexstr_to_double(const wchar_t* s, std::size_t length, double& val)
+    {
+        const wchar_t* cur = s+length;
+        wchar_t *end = nullptr;
+        val = wcstod(s, &end);
+        const wchar_t* str_end = end;
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                std::wstring buf{s, length};
+                wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
+                *dot_ptr = ',';
+                end = nullptr;
+                val = wcstod(buf.c_str(), &end);
+                str_end = s + (end-&buf[0]);
+            }
+            if (JSONCONS_UNLIKELY(str_end != cur))
+            {
+                return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
+            }
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+        {
+            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
+        }
+        return to_number_result<wchar_t>{str_end};
+    }
+    
 } // namespace utility
 } // namespace jsoncons
 
