@@ -2308,7 +2308,11 @@ private:
                 {
                     double d{0};
                     auto result = jsoncons::utility::to_double(buffer.c_str(), buffer.length(), d);
-                    if (result.ec == std::errc::invalid_argument)
+                    if (result.ec == std::errc::result_out_of_range)
+                    {
+                        d = buffer.front() == '-' ? -HUGE_VAL : HUGE_VAL;
+                    }
+                    else if (result.ec == std::errc::invalid_argument)
                     {
                         ec = csv_errc::invalid_number; 
                         more_ = false;

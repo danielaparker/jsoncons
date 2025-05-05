@@ -779,33 +779,43 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t len, double& val) 
+    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val) 
     {
-        const auto res = std::from_chars(s, s+len, val);
+        const char* cur = s+length;
+        const auto res = std::from_chars(s, cur, val);
+        if (JSONCONS_UNLIKELY(res.ptr != cur))
+        {
+            return to_number_result<char>{res.ptr,std::errc::invalid_argument};
+        }
         return to_number_result<char>{res.ptr,res.ec};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t len, double& val)
+    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
     {
-        std::string input(len,'0');
-        for (size_t i = 0; i < len; ++i)
+        std::string buf(length,'0');
+        for (size_t i = 0; i < length; ++i)
         {
-            input[i] = static_cast<char>(s[i]);
+            buf[i] = static_cast<char>(s[i]);
         }
         
-        const auto res = std::from_chars(input.data(), input.data()+len, val);
-        return to_number_result<wchar_t>{s+(res.ptr-input.data()),res.ec};
+        const auto res = std::from_chars(buf.data(), buf.data()+length, val);
+        if (JSONCONS_UNLIKELY(res.ptr != (buf.data()+length)))
+        {
+            return to_number_result<wchar_t>{s+(res.ptr-buf.data()),std::errc::invalid_argument};
+        }
+        return to_number_result<wchar_t>{s+length,res.ec};
     }
 
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t, double& val)
+    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
+        const char* cur = s+length;
         char *end = nullptr;
         val = _strtod_l(s, &end, locale);
-        if (s == end)
+        if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
@@ -816,13 +826,14 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t, double& val)
+    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
+        const wchar_t* cur = s+length;
         wchar_t* end = nullptr;
         val = _wcstod_l(s, &end, locale);
-        if (s == end)
+        if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
@@ -836,13 +847,14 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t, double& val)
+    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
+        const char* cur = s+length;
         char *end = nullptr;
         val = strtod_l(s, &end, locale);
-        if (s == end)
+        if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
@@ -853,13 +865,14 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t, double& val)
+    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
+        const wchar_t* cur = s+length;
         wchar_t *end = nullptr;
         val = wcstod_l(s, &end, locale);
-        if (s == end)
+        if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
