@@ -34,7 +34,6 @@ namespace
 
 TEST_CASE("bson c test suite")
 {
-#if 0
     SECTION("utf8")
     {
         std::string in_file = "./bson/input/test11.bson";
@@ -306,7 +305,7 @@ TEST_CASE("bson c test suite")
         auto m2 = bson::decode_bson<std::map<std::string, int64_t>>(bytes);
         CHECK(m2 == m);
     }
-#endif
+
     SECTION("decimal128")
     {
         std::string in_file = "./bson/input/test58.bson";
@@ -320,7 +319,7 @@ TEST_CASE("bson c test suite")
         auto rc = bson::decimal128_to_chars(buf,buf+sizeof(buf),dec);
         std::string s1 = std::string(buf,rc.ptr); 
         std::string s2 = j.at("a").as_string();
-        /*CHECK(s1.length() == s2.length());
+        CHECK(s1.length() == s2.length());
         CHECK(s1[0] == s2[0]);
         CHECK(s1[1] == s2[1]);
         CHECK(s1[2] == s2[2]);
@@ -328,7 +327,7 @@ TEST_CASE("bson c test suite")
         CHECK(s1[4] == s2[4]);
         CHECK(s1[5] == s2[5]);
         CHECK(s1[6] == s2[6]);
-        CHECK(j.at("a").tag() == semantic_tag::float128);*/
+        CHECK(j.at("a").tag() == semantic_tag::float128);
         CHECK(j.at("a") == json(std::string(buf,rc.ptr)));
 
         std::vector<char> output;
