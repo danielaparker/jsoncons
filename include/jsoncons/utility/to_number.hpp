@@ -777,7 +777,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 // to_double
 
-#if defined(aJSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
     inline to_number_result<char> to_double(const char* s, std::size_t len, double& val) 
     {
@@ -797,7 +797,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<wchar_t>{s+(res.ptr-input.data()),res.ec};
     }
 
-#elif defined(aJSONCONS_HAS_MSC_STRTOD_L)
+#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
     inline to_number_result<char> to_double(const char* s, std::size_t, double& val)
     {
