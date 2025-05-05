@@ -3513,11 +3513,7 @@ namespace jsoncons {
                     else
                     {
                         auto result = jsoncons::utility::to_double(as_cstring(), as_string_view().length(), x);
-                        if (result.ec == std::errc::result_out_of_range)
-                        {
-                            return *s == '-' ? -HUGE_VAL : HUGE_VAL;
-                        }
-                        else if (result.ec == std::errc::invalid_argument)
+                        if (result.ec == std::errc::invalid_argument)
                         {
                             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
                         }
