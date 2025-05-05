@@ -307,7 +307,11 @@ namespace utility {
             return false;
         }
         double x{0};
-        to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, sizeof(buffer), x);
+        if (res.ec == std::errc::invalid_argument)
+        {
+            return false;
+        }
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
@@ -340,7 +344,11 @@ namespace utility {
             return false;
         }
         double x{0};
-        to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, sizeof(buffer), x);
+        if (res.ec == std::errc::invalid_argument)
+        {
+            return false;
+        }
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
@@ -407,7 +415,11 @@ namespace utility {
             return false;
         }
         double x{0};
-        to_double(buffer, sizeof(buffer), x);
+        auto res = to_double(buffer, sizeof(buffer), x);
+        if (res.ec == std::errc::invalid_argument)
+        {
+            return false;
+        }
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;

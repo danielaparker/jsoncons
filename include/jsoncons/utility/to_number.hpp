@@ -811,7 +811,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         }
         if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
-            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
+            return to_number_result<char>{end, std::errc::result_out_of_range};
         }
         return to_number_result<char>{end};
     }
