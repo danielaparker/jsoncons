@@ -777,7 +777,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 // to_double
 
-#if defined(aJSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
     inline to_number_result<char> to_double(const char* s, std::size_t len, double& val) 
     {
@@ -797,7 +797,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<wchar_t>{s+(res.ptr-input.data()),res.ec};
     }
 
-#elif defined(aJSONCONS_HAS_MSC_STRTOD_L)
+#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
     inline to_number_result<char> to_double(const char* s, std::size_t, double& val)
     {
@@ -809,7 +809,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
         }
@@ -826,7 +826,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
         }
@@ -846,7 +846,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<char>{end, std::errc::result_out_of_range};
         }
@@ -863,7 +863,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
         }
@@ -894,7 +894,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
                 return to_number_result<char>{str_end,std::errc::invalid_argument};
             }
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<char>{str_end, std::errc::result_out_of_range};
         }
@@ -923,7 +923,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
                 return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
             }
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
         }
@@ -949,7 +949,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
                 return to_number_result<char>{end,std::errc::invalid_argument};
             }
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<char>{end, std::errc::result_out_of_range};
         }
@@ -975,7 +975,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
                 return to_number_result<wchar_t>{end,std::errc::invalid_argument};
             }
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
         {
             return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
         }
