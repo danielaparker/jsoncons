@@ -2660,7 +2660,7 @@ private:
                         }
                         else
                         {
-                            visitor.double_value(string_buffer_.front() == '-' ? -HUGE_VAL : HUGE_VAL, semantic_tag::none, *this, ec);
+                            visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
                         }
                     }
                     else
