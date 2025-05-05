@@ -589,7 +589,6 @@ private:
     int level_{0};
     std::size_t depth_{0};
     std::size_t offset_{0};
-    jsoncons::utility::chars_to to_double_; 
     const CharT* begin_input_{nullptr};
     const CharT* input_end_{nullptr};
     const CharT* input_ptr_{nullptr};
@@ -2112,9 +2111,11 @@ private:
                 {
                     switch (*p)
                     {
-                    case '.':
-                        buffer.push_back(to_double_.get_decimal_point());
-                        state = numeric_check_state::fraction1;
+                        case '.':
+                        {
+                            buffer.push_back('.');
+                            state = numeric_check_state::fraction1;
+                        }
                         break;
                     case 'e':case 'E':
                         buffer.push_back(*p);
@@ -2135,7 +2136,7 @@ private:
                         buffer.push_back(*p);
                         break;
                     case '.':
-                        buffer.push_back(to_double_.get_decimal_point());
+                        buffer.push_back('.');
                         state = numeric_check_state::fraction1;
                         break;
                     case 'e':case 'E':
@@ -2305,7 +2306,14 @@ private:
                 }
                 else
                 {
-                    double d = to_double_(buffer.c_str(), buffer.length());
+                    double d{0};
+                    auto result = jsoncons::utility::to_double(buffer.c_str(), buffer.length(), d);
+                    if (result.ec == std::errc::invalid_argument)
+                    {
+                        ec = csv_errc::invalid_number; 
+                        more_ = false;
+                        return;
+                    }
                     visitor.double_value(d, semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                 }

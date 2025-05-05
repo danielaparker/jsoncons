@@ -36,12 +36,12 @@ TEST_CASE("test_string_to_double")
 
 TEST_CASE("test_exponent")
 {
-    jsoncons::utility::chars_to reader;
     const char* begin = "1.15507e-173";
     char* endptr = nullptr;
     const double value1 = 1.15507e-173;
     const double value2 = strtod(begin, &endptr );
-    const double value3 = reader(begin,endptr-begin);
+    double value3{ 0 };
+    jsoncons::utility::to_double(begin, endptr-begin, value3);
 
     CHECK(value1 == value2);
     CHECK(value2 == value3);

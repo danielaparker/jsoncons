@@ -2390,14 +2390,14 @@ namespace detail {
                         {
                             return *context.create_json(sval);
                         }
-                        const jsoncons::utility::chars_to to_double_func;
-                        try
+                        auto s = arg0.as_string();
+                        double d{0};
+                        auto result3 = jsoncons::utility::to_double(s.c_str(), s.length(), d);
+                        if (result3)
                         {
-                            auto s = arg0.as_string();
-                            double d = to_double_func(s.c_str(), s.length());
                             return *context.create_json(d);
                         }
-                        catch (const std::exception&)
+                        else
                         {
                             return context.null_value();
                         }

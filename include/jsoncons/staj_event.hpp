@@ -442,8 +442,9 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                jsoncons::utility::chars_to f;
-                return f(value_.string_data_, length_);
+                double val{0};
+                jsoncons::utility::to_double(value_.string_data_, length_, val);
+                return val;
             }
             case staj_event_type::double_value:
                 return value_.double_value_;

@@ -775,227 +775,9 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
     return to_number_result<CharT>(s, std::errc());
 }
 
-#if defined(aJSONCONS_HAS_STD_FROM_CHARS)
-
-class chars_to
-{
-public:
-
-    char get_decimal_point() const
-    {
-        return '.';
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, std::size_t len) const
-    {
-        double val = 0;
-        const auto res = std::from_chars(s, s+len, val);
-        if (res.ec != std::errc())
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert chars to double failed"));
-        }
-        return val;
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, std::size_t len) const
-    {
-        std::string input(len,'0');
-        for (size_t i = 0; i < len; ++i)
-        {
-            input[i] = static_cast<char>(s[i]);
-        }
-
-        double val = 0;
-        const auto res = std::from_chars(input.data(), input.data() + len, val);
-        if (res.ec != std::errc())
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert chars to double failed"));
-        }
-        return val;
-    }
-};
-#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
-
-class chars_to
-{
-private:
-    _locale_t locale_;
-public:
-    chars_to()
-    {
-        locale_ = _create_locale(LC_NUMERIC, "C");
-    }
-    ~chars_to() noexcept
-    {
-        _free_locale(locale_);
-    }
-
-    chars_to(const chars_to&)
-    {
-        locale_ = _create_locale(LC_NUMERIC, "C");
-    }
-
-    chars_to& operator=(const chars_to&) 
-    {
-        // Don't assign locale
-        return *this;
-    }
-
-    char get_decimal_point() const
-    {
-        return '.';
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, std::size_t) const
-    {
-        CharT *end = nullptr;
-        double val = _strtod_l(s, &end, locale_);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, std::size_t) const
-    {
-        CharT *end = nullptr;
-        double val = _wcstod_l(s, &end, locale_);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-};
-
-#elif defined(JSONCONS_HAS_STRTOLD_L)
-
-class chars_to
-{
-private:
-    locale_t locale_;
-public:
-    chars_to()
-    {
-        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
-    }
-    ~chars_to() noexcept
-    {
-        freelocale(locale_);
-    }
-
-    chars_to(const chars_to&)
-    {
-        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
-    }
-
-    chars_to& operator=(const chars_to&) 
-    {
-        return *this;
-    }
-
-    char get_decimal_point() const
-    {
-        return '.';
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, std::size_t) const
-    {
-        char *end = nullptr;
-        double val = strtold_l(s, &end, locale_);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, std::size_t) const
-    {
-        CharT *end = nullptr;
-        double val = wcstold_l(s, &end, locale_);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-};
-
-#else
-class chars_to
-{
-private:
-    std::vector<char> buffer_;
-    char decimal_point_;
-public:
-    chars_to()
-        : buffer_()
-    {
-        struct lconv * lc = localeconv();
-        if (lc != nullptr && lc->decimal_point[0] != 0)
-        {
-            decimal_point_ = lc->decimal_point[0];    
-        }
-        else
-        {
-            decimal_point_ = '.'; 
-        }
-        buffer_.reserve(100);
-    }
-
-    chars_to(const chars_to&) = default;
-    chars_to& operator=(const chars_to&) = default;
-
-    char get_decimal_point() const
-    {
-        return decimal_point_;
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, std::size_t /*length*/) const
-    {
-        CharT *end = nullptr;
-        double val = strtod(s, &end);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-
-    template <typename CharT>
-    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, std::size_t /*length*/) const
-    {
-        CharT *end = nullptr;
-        double val = wcstod(s, &end);
-        if (s == end)
-        {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
-        }
-        return val;
-    }
-};
-#endif
-
 // to_double
 
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(aJSONCONS_HAS_STD_FROM_CHARS)
 
     inline to_number_result<char> to_double(const char* s, std::size_t len, double& val) 
     {
@@ -1015,7 +797,7 @@ public:
         return to_number_result<wchar_t>{s+(res.ptr-input.data()),res.ec};
     }
 
-#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
+#elif defined(aJSONCONS_HAS_MSC_STRTOD_L)
 
     inline to_number_result<char> to_double(const char* s, std::size_t, double& val)
     {
@@ -1026,6 +808,10 @@ public:
         if (s == end)
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
         }
         return to_number_result<char>{end};
     }
@@ -1039,6 +825,10 @@ public:
         if (s == end)
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
         }
         return to_number_result<wchar_t>{end};
     }
@@ -1056,6 +846,10 @@ public:
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<char>{end, std::errc::result_out_of_range};
+        }
         return to_number_result<char>{end};
     }
 
@@ -1069,6 +863,10 @@ public:
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
+        }
         return to_number_result<wchar_t>{end};
     }
 
@@ -1079,55 +877,107 @@ public:
         const char* cur = s+length;
         char *end = nullptr;
         val = strtod(s, &end);
+        const char* str_end = end;
         if (JSONCONS_UNLIKELY(end < cur))
         {
             if (*end == '.')
             {
-                char buffer[34];
-                if (length >= sizeof(buffer))
-                {
-                    return to_number_result<char>{s,std::errc::invalid_argument};
-                }
-                memcpy(buffer, s, length);
-                s[length] = 0;
-                char* dot_ptr = buffer + (cur - end);
+                std::string buf{s, length};
+                char* dot_ptr = &buf[0] + (cur - end - 1);
                 *dot_ptr = ',';
-                val = strtod(buffer, &end);
-                end = s + ((buffer + length) - end); 
+                end = nullptr;
+                val = strtod(buf.c_str(), &end);
+                str_end = s + (end - &buf[0]);
+            }
+            if (JSONCONS_UNLIKELY(str_end != cur))
+            {
+                return to_number_result<char>{str_end,std::errc::invalid_argument};
+            }
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<char>{str_end, std::errc::result_out_of_range};
+        }
+        return to_number_result<char>{str_end};
+    }
+
+    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    {
+        const wchar_t* cur = s+length;
+        wchar_t *end = nullptr;
+        val = wcstod(s, &end);
+        const wchar_t* str_end = end;
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                std::wstring buf{s, length};
+                wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
+                *dot_ptr = ',';
+                end = nullptr;
+                val = wcstod(buf.c_str(), &end);
+                str_end = s + (end-&buf[0]);
+            }
+            if (JSONCONS_UNLIKELY(str_end != cur))
+            {
+                return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
+            }
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
+        }
+        return to_number_result<wchar_t>{str_end};
+    }
+    
+    inline to_number_result<char> to_double(char* s, std::size_t length)
+    {
+        char* cur = s+length;
+        char *end = nullptr;
+        double val = strtod(s, &end);
+        if (JSONCONS_UNLIKELY(end < cur))
+        {
+            if (*end == '.')
+            {
+                char* dot_ptr = end;
+                *end = ',';
+                val = strtod(s, &end);
+                *dot_ptr = '.';
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
                 return to_number_result<char>{end,std::errc::invalid_argument};
             }
         }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<char>{end, std::errc::result_out_of_range};
+        }
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> to_double(wchar_t* s, std::size_t length)
     {
         wchar_t* cur = s+length;
         wchar_t *end = nullptr;
-        val = wcstod(s, &end);
+        double val = wcstod(s, &end);
         if (JSONCONS_UNLIKELY(end < cur))
         {
             if (*end == '.')
             {
-                wchar_t buffer[34];
-                if (length >= sizeof(buffer))
-                {
-                    return to_number_result<wchar_t>{s,std::errc::invalid_argument};
-                }
-                memcpy(buffer, s, length*sizeof(wchar_t));
-                s[length] = 0;
-                wchar_t* dot_ptr = buffer + (cur - end);
-                *dot_ptr = ',';
-                val = wcstod(buffer, &end);
-                end = s + ((buffer + length) - end); 
+                wchar_t* dot_ptr = end;
+                *end = ',';
+                val = wcstod(s, &end);
+                *dot_ptr = '.';
             }
             if (JSONCONS_UNLIKELY(end != cur))
             {
                 return to_number_result<wchar_t>{end,std::errc::invalid_argument};
             }
+        }
+        if (JSONCONS_UNLIKELY(val <= -HUGE || val >= HUGE))
+        {
+            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
         }
         return to_number_result<wchar_t>{end};
     }
