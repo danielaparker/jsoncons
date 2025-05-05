@@ -26,13 +26,13 @@
  @author YaoYuan
  */
 
-#ifndef JSONCONS_JSON_ELEMENT_HPP
-#define JSONCONS_JSON_ELEMENT_HPP
+#ifndef JSONCONS_VIEWS_JSON_REF_HPP
+#define JSONCONS_VIEWS_JSON_REF_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/views/read_json_error.hpp>
 #include <jsoncons/views/more_concepts.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/json_type.hpp>
 #include <float.h>
@@ -235,7 +235,7 @@ namespace jsoncons {
                 {
                     auto sv = get_string_view();
                     T val;
-                    auto result = jsoncons::detail::dec_to_integer(sv.data(), sv.length(), val);
+                    auto result = jsoncons::utility::to_integer(sv.data(), sv.length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(std::system_error(result.error_code()));
@@ -410,4 +410,4 @@ namespace jsoncons {
 #   pragma warning(pop)
 #endif /* warning suppress end */
 
-#endif /* YYJSON_H */
+#endif // JSONCONS_VIEWS_JSON_REF_HPP
