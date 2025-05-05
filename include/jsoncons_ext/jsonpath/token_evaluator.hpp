@@ -21,7 +21,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -1563,28 +1563,25 @@ namespace detail {
                 {
                     auto sv = arg0.as_string_view();
                     uint64_t un{0};
-                    auto result1 = jsoncons::detail::to_integer(sv.data(), sv.length(), un);
+                    auto result1 = jsoncons::utility::to_integer(sv.data(), sv.length(), un);
                     if (result1)
                     {
                         return value_type(un, semantic_tag::none);
                     }
                     int64_t sn{0};
-                    auto result2 = jsoncons::detail::to_integer(sv.data(), sv.length(), sn);
+                    auto result2 = jsoncons::utility::to_integer(sv.data(), sv.length(), sn);
                     if (result2)
                     {
                         return value_type(sn, semantic_tag::none);
                     }
-                    const jsoncons::detail::chars_to to_double;
-                    try
-                    {
-                        auto s = arg0.as_string();
-                        double d = to_double(s.c_str(), s.length());
-                        return value_type(d, semantic_tag::none);
-                    }
-                    catch (const std::exception&)
+                    auto s = arg0.as_string();
+                    double d;
+                    auto result = jsoncons::utility::to_double(s.c_str(), s.length(), d);
+                    if (result.ec == std::errc::invalid_argument)
                     {
                         return value_type::null();
                     }
+                    return value_type(d, semantic_tag::none);
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;

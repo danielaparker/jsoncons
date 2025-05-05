@@ -116,7 +116,7 @@ namespace detail {
             return location;
         }
         string_type last_token;
-        jsoncons::detail::from_integer(val.size(), last_token);
+        jsoncons::utility::from_integer(val.size(), last_token);
         tokens.emplace_back(std::move(last_token));
 
         return jsonpointer::basic_json_pointer<char_type>(std::move(tokens));
@@ -219,7 +219,7 @@ namespace detail {
             {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::from_integer(i,ss);
+                jsoncons::utility::from_integer(i,ss);
                 auto temp_diff = from_diff(source[i],target[i],ss);
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
@@ -228,7 +228,7 @@ namespace detail {
             {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::from_integer(i,ss);
+                jsoncons::utility::from_integer(i,ss);
                 Json val(json_object_arg);
                 val.insert_or_assign(jsonpatch_names<char_type>::op_name(), jsonpatch_names<char_type>::remove_name());
                 val.insert_or_assign(jsonpatch_names<char_type>::path_name(), ss);
@@ -241,7 +241,7 @@ namespace detail {
                 const auto& a = target[i];
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::from_integer(i,ss);
+                jsoncons::utility::from_integer(i,ss);
                 Json val(json_object_arg);
                 val.insert_or_assign(jsonpatch_names<char_type>::op_name(), jsonpatch_names<char_type>::add_name());
                 val.insert_or_assign(jsonpatch_names<char_type>::path_name(), ss);

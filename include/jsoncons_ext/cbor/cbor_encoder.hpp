@@ -21,7 +21,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -696,7 +696,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{};
-            auto r = jsoncons::detail::to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::utility::to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -708,13 +708,13 @@ private:
         if (JSONCONS_UNLIKELY(ec)) {return;}
 
         int64_t val{ 0 };
-        auto r = jsoncons::detail::to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::utility::to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
-        else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (r.error_code() == std::errc::result_out_of_range)
         {
             bigint n = bigint::from_string(s.data(), s.length());
             write_bignum(n);
@@ -871,7 +871,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{ 0 };
-            auto r = jsoncons::detail::hex_to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::utility::hexstr_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -883,13 +883,13 @@ private:
         if (JSONCONS_UNLIKELY(ec)) return;
 
         int64_t val{ 0 };
-        auto r = jsoncons::detail::hex_to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::utility::hexstr_to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);
             if (JSONCONS_UNLIKELY(ec)) return;
         }
-        else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (r.error_code() == std::errc::result_out_of_range)
         {
             bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);

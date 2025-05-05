@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/to_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -589,7 +589,6 @@ private:
     int level_{0};
     std::size_t depth_{0};
     std::size_t offset_{0};
-    jsoncons::detail::chars_to to_double_; 
     const CharT* begin_input_{nullptr};
     const CharT* input_end_{nullptr};
     const CharT* input_ptr_{nullptr};
@@ -1707,7 +1706,7 @@ private:
                 switch (mapping_kind_)
                 {
                 case csv_mapping_kind::n_rows:
-                    if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                    if (unquoted_empty_value_is_null_ && buffer_.empty())
                     {
                         visitor.null_value(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
@@ -1722,7 +1721,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1734,7 +1733,7 @@ private:
                         }
                         else if (depth_ > 0)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1784,7 +1783,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -1796,7 +1795,7 @@ private:
                         }
                         else if (depth_ > 0)
                         {
-                            if (unquoted_empty_value_is_null_ && buffer_.length() == 0)
+                            if (unquoted_empty_value_is_null_ && buffer_.empty())
                             {
                                 visitor.null_value(semantic_tag::none, *this, ec);
                                 more_ = !cursor_mode_;
@@ -2112,9 +2111,11 @@ private:
                 {
                     switch (*p)
                     {
-                    case '.':
-                        buffer.push_back(to_double_.get_decimal_point());
-                        state = numeric_check_state::fraction1;
+                        case '.':
+                        {
+                            buffer.push_back('.');
+                            state = numeric_check_state::fraction1;
+                        }
                         break;
                     case 'e':case 'E':
                         buffer.push_back(*p);
@@ -2135,7 +2136,7 @@ private:
                         buffer.push_back(*p);
                         break;
                     case '.':
-                        buffer.push_back(to_double_.get_decimal_point());
+                        buffer.push_back('.');
                         state = numeric_check_state::fraction1;
                         break;
                     case 'e':case 'E':
@@ -2260,7 +2261,7 @@ private:
                 if (is_negative)
                 {
                     int64_t val{ 0 };
-                    auto result = jsoncons::detail::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2275,20 +2276,20 @@ private:
                 else
                 {
                     uint64_t val{ 0 };
-                    auto result = jsoncons::detail::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.uint64_value(val, semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                     }
-                    else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
+                    else if (result.ec == std::errc::result_out_of_range)
                     {
                         visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
                         more_ = !cursor_mode_;
                     }
                     else
                     {
-                        ec = result.ec;
+                        ec = csv_errc::invalid_number; 
                         more_ = false;
                         return;
                     }
@@ -2305,7 +2306,18 @@ private:
                 }
                 else
                 {
-                    double d = to_double_(buffer.c_str(), buffer.length());
+                    double d{0};
+                    auto result = jsoncons::utility::to_double(buffer.c_str(), buffer.length(), d);
+                    if (result.ec == std::errc::result_out_of_range)
+                    {
+                        d = buffer.front() == '-' ? -HUGE_VAL : HUGE_VAL;
+                    }
+                    else if (result.ec == std::errc::invalid_argument)
+                    {
+                        ec = csv_errc::invalid_number; 
+                        more_ = false;
+                        return;
+                    }
                     visitor.double_value(d, semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                 }

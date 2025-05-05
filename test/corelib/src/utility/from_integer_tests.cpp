@@ -6,7 +6,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("detail::from_integer tests")
+TEST_CASE("utility::from_integer tests")
 {
     SECTION("")
     {

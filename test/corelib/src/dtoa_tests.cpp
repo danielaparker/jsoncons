@@ -6,7 +6,7 @@
 
 #include <catch/catch.hpp>
 
-#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
 
 using namespace jsoncons;
@@ -14,7 +14,7 @@ using namespace jsoncons;
 static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = jsoncons::detail::dtoa_general(x, '.', s, std::false_type());
+    bool result = jsoncons::utility::dtoa_general(x, '.', s, std::false_type());
     if (!result)
     {
         std::cout << "safe dtoa_general failed " << s << "\n";
@@ -37,7 +37,7 @@ static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 static void check_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = jsoncons::detail::dtoa_general(x, '.', s);
+    bool result = jsoncons::utility::dtoa_general(x, '.', s);
     if (!result)
     {
         std::cout << "dtoa_general failed " << s << "\n";

@@ -634,8 +634,8 @@ namespace jsoncons {
                 auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
                 if (JSONCONS_UNLIKELY(ec)) {return val;}
                 key_type n{0};
-                auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
-                if (r.ec != jsoncons::detail::to_integer_errc())
+                auto r = jsoncons::utility::to_integer(s.data(), s.size(), n); 
+                if (r.ec != std::errc())
                 {
                     ec = json_errc::invalid_number;
                     return val;

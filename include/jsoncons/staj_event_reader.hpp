@@ -16,7 +16,7 @@
 #include <system_error>
 
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>

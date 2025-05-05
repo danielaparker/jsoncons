@@ -109,18 +109,18 @@ TEST_CASE("json::as<__int128>()")
     std::string s1 = "-18446744073709551617";
 
     __int128 n;
-    auto result = jsoncons::detail::to_integer_unchecked(s1.data(),s1.size(), n);
-    REQUIRE(result.ec == jsoncons::detail::to_integer_errc());
+    auto result = jsoncons::utility::to_integer_unchecked(s1.data(),s1.size(), n);
+    REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
 
     __int128 val = doc.as<__int128>();
 
     std::string s2;
-    jsoncons::detail::from_integer(val, s2);
+    jsoncons::utility::from_integer(val, s2);
 
     std::string s3;
-    jsoncons::detail::from_integer(n, s3);
+    jsoncons::utility::from_integer(n, s3);
 
     CHECK((n == val));
 }
@@ -131,17 +131,17 @@ TEST_CASE("json::as<unsigned __int128>()")
 
     unsigned __int128 n;
 
-    auto result = jsoncons::detail::to_integer_unchecked(s1.data(),s1.size(), n);
-    REQUIRE(result.ec == jsoncons::detail::to_integer_errc());
+    auto result = jsoncons::utility::to_integer_unchecked(s1.data(),s1.size(), n);
+    REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
 
     unsigned __int128 val = doc.as<unsigned __int128>();
 
     std::string s2;
-    jsoncons::detail::from_integer(val, s2);
+    jsoncons::utility::from_integer(val, s2);
     std::string s3;
-    jsoncons::detail::from_integer(n, s3);
+    jsoncons::utility::from_integer(n, s3);
 
     CHECK((n == val));
 }

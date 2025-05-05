@@ -1304,7 +1304,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             switch (j.type())
             {
                 case json_type::string_value:
-                    return jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length());
+                    return jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::int64_value:
                 case json_type::uint64_value:
                     return true;
@@ -1318,7 +1318,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             switch (j.type())
             {
                 case json_type::string_value:
-                    if (!jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length()))
+                    if (!jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length()))
                     {
                         JSONCONS_THROW(conv_error(conv_errc::not_bigint));
                     }
@@ -1656,7 +1656,7 @@ namespace variant_detail
                     {
                         auto sv = j.as_string_view();
                         Rep n{0};
-                        auto result = jsoncons::detail::dec_to_integer(sv.data(), sv.size(), n);
+                        auto result = jsoncons::utility::decstr_to_integer(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();

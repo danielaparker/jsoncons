@@ -687,7 +687,7 @@ TEST_CASE("cbor bigfloat tests")
 
         json j = cbor::decode_cbor<json>(v);
 
-        //std::string s = j.as<std::string>();
+        //std::cout << j << "\n";
 
         double val = j.as<double>();
         CHECK(val == Approx(1.5).epsilon(0.0000000001));

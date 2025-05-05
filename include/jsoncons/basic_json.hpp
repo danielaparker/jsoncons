@@ -2458,7 +2458,7 @@ namespace jsoncons {
                    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::detail::from_integer(val, s);
+            jsoncons::utility::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -2489,7 +2489,7 @@ namespace jsoncons {
                    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::detail::from_integer(val, s);
+            jsoncons::utility::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -3022,7 +3022,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
-                    return jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length());
+                    return jsoncons::utility::is_base10(as_string_view().data(), as_string_view().length());
                 case json_storage_kind::int64:
                 case json_storage_kind::uint64:
                     return true;
@@ -3368,7 +3368,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -3423,7 +3423,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3468,7 +3468,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3491,9 +3491,35 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    const jsoncons::detail::chars_to to_double;
-                    // to_double() throws std::invalid_argument if conversion fails
-                    return to_double(as_cstring(), as_string_view().length());
+                    double x{0};
+                    const char_type* s = as_cstring();
+                    std::size_t len = as_string_view().length();
+                    if (JSONCONS_UNLIKELY(len > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')))
+                    {
+                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
+                    }
+                    else if (JSONCONS_UNLIKELY(len > 3 && s[0] == '-' && s[1] == '0' && (s[2] == 'x' || s[2] == 'X')))
+                    {
+                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
+                    }
+                    else
+                    {
+                        auto result = jsoncons::utility::to_double(as_cstring(), as_string_view().length(), x);
+                        if (result.ec == std::errc::invalid_argument)
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                        }
+                    }
+                    
+                    return x;
                 }
                 case json_storage_kind::half_float:
                     return binary::decode_half(cast<half_storage>().value());

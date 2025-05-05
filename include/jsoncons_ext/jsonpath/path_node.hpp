@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
@@ -297,7 +297,7 @@ namespace jsonpath {
                     break;
                 case path_node_kind::index:
                     buffer.push_back('[');
-                    jsoncons::detail::from_integer(node->index(), buffer);
+                    jsoncons::utility::from_integer(node->index(), buffer);
                     buffer.push_back(']');
                     break;
             }
