@@ -86,6 +86,17 @@ TEST_CASE("utility::decstr_to_integer tests")
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::invalid_argument);
     }
+    SECTION("max uint64_t")
+    {
+        std::string s = std::to_string((std::numeric_limits<uint64_t>::max)());
+        uint64_t value{ 0 };
+        auto result = jsoncons::utility::decstr_to_integer(s.data(), s.length(), value);
+        REQUIRE(result);
+        CHECK(value == (std::numeric_limits<uint64_t>::max)());
+        s.push_back('0');
+        auto result2 = jsoncons::utility::decstr_to_integer(s.data(), s.length(), value);
+        REQUIRE_FALSE(result2);
+    }
     SECTION("min int64_t")
     {
         std::string s = "-9223372036854775808";
@@ -124,19 +135,25 @@ TEST_CASE("utility::to_integer_unchecked tests")
 {
     SECTION("max uint64_t")
     {
-        std::string s = "18446744073709551615";
-        uint64_t val;
-        auto result = jsoncons::utility::to_integer_unchecked(s.data(), s.length(), val);
+        std::string s = std::to_string((std::numeric_limits<uint64_t>::max)());
+        uint64_t value{ 0 };
+        auto result = jsoncons::utility::decstr_to_integer(s.data(), s.length(), value);
         REQUIRE(result);
-        CHECK(val == (std::numeric_limits<uint64_t>::max)());
+        CHECK(value == (std::numeric_limits<uint64_t>::max)());
+        s.push_back('0');
+        auto result2 = jsoncons::utility::decstr_to_integer(s.data(), s.length(), value);
+        REQUIRE_FALSE(result2);
     }
     SECTION("min int64_t")
     {
-        std::string s = "-9223372036854775808";
-        int64_t val;
-        auto result = jsoncons::utility::to_integer_unchecked(s.data(), s.length(), val);
+        std::string s = std::to_string((std::numeric_limits<int64_t>::lowest)());
+        int64_t value;
+        auto result = jsoncons::utility::to_integer_unchecked(s.data(), s.length(), value);
         REQUIRE(result);
-        CHECK(val == (std::numeric_limits<int64_t>::min)());
+        CHECK(value == (std::numeric_limits<int64_t>::lowest)());
+        s.push_back('0');
+        auto result2 = jsoncons::utility::decstr_to_integer(s.data(), s.length(), value);
+        REQUIRE_FALSE(result2);
     }
     SECTION("max int64_t")
     {

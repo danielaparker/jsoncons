@@ -268,6 +268,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& n)
             }
             else
             {
+                cur += i;
                 goto integer_end;
             }
             ++i;
@@ -278,7 +279,11 @@ decstr_to_integer(const CharT* s, std::size_t length, T& n)
             value = num;
             return to_number_result<CharT>(cur, std::errc{});
         }
-        else if (is_digit(*cur))
+        if (i+1 != length)
+        {
+            return to_number_result<CharT>(cur, std::errc::result_out_of_range);
+        }
+        if (is_digit(*cur))
         {
             if (num > max_value_div_10)
             {
@@ -297,7 +302,6 @@ decstr_to_integer(const CharT* s, std::size_t length, T& n)
         }
         
 integer_end:
-        cur += i;
         return to_number_result<CharT>(cur, std::errc::invalid_argument);
     }
 
