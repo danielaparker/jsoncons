@@ -22,10 +22,6 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
-#define JSONCONS_REPEAT_IN_1_18(x) { x(1)  x(2)  x(3)  x(4)  x(5)  x(6)  x(7)  x(8)  \
-                                     x(9)  x(10) x(11) x(12) x(13) x(14) x(15) x(16) \
-                                     x(17) x(18) }
-
 namespace jsoncons { 
 namespace utility {
 
@@ -169,141 +165,68 @@ bool is_base16(const CharT* s, std::size_t length)
     }
     return state == integer_chars_state::base16 ? true : false;
 }
-/*
+    
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-decstr_to_integer(const CharT* s, std::size_t length, T& n)
+decstr_to_integer(const CharT* s, std::size_t length, T& value)
 {
-    n = 0;
-
-    integer_chars_state state = integer_chars_state::initial;
-
-    const CharT* end = s + length; 
-    while (s < end)
+    if (length == 0)
     {
-        switch(state)
-        {
-            case integer_chars_state::initial:
-            {
-                switch(*s)
-                {
-                    case '0':
-                        if (++s == end)
-                        {
-                            return (++s == end) ? to_number_result<CharT>(s) : to_number_result<CharT>(s, std::errc());
-                        }
-                        else
-                        {
-                            return to_number_result<CharT>(s, std::errc::invalid_argument);
-                        }
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
-                        state = integer_chars_state::decimal;
-                        break;
-                    default:
-                        return to_number_result<CharT>(s, std::errc::invalid_argument);
-                }
-                break;
-            }
-            case integer_chars_state::decimal:
-            {
-                static constexpr T max_value = (ext_traits::integer_limits<T>::max)();
-                static constexpr T max_value_div_10 = max_value / 10;
-                for (; s < end; ++s)
-                {
-                    T x = 0;
-                    switch(*s)
-                    {
-                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            x = static_cast<T>(*s) - static_cast<T>('0');
-                            break;
-                        default:
-                            return to_number_result<CharT>(s, std::errc::invalid_argument);
-                    }
-                    if (n > max_value_div_10)
-                    {
-                        return to_number_result<CharT>(s, std::errc::result_out_of_range);
-                    }
-                    n = n * 10;
-                    if (n > max_value - x)
-                    {
-                        return to_number_result<CharT>(s, std::errc::result_out_of_range);
-                    }
-                    n += x;
-                }
-                break;
-            }
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
-        }
+        return to_number_result<CharT>(s, std::errc::invalid_argument);
     }
-    return (state == integer_chars_state::initial) ? to_number_result<CharT>(s, std::errc::invalid_argument) : to_number_result<CharT>(s, std::errc());
-}
-*/
-    
-    template <typename T,typename CharT>
-    typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-    decstr_to_integer(const CharT* s, std::size_t length, T& value)
+
+    static constexpr T max_value = (ext_traits::integer_limits<T>::max)();
+    static constexpr T max_value_div_10 = max_value / 10;
+
+    T num = 0;
+    const CharT* cur = s;
+    const CharT* last = s + length;
+    static constexpr std::size_t digits10 = static_cast<std::size_t>(std::numeric_limits<T>::digits10);
+    const std::size_t n = (std::min)(digits10, length);
+    const CharT* stop = s + n;
+     
+    while (cur < stop)
     {
-        if (length == 0)
+        uint8_t d;
+        if (JSONCONS_LIKELY((d = static_cast<uint8_t>(*cur - '0')) <= 9) )
         {
-            return to_number_result<CharT>(s, std::errc::invalid_argument);
+            num = static_cast<T>(d) + num*10;
         }
-
-        static constexpr T max_value = (ext_traits::integer_limits<T>::max)();
-        static constexpr T max_value_div_10 = max_value / 10;
-
-        T num = 0;
-        const CharT* cur = s;
-        static constexpr std::size_t digits10 = static_cast<std::size_t>(std::numeric_limits<T>::digits10);
-        const std::size_t n = (std::min)(digits10, length);
-         
-        std::size_t i = 0;      
-        while (i < n)
+        else
         {
-            uint8_t d;
-            if (JSONCONS_LIKELY((d = static_cast<uint8_t>(cur[i] - '0')) <= 9) )
-            {
-                num = static_cast<T>(d) + num*10;
-            }
-            else
-            {
-                cur += i;
-                goto integer_end;
-            }
-            ++i;
+            return to_number_result<CharT>(cur, std::errc::invalid_argument);
         }
-        cur += i;
-        if (i == length)
-        {
-            value = num;
-            return to_number_result<CharT>(cur, std::errc{});
-        }
-        if (i+1 != length)
+        ++cur;
+    }
+    if (cur == last)
+    {
+        value = num;
+        return to_number_result<CharT>(cur, std::errc{});
+    }
+    if (cur+1 != last)
+    {
+        return to_number_result<CharT>(cur, std::errc::result_out_of_range);
+    }
+    if (is_digit(*cur))
+    {
+        if (num > max_value_div_10)
         {
             return to_number_result<CharT>(cur, std::errc::result_out_of_range);
         }
-        if (is_digit(*cur))
+        uint8_t d = static_cast<uint8_t>(*cur - '0');
+        num = num*10;
+        if (num > max_value - d)
         {
-            if (num > max_value_div_10)
-            {
-                return to_number_result<CharT>(cur, std::errc::result_out_of_range);
-            }
-            uint8_t d = static_cast<uint8_t>(*cur - '0');
-            num = num*10;
-            if (num > max_value - d)
-            {
-                return to_number_result<CharT>(s, std::errc::result_out_of_range);
-            }
-            num += d;
-            ++cur;
-            value = num;
-            return to_number_result<CharT>(cur, std::errc{});
+            return to_number_result<CharT>(s, std::errc::result_out_of_range);
         }
-        
-integer_end:
-        return to_number_result<CharT>(cur, std::errc::invalid_argument);
+        num += d;
+        ++cur;
+        value = num;
+        return to_number_result<CharT>(cur, std::errc{});
     }
+    
+    return to_number_result<CharT>(cur, std::errc::invalid_argument);
+}
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
