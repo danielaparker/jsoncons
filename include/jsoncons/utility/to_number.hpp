@@ -181,7 +181,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& value)
     T num = 0;
     const CharT* cur = s;
     const CharT* last = s + length;
-    static constexpr std::size_t digits10 = static_cast<std::size_t>(std::numeric_limits<T>::digits10);
+    static constexpr std::size_t digits10 = static_cast<std::size_t>(ext_traits::integer_limits<T>::digits10);
     const std::size_t n = (std::min)(digits10, length);
     const CharT* stop = s + n;
      
