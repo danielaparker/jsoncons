@@ -821,6 +821,15 @@ public:
                                     return;
                                 }
                             }
+                            else
+                            {
+                                more_ = err_handler_(json_errc::unexpected_character, *this);
+                                if (!more_)
+                                {
+                                    ec = json_errc::unexpected_character;
+                                    return;
+                                }
+                            }
                             ++input_ptr_;
                             ++position_;
                             break;
