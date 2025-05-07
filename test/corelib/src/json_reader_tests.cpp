@@ -252,10 +252,10 @@ TEST_CASE("test_read_primitive_fail")
     test_json_reader_error("fals ", jsoncons::json_errc::invalid_value);
     test_json_reader_error("true []", jsoncons::json_errc::extra_character);
     test_json_reader_error("tru ", jsoncons::json_errc::invalid_value);
-    test_json_reader_error("10 {}", jsoncons::json_errc::extra_character);
-    test_json_reader_error("1a ", jsoncons::json_errc::invalid_number);
-    test_json_reader_error("1.999 []", jsoncons::json_errc::extra_character);
-    test_json_reader_error("1e0-1", jsoncons::json_errc::invalid_number);
+    test_json_reader_error("10 {}", jsoncons::json_errc::unexpected_character);
+    test_json_reader_error("1a ", jsoncons::json_errc::unexpected_character);
+    test_json_reader_error("1.999 []", jsoncons::json_errc::unexpected_character);
+    test_json_reader_error("1e0-1", jsoncons::json_errc::unexpected_character);
     test_json_reader_error("\"string\"{}", jsoncons::json_errc::extra_character);
     test_json_reader_error("\"string\"[]", jsoncons::json_errc::extra_character);
 }
