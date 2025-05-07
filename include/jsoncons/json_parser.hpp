@@ -1808,7 +1808,7 @@ integer:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
+            /*case '\r': 
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
                 push_state(state_);
@@ -1842,7 +1842,7 @@ integer:
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
                 state_ = parse_state::expect_comma_or_end;
-                return;
+                return;*/
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
@@ -1858,19 +1858,22 @@ integer:
                 ++input_ptr_;
                 ++position_;
                 goto exp1;
-            case ',':
+            /*case ',':
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
                 begin_member_or_element(ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
                 ++input_ptr_;
                 ++position_;
-                return;
+                return;*/
             default:
-                err_handler_(json_errc::invalid_number, *this);
-                ec = json_errc::invalid_number;
-                more_ = false;
-                number_state_ = parse_number_state::integer;
+                end_integer_value(visitor, ec);
+                if (JSONCONS_UNLIKELY(ec)) return;
+                state_ = parse_state::expect_comma_or_end;
+                //err_handler_(json_errc::invalid_number, *this);
+                //ec = json_errc::invalid_number;
+                //more_ = false;
+                //number_state_ = parse_number_state::integer;
                 return;
         }
 fraction1:
