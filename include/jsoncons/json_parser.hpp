@@ -1743,41 +1743,6 @@ zero:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = parse_state::cr;
-                return; 
-            case '\n': 
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
-            case ' ':case '\t':
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                skip_space(&input_ptr_);
-                return;
-            case '/': 
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = parse_state::slash;
-                return;
-            case '}':
-            case ']':
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                state_ = parse_state::expect_comma_or_end;
-                return;
             case '.':
                 string_buffer_.push_back('.');
                 ++input_ptr_;
@@ -1788,14 +1753,6 @@ zero:
                 ++input_ptr_;
                 ++position_;
                 goto exp1;
-            case ',':
-                end_integer_value(visitor, ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                begin_member_or_element(ec);
-                if (JSONCONS_UNLIKELY(ec)) return;
-                ++input_ptr_;
-                ++position_;
-                return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 err_handler_(json_errc::leading_zero, *this);
                 ec = json_errc::leading_zero;
@@ -1803,10 +1760,9 @@ zero:
                 number_state_ = parse_number_state::zero;
                 return;
             default:
-                err_handler_(json_errc::invalid_number, *this);
-                ec = json_errc::invalid_number;
-                more_ = false;
-                number_state_ = parse_number_state::zero;
+                end_integer_value(visitor, ec);
+                if (JSONCONS_UNLIKELY(ec)) return;
+                state_ = parse_state::expect_comma_or_end;
                 return;
         }
 integer:
