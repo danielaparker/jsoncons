@@ -1762,7 +1762,7 @@ zero:
             default:
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                state_ = parse_state::expect_comma_or_end;
+                //state_ = parse_state::expect_comma_or_end;
                 return;
         }
 integer:
@@ -1791,7 +1791,7 @@ integer:
             default:
                 end_integer_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                state_ = parse_state::expect_comma_or_end;
+                //state_ = parse_state::expect_comma_or_end;
                 return;
         }
 fraction1:
