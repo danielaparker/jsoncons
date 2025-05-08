@@ -576,7 +576,7 @@ TEST_CASE("test_fail29")
         err = e.code();
         //std::cout << in_file << " " << e.what() << '\n';
     }
-    CHECK(err == jsoncons::json_errc::expected_value);
+    CHECK(err == jsoncons::json_errc::invalid_number);
 }
 
 TEST_CASE("test_fail30")
@@ -596,7 +596,7 @@ TEST_CASE("test_fail30")
         err = e.code();
         //std::cout << in_file << " " << e.what() << '\n';
     }
-    CHECK(err == jsoncons::json_errc::expected_value);
+    CHECK(err == jsoncons::json_errc::invalid_number);
 }
 
 TEST_CASE("test_fail31")
@@ -616,7 +616,7 @@ TEST_CASE("test_fail31")
         err = e.code();
         //std::cout << in_file << " " << e.what() << '\n';
     }
-    CHECK(err == jsoncons::json_errc::expected_value);
+    CHECK(err == jsoncons::json_errc::invalid_number);
 }
 
 TEST_CASE("test_fail32")
