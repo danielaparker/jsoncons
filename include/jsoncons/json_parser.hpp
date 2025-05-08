@@ -1743,9 +1743,9 @@ zero:
             ++position_;
             goto fraction1;
         }
-        if (*input_ptr_ == 'e' || *input_ptr_ == 'E')
+        if (jsoncons::utility::is_exp(*input_ptr_))
         {
-            string_buffer_.push_back('e');
+            string_buffer_.push_back(*input_ptr_);
             ++input_ptr_;
             ++position_;
             goto exp1;
@@ -1783,7 +1783,7 @@ integer:
             ++position_;
             goto fraction1;
         }
-        if (*input_ptr_ == 'e' || *input_ptr_ == 'E')
+        if (jsoncons::utility::is_exp(*input_ptr_))
         {
             string_buffer_.push_back(*input_ptr_);
             ++input_ptr_;
@@ -1826,7 +1826,7 @@ fraction2:
             ++input_ptr_;
             ++position_;
         }
-        if (*input_ptr_ == 'e' || *input_ptr_ == 'E')
+        if (jsoncons::utility::is_exp(*input_ptr_))
         {
             string_buffer_.push_back(*input_ptr_);
             ++input_ptr_;
