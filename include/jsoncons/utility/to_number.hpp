@@ -35,6 +35,16 @@ constexpr bool is_digit(wchar_t d)
     return d >= '0' && d <= '9';
 }
 
+constexpr bool is_nonzero_digit(char d) 
+{
+    return d >= '1' && d <= '9';
+}
+
+constexpr bool is_nonzero_digit(wchar_t d)
+{
+    return d >= '1' && d <= '9';
+}
+
 template <typename CharT>
 struct to_number_result
 {
