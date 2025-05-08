@@ -156,9 +156,9 @@ TEST_CASE("test_parse_primitive_fail")
     test_parse_error("true []", jsoncons::json_errc::extra_character);
     test_parse_error("tru ", jsoncons::json_errc::invalid_value);
     test_parse_error("10 {}", jsoncons::json_errc::extra_character);
-    test_parse_error("1a ", jsoncons::json_errc::invalid_number);
+    test_parse_error("1a ", jsoncons::json_errc::extra_character);
     test_parse_error("1.999 []", jsoncons::json_errc::extra_character);
-    test_parse_error("1e0-1", jsoncons::json_errc::invalid_number);
+    test_parse_error("1e0-1", jsoncons::json_errc::extra_character);
     test_parse_error("\"string\"{}", jsoncons::json_errc::extra_character);
     test_parse_error("\"string\"[]", jsoncons::json_errc::extra_character);
 }

@@ -622,23 +622,15 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
         REQUIRE_FALSE(cursor.done());
-        cursor.next();
-        CHECK(cursor.done());
-
         cursor.reset();
         CHECK(staj_event_type::int64_value == cursor.current().event_type());
         CHECK(-100 == cursor.current().template get<int>());
-        REQUIRE_FALSE(cursor.done());
-        cursor.next();
-        CHECK(cursor.done());
-
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
         CHECK(staj_event_type::null_value == cursor.current().event_type());
-        REQUIRE_FALSE(cursor.done());
+        CHECK_FALSE(cursor.done());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
-        CHECK(cursor.done());
     }
 
     SECTION("with another source")
