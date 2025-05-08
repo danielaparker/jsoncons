@@ -1835,7 +1835,6 @@ fraction2:
             default:
                 end_fraction_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                state_ = parse_state::expect_comma_or_end;
                 return;
         }
 exp1:
@@ -1904,7 +1903,6 @@ exp3:
             default:
                 end_fraction_value(visitor, ec);
                 if (JSONCONS_UNLIKELY(ec)) return;
-                state_ = parse_state::expect_comma_or_end;
                 return;
         }
 
