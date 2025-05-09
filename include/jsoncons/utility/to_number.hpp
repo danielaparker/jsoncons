@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace utility {
 
-// follows yyjson https://github.com/ibireme/yyjson
+// Inspired by yyjson https://github.com/ibireme/yyjson
 
 // Digit: '0'.
 JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_ZERO       = 1 << 0;
