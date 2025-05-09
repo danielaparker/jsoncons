@@ -25,24 +25,108 @@
 namespace jsoncons { 
 namespace utility {
 
-constexpr bool is_digit(char d) 
-{
-    return d >= '0' && d <= '9';
+// Inspired by yyjson https://github.com/ibireme/yyjson
+
+// Digit: '0'.
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_ZERO       = 1 << 0;
+
+// Digit: [1-9]. 
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_NONZERO    = 1 << 1;
+
+// Plus sign (positive): '+'. 
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_POS        = 1 << 2;
+
+// Minus sign (negative): '-'. 
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_NEG        = 1 << 3;
+
+// Decimal point: '.' 
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_DOT        = 1 << 4;
+
+// Exponent sign: 'e, 'E'. 
+JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_EXP        = 1 << 5;
+
+// Digit type table (generate with misc/make_tables.c) 
+JSONCONS_INLINE_CONSTEXPR uint8_t digi_table[256] = {
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x04, 0x00, 0x08, 0x10, 0x00,
+    0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+    0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+/** Match a character with specified type. */
+constexpr bool is_type(uint8_t d, uint8_t type) {
+    return (digi_table[d] & type) != 0;
 }
 
-constexpr bool is_digit(wchar_t d)
-{
-    return d >= '0' && d <= '9';
+// Match a sign: '+', '-' 
+constexpr bool is_sign(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_POS | DIGIT_TYPE_NEG));
 }
 
-constexpr bool is_nonzero_digit(char d) 
-{
+// Match a none zero digit: [1-9] 
+constexpr bool is_nonzero_digit(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_NONZERO);
+}
+
+// Match a digit: [0-9] 
+constexpr bool is_digit(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO));
+}
+
+// Match an exponent sign: 'e', 'E'. 
+constexpr bool is_exp(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_EXP);
+}
+
+// Match a floating point indicator: '.', 'e', 'E'. 
+constexpr bool is_fp_indicator(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+}
+
+// Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
+constexpr bool is_digit_or_fp(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO |
+                                       DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+}
+constexpr bool is_sign(wchar_t d) {
+    return d == '+' || d == '-';
+}
+
+// Match a none zero digit: [1-9] 
+constexpr bool is_nonzero_digit(wchar_t d) {
     return d >= '1' && d <= '9';
 }
 
-constexpr bool is_nonzero_digit(wchar_t d)
-{
-    return d >= '1' && d <= '9';
+// Match a digit: [0-9] 
+constexpr bool is_digit(wchar_t d) {
+    return d >= '0' && d <= '9';
+}
+
+// Match an exponent sign: 'e', 'E'. 
+constexpr bool is_exp(wchar_t d) {
+    return d == 'e' || d == 'E';
+}
+
+// Match a floating point indicator: '.', 'e', 'E'. 
+constexpr bool is_fp(wchar_t d) {
+    return d == '.' || d == 'e' || d == 'E';
+}
+
+// Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
+constexpr bool is_digit_or_fp(wchar_t d) {
+    return is_digit(d) || is_fp(d);
 }
 
 template <typename CharT>
