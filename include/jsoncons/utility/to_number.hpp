@@ -25,6 +25,8 @@
 namespace jsoncons { 
 namespace utility {
 
+// follows yyjson https://github.com/ibireme/yyjson
+
 // Digit: '0'.
 JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_ZERO       = 1 << 0;
 
@@ -99,56 +101,33 @@ constexpr bool is_digit_or_fp(char d) {
                                        DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
 }
 constexpr bool is_sign(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_POS | DIGIT_TYPE_NEG));
+    return d == '+' || d == '-';
 }
 
 // Match a none zero digit: [1-9] 
 constexpr bool is_nonzero_digit(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_NONZERO);
+    return d >= '1' && d <= '9';
 }
 
 // Match a digit: [0-9] 
 constexpr bool is_digit(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO));
+    return d >= '0' && d <= '9';
 }
 
 // Match an exponent sign: 'e', 'E'. 
 constexpr bool is_exp(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_EXP);
+    return d == 'e' || d == 'E';
 }
 
 // Match a floating point indicator: '.', 'e', 'E'. 
-constexpr bool is_fp_indicator(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+constexpr bool is_fp(wchar_t d) {
+    return d == '.' || d == 'e' || d == 'E';
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
 constexpr bool is_digit_or_fp(wchar_t d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO |
-                                       DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+    return is_digit(d) || is_fp(d);
 }
-
-/*
-constexpr bool is_digit(char d) 
-{
-    return d >= '0' && d <= '9';
-}
-
-constexpr bool is_digit(wchar_t d)
-{
-    return d >= '0' && d <= '9';
-}
-
-constexpr bool is_nonzero_digit(char d) 
-{
-    return d >= '1' && d <= '9';
-}
-
-constexpr bool is_nonzero_digit(wchar_t d)
-{
-    return d >= '1' && d <= '9';
-}
-*/
 
 template <typename CharT>
 struct to_number_result
