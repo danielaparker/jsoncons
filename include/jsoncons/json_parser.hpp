@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -2466,7 +2466,7 @@ private:
         else
         {
             double d{0};
-            auto result = jsoncons::utility::to_double(&string_buffer_[0], string_buffer_.length(), d);
+            auto result = jsoncons::utility::decstr_to_double(&string_buffer_[0], string_buffer_.length(), d);
             if (JSONCONS_LIKELY(result))
             {
                 visitor.double_value(d, semantic_tag::none, *this, ec);

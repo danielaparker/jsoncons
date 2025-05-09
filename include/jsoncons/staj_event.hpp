@@ -443,7 +443,7 @@ private:
             case staj_event_type::string_value:
             {
                 double val{0};
-                jsoncons::utility::to_double(value_.string_data_, length_, val);
+                jsoncons::utility::decstr_to_double(value_.string_data_, length_, val);
                 return val;
             }
             case staj_event_type::double_value:

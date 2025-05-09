@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -2307,7 +2307,7 @@ private:
                 else
                 {
                     double d{0};
-                    auto result = jsoncons::utility::to_double(buffer.c_str(), buffer.length(), d);
+                    auto result = jsoncons::utility::decstr_to_double(buffer.c_str(), buffer.length(), d);
                     if (result.ec == std::errc::result_out_of_range)
                     {
                         d = buffer.front() == '-' ? -HUGE_VAL : HUGE_VAL;

@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -41,7 +41,7 @@ TEST_CASE("test_exponent")
     const double value1 = 1.15507e-173;
     const double value2 = strtod(begin, &endptr );
     double value3{ 0 };
-    jsoncons::utility::to_double(begin, endptr-begin, value3);
+    jsoncons::utility::decstr_to_double(begin, endptr-begin, value3);
 
     CHECK(value1 == value2);
     CHECK(value2 == value3);
