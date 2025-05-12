@@ -798,7 +798,6 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         CHECK_FALSE(ec);
         //std::cout << visitor.get_result() << "" << '\n';
     }
-#endif
 
     // Fuzz target: fuzz_msgpack_encoder
     // Issue: Integer-overflow
@@ -816,6 +815,25 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
 
         REQUIRE_NOTHROW(reader.read(ec));
+    }
+#endif
+
+    // Fuzz target: fuzz_json_parser_max
+    // Issue: Timeout (exceeds 60 secs)
+    SECTION("issue 416794751")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_parser_max-4672808494104576";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::string s2;
+        json_string_encoder visitor(s2);
+
+        json_stream_reader reader(is, visitor);
+        std::error_code ec;
+        reader.read(ec);
+        //std::cout << ec.message() << "\n";
     }
 }
 

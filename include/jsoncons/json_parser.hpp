@@ -1715,6 +1715,13 @@ public:
                 JSONCONS_UNREACHABLE();               
         }
 minus_sign:
+        if (JSONCONS_UNLIKELY(cur >= local_input_end)) // Buffer exhausted               
+        {
+            number_state_ = parse_number_state::minus;
+            buffer_.append(hdr, cur);
+            position_ += (cur - hdr);
+            return cur;
+        }
         if (jsoncons::utility::is_nonzero_digit(*cur))
         {
             ++cur;
