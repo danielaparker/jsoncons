@@ -15,6 +15,32 @@
 namespace jsoncons {
 namespace reflect {
 
+class decode_error
+{
+    std::error_code ec_{};
+    std::size_t line_{};
+    std::size_t column_{};
+    
+public:
+    decode_error(std::error_code ec, std::size_t line, std::size_t column)
+        : ec_{ec}, line_{line}, column_{column}
+    {
+    }
+    
+    const std::error_code& ec() const
+    {
+        return ec_;
+    }
+    std::size_t line() const
+    {
+        return line_;
+    }
+    std::size_t column() const
+    {
+        return column_;
+    }
+};
+
 template <typename T>
 class decode_result;
 
@@ -47,11 +73,16 @@ public:
 private:
     bool has_value_;
     union {
-        ser_error error_;
+        decode_error error_;
         T value_;
     };
 public:
-    decode_result(const ser_error& err) noexcept
+    decode_result(const decode_error& err) noexcept
+        : has_value_(false), error_{err}
+    {
+    }
+
+    decode_result(decode_error&& err) noexcept
         : has_value_(false), error_{err}
     {
     }
@@ -251,7 +282,7 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
     }
 
-    ser_error error() &
+    decode_error error() &
     {
         if (!has_value_)
         {
@@ -354,10 +385,6 @@ private:
         {
             value_.~T();
             has_value_ = false;
-        }
-        else
-        {
-            error_.~ser_error();
         }
     }
 

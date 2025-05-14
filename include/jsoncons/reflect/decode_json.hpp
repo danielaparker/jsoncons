@@ -10,6 +10,7 @@
 #include <iostream>
 #include <istream> // std::basic_istream
 #include <tuple>
+#include <type_traits>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_set.hpp>
@@ -19,6 +20,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/reflect/decode_result.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {
@@ -31,6 +33,8 @@ typename std::enable_if<ext_traits::is_basic_json<T>::value &&
 try_decode_json(const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename Source::value_type;
 
     jsoncons::json_decoder<T> decoder;
@@ -38,9 +42,9 @@ try_decode_json(const Source& s,
     reader.read();
     if (!decoder.is_valid())
     {
-        JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type{ decode_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
     }
-    return decoder.get_result();
+    return result_type{decoder.get_result()};
 }
 
 template <typename T,typename Source>
@@ -49,17 +53,13 @@ typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
 try_decode_json(const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename Source::value_type;
 
     basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, default_json_parsing());
     jsoncons::json_decoder<basic_json<char_type>> decoder;
-    std::error_code ec;
-    T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-    }
-    return val;
+    return decode_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename CharT>
@@ -67,14 +67,17 @@ typename std::enable_if<ext_traits::is_basic_json<T>::value,decode_result<T>>::t
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
+
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
     reader.read();
     if (!decoder.is_valid())
     {
-        JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
-    return decoder.get_result();
+    return result_type{decoder.get_result()};
 }
 
 template <typename T,typename CharT>
@@ -82,16 +85,14 @@ typename std::enable_if<!ext_traits::is_basic_json<T>::value,decode_result<T>>::
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
+    using value_type = T;
+    using char_type = CharT;
+    using result_type = decode_result<value_type>;
+
     basic_json_cursor<CharT> cursor(is, options, default_json_parsing());
     json_decoder<basic_json<CharT>> decoder{};
 
-    std::error_code ec;
-    T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
-    }
-    return val;
+    return decode_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename InputIt>
@@ -100,6 +101,8 @@ try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename std::iterator_traits<InputIt>::value_type;
 
     jsoncons::json_decoder<T> decoder;
@@ -107,9 +110,9 @@ try_decode_json(InputIt first, InputIt last,
     reader.read();
     if (!decoder.is_valid())
     {
-        JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
-    return decoder.get_result();
+    return result_type{decoder.get_result()};
 }
 
 template <typename T,typename InputIt>
@@ -118,17 +121,13 @@ try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename std::iterator_traits<InputIt>::value_type;
 
     basic_json_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), options, default_json_parsing());
     jsoncons::json_decoder<basic_json<char_type>> decoder;
-    std::error_code ec;
-    T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
-    }
-    return val;
+    return decode_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 // With leading allocator_set parameter
@@ -140,6 +139,8 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename Source::value_type;
 
     json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
@@ -148,9 +149,9 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     reader.read();
     if (!decoder.is_valid())
     {
-        JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
-    return decoder.get_result();
+    return result_type{decoder.get_result()};
 }
 
 template <typename T,typename Source,typename Allocator,typename TempAllocator >
@@ -160,18 +161,14 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
     using char_type = typename Source::value_type;
 
     basic_json_cursor<char_type,string_source<char_type>,TempAllocator> cursor(s, options, default_json_parsing(), alloc_set.get_temp_allocator());
     json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
 
-    std::error_code ec;
-    T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-    }
-    return val;
+    return decode_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -180,15 +177,18 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
+    using value_type = T;
+    using result_type = decode_result<value_type>;
+
     json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
     basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
     reader.read();
     if (!decoder.is_valid())
     {
-        JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
-    return decoder.get_result();
+    return result_type{decoder.get_result()};
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -197,16 +197,14 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
-    basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(is, options, default_json_parsing(), alloc_set.get_temp_allocator());
+    using value_type = T;
+    using char_type = CharT;
+    using result_type = decode_result<value_type>;
+
+    basic_json_cursor<char_type,stream_source<char_type>,TempAllocator> cursor(is, options, default_json_parsing(), alloc_set.get_temp_allocator());
     json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(),alloc_set.get_temp_allocator());
 
-    std::error_code ec;
-    T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        return decode_traits<T>(ser_error(ec, cursor.context().line(), cursor.context().column()));
-    }
-    return decode_traits<T>(std::move(val));
+    return decode_traits<value_type,char_type>::try_decode(cursor, decoder);
 }
 
 } // namespace reflect
