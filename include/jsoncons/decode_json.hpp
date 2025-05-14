@@ -36,9 +36,9 @@ namespace jsoncons {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+            return decode_traits<T>(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
-        return decoder.get_result();
+        return decode_traits<T>(decoder.get_result());
     }
 
     template <typename T,typename Source>
@@ -55,9 +55,9 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            return decode_traits<T>(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
-        return val;
+        return decode_traits<T>(std::move(val));
     }
 
     template <typename T,typename CharT>
@@ -70,9 +70,9 @@ namespace jsoncons {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+            return decode_traits<T>(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
-        return decoder.get_result();
+        return decode_traits<T>(decoder.get_result());
     }
 
     template <typename T,typename CharT>
@@ -87,9 +87,9 @@ namespace jsoncons {
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
+            return decode_traits<T>(ser_error(ec, cursor.line(), cursor.column()));
         }
-        return val;
+        return decode_traits<T>(std::move(val));
     }
 
     template <typename T,typename InputIt>
@@ -105,9 +105,9 @@ namespace jsoncons {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+            return decode_traits<T>(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
-        return decoder.get_result();
+        return decode_traits<T>(decoder.get_result());
     }
 
     template <typename T,typename InputIt>
@@ -124,9 +124,9 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
+            return decode_traits<T>(ser_error(ec, cursor.line(), cursor.column()));
         }
-        return val;
+        return decode_traits<T>(std::move(val));
     }
 
     // With leading allocator_set parameter
@@ -146,9 +146,9 @@ namespace jsoncons {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+            return decode_traits<T>(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
-        return decoder.get_result();
+        return decode_traits<T>(decoder.get_result());
     }
 
     template <typename T,typename Source,typename Allocator,typename TempAllocator >
@@ -167,9 +167,9 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            return decode_traits<T>(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
-        return val;
+        return decode_traits<T>(std::move(val));
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -184,9 +184,9 @@ namespace jsoncons {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+            return decode_traits<T>(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
-        return decoder.get_result();
+        return decode_traits<T>(decoder.get_result());
     }
 
     template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -202,9 +202,9 @@ namespace jsoncons {
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            return decode_traits<T>(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
-        return val;
+        return decode_traits<T>(std::move(val));
     }
 
 
