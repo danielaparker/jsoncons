@@ -58,7 +58,7 @@ struct decode_traits
         {
             return result_type{decode_error{conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()}};
         }
-        auto result = reflect::json_conv_traits<value_type>::try_as(decoder.get_result());
+        auto result = reflect::json_conv_traits<Json,value_type>::try_as(decoder.get_result());
 
         return result ? result_type{result.error(), cursor.line(), cursor.column()} : result_type{std::move(result.value())};
     }
