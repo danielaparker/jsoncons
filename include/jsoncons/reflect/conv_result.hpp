@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_REFLECT_DECODE_RESULT_HPP    
-#define JSONCONS_REFLECT_DECODE_RESULT_HPP    
+#ifndef JSONCONS_REFLECT_CONV_RESULT_HPP    
+#define JSONCONS_REFLECT_CONV_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -15,81 +15,50 @@
 namespace jsoncons {
 namespace reflect {
 
-class decode_error
-{
-    std::error_code ec_{};
-    std::size_t line_{};
-    std::size_t column_{};
-    
-public:
-    decode_error(std::error_code ec, std::size_t line, std::size_t column)
-        : ec_{ec}, line_{line}, column_{column}
-    {
-    }
-    
-    const std::error_code& ec() const
-    {
-        return ec_;
-    }
-    std::size_t line() const
-    {
-        return line_;
-    }
-    std::size_t column() const
-    {
-        return column_;
-    }
-};
-
 template <typename T>
-class decode_result;
+class conv_result;
 
 template <typename T1, typename T2>
-struct is_constructible_or_convertible_from_decode_result
+struct is_constructible_or_convertible_from_conv_result
     : std::integral_constant<
-          bool, std::is_constructible<T1, decode_result<T2>&>::value ||
-                std::is_constructible<T1, decode_result<T2>&&>::value ||
-                std::is_constructible<T1, const decode_result<T2>&>::value ||
-                std::is_constructible<T1, const decode_result<T2>&&>::value ||
-                std::is_convertible<decode_result<T2>&, T1>::value ||
-                std::is_convertible<decode_result<T2>&&, T1>::value ||
-                std::is_convertible<const decode_result<T2>&, T1>::value ||
-                std::is_convertible<const decode_result<T2>&&, T1>::value> {};
+          bool, std::is_constructible<T1, conv_result<T2>&>::value ||
+                std::is_constructible<T1, conv_result<T2>&&>::value ||
+                std::is_constructible<T1, const conv_result<T2>&>::value ||
+                std::is_constructible<T1, const conv_result<T2>&&>::value ||
+                std::is_convertible<conv_result<T2>&, T1>::value ||
+                std::is_convertible<conv_result<T2>&&, T1>::value ||
+                std::is_convertible<const conv_result<T2>&, T1>::value ||
+                std::is_convertible<const conv_result<T2>&&, T1>::value> {};
 
 template <typename T1, typename T2>
-struct is_constructible_convertible_or_assignable_from_decode_result
+struct is_constructible_convertible_or_assignable_from_conv_result
     : std::integral_constant<
-          bool, is_constructible_or_convertible_from_decode_result<T1, T2>::value ||
-                std::is_assignable<T1&, decode_result<T2>&>::value ||
-                std::is_assignable<T1&, decode_result<T2>&&>::value ||
-                std::is_assignable<T1&, const decode_result<T2>&>::value ||
-                std::is_assignable<T1&, const decode_result<T2>&&>::value> {};
+          bool, is_constructible_or_convertible_from_conv_result<T1, T2>::value ||
+                std::is_assignable<T1&, conv_result<T2>&>::value ||
+                std::is_assignable<T1&, conv_result<T2>&&>::value ||
+                std::is_assignable<T1&, const conv_result<T2>&>::value ||
+                std::is_assignable<T1&, const conv_result<T2>&&>::value> {};
 
 template <typename T>
-class decode_result
+class conv_result
 {
 public:
     using value_type = T;
 private:
     bool has_value_;
     union {
-        decode_error error_;
+        std::error_code ec_;
         T value_;
     };
 public:
-    decode_result(const decode_error& err) noexcept
-        : has_value_(false), error_{err}
+    conv_result(std::error_code ec) noexcept
+        : has_value_(false), ec_{ec}
     {
     }
 
-    decode_result(decode_error&& err) noexcept
-        : has_value_(false), error_{err}
-    {
-    }
-    
     // copy constructors
-    decode_result(const decode_result<T>& other)
-        : has_value_(false), error_{other.error_}
+    conv_result(const conv_result<T>& other)
+        : has_value_(false), ec_{other.ec_}
     {
         if (other)
         {
@@ -102,10 +71,10 @@ public:
               typename std::enable_if<!std::is_same<T,U>::value &&
                                       std::is_constructible<T, const U&>::value &&
                                       std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_decode_result<T,U>::value &&
+                                      !is_constructible_or_convertible_from_conv_result<T,U>::value &&
                                       std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    decode_result(const decode_result<U>& other)
-        : has_value_(false), error_{other.error_}
+    conv_result(const conv_result<U>& other)
+        : has_value_(false), ec_{other.ec_}
     {
         if (other)
         {
@@ -117,10 +86,10 @@ public:
               typename std::enable_if<!std::is_same<T,U>::value &&
                                       std::is_constructible<T, const U&>::value &&
                                       !std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_decode_result<T,U>::value &&
+                                      !is_constructible_or_convertible_from_conv_result<T,U>::value &&
                                       std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    explicit decode_result(const decode_result<U>& other)
-        : has_value_(false), error_{other.error_}
+    explicit conv_result(const conv_result<U>& other)
+        : has_value_(false), ec_{other.ec_}
     {
         if (other)
         {
@@ -130,9 +99,9 @@ public:
 
     // move constructors
     template <class T2 = T>
-    decode_result(decode_result<T>&& other,
+    conv_result(conv_result<T>&& other,
              typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
-        : has_value_(false), error_{other.error_}
+        : has_value_(false), ec_{other.ec_}
    {
         if (other)
         {
@@ -142,20 +111,20 @@ public:
 
     // converting 
     template <class U>
-    decode_result(decode_result<U>&& value,
+    conv_result(conv_result<U>&& value,
          typename std::enable_if<!std::is_same<T,U>::value &&
                                  std::is_constructible<T, U&&>::value &&
-                                 !is_constructible_or_convertible_from_decode_result<T,U>::value &&
+                                 !is_constructible_or_convertible_from_conv_result<T,U>::value &&
                                  std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
         : has_value_(true), value_(std::forward<U>(value))
     {
     }
 
     template <class U>
-    explicit decode_result(decode_result<U>&& value,
+    explicit conv_result(conv_result<U>&& value,
                      typename std::enable_if<!std::is_same<T,U>::value &&
                                              std::is_constructible<T, U&&>::value &&
-                                             !is_constructible_or_convertible_from_decode_result<T,U>::value &&
+                                             !is_constructible_or_convertible_from_conv_result<T,U>::value &&
                                              !std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
         : has_value_(true), value_(std::forward<U>(value))
     {
@@ -164,8 +133,8 @@ public:
 
     // value constructors
     template <class T2>
-    decode_result(T2&& value,
-         typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
+    conv_result(T2&& value,
+         typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
                                  std::is_constructible<T, T2>::value &&
                                  std::is_convertible<T2,T>::value,int>::type = 0) // (8)
         : has_value_(true), value_(std::forward<T2>(value))
@@ -173,20 +142,20 @@ public:
     }
 
     template <class T2>
-    explicit decode_result(T2&& value,
-                     typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
+    explicit conv_result(T2&& value,
+                     typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
                                              std::is_constructible<T, T2>::value &&
                                              !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
         : has_value_(true), value_(std::forward<T2>(value))
     {
     }
 
-    ~decode_result() noexcept
+    ~conv_result() noexcept
     {
         destroy();
     }
 
-    decode_result& operator=(const decode_result& other)
+    conv_result& operator=(const conv_result& other)
     {
         if (other)
         {
@@ -199,7 +168,7 @@ public:
         return *this;
     }
 
-    decode_result& operator=(decode_result&& other )
+    conv_result& operator=(conv_result&& other )
     {
         if (other)
         {
@@ -213,12 +182,12 @@ public:
     }
 
     template <typename U>
-    typename std::enable_if<!std::is_same<decode_result<T>, U>::value &&
+    typename std::enable_if<!std::is_same<conv_result<T>, U>::value &&
                             std::is_constructible<T, const U&>::value &&
-                           !is_constructible_convertible_or_assignable_from_decode_result<T,U>::value &&
+                           !is_constructible_convertible_or_assignable_from_conv_result<T,U>::value &&
                             std::is_assignable<T&, const U&>::value,
-        decode_result&>::type
-    operator=(const decode_result<U>& other)
+        conv_result&>::type
+    operator=(const conv_result<U>& other)
     {
         if (other) 
         {
@@ -232,12 +201,12 @@ public:
     }
 
     template <typename U>
-    typename std::enable_if<!std::is_same<decode_result<T>, U>::value &&
+    typename std::enable_if<!std::is_same<conv_result<T>, U>::value &&
                             std::is_constructible<T, U>::value &&
-                            !is_constructible_convertible_or_assignable_from_decode_result<T,U>::value &&
+                            !is_constructible_convertible_or_assignable_from_conv_result<T,U>::value &&
                             std::is_assignable<T&, U>::value,
-        decode_result&>::type
-    operator=(decode_result<U>&& other)
+        conv_result&>::type
+    operator=(conv_result<U>&& other)
     {
         if (other) 
         {
@@ -252,11 +221,11 @@ public:
 
     // value assignment
     template <typename T2>
-    typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
+    typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
                             std::is_constructible<T, T2>::value &&
                             std::is_assignable<T&, T2>::value &&
                             !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<T2>::type>::value),
-        decode_result&>::type
+        conv_result&>::type
     operator=(T2&& v)
     {
         assign(std::forward<T2>(v));
@@ -279,16 +248,16 @@ public:
         {
             return get();
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
-    decode_error error() &
+    std::error_code error() const
     {
         if (!has_value_)
         {
-            return this->error_;
+            return this->ec_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
@@ -297,7 +266,7 @@ public:
         {
             return get();
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
     template <typename U>
@@ -348,7 +317,7 @@ public:
         destroy();
     }
 
-    void swap(decode_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+    void swap(conv_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
         const bool contains_a_value = has_value();
@@ -362,9 +331,9 @@ public:
         }
         else
         {
-            decode_result& source = contains_a_value ? *this : other;
-            decode_result& target = contains_a_value ? other : *this;
-            target = decode_result<T>(*source);
+            conv_result& source = contains_a_value ? *this : other;
+            conv_result& target = contains_a_value ? other : *this;
+            target = conv_result<T>(*source);
             source.reset();
         }
     }
@@ -404,110 +373,110 @@ private:
 
 template <typename T>
 typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-swap(decode_result<T>& lhs, decode_result<T>& rhs) noexcept
+swap(conv_result<T>& lhs, conv_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator==(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator==(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator!=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator!=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator<(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator<(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator>(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator>(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator<=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator<=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator>=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator>=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
 }
 
 template <class T1, typename T2>
-constexpr bool operator==(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator==(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs == rhs : false;
 }
 template <class T1, typename T2>
-constexpr bool operator==(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator==(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs == *rhs : false;
 }
 
 template <class T1, typename T2>
-constexpr bool operator!=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator!=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs != rhs : true;
 }
 template <class T1, typename T2>
-constexpr bool operator!=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator!=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs != *rhs : true;
 }
 
 template <class T1, typename T2>
-constexpr bool operator<(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator<(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs < rhs : true;
 }
 template <class T1, typename T2>
-constexpr bool operator<(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator<(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs < *rhs : false;
 }
 
 template <class T1, typename T2>
-constexpr bool operator<=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator<=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs <= rhs : true;
 }
 template <class T1, typename T2>
-constexpr bool operator<=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator<=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs <= *rhs : false;
 }
 
 template <class T1, typename T2>
-constexpr bool operator>(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator>(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs > rhs : false;
 }
 
 template <class T1, typename T2>
-constexpr bool operator>(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator>(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs > *rhs : true;
 }
 
 template <class T1, typename T2>
-constexpr bool operator>=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
+constexpr bool operator>=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
 {
     return lhs ? *lhs >= rhs : false;
 }
 template <class T1, typename T2>
-constexpr bool operator>=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
+constexpr bool operator>=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
 {
     return rhs ? lhs >= *rhs : true;
 }
@@ -515,4 +484,4 @@ constexpr bool operator>=(const T1& lhs, const decode_result<T2>& rhs) noexcept
 } // reflect
 } // jsoncons
 
-#endif // JSONCONS_REFLECT_DECODE_RESULT_HPP
+#endif // JSONCONS_REFLECT_CONV_RESULT_HPP
