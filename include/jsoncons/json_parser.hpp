@@ -2432,7 +2432,7 @@ private:
     void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         int64_t val;
-        auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
+        auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
             visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2449,7 +2449,7 @@ private:
     void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         uint64_t val;
-        auto result = jsoncons::utility::decstr_to_integer(buffer_.data(), buffer_.length(), val);
+        auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
             visitor.uint64_value(val, semantic_tag::none, *this, ec);

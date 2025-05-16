@@ -262,7 +262,7 @@ bool is_base16(const CharT* s, std::size_t length)
     
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-decstr_to_integer(const CharT* s, std::size_t length, T& value)
+dec_to_integer(const CharT* s, std::size_t length, T& value)
 {
     if (length == 0)
     {
@@ -324,7 +324,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& value)
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-decstr_to_integer(const CharT* s, std::size_t length, T& value)
+dec_to_integer(const CharT* s, std::size_t length, T& value)
 {
     if (length == 0)
     {
@@ -338,7 +338,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& value)
     using U = typename ext_traits::make_unsigned<T>::type;
 
     U num;
-    auto ru = decstr_to_integer(s, length, num);
+    auto ru = dec_to_integer(s, length, num);
     if (ru.ec != std::errc())
     {
         return to_number_result<CharT>(ru.ptr, ru.ec);
@@ -611,11 +611,11 @@ to_integer(const CharT* s, T& n)
     return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s), n);
 }
 
-// hexstr_to_integer
+// hex_to_integer
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-hexstr_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(ext_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -699,7 +699,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-hexstr_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(ext_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
