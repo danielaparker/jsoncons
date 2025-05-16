@@ -30,6 +30,20 @@ private:
         T value_;
     };
 public:
+
+    // value constructors
+    conv_result(const T& value)
+        : has_value_(true)
+    {
+        construct(value);
+    }
+
+    conv_result(T&& value) noexcept
+        : has_value_(true)
+    {
+        construct(std::move(value));
+    }
+
     conv_result(std::error_code ec) noexcept
         : has_value_(false), ec_{ec}
     {
@@ -37,28 +51,30 @@ public:
 
     // copy constructors
     conv_result(const conv_result<T>& other)
-        : has_value_(false), ec_{other.ec_}
+        : has_value_(other.has_value_)
     {
         if (other)
         {
-            construct(*other);
+            construct(other.value_);
+        }
+        else
+        {
+            ec_ = other.ec_;
         }
     }
 
     // move constructors
-    conv_result(conv_result<T>&& other)
-        : has_value_(false), ec_{other.ec_}
-   {
+    conv_result(conv_result<T>&& other) noexcept
+        : has_value_(other.has_value())
+    {
         if (other)
         {
             construct(std::move(other.value_));
         }
-   }
-
-    // value constructors
-    conv_result(T&& value) // (8)
-        : has_value_(true), value_(std::move(value))
-    {
+        else
+        {
+            ec_ = other.ec_;
+        }
     }
 
     ~conv_result() noexcept
@@ -74,7 +90,8 @@ public:
         }
         else
         {
-            reset();
+            destroy();
+            ec_ = other.ec_;
         }
         return *this;
     }
@@ -87,7 +104,8 @@ public:
         }
         else
         {
-            reset();
+            destroy();
+            ec_ = other.ec_;
         }
         return *this;
     }
@@ -178,17 +196,23 @@ public:
             conv_result& source = contains_a_value ? *this : other;
             conv_result& target = contains_a_value ? other : *this;
             target = conv_result<T>(*source);
-            source.reset();
+            source.destroy();
+            source.ec_ = target.ec_;
         }
     }
 private:
     constexpr const T& get() const { return this->value_; }
     T& get() { return this->value_; }
 
-    template <typename... Args>
-    void construct(Args&&... args) 
+    void construct(const T& value) 
     {
-        ::new (static_cast<void*>(&this->value_)) T(std::forward<Args>(args)...);
+        ::new (&value_) T(value);
+        has_value_ = true;
+    }
+
+    void construct(T&& value) noexcept
+    {
+        ::new (&value_) T(std::move(value));
         has_value_ = true;
     }
 
@@ -219,109 +243,6 @@ typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
 swap(conv_result<T>& lhs, conv_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator==(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator!=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator<(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator<=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator>=(const conv_result<T1>& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator==(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs == rhs : false;
-}
-template <class T1, typename T2>
-constexpr bool operator==(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs == *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator!=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs != rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator!=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs != *rhs : true;
-}
-
-template <class T1, typename T2>
-constexpr bool operator<(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs < rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator<(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs < *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator<=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs <= rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator<=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs <= *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs > rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs > *rhs : true;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>=(const conv_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs >= rhs : false;
-}
-template <class T1, typename T2>
-constexpr bool operator>=(const T1& lhs, const conv_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs >= *rhs : true;
 }
 
 } // reflect

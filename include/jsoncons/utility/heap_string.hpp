@@ -91,19 +91,6 @@ namespace utility {
         };
     };
 
-    // From boost 1_71
-    template <typename T,typename U>
-    T launder_cast(U* u)
-    {
-    #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
-        return std::launder(reinterpret_cast<T>(u));
-    #elif defined(__GNUC__) &&  (__GNUC__ * 100 + __GNUC_MINOR__) > 800
-        return __builtin_launder(reinterpret_cast<T>(u));
-    #else
-        return reinterpret_cast<T>(u);
-    #endif
-    }
-
     // heap_string_factory
 
     template <typename CharT,typename Extra,typename Allocator>

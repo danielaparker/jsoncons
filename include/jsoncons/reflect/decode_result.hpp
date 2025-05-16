@@ -61,44 +61,55 @@ private:
         T value_;
     };
 public:
-    decode_result(const decode_error& err) noexcept
+
+    decode_result(const T& value) 
+        : has_value_(true)
+    {
+        construct(value);
+    }
+
+     decode_result(T&& value) noexcept
+         : has_value_(true)
+     {
+         construct(std::move(value));
+     }
+
+     decode_result(const decode_error& err)
         : has_value_(false), error_{err}
     {
     }
 
     decode_result(decode_error&& err) noexcept
-        : has_value_(false), error_{err}
+        : has_value_(false), error_{std::move(err)}
     {
     }
     
     // copy constructors
-    decode_result(const decode_result<T>& other)
-        : has_value_(false), error_{other.error_}
+    decode_result(const decode_result<T>& other) 
+        : has_value_(other.has_value())
     {
         if (other)
         {
-            construct(*other);
+            construct(other.value_);
+        }
+        else
+        {
+            error_ = other.error_;
         }
     }
 
     // move constructors
-    decode_result(decode_result<T>&& other)
-        : has_value_(false), error_{other.error_}
-   {
+    decode_result(decode_result<T>&& other) noexcept
+        : has_value_(other.has_value())
+    {
         if (other)
         {
             construct(std::move(other.value_));
         }
-   }
-
-   decode_result(const T& value) // (8)
-       : has_value_(true), value_(value)
-   {
-   }
-
-    decode_result(T&& value) // (8)
-        : has_value_(true), value_(std::move(value))
-    {
+        else
+        {
+            error_ = other.error_;
+        }
     }
 
     ~decode_result() noexcept
@@ -114,12 +125,13 @@ public:
         }
         else
         {
-            reset();
+            destroy();
+            error_ = other.error_;
         }
         return *this;
     }
 
-    decode_result& operator=(decode_result&& other )
+    decode_result& operator=(decode_result&& other)
     {
         if (other)
         {
@@ -127,12 +139,19 @@ public:
         }
         else
         {
-            reset();
+            destroy();
+            error_ = other.error_;
         }
         return *this;
     }
 
     // value assignment
+    decode_result& operator=(const T& v)
+    {
+        assign(v);
+        return *this;
+    }
+
     decode_result& operator=(T&& v)
     {
         assign(std::move(v));
@@ -196,11 +215,6 @@ public:
         return value();
     }
 
-    void reset() noexcept
-    {
-        destroy();
-    }
-
     void swap(decode_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
@@ -218,17 +232,24 @@ public:
             decode_result& source = contains_a_value ? *this : other;
             decode_result& target = contains_a_value ? other : *this;
             target = decode_result<T>(*source);
-            source.reset();
+            source.destroy();
+            source.error_ = target.error_;
         }
     }
 private:
     constexpr const T& get() const { return this->value_; }
     T& get() { return this->value_; }
 
-    template <typename... Args>
-    void construct(Args&&... args) 
+
+    void construct(const T& value) 
     {
-        ::new (static_cast<void*>(&this->value_)) T(std::forward<Args>(args)...);
+        ::new (&value_) T(value);
+        has_value_ = true;
+    }
+
+    void construct(T&& value) noexcept
+    {
+        ::new (&value_) T(std::move(value));
         has_value_ = true;
     }
 
@@ -238,6 +259,18 @@ private:
         {
             value_.~T();
             has_value_ = false;
+        }
+    }
+
+    void assign(const T& u) 
+    {
+        if (has_value_) 
+        {
+            value_ = u;
+        } 
+        else 
+        {
+            construct(u);
         }
     }
 
@@ -259,109 +292,6 @@ typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
 swap(decode_result<T>& lhs, decode_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator==(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator!=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator<(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator<=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator>=(const decode_result<T1>& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
-}
-
-template <class T1, typename T2>
-constexpr bool operator==(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs == rhs : false;
-}
-template <class T1, typename T2>
-constexpr bool operator==(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs == *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator!=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs != rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator!=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs != *rhs : true;
-}
-
-template <class T1, typename T2>
-constexpr bool operator<(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs < rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator<(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs < *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator<=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs <= rhs : true;
-}
-template <class T1, typename T2>
-constexpr bool operator<=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs <= *rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs > rhs : false;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs > *rhs : true;
-}
-
-template <class T1, typename T2>
-constexpr bool operator>=(const decode_result<T1>& lhs, const T2& rhs) noexcept 
-{
-    return lhs ? *lhs >= rhs : false;
-}
-template <class T1, typename T2>
-constexpr bool operator>=(const T1& lhs, const decode_result<T2>& rhs) noexcept 
-{
-    return rhs ? lhs >= *rhs : true;
 }
 
 } // reflect
