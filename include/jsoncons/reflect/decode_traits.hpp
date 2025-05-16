@@ -155,7 +155,7 @@ struct decode_traits<std::pair<T1, T2>, CharT>
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
@@ -164,7 +164,7 @@ struct decode_traits<std::pair<T1, T2>, CharT>
         cursor.next(ec); // skip past array
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
 
         T1 v1 = decode_traits<T1,CharT>::try_decode(cursor, decoder, ec);
@@ -172,12 +172,12 @@ struct decode_traits<std::pair<T1, T2>, CharT>
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         T2 v2 = decode_traits<T2, CharT>::try_decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         cursor.next(ec);
 
@@ -185,7 +185,7 @@ struct decode_traits<std::pair<T1, T2>, CharT>
         {
             return result_type{decode_error{conv_errc::not_pair, cursor.line(), cursor.column()}}; 
         }
-        return decode_result{std::make_pair(v1, v2)};
+        return result_type{std::make_pair(v1, v2)};
     }
 };
 
@@ -211,7 +211,7 @@ struct decode_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
@@ -221,7 +221,7 @@ struct decode_traits<T,CharT,
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
             v.push_back(decode_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
-            if (JSONCONS_UNLIKELY(ec)) {return decode_result{decode_error{ec, cursor.line(), cursor.column()}};}
+            if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "read next 10\n";
             cursor.next(ec);
         }
@@ -370,7 +370,7 @@ struct decode_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         switch (cursor.current().event_type())
         {
@@ -393,7 +393,7 @@ struct decode_traits<T,CharT,
                 }
                 else
                 {
-                    return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+                    return result_type{decode_error{ec, cursor.line(), cursor.column()}};
                 }
             }
             case staj_event_type::begin_array:
@@ -445,7 +445,7 @@ struct decode_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         switch (cursor.current().event_type())
         {
@@ -458,7 +458,7 @@ struct decode_traits<T,CharT,
                 }
                 typed_array_visitor<T> visitor(v);
                 cursor.read_to(visitor, ec);
-                return decode_result{std::move(v)};
+                return result_type{std::move(v)};
             }
             default:
             {
@@ -499,7 +499,7 @@ struct decode_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return decode_result{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
@@ -513,10 +513,10 @@ struct decode_traits<T,CharT,
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
             v.insert(decode_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
-            if (JSONCONS_UNLIKELY(ec)) {return decode_result{decode_error{ec, cursor.line(), cursor.column()}};}
+            if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "cursor.next 20\n";
             cursor.next(ec);
-            if (JSONCONS_UNLIKELY(ec)) {return decode_result{decode_error{ec, cursor.line(), cursor.column()}};}
+            if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
         }
         return result_type{std::move(v)};
     }
