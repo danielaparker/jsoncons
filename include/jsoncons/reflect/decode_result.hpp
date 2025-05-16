@@ -27,6 +27,14 @@ public:
     {
     }
     
+    decode_error(const decode_error& other) = default;
+
+    decode_error(decode_error&& other) = default;
+
+    decode_error& operator=(const decode_error& other) = default;
+
+    decode_error& operator=(decode_error&& other) = default;
+    
     const std::error_code& ec() const
     {
         return ec_;
@@ -40,30 +48,6 @@ public:
         return column_;
     }
 };
-
-template <typename T>
-class decode_result;
-
-template <typename T1, typename T2>
-struct is_constructible_or_convertible_from_decode_result
-    : std::integral_constant<
-          bool, std::is_constructible<T1, decode_result<T2>&>::value ||
-                std::is_constructible<T1, decode_result<T2>&&>::value ||
-                std::is_constructible<T1, const decode_result<T2>&>::value ||
-                std::is_constructible<T1, const decode_result<T2>&&>::value ||
-                std::is_convertible<decode_result<T2>&, T1>::value ||
-                std::is_convertible<decode_result<T2>&&, T1>::value ||
-                std::is_convertible<const decode_result<T2>&, T1>::value ||
-                std::is_convertible<const decode_result<T2>&&, T1>::value> {};
-
-template <typename T1, typename T2>
-struct is_constructible_convertible_or_assignable_from_decode_result
-    : std::integral_constant<
-          bool, is_constructible_or_convertible_from_decode_result<T1, T2>::value ||
-                std::is_assignable<T1&, decode_result<T2>&>::value ||
-                std::is_assignable<T1&, decode_result<T2>&&>::value ||
-                std::is_assignable<T1&, const decode_result<T2>&>::value ||
-                std::is_assignable<T1&, const decode_result<T2>&&>::value> {};
 
 template <typename T>
 class decode_result
@@ -97,41 +81,8 @@ public:
         }
     }
 
-    // converting
-    template <class U,
-              typename std::enable_if<!std::is_same<T,U>::value &&
-                                      std::is_constructible<T, const U&>::value &&
-                                      std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_decode_result<T,U>::value &&
-                                      std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    decode_result(const decode_result<U>& other)
-        : has_value_(false), error_{other.error_}
-    {
-        if (other)
-        {
-            construct(*other);
-        }
-    }
-
-    template <class U,
-              typename std::enable_if<!std::is_same<T,U>::value &&
-                                      std::is_constructible<T, const U&>::value &&
-                                      !std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_decode_result<T,U>::value &&
-                                      std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    explicit decode_result(const decode_result<U>& other)
-        : has_value_(false), error_{other.error_}
-    {
-        if (other)
-        {
-            construct(*other);
-        }
-    }
-
     // move constructors
-    template <class T2 = T>
-    decode_result(decode_result<T>&& other,
-             typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
+    decode_result(decode_result<T>&& other)
         : has_value_(false), error_{other.error_}
    {
         if (other)
@@ -140,44 +91,13 @@ public:
         }
    }
 
-    // converting 
-    template <class U>
-    decode_result(decode_result<U>&& value,
-         typename std::enable_if<!std::is_same<T,U>::value &&
-                                 std::is_constructible<T, U&&>::value &&
-                                 !is_constructible_or_convertible_from_decode_result<T,U>::value &&
-                                 std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<U>(value))
-    {
-    }
+   decode_result(const T& value) // (8)
+       : has_value_(true), value_(value)
+   {
+   }
 
-    template <class U>
-    explicit decode_result(decode_result<U>&& value,
-                     typename std::enable_if<!std::is_same<T,U>::value &&
-                                             std::is_constructible<T, U&&>::value &&
-                                             !is_constructible_or_convertible_from_decode_result<T,U>::value &&
-                                             !std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<U>(value))
-    {
-    }
-
-
-    // value constructors
-    template <class T2>
-    decode_result(T2&& value,
-         typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
-                                 std::is_constructible<T, T2>::value &&
-                                 std::is_convertible<T2,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<T2>(value))
-    {
-    }
-
-    template <class T2>
-    explicit decode_result(T2&& value,
-                     typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
-                                             std::is_constructible<T, T2>::value &&
-                                             !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<T2>(value))
+    decode_result(T&& value) // (8)
+        : has_value_(true), value_(std::move(value))
     {
     }
 
@@ -212,54 +132,10 @@ public:
         return *this;
     }
 
-    template <typename U>
-    typename std::enable_if<!std::is_same<decode_result<T>, U>::value &&
-                            std::is_constructible<T, const U&>::value &&
-                           !is_constructible_convertible_or_assignable_from_decode_result<T,U>::value &&
-                            std::is_assignable<T&, const U&>::value,
-        decode_result&>::type
-    operator=(const decode_result<U>& other)
-    {
-        if (other) 
-        {
-            assign(*other);
-        } 
-        else 
-        {
-            destroy();
-        }
-        return *this;
-    }
-
-    template <typename U>
-    typename std::enable_if<!std::is_same<decode_result<T>, U>::value &&
-                            std::is_constructible<T, U>::value &&
-                            !is_constructible_convertible_or_assignable_from_decode_result<T,U>::value &&
-                            std::is_assignable<T&, U>::value,
-        decode_result&>::type
-    operator=(decode_result<U>&& other)
-    {
-        if (other) 
-        {
-            assign(std::move(*other));
-        } 
-        else 
-        {
-            destroy();
-        }
-        return *this;
-    }
-
     // value assignment
-    template <typename T2>
-    typename std::enable_if<!std::is_same<decode_result<T>, typename std::decay<T2>::type>::value &&
-                            std::is_constructible<T, T2>::value &&
-                            std::is_assignable<T&, T2>::value &&
-                            !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<T2>::type>::value),
-        decode_result&>::type
-    operator=(T2&& v)
+    decode_result& operator=(T&& v)
     {
-        assign(std::forward<T2>(v));
+        assign(std::move(v));
         return *this;
     }
 

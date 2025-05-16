@@ -18,27 +18,6 @@ namespace reflect {
 template <typename T>
 class conv_result;
 
-template <typename T1, typename T2>
-struct is_constructible_or_convertible_from_conv_result
-    : std::integral_constant<
-          bool, std::is_constructible<T1, conv_result<T2>&>::value ||
-                std::is_constructible<T1, conv_result<T2>&&>::value ||
-                std::is_constructible<T1, const conv_result<T2>&>::value ||
-                std::is_constructible<T1, const conv_result<T2>&&>::value ||
-                std::is_convertible<conv_result<T2>&, T1>::value ||
-                std::is_convertible<conv_result<T2>&&, T1>::value ||
-                std::is_convertible<const conv_result<T2>&, T1>::value ||
-                std::is_convertible<const conv_result<T2>&&, T1>::value> {};
-
-template <typename T1, typename T2>
-struct is_constructible_convertible_or_assignable_from_conv_result
-    : std::integral_constant<
-          bool, is_constructible_or_convertible_from_conv_result<T1, T2>::value ||
-                std::is_assignable<T1&, conv_result<T2>&>::value ||
-                std::is_assignable<T1&, conv_result<T2>&&>::value ||
-                std::is_assignable<T1&, const conv_result<T2>&>::value ||
-                std::is_assignable<T1&, const conv_result<T2>&&>::value> {};
-
 template <typename T>
 class conv_result
 {
@@ -66,41 +45,8 @@ public:
         }
     }
 
-    // converting
-    template <class U,
-              typename std::enable_if<!std::is_same<T,U>::value &&
-                                      std::is_constructible<T, const U&>::value &&
-                                      std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_conv_result<T,U>::value &&
-                                      std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    conv_result(const conv_result<U>& other)
-        : has_value_(false), ec_{other.ec_}
-    {
-        if (other)
-        {
-            construct(*other);
-        }
-    }
-
-    template <class U,
-              typename std::enable_if<!std::is_same<T,U>::value &&
-                                      std::is_constructible<T, const U&>::value &&
-                                      !std::is_convertible<const U&,T>::value &&
-                                      !is_constructible_or_convertible_from_conv_result<T,U>::value &&
-                                      std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
-    explicit conv_result(const conv_result<U>& other)
-        : has_value_(false), ec_{other.ec_}
-    {
-        if (other)
-        {
-            construct(*other);
-        }
-    }
-
     // move constructors
-    template <class T2 = T>
-    conv_result(conv_result<T>&& other,
-             typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
+    conv_result(conv_result<T>&& other)
         : has_value_(false), ec_{other.ec_}
    {
         if (other)
@@ -109,44 +55,9 @@ public:
         }
    }
 
-    // converting 
-    template <class U>
-    conv_result(conv_result<U>&& value,
-         typename std::enable_if<!std::is_same<T,U>::value &&
-                                 std::is_constructible<T, U&&>::value &&
-                                 !is_constructible_or_convertible_from_conv_result<T,U>::value &&
-                                 std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<U>(value))
-    {
-    }
-
-    template <class U>
-    explicit conv_result(conv_result<U>&& value,
-                     typename std::enable_if<!std::is_same<T,U>::value &&
-                                             std::is_constructible<T, U&&>::value &&
-                                             !is_constructible_or_convertible_from_conv_result<T,U>::value &&
-                                             !std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<U>(value))
-    {
-    }
-
-
     // value constructors
-    template <class T2>
-    conv_result(T2&& value,
-         typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
-                                 std::is_constructible<T, T2>::value &&
-                                 std::is_convertible<T2,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<T2>(value))
-    {
-    }
-
-    template <class T2>
-    explicit conv_result(T2&& value,
-                     typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
-                                             std::is_constructible<T, T2>::value &&
-                                             !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
-        : has_value_(true), value_(std::forward<T2>(value))
+    conv_result(T&& value) // (8)
+        : has_value_(true), value_(std::move(value))
     {
     }
 
@@ -181,54 +92,10 @@ public:
         return *this;
     }
 
-    template <typename U>
-    typename std::enable_if<!std::is_same<conv_result<T>, U>::value &&
-                            std::is_constructible<T, const U&>::value &&
-                           !is_constructible_convertible_or_assignable_from_conv_result<T,U>::value &&
-                            std::is_assignable<T&, const U&>::value,
-        conv_result&>::type
-    operator=(const conv_result<U>& other)
-    {
-        if (other) 
-        {
-            assign(*other);
-        } 
-        else 
-        {
-            destroy();
-        }
-        return *this;
-    }
-
-    template <typename U>
-    typename std::enable_if<!std::is_same<conv_result<T>, U>::value &&
-                            std::is_constructible<T, U>::value &&
-                            !is_constructible_convertible_or_assignable_from_conv_result<T,U>::value &&
-                            std::is_assignable<T&, U>::value,
-        conv_result&>::type
-    operator=(conv_result<U>&& other)
-    {
-        if (other) 
-        {
-            assign(std::move(*other));
-        } 
-        else 
-        {
-            destroy();
-        }
-        return *this;
-    }
-
     // value assignment
-    template <typename T2>
-    typename std::enable_if<!std::is_same<conv_result<T>, typename std::decay<T2>::type>::value &&
-                            std::is_constructible<T, T2>::value &&
-                            std::is_assignable<T&, T2>::value &&
-                            !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<T2>::type>::value),
-        conv_result&>::type
-    operator=(T2&& v)
+    conv_result<T>& operator=(T&& v)
     {
-        assign(std::forward<T2>(v));
+        assign(std::move(v));
         return *this;
     }
 
@@ -269,27 +136,27 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
-    template <typename U>
-    constexpr T value_or(U&& default_value) const & 
+    template <typename T>
+    constexpr T value_or(T&& default_value) const & 
     {
         static_assert(std::is_copy_constructible<T>::value,
                       "get_value_or: T must be copy constructible");
-        static_assert(std::is_convertible<U&&, T>::value,
-                      "get_value_or: U must be convertible to T");
+        static_assert(std::is_convertible<T&&, T>::value,
+                      "get_value_or: T must be convertible to T");
         return static_cast<bool>(*this)
                    ? **this
-                   : static_cast<T>(std::forward<U>(default_value));
+                   : static_cast<T>(std::forward<T>(default_value));
     }
 
-    template <typename U>
-    T value_or(U&& default_value) && 
+    template <typename T>
+    T value_or(T&& default_value) && 
     {
         static_assert(std::is_move_constructible<T>::value,
                       "get_value_or: T must be move constructible");
-        static_assert(std::is_convertible<U&&, T>::value,
-                      "get_value_or: U must be convertible to T");
+        static_assert(std::is_convertible<T&&, T>::value,
+                      "get_value_or: T must be convertible to T");
         return static_cast<bool>(*this) ? std::move(**this)
-                                        : static_cast<T>(std::forward<U>(default_value));
+                                        : static_cast<T>(std::forward<T>(default_value));
     }
 
     constexpr const T* operator->() const
@@ -357,16 +224,16 @@ private:
         }
     }
 
-    template <typename U>
-    void assign(U&& u) 
+    template <typename T>
+    void assign(T&& u) 
     {
         if (has_value_) 
         {
-            value_ = std::forward<U>(u);
+            value_ = std::forward<T>(u);
         } 
         else 
         {
-            construct(std::forward<U>(u));
+            construct(std::forward<T>(u));
         }
     }
 };
