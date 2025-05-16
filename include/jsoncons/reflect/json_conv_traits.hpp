@@ -1853,7 +1853,7 @@ namespace variant_detail
             {
                 jsoncons::string_view sv = j.as_string_view();
                 null_back_insertable_byte_container cont;
-                auto result = decode_base16(sv.begin(), sv.end(), cont);
+                auto result = base16_to_bytes(sv.begin(), sv.end(), cont);
                 return result.ec == conv_errc::success ? true : false;
             }
             return false;
@@ -1878,7 +1878,7 @@ namespace variant_detail
                 else
                 {
                     jsoncons::string_view sv = j.as_string_view();
-                    auto result = decode_base16(sv.begin(), sv.end(), bits);
+                    auto result = base16_to_bytes(sv.begin(), sv.end(), bits);
                     if (result.ec != conv_errc::success)
                     {
                         return result_type(conv_errc::not_bitset);
