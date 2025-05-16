@@ -21,7 +21,7 @@ TEST_CASE("test_byte_string_serialization")
 
     std::string expected; 
     expected.push_back('\"');
-    encode_base64url(bytes.begin(),bytes.end(),expected);
+    bytes_to_base64url(bytes.begin(),bytes.end(),expected);
     expected.push_back('\"');
 
     //std::cout << expected << " " << os.str() << '\n';

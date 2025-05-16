@@ -27,13 +27,20 @@
 
 namespace jsoncons {
 
+    template <typename InputIt>
+    struct to_bytes_result 
+    {
+        InputIt it;
+        conv_errc ec;
+    };
+
     // Algorithms
 
 namespace detail {
 
     template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base64_generic(InputIt first, InputIt last, const char alphabet[65], Container& result)
+    bytes_to_base64_generic(InputIt first, InputIt last, const char alphabet[65], Container& result)
     {
         std::size_t count = 0;
         unsigned char a3[3];
@@ -92,8 +99,8 @@ namespace detail {
     }
 
     template <typename InputIt,typename F,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
-    decode_base64_generic(InputIt first, InputIt last, 
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    base64_to_bytes_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
                           F f,
                           Container& result)
@@ -106,7 +113,7 @@ namespace detail {
         {
             if (!f(*first))
             {
-                return decode_result<InputIt>{first, conv_errc::conversion_failed};
+                return to_bytes_result<InputIt>{first, conv_errc::conversion_failed};
             }
 
             a4[i++] = static_cast<uint8_t>(*first++); 
@@ -144,14 +151,14 @@ namespace detail {
                 result.push_back(a3[j]);
             }
         }
-        return decode_result<InputIt>{last, conv_errc::success};
+        return to_bytes_result<InputIt>{last, conv_errc::success};
     }
 
 } // namespace detail
 
     template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base16(InputIt first, InputIt last, Container& result)
+    bytes_to_base16(InputIt first, InputIt last, Container& result)
     {
         static constexpr char characters[] = "0123456789ABCDEF";
 
@@ -166,24 +173,24 @@ namespace detail {
 
     template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base64url(InputIt first, InputIt last, Container& result)
+    bytes_to_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                       "abcdefghijklmnopqrstuvwxyz"
                                                       "0123456789-_"
                                                       "\0";
-        return detail::encode_base64_generic(first, last, alphabet, result);
+        return detail::bytes_to_base64_generic(first, last, alphabet, result);
     }
 
     template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base64(InputIt first, InputIt last, Container& result)
+    bytes_to_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                    "abcdefghijklmnopqrstuvwxyz"
                                                    "0123456789+/"
                                                    "=";
-        return detail::encode_base64_generic(first, last, alphabet, result);
+        return detail::bytes_to_base64_generic(first, last, alphabet, result);
     }
 
     template <typename Char>
@@ -207,8 +214,8 @@ namespace detail {
     // decode
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
-    decode_base64url(InputIt first, InputIt last, Container& result)
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    base64url_to_bytes(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -228,15 +235,15 @@ namespace detail {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
-        auto retval = jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
+        auto retval = jsoncons::detail::base64_to_bytes_generic(first, last, reverse_alphabet, 
                                                               is_base64url<typename std::iterator_traits<InputIt>::value_type>, 
                                                               result);
-        return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64url};
+        return retval.ec == conv_errc::success ? retval : to_bytes_result<InputIt>{retval.it, conv_errc::not_base64url};
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
-    decode_base64(InputIt first, InputIt last, Container& result)
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    base64_to_bytes(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -256,20 +263,20 @@ namespace detail {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
-        auto retval = jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
+        auto retval = jsoncons::detail::base64_to_bytes_generic(first, last, reverse_alphabet, 
                                                              is_base64<typename std::iterator_traits<InputIt>::value_type>, 
                                                              result);
-        return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64};
+        return retval.ec == conv_errc::success ? retval : to_bytes_result<InputIt>{retval.it, conv_errc::not_base64};
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
-    decode_base16(InputIt first, InputIt last, Container& result)
+    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    base16_to_bytes(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
         if (len & 1) 
         {
-            return decode_result<InputIt>{first, conv_errc::not_base16};
+            return to_bytes_result<InputIt>{first, conv_errc::not_base16};
         }
 
         InputIt it = first;
@@ -287,7 +294,7 @@ namespace detail {
             } 
             else 
             {
-                return decode_result<InputIt>{first, conv_errc::not_base16};
+                return to_bytes_result<InputIt>{first, conv_errc::not_base16};
             }
 
             auto b = *it++;
@@ -301,12 +308,12 @@ namespace detail {
             } 
             else 
             {
-                return decode_result<InputIt>{first, conv_errc::not_base16};
+                return to_bytes_result<InputIt>{first, conv_errc::not_base16};
             }
 
             result.push_back(val);
         }
-        return decode_result<InputIt>{last, conv_errc::success};
+        return to_bytes_result<InputIt>{last, conv_errc::success};
     }
 
     struct byte_traits

@@ -116,13 +116,6 @@ namespace jsoncons {
         not_base16
     };
 
-    template <typename InputIt>
-    struct decode_result 
-    {
-        InputIt it;
-        conv_errc ec;
-    };
-
 } // namespace jsoncons
 
 namespace std {

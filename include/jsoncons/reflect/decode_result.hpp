@@ -195,22 +195,22 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
     }
 
-    constexpr const T* operator->() const
+    const T* operator->() const
     {
         return std::addressof(this->value_);
     }
 
-    constexpr T* operator->()
+    T* operator->()
     {
         return std::addressof(this->value_);
     }
 
-    constexpr const T& operator*() const&
+    const T& operator*() const&
     {
         return value();
     }
 
-    constexpr T& operator*() &
+    T& operator*() &
     {
         return value();
     }

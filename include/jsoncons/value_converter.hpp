@@ -64,13 +64,13 @@ namespace jsoncons {
             switch (tag)
             {
                 case semantic_tag::base64:
-                    encode_base64(value.begin(), value.end(), s);
+                    bytes_to_base64(value.begin(), value.end(), s);
                     break;
                 case semantic_tag::base16:
-                    encode_base16(value.begin(), value.end(), s);
+                    bytes_to_base16(value.begin(), value.end(), s);
                     break;
                 default:
-                    encode_base64url(value.begin(), value.end(), s);
+                    bytes_to_base64url(value.begin(), value.end(), s);
                     break;
             }
             return s;
@@ -83,13 +83,13 @@ namespace jsoncons {
             switch (tag)
             {
                 case semantic_tag::base64:
-                    encode_base64(value.begin(), value.end(), s);
+                    bytes_to_base64(value.begin(), value.end(), s);
                     break;
                 case semantic_tag::base16:
-                    encode_base16(value.begin(), value.end(), s);
+                    bytes_to_base16(value.begin(), value.end(), s);
                     break;
                 default:
-                    encode_base64url(value.begin(), value.end(), s);
+                    bytes_to_base64url(value.begin(), value.end(), s);
                     break;
             }
 
@@ -180,7 +180,7 @@ namespace jsoncons {
             {
                 case semantic_tag::base16:
                 {
-                    auto res = decode_base16(value.begin(), value.end(), bytes);
+                    auto res = base16_to_bytes(value.begin(), value.end(), bytes);
                     if (res.ec != conv_errc::success)
                     {
                         ec = conv_errc::not_byte_string;
@@ -189,12 +189,12 @@ namespace jsoncons {
                 }
                 case semantic_tag::base64:
                 {
-                    decode_base64(value.begin(), value.end(), bytes);
+                    base64_to_bytes(value.begin(), value.end(), bytes);
                     break;
                 }
                 case semantic_tag::base64url:
                 {
-                    decode_base64url(value.begin(), value.end(), bytes);
+                    base64url_to_bytes(value.begin(), value.end(), bytes);
                     break;
                 }
                 default:
@@ -222,7 +222,7 @@ namespace jsoncons {
             {
                 case semantic_tag::base16:
                 {
-                    auto res = decode_base16(s.begin(), s.end(), bytes);
+                    auto res = base16_to_bytes(s.begin(), s.end(), bytes);
                     if (res.ec != conv_errc::success)
                     {
                         ec = conv_errc::not_byte_string;
@@ -231,12 +231,12 @@ namespace jsoncons {
                 }
                 case semantic_tag::base64:
                 {
-                    decode_base64(s.begin(), s.end(), bytes);
+                    base64_to_bytes(s.begin(), s.end(), bytes);
                     break;
                 }
                 case semantic_tag::base64url:
                 {
-                    decode_base64url(s.begin(), s.end(), bytes);
+                    base64url_to_bytes(s.begin(), s.end(), bytes);
                     break;
                 }
                 default:

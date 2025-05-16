@@ -456,7 +456,7 @@ namespace jsonschema {
             {
                 auto s = instance.template as<jsoncons::string_view>();
                 std::string content;
-                auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
+                auto retval = jsoncons::base64_to_bytes(s.begin(), s.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -527,7 +527,7 @@ namespace jsonschema {
             if (content_encoding_ == "base64")
             {
                 std::string content;
-                auto retval = jsoncons::decode_base64(str.begin(), str.end(), content);
+                auto retval = jsoncons::base64_to_bytes(str.begin(), str.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
                     return walk_result::advance;
