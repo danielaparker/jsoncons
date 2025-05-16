@@ -136,27 +136,6 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
-    constexpr T value_or(T&& default_value) const & 
-    {
-        static_assert(std::is_copy_constructible<T>::value,
-                      "get_value_or: T must be copy constructible");
-        static_assert(std::is_convertible<T&&, T>::value,
-                      "get_value_or: T must be convertible to T");
-        return static_cast<bool>(*this)
-                   ? **this
-                   : static_cast<T>(std::forward<T>(default_value));
-    }
-
-    T value_or(T&& default_value) && 
-    {
-        static_assert(std::is_move_constructible<T>::value,
-                      "get_value_or: T must be move constructible");
-        static_assert(std::is_convertible<T&&, T>::value,
-                      "get_value_or: T must be convertible to T");
-        return static_cast<bool>(*this) ? std::move(**this)
-                                        : static_cast<T>(std::forward<T>(default_value));
-    }
-
     constexpr const T* operator->() const
     {
         return std::addressof(this->value_);
@@ -222,16 +201,15 @@ private:
         }
     }
 
-    template <typename T>
     void assign(T&& u) 
     {
         if (has_value_) 
         {
-            value_ = std::forward<T>(u);
+            value_ = std::move(u);
         } 
         else 
         {
-            construct(std::forward<T>(u));
+            construct(std::move(u));
         }
     }
 };
