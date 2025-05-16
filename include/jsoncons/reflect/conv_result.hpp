@@ -136,7 +136,6 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
-    template <typename T>
     constexpr T value_or(T&& default_value) const & 
     {
         static_assert(std::is_copy_constructible<T>::value,
@@ -148,7 +147,6 @@ public:
                    : static_cast<T>(std::forward<T>(default_value));
     }
 
-    template <typename T>
     T value_or(T&& default_value) && 
     {
         static_assert(std::is_move_constructible<T>::value,
