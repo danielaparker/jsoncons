@@ -40,9 +40,94 @@ basic_json<CharT> to_basic_json_single(basic_staj_cursor<CharT>& cursor,
 {
     switch (cursor.current().event_type())
     {
+        case staj_event_type::string_value:
+            return basic_json<CharT>{cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag()};
+        case staj_event_type::byte_string_value:
+            return basic_json<CharT>{byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag()};
+        case staj_event_type::null_value:
+            return basic_json<CharT>{null_arg};
+        case staj_event_type::bool_value:
+            return basic_json<CharT>{cursor.current().get<bool>(ec), cursor.current().tag()};
+        case staj_event_type::int64_value:
+            return basic_json<CharT>{cursor.current().get<std::int64_t>(ec), cursor.current().tag()};
+        case staj_event_type::uint64_value:
+            return basic_json<CharT>{cursor.current().get<std::uint64_t>(ec), cursor.current().tag()};
+        case staj_event_type::half_value:
+            return basic_json<CharT>{half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag()};
+        case staj_event_type::double_value:
+            return basic_json<CharT>{cursor.current().get<double>(ec), cursor.current().tag()};
         default:
+            ec = conv_errc::conversion_failed; 
             return basic_json<CharT>{};
     }
+}
+
+template <typename CharT>
+basic_json<CharT> to_basic_json_container(basic_staj_cursor<CharT>& cursor,
+    std::error_code& ec)
+{
+    auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
+        basic_json<CharT>(json_object_arg) : basic_json<CharT>(json_array_arg);
+    std::vector<basic_json<CharT>*> stack;
+    stack.push_back(std::addressof(cont));
+
+    cursor.next(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return basic_json<CharT>{};
+    }
+    while (!cursor.done() && !stack.empty())
+    {
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::string_value:
+                stack.back()->emplace_back(cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::byte_string_value:
+                stack.back()->emplace_back(byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::null_value:
+                stack.back()->emplace_back(null_arg);
+                break;
+            case staj_event_type::bool_value:
+                stack.back()->emplace_back(cursor.current().get<bool>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::int64_value:
+                stack.back()->emplace_back(cursor.current().get<std::int64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::uint64_value:
+                stack.back()->emplace_back(cursor.current().get<std::uint64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::half_value:
+                stack.back()->emplace_back(half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::double_value:
+                stack.back()->emplace_back(cursor.current().get<double>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::end_array:
+                stack.pop_back();
+                break;
+            default:
+                ec = conv_errc::conversion_failed; 
+                return basic_json<CharT>{};
+        }
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return basic_json<CharT>{};
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return basic_json<CharT>{};
+        }
+    }
+    if (!stack.empty())
+    {
+        ec = conv_errc::conversion_failed; 
+        return basic_json<CharT>{};
+    }
+
+    return cont;
 }
 
 template <typename CharT>
@@ -58,8 +143,7 @@ basic_json<CharT> to_basic_json(basic_staj_cursor<CharT>& cursor,
     {
         return to_basic_json_single(cursor, ec);
     }
-    basic_json<CharT> val;
-    return val;
+    return to_basic_json_container(cursor, ec);
 }
 
 // serialization_traits

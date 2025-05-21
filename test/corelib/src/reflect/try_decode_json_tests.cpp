@@ -95,5 +95,15 @@ TEST_CASE("cursor to basic_json")
         REQUIRE_FALSE(ec);
         std::cout << j << "\n";
     }
-    
+    SECTION("array")
+    {
+        std::string s = R"([false, 1, "foo"])";
+        jsoncons::json_string_cursor cursor(s);
+        std::error_code ec;
+        auto j = jsoncons::reflect::to_basic_json(cursor, ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE(j.is_array());
+        std::cout << j << "\n";
+    }
+
 }
