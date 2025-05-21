@@ -103,7 +103,51 @@ TEST_CASE("cursor to basic_json")
         auto j = jsoncons::reflect::to_basic_json(cursor, ec);
         REQUIRE_FALSE(ec);
         REQUIRE(j.is_array());
-        std::cout << j << "\n";
+        //std::cout << j << "\n";
+    }
+    SECTION("array of arrays")
+    {
+        std::string s = R"([[null, false, true], [1.5, 123456]])";
+        jsoncons::json_string_cursor cursor(s);
+        std::error_code ec;
+        auto j = jsoncons::reflect::to_basic_json(cursor, ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE(j.is_array());
+        //std::cout << j << "\n";
     }
 
+    SECTION("object")
+    {
+        std::string s = R"(
+{
+    "short" : "bar",
+    "long" : "string to long for short string"
+}
+    )";
+        jsoncons::json_string_cursor cursor(s);
+        std::error_code ec;
+        auto j = jsoncons::reflect::to_basic_json(cursor, ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE(j.is_object());
+        std::cout << j << "\n";
+    }
+    SECTION("object with nested containers")
+    {
+        std::string s = R"(
+{"foo" : [{"short" : "bar",
+          "long" : "string to long for short string", 
+          "false" : false, 
+          "true" : true,
+          "null" : null,
+          "integer" : 10,
+          "double" : 1000.1}]
+}
+    )";
+        jsoncons::json_string_cursor cursor(s);
+        std::error_code ec;
+        auto j = jsoncons::reflect::to_basic_json(cursor, ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE(j.is_object());
+        std::cout << j << "\n";
+    }
 }

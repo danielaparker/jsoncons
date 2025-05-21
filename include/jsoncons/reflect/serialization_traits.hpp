@@ -19,7 +19,6 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
@@ -70,7 +69,14 @@ basic_json<CharT> to_basic_json_container(basic_staj_cursor<CharT>& cursor,
         basic_json<CharT>(json_object_arg) : basic_json<CharT>(json_array_arg);
     std::vector<basic_json<CharT>*> stack;
     stack.push_back(std::addressof(cont));
-
+    std::basic_string<CharT> key;
+    if (cursor.current().event_type() == staj_event_type::begin_object)
+    {
+        goto begin_object;
+    }
+    goto begin_array;
+    
+begin_object:    
     cursor.next(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -80,6 +86,95 @@ basic_json<CharT> to_basic_json_container(basic_staj_cursor<CharT>& cursor,
     {
         switch (cursor.current().event_type())
         {
+            case staj_event_type::begin_object:
+            {
+                auto result = stack.back()->try_emplace(key, json_object_arg);
+                stack.push_back(std::addressof(result.first->value()));
+                goto begin_object;
+            }
+            case staj_event_type::begin_array:
+            {
+                auto result = stack.back()->try_emplace(key, json_array_arg);
+                stack.push_back(std::addressof(result.first->value()));
+                goto begin_array;
+            }
+            case staj_event_type::key:
+                key = cursor.current().get<jsoncons::string_view>(ec);
+                break;
+            case staj_event_type::string_value:
+                stack.back()->try_emplace(key, cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::byte_string_value:
+                stack.back()->try_emplace(key, byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::null_value:
+                stack.back()->try_emplace(key, null_arg);
+                break;
+            case staj_event_type::bool_value:
+                stack.back()->try_emplace(key, cursor.current().get<bool>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::int64_value:
+                stack.back()->try_emplace(key, cursor.current().get<std::int64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::uint64_value:
+                stack.back()->try_emplace(key, cursor.current().get<std::uint64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::half_value:
+                stack.back()->try_emplace(key, half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::double_value:
+                stack.back()->try_emplace(key, cursor.current().get<double>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::end_object:
+                stack.pop_back();
+                if (stack.empty())
+                {
+                    return cont;
+                }
+                if (stack.back()->type() == json_type::object_value)
+                {
+                    goto begin_object;
+                }
+                goto begin_array;
+                break;
+            default:
+                ec = conv_errc::conversion_failed; 
+                return basic_json<CharT>{};
+        }
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return basic_json<CharT>{};
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return basic_json<CharT>{};
+        }
+    }
+    return cont;
+
+begin_array:    
+    cursor.next(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return basic_json<CharT>{};
+    }
+    while (!cursor.done() && !stack.empty())
+    {
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::begin_object:
+            {
+                auto& result = stack.back()->emplace_back(json_object_arg);
+                stack.push_back(std::addressof(result));
+                goto begin_object;
+            }
+            case staj_event_type::begin_array:
+            {
+                auto& result = stack.back()->emplace_back(json_array_arg);
+                stack.push_back(std::addressof(result));
+                goto begin_array;
+            }
             case staj_event_type::string_value:
                 stack.back()->emplace_back(cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag());
                 break;
@@ -106,6 +201,15 @@ basic_json<CharT> to_basic_json_container(basic_staj_cursor<CharT>& cursor,
                 break;
             case staj_event_type::end_array:
                 stack.pop_back();
+                if (stack.empty())
+                {
+                    return cont;
+                }
+                if (stack.back()->type() == json_type::object_value)
+                {
+                    goto begin_object;
+                }
+                goto begin_array;
                 break;
             default:
                 ec = conv_errc::conversion_failed; 
@@ -121,13 +225,8 @@ basic_json<CharT> to_basic_json_container(basic_staj_cursor<CharT>& cursor,
             return basic_json<CharT>{};
         }
     }
-    if (!stack.empty())
-    {
-        ec = conv_errc::conversion_failed; 
-        return basic_json<CharT>{};
-    }
-
-    return cont;
+    
+    JSONCONS_UNREACHABLE();
 }
 
 template <typename CharT>
@@ -154,25 +253,19 @@ struct serialization_traits
     using value_type = T;
     using result_type = decode_result<value_type>;
     
-    template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    //template <typename Json,typename TempAllocator>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
-
-        decoder.reset();
-        cursor.read_to(decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
+        
+        auto j = to_basic_json(cursor, ec);
+        if (ec)
         {
-            return result_type{decode_error{ec, cursor.context().line(), cursor.context().column()}};
+            return result_type{ {ec, cursor.line(), cursor.column()} };
         }
-        if (!decoder.is_valid())
-        {
-            return result_type{decode_error{conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()}};
-        }
-        auto result = reflect::json_conv_traits<Json,value_type>::try_as(decoder.get_result());
+        auto result = reflect::json_conv_traits<decltype(j), value_type>::try_as(j);
 
-        return result ? result_type{{ std::move(result.value()) }} : result_type{ {result.error(), cursor.line(), cursor.column()} };
+        return result ? result_type{ { std::move(result.value()) } } : result_type{ {result.error(), cursor.line(), cursor.column()} };
     }
 };
 
@@ -189,8 +282,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>&)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         
@@ -211,8 +303,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>&)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -231,8 +322,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>&)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -259,8 +349,7 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
     using result_type = decode_result<value_type>;
     
     template <typename Json,typename TempAllocator >
-    static value_type try_decode(basic_staj_cursor<CharT>& cursor,
-        json_decoder<Json, TempAllocator>& decoder)
+    static value_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -279,14 +368,14 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
 
-        T1 v1 = serialization_traits<T1,CharT>::try_decode(cursor, decoder, ec);
+        T1 v1 = serialization_traits<T1,CharT>::try_decode(cursor);
         if (JSONCONS_UNLIKELY(!v1.has_value())) {v1;}
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
-        T2 v2 = serialization_traits<T2, CharT>::try_decode(cursor, decoder, ec);
+        T2 v2 = serialization_traits<T2, CharT>::try_decode(cursor);
         if (JSONCONS_UNLIKELY(ec)) 
         {
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
@@ -314,8 +403,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         T v;
@@ -332,7 +420,7 @@ struct serialization_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            v.push_back(serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
+            v.push_back(serialization_traits<value_type,CharT>::try_decode(cursor));
             if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "read next 10\n";
             cursor.next(ec);
@@ -474,8 +562,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>&)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -549,8 +636,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>&)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -602,8 +688,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         T v;
@@ -624,7 +709,7 @@ struct serialization_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            v.insert(serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
+            v.insert(serialization_traits<value_type,CharT>::try_decode(cursor));
             if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "cursor.next 20\n";
             cursor.next(ec);
@@ -652,8 +737,7 @@ struct serialization_traits<std::array<T,N>,CharT>
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static std::array<T, N> try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    static std::array<T, N> try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -671,7 +755,7 @@ struct serialization_traits<std::array<T,N>,CharT>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
         {
-            v[i] = serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec);
+            v[i] = serialization_traits<value_type,CharT>::try_decode(cursor);
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
@@ -700,8 +784,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -733,7 +816,7 @@ struct serialization_traits<T,CharT,
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
             }
-            val.emplace(std::move(key),serialization_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
+            val.emplace(std::move(key),serialization_traits<mapped_type,CharT>::try_decode(cursor));
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
@@ -771,8 +854,7 @@ struct serialization_traits<T,CharT,
     using result_type = decode_result<value_type>;
 
     template <typename Json,typename TempAllocator >
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
-        json_decoder<Json,TempAllocator>& decoder)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -810,7 +892,7 @@ struct serialization_traits<T,CharT,
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
             }
-            val.emplace(n, serialization_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
+            val.emplace(n, serialization_traits<mapped_type,CharT>::try_decode(cursor));
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 

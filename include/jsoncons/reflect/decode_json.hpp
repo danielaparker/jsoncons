@@ -67,8 +67,7 @@ try_decode_json(const Source& s,
     {
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
-    jsoncons::json_decoder<basic_json<char_type>> decoder;
-    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename CharT>
@@ -109,9 +108,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     {
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
-    json_decoder<basic_json<CharT>> decoder{};
-
-    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename InputIt>
@@ -156,8 +153,7 @@ try_decode_json(InputIt first, InputIt last,
     {
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
-    jsoncons::json_decoder<basic_json<char_type>> decoder;
-    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 // With leading allocator_set parameter
@@ -207,9 +203,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
-    json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
-
-    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -254,9 +248,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
-    json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(),alloc_set.get_temp_allocator());
-
-    return serialization_traits<value_type,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<value_type,char_type>::try_decode(cursor);
 }
 
 } // namespace reflect
