@@ -74,9 +74,26 @@ TEST_CASE("reflect decode json with error")
 
 TEST_CASE("reflect decode tuple")
 {
-    std::string s = R"([false, 1, "foo"])"; 
-    auto result = jsoncons::reflect::try_decode_json<std::tuple<bool,int,std::string>>(s);
+    SECTION("decode array to tuple")
+    {
+        std::string s = R"([false, 1, "foo"])"; 
+        auto result = jsoncons::reflect::try_decode_json<std::tuple<bool,int,std::string>>(s);
 
-    REQUIRE(result);
-    std::cout << get<0>(result.value()) << "\n";
+        REQUIRE(result);
+        CHECK(get<0>(result.value()) == false);
+    }
+}
+
+TEST_CASE("cursor to basic_json")
+{
+    SECTION("single")
+    {
+        std::string s = R"("foo")"; 
+        jsoncons::json_string_cursor cursor(s);
+        std::error_code ec;
+        auto j = jsoncons::reflect::to_basic_json(cursor, ec);
+        REQUIRE_FALSE(ec);
+        std::cout << j << "\n";
+    }
+    
 }

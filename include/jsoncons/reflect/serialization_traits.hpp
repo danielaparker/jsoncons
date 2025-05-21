@@ -34,6 +34,34 @@
 namespace jsoncons {
 namespace reflect {
 
+template <typename CharT>
+basic_json<CharT> to_basic_json_single(basic_staj_cursor<CharT>& cursor, 
+    std::error_code& ec)
+{
+    switch (cursor.current().event_type())
+    {
+        default:
+            return basic_json<CharT>{};
+    }
+}
+
+template <typename CharT>
+basic_json<CharT> to_basic_json(basic_staj_cursor<CharT>& cursor, 
+    std::error_code& ec)
+{
+    if (JSONCONS_UNLIKELY(is_end_container(cursor.current().event_type())))
+    {
+        ec = conv_errc::conversion_failed; 
+        return basic_json<CharT>{};
+    }
+    if (!is_begin_container(cursor.current().event_type()))
+    {
+        return to_basic_json_single(cursor, ec);
+    }
+    basic_json<CharT> val;
+    return val;
+}
+
 // serialization_traits
 
 template <typename T,typename CharT,typename Enable = void>
@@ -46,8 +74,6 @@ struct serialization_traits
     static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
         json_decoder<Json,TempAllocator>& decoder)
     {
-        std::cout << "Default try_decode\n";
-        
         std::error_code ec;
 
         decoder.reset();
