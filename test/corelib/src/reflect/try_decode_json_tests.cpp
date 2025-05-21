@@ -4,11 +4,27 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/reflect/decode_json.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/json_traits_macros.hpp>
 
 #include <map>
 #include <vector>
 
 #include <catch/catch.hpp>
+
+namespace {
+namespace ns {
+
+    struct book1a
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+
+} // namespace ns
+} // namespace 
+
+//JSONCONS_ALL_MEMBER_TRAITS(ns::book1a, author, title, price)
 
 TEST_CASE("reflect decode json")
 {
@@ -54,4 +70,13 @@ TEST_CASE("reflect decode json with error")
 
         REQUIRE(!result);
     }
+}
+
+TEST_CASE("reflect decode tuple")
+{
+    std::string s = R"([false, 1, "foo"])"; 
+    auto result = jsoncons::reflect::try_decode_json<std::tuple<bool,int,std::string>>(s);
+
+    REQUIRE(result);
+    std::cout << get<0>(result.value()) << "\n";
 }

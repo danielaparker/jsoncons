@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_DECODE_TRAITS_HPP
-#define JSONCONS_REFLECT_DECODE_TRAITS_HPP
+#ifndef JSONCONS_REFLECT_SERIALIZATION_TRAITS_HPP
+#define JSONCONS_REFLECT_SERIALIZATION_TRAITS_HPP
 
 #include <array>
 #include <cstddef>
@@ -34,10 +34,10 @@
 namespace jsoncons {
 namespace reflect {
 
-// decode_traits
+// serialization_traits
 
 template <typename T,typename CharT,typename Enable = void>
-struct decode_traits
+struct serialization_traits
 {
     using value_type = T;
     using result_type = decode_result<value_type>;
@@ -46,6 +46,8 @@ struct decode_traits
     static result_type try_decode(basic_staj_cursor<CharT>& cursor, 
         json_decoder<Json,TempAllocator>& decoder)
     {
+        std::cout << "Default try_decode\n";
+        
         std::error_code ec;
 
         decoder.reset();
@@ -54,13 +56,13 @@ struct decode_traits
         {
             return result_type{decode_error{ec, cursor.context().line(), cursor.context().column()}};
         }
-        else if (!decoder.is_valid())
+        if (!decoder.is_valid())
         {
             return result_type{decode_error{conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()}};
         }
         auto result = reflect::json_conv_traits<Json,value_type>::try_as(decoder.get_result());
 
-        return result ? result_type{result.error(), cursor.line(), cursor.column()} : result_type{std::move(result.value())};
+        return result ? result_type{{ std::move(result.value()) }} : result_type{ {result.error(), cursor.line(), cursor.column()} };
     }
 };
 
@@ -69,7 +71,7 @@ struct decode_traits
 // primitive
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<ext_traits::is_primitive<T>::value
 >::type>
 {
@@ -90,7 +92,7 @@ struct decode_traits<T,CharT,
 // string
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<ext_traits::is_string<T>::value &&
                             std::is_same<typename T::value_type,CharT>::value
 >::type>
@@ -110,7 +112,7 @@ struct decode_traits<T,CharT,
 };
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<ext_traits::is_string<T>::value &&
                             !std::is_same<typename T::value_type,CharT>::value
 >::type>
@@ -141,7 +143,7 @@ struct decode_traits<T,CharT,
 // std::pair
 
 template <typename T1,typename T2,typename CharT>
-struct decode_traits<std::pair<T1, T2>, CharT>
+struct serialization_traits<std::pair<T1, T2>, CharT>
 {
     using value_type = std::pair<T1, T2>;
     using result_type = decode_result<value_type>;
@@ -167,14 +169,14 @@ struct decode_traits<std::pair<T1, T2>, CharT>
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
 
-        T1 v1 = decode_traits<T1,CharT>::try_decode(cursor, decoder, ec);
+        T1 v1 = serialization_traits<T1,CharT>::try_decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(!v1.has_value())) {v1;}
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
         }
-        T2 v2 = decode_traits<T2, CharT>::try_decode(cursor, decoder, ec);
+        T2 v2 = serialization_traits<T2, CharT>::try_decode(cursor, decoder, ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
             return result_type{decode_error{ec, cursor.line(), cursor.column()}};
@@ -191,7 +193,7 @@ struct decode_traits<std::pair<T1, T2>, CharT>
 
 // vector like
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -220,7 +222,7 @@ struct decode_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            v.push_back(decode_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
+            v.push_back(serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
             if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "read next 10\n";
             cursor.next(ec);
@@ -351,7 +353,7 @@ private:
 };
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable_byte_container<T>::value &&
@@ -425,7 +427,7 @@ struct decode_traits<T,CharT,
 };
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -479,7 +481,7 @@ struct decode_traits<T,CharT,
 
 // set like
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              !ext_traits::is_back_insertable<T>::value &&
@@ -512,7 +514,7 @@ struct decode_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            v.insert(decode_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
+            v.insert(serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec));
             if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
             //std::cout << "cursor.next 20\n";
             cursor.next(ec);
@@ -534,7 +536,7 @@ struct decode_traits<T,CharT,
 // std::array
 
 template <typename T,typename CharT, std::size_t N>
-struct decode_traits<std::array<T,N>,CharT>
+struct serialization_traits<std::array<T,N>,CharT>
 {
     using value_type = typename std::array<T,N>::value_type;
     using result_type = decode_result<value_type>;
@@ -559,7 +561,7 @@ struct decode_traits<std::array<T,N>,CharT>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
         {
-            v[i] = decode_traits<value_type,CharT>::try_decode(cursor, decoder, ec);
+            v[i] = serialization_traits<value_type,CharT>::try_decode(cursor, decoder, ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
@@ -576,7 +578,7 @@ struct decode_traits<std::array<T,N>,CharT>
 // map like
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -621,7 +623,7 @@ struct decode_traits<T,CharT,
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
             }
-            val.emplace(std::move(key),decode_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
+            val.emplace(std::move(key),serialization_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
@@ -647,7 +649,7 @@ struct decode_traits<T,CharT,
 };
 
 template <typename T,typename CharT>
-struct decode_traits<T,CharT,
+struct serialization_traits<T,CharT,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             std::is_integral<typename T::key_type>::value
@@ -698,7 +700,7 @@ struct decode_traits<T,CharT,
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
             }
-            val.emplace(n, decode_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
+            val.emplace(n, serialization_traits<mapped_type,CharT>::try_decode(cursor, decoder, ec));
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
@@ -726,5 +728,5 @@ struct decode_traits<T,CharT,
 } // namespace reflect
 } // namespace jsoncons
 
-#endif // JSONCONS_REFLECT_DECODE_TRAITS_HPP
+#endif // JSONCONS_REFLECT_SERIALIZATION_TRAITS_HPP
 

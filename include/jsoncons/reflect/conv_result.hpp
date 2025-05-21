@@ -142,7 +142,7 @@ public:
         {
             return this->ec_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
+        return std::error_code{};
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &

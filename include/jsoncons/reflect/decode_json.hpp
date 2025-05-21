@@ -15,12 +15,11 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/reflect/decode_result.hpp>
-#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/serialization_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {
@@ -69,7 +68,7 @@ try_decode_json(const Source& s,
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
     jsoncons::json_decoder<basic_json<char_type>> decoder;
-    return decode_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename CharT>
@@ -112,7 +111,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     }
     json_decoder<basic_json<CharT>> decoder{};
 
-    return decode_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename InputIt>
@@ -158,7 +157,7 @@ try_decode_json(InputIt first, InputIt last,
         return result_type{decode_error{ec, cursor.line(), cursor.column()}};
     }
     jsoncons::json_decoder<basic_json<char_type>> decoder;
-    return decode_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 // With leading allocator_set parameter
@@ -210,7 +209,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     }
     json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
 
-    return decode_traits<T,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<T,char_type>::try_decode(cursor, decoder);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -257,7 +256,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     }
     json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(),alloc_set.get_temp_allocator());
 
-    return decode_traits<value_type,char_type>::try_decode(cursor, decoder);
+    return serialization_traits<value_type,char_type>::try_decode(cursor, decoder);
 }
 
 } // namespace reflect

@@ -689,6 +689,11 @@ public:
     virtual void next(std::error_code& ec) = 0;
 
     virtual const ser_context& context() const = 0;
+    
+    virtual std::size_t line() const = 0;
+
+    virtual std::size_t column() const = 0;
+    
 };
 
 template <typename CharT>
