@@ -70,10 +70,6 @@ TEST_CASE("reflect decode json with error")
 
         REQUIRE(!result);
     }
-}
-
-TEST_CASE("reflect decode tuple")
-{
     SECTION("decode array to tuple")
     {
         std::string s = R"([false, 1, "foo"])"; 
@@ -81,6 +77,15 @@ TEST_CASE("reflect decode tuple")
 
         REQUIRE(result);
         CHECK(get<0>(result.value()) == false);
+    }
+    SECTION("decode array to pair")
+    {
+        std::string s = R"([1.5, "foo"])"; 
+        auto result = jsoncons::reflect::try_decode_json<std::pair<double,std::string>>(s);
+
+        REQUIRE(result);
+        CHECK(1.5 == get<0>(result.value()));
+        CHECK("foo" == get<1>(result.value()));
     }
 }
 

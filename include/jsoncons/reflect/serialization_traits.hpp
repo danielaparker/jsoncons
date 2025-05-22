@@ -253,7 +253,6 @@ struct serialization_traits
     using value_type = T;
     using result_type = decode_result<value_type>;
     
-    //template <typename Json,typename TempAllocator>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -261,7 +260,7 @@ struct serialization_traits
         auto j = to_basic_json(cursor, ec);
         if (ec)
         {
-            return result_type{ {ec, cursor.line(), cursor.column()} };
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         auto result = reflect::json_conv_traits<decltype(j), value_type>::try_as(j);
 
@@ -281,7 +280,6 @@ struct serialization_traits<T,CharT,
     using value_type = T;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -302,7 +300,6 @@ struct serialization_traits<T,CharT,
     using value_type = T;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -321,7 +318,6 @@ struct serialization_traits<T,CharT,
     using value_type = T;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -329,7 +325,7 @@ struct serialization_traits<T,CharT,
         auto val = cursor.current().template get<std::basic_string<CharT>>(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         else
         {
@@ -348,45 +344,51 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
     using value_type = std::pair<T1, T2>;
     using result_type = decode_result<value_type>;
     
-    template <typename Json,typename TempAllocator >
-    static value_type try_decode(basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
-            return result_type{conv_errc::not_pair, cursor.line(), cursor.column()}; 
+            return result_type(decode_error{conv_errc::not_pair, cursor.line(), cursor.column()});
         }
         cursor.next(ec); // skip past array
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
 
-        T1 v1 = serialization_traits<T1,CharT>::try_decode(cursor);
-        if (JSONCONS_UNLIKELY(!v1.has_value())) {v1;}
+        auto r1 = serialization_traits<T1,CharT>::try_decode(cursor);
+        if (JSONCONS_UNLIKELY(!r1.has_value()))
+        {
+            return result_type(r1.error());
+        }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) 
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
-        T2 v2 = serialization_traits<T2, CharT>::try_decode(cursor);
-        if (JSONCONS_UNLIKELY(ec)) 
+        auto r2 = serialization_traits<T2, CharT>::try_decode(cursor);
+        if (JSONCONS_UNLIKELY(!r2.has_value())) 
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(r2.error());
         }
         cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
+        }
 
         if (cursor.current().event_type() != staj_event_type::end_array)
         {
-            return result_type{decode_error{conv_errc::not_pair, cursor.line(), cursor.column()}}; 
+            return result_type(decode_error{conv_errc::not_pair, cursor.line(), cursor.column()}); 
         }
-        return result_type{std::make_pair(v1, v2)};
+        return result_type{std::make_pair(std::move(r1.value()), std::move(r2.value()))};
     }
 };
 
@@ -402,7 +404,6 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -411,17 +412,17 @@ struct serialization_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
-            return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+            return result_type(decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}); 
         }
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
             v.push_back(serialization_traits<value_type,CharT>::try_decode(cursor));
-            if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
+            if (JSONCONS_UNLIKELY(ec)) {return result_type(decode_error{ec, cursor.line(), cursor.column()});}
             //std::cout << "read next 10\n";
             cursor.next(ec);
         }
@@ -561,7 +562,6 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -569,7 +569,7 @@ struct serialization_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         switch (cursor.current().event_type())
         {
@@ -592,7 +592,7 @@ struct serialization_traits<T,CharT,
                 }
                 else
                 {
-                    return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+                    return result_type(decode_error{ec, cursor.line(), cursor.column()});
                 }
             }
             case staj_event_type::begin_array:
@@ -608,7 +608,7 @@ struct serialization_traits<T,CharT,
             }
             default:
             {
-                return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                return result_type(decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}); 
             }
         }
     }
@@ -635,7 +635,6 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -643,7 +642,7 @@ struct serialization_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         switch (cursor.current().event_type())
         {
@@ -660,7 +659,7 @@ struct serialization_traits<T,CharT,
             }
             default:
             {
-                return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                return result_type(decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}); 
             }
         }
     }
@@ -687,7 +686,6 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -696,11 +694,11 @@ struct serialization_traits<T,CharT,
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+            return result_type(decode_error{ec, cursor.line(), cursor.column()});
         }
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
-            return result_type{decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+            return result_type(decode_error{conv_errc::not_vector, cursor.line(), cursor.column()}); 
         }
         if (cursor.current().size() > 0)
         {
@@ -710,7 +708,7 @@ struct serialization_traits<T,CharT,
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
             v.insert(serialization_traits<value_type,CharT>::try_decode(cursor));
-            if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
+            if (JSONCONS_UNLIKELY(ec)) {return result_type(decode_error{ec, cursor.line(), cursor.column()});}
             //std::cout << "cursor.next 20\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) {return result_type{decode_error{ec, cursor.line(), cursor.column()}};}
@@ -736,7 +734,6 @@ struct serialization_traits<std::array<T,N>,CharT>
     using value_type = typename std::array<T,N>::value_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static std::array<T, N> try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -783,7 +780,6 @@ struct serialization_traits<T,CharT,
     using key_type = typename T::key_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -853,7 +849,6 @@ struct serialization_traits<T,CharT,
     using key_type = typename T::key_type;
     using result_type = decode_result<value_type>;
 
-    template <typename Json,typename TempAllocator >
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -875,7 +870,7 @@ struct serialization_traits<T,CharT,
             {
                 return result_type{decode_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
             }
-            auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
+            auto s = cursor.current().template get<jsoncons::basic_string_view<CharT>>(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return result_type{decode_error{ec, cursor.line(), cursor.column()}}; 
