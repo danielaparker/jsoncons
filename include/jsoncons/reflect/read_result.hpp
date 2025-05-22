@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_REFLECT_DECODE_RESULT_HPP    
-#define JSONCONS_REFLECT_DECODE_RESULT_HPP    
+#ifndef JSONCONS_REFLECT_READ_RESULT_HPP    
+#define JSONCONS_REFLECT_READ_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -15,25 +15,25 @@
 namespace jsoncons {
 namespace reflect {
 
-class decode_error
+class read_error
 {
     std::error_code ec_{};
     std::size_t line_{};
     std::size_t column_{};
     
 public:
-    decode_error(std::error_code ec, std::size_t line, std::size_t column)
+    read_error(std::error_code ec, std::size_t line, std::size_t column)
         : ec_{ec}, line_{line}, column_{column}
     {
     }
     
-    decode_error(const decode_error& other) = default;
+    read_error(const read_error& other) = default;
 
-    decode_error(decode_error&& other) = default;
+    read_error(read_error&& other) = default;
 
-    decode_error& operator=(const decode_error& other) = default;
+    read_error& operator=(const read_error& other) = default;
 
-    decode_error& operator=(decode_error&& other) = default;
+    read_error& operator=(read_error&& other) = default;
     
     const std::error_code& ec() const
     {
@@ -50,42 +50,42 @@ public:
 };
 
 template <typename T>
-class decode_result
+class read_result
 {
 public:
     using value_type = T;
 private:
     bool has_value_;
     union {
-        decode_error error_;
+        read_error error_;
         T value_;
     };
 public:
 
-    decode_result(const T& value) 
+    read_result(const T& value) 
         : has_value_(true)
     {
         construct(value);
     }
 
-     decode_result(T&& value) noexcept
+     read_result(T&& value) noexcept
          : has_value_(true)
      {
          construct(std::move(value));
      }
 
-     decode_result(const decode_error& err)
+     read_result(const read_error& err)
         : has_value_(false), error_{err}
     {
     }
 
-    decode_result(decode_error&& err) noexcept
+    read_result(read_error&& err) noexcept
         : has_value_(false), error_{std::move(err)}
     {
     }
     
     // copy constructors
-    decode_result(const decode_result<T>& other) 
+    read_result(const read_result<T>& other) 
         : has_value_(other.has_value())
     {
         if (other)
@@ -99,7 +99,7 @@ public:
     }
 
     // move constructors
-    decode_result(decode_result<T>&& other) noexcept
+    read_result(read_result<T>&& other) noexcept
         : has_value_(other.has_value())
     {
         if (other)
@@ -112,12 +112,12 @@ public:
         }
     }
 
-    ~decode_result() noexcept
+    ~read_result() noexcept
     {
         destroy();
     }
 
-    decode_result& operator=(const decode_result& other)
+    read_result& operator=(const read_result& other)
     {
         if (other)
         {
@@ -131,7 +131,7 @@ public:
         return *this;
     }
 
-    decode_result& operator=(decode_result&& other)
+    read_result& operator=(read_result&& other)
     {
         if (other)
         {
@@ -146,13 +146,13 @@ public:
     }
 
     // value assignment
-    decode_result& operator=(const T& v)
+    read_result& operator=(const T& v)
     {
         assign(v);
         return *this;
     }
 
-    decode_result& operator=(T&& v)
+    read_result& operator=(T&& v)
     {
         assign(std::move(v));
         return *this;
@@ -174,16 +174,16 @@ public:
         {
             return get();
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
     }
 
-    decode_error error() &
+    read_error error() &
     {
         if (!has_value_)
         {
             return this->error_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
@@ -192,7 +192,7 @@ public:
         {
             return get();
         }
-        JSONCONS_THROW(std::runtime_error("Bad decode_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
     }
 
     const T* operator->() const
@@ -215,7 +215,7 @@ public:
         return value();
     }
 
-    void swap(decode_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+    void swap(read_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
         const bool contains_a_value = has_value();
@@ -229,9 +229,9 @@ public:
         }
         else
         {
-            decode_result& source = contains_a_value ? *this : other;
-            decode_result& target = contains_a_value ? other : *this;
-            target = decode_result<T>(*source);
+            read_result& source = contains_a_value ? *this : other;
+            read_result& target = contains_a_value ? other : *this;
+            target = read_result<T>(*source);
             source.destroy();
             source.error_ = target.error_;
         }
@@ -289,7 +289,7 @@ private:
 
 template <typename T>
 typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-swap(decode_result<T>& lhs, decode_result<T>& rhs) noexcept
+swap(read_result<T>& lhs, read_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
@@ -297,4 +297,4 @@ swap(decode_result<T>& lhs, decode_result<T>& rhs) noexcept
 } // reflect
 } // jsoncons
 
-#endif // JSONCONS_REFLECT_DECODE_RESULT_HPP
+#endif // JSONCONS_REFLECT_READ_RESULT_HPP

@@ -18,7 +18,7 @@
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/reflect/decode_result.hpp>
+#include <jsoncons/reflect/read_result.hpp>
 #include <jsoncons/reflect/serialization_traits.hpp>
 
 namespace jsoncons {
@@ -28,12 +28,12 @@ namespace reflect {
 
 template <typename T,typename Source>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,decode_result<T>>::type
+                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename Source::value_type;
 
     std::error_code ec;   
@@ -42,41 +42,41 @@ try_decode_json(const Source& s,
     reader.read(ec);
     if (ec)
     {
-        return result_type{decode_error{ec, reader.line(), reader.column()}};
+        return result_type{read_error{ec, reader.line(), reader.column()}};
     }
     if (!decoder.is_valid())
     {
-        return result_type{ decode_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
     }
     return result_type{decoder.get_result()};
 }
 
 template <typename T,typename Source>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<Source>::value,decode_result<T>>::type
+                        ext_traits::is_char_sequence<Source>::value,read_result<T>>::type
 try_decode_json(const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename Source::value_type;
 
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, default_json_parsing(), ec);
     if (ec)
     {
-        return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
     return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
 
     std::error_code ec;   
     jsoncons::json_decoder<T> decoder;
@@ -84,41 +84,41 @@ try_decode_json(std::basic_istream<CharT>& is,
     reader.read(ec);
     if (ec)
     {
-        return result_type{decode_error{ec, reader.line(), reader.column()}};
+        return result_type{read_error{ec, reader.line(), reader.column()}};
     }
     if (!decoder.is_valid())
     {
-        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
     return result_type{decoder.get_result()};
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
     using char_type = CharT;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
 
     std::error_code ec;
     basic_json_cursor<CharT> cursor(is, options, default_json_parsing(), ec);
     if (ec)
     {
-        return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
     return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename std::iterator_traits<InputIt>::value_type;
 
     std::error_code ec;   
@@ -127,23 +127,23 @@ try_decode_json(InputIt first, InputIt last,
     reader.read(ec);
     if (ec)
     {
-        return result_type{decode_error{ec, reader.line(), reader.column()}};
+        return result_type{read_error{ec, reader.line(), reader.column()}};
     }
     if (!decoder.is_valid())
     {
-        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
     return result_type{decoder.get_result()};
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename std::iterator_traits<InputIt>::value_type;
 
     std::error_code ec;
@@ -151,7 +151,7 @@ try_decode_json(InputIt first, InputIt last,
         options, default_json_parsing(), ec);
     if (ec)
     {
-        return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
     return serialization_traits<T,char_type>::try_decode(cursor);
 }
@@ -160,13 +160,13 @@ try_decode_json(InputIt first, InputIt last,
 
 template <typename T,typename Source,typename Allocator,typename TempAllocator >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,decode_result<T>>::type
+                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename Source::value_type;
 
     json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
@@ -176,24 +176,24 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     reader.read(ec);
     if (ec)
     {
-        return result_type{decode_error{ec, reader.line(), reader.column()}};
+        return result_type{read_error{ec, reader.line(), reader.column()}};
     }
     if (!decoder.is_valid())
     {
-        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
     return result_type{decoder.get_result()};
 }
 
 template <typename T,typename Source,typename Allocator,typename TempAllocator >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<Source>::value,decode_result<T>>::type
+                        ext_traits::is_char_sequence<Source>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
     using char_type = typename Source::value_type;
 
     std::error_code ec;
@@ -201,19 +201,19 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         default_json_parsing(), alloc_set.get_temp_allocator(), ec);
     if (ec)
     {
-        return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
     return serialization_traits<T,char_type>::try_decode(cursor);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
 
     json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
@@ -222,31 +222,31 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     reader.read(ec);
     if (ec)
     {
-        return result_type{decode_error{ec, reader.line(), reader.column()}};
+        return result_type{read_error{ec, reader.line(), reader.column()}};
     }
     if (!decoder.is_valid())
     {
-        return result_type(decode_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
     return result_type{decoder.get_result()};
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,decode_result<T>>::type
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
     using char_type = CharT;
-    using result_type = decode_result<value_type>;
+    using result_type = read_result<value_type>;
 
     std::error_code ec;   
     basic_json_cursor<char_type,stream_source<char_type>,TempAllocator> cursor(is, options, 
         default_json_parsing(), alloc_set.get_temp_allocator(), ec);
     if (ec)
     {
-        return result_type{decode_error{ec, cursor.line(), cursor.column()}};
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
     return serialization_traits<value_type,char_type>::try_decode(cursor);
 }
