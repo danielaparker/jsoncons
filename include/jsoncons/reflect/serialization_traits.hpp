@@ -247,12 +247,13 @@ basic_json<CharT> to_basic_json(basic_staj_cursor<CharT>& cursor,
 
 // serialization_traits
 
-template <typename T,typename CharT,typename Enable = void>
+template <typename T,typename Enable = void>
 struct serialization_traits
 {
     using value_type = T;
     using result_type = read_result<value_type>;
     
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -272,14 +273,15 @@ struct serialization_traits
 
 // primitive
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<ext_traits::is_primitive<T>::value
 >::type>
 {
     using value_type = T;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -291,34 +293,26 @@ struct serialization_traits<T,CharT,
 
 // string
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
-    typename std::enable_if<ext_traits::is_string<T>::value &&
-                            std::is_same<typename T::value_type,CharT>::value
->::type>
+template <typename T>
+struct serialization_traits<T,
+    typename std::enable_if<ext_traits::is_string<T>::value>::type>
 {
     using value_type = T;
     using result_type = read_result<value_type>;
 
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor,
+        typename std::enable_if<std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
         std::error_code ec;
 
         T v = cursor.current().template get<value_type>(ec);
         return ec ? result_type{read_error{ec, cursor.line(), cursor.column()}} : result_type{std::move(v)};
     }
-};
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
-    typename std::enable_if<ext_traits::is_string<T>::value &&
-                            !std::is_same<typename T::value_type,CharT>::value
->::type>
-{
-    using value_type = T;
-    using result_type = read_result<value_type>;
-
-    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor,
+        typename std::enable_if<!std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
         std::error_code ec;
 
@@ -338,12 +332,13 @@ struct serialization_traits<T,CharT,
 
 // std::pair
 
-template <typename T1,typename T2,typename CharT>
-struct serialization_traits<std::pair<T1, T2>, CharT>
+template <typename T1,typename T2>
+struct serialization_traits<std::pair<T1, T2>>
 {
     using value_type = std::pair<T1, T2>;
     using result_type = read_result<value_type>;
     
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -363,7 +358,7 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
             return result_type(read_error{ec, cursor.line(), cursor.column()});
         }
 
-        auto r1 = serialization_traits<T1,CharT>::try_decode(cursor);
+        auto r1 = serialization_traits<T1>::try_decode(cursor);
         if (JSONCONS_UNLIKELY(!r1.has_value()))
         {
             return result_type(r1.error());
@@ -373,7 +368,7 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
         {
             return result_type(read_error{ec, cursor.line(), cursor.column()});
         }
-        auto r2 = serialization_traits<T2, CharT>::try_decode(cursor);
+        auto r2 = serialization_traits<T2>::try_decode(cursor);
         if (JSONCONS_UNLIKELY(!r2.has_value())) 
         {
             return result_type(r2.error());
@@ -393,8 +388,8 @@ struct serialization_traits<std::pair<T1, T2>, CharT>
 };
 
 // vector like
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -404,6 +399,7 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -421,7 +417,7 @@ struct serialization_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            auto r = serialization_traits<value_type,CharT>::try_decode(cursor);
+            auto r = serialization_traits<value_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error()); 
@@ -556,8 +552,8 @@ private:
     }
 };
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable_byte_container<T>::value &&
@@ -567,6 +563,7 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -628,8 +625,8 @@ struct serialization_traits<T,CharT,
     }
 };
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -640,6 +637,7 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -680,8 +678,8 @@ struct serialization_traits<T,CharT,
 };
 
 // set like
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              !ext_traits::is_back_insertable<T>::value &&
@@ -691,6 +689,7 @@ struct serialization_traits<T,CharT,
     using value_type = typename T::value_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -712,7 +711,7 @@ struct serialization_traits<T,CharT,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            auto r = serialization_traits<value_type,CharT>::try_decode(cursor);
+            auto r = serialization_traits<value_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error());
@@ -738,12 +737,13 @@ struct serialization_traits<T,CharT,
 
 // std::array
 
-template <typename T,typename CharT, std::size_t N>
-struct serialization_traits<std::array<T,N>,CharT>
+template <typename T, std::size_t N>
+struct serialization_traits<std::array<T,N>>
 {
     using value_type = typename std::array<T,N>::value_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static std::array<T, N> try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -762,7 +762,7 @@ struct serialization_traits<std::array<T,N>,CharT>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
         {
-            auto r = serialization_traits<value_type,CharT>::try_decode(cursor);
+            auto r = serialization_traits<value_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error());
@@ -780,8 +780,8 @@ struct serialization_traits<std::array<T,N>,CharT>
 
 // map like
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -792,6 +792,7 @@ struct serialization_traits<T,CharT,
     using key_type = typename T::key_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -824,7 +825,7 @@ struct serialization_traits<T,CharT,
             {
                 return result_type{read_error{ec, cursor.line(), cursor.column()}}; 
             }
-            auto r = serialization_traits<mapped_type,CharT>::try_decode(cursor);
+            auto r = serialization_traits<mapped_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error());
@@ -850,8 +851,8 @@ struct serialization_traits<T,CharT,
     }
 };
 
-template <typename T,typename CharT>
-struct serialization_traits<T,CharT,
+template <typename T>
+struct serialization_traits<T,
     typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             std::is_integral<typename T::key_type>::value
@@ -862,6 +863,7 @@ struct serialization_traits<T,CharT,
     using key_type = typename T::key_type;
     using result_type = read_result<value_type>;
 
+    template <typename CharT>
     static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -900,7 +902,7 @@ struct serialization_traits<T,CharT,
             {
                 return result_type{read_error{ec, cursor.line(), cursor.column()}}; 
             }
-            auto r1 = serialization_traits<mapped_type,CharT>::try_decode(cursor);
+            auto r1 = serialization_traits<mapped_type>::try_decode(cursor);
             if (!r1)
             {
                 return result_type(r1.error());
