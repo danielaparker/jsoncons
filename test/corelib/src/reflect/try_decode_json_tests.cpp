@@ -8,6 +8,7 @@
 
 #include <map>
 #include <vector>
+#include <tuple>
 
 #include <catch/catch.hpp>
 
@@ -76,7 +77,7 @@ TEST_CASE("reflect decode json with error")
         auto result = jsoncons::reflect::try_decode_json<std::tuple<bool,int,std::string>>(s);
 
         REQUIRE(result);
-        CHECK(get<0>(result.value()) == false);
+        CHECK(std::get<0>(result.value()) == false);
     }
     SECTION("decode array to pair")
     {
@@ -84,8 +85,8 @@ TEST_CASE("reflect decode json with error")
         auto result = jsoncons::reflect::try_decode_json<std::pair<double,std::string>>(s);
 
         REQUIRE(result);
-        CHECK(1.5 == get<0>(result.value()));
-        CHECK("foo" == get<1>(result.value()));
+        CHECK(1.5 == std::get<0>(result.value()));
+        CHECK("foo" == std::get<1>(result.value()));
     }
 }
 
