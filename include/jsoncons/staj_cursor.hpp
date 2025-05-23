@@ -756,6 +756,16 @@ public:
         return cursor_->context();
     }
 
+    std::size_t line() const override
+    {
+        return cursor_->line();
+    }
+
+    std::size_t column() const override
+    {
+        return cursor_->column();
+    }
+
     friend
     basic_staj_filter_view<CharT> operator|(basic_staj_filter_view& cursor, 
                                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
