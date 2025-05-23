@@ -99,7 +99,7 @@ begin_object:
                 goto begin_array;
             }
             case staj_event_type::key:
-                key = cursor.current().template get<jsoncons::string_view>(ec);
+                key = cursor.current().template get<std::basic_string<CharT>>(ec);
                 break;
             case staj_event_type::string_value:
                 stack.back()->try_emplace(key, cursor.current().template get<jsoncons::string_view>(ec), cursor.current().tag());
