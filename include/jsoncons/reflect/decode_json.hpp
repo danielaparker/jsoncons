@@ -19,7 +19,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/reflect/read_result.hpp>
-#include <jsoncons/reflect/serialization_traits.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {
@@ -67,7 +67,7 @@ try_decode_json(const Source& s,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return serialization_traits<T>::try_decode(cursor);
+    return decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename CharT>
@@ -108,7 +108,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return serialization_traits<T>::try_decode(cursor);
+    return decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename InputIt>
@@ -153,7 +153,7 @@ try_decode_json(InputIt first, InputIt last,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return serialization_traits<T>::try_decode(cursor);
+    return decode_traits<T>::try_decode(cursor);
 }
 
 // With leading allocator_set parameter
@@ -203,7 +203,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return serialization_traits<T>::try_decode(cursor);
+    return decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -248,7 +248,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return serialization_traits<value_type>::try_decode(cursor);
+    return decode_traits<value_type>::try_decode(cursor);
 }
 
 } // namespace reflect
