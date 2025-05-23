@@ -40,21 +40,21 @@ basic_json<CharT> to_basic_json_single(basic_staj_cursor<CharT>& cursor,
     switch (cursor.current().event_type())
     {
         case staj_event_type::string_value:
-            return basic_json<CharT>{cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag()};
+            return basic_json<CharT>{cursor.current().template get<jsoncons::string_view>(ec), cursor.current().tag()};
         case staj_event_type::byte_string_value:
-            return basic_json<CharT>{byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag()};
+            return basic_json<CharT>{byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag()};
         case staj_event_type::null_value:
             return basic_json<CharT>{null_arg};
         case staj_event_type::bool_value:
-            return basic_json<CharT>{cursor.current().get<bool>(ec), cursor.current().tag()};
+            return basic_json<CharT>{cursor.current().template get<bool>(ec), cursor.current().tag()};
         case staj_event_type::int64_value:
-            return basic_json<CharT>{cursor.current().get<std::int64_t>(ec), cursor.current().tag()};
+            return basic_json<CharT>{cursor.current().template get<std::int64_t>(ec), cursor.current().tag()};
         case staj_event_type::uint64_value:
-            return basic_json<CharT>{cursor.current().get<std::uint64_t>(ec), cursor.current().tag()};
+            return basic_json<CharT>{cursor.current().template get<std::uint64_t>(ec), cursor.current().tag()};
         case staj_event_type::half_value:
-            return basic_json<CharT>{half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag()};
+            return basic_json<CharT>{half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag()};
         case staj_event_type::double_value:
-            return basic_json<CharT>{cursor.current().get<double>(ec), cursor.current().tag()};
+            return basic_json<CharT>{cursor.current().template get<double>(ec), cursor.current().tag()};
         default:
             ec = conv_errc::conversion_failed; 
             return basic_json<CharT>{};
@@ -99,31 +99,31 @@ begin_object:
                 goto begin_array;
             }
             case staj_event_type::key:
-                key = cursor.current().get<jsoncons::string_view>(ec);
+                key = cursor.current().template get<jsoncons::string_view>(ec);
                 break;
             case staj_event_type::string_value:
-                stack.back()->try_emplace(key, cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<jsoncons::string_view>(ec), cursor.current().tag());
                 break;
             case staj_event_type::byte_string_value:
-                stack.back()->try_emplace(key, byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
                 break;
             case staj_event_type::null_value:
                 stack.back()->try_emplace(key, null_arg);
                 break;
             case staj_event_type::bool_value:
-                stack.back()->try_emplace(key, cursor.current().get<bool>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<bool>(ec), cursor.current().tag());
                 break;
             case staj_event_type::int64_value:
-                stack.back()->try_emplace(key, cursor.current().get<std::int64_t>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::uint64_value:
-                stack.back()->try_emplace(key, cursor.current().get<std::uint64_t>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::half_value:
-                stack.back()->try_emplace(key, half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::double_value:
-                stack.back()->try_emplace(key, cursor.current().get<double>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<double>(ec), cursor.current().tag());
                 break;
             case staj_event_type::end_object:
                 stack.pop_back();
@@ -176,28 +176,28 @@ begin_array:
                 goto begin_array;
             }
             case staj_event_type::string_value:
-                stack.back()->emplace_back(cursor.current().get<jsoncons::string_view>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<jsoncons::string_view>(ec), cursor.current().tag());
                 break;
             case staj_event_type::byte_string_value:
-                stack.back()->emplace_back(byte_string_arg, cursor.current().get<byte_string_view>(ec), cursor.current().tag());
+                stack.back()->emplace_back(byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
                 break;
             case staj_event_type::null_value:
                 stack.back()->emplace_back(null_arg);
                 break;
             case staj_event_type::bool_value:
-                stack.back()->emplace_back(cursor.current().get<bool>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<bool>(ec), cursor.current().tag());
                 break;
             case staj_event_type::int64_value:
-                stack.back()->emplace_back(cursor.current().get<std::int64_t>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::uint64_value:
-                stack.back()->emplace_back(cursor.current().get<std::uint64_t>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::half_value:
-                stack.back()->emplace_back(half_arg, cursor.current().get<std::uint16_t>(ec), cursor.current().tag());
+                stack.back()->emplace_back(half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
                 break;
             case staj_event_type::double_value:
-                stack.back()->emplace_back(cursor.current().get<double>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<double>(ec), cursor.current().tag());
                 break;
             case staj_event_type::end_array:
                 stack.pop_back();
