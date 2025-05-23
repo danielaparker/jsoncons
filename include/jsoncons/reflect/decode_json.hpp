@@ -99,7 +99,6 @@ try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
-    using char_type = CharT;
     using result_type = read_result<value_type>;
 
     std::error_code ec;
