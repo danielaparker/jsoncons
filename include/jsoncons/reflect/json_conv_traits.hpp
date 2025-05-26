@@ -35,6 +35,7 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/value_converter.hpp>
 #include <jsoncons/reflect/conv_result.hpp>
+#include <jsoncons/json_type_traits.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
   #include <variant>
@@ -61,24 +62,34 @@ namespace reflect {
 
         static constexpr bool is_compatible = false;
 
-        static constexpr bool is(const Json&) noexcept
+        static constexpr bool is(const Json& j) noexcept
         {
-            return false;
+            return json_type_traits<Json,T>::is(j);
         }
 
-        static result_type try_as(const Json&)
+        static result_type try_as(const Json& j)
         {
-            static_assert(unimplemented<T>::value, "as not implemented");
+            
+            JSONCONS_TRY
+            {
+                return result_type(json_type_traits<Json,T>::as(j));
+            }
+            JSONCONS_CATCH (const ser_error&)
+            {
+                return result_type(conv_errc::conversion_failed);
+            }
         }
 
-        static Json to_json(const T&)
+        static Json to_json(const T& val, const allocator_type& alloc = allocator_type())
         {
-            static_assert(unimplemented<T>::value, "to_json not implemented");
-        }
-
-        static Json to_json(const T&, const allocator_type&)
-        {
-            static_assert(unimplemented<T>::value, "to_json not implemented");
+            JSONCONS_TRY
+            {
+                return result_type(json_type_traits<Json,T>::to_json(val, alloc));
+            }
+            JSONCONS_CATCH (const ser_error& e)
+            {
+                return result_type(conv_errc::conversion_failed);
+            }
         }
     };
 

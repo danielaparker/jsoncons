@@ -250,6 +250,17 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     return decode_traits<value_type>::try_decode(cursor);
 }
 
+template <typename T, typename... Args>
+T decode_json(Args&& ... args)
+{
+    auto result = try_decode_json<T>(std::forward<Args>(args)...); 
+    if (!result)
+    {
+        JSONCONS_THROW(ser_error(result.error().ec(), result.error().line(), result.error().column()));
+    }
+    return std::move(result.value());
+}
+
 } // namespace reflect
 } // namespace jsoncons
 
