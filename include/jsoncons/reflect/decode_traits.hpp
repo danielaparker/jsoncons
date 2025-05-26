@@ -178,7 +178,7 @@ struct decode_traits<std::pair<T1, T2>>
 // vector like
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
              !ext_traits::is_typed_array<T>::value 
@@ -342,7 +342,7 @@ private:
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable_byte_container<T>::value &&
              ext_traits::is_typed_array<T>::value
@@ -415,7 +415,7 @@ struct decode_traits<T,
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
              !ext_traits::is_back_insertable_byte_container<T>::value &&
@@ -468,7 +468,7 @@ struct decode_traits<T,
 // set like
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              !ext_traits::is_back_insertable<T>::value &&
              ext_traits::is_insertable<T>::value 
@@ -570,7 +570,7 @@ struct decode_traits<std::array<T,N>>
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
 >::type>
@@ -641,7 +641,7 @@ struct decode_traits<T,
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_type_traits_declared<T>::value && 
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             std::is_integral<typename T::key_type>::value
 >::type>
