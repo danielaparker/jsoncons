@@ -47,6 +47,7 @@ public:
     conv_result(std::error_code ec) noexcept
         : has_value_(false), ec_{ec}
     {
+        ::new (&ec_) std::error_code(ec);
     }
 
     // copy constructors
@@ -59,7 +60,7 @@ public:
         }
         else
         {
-            ec_ = other.ec_;
+            ::new (&ec_) std::error_code(other.ec_);
         }
     }
 
@@ -73,7 +74,7 @@ public:
         }
         else
         {
-            ec_ = other.ec_;
+            ::new (&ec_) std::error_code(other.ec_);
         }
     }
 
@@ -91,7 +92,7 @@ public:
         else
         {
             destroy();
-            ec_ = other.ec_;
+            ::new (&ec_) std::error_code(other.ec_);
         }
         return *this;
     }
@@ -105,7 +106,7 @@ public:
         else
         {
             destroy();
-            ec_ = other.ec_;
+            ::new (&ec_) std::error_code(other.ec_);
         }
         return *this;
     }

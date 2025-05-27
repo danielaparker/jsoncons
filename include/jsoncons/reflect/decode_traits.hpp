@@ -52,14 +52,15 @@ struct decode_traits
     {
         std::error_code ec;
         
-        auto j = try_to_json<basic_json<CharT>>(cursor, ec);
+        using json_type = basic_json<CharT>;
+        auto j = try_to_json<json_type>(cursor, ec);
         if (ec)
         {
             return result_type(read_error{ec, cursor.line(), cursor.column()});
         }
-        auto result = reflect::json_conv_traits<decltype(j), value_type>::try_as(j);
+        auto result = reflect::json_conv_traits<json_type, value_type>::try_as(j);
 
-        return result ? result_type{ { std::move(result.value()) } } : result_type{ {result.error(), cursor.line(), cursor.column()} };
+        return result ? result_type(std::move(result.value())) : result_type(read_error{result.error(), cursor.line(), cursor.column()});
     }
 };
 
