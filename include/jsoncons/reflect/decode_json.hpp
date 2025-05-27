@@ -196,8 +196,8 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     using char_type = typename Source::value_type;
 
     std::error_code ec;
-    basic_json_cursor<char_type,string_source<char_type>,TempAllocator> cursor(s, options, 
-        default_json_parsing(), alloc_set.get_temp_allocator(), ec);
+    basic_json_cursor<char_type, Source, TempAllocator> cursor{s, options,
+        default_json_parsing(), alloc_set.get_temp_allocator(), ec};
     if (ec)
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};

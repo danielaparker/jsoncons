@@ -17,17 +17,23 @@
 #include <utility>
 #include <vector>
 
+#include <jsoncons/allocator_set.hpp>
+#include <jsoncons/basic_json.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
+#include <jsoncons/decode_traits.hpp>
+#include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/reflect/decode_json.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/reflect/read_result.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/staj_event.hpp>
-#include <jsoncons/reflect/read_result.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
@@ -184,7 +190,8 @@ struct decode_traits<T,
              !ext_traits::is_typed_array<T>::value 
 >::type>
 {
-    using value_type = typename T::value_type;
+    using element_type = typename T::value_type;
+    using value_type = T;
     using result_type = read_result<value_type>;
 
     template <typename CharT>
@@ -205,7 +212,7 @@ struct decode_traits<T,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            auto r = decode_traits<value_type>::try_decode(cursor);
+            auto r = decode_traits<element_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error()); 
@@ -225,7 +232,8 @@ struct typed_array_visitor : public default_json_visitor
     T& v_;
     int level_{0};
 public:
-    using value_type = typename T::value_type;
+    using element_type = typename T::value_type;
+    using value_type = T;
     using result_type = read_result<value_type>;
 
     typed_array_visitor(T& v)
@@ -278,7 +286,7 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        v_.push_back(static_cast<value_type>(value));
+        v_.push_back(static_cast<element_type>(value));
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -287,7 +295,7 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        v_.push_back(static_cast<value_type>(value));
+        v_.push_back(static_cast<element_type>(value));
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -296,18 +304,18 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+        visit_half_(typename std::integral_constant<bool, std::is_integral<element_type>::value>::type(), value);
         JSONCONS_VISITOR_RETURN;
     }
 
     void visit_half_(std::true_type, uint16_t value)
     {
-        v_.push_back(static_cast<value_type>(value));
+        v_.push_back(static_cast<element_type>(value));
     }
 
     void visit_half_(std::false_type, uint16_t value)
     {
-        v_.push_back(static_cast<value_type>(binary::decode_half(value)));
+        v_.push_back(static_cast<element_type>(binary::decode_half(value)));
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
@@ -315,16 +323,16 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        v_.push_back(static_cast<value_type>(value));
+        v_.push_back(static_cast<element_type>(value));
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const value_type>& data,  
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const element_type>& data,  
         semantic_tag,
         const ser_context&,
         std::error_code&) override
     {
-        v_ = std::vector<value_type>(data.begin(),data.end());
+        v_ = std::vector<element_type>(data.begin(),data.end());
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -348,7 +356,8 @@ struct decode_traits<T,
              ext_traits::is_typed_array<T>::value
 >::type>
 {
-    using value_type = typename T::value_type;
+    using element_type = typename T::value_type;
+    using value_type = T;
     using result_type = read_result<value_type>;
 
     template <typename CharT>
@@ -375,7 +384,7 @@ struct decode_traits<T,
                     }
                     for (auto ch : bytes)
                     {
-                        v.push_back(static_cast<value_type>(ch));
+                        v.push_back(static_cast<element_type>(ch));
                     }
                     cursor.next(ec);
                     return result_type{std::move(v)};
@@ -422,7 +431,7 @@ struct decode_traits<T,
              ext_traits::is_typed_array<T>::value
 >::type>
 {
-    using value_type = typename T::value_type;
+    using value_type = T;
     using result_type = read_result<value_type>;
 
     template <typename CharT>
@@ -474,7 +483,8 @@ struct decode_traits<T,
              ext_traits::is_insertable<T>::value 
 >::type>
 {
-    using value_type = typename T::value_type;
+    using element_type = typename T::value_type;
+    using value_type = T;
     using result_type = read_result<value_type>;
 
     template <typename CharT>
@@ -499,7 +509,7 @@ struct decode_traits<T,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
-            auto r = decode_traits<value_type>::try_decode(cursor);
+            auto r = decode_traits<element_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error());
@@ -528,11 +538,12 @@ struct decode_traits<T,
 template <typename T, std::size_t N>
 struct decode_traits<std::array<T,N>>
 {
-    using value_type = typename std::array<T,N>::value_type;
+    using element_type = typename std::array<T,N>::value_type;
+    using value_type = typename std::array<T,N>;
     using result_type = read_result<value_type>;
 
     template <typename CharT>
-    static std::array<T, N> try_decode(basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -540,7 +551,7 @@ struct decode_traits<std::array<T,N>>
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return result_type{read_error{ec, cursor.line(), cursor.column()}};
+            return result_type(read_error{ec, cursor.line(), cursor.column()});
         }
         v.fill(T{});
         if (cursor.current().event_type() != staj_event_type::begin_array)
@@ -550,7 +561,7 @@ struct decode_traits<std::array<T,N>>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
         {
-            auto r = decode_traits<value_type>::try_decode(cursor);
+            auto r = decode_traits<element_type>::try_decode(cursor);
             if (!r)
             {
                 return result_type(r.error());
@@ -576,7 +587,7 @@ struct decode_traits<T,
 >::type>
 {
     using mapped_type = typename T::mapped_type;
-    using value_type = typename T::value_type;
+    using value_type = T;
     using key_type = typename T::key_type;
     using result_type = read_result<value_type>;
 
@@ -647,7 +658,7 @@ struct decode_traits<T,
 >::type>
 {
     using mapped_type = typename T::mapped_type;
-    using value_type = typename T::value_type;
+    using value_type = T;
     using key_type = typename T::key_type;
     using result_type = read_result<value_type>;
 
