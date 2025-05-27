@@ -1496,7 +1496,7 @@ namespace variant_detail
     }
 
     template<std::size_t N,typename Json,typename Variant,typename T,typename ... U>
-    typename std::enable_if<N < std::variant_size_v<Variant>, Variant>::type
+    typename std::enable_if<N < std::variant_size_v<Variant>, conv_result<Variant>>::type
     as_variant(const Json& j)
     {
       if (j.template is<T>())

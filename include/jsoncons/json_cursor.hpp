@@ -161,6 +161,35 @@ public:
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
         Sourceable&& source, 
         const basic_json_decode_options<CharT>& options,
+        std::error_code& ec,
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+       : source_(std::forward<Sourceable>(source)),
+         parser_(options,default_json_parsing(),alloc)
+    {
+        parser_.cursor_mode(true);
+
+        if (!done())
+        {
+            std::error_code local_ec;
+            read_next(local_ec);
+            if (local_ec)
+            {
+                if (local_ec == json_errc::unexpected_eof)
+                {
+                    done_ = true;
+                }
+                else
+                {
+                    ec = local_ec;
+                }
+            }
+        }
+    }
+
+    template <typename Sourceable>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler,
         std::error_code& ec,
         typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
