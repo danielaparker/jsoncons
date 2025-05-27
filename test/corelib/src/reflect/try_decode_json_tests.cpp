@@ -26,7 +26,7 @@ namespace ns {
 } // namespace 
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book1a, author, title, price)
-TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
+TEST_CASE("default to json_type_traits tests")
 {
     std::string an_author = "Haruki Murakami";
     std::string a_title = "Kafka on the Shore";
