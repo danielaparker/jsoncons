@@ -21,12 +21,10 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/reflect/decode_json.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/read_result.hpp>
 #include <jsoncons/semantic_tag.hpp>

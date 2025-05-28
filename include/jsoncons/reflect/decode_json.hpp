@@ -67,7 +67,7 @@ try_decode_json(const Source& s,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename CharT>
@@ -107,7 +107,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename InputIt>
@@ -152,7 +152,7 @@ try_decode_json(InputIt first, InputIt last,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(cursor);
 }
 
 // With leading allocator_set parameter
@@ -202,7 +202,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(cursor);
 }
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator >
@@ -247,7 +247,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
-    return decode_traits<value_type>::try_decode(cursor);
+    return reflect::decode_traits<value_type>::try_decode(cursor);
 }
 
 template <typename T, typename... Args>
