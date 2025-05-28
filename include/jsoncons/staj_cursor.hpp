@@ -15,7 +15,6 @@
 #include <memory> // std::allocator
 #include <system_error>
 
-#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
@@ -26,6 +25,7 @@
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {

@@ -34,7 +34,7 @@
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/value_converter.hpp>
-#include <jsoncons/reflect/conv_result.hpp>
+#include <jsoncons/conv_result.hpp>
 #include <jsoncons/json_type_traits.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
@@ -237,7 +237,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return j.template as_integer<T>();
+            return result_type(j.template as_integer<T>());
         }
 
         static Json to_json(T val, const allocator_type& alloc = allocator_type())
@@ -246,7 +246,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template <typename Json,typename T>
+    template <typename Json, typename T>
     struct json_conv_traits<Json, T,
                             typename std::enable_if<std::is_floating_point<T>::value
     >::type>
@@ -260,7 +260,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return static_cast<T>(j.as_double());
+            return result_type(static_cast<T>(j.as_double()));
         }
         static Json to_json(T val)
         {
@@ -324,7 +324,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return j;
+            return result_type{j};
         }
         static Json to_json(const Json& val)
         {
@@ -352,7 +352,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 return result_type{conv_errc::not_jsoncons_null_type};
             }
-            return jsoncons::null_type();
+            return result_type{jsoncons::null_type()};
         }
         static Json to_json(jsoncons::null_type)
         {
@@ -376,7 +376,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return j.as_bool();
+            return result_type{j.as_bool()};
         }
         static Json to_json(bool val)
         {
@@ -403,7 +403,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return j.as_bool();
+            return result_type{j.as_bool()};
         }
         static Json to_json(bool val)
         {
@@ -427,7 +427,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return j.as_bool();
+            return result_type{j.as_bool()};
         }
         static Json to_json(bool val)
         {
@@ -455,7 +455,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j)
         {
-            return T(j.as_string());
+            return result_type{T(j.as_string())};
         }
 
         static Json to_json(const T& val)
@@ -489,7 +489,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             auto s = j.as_string();
             T val;
             unicode_traits::convert(s.data(), s.size(), val);
-            return val;
+            return result_type(std::move(val));
         }
 
         static Json to_json(const T& val)
@@ -524,7 +524,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j)
         {
-            return T(j.as_string_view().data(),j.as_string_view().size());
+            return result_type(T(j.as_string_view().data(),j.as_string_view().size()));
         }
 
         static Json to_json(const T& val)
@@ -583,7 +583,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     result.push_back(item.template as<value_type>());
                 }
 
-                return result;
+                return result_type(std::move(result));
             }
             else 
             {
@@ -607,7 +607,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     result.push_back(item.template as<value_type>());
                 }
 
-                return result;
+                return result_type(std::move(result));
             }
             else if (j.is_byte_string_view())
             {
@@ -733,7 +733,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     result.insert(item.template as<value_type>());
                 }
 
-                return result;
+                return result_type(std::move(result));
             }
             else 
             {
@@ -814,7 +814,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     result.push_front((*it).template as<value_type>());
                 }
 
-                return result;
+                return result_type(std::move(result));
             }
             else 
             {
@@ -889,7 +889,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 buff[i] = j[i].template as<E>();
             }
-            return buff;
+            return result_type(std::move(buff));
         }
 
         static Json to_json(const std::array<E, N>& val)
@@ -956,7 +956,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 result.emplace(key_type(item.key().data(),item.key().size()), item.value().template as<mapped_type>());
             }
 
-            return result;
+            return result_type(std::move(result));
         }
 
         static Json to_json(const T& val)
@@ -1016,7 +1016,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 result.emplace(std::move(key), item.value().template as<mapped_type>());
             }
 
-            return result;
+            return result_type(std::move(result));
         }
 
         static Json to_json(const T& val) 
@@ -1132,7 +1132,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             std::tuple<E...> buff;
             helper::as(buff, j);
-            return buff;
+            return result_type(std::move(buff));
         }
          
         static Json to_json(const std::tuple<E...>& val)
@@ -1167,7 +1167,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         {
-            return std::make_pair<T1,T2>(j[0].template as<T1>(),j[1].template as<T2>());
+            return result_type(std::make_pair<T1,T2>(j[0].template as<T1>(),j[1].template as<T2>()));
         }
         
         static Json to_json(const std::pair<T1,T2>& val)
@@ -1204,7 +1204,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         { 
-            return j.template as_byte_string<typename T::allocator_type>();
+            return result_type(j.template as_byte_string<typename T::allocator_type>());
         }
         
         static Json to_json(const T& val, 
@@ -1230,7 +1230,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j) 
         {
-            return j.is_null() ? std::shared_ptr<ValueType>(nullptr) : std::make_shared<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? result_type(std::shared_ptr<ValueType>(nullptr)) : result_type(std::make_shared<ValueType>(j.template as<ValueType>()));
         }
 
         static Json to_json(const std::shared_ptr<ValueType>& ptr, 
@@ -1264,7 +1264,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j) 
         {
-            return j.is_null() ? std::unique_ptr<ValueType>(nullptr) : jsoncons::make_unique<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? result_type(std::unique_ptr<ValueType>(nullptr)) : result_type(jsoncons::make_unique<ValueType>(j.template as<ValueType>()));
         }
 
         static Json to_json(const std::unique_ptr<ValueType>& ptr,
@@ -1297,7 +1297,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         { 
-            return j.is_null() ? jsoncons::optional<T>() : jsoncons::optional<T>(j.template as<T>());
+            return j.is_null() ? result_type(jsoncons::optional<T>()) : result_type(jsoncons::optional<T>(j.template as<T>()));
         }
         
         static Json to_json(const jsoncons::optional<T>& val, 
@@ -1322,7 +1322,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         {
-            return j.as_byte_string_view();
+            return result_type(j.as_byte_string_view());
         }
         
         static Json to_json(const byte_string_view& val, const allocator_type& alloc = allocator_type())
@@ -1364,7 +1364,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(conv_errc::not_bigint);
                     }
-                    return basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
+                    return result_type(basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length()));
                 case json_type::half_value:
                 case json_type::double_value:
                     return basic_bigint<Allocator>(j.template as<int64_t>());
@@ -1426,7 +1426,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 {
                     v[i] = j[i].template as<T>();
                 }
-                return v;
+                return result_type(std::move(v));
             }
             else
             {
@@ -1540,7 +1540,7 @@ namespace variant_detail
 
         static result_type try_as(const Json& j)
         {
-            return variant_detail::as_variant<0,Json,variant_type, VariantTypes...>(j); 
+            return result_type(variant_detail::as_variant<0,Json,variant_type, VariantTypes...>(j)); 
         }
 
         static Json to_json(const std::variant<VariantTypes...>& var)
@@ -1581,7 +1581,7 @@ namespace variant_detail
 
         static result_type try_as(const Json& j)
         {
-            return from_json_(j);
+            return result_type(from_json_(j));
         }
 
         static Json to_json(const duration_type& val, const allocator_type& = allocator_type())
@@ -1828,7 +1828,7 @@ namespace variant_detail
             {
                 return result_type(conv_errc::not_nullptr);
             }
-            return nullptr;
+            return result_type(nullptr);
         }
 
         static Json to_json(const std::nullptr_t&, const allocator_type& = allocator_type())
@@ -1876,7 +1876,7 @@ namespace variant_detail
             {
                 auto bits = j.template as<uint64_t>();
                 std::bitset<N> bs = static_cast<unsigned long long>(bits);
-                return bs;
+                return result_type(std::move(bs));
             }
             else if (j.is_byte_string() || j.is_string())
             {

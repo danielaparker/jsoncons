@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_REFLECT_READ_RESULT_HPP    
-#define JSONCONS_REFLECT_READ_RESULT_HPP    
+#ifndef JSONCONS_READ_RESULT_HPP    
+#define JSONCONS_READ_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -13,7 +13,6 @@
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
-namespace reflect {
 
 class read_error
 {
@@ -294,7 +293,6 @@ swap(read_result<T>& lhs, read_result<T>& rhs) noexcept
     lhs.swap(rhs);
 }
 
-} // reflect
 } // jsoncons
 
-#endif // JSONCONS_REFLECT_READ_RESULT_HPP
+#endif // JSONCONS_READ_RESULT_HPP
