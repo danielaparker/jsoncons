@@ -60,7 +60,7 @@ struct decode_traits
         
         using json_type = basic_json<CharT>;
         auto j = try_to_json<json_type>(cursor, ec);
-        if (ec)
+        if (JSONCONS_UNLIKELY(ec))
         {
             return result_type(read_error{ec, cursor.line(), cursor.column()});
         }

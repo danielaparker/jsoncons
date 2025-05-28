@@ -35,7 +35,7 @@ namespace msgpack {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor, options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -69,7 +69,7 @@ namespace msgpack {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         msgpack_stream_reader reader(is, adaptor, options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -102,7 +102,7 @@ namespace msgpack {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -139,7 +139,7 @@ namespace msgpack {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -175,7 +175,7 @@ namespace msgpack {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }

@@ -35,7 +35,7 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder,options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -71,7 +71,7 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder,options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -105,7 +105,7 @@ namespace csv {
         jsoncons::json_decoder<T> decoder;
         basic_csv_reader<char_type, iterator_source<InputIt>> reader(iterator_source<InputIt>(first,last), decoder, options);
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -146,7 +146,7 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(s,decoder,options,alloc_set.get_temp_allocator());
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
@@ -186,7 +186,7 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(is,decoder,options,alloc_set.get_temp_allocator());
         reader.read();
-        if (!decoder.is_valid())
+        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
         {
             JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }

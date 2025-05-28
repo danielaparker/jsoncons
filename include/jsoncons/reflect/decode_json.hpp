@@ -40,11 +40,11 @@ try_decode_json(const Source& s,
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<char_type, string_source<char_type>> reader(s, decoder, options);
     reader.read(ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, reader.line(), reader.column()}};
     }
-    if (!decoder.is_valid())
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
         return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
     }
@@ -63,7 +63,7 @@ try_decode_json(const Source& s,
 
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, default_json_parsing(), ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
@@ -82,11 +82,11 @@ try_decode_json(std::basic_istream<CharT>& is,
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
     reader.read(ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, reader.line(), reader.column()}};
     }
-    if (!decoder.is_valid())
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
         return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
@@ -103,7 +103,7 @@ try_decode_json(std::basic_istream<CharT>& is,
 
     std::error_code ec;
     basic_json_cursor<CharT> cursor(is, options, default_json_parsing(), ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
@@ -124,11 +124,11 @@ try_decode_json(InputIt first, InputIt last,
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<char_type, iterator_source<InputIt>> reader(iterator_source<InputIt>(first,last), decoder, options);
     reader.read(ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, reader.line(), reader.column()}};
     }
-    if (!decoder.is_valid())
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
         return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
@@ -148,7 +148,7 @@ try_decode_json(InputIt first, InputIt last,
     std::error_code ec;
     basic_json_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), 
         options, default_json_parsing(), ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
@@ -173,11 +173,11 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::error_code ec;   
     basic_json_reader<char_type, string_source<char_type>,TempAllocator> reader(s, decoder, options, alloc_set.get_temp_allocator());
     reader.read(ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, reader.line(), reader.column()}};
     }
-    if (!decoder.is_valid())
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
         return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
@@ -198,7 +198,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>,TempAllocator> cursor(
         std::allocator_arg, alloc_set.get_temp_allocator(), s, options, default_json_parsing(), ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
@@ -219,11 +219,11 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::error_code ec;   
     basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
     reader.read(ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, reader.line(), reader.column()}};
     }
-    if (!decoder.is_valid())
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
         return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
     }
@@ -237,13 +237,13 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     using value_type = T;
-    using char_type = CharT;
     using result_type = read_result<value_type>;
+    using char_type = CharT;
 
     std::error_code ec;   
     basic_json_cursor<char_type,stream_source<char_type>,TempAllocator> cursor(
         std::allocator_arg, alloc_set.get_temp_allocator(), is, options, ec);
-    if (ec)
+    if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }

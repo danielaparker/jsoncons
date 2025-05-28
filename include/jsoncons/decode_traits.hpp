@@ -48,7 +48,7 @@ namespace jsoncons {
             {
                 JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
             }
-            else if (!decoder.is_valid())
+            else if (JSONCONS_UNLIKELY(!decoder.is_valid()))
             {
                 JSONCONS_THROW(ser_error(conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()));
             }

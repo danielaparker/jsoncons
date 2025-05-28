@@ -14,6 +14,12 @@
 
 namespace jsoncons {
 
+// Ignore false positives 
+#if defined(__GNUC__) 
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 template <typename T>
 class conv_result;
 
@@ -244,6 +250,10 @@ swap(conv_result<T>& lhs, conv_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 } // jsoncons
 
