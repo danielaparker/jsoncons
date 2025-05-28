@@ -15,7 +15,8 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/decode_traits.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/read_result.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
@@ -25,180 +26,237 @@
 namespace jsoncons { 
 namespace msgpack {
 
-    template <typename T,typename Source>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const Source& v, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
+template <typename T,typename Source>
+typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+try_decode_msgpack(const Source& v, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+    basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor, options);
+    reader.read(ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor, options);
-        reader.read();
-        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
-        {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
-        }
-        return decoder.get_result();
+        return result_type{read_error{ec, reader.line(), reader.column()}};
+    }
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
+    {
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+    }
+    return result_type{decoder.get_result()};
+}
+
+template <typename T,typename Source>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+try_decode_msgpack(const Source& v, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    basic_msgpack_cursor<bytes_source> cursor(v, options, ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
 
-    template <typename T,typename Source>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const Source& v, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        basic_msgpack_cursor<bytes_source> cursor(v, options);
-        json_decoder<basic_json<char,sorted_policy>> decoder{};
+    return reflect::decode_traits<T>::try_decode(cursor);
+}
 
-        std::error_code ec;
-        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
+template <typename T>
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(std::istream& is, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+    msgpack_stream_reader reader(is, adaptor, options);
+    reader.read(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, reader.line(), reader.column()}};
+    }
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
+    {
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+    }
+    return result_type{decoder.get_result()};
+}
+
+template <typename T>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(std::istream& is, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    basic_msgpack_cursor<binary_stream_source> cursor(is, options, ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
 
-    template <typename T>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(std::istream& is, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
+    return reflect::decode_traits<T>::try_decode(cursor);
+}
+
+template <typename T,typename InputIt>
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(InputIt first, InputIt last,
+            const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+    basic_msgpack_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
+    reader.read(ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        msgpack_stream_reader reader(is, adaptor, options);
-        reader.read();
-        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
-        {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
-        }
-        return decoder.get_result();
+        return result_type{read_error{ec, reader.line(), reader.column()}};
+    }
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
+    {
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+    }
+    return result_type{decoder.get_result()};
+}
+
+template <typename T,typename InputIt>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(InputIt first, InputIt last,
+            const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    basic_msgpack_cursor<binary_iterator_source<InputIt>> cursor(binary_iterator_source<InputIt>(first, last), options, ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
 
-    template <typename T>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(std::istream& is, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        basic_msgpack_cursor<binary_stream_source> cursor(is, options);
-        json_decoder<basic_json<char,sorted_policy>> decoder{};
+    return reflect::decode_traits<T>::try_decode(cursor);
+}
 
-        std::error_code ec;
-        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
+// With leading allocator_set parameter
+
+template <typename T,typename Source,typename Allocator,typename TempAllocator >
+typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+try_decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+               const Source& v, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+    auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+    basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
+    reader.read(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, reader.line(), reader.column()}};
+    }
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
+    {
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+    }
+    return result_type{decoder.get_result()};
+}
+
+template <typename T,typename Source,typename Allocator,typename TempAllocator >
+typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+try_decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+               const Source& v, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    basic_msgpack_cursor<bytes_source,TempAllocator> cursor(std::allocator_arg, alloc_set.get_temp_allocator(), v, options, ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
 
-    template <typename T,typename InputIt>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(InputIt first, InputIt last,
-                const msgpack_decode_options& options = msgpack_decode_options())
+    return reflect::decode_traits<T>::try_decode(cursor);
+}
+
+template <typename T,typename Allocator,typename TempAllocator >
+typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+               std::istream& is, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+    auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+    basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
+    reader.read(ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
-        reader.read();
-        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
-        {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
-        }
-        return decoder.get_result();
+        return result_type{read_error{ec, reader.line(), reader.column()}};
+    }
+    if (JSONCONS_UNLIKELY(!decoder.is_valid()))
+    {
+        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+    }
+    return result_type{decoder.get_result()};
+}
+
+template <typename T,typename Allocator,typename TempAllocator >
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+try_decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+               std::istream& is, 
+               const msgpack_decode_options& options = msgpack_decode_options())
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    std::error_code ec;   
+    basic_msgpack_cursor<binary_stream_source,TempAllocator> cursor(
+        std::allocator_arg, alloc_set.get_temp_allocator(), is, options, ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return result_type{read_error{ec, cursor.line(), cursor.column()}};
     }
 
-    template <typename T,typename InputIt>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(InputIt first, InputIt last,
-                const msgpack_decode_options& options = msgpack_decode_options())
+    return reflect::decode_traits<T>::try_decode(cursor);
+}
+
+template <typename T, typename... Args>
+T decode_msgpack(Args&& ... args)
+{
+    auto result = try_decode_msgpack<T>(std::forward<Args>(args)...); 
+    if (!result)
     {
-        basic_msgpack_cursor<binary_iterator_source<InputIt>> cursor(binary_iterator_source<InputIt>(first, last), options);
-        json_decoder<basic_json<char,sorted_policy>> decoder{};
-
-        std::error_code ec;
-        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
+        JSONCONS_THROW(ser_error(result.error().ec(), result.error().line(), result.error().column()));
     }
-
-    // With leading allocator_set parameter
-
-    template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
-                   const Source& v, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
-        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
-        reader.read();
-        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
-        {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
-        }
-        return decoder.get_result();
-    }
-
-    template <typename T,typename Source,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
-                   const Source& v, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        basic_msgpack_cursor<bytes_source,TempAllocator> cursor(v, options, alloc_set.get_temp_allocator());
-        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
-
-        std::error_code ec;
-        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
-    }
-
-    template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
-                   std::istream& is, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
-        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
-        reader.read();
-        if (JSONCONS_UNLIKELY(!decoder.is_valid()))
-        {
-            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
-        }
-        return decoder.get_result();
-    }
-
-    template <typename T,typename Allocator,typename TempAllocator >
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
-                   std::istream& is, 
-                   const msgpack_decode_options& options = msgpack_decode_options())
-    {
-        basic_msgpack_cursor<binary_stream_source,TempAllocator> cursor(is, options, alloc_set.get_temp_allocator());
-        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
-
-        std::error_code ec;
-        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
-    }
+    return std::move(result.value());
+}
 
 } // namespace msgpack
 } // namespace jsoncons

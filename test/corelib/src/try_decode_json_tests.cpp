@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/reflect/decode_json.hpp>
+#include <jsoncons/decode_json.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/json_traits_macros.hpp>
 
@@ -43,7 +43,7 @@ TEST_CASE("default to json_type_traits tests")
 
         jsoncons::encode_json(book, s);
 
-        auto result = jsoncons::reflect::try_decode_json<jsoncons::json>(s);
+        auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(result);
         REQUIRE(result.value().is<ns::book1a>() == true);
@@ -69,7 +69,7 @@ TEST_CASE("reflect decode json")
     SECTION("decode array")
     {
         std::string s = R"([false,"foo"])";
-        auto result = jsoncons::reflect::try_decode_json<jsoncons::json>(s);
+        auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(result);
         REQUIRE(result.has_value());
@@ -78,12 +78,12 @@ TEST_CASE("reflect decode json")
         CHECK(result.value()[0] == false);
         CHECK(result.value()[1] == "foo");
         
-        REQUIRE_NOTHROW(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_NOTHROW(jsoncons::decode_json<jsoncons::json>(s));
     }
     SECTION("decode object")
     {
         std::string s = R"({"a" : 1, "b" : 2})";
-        auto result = jsoncons::reflect::try_decode_json<jsoncons::json>(s);
+        auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(result);
         REQUIRE(result.has_value());
@@ -92,7 +92,7 @@ TEST_CASE("reflect decode json")
         CHECK(result.value().at("a") == 1);
         CHECK(result.value().at("b") == 2);
 
-        REQUIRE_NOTHROW(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_NOTHROW(jsoncons::decode_json<jsoncons::json>(s));
     }
 }
 
@@ -101,37 +101,37 @@ TEST_CASE("reflect decode json with error")
     SECTION("decode array")
     {
         std::string s = R"([false,"foo")";
-        auto result = jsoncons::reflect::try_decode_json<jsoncons::json>(s);
+        auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(!result);
-        REQUIRE_THROWS(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_THROWS(jsoncons::decode_json<jsoncons::json>(s));
     }
     SECTION("decode object")
     {
         std::string s = R"({"a" : 1, "b : 2})";
-        auto result = jsoncons::reflect::try_decode_json<jsoncons::json>(s);
+        auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(!result);
-        REQUIRE_THROWS(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_THROWS(jsoncons::decode_json<jsoncons::json>(s));
     }
     SECTION("decode array to tuple")
     {
         std::string s = R"([false, 1, "foo"])"; 
-        auto result = jsoncons::reflect::try_decode_json<std::tuple<bool,int,std::string>>(s);
+        auto result = jsoncons::try_decode_json<std::tuple<bool,int,std::string>>(s);
 
         REQUIRE(result);
         CHECK(std::get<0>(result.value()) == false);
-        REQUIRE_NOTHROW(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_NOTHROW(jsoncons::decode_json<jsoncons::json>(s));
     }
     SECTION("decode array to pair")
     {
         std::string s = R"([1.5, "foo"])"; 
-        auto result = jsoncons::reflect::try_decode_json<std::pair<double,std::string>>(s);
+        auto result = jsoncons::try_decode_json<std::pair<double,std::string>>(s);
 
         REQUIRE(result);
         CHECK(1.5 == std::get<0>(result.value()));
         CHECK("foo" == std::get<1>(result.value()));
-        REQUIRE_NOTHROW(jsoncons::reflect::decode_json<jsoncons::json>(s));
+        REQUIRE_NOTHROW(jsoncons::decode_json<jsoncons::json>(s));
     }
 }
 

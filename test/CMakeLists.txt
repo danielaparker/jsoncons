@@ -191,7 +191,7 @@ add_executable(unit_tests
                corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/string_to_double_tests.cpp
                corelib/src/wjson_tests.cpp
-               corelib/src/reflect/try_decode_json_tests.cpp
+               corelib/src/try_decode_json_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
