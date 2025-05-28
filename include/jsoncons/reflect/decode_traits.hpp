@@ -41,6 +41,12 @@ namespace reflect {
 
 // decode_traits
 
+// Ignore false positives 
+#if defined(__GNUC__) 
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 template <typename T,typename Enable = void>
 struct decode_traits
 {
@@ -63,6 +69,10 @@ struct decode_traits
         return result ? result_type(std::move(result.value())) : result_type(read_error{result.error(), cursor.line(), cursor.column()});
     }
 };
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 // specializations
 
