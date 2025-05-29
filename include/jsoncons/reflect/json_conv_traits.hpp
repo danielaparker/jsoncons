@@ -1227,7 +1227,16 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j) 
         {
-            return j.is_null() ? result_type(std::shared_ptr<ValueType>(nullptr)) : result_type(std::make_shared<ValueType>(j.template as<ValueType>()));
+            if (j.is_null())
+            {
+                return result_type(std::shared_ptr<ValueType>(nullptr));
+            }
+            auto r = j.template try_as<ValueType>();
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            return result_type(std::make_shared<ValueType>(std::move(r.value())));
         }
 
         static Json to_json(const std::shared_ptr<ValueType>& ptr, 
@@ -1261,7 +1270,16 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j) 
         {
-            return j.is_null() ? result_type(std::unique_ptr<ValueType>(nullptr)) : result_type(jsoncons::make_unique<ValueType>(j.template as<ValueType>()));
+            if (j.is_null())
+            {
+                return result_type(std::unique_ptr<ValueType>(nullptr));
+            }
+            auto r = j.template try_as<ValueType>();
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            return result_type(jsoncons::make_unique<ValueType>(std::move(r.value())));
         }
 
         static Json to_json(const std::unique_ptr<ValueType>& ptr,
@@ -1294,7 +1312,16 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         { 
-            return j.is_null() ? result_type(jsoncons::optional<T>()) : result_type(jsoncons::optional<T>(j.template as<T>()));
+            if (j.is_null())
+            {
+                return result_type(jsoncons::optional<T>());
+            }
+            auto r = j.template try_as<T>();
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            return result_type(jsoncons::optional<T>(std::move(r.value())));
         }
         
         static Json to_json(const jsoncons::optional<T>& val, 

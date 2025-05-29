@@ -21,7 +21,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -51,7 +51,7 @@ namespace reflect {
                            const Json& /*proto*/, 
                            std::error_code& ec)
         {
-            auto j = json_type_traits<Json,T>::to_json(val);
+            auto j = json_conv_traits<Json,T>::to_json(val);
             j.dump(encoder, ec);
         }
         template <typename Json>
@@ -61,7 +61,7 @@ namespace reflect {
                            const Json& proto, 
                            std::error_code& ec)
         {
-            auto j = json_type_traits<Json,T>::to_json(val, proto.get_allocator());
+            auto j = json_conv_traits<Json,T>::to_json(val, proto.get_allocator());
             j.dump(encoder, ec);
         }
     };

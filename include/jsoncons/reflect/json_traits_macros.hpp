@@ -11,7 +11,6 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
-#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 
 namespace jsoncons {

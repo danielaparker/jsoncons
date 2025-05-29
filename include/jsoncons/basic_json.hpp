@@ -3294,6 +3294,13 @@ namespace jsoncons {
         }
 
         template <typename T>
+        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conv_result<T>>::type
+        try_as() const
+        {
+            return reflect::json_conv_traits<basic_json,T>::try_as(*this);
+        }
+
+        template <typename T>
         typename std::enable_if<(!ext_traits::is_string<T>::value && 
                                  ext_traits::is_back_insertable_byte_container<T>::value) ||
                                  ext_traits::is_basic_byte_string<T>::value,T>::type
