@@ -140,7 +140,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // is_json_conv_traits_specialized
     template <typename Json,typename T,typename Enable=void>
-    struct is_json_conv_traits_specialized : std::false_type {};
+    struct is_json_conv_traits_specialized : is_json_type_traits_specialized<Json,T> {};
 
     template <typename Json,typename T>
     struct is_json_conv_traits_specialized<Json,T, 
@@ -1005,8 +1005,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             for (const auto& item : val.object_range())
             {
                 Json j(item.key());
-                auto key = json_conv_traits<Json,key_type>::as(j);
-                result.emplace(std::move(key), item.value().template as<mapped_type>());
+                auto r = json_conv_traits<Json,key_type>::try_as(j);
+                if (!r)
+                {
+                    return result_type(r.error());
+                }
+                result.emplace(std::move(r.value()), item.value().template as<mapped_type>());
             }
 
             return result_type(std::move(result));

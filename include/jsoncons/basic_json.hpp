@@ -3282,11 +3282,15 @@ namespace jsoncons {
         }
 
         template <typename T>
-        typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
+        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,T>::type
         as() const
         {
-            T val = json_type_traits<basic_json,T>::as(*this);
-            return val;
+            auto r = reflect::json_conv_traits<basic_json,T>::try_as(*this);
+            if (!r)
+            {
+                JSONCONS_THROW(conv_error(r.error()));
+            }
+            return std::move(r.value());
         }
 
         template <typename T>
