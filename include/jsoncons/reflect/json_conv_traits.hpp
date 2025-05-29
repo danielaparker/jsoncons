@@ -82,14 +82,7 @@ namespace reflect {
 
         static Json to_json(const T& val, const allocator_type& alloc = allocator_type())
         {
-            JSONCONS_TRY
-            {
-                return result_type(json_type_traits<Json,T>::to_json(val, alloc));
-            }
-            JSONCONS_CATCH (const ser_error& e)
-            {
-                return result_type(conv_errc::conversion_failed);
-            }
+            return json_type_traits<Json,T>::to_json(val, alloc);
         }
     };
 
