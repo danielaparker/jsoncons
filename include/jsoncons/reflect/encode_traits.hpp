@@ -27,6 +27,7 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
+namespace reflect {
 
     // encode_traits
 
@@ -236,7 +237,7 @@ namespace jsoncons {
                            const Json& proto, 
                            std::error_code& ec)
         {
-            using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
+            using helper = detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
             encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
             helper::encode(val, encoder, proto, ec);
@@ -379,6 +380,7 @@ namespace jsoncons {
         }
     };
 
+} // namespace reflect
 } // namespace jsoncons
 
 #endif // JSONCONS_REFLECT_ENCODE_TRAITS_HPP

@@ -41,7 +41,7 @@ namespace csv {
         using char_type = typename CharContainer::value_type;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(cont,options);
         std::error_code ec;
-        encode_traits<T,char_type>::encode(val, encoder, json(), ec);
+        reflect::encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -64,7 +64,7 @@ namespace csv {
         using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
         std::error_code ec;
-        encode_traits<T,CharT>::encode(val, encoder, json(), ec);
+        reflect::encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -93,7 +93,7 @@ namespace csv {
         using char_type = typename CharContainer::value_type;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAllocator> encoder(cont, options, alloc_set.get_temp_allocator());
         std::error_code ec;
-        encode_traits<T,char_type>::encode(val, encoder, json(), ec);
+        reflect::encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -118,7 +118,7 @@ namespace csv {
         using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
         std::error_code ec;
-        encode_traits<T,CharT>::encode(val, encoder, json(), ec);
+        reflect::encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
