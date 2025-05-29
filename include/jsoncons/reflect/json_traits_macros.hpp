@@ -1018,6 +1018,7 @@ namespace jsoncons { \
 namespace jsoncons { \
     template <typename Json> \
     struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
+        using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
@@ -1030,7 +1031,7 @@ namespace jsoncons { \
             return std::shared_ptr<BaseClass>(); \
         } \
 \
-        static Json to_json(const std::shared_ptr<BaseClass>& ptr) { \
+        static Json to_json(const std::shared_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
@@ -1038,6 +1039,7 @@ namespace jsoncons { \
     }; \
     template <typename Json> \
     struct json_type_traits<Json, std::unique_ptr<BaseClass>> { \
+        using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
@@ -1048,7 +1050,7 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
             return std::unique_ptr<BaseClass>(); \
         } \
-        static Json to_json(const std::unique_ptr<BaseClass>& ptr) { \
+        static Json to_json(const std::unique_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \

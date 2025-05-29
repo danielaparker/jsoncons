@@ -45,7 +45,7 @@ namespace jsoncons {
 namespace reflect {
 
     template <typename T>
-    struct is_json_conv_traits_declared : public std::false_type
+    struct is_json_conv_traits_declared : public is_json_type_traits_declared<T>
     {};
 
     // json_conv_traits

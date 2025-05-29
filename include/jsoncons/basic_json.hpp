@@ -37,7 +37,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -2347,14 +2347,14 @@ namespace jsoncons {
         template <typename T,
                   class = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val)
-            : basic_json(json_type_traits<basic_json,T>::to_json(val))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val))
         {
         }
 
         template <typename T,
                   class = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val, const Allocator& alloc)
-            : basic_json(json_type_traits<basic_json,T>::to_json(val,alloc))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val,alloc))
         {
         }
 
@@ -2558,7 +2558,7 @@ namespace jsoncons {
         template <typename T>
         basic_json& operator=(const T& val)
         {
-            *this = json_type_traits<basic_json,T>::to_json(val);
+            *this = reflect::json_conv_traits<basic_json,T>::to_json(val);
             return *this;
         }
 
