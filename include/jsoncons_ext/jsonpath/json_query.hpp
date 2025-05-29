@@ -11,6 +11,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
@@ -85,7 +86,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
+    typename std::enable_if<reflect::is_json_conv_traits_specialized<Json,T>::value,void>::type
         json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value,
                      const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -112,7 +113,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename T,typename TempAllocator >
-    typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
+    typename std::enable_if<reflect::is_json_conv_traits_specialized<Json,T>::value,void>::type
         json_replace(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
             Json& root, const typename Json::string_view_type& path, T&& new_value,
             const custom_functions<Json>& funcs = custom_functions<Json>())
