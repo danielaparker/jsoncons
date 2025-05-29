@@ -74,13 +74,15 @@ public:
      }
 
      read_result(const read_error& err)
-        : has_value_(false), error_{err}
+        : has_value_(false)
     {
+        ::new (&error_) read_error(err);
     }
 
     read_result(read_error&& err) noexcept
-        : has_value_(false), error_{std::move(err)}
+        : has_value_(false)
     {
+        ::new (&error_) read_error(err);
     }
     
     // copy constructors
@@ -93,7 +95,7 @@ public:
         }
         else
         {
-            error_ = other.error_;
+            ::new (&error_) read_error(other.error_);
         }
     }
 
@@ -107,7 +109,7 @@ public:
         }
         else
         {
-            error_ = other.error_;
+            ::new (&error_) read_error(other.error_);
         }
     }
 
@@ -125,7 +127,7 @@ public:
         else
         {
             destroy();
-            error_ = other.error_;
+            ::new (&error_) read_error(other.error_);
         }
         return *this;
     }
@@ -139,7 +141,7 @@ public:
         else
         {
             destroy();
-            error_ = other.error_;
+            ::new (&error_) read_error(other.error_);
         }
         return *this;
     }

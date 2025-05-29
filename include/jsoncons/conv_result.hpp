@@ -50,7 +50,7 @@ public:
     }
 
     conv_result(std::error_code ec) noexcept
-        : has_value_(false), ec_{ec}
+        : has_value_(false)
     {
         ::new (&ec_) std::error_code(ec);
     }
