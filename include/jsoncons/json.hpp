@@ -10,7 +10,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/decode_json.hpp>
 #include <jsoncons/encode_json.hpp>
-#include <jsoncons/json_traits_macros.hpp>
+#include <jsoncons/reflect/json_traits_macros.hpp>
 #include <jsoncons/staj_iterator.hpp>
 
 #endif // JSONCONS_JSON_HPP

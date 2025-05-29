@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_TRAITS_MACROS_HPP
-#define JSONCONS_JSON_TRAITS_MACROS_HPP
+#ifndef JSONCONS_REFLECT_JSON_TRAITS_MACROS_HPP
+#define JSONCONS_REFLECT_JSON_TRAITS_MACROS_HPP
 
 #include <utility>
 
@@ -14,8 +14,8 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 
-namespace jsoncons
-{
+namespace jsoncons {
+
     #define JSONCONS_RDONLY(X)
 
     #define JSONCONS_RDWR(X) X
@@ -276,8 +276,7 @@ namespace jsoncons
     ajson.try_emplace(json_traits_macro_names<char_type,class_type>::Member##_str(char_type{}),class_instance.Member);
 
 #define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -393,8 +392,7 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, From) ajson.try_emplace(Name, Into(class_instance.Member));
 
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -466,8 +464,7 @@ else { \
 }
 
 #define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -570,8 +567,7 @@ else { \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -627,8 +623,7 @@ JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryP
 #define JSONCONS_ENUM_PAIR_LAST(Prefix, P2, P3, Member, Count) {enum_type::Member, json_traits_macro_names<char_type,enum_type>::Member##_str(char_type{})}
 
 #define JSONCONS_ENUM_TRAITS_BASE(EnumType, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename ChT> \
     struct json_traits_macro_names<ChT,EnumType> \
     { \
@@ -733,8 +728,7 @@ namespace jsoncons \
 #define JSONCONS_NAME_ENUM_PAIR_(Member, Name) {enum_type::Member, Name}
 
 #define JSONCONS_ENUM_NAME_TRAITS(EnumType, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename Json> \
     struct json_type_traits<Json, EnumType> \
     { \
@@ -846,8 +840,7 @@ else \
 #define JSONCONS_ALL_GETTER_SETTER_TO_JSON_(Prefix, Getter, Setter, Property, Count) ajson.try_emplace(json_traits_macro_names<char_type,class_type>::Property##_str(char_type{}),class_instance.Getter() );
 
 #define JSONCONS_GETTER_SETTER_TRAITS_BASE(AsT,ToJ,NumTemplateParams, ClassType,GetPrefix,SetPrefix,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -952,8 +945,7 @@ else \
   {json_traits_helper<Json>::set_optional_json_member(Name, Into(class_instance.Getter()), ajson);}
  
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
-namespace jsoncons \
-{ \
+namespace jsoncons { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
@@ -1065,4 +1057,4 @@ namespace jsoncons { \
 }  \
   /**/
 
-#endif // JSONCONS_JSON_TRAITS_MACROS_HPP
+#endif // JSONCONS_REFLECT_JSON_TRAITS_MACROS_HPP
