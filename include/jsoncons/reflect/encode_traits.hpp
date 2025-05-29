@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_ENCODE_TRAITS_HPP
-#define JSONCONS_ENCODE_TRAITS_HPP
+#ifndef JSONCONS_REFLECT_ENCODE_TRAITS_HPP
+#define JSONCONS_REFLECT_ENCODE_TRAITS_HPP
 
 #include <array>
 #include <cstddef>
@@ -381,5 +381,5 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif // JSONCONS_ENCODE_TRAITS_HPP
+#endif // JSONCONS_REFLECT_ENCODE_TRAITS_HPP
 

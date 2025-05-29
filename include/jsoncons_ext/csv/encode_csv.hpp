@@ -17,7 +17,7 @@
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/encode_traits.hpp>
+#include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/sink.hpp>
 
 namespace jsoncons { 
