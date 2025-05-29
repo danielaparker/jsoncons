@@ -2972,7 +2972,7 @@ namespace jsoncons {
         template <typename T,typename... Args>
         bool is(Args&&... args) const noexcept
         {
-            return json_type_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
+            return reflect::json_conv_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
         }
 
         bool is_string() const noexcept
