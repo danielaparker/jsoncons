@@ -84,6 +84,13 @@ public:
     {
         ::new (&error_) read_error(std::move(err));
     }
+
+    template <typename... Args>    
+    read_result(unexpect_t, Args&& ... args) noexcept
+        : has_value_(false)
+    {
+        ::new (&error_) read_error(std::forward<Args>(args)...);
+    }
     
     // copy constructors
     read_result(const read_result<T>& other) 

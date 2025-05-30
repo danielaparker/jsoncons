@@ -18,6 +18,13 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
+    
+    struct unexpect_t
+    {
+        explicit unexpect_t() = default; 
+    };
+    
+    JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
 
     class assertion_error : public std::runtime_error
     {

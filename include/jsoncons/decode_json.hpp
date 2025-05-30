@@ -64,7 +64,7 @@ try_decode_json(const Source& s,
     basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, default_json_parsing(), ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
     return reflect::decode_traits<T>::try_decode(cursor);
 }
@@ -87,7 +87,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column());
     }
     return result_type{decoder.get_result()};
 }
@@ -104,7 +104,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     basic_json_cursor<CharT> cursor(is, options, default_json_parsing(), ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
     return reflect::decode_traits<T>::try_decode(cursor);
 }
@@ -129,7 +129,7 @@ try_decode_json(InputIt first, InputIt last,
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column());
     }
     return result_type{decoder.get_result()};
 }
@@ -149,7 +149,7 @@ try_decode_json(InputIt first, InputIt last,
         options, default_json_parsing(), ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
     return reflect::decode_traits<T>::try_decode(cursor);
 }
@@ -178,7 +178,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column());
     }
     return result_type{decoder.get_result()};
 }
@@ -199,7 +199,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         std::allocator_arg, alloc_set.get_temp_allocator(), s, options, default_json_parsing(), ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
     return reflect::decode_traits<T>::try_decode(cursor);
 }
@@ -224,7 +224,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type(read_error(conv_errc::conversion_failed, reader.line(), reader.column()));
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column());
     }
     return result_type{decoder.get_result()};
 }
@@ -244,7 +244,7 @@ try_decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         std::allocator_arg, alloc_set.get_temp_allocator(), is, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
     return reflect::decode_traits<value_type>::try_decode(cursor);
 }

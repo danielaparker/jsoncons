@@ -65,7 +65,7 @@ try_decode_csv(const Source& s, const basic_csv_decode_options<typename Source::
     basic_csv_cursor<char_type> cursor(s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
     return reflect::decode_traits<T>::try_decode(cursor);
@@ -107,7 +107,7 @@ try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<Cha
     basic_csv_cursor<CharT> cursor(is, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
     return reflect::decode_traits<T>::try_decode(cursor);
@@ -154,7 +154,7 @@ try_decode_csv(InputIt first, InputIt last,
     basic_csv_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
     return reflect::decode_traits<T>::try_decode(cursor);
@@ -207,7 +207,7 @@ try_decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
         std::allocator_arg, alloc_set.get_temp_allocator(), s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
     return reflect::decode_traits<T>::try_decode(cursor);
@@ -254,7 +254,7 @@ try_decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
         std::allocator_arg, alloc_set.get_temp_allocator(), is, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, cursor.line(), cursor.column()}};
+        return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
     return reflect::decode_traits<T>::try_decode(cursor);
