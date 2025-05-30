@@ -343,7 +343,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             if (!j.is_null())
             {
-                return result_type{conv_errc::not_jsoncons_null_type};
+                return result_type{jsoncons::unexpect, conv_errc::not_jsoncons_null_type};
             }
             return result_type{jsoncons::null_type()};
         }
