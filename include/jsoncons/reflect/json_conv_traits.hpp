@@ -74,9 +74,9 @@ namespace reflect {
             {
                 return result_type(json_type_traits<Json,T>::as(j));
             }
-            JSONCONS_CATCH (const ser_error&)
+            JSONCONS_CATCH (const ser_error& ec)
             {
-                return result_type(conv_errc::conversion_failed);
+                return result_type(jsoncons::unexpect, ec.code());
             }
         }
 
@@ -580,7 +580,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else 
             {
-                return result_type(conv_errc::not_vector);
+                return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
         }
 
@@ -624,7 +624,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else
             {
-                return result_type(conv_errc::not_vector);
+                return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
         }
 
@@ -730,7 +730,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else 
             {
-                return result_type(conv_errc::not_vector);
+                return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
         }
 
@@ -811,7 +811,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else 
             {
-                return result_type(conv_errc::not_vector);
+                return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
         }
 
@@ -876,7 +876,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             std::array<E, N> buff;
             if (j.size() != N)
             {
-                return result_type(conv_errc::not_array);
+                return result_type(jsoncons::unexpect, conv_errc::not_array);
             }
             for (std::size_t i = 0; i < N; i++)
             {
@@ -941,7 +941,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             if (!j.is_object())
             {
-                return result_type(conv_errc::not_map);
+                return result_type(jsoncons::unexpect, conv_errc::not_map);
             }
             T result;
             for (const auto& item : j.object_range())
@@ -1386,7 +1386,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 case json_type::string_value:
                     if (!jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length()))
                     {
-                        return result_type(conv_errc::not_bigint);
+                        return result_type(jsoncons::unexpect, conv_errc::not_bigint);
                     }
                     return result_type(basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length()));
                 case json_type::half_value:
@@ -1397,7 +1397,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 case json_type::uint64_value:
                     return basic_bigint<Allocator>(j.template as<uint64_t>());
                 default:
-                    return result_type(conv_errc::not_bigint);
+                    return result_type(jsoncons::unexpect, conv_errc::not_bigint);
             }
         }
         
@@ -1454,7 +1454,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else
             {
-                return result_type(conv_errc::not_array);
+                return result_type(jsoncons::unexpect, conv_errc::not_array);
             }
         }
         
@@ -1516,7 +1516,7 @@ namespace variant_detail
     typename std::enable_if<N == std::variant_size_v<Variant>, conv_result<Variant>>::type
     as_variant(const Json& /*j*/)
     {
-        return conv_result<Variant>(conv_errc::not_variant);
+        return conv_result<Variant>(jsoncons::unexpect, conv_errc::not_variant);
     }
 
     template<std::size_t N,typename Json,typename Variant,typename T,typename ... U>
@@ -1850,7 +1850,7 @@ namespace variant_detail
         {
             if (!j.is_null())
             {
-                return result_type(conv_errc::not_nullptr);
+                return result_type(jsoncons::unexpect, conv_errc::not_nullptr);
             }
             return result_type(nullptr);
         }
@@ -1916,7 +1916,7 @@ namespace variant_detail
                     auto result = base16_to_bytes(sv.begin(), sv.end(), bits);
                     if (result.ec != conv_errc::success)
                     {
-                        return result_type(conv_errc::not_bitset);
+                        return result_type(jsoncons::unexpect, conv_errc::not_bitset);
                     }
                 }
                 std::uint8_t byte = 0;
@@ -1929,7 +1929,7 @@ namespace variant_detail
                     {
                         if (pos >= bits.size())
                         {
-                            return result_type(conv_errc::not_bitset);
+                            return result_type(jsoncons::unexpect, conv_errc::not_bitset);
                         }
                         byte = bits.at(pos++);
                         mask = 0x80;
@@ -1946,7 +1946,7 @@ namespace variant_detail
             }
             else
             {
-                return result_type(conv_errc::not_bitset);
+                return result_type(jsoncons::unexpect, conv_errc::not_bitset);
             }
         }
 
