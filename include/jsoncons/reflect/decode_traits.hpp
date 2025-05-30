@@ -55,9 +55,9 @@ struct decode_traits
         {
             return result_type(read_error{ec, cursor.line(), cursor.column()});
         }
-        auto result = reflect::json_conv_traits<json_type, value_type>::try_as(j);
+        conv_result<value_type> conv_res = reflect::json_conv_traits<json_type, value_type>::try_as(j);
 
-        return result ? result_type(std::move(result.value())) : result_type(read_error{result.error(), cursor.line(), cursor.column()});
+        return conv_res ? result_type(std::move(*conv_res)) : result_type(read_error(conv_res.error(), cursor.line(), cursor.column()));
     }
 };
 
@@ -208,6 +208,7 @@ struct decode_traits<T,
             return result_type(read_error{conv_errc::not_vector, cursor.line(), cursor.column()}); 
         }
         cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec)) { return result_type(read_error{ec, cursor.line(), cursor.column()}); }
         while (cursor.current().event_type() != staj_event_type::end_array && !ec)
         {
             auto r = decode_traits<element_type>::try_decode(cursor);
@@ -216,9 +217,9 @@ struct decode_traits<T,
                 return result_type(r.error()); 
             }
             v.push_back(std::move(r.value()));
-            if (JSONCONS_UNLIKELY(ec)) {return result_type(read_error{ec, cursor.line(), cursor.column()});}
             //std::cout << "read next 10\n";
             cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) { return result_type(read_error{ec, cursor.line(), cursor.column()}); }
         }
         return result_type{std::move(v)};
     }

@@ -15,6 +15,7 @@
 #include <jsoncons/reflect/json_conv_traits.hpp>
 
 namespace jsoncons {
+namespace reflect {
 
     #define JSONCONS_RDONLY(X)
 
@@ -87,7 +88,10 @@ namespace jsoncons {
             j.try_emplace(key, val); 
         } 
     };
-}
+} // namespace reflect
+    using always_true = reflect::always_true; 
+    using identity = reflect::identity; 
+} // namespace jsoncons
 
 #if defined(_MSC_VER)
 #pragma warning( disable : 4127)
@@ -279,13 +283,14 @@ namespace jsoncons {
 
 #define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -301,12 +306,12 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_MEMBER_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT, ,,, __VA_ARGS__) \
-            return class_instance; \
+            return result_type(std::move(class_instance)); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -315,6 +320,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
 
@@ -396,8 +402,9 @@ else \
 
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -413,12 +420,12 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,,,, __VA_ARGS__) \
-            return class_instance; \
+            return result_type(std::move(class_instance)); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -427,6 +434,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
 
@@ -469,13 +477,14 @@ else { \
 
 #define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -491,7 +500,7 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
@@ -503,6 +512,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
  
@@ -573,8 +583,9 @@ else { \
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -590,7 +601,7 @@ namespace jsoncons { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
@@ -602,6 +613,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
                                                                        
@@ -630,13 +642,14 @@ JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryP
 
 #define JSONCONS_ENUM_TRAITS_BASE(EnumType, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename ChT> \
     struct json_traits_macro_names<ChT,EnumType> \
     { \
         JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template <typename Json> \
-    struct json_type_traits<Json, EnumType> \
+    struct json_conv_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using enum_type = EnumType; \
@@ -672,7 +685,7 @@ namespace jsoncons { \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static enum_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
@@ -691,14 +704,14 @@ namespace jsoncons { \
             { \
                 if (s.empty()) \
                 { \
-                    return enum_type(); \
+                    return result_type(enum_type()); \
                 } \
                 else \
                 { \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            return (*it).first; \
+            return result_type((*it).first); \
         } \
         static Json to_json(enum_type class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -723,6 +736,7 @@ namespace jsoncons { \
         } \
     }; \
 } \
+} \
     /**/
 
 #define JSONCONS_ENUM_TRAITS(EnumType, ...)  \
@@ -736,8 +750,9 @@ namespace jsoncons { \
 
 #define JSONCONS_ENUM_NAME_TRAITS(EnumType, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename Json> \
-    struct json_type_traits<Json, EnumType> \
+    struct json_conv_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using enum_type = EnumType; \
@@ -773,7 +788,7 @@ namespace jsoncons { \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static enum_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
@@ -823,6 +838,7 @@ namespace jsoncons { \
             return Json((*it).second,alloc); \
         } \
     }; \
+} \
     template <> struct is_json_type_traits_declared<EnumType> : public std::true_type {}; \
 } \
     /**/
@@ -849,13 +865,14 @@ else \
 
 #define JSONCONS_GETTER_SETTER_TRAITS_BASE(AsT,ToJ,NumTemplateParams, ClassType,GetPrefix,SetPrefix,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -871,12 +888,12 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_MEMBER_IS, ,GetPrefix,SetPrefix, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
-            return class_instance; \
+            return result_type(std::move(class_instance)); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -885,6 +902,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
 
@@ -955,8 +973,9 @@ else \
  
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conv_result<value_type>; \
@@ -972,12 +991,12 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GETTER_SETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # ClassType)); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,,,, __VA_ARGS__) \
-            return class_instance; \
+            return result_type(std::move(class_instance)); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -986,6 +1005,7 @@ namespace jsoncons { \
             return ajson; \
         } \
     }; \
+} \
 } \
   /**/
  
@@ -1012,22 +1032,23 @@ namespace jsoncons { \
 #define JSONCONS_POLYMORPHIC_IS(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return true;
 #define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return true;
 
-#define JSONCONS_POLYMORPHIC_AS(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
-#define JSONCONS_POLYMORPHIC_AS_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
+#define JSONCONS_POLYMORPHIC_AS(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
 
-#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>());
-#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>());
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
 
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
  
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 #define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 
 #define JSONCONS_POLYMORPHIC_TRAITS(BaseClass, ...)  \
 namespace jsoncons { \
+namespace reflect { \
     template <typename Json> \
-    struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
+    struct json_conv_traits<Json, std::shared_ptr<BaseClass>> { \
         using value_type = std::shared_ptr<BaseClass>; \
         using result_type = conv_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
@@ -1037,10 +1058,10 @@ namespace jsoncons { \
             return false; \
         } \
 \
-        static std::shared_ptr<BaseClass> as(const Json& ajson) { \
-            if (!ajson.is_object()) return std::shared_ptr<BaseClass>(); \
+        static result_type try_as(const Json& ajson) { \
+            if (!ajson.is_object()) return result_type(std::shared_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
-            return std::shared_ptr<BaseClass>(); \
+            return result_type(std::shared_ptr<BaseClass>()); \
         } \
 \
         static Json to_json(const std::shared_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
@@ -1050,8 +1071,8 @@ namespace jsoncons { \
         } \
     }; \
     template <typename Json> \
-    struct json_type_traits<Json, std::unique_ptr<BaseClass>> { \
-        using value_type = std::shared_ptr<BaseClass>; \
+    struct json_conv_traits<Json, std::unique_ptr<BaseClass>> { \
+        using value_type = std::unique_ptr<BaseClass>; \
         using result_type = conv_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
@@ -1059,10 +1080,10 @@ namespace jsoncons { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
             return false; \
         } \
-        static std::unique_ptr<BaseClass> as(const Json& ajson) { \
-            if (!ajson.is_object()) return std::unique_ptr<BaseClass>(); \
+        static result_type try_as(const Json& ajson) { \
+            if (!ajson.is_object()) return result_type(std::unique_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
-            return std::unique_ptr<BaseClass>(); \
+            return result_type(std::unique_ptr<BaseClass>()); \
         } \
         static Json to_json(const std::unique_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
             if (ptr.get() == nullptr) {return Json::null();} \
@@ -1070,7 +1091,8 @@ namespace jsoncons { \
             return Json::null(); \
         } \
     }; \
-}  \
+} \
+} \
   /**/
 
 #endif // JSONCONS_REFLECT_JSON_TRAITS_GEN_HPP

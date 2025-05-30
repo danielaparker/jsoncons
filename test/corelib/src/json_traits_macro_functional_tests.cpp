@@ -996,7 +996,7 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::reflect::always_true(), 
      ns::toEmployeesFromIds<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>),
     (rating_, "rating")
 )

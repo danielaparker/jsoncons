@@ -173,7 +173,7 @@ public:
     {
         if (has_value_)
         {
-            return get();
+            return this->value_;
         }
         JSONCONS_THROW(std::runtime_error("Bad read_result access"));
     }
@@ -191,29 +191,39 @@ public:
     {
         if (has_value_)
         {
-            return get();
+            return this->value_;
         }
         JSONCONS_THROW(std::runtime_error("Bad read_result access"));
     }
 
-    const T* operator->() const
+    const T* operator->() const noexcept
     {
         return std::addressof(this->value_);
     }
 
-    T* operator->()
+    T* operator->() noexcept
     {
         return std::addressof(this->value_);
     }
 
-    const T& operator*() const&
+    const T& operator*() const & noexcept
     {
-        return value();
+        return this->value_;
     }
 
-    T& operator*() &
+    T& operator*() & noexcept
     {
-        return value();
+        return this->value_;
+    }
+
+    const T&& operator*() const && noexcept
+    {
+        return this->value_;
+    }
+
+    T&& operator*() && noexcept
+    {
+        return this->value_;
     }
 
     void swap(read_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
@@ -238,10 +248,6 @@ public:
         }
     }
 private:
-    constexpr const T& get() const { return this->value_; }
-    T& get() { return this->value_; }
-
-
     void construct(const T& value) 
     {
         ::new (&value_) T(value);

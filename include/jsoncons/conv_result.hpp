@@ -79,7 +79,7 @@ public:
         }
         else
         {
-            ::new (&ec_) std::error_code(other.ec_);
+            ::new (&ec_) std::error_code(std::move(other.ec_));
         }
     }
 
@@ -111,7 +111,7 @@ public:
         else
         {
             destroy();
-            ::new (&ec_) std::error_code(other.ec_);
+            ::new (&ec_) std::error_code(std::move(other.ec_));
         }
         return *this;
     }
@@ -137,7 +137,7 @@ public:
     {
         if (has_value_)
         {
-            return get();
+            return this->value_;
         }
         JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
@@ -155,29 +155,39 @@ public:
     {
         if (has_value_)
         {
-            return get();
+            return this->value_;
         }
         JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
     }
 
-    const T* operator->() const
+    const T* operator->() const noexcept
     {
         return std::addressof(this->value_);
     }
 
-    T* operator->()
+    T* operator->() noexcept
     {
         return std::addressof(this->value_);
     }
 
-    const T& operator*() const&
+    const T& operator*() const & noexcept
     {
-        return value();
+        return this->value_;
     }
 
-    T& operator*() &
+    T& operator*() & noexcept
     {
-        return value();
+        return this->value_;
+    }
+
+    const T&& operator*() const && noexcept
+    {
+        return this->value_;
+    }
+
+    T&& operator*() && noexcept
+    {
+        return this->value_;
     }
 
     void reset() noexcept
@@ -207,9 +217,6 @@ public:
         }
     }
 private:
-    constexpr const T& get() const { return this->value_; }
-    T& get() { return this->value_; }
-
     void construct(const T& value) 
     {
         ::new (&value_) T(value);
