@@ -20,9 +20,6 @@ namespace jsoncons {
 
     class conv_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_{0};
-        std::size_t column_number_{0};
-        mutable std::string what_;
     public:
         conv_error(std::error_code ec)
             : std::system_error(ec)
@@ -32,58 +29,17 @@ namespace jsoncons {
             : std::system_error(ec, what_arg)
         {
         }
-        conv_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec), column_number_(position)
-        {
-        }
-        conv_error(std::error_code ec, std::size_t line, std::size_t column)
-            : std::system_error(ec), line_number_(line), column_number_(column)
+        conv_error(std::error_code ec, const char* what_arg)
+            : std::system_error(ec, what_arg)
         {
         }
         conv_error(const conv_error& other) = default;
 
         conv_error(conv_error&& other) = default;
-
-        const char* what() const noexcept override
+        
+        const char* what() const noexcept final
         {
-            if (what_.empty())
-            {
-                JSONCONS_TRY
-                {
-                    what_.append(std::system_error::what());
-                    if (line_number_ != 0 && column_number_ != 0)
-                    {
-                        what_.append(" at line ");
-                        what_.append(std::to_string(line_number_));
-                        what_.append(" and column ");
-                        what_.append(std::to_string(column_number_));
-                    }
-                    else if (column_number_ != 0)
-                    {
-                        what_.append(" at position ");
-                        what_.append(std::to_string(column_number_));
-                    }
-                    return what_.c_str();
-                }
-                JSONCONS_CATCH(...)
-                {
-                    return std::system_error::what();
-                }
-            }
-            else
-            {
-                return what_.c_str();
-            }
-        }
-
-        std::size_t line() const noexcept
-        {
-            return line_number_;
-        }
-
-        std::size_t column() const noexcept
-        {
-            return column_number_;
+            return std::system_error::what();
         }
     };
 

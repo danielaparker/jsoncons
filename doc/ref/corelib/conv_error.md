@@ -16,26 +16,16 @@ std::exception
 
     conv_error(std::error_code ec);
 
-    conv_error(std::error_code ec, std::size_t position);
+    conv_error(std::error_code ec, const std::string& what_arg);
 
-    conv_error(std::error_code ec,
-                        std::size_t line,
-                        std::size_t column);
+    conv_error(std::error_code ec, const char* what_arg);
 
     conv_error(const conv_error& other);
 
 #### Member functions
 
-    std::size_t line() const noexcept
-Returns the line number to the end of the text where the exception occurred.
-Line numbers start at 1.
-
-    std::size_t column() const noexcept
-Returns the column number to the end of the text where the exception occurred.
-Column numbers start at 1.
-
-    const char* what() const noexcept
-Constructs an error message, including line and column position
+    const char* what() const noexcept final
+Returns an error message
 
 #### Inherited from std::system_error
 

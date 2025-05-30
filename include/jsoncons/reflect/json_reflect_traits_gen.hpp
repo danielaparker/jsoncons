@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_JSON_TRAITS_GEN_HPP
-#define JSONCONS_REFLECT_JSON_TRAITS_GEN_HPP
+#ifndef JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP
+#define JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP
 
 #include <utility>
 
@@ -17,80 +17,83 @@
 namespace jsoncons {
 namespace reflect {
 
-    #define JSONCONS_RDONLY(X)
+#define JSONCONS_RDONLY(X)
 
-    #define JSONCONS_RDWR(X) X
+#define JSONCONS_RDWR(X) X
 
-    struct always_true
+struct always_true
+{
+    template< typename T>
+    constexpr bool operator()(const T&) const noexcept
     {
-        template< typename T>
-        constexpr bool operator()(const T&) const noexcept
-        {
-            return true;
-        }
-    };
+        return true;
+    }
+};
 
-    struct identity
+struct identity
+{
+    template< typename T>
+    constexpr T&& operator()(T&& val) const noexcept
     {
-        template< typename T>
-        constexpr T&& operator()(T&& val) const noexcept
-        {
-            return std::forward<T>(val);
-        }
-    };
+        return std::forward<T>(val);
+    }
+};
 
-    template <typename ChT,typename T>
-    struct json_traits_macro_names
-    {};
+template <typename ChT,typename T>
+struct json_traits_macro_names
+{};
 
-    template <typename Json>
-    struct json_traits_helper
-    {
-        using string_view_type = typename Json::string_view_type; 
+template <typename Json>
+struct json_traits_helper
+{
+    using string_view_type = typename Json::string_view_type; 
 
-        template <typename OutputType> 
-        static void set_udt_member(const Json&, const string_view_type&, const OutputType&) 
-        { 
-        } 
-        template <typename OutputType> 
-        static void set_udt_member(const Json& j, const string_view_type& key, OutputType& val) 
-        { 
-            val = j.at(key).template as<OutputType>(); 
-        } 
+    template <typename OutputType> 
+    static void set_udt_member(const Json&, const string_view_type&, const OutputType&) 
+    { 
+    } 
+    template <typename OutputType> 
+    static void set_udt_member(const Json& j, const string_view_type& key, OutputType& val) 
+    { 
+        val = j.at(key).template as<OutputType>(); 
+    } 
 
-        template <typename T,typename From,typename OutputType> 
-        static void set_udt_member(const Json&, const string_view_type&, From, const OutputType&) 
-        { 
-        } 
-        template <typename T,typename From,typename OutputType> 
-        static void set_udt_member(const Json& j, const string_view_type& key, From from, OutputType& val) 
-        { 
-            val = from(j.at(key).template as<T>()); 
-        } 
-        template <typename U> 
-        static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
-        { 
-            if (val) j.try_emplace(key, val); 
-        } 
-        template <typename U> 
-        static void set_optional_json_member(const string_view_type& key, const std::unique_ptr<U>& val, Json& j) 
-        { 
-            if (val) j.try_emplace(key, val); 
-        } 
-        template <typename U> 
-        static void set_optional_json_member(const string_view_type& key, const jsoncons::optional<U>& val, Json& j) 
-        { 
-            if (val) j.try_emplace(key, val); 
-        } 
-        template <typename U> 
-        static void set_optional_json_member(const string_view_type& key, const U& val, Json& j) 
-        { 
-            j.try_emplace(key, val); 
-        } 
-    };
+    template <typename T,typename From,typename OutputType> 
+    static void set_udt_member(const Json&, const string_view_type&, From, const OutputType&) 
+    { 
+    } 
+    template <typename T,typename From,typename OutputType> 
+    static void set_udt_member(const Json& j, const string_view_type& key, From from, OutputType& val) 
+    { 
+        val = from(j.at(key).template as<T>()); 
+    } 
+    template <typename U> 
+    static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
+    { 
+        if (val) j.try_emplace(key, val); 
+    } 
+    template <typename U> 
+    static void set_optional_json_member(const string_view_type& key, const std::unique_ptr<U>& val, Json& j) 
+    { 
+        if (val) j.try_emplace(key, val); 
+    } 
+    template <typename U> 
+    static void set_optional_json_member(const string_view_type& key, const jsoncons::optional<U>& val, Json& j) 
+    { 
+        if (val) j.try_emplace(key, val); 
+    } 
+    template <typename U> 
+    static void set_optional_json_member(const string_view_type& key, const U& val, Json& j) 
+    { 
+        j.try_emplace(key, val); 
+    } 
+};
+
 } // namespace reflect
-    using always_true = reflect::always_true; 
-    using identity = reflect::identity; 
+
+using always_true = reflect::always_true; 
+using identity = reflect::identity; 
+
 } // namespace jsoncons
 
 #if defined(_MSC_VER)
@@ -1095,4 +1098,4 @@ namespace reflect { \
 } \
   /**/
 
-#endif // JSONCONS_REFLECT_JSON_TRAITS_GEN_HPP
+#endif // JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP

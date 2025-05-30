@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/decode_json.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
-#include <jsoncons/reflect/json_traits_gen.hpp>
+#include <jsoncons/reflect/json_reflect_traits_gen.hpp>
 
 #include <map>
 #include <vector>
