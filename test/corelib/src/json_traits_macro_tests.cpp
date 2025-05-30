@@ -461,8 +461,8 @@ namespace ns {
 } // namespace ns
 } // namespace 
  
-
 JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
+
 JSONCONS_ALL_MEMBER_TRAITS(ns::book1a,author,title,price)
 JSONCONS_N_MEMBER_TRAITS(ns::book1b,3,author,title,price,isbn)
 JSONCONS_N_MEMBER_TRAITS(ns::book1c,3,author,title,price,isbn)
