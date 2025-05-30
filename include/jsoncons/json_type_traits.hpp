@@ -41,6 +41,9 @@
 
 namespace jsoncons {
 
+    template <typename Json,typename T,typename Enable>
+    struct json_conv_traits;
+
     template <typename T>
     struct is_json_type_traits_declared : public std::false_type
     {};

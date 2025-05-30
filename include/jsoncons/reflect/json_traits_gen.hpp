@@ -181,7 +181,9 @@ namespace jsoncons {
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <typename JSON,typename T,typename Enable> \
-    friend struct jsoncons::json_type_traits;
+    friend struct jsoncons::json_type_traits; \
+    template <typename JSON,typename T,typename Enable> \
+    friend struct jsoncons::reflect::json_conv_traits;
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_PP_EXPAND(Call(Expr, Id))
 
