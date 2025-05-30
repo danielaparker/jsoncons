@@ -20,7 +20,6 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>

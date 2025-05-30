@@ -536,7 +536,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
                             typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_compatible_array_type<Json,T>::value &&
+                                                    detail::is_compatible_array_type<Json,T>::value &&
                                                     ext_traits::is_back_insertable<T>::value 
                                                     >::type>
     {
@@ -691,7 +691,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
                             typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_compatible_array_type<Json,T>::value &&
+                                                    detail::is_compatible_array_type<Json,T>::value &&
                                                     !ext_traits::is_back_insertable<T>::value &&
                                                     ext_traits::is_insertable<T>::value>::type>
     {
@@ -768,7 +768,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
                             typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_compatible_array_type<Json,T>::value &&
+                                                    detail::is_compatible_array_type<Json,T>::value &&
                                                     !ext_traits::is_back_insertable<T>::value &&
                                                     !ext_traits::is_insertable<T>::value &&
                                                     ext_traits::is_front_insertable<T>::value>::type>

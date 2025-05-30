@@ -82,7 +82,7 @@ public:
     read_result(read_error&& err) noexcept
         : has_value_(false)
     {
-        ::new (&error_) read_error(err);
+        ::new (&error_) read_error(std::move(err));
     }
     
     // copy constructors
