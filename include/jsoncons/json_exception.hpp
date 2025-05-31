@@ -155,7 +155,7 @@ namespace jsoncons {
 
     class ser_error : public std::exception, public virtual json_exception
     {
-        std::runtime_error err_;
+        std::string err_;
         std::error_code ec_;
         std::size_t line_{0};
         std::size_t column_{0};
@@ -202,7 +202,7 @@ namespace jsoncons {
 
         const char* what() const noexcept final
         {
-            return err_.what();
+            return err_.c_str();
         }
         
         std::error_code code() const
