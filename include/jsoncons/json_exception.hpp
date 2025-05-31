@@ -161,40 +161,49 @@ namespace jsoncons {
         std::size_t column_{0};
     public:
         ser_error(std::error_code ec)
-            : err_(to_what_arg(ec)), ec_(ec)
+            : ec_(ec)
         {
+            err_ = to_what_arg(ec); 
         }
         ser_error(std::error_code ec, const std::string& what_arg)
-            : err_(to_what_arg(ec, what_arg.c_str())), ec_(ec)
+            : ec_(ec)
         {
+            err_ = to_what_arg(ec, what_arg.c_str()); 
         }
         ser_error(std::error_code ec, const char* what_arg)
-            : err_(to_what_arg(ec, what_arg)), ec_(ec)
+            : ec_(ec)
         {
+            err_ = to_what_arg(ec, what_arg); 
         }
         ser_error(std::error_code ec, std::size_t position)
-            : err_(to_what_arg(ec, "", 0, position)), ec_(ec), column_(position)
+            : ec_(ec), column_(position)
         {
+            err_ = to_what_arg(ec, "", 0, position); 
         }
         ser_error(std::error_code ec, const std::string& what_arg, std::size_t position)
-            : err_(to_what_arg(ec, what_arg.c_str(), 0, position)), ec_(ec), column_(position)
+            : ec_(ec), column_(position)
         {
+            err_ = to_what_arg(ec, what_arg.c_str(), 0, position); 
         }
         ser_error(std::error_code ec, const char* what_arg, std::size_t position)
-            : err_(to_what_arg(ec, what_arg, 0, position)), ec_(ec), column_(position)
+            : ec_(ec), column_(position)
         {
+            err_ = to_what_arg(ec, what_arg, 0, position); 
         }
         ser_error(std::error_code ec, std::size_t line, std::size_t column)
-            : err_(to_what_arg(ec, "", line, column)), ec_(ec), line_(line), column_(column)
+            : ec_(ec), line_(line), column_(column)
         {
+            err_ = to_what_arg(ec, "", line, column); 
         }
         ser_error(std::error_code ec, const std::string& what_arg, std::size_t line, std::size_t column)
-            : err_(to_what_arg(ec, what_arg.c_str(), line, column)), ec_(ec), line_(line), column_(column)
+            : ec_(ec), line_(line), column_(column)
         {
+            err_ = to_what_arg(ec, what_arg.c_str(), line, column); 
         }
         ser_error(std::error_code ec, const char* what_arg, std::size_t line, std::size_t column)
-            : err_(to_what_arg(ec, what_arg, line, column)), ec_(ec), line_(line), column_(column)
+            : ec_(ec), line_(line), column_(column)
         {
+            err_ = to_what_arg(ec, what_arg, line, column); 
         }
         ser_error(const ser_error& other) = default;
 
