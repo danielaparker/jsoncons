@@ -153,45 +153,46 @@ namespace jsoncons {
         }
     };
 
-    class ser_error : public std::system_error, public virtual json_exception
+    class ser_error : public std::exception, public virtual json_exception
     {
+        std::system_error err_;
         std::size_t line_{0};
         std::size_t column_{0};
     public:
         ser_error(std::error_code ec)
-            : std::system_error(ec)
+            : err_(ec)
         {
         }
         ser_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg)
+            : err_(ec, what_arg)
         {
         }
         ser_error(std::error_code ec, const char* what_arg)
-            : std::system_error(ec, what_arg)
+            : err_(ec, what_arg)
         {
         }
         ser_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec, to_what_arg("", 0, position)), column_(position)
+            : err_(ec, to_what_arg("", 0, position)), column_(position)
         {
         }
         ser_error(std::error_code ec, const std::string& what_arg, std::size_t position)
-            : std::system_error(ec, to_what_arg(what_arg.c_str(), 0, position)), column_(position)
+            : err_(ec, to_what_arg(what_arg.c_str(), 0, position)), column_(position)
         {
         }
         ser_error(std::error_code ec, const char* what_arg, std::size_t position)
-            : std::system_error(ec, to_what_arg(what_arg, 0, position)), column_(position)
+            : err_(ec, to_what_arg(what_arg, 0, position)), column_(position)
         {
         }
         ser_error(std::error_code ec, std::size_t line, std::size_t column)
-            : std::system_error(ec, to_what_arg("", line, column)), line_(line), column_(column)
+            : err_(ec, to_what_arg("", line, column)), line_(line), column_(column)
         {
         }
         ser_error(std::error_code ec, const std::string& what_arg, std::size_t line, std::size_t column)
-            : std::system_error(ec, to_what_arg(what_arg.c_str(), line, column)), line_(line), column_(column)
+            : err_(ec, to_what_arg(what_arg.c_str(), line, column)), line_(line), column_(column)
         {
         }
         ser_error(std::error_code ec, const char* what_arg, std::size_t line, std::size_t column)
-            : std::system_error(ec, to_what_arg(what_arg, line, column)), line_(line), column_(column)
+            : err_(ec, to_what_arg(what_arg, line, column)), line_(line), column_(column)
         {
         }
         ser_error(const ser_error& other) = default;
@@ -200,7 +201,12 @@ namespace jsoncons {
 
         const char* what() const noexcept final
         {
-            return std::system_error::what();
+            return err_.what();
+        }
+        
+        std::error_code code() const
+        {
+            return err_.code();
         }
 
         std::size_t line() const noexcept
