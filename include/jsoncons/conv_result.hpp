@@ -247,6 +247,10 @@ private:
             value_.~T();
             has_value_ = false;
         }
+        else
+        {
+            error_.~conv_error();
+        }
     }
 
     void assign(const T& u) 
