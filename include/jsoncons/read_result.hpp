@@ -17,6 +17,7 @@ namespace jsoncons {
 class read_error
 {
     std::error_code ec_{};
+    std::string message_;
     std::size_t line_{};
     std::size_t column_{};
     
@@ -26,6 +27,11 @@ public:
     {
     }
     
+    read_error(std::error_code ec, const std::string& message, std::size_t line, std::size_t column)
+        : ec_{ec}, message_(message), line_{line}, column_{column}
+    {
+    }
+
     read_error(const read_error& other) = default;
 
     read_error(read_error&& other) = default;
@@ -34,9 +40,13 @@ public:
 
     read_error& operator=(read_error&& other) = default;
     
-    const std::error_code& ec() const
+    const std::error_code& code() const
     {
         return ec_;
+    }
+    const std::string& message() const 
+    {
+        return message_;
     }
     std::size_t line() const
     {
@@ -47,6 +57,37 @@ public:
         return column_;
     }
 };
+
+inline
+std::string to_string(const read_error& err)
+{
+    std::string str(err.message());
+    if (!str.empty())
+    {
+        str.append(": ");
+    }
+    str.append(err.code().message());
+    if (err.line() != 0 && err.column() != 0)
+    {
+        str.append(" at line ");
+        str.append(std::to_string(err.line()));
+        str.append(" and column ");
+        str.append(std::to_string(err.column()));
+    }
+    else if (err.column() != 0)
+    {
+        str.append(" at position ");
+        str.append(std::to_string(err.column()));
+    }
+    return str;
+}
+
+inline
+std::ostream& operator<<(std::ostream& os, const read_error& err)
+{
+    os << to_string(err);
+    return os;
+}
 
 template <typename T>
 class read_result

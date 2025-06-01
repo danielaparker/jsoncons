@@ -55,9 +55,10 @@ struct decode_traits
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        conv_result<value_type> conv_res = reflect::json_conv_traits<json_type, value_type>::try_as(j);
+        auto conv_result = reflect::json_conv_traits<json_type, value_type>::try_as(j);
 
-        return conv_res ? result_type(std::move(*conv_res)) : result_type(jsoncons::unexpect, conv_res.error().code(), cursor.line(), cursor.column());
+        return conv_result ? result_type(std::move(*conv_result)) : result_type(jsoncons::unexpect, 
+            conv_result.error().code(), conv_result.error().message(), cursor.line(), cursor.column());
     }
 };
 

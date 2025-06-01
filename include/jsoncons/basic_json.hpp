@@ -3294,7 +3294,7 @@ namespace jsoncons {
         }
 
         template <typename T>
-        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conv_result<T>>::type
+        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
         try_as() const
         {
             return reflect::json_conv_traits<basic_json,T>::try_as(*this);

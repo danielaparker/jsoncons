@@ -255,7 +255,7 @@ T decode_json(Args&& ... args)
     auto result = try_decode_json<T>(std::forward<Args>(args)...); 
     if (!result)
     {
-        JSONCONS_THROW(ser_error(result.error().ec(), result.error().line(), result.error().column()));
+        JSONCONS_THROW(ser_error(result.error().code(), result.error().line(), result.error().column()));
     }
     return std::move(*result);
 }

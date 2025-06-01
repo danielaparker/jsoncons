@@ -296,7 +296,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -410,7 +410,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -490,7 +490,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -591,7 +591,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -656,7 +656,7 @@ namespace reflect { \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using enum_type = EnumType; \
-        using result_type = conv_result<enum_type>; \
+        using result_type = conversion_result<enum_type>; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = jsoncons::basic_string_view<char_type>; \
@@ -759,7 +759,7 @@ namespace reflect { \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using enum_type = EnumType; \
-        using result_type = conv_result<enum_type>; \
+        using result_type = conversion_result<enum_type>; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = jsoncons::basic_string_view<char_type>; \
@@ -878,7 +878,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -981,7 +981,7 @@ namespace reflect { \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -1053,7 +1053,7 @@ namespace reflect { \
     template <typename Json> \
     struct json_conv_traits<Json, std::shared_ptr<BaseClass>> { \
         using value_type = std::shared_ptr<BaseClass>; \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
@@ -1076,7 +1076,7 @@ namespace reflect { \
     template <typename Json> \
     struct json_conv_traits<Json, std::unique_ptr<BaseClass>> { \
         using value_type = std::unique_ptr<BaseClass>; \
-        using result_type = conv_result<value_type>; \
+        using result_type = conversion_result<value_type>; \
         using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \

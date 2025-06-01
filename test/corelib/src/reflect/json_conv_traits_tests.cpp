@@ -29,7 +29,7 @@ namespace reflect {
 template <typename Json>
 struct json_conv_traits<Json, ns::book>
 {
-    using result_type = conv_result<ns::book>;
+    using result_type = conversion_result<ns::book>;
     using allocator_type = Json::allocator_type;
 
     static bool is(const Json& j) noexcept

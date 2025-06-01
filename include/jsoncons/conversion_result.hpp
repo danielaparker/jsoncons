@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_CONV_RESULT_HPP    
-#define JSONCONS_CONV_RESULT_HPP    
+#ifndef JSONCONS_CONVERSION_RESULT_HPP    
+#define JSONCONS_CONVERSION_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -16,57 +16,110 @@
 namespace jsoncons {
 
 // Ignore false positives 
-#if defined(__GNUC__) 
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
+//#if defined(__GNUC__) 
+//# pragma GCC diagnostic push
+//# pragma GCC diagnostic ignored "-Warray-bounds"
+//#endif
+
+class conversion_error
+{
+    std::error_code ec_;
+    std::string message_;
+public:
+    conversion_error(std::error_code ec)
+        : ec_(ec)
+    {
+    }
+    conversion_error(std::error_code ec, const std::string& message)
+        : ec_(ec), message_(message)
+    {
+    }
+
+    conversion_error(const conversion_error& other) = default;
+
+    conversion_error(conversion_error&& other) = default;
+
+    conversion_error& operator=(const conversion_error& other) = default;
+
+    conversion_error& operator=(conversion_error&& other) = default;
+    
+    std::error_code code() const
+    {
+        return ec_;
+    }
+    
+    const std::string& message() const 
+    {
+        return message_;
+    }
+};
+
+inline
+std::string to_string(const conversion_error& err)
+{
+    std::string str{err.message()};
+    if (!str.empty())
+    {
+        str.append(": ");
+    }
+    str.append(err.code().message());
+    return str;
+}
+
+inline
+std::ostream& operator<<(std::ostream& os, const conversion_error& err)
+{
+    os << to_string(err);
+    return os;
+}
+
 
 template <typename T>
-class conv_result
+class conversion_result
 {
 public:
     using value_type = T;
 private:
     bool has_value_;
     union {
-        conv_error error_;
+        conversion_error error_;
         T value_;
     };
 public:
 
-    conv_result(const T& value) 
+    conversion_result(const T& value) 
         : has_value_(true)
     {
         construct(value);
     }
 
-     conv_result(T&& value) noexcept
+     conversion_result(T&& value) noexcept
          : has_value_(true)
      {
          construct(std::move(value));
      }
 
-     conv_result(const conv_error& err)
+     conversion_result(const conversion_error& err)
         : has_value_(false)
     {
-        ::new (&error_) conv_error(err);
+        ::new (&error_) conversion_error(err);
     }
 
-    conv_result(conv_error&& err) noexcept
+    conversion_result(conversion_error&& err) noexcept
         : has_value_(false)
     {
-        ::new (&error_) conv_error(std::move(err));
+        ::new (&error_) conversion_error(std::move(err));
     }
 
     template <typename... Args>    
-    conv_result(unexpect_t, Args&& ... args) noexcept
+    conversion_result(unexpect_t, Args&& ... args) noexcept
         : has_value_(false)
     {
-        ::new (&error_) conv_error(std::forward<Args>(args)...);
+        ::new (&error_) conversion_error(std::forward<Args>(args)...);
     }
     
     // copy constructors
-    conv_result(const conv_result<T>& other) 
+    conversion_result(const conversion_result<T>& other) 
         : has_value_(other.has_value())
     {
         if (other)
@@ -75,12 +128,12 @@ public:
         }
         else
         {
-            ::new (&error_) conv_error(other.error_);
+            ::new (&error_) conversion_error(other.error_);
         }
     }
 
     // move constructors
-    conv_result(conv_result<T>&& other) noexcept
+    conversion_result(conversion_result<T>&& other) noexcept
         : has_value_(other.has_value())
     {
         if (other)
@@ -89,16 +142,16 @@ public:
         }
         else
         {
-            ::new (&error_) conv_error(other.error_);
+            ::new (&error_) conversion_error(other.error_);
         }
     }
 
-    ~conv_result() noexcept
+    ~conversion_result() noexcept
     {
         destroy();
     }
 
-    conv_result& operator=(const conv_result& other)
+    conversion_result& operator=(const conversion_result& other)
     {
         if (other)
         {
@@ -107,12 +160,12 @@ public:
         else
         {
             destroy();
-            ::new (&error_) conv_error(other.error_);
+            ::new (&error_) conversion_error(other.error_);
         }
         return *this;
     }
 
-    conv_result& operator=(conv_result&& other)
+    conversion_result& operator=(conversion_result&& other)
     {
         if (other)
         {
@@ -121,19 +174,19 @@ public:
         else
         {
             destroy();
-            ::new (&error_) conv_error(other.error_);
+            ::new (&error_) conversion_error(other.error_);
         }
         return *this;
     }
 
     // value assignment
-    conv_result& operator=(const T& v)
+    conversion_result& operator=(const T& v)
     {
         assign(v);
         return *this;
     }
 
-    conv_result& operator=(T&& v)
+    conversion_result& operator=(T&& v)
     {
         assign(std::move(v));
         return *this;
@@ -155,16 +208,16 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conversion_result access"));
     }
 
-    conv_error error() &
+    conversion_error error() &
     {
         if (!has_value_)
         {
             return this->error_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conversion_result access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
@@ -173,7 +226,7 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad conv_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad conversion_result access"));
     }
 
     const T* operator->() const noexcept
@@ -206,7 +259,7 @@ public:
         return this->value_;
     }
 
-    void swap(conv_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+    void swap(conversion_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
         const bool contains_a_value = has_value();
@@ -220,9 +273,9 @@ public:
         }
         else
         {
-            conv_result& source = contains_a_value ? *this : other;
-            conv_result& target = contains_a_value ? other : *this;
-            target = conv_result<T>(*source);
+            conversion_result& source = contains_a_value ? *this : other;
+            conversion_result& target = contains_a_value ? other : *this;
+            target = conversion_result<T>(*source);
             source.destroy();
             source.error_ = target.error_;
         }
@@ -249,7 +302,7 @@ private:
         }
         else
         {
-            error_.~conv_error();
+            error_.~conversion_error();
         }
     }
 
@@ -280,15 +333,15 @@ private:
 
 template <typename T>
 typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-swap(conv_result<T>& lhs, conv_result<T>& rhs) noexcept
+swap(conversion_result<T>& lhs, conversion_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
 
-#if defined(__GNUC__)
-# pragma GCC diagnostic pop
-#endif
+//#if defined(__GNUC__)
+//# pragma GCC diagnostic pop
+//#endif
 
 } // jsoncons
 
-#endif // JSONCONS_CONV_RESULT_HPP
+#endif // JSONCONS_CONVERSION_RESULT_HPP
