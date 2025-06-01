@@ -3288,7 +3288,7 @@ namespace jsoncons {
             auto r = reflect::json_conv_traits<basic_json,T>::try_as(*this);
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error()));
+                JSONCONS_THROW(conv_error(r.code(), r.message()));
             }
             return std::move(r.value());
         }

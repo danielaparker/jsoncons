@@ -315,6 +315,10 @@ private:
             value_.~T();
             has_value_ = false;
         }
+        else
+        {
+            error_.~read_error();
+        }
     }
 
     void assign(const T& u) 
