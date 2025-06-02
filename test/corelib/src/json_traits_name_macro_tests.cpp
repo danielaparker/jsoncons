@@ -22,7 +22,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
 
         book1a()
             : author(""), title(""), price(0)
@@ -39,7 +39,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
     class book2a

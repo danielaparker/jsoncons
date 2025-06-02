@@ -1024,7 +1024,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
 } // namespace ns
@@ -1084,7 +1084,7 @@ namespace ns {
         BookCategory category;
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
     // #2 Class with private member data and default constructor   
@@ -1093,7 +1093,7 @@ namespace ns {
         BookCategory category;
         std::string author;
         std::string title;
-        double price;
+        double price{0};
         Book2() = default;
 
         JSONCONS_TYPE_TRAITS_FRIEND
@@ -1331,7 +1331,7 @@ namespace ns {
         BookCategory category;
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
     // #2 Class with private member data and default constructor   
@@ -1619,7 +1619,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 } // namespace ns
 

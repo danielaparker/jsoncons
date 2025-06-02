@@ -46,7 +46,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
     class Person

@@ -58,20 +58,20 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
     struct book1b
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
         std::string isbn;
     };
     struct book1c
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
         jsoncons::optional<std::string> isbn;
     };
 
