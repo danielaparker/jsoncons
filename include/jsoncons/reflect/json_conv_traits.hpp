@@ -824,7 +824,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
                     }
-                    result.insert(std::move(res.value()));
+                    result.push_front(std::move(res.value()));
                 }
 
                 return result_type(std::move(result));
