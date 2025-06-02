@@ -1873,8 +1873,8 @@ namespace jsoncons {
 
         template <typename Source>
         static
-         typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-            parse(const Source& source, 
+        typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+        parse(const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             json_decoder<basic_json> decoder;
