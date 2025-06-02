@@ -1482,7 +1482,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 std::valarray<T> v(j.size());
                 for (std::size_t i = 0; i < j.size(); ++i)
                 {
-                    v[i] = j[i].template as<T>();
+                    auto res = j[i].template try_as<T>();
+                    if (JSONCONS_UNLIKELY(!res))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_array);
+                    }
+                    v[i] = std::move(res.value());
                 }
                 return result_type(std::move(v));
             }
@@ -1557,9 +1562,15 @@ namespace variant_detail
     typename std::enable_if<N < std::variant_size_v<Variant>, conversion_result<Variant>>::type
     as_variant(const Json& j)
     {
-      if (j.template is<T>())
+        using result_type = conversion_result<Variant>;
+        if (j.template is<T>())
       {
-        return conversion_result<Variant>(Variant(j.template as<T>()));
+          auto res = j.template try_as<T>();
+          if (JSONCONS_UNLIKELY(!res))
+          {
+              return result_type(jsoncons::unexpect, conv_errc::not_variant);
+          }
+          return conversion_result<Variant>(jsoncons::in_place, std::move(res.value()));
       }
       else
       {
