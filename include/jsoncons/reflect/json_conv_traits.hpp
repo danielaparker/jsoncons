@@ -573,7 +573,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
-                    result.push_back(item.template as<value_type>());
+                    auto res = item.template try_as<value_type>();
+                    if (JSONCONS_UNLIKELY(!res))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_vector);
+                    }
+                    result.push_back(std::move(res.value()));
                 }
 
                 return result_type(std::move(result));
@@ -597,7 +602,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
-                    result.push_back(item.template as<value_type>());
+                    auto res = item.template try_as<value_type>();
+                    if (JSONCONS_UNLIKELY(!res))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_vector);
+                    }
+                    result.push_back(std::move(res.value()));
                 }
 
                 return result_type(std::move(result));
@@ -723,7 +733,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 T result;
                 for (const auto& item : j.array_range())
                 {
-                    result.insert(item.template as<value_type>());
+                    auto res = item.template try_as<value_type>();
+                    if (JSONCONS_UNLIKELY(!res))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_vector);
+                    }
+                    result.insert(std::move(res.value()));
                 }
 
                 return result_type(std::move(result));
@@ -804,7 +819,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 auto end = j.array_range().rend();
                 for (; it != end; ++it)
                 {
-                    result.push_front((*it).template as<value_type>());
+                    auto res = (*it).template try_as<value_type>();
+                    if (JSONCONS_UNLIKELY(!res))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_vector);
+                    }
+                    result.insert(std::move(res.value()));
                 }
 
                 return result_type(std::move(result));
@@ -880,7 +900,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             for (std::size_t i = 0; i < N; i++)
             {
-                buff[i] = j[i].template as<E>();
+                auto res = j[i].template try_as<E>();
+                if (JSONCONS_UNLIKELY(!res))
+                {
+                    return result_type(jsoncons::unexpect, conv_errc::not_array);
+                }
+                buff[i] = std::move(res.value());
             }
             return result_type(std::move(buff));
         }

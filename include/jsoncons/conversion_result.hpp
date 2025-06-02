@@ -15,12 +15,6 @@
 
 namespace jsoncons {
 
-// Ignore false positives 
-//#if defined(__GNUC__) 
-//# pragma GCC diagnostic push
-//# pragma GCC diagnostic ignored "-Warray-bounds"
-//#endif
-
 class conversion_error
 {
     std::error_code ec_;
@@ -344,10 +338,6 @@ swap(conversion_result<T>& lhs, conversion_result<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
-
-//#if defined(__GNUC__)
-//# pragma GCC diagnostic pop
-//#endif
 
 } // jsoncons
 
