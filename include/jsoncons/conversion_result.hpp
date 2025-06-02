@@ -99,6 +99,13 @@ public:
          construct(std::move(value));
      }
 
+     template <typename... Args>    
+     conversion_result(in_place_t, Args&& ... args) noexcept
+         : has_value_(true)
+     {
+         ::new (&value_) T(std::forward<Args>(args)...);
+     }
+
      conversion_result(const conversion_error& err)
         : has_value_(false)
     {

@@ -19,11 +19,18 @@
 
 namespace jsoncons {
     
+    struct in_place_t
+    {
+        explicit in_place_t() = default; 
+    };
+    
+    JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
+
     struct unexpect_t
     {
         explicit unexpect_t() = default; 
     };
-    
+
     JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
 
     class assertion_error : public std::runtime_error

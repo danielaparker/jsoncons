@@ -1391,11 +1391,20 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     return result_type(basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length()));
                 case json_type::half_value:
                 case json_type::double_value:
-                    return basic_bigint<Allocator>(j.template try_as<int64_t>());
+                {
+                    auto res = j.template try_as<int64_t>();
+                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                }
                 case json_type::int64_value:
-                    return basic_bigint<Allocator>(j.template try_as<int64_t>());
+                {
+                    auto res = j.template try_as<int64_t>();
+                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                }
                 case json_type::uint64_value:
-                    return basic_bigint<Allocator>(j.template try_as<uint64_t>());
+                {
+                    auto res = j.template try_as<uint64_t>();
+                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                }
                 default:
                     return result_type(jsoncons::unexpect, conv_errc::not_bigint);
             }
