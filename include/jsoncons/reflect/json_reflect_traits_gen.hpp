@@ -432,7 +432,7 @@ namespace reflect { \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
-            (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; 
+            (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \ 
             std::size_t object_size{0}; \
             JSONCONS_VARIADIC_FOR_EACH(ObjectSize, ,,, __VA_ARGS__) \
             encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
