@@ -264,7 +264,7 @@ struct encode_traits<T,
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
-        encoder.begin_array(0,semantic_tag::none,ser_context(),ec);
+        encoder.begin_array(semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {

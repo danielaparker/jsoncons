@@ -393,13 +393,11 @@ namespace reflect { \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
-            encoder.begin_object(0, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(EnMem, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
-            /*auto j = json_conv_traits<basic_json<CharT,order_preserving_policy>,value_type>::to_json(val);*/ \
-            /*j.dump(encoder, ec);*/ \
         } \
     }; \
 } \
