@@ -349,13 +349,13 @@ using identity = reflect::identity;
 #define JSONCONS_N_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    try_encode_optional_member<CharT>(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{}), \
-        val.Member, encoder, ec); \
+    encoder.key(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{})); \
+    encode_traits<typename std::decay<decltype(std::declval<value_type*>()->Member)>::type>::try_encode(val.Member, encoder, ec); \
 } \
 else \
 { \
-    encoder.key(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{})); \
-    encode_traits<typename std::decay<decltype(std::declval<value_type*>()->Member)>::type>::try_encode(val.Member, encoder, ec); \
+    try_encode_optional_member<CharT>(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{}), \
+        val.Member, encoder, ec); \
 }
 
 #define JSONCONS_ALL_ENCODE_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count)
@@ -367,14 +367,14 @@ else \
 #define JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
+    ++object_size; \
+} \
+else \
+{ \
     if (is_optional_value_set(val.Member)) \
     { \
         ++object_size; \
     } \
-} \
-else \
-{ \
-    ++object_size; \
 }
 
 #define JSONCONS_ALL_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_ALL_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
