@@ -58,20 +58,20 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price{0};
+        double price;
     };
     struct book1b
     {
         std::string author;
         std::string title;
-        double price{0};
+        double price;
         std::string isbn;
     };
     struct book1c
     {
         std::string author;
         std::string title;
-        double price{0};
+        double price;
         jsoncons::optional<std::string> isbn;
     };
 
@@ -79,7 +79,7 @@ namespace ns {
     {
         std::string author_;
         std::string title_;
-        double price_;
+        double price_{0};
     public:
         book2a(const std::string& author,
               const std::string& title,
@@ -113,7 +113,7 @@ namespace ns {
     {
         std::string author_;
         std::string title_;
-        double price_;
+        double price_{0};
         std::string isbn_;
         jsoncons::optional<std::string> publisher_; 
     public:
@@ -162,7 +162,7 @@ namespace ns {
     {
         std::string author_;
         std::string title_;
-        double price_;
+        double price_{0};
     public:
         book3a()
             : author_(), title_(), price_()
@@ -209,7 +209,7 @@ namespace ns {
     {
         std::string author_;
         std::string title_;
-        double price_;
+        double price_{0};
         std::string isbn_;
     public:
         book3b()
@@ -267,7 +267,7 @@ namespace ns {
     {
         std::string author_;
         std::string title_;
-        double price_;
+        double price_{0};
         jsoncons::optional<std::string> isbn_;
     public:
         book3c()
