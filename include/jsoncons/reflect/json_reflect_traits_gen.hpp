@@ -143,7 +143,7 @@ bool is_optional_value_set(const jsoncons::optional<T>& val)
     return val ? true : false;
 } 
 template <typename T> 
-bool is_optional_value_set(const T& val) 
+bool is_optional_value_set(const T&) 
 {
     return true; 
 } 
