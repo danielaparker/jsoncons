@@ -90,7 +90,7 @@ struct json_traits_helper
 };
 
 template <typename CharT, typename T> 
-static void try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder,
+void try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val) 
@@ -100,7 +100,7 @@ static void try_encode_optional_member(const basic_string_view<CharT>& key, cons
     }
 } 
 template <typename CharT, typename T> 
-static void try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder,
+void try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val)
@@ -110,7 +110,7 @@ static void try_encode_optional_member(const basic_string_view<CharT>& key, cons
     }
 } 
 template <typename CharT, typename T> 
-static void try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder,
+void try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val)
@@ -120,11 +120,32 @@ static void try_encode_optional_member(const basic_string_view<CharT>& key, cons
     }
 } 
 template <typename CharT, typename T> 
-static void try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
+void try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     encoder.key(key);
     encode_traits<T>::try_encode(val, encoder, ec); 
+} 
+
+template <typename T> 
+bool is_optional_value_set(const std::shared_ptr<T>& val) 
+{ 
+    return val ? true : false; 
+} 
+template <typename T> 
+bool is_optional_value_set(const std::unique_ptr<T>& val) 
+{ 
+    return val ? true : false;
+} 
+template <typename T> 
+bool is_optional_value_set(const jsoncons::optional<T>& val) 
+{ 
+    return val ? true : false;
+} 
+template <typename T> 
+bool is_optional_value_set(const T& val) 
+{
+    return true; 
 } 
 
 } // namespace reflect
@@ -324,8 +345,8 @@ using identity = reflect::identity;
 #define JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Count) \
     ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),class_instance.Member);
 
-#define JSONCONS_ENCODE_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
+#define JSONCONS_N_ENCODE_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_N_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count)
+#define JSONCONS_N_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
     try_encode_optional_member<CharT>(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{}), \
@@ -337,12 +358,30 @@ else \
     encode_traits<typename std::decay<decltype(std::declval<value_type*>()->Member)>::type>::try_encode(val.Member, encoder, ec); \
 }
 
-#define JSONCONS_ENCODE_ALL_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_ENCODE_ALL_MEMBER_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_ENCODE_ALL_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
+#define JSONCONS_ALL_ENCODE_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count)
+#define JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
     encoder.key(json_traits_macro_names<CharT,value_type>::Member##_str(CharT{})); \
     encode_traits<typename std::decay<decltype(std::declval<value_type*>()->Member)>::type>::try_encode(val.Member, encoder, ec); 
 
-#define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,EnMem,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
+#define JSONCONS_N_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
+#define JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
+if ((num_params-Count) < num_mandatory_params2) \
+{ \
+    if (is_optional_value_set(val.Member)) \
+    { \
+        ++object_size; \
+    } \
+} \
+else \
+{ \
+    ++object_size; \
+}
+
+#define JSONCONS_ALL_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_ALL_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
+#define JSONCONS_ALL_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
+    ++object_size; 
+
+#define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,ObjectSize,EnMem,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -393,7 +432,9 @@ namespace reflect { \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
-            encoder.begin_object(semantic_tag::none, ser_context(), ec); \
+            std::size_t object_size{0}; \
+            JSONCONS_VARIADIC_FOR_EACH(ObjectSize, ,,, __VA_ARGS__) \
+            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(EnMem, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -405,22 +446,22 @@ namespace reflect { \
   /**/
 
 #define JSONCONS_N_MEMBER_TRAITS(ClassType,NumMandatoryParams,...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_ENCODE_MEMBER, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_N_OBJECT_SIZE, JSONCONS_N_ENCODE_MEMBER, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_TRAITS(NumTemplateParams, ClassType,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_ENCODE_MEMBER,NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_N_OBJECT_SIZE, JSONCONS_N_ENCODE_MEMBER,NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_ALL_MEMBER_TRAITS(ClassType, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ENCODE_ALL_MEMBER,0,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ALL_OBJECT_SIZE, JSONCONS_ALL_ENCODE_MEMBER,0,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_ALL_MEMBER_TRAITS(NumTemplateParams, ClassType, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ENCODE_ALL_MEMBER,NumTemplateParams,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ALL_OBJECT_SIZE, JSONCONS_ALL_ENCODE_MEMBER,NumTemplateParams,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/ 
 

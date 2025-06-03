@@ -227,8 +227,7 @@ struct encode_traits<std::tuple<E...>>
 template <typename T>
 struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             ext_traits::has_size<T>::value &&
+             ext_traits::is_array_like_with_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
 >::type>
 {
@@ -252,8 +251,7 @@ struct encode_traits<T,
 template <typename T>
 struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             !ext_traits::has_size<T>::value &&
+             ext_traits::is_array_like_without_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
 >::type>
 {
@@ -264,7 +262,7 @@ struct encode_traits<T,
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
-        encoder.begin_array(semantic_tag::none,ser_context(),ec);
+        encoder.begin_array(std::distance(val.begin(), val.end()), semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
