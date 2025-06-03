@@ -36,7 +36,7 @@ struct encode_traits
 {
 public:
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder,
         std::error_code& ec)
     {
@@ -45,7 +45,7 @@ public:
     }
     
     template <typename CharT, typename Allocator>
-    static void encode(std::allocator_arg_t,
+    static void try_encode(std::allocator_arg_t,
         const Allocator& alloc,
         const T& val, 
         basic_json_visitor<CharT>& encoder,
@@ -65,7 +65,7 @@ struct encode_traits<T,
 >::type>
 {
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -80,7 +80,7 @@ struct encode_traits<T,
 >::type>
 {
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -95,7 +95,7 @@ struct encode_traits<T,
 >::type>
 {
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -110,7 +110,7 @@ struct encode_traits<T,
 >::type>
 {
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -128,7 +128,7 @@ struct encode_traits<T,
     template <typename CharT>
     static
     typename std::enable_if<std::is_same<typename T::value_type, CharT>::value>::type
-    encode(const T& val,
+    try_encode(const T& val,
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -137,7 +137,7 @@ struct encode_traits<T,
     template <typename CharT>
     static
     typename std::enable_if<!std::is_same<typename T::value_type, CharT>::value>::type
-        encode(const T& val,
+        try_encode(const T& val,
         basic_json_visitor<CharT>& encoder,
         std::error_code& ec)
     {
@@ -155,15 +155,15 @@ struct encode_traits<std::pair<T1, T2>>
     using value_type = std::pair<T1, T2>;
 
     template <typename CharT>
-    static void encode(const value_type& val, 
+    static void try_encode(const value_type& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
         encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
-        encode_traits<T1>::encode(val.first, encoder, ec);
+        encode_traits<T1>::try_encode(val.first, encoder, ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
-        encode_traits<T2>::encode(val.second, encoder, ec);
+        encode_traits<T2>::try_encode(val.second, encoder, ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
         encoder.end_array(ser_context(),ec);
     }
@@ -180,13 +180,13 @@ namespace detail
         using next = json_serialize_tuple_helper<Pos-1, Size, Tuple>;
 
         template <typename CharT>
-        static void encode(const Tuple& tuple,
+        static void try_encode(const Tuple& tuple,
             basic_json_visitor<CharT>& encoder, 
             std::error_code& ec)
         {
-            encode_traits<element_type>::encode(std::get<Size-Pos>(tuple), encoder, ec);
+            encode_traits<element_type>::try_encode(std::get<Size-Pos>(tuple), encoder, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
-            next::encode(tuple, encoder, ec);
+            next::try_encode(tuple, encoder, ec);
         }
     };
 
@@ -194,7 +194,7 @@ namespace detail
     struct json_serialize_tuple_helper<0, Size, Tuple>
     {
         template <typename CharT>
-        static void encode(const Tuple&,
+        static void try_encode(const Tuple&,
             basic_json_visitor<CharT>&, 
             std::error_code&)
         {
@@ -210,14 +210,14 @@ struct encode_traits<std::tuple<E...>>
     static constexpr std::size_t size = sizeof...(E);
 
     template <typename CharT>
-    static void encode(const value_type& val, 
+    static void try_encode(const value_type& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
         using helper = detail::json_serialize_tuple_helper<size, size, std::tuple<E...>>;
         encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
-        helper::encode(val, encoder, ec);
+        helper::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec)) {return;}
         encoder.end_array(ser_context(),ec);
     }
@@ -234,7 +234,7 @@ struct encode_traits<T,
     using value_type = typename T::value_type;
 
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -242,7 +242,7 @@ struct encode_traits<T,
         if (JSONCONS_UNLIKELY(ec)) {return;}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            encode_traits<value_type>::encode(*it, encoder, ec);
+            encode_traits<value_type>::try_encode(*it, encoder, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         encoder.end_array(ser_context(), ec);
@@ -259,7 +259,7 @@ struct encode_traits<T,
     using value_type = typename T::value_type;
 
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -275,7 +275,7 @@ struct encode_traits<std::array<T,N>>
     using value_type = typename std::array<T,N>::value_type;
 
     template <typename CharT>
-    static void encode(const std::array<T, N>& val, 
+    static void try_encode(const std::array<T, N>& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -283,7 +283,7 @@ struct encode_traits<std::array<T,N>>
         if (JSONCONS_UNLIKELY(ec)) {return;}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            encode_traits<value_type>::encode(*it, encoder, ec);
+            encode_traits<value_type>::try_encode(*it, encoder, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         encoder.end_array(ser_context(),ec);
@@ -304,7 +304,7 @@ struct encode_traits<T,
     using key_type = typename T::key_type;
 
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -313,7 +313,7 @@ struct encode_traits<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             encoder.key((*it).first);
-            encode_traits<mapped_type>::encode((*it).second, encoder, ec);
+            encode_traits<mapped_type>::try_encode((*it).second, encoder, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         encoder.end_object(ser_context(), ec);
@@ -333,7 +333,7 @@ struct encode_traits<T,
     using key_type = typename T::key_type;
 
     template <typename CharT>
-    static void encode(const T& val, 
+    static void try_encode(const T& val, 
         basic_json_visitor<CharT>& encoder, 
         std::error_code& ec)
     {
@@ -344,7 +344,7 @@ struct encode_traits<T,
             std::basic_string<CharT> s;
             jsoncons::utility::from_integer((*it).first,s);
             encoder.key(s);
-            encode_traits<mapped_type>::encode((*it).second, encoder, ec);
+            encode_traits<mapped_type>::try_encode((*it).second, encoder, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         encoder.end_object(ser_context(), ec);

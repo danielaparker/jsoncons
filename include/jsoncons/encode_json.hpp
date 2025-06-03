@@ -198,7 +198,7 @@ namespace jsoncons {
     void encode_json(const T& val, basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
-        reflect::encode_traits<T>::encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
