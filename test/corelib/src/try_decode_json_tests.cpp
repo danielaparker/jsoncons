@@ -19,7 +19,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price{0};
+        double price;
     };
 
 } // namespace ns
