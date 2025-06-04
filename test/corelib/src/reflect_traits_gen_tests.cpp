@@ -584,8 +584,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
-        std::cout << result.error() << "\n";
-        CHECK(result.error().code() == jsoncons::json_errc::expected_object);
+        CHECK(result.error().code() == jsoncons::conv_errc::expected_object);
+        //std::cout << result.error() << "\n";
     }
     SECTION("missing member")
     {
@@ -598,8 +598,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
-        CHECK(result.error().code() == jsoncons::json_errc::missing_required_member);
-        std::cout << result.error() << "\n";
+        CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        //std::cout << result.error() << "\n";
     }
 }
 

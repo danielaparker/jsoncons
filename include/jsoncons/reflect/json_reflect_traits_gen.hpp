@@ -350,7 +350,7 @@ using identity = reflect::identity;
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
     if (!json_traits_helper<Json>::set_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),class_instance.Member)) \
     { \
-        return result_type(jsoncons::unexpect, json_errc::missing_required_member, # Prefix "." # Member); \
+        return result_type(jsoncons::unexpect, conv_errc::missing_required_member, # Prefix "." # Member); \
     }
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
@@ -425,7 +425,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!ajson.is_object()) return result_type(jsoncons::unexpect, json_errc::expected_object, # ClassType); \
+            if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,ClassType,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \

@@ -70,7 +70,8 @@ namespace jsoncons {
         not_base64,
         not_base64url,
         not_base16,
-        expected_json_object
+        expected_object,
+        missing_required_member
     };
 
 } // namespace jsoncons
@@ -146,8 +147,10 @@ namespace detail {
                     return "Input is not a base64url encoded string";
                 case conv_errc::not_base16:
                     return "Input is not a base16 encoded string";
-                case conv_errc::expected_json_object:
-                    return "Input is not a JSON object";
+                case conv_errc::expected_object:
+                    return "Expected JSON object";
+                case conv_errc::missing_required_member:
+                    return "Missing required JSON object member";
                 default:
                     return "Unknown conversion error";
             }
