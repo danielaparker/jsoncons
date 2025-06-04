@@ -408,7 +408,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT, ,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \
@@ -544,7 +544,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \
@@ -624,7 +624,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
@@ -725,7 +725,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
@@ -809,7 +809,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # EnumType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -830,7 +830,7 @@ namespace reflect { \
                 } \
                 else \
                 { \
-                    return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # EnumType); \
+                    return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
                 } \
             } \
             return result_type((*it).first); \
@@ -851,7 +851,7 @@ namespace reflect { \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # EnumType)); \
+                    JSONCONS_THROW(conv_error(conv_errc::conversion_failed, # EnumType)); \
                 } \
             } \
             return Json((*it).second,alloc); \
@@ -912,7 +912,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # EnumType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -933,7 +933,7 @@ namespace reflect { \
                 } \
                 else \
                 { \
-                    return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # EnumType); \
+                    return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
                 } \
             } \
             return (*it).first; \
@@ -954,7 +954,7 @@ namespace reflect { \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not a " # EnumType)); \
+                    JSONCONS_THROW(conv_error(conv_errc::conversion_failed, # EnumType)); \
                 } \
             } \
             return Json((*it).second,alloc); \
@@ -1012,7 +1012,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \
@@ -1115,7 +1115,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, "Not a " # ClassType); \
+            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \

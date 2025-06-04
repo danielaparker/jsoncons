@@ -173,9 +173,9 @@ add_executable(unit_tests
                corelib/src/json_storage_tests.cpp
                corelib/src/json_swap_tests.cpp
                corelib/src/json_traits_macro_functional_tests.cpp
-               corelib/src/json_traits_macro_tests.cpp
+               corelib/src/reflect_traits_gen_tests.cpp
+               corelib/src/reflect_traits_gen_with_name_tests.cpp
                corelib/src/json_traits_macro_limit_tests.cpp
-               corelib/src/json_traits_name_macro_tests.cpp
                corelib/src/json_type_traits_chrono_tests.cpp
                corelib/src/json_type_traits_container_tests.cpp
                corelib/src/json_type_traits_tests.cpp
