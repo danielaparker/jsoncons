@@ -191,7 +191,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "Not a ns::employee_AMN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_AMN: Unable to convert into the provided type");
             }
         }
     }
@@ -210,7 +210,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "Not a ns::employee_NMN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_NMN: Unable to convert into the provided type");
             }
         }
     }
@@ -229,7 +229,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "Not a ns::employee_ACGN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_ACGN: Unable to convert into the provided type");
             }
         }
     }
@@ -248,7 +248,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "Not a ns::employee_NCGN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_NCGN: Unable to convert into the provided type");
             }
         }
     }
@@ -267,7 +267,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it,  "Not a ns::employee_AGSN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it,  "ns::employee_AGSN: Unable to convert into the provided type");
             }
         }
     }
@@ -286,7 +286,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it,  "Not a ns::employee_NGSN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it,  "ns::employee_NGSN: Unable to convert into the provided type");
             }
         }
     }
