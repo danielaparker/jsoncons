@@ -584,7 +584,21 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
-        std::cout << result.error() << "\n";
+        //std::cout << result.error() << "\n";
+        CHECK(result.error().code() == jsoncons::conv_errc::conversion_failed);
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+        REQUIRE_FALSE(result);
+        // std::cout << result.error() << "\n";
     }
 }
 

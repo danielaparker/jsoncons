@@ -448,7 +448,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j)
         {
-            return result_type{T(j.as_string())};
+            return result_type{jsoncons::in_place, j.as_string()};
         }
 
         static Json to_json(const T& val)
@@ -517,7 +517,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j)
         {
-            return result_type(T(j.as_string_view().data(),j.as_string_view().size()));
+            return result_type(jsoncons::in_place, j.as_string_view().data(),j.as_string_view().size());
         }
 
         static Json to_json(const T& val)
@@ -1987,7 +1987,7 @@ namespace variant_detail
 
                     mask = static_cast<std::uint8_t>(mask >> 1);
                 }
-                return bs;
+                return result_type(std::move(bs));
             }
             else
             {

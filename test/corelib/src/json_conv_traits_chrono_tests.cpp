@@ -6,7 +6,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("json_type_traits chron tests")
+TEST_CASE("json_conv_traits chron tests")
 {
     SECTION("test 1")
     {

@@ -561,7 +561,7 @@ namespace ns {
         std::string          name;
         std::string          author;
         std::string          notes;
-        bool                 showNotes;
+        bool                 showNotes{false};
         Container values;
 
         friend bool operator==(const Project& lhs, const Project& rhs)
