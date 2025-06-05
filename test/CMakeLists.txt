@@ -179,6 +179,7 @@ add_executable(unit_tests
                corelib/src/json_conv_traits_chrono_tests.cpp
                corelib/src/json_conv_traits_string_tests.cpp
                corelib/src/reflect_traits_container_tests.cpp
+               corelib/src/reflect/json_conv_traits_tests.cpp
                corelib/src/json_type_traits_tests.cpp
                corelib/src/json_validation_tests.cpp 
                corelib/src/jsoncons_tests.cpp

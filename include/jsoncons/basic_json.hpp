@@ -27,6 +27,8 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/version.hpp>
+#include <jsoncons/conv_error.hpp>
+#include <jsoncons/conversion_result.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_encoder.hpp>
@@ -395,7 +397,6 @@ namespace jsoncons {
         using allocator_type = Allocator; 
 
         using policy_type = Policy;
-
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type,char_traits_type>;
@@ -3371,8 +3372,10 @@ namespace jsoncons {
         }
 
         template <typename IntegerType>
-        IntegerType as_integer() const
+        conversion_result<IntegerType> try_as_integer() const
         {
+            using result_type = conversion_result<IntegerType>;
+            
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
@@ -3382,27 +3385,38 @@ namespace jsoncons {
                     auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
-                        JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
+                        return result_type(unexpect, conv_errc::not_integer);
                     }
                     return val;
                 }
                 case json_storage_kind::half_float:
-                    return static_cast<IntegerType>(cast<half_storage>().value());
+                    return result_type(static_cast<IntegerType>(cast<half_storage>().value()));
                 case json_storage_kind::float64:
-                    return static_cast<IntegerType>(cast<double_storage>().value());
+                    return result_type(static_cast<IntegerType>(cast<double_storage>().value()));
                 case json_storage_kind::int64:
-                    return static_cast<IntegerType>(cast<int64_storage>().value());
+                    return result_type(static_cast<IntegerType>(cast<int64_storage>().value()));
                 case json_storage_kind::uint64:
-                    return static_cast<IntegerType>(cast<uint64_storage>().value());
+                    return result_type(static_cast<IntegerType>(cast<uint64_storage>().value()));
                 case json_storage_kind::boolean:
-                    return static_cast<IntegerType>(cast<bool_storage>().value() ? 1 : 0);
+                    return result_type(static_cast<IntegerType>(cast<bool_storage>().value() ? 1 : 0));
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().template as_integer<IntegerType>();
+                    return cast<json_const_reference_storage>().value().template try_as_integer<IntegerType>();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().template as_integer<IntegerType>();
+                    return cast<json_reference_storage>().value().template try_as_integer<IntegerType>();
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
+                    return result_type(unexpect, conv_errc::not_integer);
             }
+        }
+
+        template <typename IntegerType>
+        IntegerType as_integer() const
+        {
+            auto result = try_as_integer<IntegerType>();
+            if (!result)
+            {
+                JSONCONS_THROW(conv_error(result.error().code()));
+            }
+            return result.value();
         }
 
         template <typename IntegerType>
@@ -3495,8 +3509,10 @@ namespace jsoncons {
             }
         }
 
-        double as_double() const
+        conversion_result<double> try_as_double() const
         {
+            using result_type = conversion_result<double>;
+
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
@@ -3510,7 +3526,7 @@ namespace jsoncons {
                         auto result = jsoncons::utility::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                            return result_type(unexpect, conv_errc::not_double);
                         }
                     }
                     else if (JSONCONS_UNLIKELY(len > 3 && s[0] == '-' && s[1] == '0' && (s[2] == 'x' || s[2] == 'X')))
@@ -3518,7 +3534,7 @@ namespace jsoncons {
                         auto result = jsoncons::utility::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                            return result_type(unexpect, conv_errc::not_double);
                         }
                     }
                     else
@@ -3526,27 +3542,37 @@ namespace jsoncons {
                         auto result = jsoncons::utility::decstr_to_double(as_cstring(), as_string_view().length(), x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                            return result_type(unexpect, conv_errc::not_double);
                         }
                     }
                     
-                    return x;
+                    return result_type(x);
                 }
                 case json_storage_kind::half_float:
-                    return binary::decode_half(cast<half_storage>().value());
+                    return result_type(binary::decode_half(cast<half_storage>().value()));
                 case json_storage_kind::float64:
-                    return cast<double_storage>().value();
+                    return result_type(cast<double_storage>().value());
                 case json_storage_kind::int64:
-                    return static_cast<double>(cast<int64_storage>().value());
+                    return result_type(static_cast<double>(cast<int64_storage>().value()));
                 case json_storage_kind::uint64:
-                    return static_cast<double>(cast<uint64_storage>().value());
+                    return result_type(static_cast<double>(cast<uint64_storage>().value()));
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().as_double();
+                    return cast<json_const_reference_storage>().value().try_as_double();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().as_double();
+                    return cast<json_reference_storage>().value().try_as_double();
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                    return result_type(unexpect, conv_errc::not_double);
             }
+        }
+
+        double as_double() const
+        {
+            auto result = try_as_double();
+            if (!result)
+            {
+                JSONCONS_THROW(conv_error(result.error().code()));
+            }
+            return result.value();
         }
 
         template <typename SAllocator=std::allocator<char_type>>

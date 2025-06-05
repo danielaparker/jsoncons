@@ -14,14 +14,18 @@
 #include <cstdint>
 #include <catch/catch.hpp>
 
+namespace {
 namespace ns {
+
     struct book
     {
         std::string author;
         std::string title;
         double price{0};
     };
+    
 } // namespace ns
+} // namespace
 
 namespace jsoncons {
 namespace reflect {
@@ -30,7 +34,7 @@ template <typename Json>
 struct json_conv_traits<Json, ns::book>
 {
     using result_type = conversion_result<ns::book>;
-    using allocator_type = Json::allocator_type;
+    using allocator_type = typename Json::allocator_type;
 
     static bool is(const Json& j) noexcept
     {
@@ -116,6 +120,30 @@ TEST_CASE("json_conv_traits tests")
         std::cout << "\n(2)\n";
         jsoncons::encode_json(book_list, std::cout, jsoncons::indenting::indent);
         std::cout << "\n\n";*/
+    }
+}
+
+TEST_CASE("json_conv_traits error tests")
+{   
+    SECTION("double")
+    {
+        auto j = jsoncons::json::parse(R"("foo")");
+        REQUIRE(j.is_string());
+    
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,double>::try_as(j);
+        REQUIRE_FALSE(result);
+        REQUIRE(jsoncons::conv_errc::not_double == result.error().code());
+        //std::cout << result.error() << "\n\n";
+    }
+    SECTION("int64_t")
+    {
+        auto j = jsoncons::json::parse(R"("foo")");
+        REQUIRE(j.is_string());
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,int64_t>::try_as(j);
+        REQUIRE_FALSE(result);
+        REQUIRE(jsoncons::conv_errc::not_integer == result.error().code());
+        //std::cout << result.error() << "\n\n";
     }
 }
 

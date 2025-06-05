@@ -202,7 +202,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return result_type{j.template as_integer<T>()};
+            return j.template try_as_integer<T>();
         }
 
         static Json to_json(T val)
@@ -253,7 +253,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         static result_type try_as(const Json& j)
         {
-            return result_type(static_cast<T>(j.as_double()));
+            auto result = j.try_as_double();
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result_type(result.error().code());
+            }
+            return result_type(static_cast<T>(result.value()));
         }
         static Json to_json(T val)
         {
