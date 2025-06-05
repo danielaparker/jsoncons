@@ -18,7 +18,7 @@ using namespace jsoncons;
 namespace {
     namespace ns {
 
-    struct t1_struct_dm_all
+    struct t1_struct_m_all
     {
         std::string s1;
         std::string s2;
@@ -92,7 +92,7 @@ namespace {
         std::string s70;
     };
 
-    bool operator==(const t1_struct_dm_all& lhs, const t1_struct_dm_all& rhs)
+    bool operator==(const t1_struct_m_all& lhs, const t1_struct_m_all& rhs)
     {
         return (lhs.s1 == rhs.s1 &&
                 lhs.s2 == rhs.s2 &&
@@ -170,7 +170,7 @@ namespace {
 } // namespace 
  
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::t1_struct_dm_all, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10,
+JSONCONS_ALL_MEMBER_TRAITS(ns::t1_struct_m_all, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10,
                                          s11, s12, s13, s14, s15, s16, s17, s18, s19, s20,
                                          s21, s22, s23, s24, s25, s26, s27, s28, s29, s30,
                                          s31, s32, s33, s34, s35, s36, s37, s38, s39, s40,
@@ -180,7 +180,7 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::t1_struct_dm_all, s1, s2, s3, s4, s5, s6, s7, s8,
 
 TEST_CASE("json traits limits tests")
 {
-    ns::t1_struct_dm_all val = {"1","2","3","4","5","6","7","8","9","10",
+    ns::t1_struct_m_all val = {"1","2","3","4","5","6","7","8","9","10",
         "11","12","13","14","15","16","17","18","19","20",
         "21","22","23","24","25","26","27","28","29","30",
         "31","32","33","34","35","36","37","38","39","40",
@@ -193,7 +193,7 @@ TEST_CASE("json traits limits tests")
         std::string buf;
         jsoncons::encode_json(val,buf);
 
-        ns::t1_struct_dm_all val2 = jsoncons::decode_json<ns::t1_struct_dm_all>(buf);
+        ns::t1_struct_m_all val2 = jsoncons::decode_json<ns::t1_struct_m_all>(buf);
 
         CHECK(val == val2);
     }

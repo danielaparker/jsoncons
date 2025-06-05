@@ -21,14 +21,14 @@ namespace {
 namespace ns {
 
     template <typename T1,typename T2>
-    struct t2_struct_dm_all
+    struct t2_struct_m_all
     {
           T1 aT1;
           T2 aT2;
     };
 
     template <typename T1>
-    struct t1_struct_dm_all
+    struct t1_struct_m_all
     {
           T1 typeContent;
           std::string someString;
@@ -69,7 +69,7 @@ namespace ns {
         double price;
         std::string isbn;
     };
-    struct book_dm_3a
+    struct book_m_3a
     {
         std::string author;
         std::string title;
@@ -468,14 +468,14 @@ JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS(ns::book_m_all,author,title,price)
 
 JSONCONS_N_MEMBER_TRAITS(ns::book_m_3,3,author,title,price,isbn)
-JSONCONS_N_MEMBER_TRAITS(ns::book_dm_3a,3,author,title,price,isbn)
+JSONCONS_N_MEMBER_TRAITS(ns::book_m_3a,3,author,title,price,isbn)
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::book_cg_all, author, title, price)
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::book_cg_2, 2, author, title, price, isbn, publisher)
-JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::t1_struct_dm_all,typeContent,someString)
+JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::t1_struct_m_all,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS(1,ns::MyStruct3,typeContent,someString)
-JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::t2_struct_dm_all,aT1,aT2)
+JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::t2_struct_m_all,aT1,aT2)
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::HourlyEmployee, firstName, lastName, wage, hours)
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
@@ -625,11 +625,11 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     double a_price = 25.17;
     std::string an_isbn = "1400079276";
 
-    SECTION("book_dm_3a no isbn")
+    SECTION("book_m_3a no isbn")
     {
-        ns::book_dm_3a book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
+        ns::book_m_3a book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
 
-        CHECK(is_json_type_traits_declared<ns::book_dm_3a>::value);
+        CHECK(is_json_type_traits_declared<ns::book_m_3a>::value);
         std::string s;
 
         encode_json(book, s);
@@ -648,7 +648,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 
         CHECK(j == j2);
 
-        auto val = j.as<ns::book_dm_3a>();
+        auto val = j.as<ns::book_m_3a>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -656,11 +656,11 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         CHECK_FALSE(val.isbn.has_value());
     }
 
-    SECTION("book_dm_3a has isbn")
+    SECTION("book_m_3a has isbn")
     {
-        ns::book_dm_3a book{an_author, a_title, a_price, an_isbn};
+        ns::book_m_3a book{an_author, a_title, a_price, an_isbn};
 
-        CHECK(is_json_type_traits_declared<ns::book_dm_3a>::value);
+        CHECK(is_json_type_traits_declared<ns::book_m_3a>::value);
         std::string s;
 
         encode_json(book, s);
@@ -680,7 +680,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 
         CHECK(j == j2);
 
-        auto val = j.as<ns::book_dm_3a>();
+        auto val = j.as<ns::book_m_3a>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -811,9 +811,9 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
 
 TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
 {
-    SECTION("t1_struct_dm_all<std::pair<int,int>>")
+    SECTION("t1_struct_m_all<std::pair<int,int>>")
     {
-        typedef ns::t1_struct_dm_all<std::pair<int, int>> value_type;
+        typedef ns::t1_struct_m_all<std::pair<int, int>> value_type;
 
         value_type val;
         val.typeContent = std::make_pair(1,2);
@@ -830,9 +830,9 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
-    SECTION("t2_struct_dm_all<int,double>")
+    SECTION("t2_struct_m_all<int,double>")
     {
-        using value_type = ns::t2_struct_dm_all<int,double>;
+        using value_type = ns::t2_struct_m_all<int,double>;
 
         value_type val;
         val.aT1 = 1;
@@ -848,9 +848,9 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
-    SECTION("t2_struct_dm_all<int,wstring>")
+    SECTION("t2_struct_m_all<int,wstring>")
     {
-        using value_type = ns::t2_struct_dm_all<int,std::wstring>;
+        using value_type = ns::t2_struct_m_all<int,std::wstring>;
 
         value_type val;
         val.aT1 = 1;
@@ -870,7 +870,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
 
 TEST_CASE("JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS tests")
 {
-    SECTION("t1_struct_dm_all<std::pair<int,int>>")
+    SECTION("t1_struct_m_all<std::pair<int,int>>")
     {
         typedef ns::MyStruct3<std::pair<int, int>> value_type;
 

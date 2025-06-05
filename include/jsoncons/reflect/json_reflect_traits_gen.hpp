@@ -342,8 +342,8 @@ using identity = reflect::identity;
 
 #define JSONCONS_GENERATE_NAME_STR(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) 
 #define JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) \
-    static inline const char* Member(char) {return JSONCONS_PP_QUOTE(,Member);} \
-    static inline const wchar_t* Member(wchar_t) {return JSONCONS_PP_QUOTE(L,Member);} \
+    static inline const string_view& Member(char) {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
+    static inline const wstring_view& Member(wchar_t) {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
     /**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Count) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Count)
@@ -895,7 +895,7 @@ namespace reflect { \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = jsoncons::basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
-        using mapped_type = std::pair<EnumType,string_type>; \
+        using mapped_type = std::pair<EnumType,string_view_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
@@ -998,7 +998,7 @@ namespace reflect { \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = jsoncons::basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
-        using mapped_type = std::pair<EnumType,string_type>; \
+        using mapped_type = std::pair<EnumType,string_view_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
