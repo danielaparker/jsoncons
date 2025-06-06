@@ -300,6 +300,8 @@ Graham Greene
 #include <jsoncons/json.hpp> // json_decoder and json
 #include <fstream>
 
+using namespace jsoncons;
+
 int main()
 {
     std::ifstream is("book_catalog.json");
