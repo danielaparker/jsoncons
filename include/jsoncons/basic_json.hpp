@@ -3416,7 +3416,7 @@ namespace jsoncons {
             {
                 JSONCONS_THROW(conv_error(result.error().code()));
             }
-            return result.value();
+            return *result;
         }
 
         template <typename IntegerType>
@@ -3572,7 +3572,7 @@ namespace jsoncons {
             {
                 JSONCONS_THROW(conv_error(result.error().code()));
             }
-            return result.value();
+            return *result;
         }
 
         template <typename SAllocator=std::allocator<char_type>>

@@ -258,7 +258,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 return result_type(result.error().code());
             }
-            return result_type(static_cast<T>(result.value()));
+            return result_type(static_cast<T>(*result));
         }
         static Json to_json(T val)
         {
@@ -583,7 +583,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
                     }
-                    result.push_back(std::move(res.value()));
+                    result.push_back(std::move(*res));
                 }
 
                 return result_type(std::move(result));
@@ -612,7 +612,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
                     }
-                    result.push_back(std::move(res.value()));
+                    result.push_back(std::move(*res));
                 }
 
                 return result_type(std::move(result));
@@ -743,7 +743,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
                     }
-                    result.insert(std::move(res.value()));
+                    result.insert(std::move(*res));
                 }
 
                 return result_type(std::move(result));
@@ -829,7 +829,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
                     }
-                    result.push_front(std::move(res.value()));
+                    result.push_front(std::move(*res));
                 }
 
                 return result_type(std::move(result));
@@ -910,7 +910,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 {
                     return result_type(jsoncons::unexpect, conv_errc::not_array);
                 }
-                buff[i] = std::move(res.value());
+                buff[i] = std::move(*res);
             }
             return result_type(std::move(buff));
         }
@@ -1423,17 +1423,17 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 case json_type::double_value:
                 {
                     auto res = j.template try_as<int64_t>();
-                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                    return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 case json_type::int64_value:
                 {
                     auto res = j.template try_as<int64_t>();
-                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                    return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 case json_type::uint64_value:
                 {
                     auto res = j.template try_as<uint64_t>();
-                    return res ? result_type(jsoncons::in_place, res.value()) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                    return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 default:
                     return result_type(jsoncons::unexpect, conv_errc::not_bigint);
@@ -1492,7 +1492,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_array);
                     }
-                    v[i] = std::move(res.value());
+                    v[i] = std::move(*res);
                 }
                 return result_type(std::move(v));
             }
@@ -1575,7 +1575,7 @@ namespace variant_detail
           {
               return result_type(jsoncons::unexpect, conv_errc::not_variant);
           }
-          return conversion_result<Variant>(jsoncons::in_place, std::move(res.value()));
+          return conversion_result<Variant>(jsoncons::in_place, std::move(*res));
       }
       else
       {

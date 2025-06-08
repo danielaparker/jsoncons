@@ -154,7 +154,7 @@ struct decode_traits<std::pair<T1, T2>>
         }
 
         auto r1 = decode_traits<T1>::try_decode(cursor);
-        if (JSONCONS_UNLIKELY(!r1.has_value()))
+        if (JSONCONS_UNLIKELY(!r1))
         {
             return result_type(r1.error());
         }
@@ -164,7 +164,7 @@ struct decode_traits<std::pair<T1, T2>>
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
         auto r2 = decode_traits<T2>::try_decode(cursor);
-        if (JSONCONS_UNLIKELY(!r2.has_value())) 
+        if (JSONCONS_UNLIKELY(!r2)) 
         {
             return result_type(r2.error());
         }
@@ -178,7 +178,7 @@ struct decode_traits<std::pair<T1, T2>>
         {
             return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column()); 
         }
-        return result_type{std::make_pair(std::move(r1.value()), std::move(r2.value()))};
+        return result_type{std::make_pair(std::move(*r1), std::move(*r2))};
     }
 };
 
@@ -219,7 +219,7 @@ struct decode_traits<T,
             {
                 return result_type(r.error()); 
             }
-            v.push_back(std::move(r.value()));
+            v.push_back(std::move(*r));
             //std::cout << "read next 10\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
@@ -516,7 +516,7 @@ struct decode_traits<T,
             {
                 return result_type(r.error());
             }
-            v.insert(std::move(r.value()));
+            v.insert(std::move(*r));
             if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
             //std::cout << "cursor.next 20\n";
             cursor.next(ec);
@@ -568,7 +568,7 @@ struct decode_traits<std::array<T,N>>
             {
                 return result_type(r.error());
             }
-            v[i] = std::move(r.value());
+            v[i] = std::move(*r);
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
@@ -631,7 +631,7 @@ struct decode_traits<T,
             {
                 return result_type(r.error());
             }
-            val.emplace(std::move(key), std::move(r.value()));
+            val.emplace(std::move(key), std::move(*r));
             //std::cout << "cursor.next 300\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
@@ -708,7 +708,7 @@ struct decode_traits<T,
             {
                 return result_type(r1.error());
             }
-            val.emplace(n, std::move(r1.value()));
+            val.emplace(n, std::move(*r1));
             //std::cout << "cursor.next 600\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 

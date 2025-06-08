@@ -255,7 +255,7 @@ T decode_msgpack(Args&& ... args)
     {
         JSONCONS_THROW(ser_error(result.error().code(), result.error().line(), result.error().column()));
     }
-    return std::move(result.value());
+    return std::move(*result);
 }
 
 } // namespace msgpack
