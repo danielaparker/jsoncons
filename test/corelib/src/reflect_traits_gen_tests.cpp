@@ -578,7 +578,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         CHECK(val.price == Approx(book.price).epsilon(0.001));
     }
     
-    SECTION("error")
+    SECTION("unexpected JSON")
     {
         std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
         

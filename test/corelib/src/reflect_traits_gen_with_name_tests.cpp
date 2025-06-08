@@ -318,7 +318,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 
     ns::book_m_all book{an_author, a_title, a_price};
 
-    SECTION("book_m_all")
+    SECTION("success")
     {
         std::string s;
 
@@ -341,6 +341,44 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
+    }
+    SECTION("unexpected JSON")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == jsoncons::conv_errc::expected_object);
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore",
+    "price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == json_errc::expected_colon);
+        //std::cout << result.error() << "\n";
     }
 } 
 

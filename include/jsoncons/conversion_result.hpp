@@ -24,7 +24,7 @@ public:
         : ec_(ec)
     {
     }
-    conversion_error(std::error_code ec, const std::string& message)
+    conversion_error(std::error_code ec, const jsoncons::string_view& message)
         : ec_(ec), message_(message)
     {
     }
