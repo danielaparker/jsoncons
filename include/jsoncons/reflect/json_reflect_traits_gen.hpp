@@ -351,8 +351,12 @@ using identity = reflect::identity;
 
 #define JSONCONS_N_MEMBER_AS(Prefix,P2,P3, Member, Count) JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
-    if ((num_params-Count) < num_mandatory_params2 || ajson.contains(json_object_member_names<value_type>::Member(char_type{}))) \
-        {json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member);}
+    if ((num_params-Count) < num_mandatory_params2) { \
+        if (!json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member)) \
+        { \
+            return result_type(jsoncons::unexpect, conv_errc::missing_required_member, # Prefix "." # Member); \
+        } \
+    } else {json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member);}    
 
 #define JSONCONS_ALL_MEMBER_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \

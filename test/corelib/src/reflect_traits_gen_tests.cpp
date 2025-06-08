@@ -688,6 +688,45 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         CHECK(val.isbn.has_value());
         CHECK(val.isbn == an_isbn);
     }
+
+    SECTION("error")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_3a>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == jsoncons::conv_errc::expected_object);
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_3a>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore",
+    "price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_m_3a>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == json_errc::expected_colon);
+        //std::cout << result.error() << "\n";
+    }
 }
 
 TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
