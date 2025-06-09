@@ -520,7 +520,7 @@ namespace reflect { \
 #define JSONCONS_MEMBER_NAME_VALIDATE_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, , )
 #define JSONCONS_MEMBER_NAME_VALIDATE_5(Member, Name, Mode, Match, Into) JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, Into, From) !ajson.contains(Name)) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect)); \
-    JSONCONS_TRY{if (!Match(ajson.at(Name).template as<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>())) return false;} \
+    JSONCONS_TRY{if (!Match(ajson.at(Name).template as<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>())) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect));} \
     JSONCONS_CATCH(...) {return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect));}
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
