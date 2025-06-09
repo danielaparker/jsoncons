@@ -599,6 +599,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        CHECK("ns::book_m_all.price" == result.error().message_arg());
         //std::cout << result.error() << "\n";
     }
     SECTION("parsing error")
@@ -616,6 +617,28 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         CHECK(result.error().code() == json_errc::expected_colon);
         //std::cout << result.error() << "\n";
     }
+    /*SECTION("invalid value")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore",
+    "price" : "foo"
+}
+        )";
+
+        try
+        {
+            auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+            REQUIRE_FALSE(result);
+            //CHECK(result.error().code() == json_errc::expected_colon);
+            std::cout << result.error() << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "EXCEPTION " << e.what() << "\n";
+        }
+    }*/
 }
 
 TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")

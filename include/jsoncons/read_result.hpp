@@ -17,7 +17,7 @@ namespace jsoncons {
 class read_error
 {
     std::error_code ec_{};
-    std::string message_;
+    std::string message_arg_;
     std::size_t line_{};
     std::size_t column_{};
     
@@ -27,8 +27,8 @@ public:
     {
     }
     
-    read_error(std::error_code ec, const std::string& message, std::size_t line, std::size_t column)
-        : ec_{ec}, message_(message), line_{line}, column_{column}
+    read_error(std::error_code ec, const std::string& message_arg, std::size_t line, std::size_t column)
+        : ec_{ec}, message_arg_(message_arg), line_{line}, column_{column}
     {
     }
 
@@ -44,9 +44,9 @@ public:
     {
         return ec_;
     }
-    const std::string& message() const 
+    const std::string& message_arg() const 
     {
-        return message_;
+        return message_arg_;
     }
     std::size_t line() const
     {
@@ -61,7 +61,7 @@ public:
 inline
 std::string to_string(const read_error& err)
 {
-    std::string str(err.message());
+    std::string str(err.message_arg());
     if (!str.empty())
     {
         str.append(": ");
