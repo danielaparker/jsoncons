@@ -191,7 +191,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_AMN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_AMN: Missing required JSON object member");
             }
         }
     }
@@ -210,7 +210,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_NMN: Unable to convert into the provided type");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_NMN: Missing required JSON object member");
             }
         }
     }
