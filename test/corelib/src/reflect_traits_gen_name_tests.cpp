@@ -363,7 +363,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_m_all.price" == result.error().message_arg());
+        CHECK("ns::book_m_all" == result.error().message_arg());
     }
     SECTION("parsing error")
     {

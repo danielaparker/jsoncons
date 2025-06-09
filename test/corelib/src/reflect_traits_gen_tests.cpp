@@ -599,8 +599,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_m_all.price" == result.error().message_arg());
-        //std::cout << result.error() << "\n";
+        CHECK("ns::book_m_all: price" == result.error().message_arg());
+        std::cout << result.error() << "\n";
     }
     SECTION("parsing error")
     {

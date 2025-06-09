@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parkerreturn result_type
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -344,7 +344,7 @@ using identity = reflect::identity;
 #define JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) \
     static inline const string_view& Member(char) {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
     static inline const wstring_view& Member(wchar_t) {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
-    static inline const string_view& Member(unexpect_t) {static const string_view sv = # Prefix "." # Member; return sv;} \
+    static inline const string_view& Member(unexpect_t) {static const string_view sv = # Prefix ": " # Member; return sv;} \
     /**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Count) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Count)
@@ -515,13 +515,13 @@ namespace reflect { \
 
 #define JSONCONS_MEMBER_NAME_VALIDATE(P1, P2, P3, Seq, Count) JSONCONS_MEMBER_NAME_VALIDATE_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_MEMBER_NAME_VALIDATE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_VALIDATE_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_MEMBER_NAME_VALIDATE_2(Member, Name) !ajson.contains(Name)) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect));
+#define JSONCONS_MEMBER_NAME_VALIDATE_2(Member, Name) !ajson.contains(Name)) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, std::string(class_name));
 #define JSONCONS_MEMBER_NAME_VALIDATE_3(Member, Name, Mode) JSONCONS_MEMBER_NAME_VALIDATE_2(Member, Name)
 #define JSONCONS_MEMBER_NAME_VALIDATE_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, , )
 #define JSONCONS_MEMBER_NAME_VALIDATE_5(Member, Name, Mode, Match, Into) JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, Into, )
-#define JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, Into, From) !ajson.contains(Name)) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect)); \
-    JSONCONS_TRY{if (!Match(ajson.at(Name).template as<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>())) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect));} \
-    JSONCONS_CATCH(...) {return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect));}
+#define JSONCONS_MEMBER_NAME_VALIDATE_6(Member, Name, Mode, Match, Into, From) !ajson.contains(Name)) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, std::string(class_name)); \
+    JSONCONS_TRY{if (!Match(ajson.at(Name).template as<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>())) return result_type(jsoncons::unexpect, conv_errc::missing_required_member, std::string(class_name));} \
+    JSONCONS_CATCH(...) {return result_type(jsoncons::unexpect, conv_errc::missing_required_member, std::string(class_name));}
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
@@ -642,12 +642,6 @@ else \
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(AsT,ToJ,ObjectSize,EnMem, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
-    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct json_object_member_names<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
-    { \
-        constexpr static const char* class_name = # ClassType; \
-        JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_UNEXPECT_STR,ClassType,,, __VA_ARGS__)\
-    }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_conv_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
