@@ -48,7 +48,7 @@ struct json_traits_helper
 {
     using string_view_type = typename Json::string_view_type; 
     template <typename OutputType> 
-    static void set_member(std::size_t index, std::size_t num_required, 
+    static void set_member(std::size_t, std::size_t, 
         const Json&, const string_view_type&, const OutputType&, std::error_code&) 
     { 
     } 
@@ -76,7 +76,7 @@ struct json_traits_helper
     } 
 
     template <typename T,typename From,typename OutputType> 
-    static void set_member(std::size_t index, std::size_t num_required, 
+    static void set_member(std::size_t, std::size_t, 
         const Json&, const string_view_type&, From, const OutputType&, std::error_code&) 
     { 
     } 
