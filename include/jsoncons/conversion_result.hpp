@@ -18,14 +18,14 @@ namespace jsoncons {
 class conversion_error
 {
     std::error_code ec_;
-    std::string message_;
+    std::string message_arg_;
 public:
     conversion_error(std::error_code ec)
         : ec_(ec)
     {
     }
-    conversion_error(std::error_code ec, const jsoncons::string_view& message)
-        : ec_(ec), message_(message)
+    conversion_error(std::error_code ec, const jsoncons::string_view& message_arg)
+        : ec_(ec), message_arg_(message_arg)
     {
     }
 
@@ -42,16 +42,16 @@ public:
         return ec_;
     }
     
-    const std::string& message() const 
+    const std::string& message_arg() const 
     {
-        return message_;
+        return message_arg_;
     }
 };
 
 inline
 std::string to_string(const conversion_error& err)
 {
-    std::string str{err.message()};
+    std::string str{err.message_arg()};
     if (!str.empty())
     {
         str.append(": ");

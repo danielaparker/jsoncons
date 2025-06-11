@@ -16,155 +16,155 @@
 using namespace jsoncons;
 
 namespace {
-    namespace ns {
+namespace ns {
 
-    struct t1_struct_m_all
-    {
-        std::string s1;
-        std::string s2;
-        std::string s3;
-        std::string s4;
-        std::string s5;
-        std::string s6;
-        std::string s7;
-        std::string s8;
-        std::string s9;
-        std::string s10;
-        std::string s11;
-        std::string s12;
-        std::string s13;
-        std::string s14;
-        std::string s15;
-        std::string s16;
-        std::string s17;
-        std::string s18;
-        std::string s19;
-        std::string s20;
-        std::string s21;
-        std::string s22;
-        std::string s23;
-        std::string s24;
-        std::string s25;
-        std::string s26;
-        std::string s27;
-        std::string s28;
-        std::string s29;
-        std::string s30;
-        std::string s31;
-        std::string s32;
-        std::string s33;
-        std::string s34;
-        std::string s35;
-        std::string s36;
-        std::string s37;
-        std::string s38;
-        std::string s39;
-        std::string s40;
-        std::string s41;
-        std::string s42;
-        std::string s43;
-        std::string s44;
-        std::string s45;
-        std::string s46;
-        std::string s47;
-        std::string s48;
-        std::string s49;
-        std::string s50;
-        std::string s51;
-        std::string s52;
-        std::string s53;
-        std::string s54;
-        std::string s55;
-        std::string s56;
-        std::string s57;
-        std::string s58;
-        std::string s59;
-        std::string s60;
-        std::string s61;
-        std::string s62;
-        std::string s63;
-        std::string s64;
-        std::string s65;
-        std::string s66;
-        std::string s67;
-        std::string s68;
-        std::string s69;
-        std::string s70;
-    };
+struct t1_struct_m_all
+{
+    std::string s1;
+    std::string s2;
+    std::string s3;
+    std::string s4;
+    std::string s5;
+    std::string s6;
+    std::string s7;
+    std::string s8;
+    std::string s9;
+    std::string s10;
+    std::string s11;
+    std::string s12;
+    std::string s13;
+    std::string s14;
+    std::string s15;
+    std::string s16;
+    std::string s17;
+    std::string s18;
+    std::string s19;
+    std::string s20;
+    std::string s21;
+    std::string s22;
+    std::string s23;
+    std::string s24;
+    std::string s25;
+    std::string s26;
+    std::string s27;
+    std::string s28;
+    std::string s29;
+    std::string s30;
+    std::string s31;
+    std::string s32;
+    std::string s33;
+    std::string s34;
+    std::string s35;
+    std::string s36;
+    std::string s37;
+    std::string s38;
+    std::string s39;
+    std::string s40;
+    std::string s41;
+    std::string s42;
+    std::string s43;
+    std::string s44;
+    std::string s45;
+    std::string s46;
+    std::string s47;
+    std::string s48;
+    std::string s49;
+    std::string s50;
+    std::string s51;
+    std::string s52;
+    std::string s53;
+    std::string s54;
+    std::string s55;
+    std::string s56;
+    std::string s57;
+    std::string s58;
+    std::string s59;
+    std::string s60;
+    std::string s61;
+    std::string s62;
+    std::string s63;
+    std::string s64;
+    std::string s65;
+    std::string s66;
+    std::string s67;
+    std::string s68;
+    std::string s69;
+    std::string s70;
+};
 
-    bool operator==(const t1_struct_m_all& lhs, const t1_struct_m_all& rhs)
-    {
-        return (lhs.s1 == rhs.s1 &&
-                lhs.s2 == rhs.s2 &&
-                lhs.s3 == rhs.s3 &&
-                lhs.s4 == rhs.s4 &&
-                lhs.s5 == rhs.s5 &&
-                lhs.s6 == rhs.s6 &&
-                lhs.s7 == rhs.s7 &&
-                lhs.s8 == rhs.s8 &&
-                lhs.s9 == rhs.s9 &&
-                lhs.s10 == rhs.s10 &&
-                lhs.s11 == rhs.s11 &&
-                lhs.s12 == rhs.s12 &&
-                lhs.s13 == rhs.s13 &&
-                lhs.s14 == rhs.s14 &&
-                lhs.s15 == rhs.s15 &&
-                lhs.s16 == rhs.s16 &&
-                lhs.s17 == rhs.s17 &&
-                lhs.s18 == rhs.s18 &&
-                lhs.s19 == rhs.s19 &&
-                lhs.s20 == rhs.s20 &&
-                lhs.s21 == rhs.s21 &&
-                lhs.s22 == rhs.s22 &&
-                lhs.s23 == rhs.s23 &&
-                lhs.s24 == rhs.s24 &&
-                lhs.s25 == rhs.s25 &&
-                lhs.s26 == rhs.s26 &&
-                lhs.s27 == rhs.s27 &&
-                lhs.s28 == rhs.s28 &&
-                lhs.s29 == rhs.s29 &&
-                lhs.s30 == rhs.s30 &&
-                lhs.s31 == rhs.s31 &&
-                lhs.s32 == rhs.s32 &&
-                lhs.s33 == rhs.s33 &&
-                lhs.s34 == rhs.s34 &&
-                lhs.s35 == rhs.s35 &&
-                lhs.s36 == rhs.s36 &&
-                lhs.s37 == rhs.s37 &&
-                lhs.s38 == rhs.s38 &&
-                lhs.s39 == rhs.s39 &&
-                lhs.s40 == rhs.s40 &&
-                lhs.s41 == rhs.s41 &&
-                lhs.s42 == rhs.s42 &&
-                lhs.s43 == rhs.s43 &&
-                lhs.s44 == rhs.s44 &&
-                lhs.s45 == rhs.s45 &&
-                lhs.s46 == rhs.s46 &&
-                lhs.s47 == rhs.s47 &&
-                lhs.s48 == rhs.s48 &&
-                lhs.s49 == rhs.s49 &&
-                lhs.s50 == rhs.s50 &&
-                lhs.s51 == rhs.s51 &&
-                lhs.s52 == rhs.s52 &&
-                lhs.s53 == rhs.s53 &&
-                lhs.s54 == rhs.s54 &&
-                lhs.s55 == rhs.s55 &&
-                lhs.s56 == rhs.s56 &&
-                lhs.s57 == rhs.s57 &&
-                lhs.s58 == rhs.s58 &&
-                lhs.s59 == rhs.s59 &&
-                lhs.s60 == rhs.s60 &&
-                lhs.s61 == rhs.s61 &&
-                lhs.s62 == rhs.s62 &&
-                lhs.s63 == rhs.s63 &&
-                lhs.s64 == rhs.s64 &&
-                lhs.s65 == rhs.s65 &&
-                lhs.s66 == rhs.s66 &&
-                lhs.s67 == rhs.s67 &&
-                lhs.s68 == rhs.s68 &&
-                lhs.s69 == rhs.s69 &&
-                lhs.s70 == rhs.s70);
-    }
+bool operator==(const t1_struct_m_all& lhs, const t1_struct_m_all& rhs)
+{
+    return (lhs.s1 == rhs.s1 &&
+            lhs.s2 == rhs.s2 &&
+            lhs.s3 == rhs.s3 &&
+            lhs.s4 == rhs.s4 &&
+            lhs.s5 == rhs.s5 &&
+            lhs.s6 == rhs.s6 &&
+            lhs.s7 == rhs.s7 &&
+            lhs.s8 == rhs.s8 &&
+            lhs.s9 == rhs.s9 &&
+            lhs.s10 == rhs.s10 &&
+            lhs.s11 == rhs.s11 &&
+            lhs.s12 == rhs.s12 &&
+            lhs.s13 == rhs.s13 &&
+            lhs.s14 == rhs.s14 &&
+            lhs.s15 == rhs.s15 &&
+            lhs.s16 == rhs.s16 &&
+            lhs.s17 == rhs.s17 &&
+            lhs.s18 == rhs.s18 &&
+            lhs.s19 == rhs.s19 &&
+            lhs.s20 == rhs.s20 &&
+            lhs.s21 == rhs.s21 &&
+            lhs.s22 == rhs.s22 &&
+            lhs.s23 == rhs.s23 &&
+            lhs.s24 == rhs.s24 &&
+            lhs.s25 == rhs.s25 &&
+            lhs.s26 == rhs.s26 &&
+            lhs.s27 == rhs.s27 &&
+            lhs.s28 == rhs.s28 &&
+            lhs.s29 == rhs.s29 &&
+            lhs.s30 == rhs.s30 &&
+            lhs.s31 == rhs.s31 &&
+            lhs.s32 == rhs.s32 &&
+            lhs.s33 == rhs.s33 &&
+            lhs.s34 == rhs.s34 &&
+            lhs.s35 == rhs.s35 &&
+            lhs.s36 == rhs.s36 &&
+            lhs.s37 == rhs.s37 &&
+            lhs.s38 == rhs.s38 &&
+            lhs.s39 == rhs.s39 &&
+            lhs.s40 == rhs.s40 &&
+            lhs.s41 == rhs.s41 &&
+            lhs.s42 == rhs.s42 &&
+            lhs.s43 == rhs.s43 &&
+            lhs.s44 == rhs.s44 &&
+            lhs.s45 == rhs.s45 &&
+            lhs.s46 == rhs.s46 &&
+            lhs.s47 == rhs.s47 &&
+            lhs.s48 == rhs.s48 &&
+            lhs.s49 == rhs.s49 &&
+            lhs.s50 == rhs.s50 &&
+            lhs.s51 == rhs.s51 &&
+            lhs.s52 == rhs.s52 &&
+            lhs.s53 == rhs.s53 &&
+            lhs.s54 == rhs.s54 &&
+            lhs.s55 == rhs.s55 &&
+            lhs.s56 == rhs.s56 &&
+            lhs.s57 == rhs.s57 &&
+            lhs.s58 == rhs.s58 &&
+            lhs.s59 == rhs.s59 &&
+            lhs.s60 == rhs.s60 &&
+            lhs.s61 == rhs.s61 &&
+            lhs.s62 == rhs.s62 &&
+            lhs.s63 == rhs.s63 &&
+            lhs.s64 == rhs.s64 &&
+            lhs.s65 == rhs.s65 &&
+            lhs.s66 == rhs.s66 &&
+            lhs.s67 == rhs.s67 &&
+            lhs.s68 == rhs.s68 &&
+            lhs.s69 == rhs.s69 &&
+            lhs.s70 == rhs.s70);
+}
 
 } // namespace ns
 } // namespace 
