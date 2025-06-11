@@ -696,7 +696,6 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        constexpr static const char* class_name = # ClassType; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -705,6 +704,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
+            const char* class_name = # ClassType; \
             std::size_t index = 0; \
             std::error_code ec; \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
