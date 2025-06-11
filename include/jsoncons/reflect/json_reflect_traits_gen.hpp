@@ -49,11 +49,6 @@ struct json_traits_helper
     using string_view_type = typename Json::string_view_type; 
 
     template <typename OutputType> 
-    static bool set_member(const Json&, const string_view_type&, const OutputType&) 
-    { 
-        return true;
-    } 
-    template <typename OutputType> 
     static bool set_member(const Json& j, const string_view_type& key, OutputType& val) 
     { 
         auto it = j.find(key);
@@ -61,15 +56,36 @@ struct json_traits_helper
         {
             return false;
         }
-        val = it->value().template as<OutputType>(); 
+        auto result = it->value().template try_as<OutputType>(); 
+        if (!result)
+        {
+            return false;
+        }
+        val = std::move(result.value());
         return true;
+    } 
+    template <typename OutputType> 
+    static void set_member(std::size_t index, std::size_t num_required, 
+        const Json& j, const string_view_type& key, OutputType& val, std::error_code& ec) 
+    { 
+        auto it = j.find(key);
+        if (it == j.object_range().end())
+        {
+            if (index < num_required)
+            {
+                ec = conv_errc::missing_required_member;
+            }
+            return;
+        }
+        auto result = it->value().template try_as<OutputType>(); 
+        if (!result)
+        {
+            ec = conv_errc::conversion_failed;
+            return;
+        }
+        val = std::move(result.value());
     } 
 
-    template <typename T,typename From,typename OutputType> 
-    static bool set_member(const Json&, const string_view_type&, From, const OutputType&) 
-    { 
-        return true;
-    } 
     template <typename T,typename From,typename OutputType> 
     static bool set_member(const Json& j, const string_view_type& key, From from, OutputType& val) 
     { 
@@ -352,18 +368,17 @@ using identity = reflect::identity;
 
 #define JSONCONS_N_MEMBER_AS(Prefix,P2,P3, Member, Count) JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
-    if ((num_params-Count) < num_mandatory_params2) { \
-        if (!json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member)) \
-        { \
-            return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect)); \
-        } \
-    } else {json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member);}    
+    json_traits_helper<Json>::set_member((num_params-Count), num_mandatory_params2, \
+        ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member, ec); \
+    if (ec) { \
+        return result_type(jsoncons::unexpect, ec, json_object_member_names<value_type>::Member(unexpect)); \
+    } 
 
 #define JSONCONS_ALL_MEMBER_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
-    if (!json_traits_helper<Json>::set_member(ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member)) \
-    { \
-        return result_type(jsoncons::unexpect, conv_errc::missing_required_member, json_object_member_names<value_type>::Member(unexpect)); \
+    json_traits_helper<Json>::set_member((num_params-Count), num_mandatory_params2, ajson,json_object_member_names<value_type>::Member(char_type{}),class_instance.Member, ec); \
+    if (ec) { \
+        return result_type(jsoncons::unexpect, ec, json_object_member_names<value_type>::Member(unexpect)); \
     } 
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
@@ -438,6 +453,7 @@ namespace reflect { \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
             value_type class_instance{}; \
+            std::error_code ec; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,ClassType,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \
         } \
@@ -524,24 +540,24 @@ namespace reflect { \
     JSONCONS_CATCH(...) {return result_type(jsoncons::unexpect, conv_errc::missing_required_member, std::string(class_name));}
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) \
-    if (ajson.contains(Name)) {json_traits_helper<Json>::set_member(ajson,Name,class_instance.Member);}
+    json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson, Name, class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name);
 #define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_2(Member, Name))
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) \
-    Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::set_member(ajson,Name,class_instance.Member);})
+    Mode(json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson,Name,class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name); )
 #define JSONCONS_N_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) \
     Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::template set_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>(ajson,Name,class_instance.Member);})
 #define JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) \
     Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::template set_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>(ajson,Name,From,class_instance.Member);})
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
-    json_traits_helper<Json>::set_member(ajson,Name,class_instance.Member);
+    json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson, Name, class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name);
 #define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name))
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) \
-    Mode(json_traits_helper<Json>::set_member(ajson,Name,class_instance.Member);)
+    Mode(json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson, Name, class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name);)
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) \
     Mode(json_traits_helper<Json>::template set_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>(ajson,Name,class_instance.Member);)
 #define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) \
@@ -662,8 +678,9 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
+            std::size_t index = 0; (index); \
+            std::error_code ec; (ec); \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
-            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_VALIDATE,,,, __VA_ARGS__)\
             value_type class_instance{}; \
             JSONCONS_VARIADIC_FOR_EACH(AsT,,,, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \

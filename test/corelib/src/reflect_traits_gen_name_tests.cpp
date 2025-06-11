@@ -380,6 +380,28 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
         CHECK(result.error().code() == json_errc::expected_colon);
         //std::cout << result.error() << "\n";
     }
+    SECTION("invalid JSON value")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" : "foo"
+}
+        )";
+
+        try
+        {
+            auto result = jsoncons::try_decode_json<ns::book_m_all>(input);
+            REQUIRE_FALSE(result);
+            //CHECK(result.error().code() == json_errc::expected_colon);
+            std::cout << result.error() << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "EXCEPTION " << e.what() << "\n";
+        }
+    }
 } 
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
