@@ -702,7 +702,7 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            std::size_t index = 0; (index); \
+            std::size_t index = 0; \
             std::error_code ec; \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
             value_type class_instance{}; \
