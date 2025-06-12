@@ -169,50 +169,50 @@ struct json_traits_helper
     } 
 };
 
-template <typename CharT, typename T> 
+template <typename Json, typename CharT, typename T> 
 void try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(val, encoder, ec); 
+    encode_traits<Json,T>::try_encode(val, encoder, ec); 
 } 
 
-template <typename CharT, typename T> 
+template <typename Json, typename CharT, typename T> 
 void try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val) 
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<Json,T>::try_encode(*val, encoder, ec); 
     }
 } 
-template <typename CharT, typename T> 
+template <typename Json, typename CharT, typename T> 
 void try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<Json,T>::try_encode(*val, encoder, ec); 
     }
 } 
-template <typename CharT, typename T> 
+template <typename Json, typename CharT, typename T> 
 void try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<Json,T>::try_encode(*val, encoder, ec); 
     }
 } 
-template <typename CharT, typename T> 
+template <typename Json, typename CharT, typename T> 
 void try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
     std::error_code& ec) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(val, encoder, ec); 
+    encode_traits<Json,T>::try_encode(val, encoder, ec); 
 } 
 
 template <typename T> 
@@ -338,7 +338,7 @@ using identity = reflect::identity;
     friend struct jsoncons::json_type_traits; \
     template <typename JSON,typename T,typename Enable> \
     friend struct jsoncons::reflect::json_conv_traits; \
-    template <typename T,typename Enable> \
+    template <typename Json,typename T,typename Enable> \
     friend struct jsoncons::reflect::encode_traits;
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_PP_EXPAND(Call(Expr, Id))
@@ -444,17 +444,17 @@ using identity = reflect::identity;
 #define JSONCONS_N_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
     { \
-        try_encode_member<CharT>(json_object_name_members<value_type>::Member(CharT{}), val.Member, encoder, ec); \
+        try_encode_member<Json>(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder, ec); \
     } \
     else \
     { \
-        try_encode_optional_member<CharT>(json_object_name_members<value_type>::Member(CharT{}), \
+        try_encode_optional_member<Json>(json_object_name_members<value_type>::Member(char_type{}), \
             val.Member, encoder, ec); \
     }
 
 #define JSONCONS_ALL_ENCODE_MEMBER(Prefix, P2, P3, Member, Count) JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
-    try_encode_member<CharT>(json_object_name_members<value_type>::Member(CharT{}), val.Member, encoder, ec); 
+    try_encode_member<Json>(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder, ec); 
 
 #define JSONCONS_N_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
@@ -514,16 +514,16 @@ namespace reflect { \
             return ajson; \
         } \
     }; \
-    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encode_traits<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
+    struct encode_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
+        using char_type = typename Json::char_type; \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
         static void try_encode(const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
+            basic_json_visitor<char_type>& encoder, \
             std::error_code& ec) \
         { \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
@@ -620,33 +620,33 @@ else \
 #define JSONCONS_N_ENCODE_MEMBER_NAME_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_ENCODE_MEMBER_NAME_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_ENCODE_MEMBER_NAME_2(Member, Name) \
     { \
-        try_encode_member<CharT>(Name, val.Member, encoder, ec); \
+        try_encode_member<Json>(basic_string_view<char_type>(Name), val.Member, encoder, ec); \
     } \
     else \
     { \
-        try_encode_optional_member<CharT>(Name, val.Member, encoder, ec); \
+        try_encode_optional_member<Json>(basic_string_view<char_type>(Name), val.Member, encoder, ec); \
     }    
 #define JSONCONS_N_ENCODE_MEMBER_NAME_3(Member, Name, Mode) JSONCONS_N_ENCODE_MEMBER_NAME_2(Member, Name)
 #define JSONCONS_N_ENCODE_MEMBER_NAME_4(Member, Name, Mode, Match) JSONCONS_N_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_N_ENCODE_MEMBER_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_N_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_N_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member<CharT>(Name, Into(val.Member), encoder, ec); \
+    try_encode_member<Json>(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member<CharT>(Name, Into(val.Member), encoder, ec); \
+    try_encode_optional_member<Json>(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); \
 }    
 
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_ENCODE_MEMBER_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_ENCODE_MEMBER_NAME_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_2(Member, Name) \
-     try_encode_member<CharT>(Name, val.Member, encoder, ec); 
+     try_encode_member<Json>(basic_string_view<char_type>(Name), val.Member, encoder, ec); 
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_3(Member, Name, Mode) JSONCONS_ALL_ENCODE_MEMBER_NAME_2(Member, Name)
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_4(Member, Name, Mode, Match) JSONCONS_ALL_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match, Into, From) \
-    try_encode_member<CharT>(Name, Into(val.Member), encoder, ec); 
+    try_encode_member<Json>(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); 
 
 #define JSONCONS_N_OBJECT_SIZE_NAME(P1, P2, P3, Seq, Count) JSONCONS_N_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_OBJECT_SIZE_NAME_,JSONCONS_NARGS Seq) Seq)
@@ -723,16 +723,16 @@ namespace reflect { \
             return ajson; \
         } \
     }; \
-    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encode_traits<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
+    struct encode_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
+        using char_type = typename Json::char_type; \
         using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
         static void try_encode(const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
+            basic_json_visitor<char_type>& encoder, \
             std::error_code& ec) \
         { \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \

@@ -1,5 +1,5 @@
 // Copyright 2013-2025 Daniel Parker
-// Distributed under Boost license
+// Distributed under Boost license 
 
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
@@ -464,7 +464,6 @@ namespace ns {
 } // namespace 
  
 JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
-
 JSONCONS_ALL_MEMBER_TRAITS(ns::book_m_all,author,title,price)
 
 JSONCONS_N_MEMBER_TRAITS(ns::book_m_3,3,author,title,price,isbn)
@@ -490,9 +489,332 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 
 // Declare the traits, first 6 members mandatory, last 6 non-mandatory
-JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,
-                         field1,field2,field3,field4,field5,field6,
-                         field7,field8,field9,field10,field11,field12)
+namespace jsoncons {
+namespace reflect {
+template <> struct json_object_name_members<ns::smart_pointer_and_optional_test1 > {
+    static inline const string_view& field1(char) {
+        static const string_view sv = "field1"; return sv;
+    } static inline const wstring_view& field1(wchar_t) {
+        static const wstring_view sv = L"field1"; return sv;
+    } static inline const string_view& field1(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field1"; return sv;
+    } static inline const string_view& field2(char) {
+        static const string_view sv = "field2"; return sv;
+    } static inline const wstring_view& field2(wchar_t) {
+        static const wstring_view sv = L"field2"; return sv;
+    } static inline const string_view& field2(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field2"; return sv;
+    } static inline const string_view& field3(char) {
+        static const string_view sv = "field3"; return sv;
+    } static inline const wstring_view& field3(wchar_t) {
+        static const wstring_view sv = L"field3"; return sv;
+    } static inline const string_view& field3(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field3"; return sv;
+    } static inline const string_view& field4(char) {
+        static const string_view sv = "field4"; return sv;
+    } static inline const wstring_view& field4(wchar_t) {
+        static const wstring_view sv = L"field4"; return sv;
+    } static inline const string_view& field4(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field4"; return sv;
+    } static inline const string_view& field5(char) {
+        static const string_view sv = "field5"; return sv;
+    } static inline const wstring_view& field5(wchar_t) {
+        static const wstring_view sv = L"field5"; return sv;
+    } static inline const string_view& field5(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field5"; return sv;
+    } static inline const string_view& field6(char) {
+        static const string_view sv = "field6"; return sv;
+    } static inline const wstring_view& field6(wchar_t) {
+        static const wstring_view sv = L"field6"; return sv;
+    } static inline const string_view& field6(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field6"; return sv;
+    } static inline const string_view& field7(char) {
+        static const string_view sv = "field7"; return sv;
+    } static inline const wstring_view& field7(wchar_t) {
+        static const wstring_view sv = L"field7"; return sv;
+    } static inline const string_view& field7(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field7"; return sv;
+    } static inline const string_view& field8(char) {
+        static const string_view sv = "field8"; return sv;
+    } static inline const wstring_view& field8(wchar_t) {
+        static const wstring_view sv = L"field8"; return sv;
+    } static inline const string_view& field8(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field8"; return sv;
+    } static inline const string_view& field9(char) {
+        static const string_view sv = "field9"; return sv;
+    } static inline const wstring_view& field9(wchar_t) {
+        static const wstring_view sv = L"field9"; return sv;
+    } static inline const string_view& field9(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field9"; return sv;
+    } static inline const string_view& field10(char) {
+        static const string_view sv = "field10"; return sv;
+    } static inline const wstring_view& field10(wchar_t) {
+        static const wstring_view sv = L"field10"; return sv;
+    } static inline const string_view& field10(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field10"; return sv;
+    } static inline const string_view& field11(char) {
+        static const string_view sv = "field11"; return sv;
+    } static inline const wstring_view& field11(wchar_t) {
+        static const wstring_view sv = L"field11"; return sv;
+    } static inline const string_view& field11(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field11"; return sv;
+    } static inline const string_view& field12(char) {
+        static const string_view sv = "field12"; return sv;
+    } static inline const wstring_view& field12(wchar_t) {
+        static const wstring_view sv = L"field12"; return sv;
+    } static inline const string_view& field12(unexpect_t) {
+        static const string_view sv = "ns::smart_pointer_and_optional_test1" ": " "field12"; return sv;
+    }
+}; template <typename Json > struct json_conv_traits<Json, ns::smart_pointer_and_optional_test1 > {
+    using value_type = ns::smart_pointer_and_optional_test1; using result_type = conversion_result<value_type>; using allocator_type = typename Json::allocator_type; using char_type = typename Json::char_type; using string_view_type = typename Json::string_view_type; constexpr static size_t num_params = 12; constexpr static size_t num_mandatory_params1 = 6; constexpr static size_t num_mandatory_params2 = 6; static bool is(const Json& ajson) noexcept {
+        if (!ajson.is_object()) return false; if ((num_params - 12) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field1(char_type{}))) return false; if ((num_params - 11) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field2(char_type{}))) return false; if ((num_params - 10) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field3(char_type{}))) return false; if ((num_params - 9) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field4(char_type{}))) return false; if ((num_params - 8) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field5(char_type{}))) return false; if ((num_params - 7) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field6(char_type{}))) return false; if ((num_params - 6) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field7(char_type{}))) return false; if ((num_params - 5) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field8(char_type{}))) return false; if ((num_params - 4) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field9(char_type{}))) return false; if ((num_params - 3) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field10(char_type{}))) return false; if ((num_params - 2) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field11(char_type{}))) return false; if ((num_params - 1) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::field12(char_type{}))) return false; return true;
+    } static result_type try_as(const Json& ajson) {
+        if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::smart_pointer_and_optional_test1"); value_type class_instance{}; std::error_code ec; json_traits_helper<Json>::set_member((num_params - 12), num_mandatory_params2, ajson, json_object_name_members<value_type>::field1(char_type{}), class_instance.field1, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field1(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 11), num_mandatory_params2, ajson, json_object_name_members<value_type>::field2(char_type{}), class_instance.field2, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field2(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 10), num_mandatory_params2, ajson, json_object_name_members<value_type>::field3(char_type{}), class_instance.field3, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field3(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 9), num_mandatory_params2, ajson, json_object_name_members<value_type>::field4(char_type{}), class_instance.field4, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field4(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 8), num_mandatory_params2, ajson, json_object_name_members<value_type>::field5(char_type{}), class_instance.field5, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field5(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 7), num_mandatory_params2, ajson, json_object_name_members<value_type>::field6(char_type{}), class_instance.field6, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field6(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 6), num_mandatory_params2, ajson, json_object_name_members<value_type>::field7(char_type{}), class_instance.field7, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field7(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 5), num_mandatory_params2, ajson, json_object_name_members<value_type>::field8(char_type{}), class_instance.field8, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field8(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 4), num_mandatory_params2, ajson, json_object_name_members<value_type>::field9(char_type{}), class_instance.field9, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field9(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 3), num_mandatory_params2, ajson, json_object_name_members<value_type>::field10(char_type{}), class_instance.field10, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field10(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 2), num_mandatory_params2, ajson, json_object_name_members<value_type>::field11(char_type{}), class_instance.field11, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field11(unexpect));
+        } json_traits_helper<Json>::set_member((num_params - 1), num_mandatory_params2, ajson, json_object_name_members<value_type>::field12(char_type{}), class_instance.field12, ec); if (ec) {
+            return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::field12(unexpect));
+        } return result_type(std::move(class_instance));
+    } static Json to_json(const value_type& class_instance, allocator_type alloc = allocator_type()) {
+        Json ajson(json_object_arg, semantic_tag::none, alloc); if ((num_params - 12) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field1(char_type{}), class_instance.field1);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field1(char_type{}), class_instance.field1, ajson);
+        } if ((num_params - 11) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field2(char_type{}), class_instance.field2);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field2(char_type{}), class_instance.field2, ajson);
+        } if ((num_params - 10) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field3(char_type{}), class_instance.field3);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field3(char_type{}), class_instance.field3, ajson);
+        } if ((num_params - 9) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field4(char_type{}), class_instance.field4);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field4(char_type{}), class_instance.field4, ajson);
+        } if ((num_params - 8) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field5(char_type{}), class_instance.field5);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field5(char_type{}), class_instance.field5, ajson);
+        } if ((num_params - 7) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field6(char_type{}), class_instance.field6);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field6(char_type{}), class_instance.field6, ajson);
+        } if ((num_params - 6) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field7(char_type{}), class_instance.field7);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field7(char_type{}), class_instance.field7, ajson);
+        } if ((num_params - 5) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field8(char_type{}), class_instance.field8);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field8(char_type{}), class_instance.field8, ajson);
+        } if ((num_params - 4) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field9(char_type{}), class_instance.field9);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field9(char_type{}), class_instance.field9, ajson);
+        } if ((num_params - 3) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field10(char_type{}), class_instance.field10);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field10(char_type{}), class_instance.field10, ajson);
+        } if ((num_params - 2) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field11(char_type{}), class_instance.field11);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field11(char_type{}), class_instance.field11, ajson);
+        } if ((num_params - 1) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::field12(char_type{}), class_instance.field12);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::field12(char_type{}), class_instance.field12, ajson);
+        } return ajson;
+    }
+}; template <typename Json > struct encode_traits<Json, ns::smart_pointer_and_optional_test1 > {
+    using char_type = typename Json::char_type; using value_type = ns::smart_pointer_and_optional_test1; constexpr static size_t num_params = 12; constexpr static size_t num_mandatory_params1 = 6; constexpr static size_t num_mandatory_params2 = 6; static void try_encode(const value_type& val, basic_json_visitor<char_type>& encoder, std::error_code& ec) {
+        (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; std::size_t object_size{0}; if ((num_params - 12) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field1)) {
+                ++object_size;
+            }
+        } if ((num_params - 11) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field2)) {
+                ++object_size;
+            }
+        } if ((num_params - 10) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field3)) {
+                ++object_size;
+            }
+        } if ((num_params - 9) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field4)) {
+                ++object_size;
+            }
+        } if ((num_params - 8) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field5)) {
+                ++object_size;
+            }
+        } if ((num_params - 7) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field6)) {
+                ++object_size;
+            }
+        } if ((num_params - 6) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field7)) {
+                ++object_size;
+            }
+        } if ((num_params - 5) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field8)) {
+                ++object_size;
+            }
+        } if ((num_params - 4) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field9)) {
+                ++object_size;
+            }
+        } if ((num_params - 3) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field10)) {
+                ++object_size;
+            }
+        } if ((num_params - 2) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field11)) {
+                ++object_size;
+            }
+        } if ((num_params - 1) < num_mandatory_params2) {
+            ++object_size;
+        }
+        else {
+            if (is_optional_value_set(val.field12)) {
+                ++object_size;
+            }
+        } encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); if (ec) {
+            return;
+        } if ((num_params - 12) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field1(char_type{}), val.field1, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field1(char_type{}), val.field1, encoder, ec);
+        } if ((num_params - 11) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field2(char_type{}), val.field2, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field2(char_type{}), val.field2, encoder, ec);
+        } if ((num_params - 10) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field3(char_type{}), val.field3, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field3(char_type{}), val.field3, encoder, ec);
+        } if ((num_params - 9) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field4(char_type{}), val.field4, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field4(char_type{}), val.field4, encoder, ec);
+        } if ((num_params - 8) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field5(char_type{}), val.field5, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field5(char_type{}), val.field5, encoder, ec);
+        } if ((num_params - 7) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field6(char_type{}), val.field6, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field6(char_type{}), val.field6, encoder, ec);
+        } if ((num_params - 6) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field7(char_type{}), val.field7, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field7(char_type{}), val.field7, encoder, ec);
+        } if ((num_params - 5) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field8(char_type{}), val.field8, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field8(char_type{}), val.field8, encoder, ec);
+        } if ((num_params - 4) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field9(char_type{}), val.field9, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field9(char_type{}), val.field9, encoder, ec);
+        } if ((num_params - 3) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field10(char_type{}), val.field10, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field10(char_type{}), val.field10, encoder, ec);
+        } if ((num_params - 2) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field11(char_type{}), val.field11, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field11(char_type{}), val.field11, encoder, ec);
+        } if ((num_params - 1) < num_mandatory_params2) {
+            try_encode_member<Json>(json_object_name_members<value_type>::field12(char_type{}), val.field12, encoder, ec);
+        }
+        else {
+            try_encode_optional_member<Json>(json_object_name_members<value_type>::field12(char_type{}), val.field12, encoder, ec);
+        } encoder.end_object(ser_context(), ec); if (ec) {
+            return;
+        }
+    }
+};
+}
+} namespace jsoncons {
+template <> struct is_json_type_traits_declared<ns::smart_pointer_and_optional_test1> : public std::true_type {
+};
+}
 
 void test_is_json_type_traits_declared(std::true_type)
 {

@@ -197,8 +197,9 @@ namespace jsoncons {
     template <typename T,typename CharT>
     void encode_json(const T& val, basic_json_visitor<CharT>& encoder)
     {
+        using json_type = basic_json<CharT,order_preserving_policy>; 
         std::error_code ec;
-        reflect::encode_traits<T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<json_type,T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
