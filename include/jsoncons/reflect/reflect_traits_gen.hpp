@@ -58,7 +58,24 @@ struct reflect_type_properties
 template <typename Json>
 struct json_traits_helper
 {
-    using string_view_type = typename Json::string_view_type; 
+    using string_view_type = typename Json::string_view_type;
+
+    template <typename T> 
+    static conversion_result<T> try_get_member(const Json& j, string_view_type key) 
+    { 
+        auto it = j.find(key);
+        if (it == j.object_range().end())
+        {
+            return conversion_result<T>(unexpect, conv_errc::missing_required_member);
+        }
+        auto result = it->value().template try_as<T>(); 
+        if (!result)
+        {
+            return conversion_result<T>(unexpect, conv_errc::missing_required_member);
+        }
+        return conversion_result<T>(std::move(result.value()));
+    } 
+
     template <typename OutputType> 
     static void set_member(std::size_t, std::size_t, 
         const Json&, const string_view_type&, const OutputType&, std::error_code&) 
@@ -1249,7 +1266,10 @@ namespace reflect { \
 
 #define JSONCONS_ALL_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
-#define JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) class_instance.Setter(ajson.at(json_object_name_members<value_type>::Property(char_type{})).template as<typename std::decay<decltype(class_instance.Getter())>::type>());
+#define JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) \
+  auto r ## Property = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(ajson, json_object_name_members<value_type>::Property(char_type{})); \
+  if (!r ## Property) {return result_type(unexpect, r ## Property.error().code(), # Prefix);} \
+  class_instance.Setter(std::move(* r ## Property));
 
 #define JSONCONS_N_GETTER_SETTER_TO_JSON(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_N_GETTER_SETTER_TO_JSON_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
@@ -1291,9 +1311,8 @@ namespace reflect { \
         static result_type try_as(const Json& ajson) \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
             value_type class_instance{}; \
-            JSONCONS_VARIADIC_FOR_EACH(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(AsT,ClassType,GetPrefix,SetPrefix, __VA_ARGS__) \
             return result_type(std::move(class_instance)); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
