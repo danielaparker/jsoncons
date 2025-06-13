@@ -4,15 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP
-#define JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP
+#ifndef JSONCONS_REFLECT_REFLECT_TRAITS_GEN_HPP
+#define JSONCONS_REFLECT_REFLECT_TRAITS_GEN_HPP
 
 #include <utility>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_PP_EXPAND, JSONCONS_PP_QUOTE
+#include <jsoncons/conv_error.hpp>
+#include <jsoncons/conv_error.hpp>
+#include <jsoncons/conversion_result.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #define JSONCONS_RDONLY(X)
 
@@ -1053,6 +1061,38 @@ namespace reflect { \
             return Json((*it).second,alloc); \
         } \
     }; \
+    template <typename Json> struct encode_traits<Json,EnumType> \
+    { \
+        using char_type = typename Json::char_type; \
+        using enum_type = EnumType; \
+        using result_type = conversion_result<enum_type>; \
+        using string_view_type = jsoncons::basic_string_view<char_type>; \
+        using mapped_type = std::pair<EnumType,string_view_type>; \
+        static void try_encode(const enum_type& val, \
+            basic_json_visitor<char_type>& encoder, \
+            std::error_code& ec) \
+        { \
+            static const char_type empty_string[] = {0}; \
+            auto first = reflect_type_properties<EnumType>::values<char_type>(); \
+            auto last = first + reflect_type_properties<EnumType>::count; \
+            auto it = std::find_if(first, last, \
+                                   [val](const mapped_type& item) -> bool \
+                                   { return item.first == val; }); \
+            if (it == last) \
+            { \
+                if (val == enum_type()) \
+                { \
+                    encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                } \
+                else \
+                { \
+                    ec = conv_errc::conversion_failed; \
+                } \
+                return; \
+            } \
+            encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
+        } \
+    }; \
 } \
 } \
     /**/
@@ -1160,6 +1200,38 @@ namespace reflect { \
                 } \
             } \
             return Json((*it).second,alloc); \
+        } \
+    }; \
+    template <typename Json> struct encode_traits<Json,EnumType> \
+    { \
+        using char_type = typename Json::char_type; \
+        using enum_type = EnumType; \
+        using result_type = conversion_result<enum_type>; \
+        using string_view_type = jsoncons::basic_string_view<char_type>; \
+        using mapped_type = std::pair<EnumType,string_view_type>; \
+        static void try_encode(const enum_type& val, \
+            basic_json_visitor<char_type>& encoder, \
+            std::error_code& ec) \
+        { \
+            static const char_type empty_string[] = {0}; \
+            auto first = reflect_type_properties<EnumType>::values<char_type>(); \
+            auto last = first + reflect_type_properties<EnumType>::count; \
+            auto it = std::find_if(first, last, \
+                                   [val](const mapped_type& item) -> bool \
+                                   { return item.first == val; }); \
+            if (it == last) \
+            { \
+                if (val == enum_type()) \
+                { \
+                    encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                } \
+                else \
+                { \
+                    ec = conv_errc::conversion_failed; \
+                } \
+                return; \
+            } \
+            encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
         } \
     }; \
 } \
@@ -1419,4 +1491,4 @@ namespace reflect { \
 } \
   /**/
 
-#endif // JSONCONS_REFLECT_JSON_REFLECT_TRAITS_GEN_HPP
+#endif // JSONCONS_REFLECT_REFLECT_TRAITS_GEN_HPP
