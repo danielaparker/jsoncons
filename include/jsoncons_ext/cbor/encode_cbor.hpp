@@ -42,10 +42,9 @@ namespace cbor {
     encode_cbor(const T& val, ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        using json_type = basic_json<char,order_preserving_policy>; 
         basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
         std::error_code ec;
-        reflect::encode_traits<json_type,T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -72,10 +71,9 @@ namespace cbor {
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        using json_type = basic_json<char,order_preserving_policy>; 
         cbor_stream_encoder encoder(os, options);
         std::error_code ec;
-        reflect::encode_traits<json_type,T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -108,10 +106,9 @@ namespace cbor {
                 ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        using json_type = basic_json<char,order_preserving_policy>; 
         basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>,TempAllocator> encoder(cont, options, alloc_set.get_temp_allocator());
         std::error_code ec;
-        reflect::encode_traits<json_type,T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -140,10 +137,9 @@ namespace cbor {
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        using json_type = basic_json<char,order_preserving_policy>; 
         basic_cbor_encoder<binary_stream_sink,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
         std::error_code ec;
-        reflect::encode_traits<json_type,T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
