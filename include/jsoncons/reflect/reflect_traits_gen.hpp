@@ -1262,7 +1262,11 @@ namespace reflect { \
 
 #define JSONCONS_N_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_N_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count)  
-#define JSONCONS_N_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) if ((num_params-Count) < num_mandatory_params2 || ajson.contains(json_object_name_members<value_type>::Property(char_type{}))) {class_instance.Setter(ajson.at(json_object_name_members<value_type>::Property(char_type{})).template as<typename std::decay<decltype(class_instance.Getter())>::type>());}
+#define JSONCONS_N_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) \
+  auto r ## Property = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(ajson, json_object_name_members<value_type>::Property(char_type{})); \
+  if (r ## Property) {class_instance.Setter(std::move(* r ## Property));} \
+  else if ((num_params-Count) < num_mandatory_params2) {return result_type(unexpect, r ## Property.error().code(), # Prefix);} \
+  else if (r ## Property.error().code() != conv_errc::missing_required_member){return result_type(unexpect, r ## Property.error().code(), # Prefix);}
 
 #define JSONCONS_ALL_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
