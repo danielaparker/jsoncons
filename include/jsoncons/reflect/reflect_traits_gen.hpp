@@ -481,8 +481,8 @@ if ((num_params-Count) < num_mandatory_params2) \
 #define JSONCONS_ALL_ENCODE_MEMBER_LAST(Prefix, P2, P3, Member, Count) \
     try_encode_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder, ec); 
 
-#define JSONCONS_N_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_N_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
+#define JSONCONS_MEMBER_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_MEMBER_SIZE_LAST(Prefix, P2, P3, Member, Count)
+#define JSONCONS_MEMBER_SIZE_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
     ++object_size; \
@@ -494,10 +494,6 @@ else \
         ++object_size; \
     } \
 }
-
-#define JSONCONS_ALL_OBJECT_SIZE(Prefix, P2, P3, Member, Count) JSONCONS_ALL_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_ALL_OBJECT_SIZE_LAST(Prefix, P2, P3, Member, Count) \
-    ++object_size; 
 
 #define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,ObjectSize,EnMem,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
@@ -567,22 +563,22 @@ namespace reflect { \
   /**/
 
 #define JSONCONS_N_MEMBER_TRAITS(ClassType,NumMandatoryParams,...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_N_OBJECT_SIZE, JSONCONS_N_ENCODE_MEMBER, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_MEMBER_SIZE, JSONCONS_N_ENCODE_MEMBER, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_TRAITS(NumTemplateParams, ClassType,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_N_OBJECT_SIZE, JSONCONS_N_ENCODE_MEMBER,NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_N_MEMBER_AS, JSONCONS_TO_JSON, JSONCONS_MEMBER_SIZE, JSONCONS_N_ENCODE_MEMBER,NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_ALL_MEMBER_TRAITS(ClassType, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ALL_OBJECT_SIZE, JSONCONS_ALL_ENCODE_MEMBER,0,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_MEMBER_SIZE, JSONCONS_ALL_ENCODE_MEMBER,0,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_ALL_MEMBER_TRAITS(NumTemplateParams, ClassType, ...)  \
-    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_ALL_OBJECT_SIZE, JSONCONS_ALL_ENCODE_MEMBER,NumTemplateParams,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_BASE(JSONCONS_ALL_MEMBER_AS,JSONCONS_ALL_TO_JSON, JSONCONS_MEMBER_SIZE, JSONCONS_ALL_ENCODE_MEMBER,NumTemplateParams,ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/ 
 
@@ -674,9 +670,9 @@ else \
 #define JSONCONS_ALL_ENCODE_MEMBER_NAME_6(Member, Name, Mode, Match, Into, From) \
     try_encode_member(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); 
 
-#define JSONCONS_N_OBJECT_SIZE_NAME(P1, P2, P3, Seq, Count) JSONCONS_N_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_OBJECT_SIZE_NAME_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_OBJECT_SIZE_NAME_2(Member, Name) \
+#define JSONCONS_MEMBER_NAME_SIZE(P1, P2, P3, Seq, Count) JSONCONS_MEMBER_NAME_SIZE_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_MEMBER_NAME_SIZE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_SIZE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_MEMBER_NAME_SIZE_2(Member, Name) \
 { \
     ++object_size; \
 } \
@@ -687,10 +683,10 @@ else \
         ++object_size; \
     } \
 }    
-#define JSONCONS_N_OBJECT_SIZE_NAME_3(Member, Name, Mode) JSONCONS_N_OBJECT_SIZE_NAME_2(Member, Name)
-#define JSONCONS_N_OBJECT_SIZE_NAME_4(Member, Name, Mode, Match) JSONCONS_N_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match,,)
-#define JSONCONS_N_OBJECT_SIZE_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_N_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match, Into, )
-#define JSONCONS_N_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match, Into, From) \
+#define JSONCONS_MEMBER_NAME_SIZE_3(Member, Name, Mode) JSONCONS_MEMBER_NAME_SIZE_2(Member, Name)
+#define JSONCONS_MEMBER_NAME_SIZE_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_SIZE_6(Member, Name, Mode, Match,,)
+#define JSONCONS_MEMBER_NAME_SIZE_5(Member, Name, Mode, Match, Into) JSONCONS_MEMBER_NAME_SIZE_6(Member, Name, Mode, Match, Into, )
+#define JSONCONS_MEMBER_NAME_SIZE_6(Member, Name, Mode, Match, Into, From) \
 { \
     ++object_size; \
 } \
@@ -702,16 +698,6 @@ else \
     } \
 }    
 
-#define JSONCONS_ALL_OBJECT_SIZE_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_OBJECT_SIZE_NAME_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_2(Member, Name) \
-    ++object_size; 
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_3(Member, Name, Mode) JSONCONS_ALL_OBJECT_SIZE_NAME_2(Member, Name)
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_4(Member, Name, Mode, Match) JSONCONS_ALL_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match,,)
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match, Into, )
-#define JSONCONS_ALL_OBJECT_SIZE_NAME_6(Member, Name, Mode, Match, Into, From) \
-     ++object_size; 
-                                                                 
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(AsT,ToJ,ObjectSize,EnMem, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
@@ -778,22 +764,22 @@ namespace reflect { \
 
 
 #define JSONCONS_N_MEMBER_NAME_TRAITS(ClassType,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_AS, JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_OBJECT_SIZE_NAME, JSONCONS_N_ENCODE_MEMBER_NAME, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_AS, JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_MEMBER_NAME_SIZE, JSONCONS_N_ENCODE_MEMBER_NAME, 0, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_NAME_TRAITS(NumTemplateParams, ClassType,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_AS, JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_OBJECT_SIZE_NAME, JSONCONS_N_ENCODE_MEMBER_NAME, NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_AS, JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_MEMBER_NAME_SIZE, JSONCONS_N_ENCODE_MEMBER_NAME, NumTemplateParams, ClassType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_ALL_MEMBER_NAME_TRAITS(ClassType, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_AS, JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_OBJECT_SIZE_NAME, JSONCONS_ALL_ENCODE_MEMBER_NAME, 0, ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_AS, JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_MEMBER_NAME_SIZE, JSONCONS_ALL_ENCODE_MEMBER_NAME, 0, ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ClassType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(NumTemplateParams, ClassType, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_AS, JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_OBJECT_SIZE_NAME, JSONCONS_ALL_ENCODE_MEMBER_NAME, NumTemplateParams, ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_AS, JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_MEMBER_NAME_SIZE, JSONCONS_ALL_ENCODE_MEMBER_NAME, NumTemplateParams, ClassType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
