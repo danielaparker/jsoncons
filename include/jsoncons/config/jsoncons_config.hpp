@@ -249,6 +249,7 @@ namespace jsoncons {
 // Preprocessor macros
 
 #define JSONCONS_PP_EXPAND(X) X    
+#define JSONCONS_PP_STRINGIFY(a) #a
 #define JSONCONS_PP_QUOTE(Prefix, A) JSONCONS_PP_EXPAND(Prefix ## #A)
 #define JSONCONS_PP_WIDEN(A) JSONCONS_PP_EXPAND(L ## A)
 
