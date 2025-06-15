@@ -71,7 +71,7 @@ struct json_traits_helper
         auto result = it->value().template try_as<T>(); 
         if (!result)
         {
-            return conversion_result<T>(unexpect, conv_errc::missing_required_member);
+            return conversion_result<T>(unexpect, conv_errc::conversion_failed);
         }
         return conversion_result<T>(std::move(result.value()));
     } 
