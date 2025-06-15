@@ -583,15 +583,15 @@ namespace reflect { \
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
-    json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson, Name, class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name);
+#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,,,,)  
 #define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name))
-#define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) \
-    Mode(json_traits_helper<Json>::set_member(index, num_mandatory_params2, ajson, Name, class_instance.Member, ec); if (ec) return result_type(jsoncons::unexpect, ec, class_name);)
-#define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) \
-    Mode(json_traits_helper<Json>::template set_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>(ajson,Name,class_instance.Member);)
-#define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) \
-    Mode(json_traits_helper<Json>::template set_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Member))>::type>(ajson,Name,From,class_instance.Member);)
+#define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,))
+#define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,))
+#define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From))
+#define JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From) \
+  auto r ## Member = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Member))>::type>(ajson, Name); \
+  if (r ## Member) {class_instance.Member = std::move(From(* r ## Member));} \
+  else {return result_type(unexpect, r ## Member.error().code(), class_name);} 
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
