@@ -207,22 +207,22 @@ namespace ns {
         }
     };
 
-    class book_gs_2
+    class book_gs_n
     {
         std::string author_;
         std::string title_;
         double price_{0};
         std::string isbn_;
     public:
-        book_gs_2()
+        book_gs_n()
             : author_(), title_(), price_(), isbn_()
         {
         }
 
-        book_gs_2(const book_gs_2&) = default;
-        book_gs_2(book_gs_2&&) = default;
-        book_gs_2& operator=(const book_gs_2&) = default;
-        book_gs_2& operator=(book_gs_2&&) = default;
+        book_gs_n(const book_gs_n&) = default;
+        book_gs_n(book_gs_n&&) = default;
+        book_gs_n& operator=(const book_gs_n&) = default;
+        book_gs_n& operator=(book_gs_n&&) = default;
 
         const std::string& getAuthor() const
         {
@@ -481,7 +481,7 @@ JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, firstName, lastName, b
 JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(ns::book_gs_all, get, set, Author, Title, Price)
-JSONCONS_N_GETTER_SETTER_TRAITS(ns::book_gs_2, get, set, 2, Author, Title, Price, Isbn)
+JSONCONS_N_GETTER_SETTER_TRAITS(ns::book_gs_n, get, set, 2, Author, Title, Price, Isbn)
 JSONCONS_N_GETTER_SETTER_TRAITS(ns::book_gs_2a, get, set, 2, Author, Title, Price, Isbn)
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
@@ -1174,17 +1174,17 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
         j["Author"] = an_author;
         j["Title"] = a_title;
 
-        CHECK(j.is<ns::book_gs_2>() == true);
+        CHECK(j.is<ns::book_gs_n>() == true);
         CHECK(j.is<ns::book_gs_all>() == false);
 
         j["Price"] = a_price;
 
-        CHECK(j.is<ns::book_gs_2>() == true);
+        CHECK(j.is<ns::book_gs_n>() == true);
         CHECK(j.is<ns::book_gs_all>() == true);
     }
     SECTION("to_json")
     {
-        ns::book_gs_2 book;
+        ns::book_gs_n book;
         book.setAuthor(an_author);
         book.setTitle(a_title);
         book.setPrice(a_price);
@@ -1205,7 +1205,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        auto book = j.as<ns::book_gs_2>();
+        auto book = j.as<ns::book_gs_n>();
 
         CHECK(book.getAuthor() == an_author);
         CHECK(book.getTitle() == a_title);
@@ -1219,7 +1219,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 
         std::string buffer;
         j.dump(buffer);
-        auto book = decode_json<ns::book_gs_2>(buffer);
+        auto book = decode_json<ns::book_gs_n>(buffer);
         CHECK(book.getAuthor() == an_author);
         CHECK(book.getTitle() == a_title);
         CHECK(book.getPrice() == double());
