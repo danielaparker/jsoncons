@@ -77,12 +77,6 @@ struct json_traits_helper
     } 
 
     template <typename OutputType> 
-    static void set_member(std::size_t, std::size_t, 
-        const Json&, const string_view_type&, const OutputType&, std::error_code&) 
-    { 
-    } 
-
-    template <typename OutputType> 
     static void set_member(std::size_t index, std::size_t num_required, 
         const Json& j, const string_view_type& key, OutputType& val, std::error_code& ec) 
     { 
@@ -102,12 +96,6 @@ struct json_traits_helper
             return;
         }
         val = std::move(result.value());
-    } 
-
-    template <typename T,typename From,typename OutputType> 
-    static void set_member(std::size_t, std::size_t, 
-        const Json&, const string_view_type&, From, const OutputType&, std::error_code&) 
-    { 
     } 
 
     template <typename T,typename From,typename OutputType> 
@@ -134,12 +122,6 @@ struct json_traits_helper
     } 
 
     template <typename OutputType> 
-    static bool set_member(const Json&, const string_view_type&, const OutputType&) 
-    { 
-        return true;
-    } 
-
-    template <typename OutputType> 
     static bool set_member(const Json& j, const string_view_type& key, OutputType& val) 
     { 
         auto it = j.find(key);
@@ -155,12 +137,6 @@ struct json_traits_helper
         val = std::move(result.value());
         return true;
     }
-     
-    template <typename T,typename From,typename OutputType> 
-    static bool set_member(const Json&, const string_view_type&, From, const OutputType&) 
-    { 
-        return true;
-    } 
     template <typename T,typename From,typename OutputType> 
     static bool set_member(const Json& j, const string_view_type& key, From from, OutputType& val) 
     { 
