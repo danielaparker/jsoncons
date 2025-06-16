@@ -825,7 +825,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_colon == result.error().code()                         );
+        CHECK(json_errc::expected_colon == result.error().code());
         //std::cout << result.error() << "\n";
     }
     SECTION("unexpected JSON")
@@ -834,7 +834,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
-        CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        CHECK(jsoncons::conv_errc::expected_object == result.error().code());
         //std::cout << result.error() << "\n";
     }
     SECTION("missing member")
