@@ -15,7 +15,7 @@
 namespace {
 namespace ns {
 
-    struct book_m_all
+    struct book_all_m
     {
         std::string author;
         std::string title;
@@ -25,19 +25,19 @@ namespace ns {
 } // namespace ns
 } // namespace 
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::book_m_all, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::book_all_m, author, title, price)
 TEST_CASE("default to json_type_traits tests")
 {
     std::string an_author = "Haruki Murakami";
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book_m_all book{an_author, a_title, a_price};
+    ns::book_all_m book{an_author, a_title, a_price};
 
-    CHECK(jsoncons::is_json_type_traits_declared<ns::book_m_all>::value);
-    //test_is_json_type_traits_declared(is_json_type_traits_declared<ns::book_m_all>());
+    CHECK(jsoncons::is_json_type_traits_declared<ns::book_all_m>::value);
+    //test_is_json_type_traits_declared(is_json_type_traits_declared<ns::book_all_m>());
 
-    SECTION("book_m_all")
+    SECTION("book_all_m")
     {
         std::string s;
 
@@ -46,7 +46,7 @@ TEST_CASE("default to json_type_traits tests")
         auto result = jsoncons::try_decode_json<jsoncons::json>(s);
 
         REQUIRE(result);
-        REQUIRE(result.value().is<ns::book_m_all>() == true);
+        REQUIRE(result.value().is<ns::book_all_m>() == true);
 
         CHECK(result.value()["author"].as<std::string>() == an_author);
         CHECK(result.value()["title"].as<std::string>() == a_title);
@@ -56,7 +56,7 @@ TEST_CASE("default to json_type_traits tests")
 
         CHECK(result.value() == j2);
 
-        ns::book_m_all val = result.value().as<ns::book_m_all>();
+        ns::book_all_m val = result.value().as<ns::book_all_m>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
