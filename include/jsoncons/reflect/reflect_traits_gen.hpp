@@ -76,78 +76,6 @@ struct json_traits_helper
         return conversion_result<T>(std::move(result.value()));
     } 
 
-    template <typename OutputType> 
-    static void set_member(std::size_t index, std::size_t num_required, 
-        const Json& j, const string_view_type& key, OutputType& val, std::error_code& ec) 
-    { 
-        auto it = j.find(key);
-        if (it == j.object_range().end())
-        {
-            if (index < num_required)
-            {
-                ec = conv_errc::missing_required_member;
-            }
-            return;
-        }
-        auto result = it->value().template try_as<OutputType>(); 
-        if (!result)
-        {
-            ec = conv_errc::conversion_failed;
-            return;
-        }
-        val = std::move(result.value());
-    } 
-
-    template <typename T,typename From,typename OutputType> 
-    static void set_member(std::size_t index, std::size_t num_required, 
-        const Json& j, const string_view_type& key, From from, OutputType& val, 
-        std::error_code& ec) 
-    { 
-        auto it = j.find(key);
-        if (it == j.object_range().end())
-        {
-            if (index < num_required)
-            {
-                ec = conv_errc::missing_required_member;
-            }
-            return;
-        }
-        auto result = it->value().template try_as<T>(); 
-        if (!result)
-        {
-            ec = conv_errc::conversion_failed;
-            return;
-        }
-        val = from(std::move(result.value()));
-    } 
-
-    template <typename OutputType> 
-    static bool set_member(const Json& j, const string_view_type& key, OutputType& val) 
-    { 
-        auto it = j.find(key);
-        if (it == j.object_range().end())
-        {
-            return false;
-        }
-        auto result = it->value().template try_as<OutputType>(); 
-        if (!result)
-        {
-            return false;
-        }
-        val = std::move(result.value());
-        return true;
-    }
-    template <typename T,typename From,typename OutputType> 
-    static bool set_member(const Json& j, const string_view_type& key, From from, OutputType& val) 
-    { 
-        auto it = j.find(key);
-        if (it == j.object_range().end())
-        {
-            return false;
-        }
-        val = from(it->value().template as<T>()); 
-        return true;
-    } 
     template <typename U> 
     static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
     { 
@@ -419,18 +347,20 @@ using identity = reflect::identity;
 
 #define JSONCONS_N_MEMBER_AS(Prefix,P2,P3, Member, Count) JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
-    json_traits_helper<Json>::set_member((num_params-Count), num_mandatory_params2, \
-        ajson,json_object_name_members<value_type>::Member(char_type{}),class_instance.Member, ec); \
-    if (ec) { \
-        return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::Member(unexpect)); \
-    } 
+  auto _r ## Member = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Member)>::type>(ajson, json_object_name_members<value_type>::Member(char_type{})); \
+  if (_r ## Member) { \
+    class_instance.Member = std::move(* _r ## Member); \
+  } \
+  else if ((num_params-Count) < num_mandatory_params2) {return result_type(unexpect, _r ## Member.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
+  else if (_r ## Member.error().code() != conv_errc::missing_required_member){return result_type(unexpect, _r ## Member.error().code(), json_object_name_members<value_type>::Member(unexpect));}
 
 #define JSONCONS_ALL_MEMBER_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) \
-    json_traits_helper<Json>::set_member((num_params-Count), num_mandatory_params2, ajson,json_object_name_members<value_type>::Member(char_type{}),class_instance.Member, ec); \
-    if (ec) { \
-        return result_type(jsoncons::unexpect, ec, json_object_name_members<value_type>::Member(unexpect)); \
-    } 
+  auto _r ## Member = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Member)>::type>(ajson, json_object_name_members<value_type>::Member(char_type{})); \
+  if (_r ## Member) { \
+    class_instance.Member = std::move(* _r ## Member); \
+  } \
+  else {return result_type(unexpect, _r ## Member.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params2) \
