@@ -1294,6 +1294,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
 
         std::string output1;
         encode_json(persons1, output1, indenting::indent);
+        auto result = try_decode_json<std::vector<ns::Person_ACGN>>(output1);
+        CHECK_FALSE(result);
         CHECK_THROWS(decode_json<std::vector<ns::Person_ACGN>>(output1));
     }
 } 

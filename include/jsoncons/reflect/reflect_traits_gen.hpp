@@ -577,27 +577,33 @@ namespace reflect { \
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name,,,,)  
-#define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_2(Member, Name))
+#define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name,,always_true(),,)  
+#define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode,always_true(),,))
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,))
 #define JSONCONS_N_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,))
 #define JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From))
 #define JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From) \
   auto _r ## Member = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Member))>::type>(ajson, Name); \
-  if (_r ## Member) {class_instance.Member = std::move(From(* _r ## Member));} \
+  if (_r ## Member) { \
+    if (!Match(From(* _r ## Member))) {return result_type(unexpect, conv_errc::conversion_failed, class_name);} \
+    {class_instance.Member = From(std::move(* _r ## Member));} \
+  } \
   else if (index < num_mandatory_params2) {return result_type(unexpect, _r ## Member.error().code(), class_name);} \
   else if (_r ## Member.error().code() != conv_errc::missing_required_member){return result_type(unexpect, _r ## Member.error().code(), class_name);}
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,,,,)  
-#define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name))
+#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,,always_true(),,)  
+#define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,Mode,always_true(),,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From))
 #define JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From) \
   auto _r ## Member = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Member))>::type>(ajson, Name); \
-  if (_r ## Member) {class_instance.Member = std::move(From(* _r ## Member));} \
+  if (_r ## Member) { \
+    if (!Match(From(* _r ## Member))) {return result_type(unexpect, conv_errc::conversion_failed, class_name);} \
+    {class_instance.Member = From(std::move(* _r ## Member));} \
+  } \
   else {return result_type(unexpect, _r ## Member.error().code(), class_name);} 
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
@@ -870,11 +876,23 @@ namespace reflect { \
 
 #define JSONCONS_COMMA ,
 
+#define JSONCONS_CTOR_GETTER_NAME_GET(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_GET_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_GET_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name,,always_true(),,)
+#define JSONCONS_CTOR_GETTER_NAME_GET_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, always_true(),,))
+#define JSONCONS_CTOR_GETTER_NAME_GET_4(Getter, Name, Mode, Match) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match,,))
+#define JSONCONS_CTOR_GETTER_NAME_GET_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into,))
+#define JSONCONS_CTOR_GETTER_NAME_GET_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From))
+#define JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From) \
+  auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(ajson, Name); \
+  if (!_r ## Getter && index < num_mandatory_params2) {return result_type(unexpect, _r ## Getter.error().code(), class_name);} \
+  if (_r ## Getter && !Match(* _r ## Getter)) {return result_type(unexpect, conv_errc::expected_object, class_name);} 
+
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_AS_LAST_2(Getter, Name) JSONCONS_COMMA
-#define JSONCONS_CTOR_GETTER_NAME_AS_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_2(Getter, Name) JSONCONS_COMMA)
-#define JSONCONS_CTOR_GETTER_NAME_AS_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match,,) 
-#define JSONCONS_CTOR_GETTER_NAME_AS_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match, Into, ) 
+#define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name,,,, ) JSONCONS_COMMA
+#define JSONCONS_CTOR_GETTER_NAME_AS_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode,,, ) JSONCONS_COMMA) 
+#define JSONCONS_CTOR_GETTER_NAME_AS_4(Getter, Name, Mode, Match) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match,, ) JSONCONS_COMMA) 
+#define JSONCONS_CTOR_GETTER_NAME_AS_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match, Into, ) JSONCONS_COMMA) 
 #define JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter,Name,Mode,Match,Into,From) JSONCONS_COMMA)
 
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_LAST_,JSONCONS_NARGS Seq) Seq)
@@ -884,7 +902,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, Match, Into, ))
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match, Into, From))
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match, Into, From) \
-  ajson.contains(Name) ? From(ajson.at(Name).template as<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>()) : From(typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type())
+  _r ## Getter ? From(std::move(*_r ## Getter)) : From(typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type())
 
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
@@ -923,12 +941,15 @@ namespace reflect { \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # ClassType); \
+            const char* class_name = # ClassType; \
+            if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
+            std::size_t index = 0; \
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_GET,ClassType,,, __VA_ARGS__) \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
@@ -1355,19 +1376,17 @@ namespace reflect { \
 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) \
-    auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(ajson, Name); \
-    if (_r ## Getter) {class_instance.Setter(std::move(* _r ## Getter));} \
-    else if (index < num_mandatory_params2) {return result_type(unexpect, _r ## Getter.error().code(), class_name);} \
-    else if (_r ## Getter.error().code() != conv_errc::missing_required_member){return result_type(unexpect, _r ## Getter.error().code(), class_name);}
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) \
-  Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name))
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, )
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,,always_true(),,)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, always_true(),,))
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, , ))
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, ))
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, From) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From) \
   auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(ajson, Name); \
-  if (_r ## Getter) {class_instance.Setter(From(std::move(* _r ## Getter)));} \
+  if (_r ## Getter) { \
+    if (!Match(From(* _r ## Getter))) {return result_type(unexpect, conv_errc::conversion_failed, class_name);} \
+    class_instance.Setter(From(std::move(* _r ## Getter))); \
+  } \
   else if (index < num_mandatory_params2) {return result_type(unexpect, _r ## Getter.error().code(), class_name);} \
   else if (_r ## Getter.error().code() != conv_errc::missing_required_member){return result_type(unexpect, _r ## Getter.error().code(), class_name);}
 
@@ -1380,17 +1399,17 @@ namespace reflect { \
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) \
-  auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(ajson, Name); \
-  if (_r ## Getter) {class_instance.Setter(std::move(* _r ## Getter));} \
-  else {return result_type(unexpect, _r ## Getter.error().code(), class_name);} 
-#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name))
-#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
-#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, )
+#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,, always_true(),,)
+#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,Mode, always_true(),,))
+#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match,,))
+#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into,))
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, From) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From))
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From) \
   auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(ajson, Name); \
-  if (_r ## Getter) {class_instance.Setter(From(std::move(* _r ## Getter)));} \
+  if (_r ## Getter) { \
+    if (!Match(From(* _r ## Getter))) {return result_type(unexpect, conv_errc::conversion_failed, class_name);} \
+    class_instance.Setter(From(std::move(* _r ## Getter))); \
+  } \
   else {return result_type(unexpect, _r ## Getter.error().code(), class_name);} 
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)

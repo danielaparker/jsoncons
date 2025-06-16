@@ -87,11 +87,11 @@ TEST_CASE("json_conv_traits tests")
         REQUIRE(2 == j.size());
     
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,ns::book>::try_as(j[0]);
-        ns::book& item{result.value()};
+        //ns::book& item{result.value()};
 
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
+        //std::cout << item.author << ", " 
+        //          << item.title << ", " 
+        //          << item.price << "\n";
     }
     
     SECTION("test 2")

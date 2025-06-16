@@ -626,17 +626,10 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 }
         )";
 
-        try
-        {
-            auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
-            REQUIRE_FALSE(result);
-            CHECK(conv_errc::conversion_failed == result.error().code()                         );
-            //std::cout << result.error() << "\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "EXCEPTION " << e.what() << "\n";
-        }
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 
@@ -759,17 +752,10 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 }
         )";
 
-        try
-        {
-            auto result = jsoncons::try_decode_json<ns::book_3_m_a>(input);
-            REQUIRE_FALSE(result);
-            CHECK(conv_errc::conversion_failed == result.error().code()                         );
-            //std::cout << result.error() << "\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "EXCEPTION " << e.what() << "\n";
-        }
+        auto result = jsoncons::try_decode_json<ns::book_3_m_a>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 
@@ -862,17 +848,10 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 }
         )";
 
-        try
-        {
-            auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
-            REQUIRE_FALSE(result);
-            CHECK(conv_errc::conversion_failed == result.error().code()                         );
-            std::cout << result.error() << "\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "EXCEPTION " << e.what() << "\n";
-        }
+        auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 
@@ -1260,17 +1239,10 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 }
         )";
 
-        try
-        {
-            auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
-            REQUIRE_FALSE(result);
-            CHECK(conv_errc::conversion_failed == result.error().code()                         );
-            //std::cout << result.error() << "\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "EXCEPTION " << e.what() << "\n";
-        }
+        auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 
