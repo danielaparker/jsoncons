@@ -506,7 +506,7 @@ namespace reflect { \
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name,,always_true(),,)  
+#define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
 #define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode,always_true(),,))
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,))
 #define JSONCONS_N_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,))
@@ -522,7 +522,7 @@ namespace reflect { \
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,,always_true(),,)  
+#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
 #define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,Mode,always_true(),,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,))
@@ -807,7 +807,7 @@ namespace reflect { \
 
 #define JSONCONS_CTOR_GETTER_NAME_GET(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_GET_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_CTOR_GETTER_NAME_GET_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name,,always_true(),,)
+#define JSONCONS_CTOR_GETTER_NAME_GET_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name,JSONCONS_RDWR,always_true(),,)
 #define JSONCONS_CTOR_GETTER_NAME_GET_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, always_true(),,))
 #define JSONCONS_CTOR_GETTER_NAME_GET_4(Getter, Name, Mode, Match) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match,,))
 #define JSONCONS_CTOR_GETTER_NAME_GET_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into,))
@@ -1305,7 +1305,7 @@ namespace reflect { \
 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,,always_true(),,)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,JSONCONS_RDWR,always_true(),,)
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, always_true(),,))
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, , ))
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, ))
@@ -1328,7 +1328,7 @@ namespace reflect { \
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,, always_true(),,)
+#define JSONCONS_ALL_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,JSONCONS_RDWR, always_true(),,)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name,Mode, always_true(),,))
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match,,))
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into,))
