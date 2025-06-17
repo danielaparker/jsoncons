@@ -1315,12 +1315,10 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
         auto j = json::parse(s);
-        std::cout << "is rect: " << j.is<ns::Rectangle_ACGN>() << "\n";
-        std::cout << "as rect ok: " << j.try_as<ns::Rectangle_ACGN>().has_value() << "\n";
-        std::cout << "is triangle: " << j.is<ns::Triangle_ACGN>() << "\n";
-        std::cout << "as triangle ok: " << j.try_as<ns::Triangle_ACGN>().has_value() << "\n";
-        std::cout << "is circle: " << j.is<ns::Circle_ACGN>() << "\n";
-        std::cout << "as circle ok: " << j.try_as<ns::Circle_ACGN>().has_value() << "\n";
+
+        CHECK(j.is<ns::Rectangle_ACGN>() == j.try_as<ns::Rectangle_ACGN>().has_value());
+        CHECK(j.is<ns::Triangle_ACGN>() == j.try_as<ns::Triangle_ACGN>().has_value());
+        CHECK(j.is<ns::Circle_ACGN>() == j.try_as<ns::Circle_ACGN>().has_value());
     }
 
     SECTION("polymorphic test")
@@ -1387,6 +1385,16 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
 ]
     )";
 
+    SECTION("test 1")
+    {
+        std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
+        auto j = json::parse(s);
+
+        CHECK(j.is<ns::Rectangle_AGSN>() == j.try_as<ns::Rectangle_AGSN>().has_value());
+        CHECK(j.is<ns::Triangle_AGSN>() == j.try_as<ns::Triangle_AGSN>().has_value());
+        CHECK(j.is<ns::Circle_AGSN>() == j.try_as<ns::Circle_AGSN>().has_value());
+    }
+
     SECTION("polymorphic test")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AGSN>>>(input);
@@ -1450,6 +1458,16 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
     {"type" : "circle", "radius" : 1.0 }
 ]
     )";
+
+    SECTION("test 1")
+    {
+        std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
+        auto j = json::parse(s);
+
+        CHECK(j.is<ns::Rectangle_NGSN>() == j.try_as<ns::Rectangle_NGSN>().has_value());
+        CHECK(j.is<ns::Triangle_NGSN>() == j.try_as<ns::Triangle_NGSN>().has_value());
+        CHECK(j.is<ns::Circle_NGSN>() == j.try_as<ns::Circle_NGSN>().has_value());
+    }
 
     SECTION("polymorphic test")
     {
@@ -1515,6 +1533,16 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
 ]
     )";
 
+    SECTION("test 1")
+    {
+        std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
+        auto j = json::parse(s);
+
+        CHECK(j.is<ns::Rectangle_AMN>() == j.try_as<ns::Rectangle_AMN>().has_value());
+        CHECK(j.is<ns::Triangle_AMN>() == j.try_as<ns::Triangle_AMN>().has_value());
+        CHECK(j.is<ns::Circle_AMN>() == j.try_as<ns::Circle_AMN>().has_value());
+    }
+
     SECTION("polymorphic test")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AMN>>>(input);
@@ -1578,6 +1606,16 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     {"type" : "circle", "radius" : 1.0 }
 ]
     )";
+
+    SECTION("test 1")
+    {
+        std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
+        auto j = json::parse(s);
+
+        CHECK(j.is<ns::Rectangle_NMN>() == j.try_as<ns::Rectangle_NMN>().has_value());
+        CHECK(j.is<ns::Triangle_NMN>() == j.try_as<ns::Triangle_NMN>().has_value());
+        CHECK(j.is<ns::Circle_NMN>() == j.try_as<ns::Circle_NMN>().has_value());
+    }
 
     SECTION("polymorphic test")
     {
