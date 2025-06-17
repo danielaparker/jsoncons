@@ -816,7 +816,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From) \
   auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(ajson, Name); \
   if (!_r ## Getter && index < num_mandatory_params2) {return result_type(unexpect, _r ## Getter.error().code(), class_name);} \
-  if (_r ## Getter && !Match(* _r ## Getter)) {return result_type(unexpect, conv_errc::expected_object, class_name);} 
+  if (_r ## Getter && !Match(* _r ## Getter)) {return result_type(unexpect, conv_errc::conversion_failed, class_name);} 
 
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name,,,, ) JSONCONS_COMMA
@@ -1426,11 +1426,15 @@ namespace reflect { \
 #define JSONCONS_POLYMORPHIC_IS(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return true;
 #define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return true;
 
-#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
-#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) \
+  if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) \
+  if (ajson.template is<DerivedClass>()) return result_type(jsoncons::make_unique<DerivedClass>(ajson.template as<DerivedClass>()));
 
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) \
+  if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) \
+  if (ajson.template is<DerivedClass>()) return result_type(std::make_shared<DerivedClass>(ajson.template as<DerivedClass>()));
  
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 #define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}

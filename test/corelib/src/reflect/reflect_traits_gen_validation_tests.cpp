@@ -229,7 +229,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_ACGN: Expected JSON object");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_ACGN: Unable to convert into the provided type");
             }
         }
     }
@@ -248,7 +248,7 @@ TEST_CASE("json validator tests")
             }
             else
             {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_NCGN: Expected JSON object");
+                REQUIRE_THROWS_WITH(*it, "ns::employee_NCGN: Unable to convert into the provided type");
             }
         }
     }
