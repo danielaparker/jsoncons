@@ -430,7 +430,6 @@ namespace reflect { \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassType); \
             value_type class_instance{}; \
-            std::error_code ec; \
             if (num_params == num_mandatory_params2) \
             { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_ALL_MEMBER_AS,,,, __VA_ARGS__) \

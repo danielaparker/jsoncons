@@ -1311,6 +1311,18 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
 ]
     )";
 
+    SECTION("test 1")
+    {
+        std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
+        auto j = json::parse(s);
+        std::cout << "is rect: " << j.is<ns::Rectangle_ACGN>() << "\n";
+        std::cout << "as rect ok: " << j.try_as<ns::Rectangle_ACGN>().has_value() << "\n";
+        std::cout << "is triangle: " << j.is<ns::Triangle_ACGN>() << "\n";
+        std::cout << "as triangle ok: " << j.try_as<ns::Triangle_ACGN>().has_value() << "\n";
+        std::cout << "is circle: " << j.is<ns::Circle_ACGN>() << "\n";
+        std::cout << "as circle ok: " << j.try_as<ns::Circle_ACGN>().has_value() << "\n";
+    }
+
     SECTION("polymorphic test")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_ACGN>>>(input);
