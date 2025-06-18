@@ -573,26 +573,23 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static typename std::enable_if<!ext_traits::is_byte<typename Container::value_type>::value,result_type>::type
         try_as(const Json& j)
         {
-            if (j.is_array())
-            {
-                T result;
-                visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
-                for (const auto& item : j.array_range())
-                {
-                    auto res = item.template try_as<value_type>();
-                    if (JSONCONS_UNLIKELY(!res))
-                    {
-                        return result_type(jsoncons::unexpect, conv_errc::not_vector);
-                    }
-                    result.push_back(std::move(*res));
-                }
-
-                return result_type(std::move(result));
-            }
-            else 
+            if (!j.is_array())
             {
                 return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
+            T result;
+            visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
+            for (const auto& item : j.array_range())
+            {
+                auto res = item.template try_as<value_type>();
+                if (JSONCONS_UNLIKELY(!res))
+                {
+                    return result_type(jsoncons::unexpect, res.error().code(), res.error().message_arg());
+                }
+                result.push_back(std::move(*res));
+            }
+
+            return result_type(std::move(result));
         }
 
         // array back insertable byte container
@@ -977,7 +974,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             T result;
             for (const auto& item : j.object_range())
             {
-                result.emplace(key_type(item.key().data(),item.key().size()), item.value().template as<mapped_type>());
+                auto res = item.value().template try_as<mapped_type>();
+                if (!res)
+                {
+                    return result_type(jsoncons::unexpect, res.error().code(), res.error().message_arg());
+                }
+                result.emplace(key_type(item.key().data(),item.key().size()), std::move(*res));
             }
 
             return result_type(std::move(result));

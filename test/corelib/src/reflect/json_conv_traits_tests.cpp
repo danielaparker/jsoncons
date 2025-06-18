@@ -27,42 +27,9 @@ namespace ns {
 } // namespace ns
 } // namespace
 
-namespace jsoncons {
-namespace reflect {
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
-template <typename Json>
-struct json_conv_traits<Json, ns::book>
-{
-    using result_type = conversion_result<ns::book>;
-    using allocator_type = typename Json::allocator_type;
-
-    static bool is(const Json& j) noexcept
-    {
-        return j.is_object() && j.contains("author") && 
-               j.contains("title") && j.contains("price");
-    }
-    static result_type try_as(const Json& j)
-    {
-        ns::book val;
-        val.author = j.at("author").template as<std::string>();
-        val.title = j.at("title").template as<std::string>();
-        val.price = j.at("price").template as<double>();
-        return result_type(std::move(val));
-    }
-    static Json to_json(const ns::book& val, 
-       allocator_type allocator=allocator_type())
-    {
-        Json j(allocator);
-        j.try_emplace("author", val.author);
-        j.try_emplace("title", val.title);
-        j.try_emplace("price", val.price);
-        return j;
-    }
-};
-
-} // namespace reflect
-} // namespace jsoncons
-
+#if 0
 TEST_CASE("json_conv_traits tests")
 {
     const std::string s = R"(
@@ -144,6 +111,95 @@ TEST_CASE("json_conv_traits error tests")
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_integer == result.error().code());
         //std::cout << result.error() << "\n\n";
+    }
+}
+#endif
+
+TEST_CASE("json_conv_traits as std::vector<T> tests")
+{   
+    SECTION("JSON is not an array")
+    {
+       const std::string s = R"(
+{
+    "author" : "Haruki Murakami",
+    "title" : "Kafka on the Shore",
+    "price" : 25.17
+}
+        )";
+
+        auto j = jsoncons::json::parse(s);
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(j);
+        REQUIRE(!result);
+        CHECK(jsoncons::conv_errc::not_vector == result.error().code());
+    }
+    SECTION("Invalid price")
+    {
+       const std::string s = R"(
+[
+    {
+        "author" : "Haruki Murakami",
+        "title" : "Kafka on the Shore",
+        "price" : 25.17
+    },
+    {
+        "author" : "Charles Bukowski",
+        "title" : "Pulp",
+        "price" : "foo"
+    }
+]
+        )";
+
+        auto j = jsoncons::json::parse(s);
+        REQUIRE(j.is_array());
+        REQUIRE(2 == j.size());
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(j);
+        REQUIRE(!result);
+        CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
+        CHECK("ns::book: price" == result.error().message_arg());
+    }
+}
+
+TEST_CASE("json_conv_traits as std::map<string,T> tests")
+{   
+    SECTION("JSON is not an object")
+    {
+       const std::string s = R"(
+["Haruki Murakami","Kafka on the Shore",25.17]
+        )";
+
+        auto j = jsoncons::json::parse(s);
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(j);
+        REQUIRE(!result);
+        CHECK(jsoncons::conv_errc::not_map == result.error().code());
+    }
+    SECTION("Invalid price")
+    {
+        const std::string s = R"(
+ {
+     "First prize" : {
+         "author" : "Haruki Murakami",
+         "title" : "Kafka on the Shore",
+         "price" : 25.17
+     },
+     "Second prize" : {
+         "author" : "Charles Bukowski",
+         "title" : "Pulp",
+         "price" : "foo"
+     }
+ }
+        )";
+
+        auto j = jsoncons::json::parse(s);
+        REQUIRE(j.is_object());
+        REQUIRE(2 == j.size());
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(j);
+        REQUIRE(!result);
+        CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
+        CHECK("ns::book: price" == result.error().message_arg());
     }
 }
 
