@@ -1508,18 +1508,30 @@ namespace jsoncons {
 
         string_view_type as_string_view() const
         {
+           auto result = try_as_string_view();
+           if (!result)
+           {
+               JSONCONS_THROW(conv_error(result.error().code()));
+           }
+           return *result;
+        }
+
+        conversion_result<string_view_type> try_as_string_view() const
+        {
+            using result_type = conversion_result<string_view_type>;
+
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
-                    return string_view_type(cast<short_string_storage>().data(),cast<short_string_storage>().length());
+                    return result_type(in_place, cast<short_string_storage>().data(),cast<short_string_storage>().length());
                 case json_storage_kind::long_str:
-                    return string_view_type(cast<long_string_storage>().data(),cast<long_string_storage>().length());
+                    return result_type(in_place, cast<long_string_storage>().data(),cast<long_string_storage>().length());
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().as_string_view();
+                    return result_type(cast<json_const_reference_storage>().value().as_string_view());
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().as_string_view();
+                    return result_type(cast<json_reference_storage>().value().as_string_view());
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a string"));
+                   return result_type(unexpect, conv_errc::not_double);
             }
         }
 

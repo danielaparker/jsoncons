@@ -522,7 +522,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static result_type try_as(const Json& j)
         {
-            return result_type(jsoncons::in_place, j.as_string_view().data(),j.as_string_view().size());
+            auto result = j.try_as_string_view();
+            return result ? result_type(in_place, result.value().data(), result.value().size()) : result_type(unexpect, conv_errc::not_string); 
         }
 
         static Json to_json(const T& val)

@@ -973,7 +973,9 @@ namespace reflect { \
             if (!ajson.is_string()) return false; \
             auto first = reflect_type_properties<EnumType>::values<char_type>(); \
             auto last = first + reflect_type_properties<EnumType>::count; \
-            const string_view_type s = ajson.template as<string_view_type>(); \
+            auto rs = ajson.try_as_string_view(); \
+            if (!rs) return false; \
+            const string_view_type s = *rs; \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type& item) -> bool \
                                           { return item.first == enum_type(); }) == last) \
@@ -988,7 +990,9 @@ namespace reflect { \
         static result_type try_as(const Json& ajson) \
         { \
             if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
-            const string_view_type s = ajson.template as<string_view_type>(); \
+            auto rs = ajson.try_as_string_view(); \
+            if (!rs) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
+            const string_view_type s = *rs; \
             auto first = reflect_type_properties<EnumType>::values<char_type>(); \
             auto last = first + reflect_type_properties<EnumType>::count; \
             if (s.empty() && std::find_if(first, last, \
@@ -1112,10 +1116,11 @@ namespace reflect { \
         \
         static bool is(const Json& ajson) noexcept \
         { \
-            if (!ajson.is_string()) return false; \
+            auto rs = ajson.try_as_string_view(); \
+            if (!rs) {return false;} \
+            const string_view_type s = *rs; \
             auto first = reflect_type_properties<enum_type>::values<char_type>(); \
             auto last = first + reflect_type_properties<enum_type>::count; \
-            const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type& item) -> bool \
                                           { return item.first == enum_type(); }) == last) \
@@ -1129,15 +1134,16 @@ namespace reflect { \
         } \
         static result_type try_as(const Json& ajson) \
         { \
-            if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
-            const string_view_type s = ajson.template as<string_view_type>(); \
+            auto rs = ajson.try_as_string_view(); \
+            if (!rs) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType);} \
+            const string_view_type s = *rs; \
             auto first = reflect_type_properties<enum_type>::values<char_type>(); \
             auto last = first + reflect_type_properties<enum_type>::count; \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type& item) -> bool \
                                           { return item.first == enum_type(); }) == last) \
             { \
-                return enum_type(); \
+                return result_type(enum_type()); \
             } \
             auto it = std::find_if(first, last, \
                                    [&](const mapped_type& item) -> bool \
@@ -1146,7 +1152,7 @@ namespace reflect { \
             { \
                 if (s.empty()) \
                 { \
-                    return enum_type(); \
+                    return result_type(enum_type()); \
                 } \
                 else \
                 { \
