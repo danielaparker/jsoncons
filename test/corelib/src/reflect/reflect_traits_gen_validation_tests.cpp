@@ -179,114 +179,96 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_AMN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_AMN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_AMN: Unable to convert into the provided type");
             }
         }
     }
 
     SECTION("employee_NMN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_NMN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_NMN: Unable to convert into the provided type");
             }
         }
     }
 
     SECTION("employee_ACGN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_ACGN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_ACGN: Unable to convert into the provided type");
             }
         }
     }
 
     SECTION("employee_NCGN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_NCGN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it, "ns::employee_NCGN: Unable to convert into the provided type");
             }
         }
     }
 
     SECTION("employee_AGSN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_AGSN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it,  "ns::employee_AGSN: Unable to convert into the provided type");
             }
         }
     }
 
     SECTION("employee_NGSN test")
     {
-        jsoncons::json_string_cursor cursor(input);
+        std::error_code ec;
+        jsoncons::json_string_cursor cursor(input, ec);
 
         auto view = jsoncons::staj_array<ns::employee_NGSN>(cursor);
 
-        for (auto it = view.begin(); it != view.end(); ++it)
+        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
         {
-            if (it.has_value())
+            if (!ec)
             {
                 auto val = *it;
-            }
-            else
-            {
-                REQUIRE_THROWS_WITH(*it,  "ns::employee_NGSN: Unable to convert into the provided type");
             }
         }
     }

@@ -151,6 +151,7 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
+            ec.clear();
             if (JSONCONS_UNLIKELY(done_))
             {
                 return;
@@ -175,7 +176,7 @@ namespace jsoncons {
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();
-                done_ = true;
+                //done_ = true;
                 return;
             }
             view_->value_ = std::move(*result);
@@ -202,6 +203,11 @@ namespace jsoncons {
         iterator begin()
         {
             return staj_array_iterator<T, Json>(*this);
+        }
+
+        iterator begin(std::error_code& ec)
+        {
+            return staj_array_iterator<T, Json>(*this, ec);
         }
 
         iterator end()
@@ -402,6 +408,11 @@ namespace jsoncons {
         iterator begin()
         {
             return staj_object_iterator<Key,T,Json>(*this);
+        }
+
+        iterator begin(std::error_code& ec)
+        {
+            return staj_object_iterator<Key,T,Json>(*this, ec);
         }
 
         iterator end()
