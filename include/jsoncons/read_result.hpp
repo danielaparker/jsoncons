@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_READ_ERROR_HPP    
-#define JSONCONS_READ_ERROR_HPP    
+#ifndef JSONCONS_READ_RESULT_HPP    
+#define JSONCONS_READ_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -94,4 +94,4 @@ using read_result = result<T,read_error>;
 
 } // jsoncons
 
-#endif // JSONCONS_READ_ERROR_HPP
+#endif // JSONCONS_READ_RESULT_HPP

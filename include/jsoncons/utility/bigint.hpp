@@ -22,7 +22,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/conversion_error.hpp>
+#include <jsoncons/conversion_result.hpp>
 
 namespace jsoncons {
 
