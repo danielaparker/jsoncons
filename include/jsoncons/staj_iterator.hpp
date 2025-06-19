@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/decode_traits.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
@@ -44,7 +44,6 @@ namespace jsoncons {
     private:
         staj_array_view<T, Json>* view_{nullptr};
         bool done_{false};
-        std::exception_ptr eptr_;
     public:
 
         staj_array_iterator() noexcept
@@ -89,26 +88,13 @@ namespace jsoncons {
 
         ~staj_array_iterator() noexcept = default;
 
-        bool has_value() const
-        {
-            return !eptr_;
-        }
-
         const T& operator*() const
         {
-            if (JSONCONS_UNLIKELY(eptr_))
-            {
-                 std::rethrow_exception(eptr_);
-            }
             return *view_->value_;
         }
 
         const T* operator->() const
         {
-            if (JSONCONS_UNLIKELY(eptr_))
-            {
-                 std::rethrow_exception(eptr_);
-            }
             return view_->value_.operator->();
         }
 
@@ -185,15 +171,14 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            eptr_ = std::exception_ptr();
-            JSONCONS_TRY
+            auto result = reflect::decode_traits<T>::try_decode(*view_->cursor_);
+            if (JSONCONS_UNLIKELY(!result))
             {
-                view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
+                ec = result.error().code();
+                done_ = true;
+                return;
             }
-            JSONCONS_CATCH(const conv_error&)
-            {
-                eptr_ = std::current_exception();
-            }           
+            view_->value_ = std::move(*result);
         }            
     };
 
@@ -244,7 +229,6 @@ namespace jsoncons {
     private:
         staj_object_view<Key, T, Json>* view_{nullptr};
         bool done_{false};
-        std::exception_ptr eptr_;
     public:
 
         staj_object_iterator() noexcept
@@ -290,30 +274,14 @@ namespace jsoncons {
 
         ~staj_object_iterator() noexcept = default;
 
-        bool has_value() const
-        {
-            return !eptr_;
-        }
-
         const value_type& operator*() const
         {
-            if (JSONCONS_UNLIKELY(eptr_))
-            {
-                 std::rethrow_exception(eptr_);
-            }
             return *view_->key_value_;
         }
 
         const value_type* operator->() const
         {
-            if (JSONCONS_UNLIKELY(eptr_))
-            {
-                 std::rethrow_exception(eptr_);
-            }
-            else
-            {
-                return view_->key_value_.operator->();
-            }
+            return view_->key_value_.operator->();
         }
 
         staj_object_iterator& operator++()
@@ -398,15 +366,14 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            eptr_ = std::exception_ptr();
-            JSONCONS_TRY
+            auto result = reflect::decode_traits<T>::try_decode(*view_->cursor_);
+            if (JSONCONS_UNLIKELY(!result))
             {
-                view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
+                ec = result.error().code();
+                done_ = true;
+                return;
             }
-            JSONCONS_CATCH(const conv_error&)
-            {
-                eptr_ = std::current_exception();
-            }
+            view_->key_value_ = value_type(std::move(key), std::move(*result));
         }
     };
 
