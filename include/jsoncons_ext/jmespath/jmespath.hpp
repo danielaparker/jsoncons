@@ -2999,6 +2999,16 @@ namespace detail {
             {
                 if (!val.is_array())
                 {
+                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                    Json j(json_const_pointer_arg, evaluate_tokens(val, token_list_, new_context, ec));
+                    if (is_true(j))
+                    {
+                        reference jj = this->apply_expressions(val, context, ec);
+                        if (!jj.is_null())
+                        {
+                            return jj;
+                        }
+                    }
                     return context.null_value();
                 }
                 auto result = context.create_json(json_array_arg);
