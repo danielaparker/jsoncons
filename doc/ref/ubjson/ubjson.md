@@ -5,6 +5,7 @@ You can either parse into or serialize from a variant-like data structure, [basi
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_ubjson](decode_ubjson.md)
+[try_decode_ubjson](try_decode_ubjson.md)   (since 1.4.0)
 
 [basic_ubjson_cursor](basic_ubjson_cursor.md)
 

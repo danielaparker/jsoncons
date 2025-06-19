@@ -3,6 +3,7 @@
 The csv extension implements decode from and encode to the [CSV format](https://www.rfc-editor.org/rfc/rfc4180.txt)
 
 [decode_csv](decode_csv.md)
+[try_decode_csv](try_decode_csv.md)   (since 1.4.0)
 
 [basic_csv_cursor](basic_csv_cursor.md)
 

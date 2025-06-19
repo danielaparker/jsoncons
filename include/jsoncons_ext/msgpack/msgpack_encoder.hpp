@@ -313,7 +313,7 @@ namespace msgpack {
                 }
                 case semantic_tag::epoch_milli:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     if (n != 0)
                     {
                         bigint q;
@@ -335,7 +335,7 @@ namespace msgpack {
                 }
                 case semantic_tag::epoch_nano:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     if (n != 0)
                     {
                         bigint q;

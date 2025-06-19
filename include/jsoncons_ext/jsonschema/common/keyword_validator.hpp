@@ -1568,9 +1568,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 > n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1664,9 +1664,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 >= n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1760,9 +1760,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 < n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1856,9 +1856,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 <= n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(

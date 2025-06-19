@@ -4,144 +4,85 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_READ_RESULT_HPP    
-#define JSONCONS_READ_RESULT_HPP    
+#ifndef JSONCONS_RESULT_HPP    
+#define JSONCONS_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/conv_error.hpp>
 
 namespace jsoncons {
-
-class read_error
+    
+struct in_place_t
 {
-    std::error_code ec_{};
-    std::string message_arg_;
-    std::size_t line_{};
-    std::size_t column_{};
-    
-public:
-    read_error(std::error_code ec, std::size_t line, std::size_t column)
-        : ec_{ec}, line_{line}, column_{column}
-    {
-    }
-    
-    read_error(std::error_code ec, const std::string& message_arg, std::size_t line, std::size_t column)
-        : ec_{ec}, message_arg_(message_arg), line_{line}, column_{column}
-    {
-    }
-
-    read_error(const read_error& other) = default;
-
-    read_error(read_error&& other) = default;
-
-    read_error& operator=(const read_error& other) = default;
-
-    read_error& operator=(read_error&& other) = default;
-    
-    const std::error_code& code() const
-    {
-        return ec_;
-    }
-    const std::string& message_arg() const 
-    {
-        return message_arg_;
-    }
-    std::size_t line() const
-    {
-        return line_;
-    }
-    std::size_t column() const
-    {
-        return column_;
-    }
+    explicit in_place_t() = default; 
 };
 
-inline
-std::string to_string(const read_error& err)
-{
-    std::string str(err.message_arg());
-    if (!str.empty())
-    {
-        str.append(": ");
-    }
-    str.append(err.code().message());
-    if (err.line() != 0 && err.column() != 0)
-    {
-        str.append(" at line ");
-        str.append(std::to_string(err.line()));
-        str.append(" and column ");
-        str.append(std::to_string(err.column()));
-    }
-    else if (err.column() != 0)
-    {
-        str.append(" at position ");
-        str.append(std::to_string(err.column()));
-    }
-    return str;
-}
+JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 
-inline
-std::ostream& operator<<(std::ostream& os, const read_error& err)
+struct unexpect_t
 {
-    os << to_string(err);
-    return os;
-}
+    explicit unexpect_t() = default; 
+};
 
-template <typename T>
-class read_result
+JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
+
+template <typename T, typename E>
+class result
 {
 public:
     using value_type = T;
+    using error_type = E;
 private:
     bool has_value_;
     union {
-        read_error error_;
+        E error_;
         T value_;
     };
 public:
 
-    read_result(const T& value) 
+    result(const T& value) 
         : has_value_(true)
     {
         construct(value);
     }
 
-     read_result(T&& value) noexcept
+     result(T&& value) noexcept
          : has_value_(true)
      {
          construct(std::move(value));
      }
 
      template <typename... Args>    
-     read_result(in_place_t, Args&& ... args) noexcept
+     result(in_place_t, Args&& ... args) noexcept
          : has_value_(true)
      {
          ::new (&value_) T(std::forward<Args>(args)...);
      }
 
-     read_result(const read_error& err)
+     result(const E& err)
         : has_value_(false)
     {
-        ::new (&error_) read_error(err);
+        ::new (&error_) E(err);
     }
 
-    read_result(read_error&& err) noexcept
+    result(E&& err) noexcept
         : has_value_(false)
     {
-        ::new (&error_) read_error(std::move(err));
+        ::new (&error_) E(std::move(err));
     }
 
     template <typename... Args>    
-    read_result(unexpect_t, Args&& ... args) noexcept
+    result(unexpect_t, Args&& ... args) noexcept
         : has_value_(false)
     {
-        ::new (&error_) read_error(std::forward<Args>(args)...);
+        ::new (&error_) E(std::forward<Args>(args)...);
     }
     
     // copy constructors
-    read_result(const read_result<T>& other) 
+    result(const result<T,E>& other) 
         : has_value_(other.has_value())
     {
         if (other)
@@ -150,12 +91,12 @@ public:
         }
         else
         {
-            ::new (&error_) read_error(other.error_);
+            ::new (&error_) E(other.error_);
         }
     }
 
     // move constructors
-    read_result(read_result<T>&& other) noexcept
+    result(result<T,E>&& other) noexcept
         : has_value_(other.has_value())
     {
         if (other)
@@ -164,16 +105,16 @@ public:
         }
         else
         {
-            ::new (&error_) read_error(other.error_);
+            ::new (&error_) E(other.error_);
         }
     }
 
-    ~read_result() noexcept
+    ~result() noexcept
     {
         destroy();
     }
 
-    read_result& operator=(const read_result& other)
+    result& operator=(const result& other)
     {
         if (other)
         {
@@ -182,12 +123,12 @@ public:
         else
         {
             destroy();
-            ::new (&error_) read_error(other.error_);
+            ::new (&error_) E(other.error_);
         }
         return *this;
     }
 
-    read_result& operator=(read_result&& other)
+    result& operator=(result&& other)
     {
         if (other)
         {
@@ -196,19 +137,19 @@ public:
         else
         {
             destroy();
-            ::new (&error_) read_error(other.error_);
+            ::new (&error_) E(other.error_);
         }
         return *this;
     }
 
     // value assignment
-    read_result& operator=(const T& v)
+    result& operator=(const T& v)
     {
         assign(v);
         return *this;
     }
 
-    read_result& operator=(T&& v)
+    result& operator=(T&& v)
     {
         assign(std::move(v));
         return *this;
@@ -230,16 +171,16 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad result access"));
     }
 
-    read_error error() &
+    E error() &
     {
         if (!has_value_)
         {
             return this->error_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad result access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
@@ -248,7 +189,7 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad read_result access"));
+        JSONCONS_THROW(std::runtime_error("Bad result access"));
     }
 
     const T* operator->() const noexcept
@@ -281,7 +222,7 @@ public:
         return this->value_;
     }
 
-    void swap(read_result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+    void swap(result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
         const bool contains_a_value = has_value();
@@ -295,9 +236,9 @@ public:
         }
         else
         {
-            read_result& source = contains_a_value ? *this : other;
-            read_result& target = contains_a_value ? other : *this;
-            target = read_result<T>(*source);
+            result& source = contains_a_value ? *this : other;
+            result& target = contains_a_value ? other : *this;
+            target = result<T,E>(*source);
             source.destroy();
             source.error_ = target.error_;
         }
@@ -324,7 +265,7 @@ private:
         }
         else
         {
-            error_.~read_error();
+            error_.~E();
         }
     }
 
@@ -353,13 +294,13 @@ private:
     }
 };
 
-template <typename T>
+template <typename T,typename E>
 typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-swap(read_result<T>& lhs, read_result<T>& rhs) noexcept
+swap(result<T,E>& lhs, result<T,E>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
 
 } // jsoncons
 
-#endif // JSONCONS_READ_RESULT_HPP
+#endif // JSONCONS_RESULT_HPP

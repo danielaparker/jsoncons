@@ -22,6 +22,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/conversion_error.hpp>
 
 namespace jsoncons {
 
@@ -369,19 +370,19 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> from_string(const std::basic_string<CharT>& s)
+    static basic_bigint<Allocator> parse(const std::basic_string<CharT>& s)
     {
-        return from_string(s.data(), s.length());
+        return parse(s.data(), s.length());
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> from_string(const CharT* s)
+    static basic_bigint<Allocator> parse(const CharT* s)
     {
-        return from_string(s, std::char_traits<CharT>::length(s));
+        return parse(s, std::char_traits<CharT>::length(s));
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> from_string(const CharT* data, size_type length)
+    static basic_bigint<Allocator> parse(const CharT* data, size_type length)
     {
         bool neg;
         if (*data == '-')

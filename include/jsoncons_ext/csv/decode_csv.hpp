@@ -14,7 +14,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/read_result.hpp>
+#include <jsoncons/read_error.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/csv/csv_cursor.hpp>
@@ -25,12 +25,12 @@
 namespace jsoncons { 
 namespace csv {
 
-template <typename T,typename Source>
+template <typename T,typename CharsLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,read_result<T>>::type 
-try_decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
+                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type 
+try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
 {
-    using char_type = typename Source::value_type;
+    using char_type = typename CharsLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -51,12 +51,12 @@ try_decode_csv(const Source& s, const basic_csv_decode_options<typename Source::
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source>
+template <typename T,typename CharsLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<Source>::value,read_result<T>>::type 
-try_decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
+                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type 
+try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
 {
-    using char_type = typename Source::value_type;
+    using char_type = typename CharsLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -162,14 +162,14 @@ try_decode_csv(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename CharsLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<Source,typename T::char_type>::value,read_result<T>>::type 
+                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
-           const Source& s, 
-           const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
+           const CharsLike& s, 
+           const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
 {
-    using char_type = typename Source::value_type;
+    using char_type = typename CharsLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -190,14 +190,14 @@ try_decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename CharsLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<Source>::value,read_result<T>>::type 
+                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
-           const Source& s, 
-           const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
+           const CharsLike& s, 
+           const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
 {
-    using char_type = typename Source::value_type;
+    using char_type = typename CharsLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 

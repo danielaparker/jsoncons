@@ -9,35 +9,31 @@
 Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
 ```cpp
-template <typename T>
-T decode_cbor(const std::vector<uint8_t>& source,
-    const cbor_decode_options& options = cbor_decode_options());        (1) (until 0.152.0)
-
-template <typename T,typename Source>
-T decode_cbor(const Source& source,
-    const cbor_decode_options& options = cbor_decode_options());        (1) (since 0.152.0)
+template <typename T,typename BytesLike>
+T decode_cbor(const BytesLike& source,
+    const cbor_decode_options& options = cbor_decode_options());        (1) 
 
 template <typename T>
 T decode_cbor(std::istream& is,
     const cbor_decode_options& options = cbor_decode_options());        (2)
 
-template <typename T,typename InputIt>
-T decode_cbor(InputIt first, InputIt last,
-    const cbor_decode_options& options = cbor_decode_options());        (3) (since 0.153.0)
-
-template <typename T,typename Source,typename Allocator,typename TempAllocator>
+template <typename T,typename BytesLike,typename Allocator,typename TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
-    const Source& source,
-    const cbor_decode_options& options = cbor_decode_options());        (4) (since 0.171.0)
+    const BytesLike& source,
+    const cbor_decode_options& options = cbor_decode_options());        (3) (since 0.171.0)
 
 template <typename T,typename Allocator,typename TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
-    const cbor_decode_options& options = cbor_decode_options());        (5) (since 0.171.0)
+    const cbor_decode_options& options = cbor_decode_options());        (4) (since 0.171.0)
+
+template <typename T,typename InputIt>
+T decode_cbor(InputIt first, InputIt last,
+    const cbor_decode_options& options = cbor_decode_options());        (5) (since 0.153.0)
 ```
 
 (1) Reads CBOR data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
-Type `Source` must be a container that has member functions `data()` and `size()`, 
+Type `BytesLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
@@ -47,12 +43,12 @@ or support [json_type_traits](../json_type_traits.md).
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
-(3) Reads CBOR data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+(3)-(4) are identical to (1)-(2) except an [allocator_set](allocator_set.md) is passed as an additional argument and
+provides allocators for result data and temporary allocations.
+
+(5) Reads CBOR data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](cbor_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
-
-Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument and
-provides allocators for result data and temporary allocations.
 
 #### Exceptions
 

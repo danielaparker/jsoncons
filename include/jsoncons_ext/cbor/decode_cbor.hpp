@@ -18,7 +18,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/read_result.hpp>
+#include <jsoncons/read_error.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -27,10 +27,10 @@
 namespace jsoncons { 
 namespace cbor {
 
-template <typename T,typename Source>
+template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
-try_decode_cbor(const Source& v, 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+try_decode_cbor(const BytesLike& v, 
             const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -52,10 +52,10 @@ try_decode_cbor(const Source& v,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source>
+template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
-try_decode_cbor(const Source& v, 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+try_decode_cbor(const BytesLike& v, 
             const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -157,11 +157,11 @@ try_decode_cbor(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename BytesLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
-            const Source& v, 
+            const BytesLike& v, 
             const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -183,11 +183,11 @@ try_decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename BytesLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
-            const Source& v, 
+            const BytesLike& v, 
             const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;

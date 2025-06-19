@@ -97,7 +97,7 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     {
         std::string s = "-18446744073709551617";
         jsoncons::json doc(s,  jsoncons::semantic_tag::bigint);
-        CHECK(bool(doc.as<jsoncons::bigint>() == jsoncons::bigint::from_string(s)));
+        CHECK(bool(doc.as<jsoncons::bigint>() == jsoncons::bigint::parse(s)));
     }
 }
 

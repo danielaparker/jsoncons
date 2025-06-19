@@ -5,6 +5,7 @@ You can either parse into or serialize from a variant-like data structure, [basi
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_cbor](decode_cbor.md)
+[try_decode_cbor](try_decode_cbor.md)   (1.4.0)
 
 [basic_cbor_cursor](basic_cbor_cursor.md)
 

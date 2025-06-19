@@ -34,7 +34,7 @@
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/value_converter.hpp>
-#include <jsoncons/conversion_result.hpp>
+#include <jsoncons/conversion_error.hpp>
 #include <jsoncons/json_type_traits.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
@@ -1446,7 +1446,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_bigint);
                     }
-                    return result_type(basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length()));
+                    return result_type(basic_bigint<Allocator>::parse(j.as_string_view().data(), j.as_string_view().length()));
                 case json_type::half_value:
                 case json_type::double_value:
                 {
@@ -1727,7 +1727,7 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / millis_in_second;
@@ -1737,7 +1737,7 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / nanos_in_second;
@@ -1839,7 +1839,7 @@ namespace variant_detail
                         {
                             return result_type(unexpect, conv_errc::not_epoch);
                         }
-                        bigint n = bigint::from_string((*res).data(), (*res).length());
+                        bigint n = bigint::parse((*res).data(), (*res).length());
                         if (n != 0)
                         {
                             n = n / nanos_in_milli;

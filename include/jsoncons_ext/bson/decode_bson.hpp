@@ -16,7 +16,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/read_result.hpp>
+#include <jsoncons/read_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -28,10 +28,10 @@
 namespace jsoncons { 
 namespace bson {
 
-template <typename T,typename Source>
+template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
-try_decode_bson(const Source& v, 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+try_decode_bson(const BytesLike& v, 
             const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -53,10 +53,10 @@ try_decode_bson(const Source& v,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source>
+template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
-try_decode_bson(const Source& v, 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+try_decode_bson(const BytesLike& v, 
             const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -158,11 +158,11 @@ try_decode_bson(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename BytesLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
-            const Source& v, 
+            const BytesLike& v, 
             const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -184,11 +184,11 @@ try_decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename Source,typename Allocator,typename TempAllocator >
+template <typename T,typename BytesLike,typename Allocator,typename TempAllocator >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<Source>::value,read_result<T>>::type 
+                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
-            const Source& v, 
+            const BytesLike& v, 
             const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;

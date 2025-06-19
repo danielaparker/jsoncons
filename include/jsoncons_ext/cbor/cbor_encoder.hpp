@@ -716,7 +716,7 @@ private:
         }
         else if (r.error_code() == std::errc::result_out_of_range)
         {
-            bigint n = bigint::from_string(s.data(), s.length());
+            bigint n = bigint::parse(s.data(), s.length());
             write_bignum(n);
             end_value();
         }
@@ -909,7 +909,7 @@ private:
         {
             case semantic_tag::bigint:
             {
-                bigint n = bigint::from_string(sv.data(), sv.length());
+                bigint n = bigint::parse(sv.data(), sv.length());
                 write_bignum(n);
                 end_value();
                 break;

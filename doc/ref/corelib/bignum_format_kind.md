@@ -26,7 +26,7 @@ int main()
 {
     std::string s = "-18446744073709551617";
 
-    json j(bigint::from_string(s.c_str()));
+    json j(bigint::parse(s.c_str()));
 
     std::cout << "(1) " << print(j) << "\n\n";
 

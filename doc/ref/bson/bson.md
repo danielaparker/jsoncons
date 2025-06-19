@@ -5,6 +5,7 @@ You can either parse into or serialize from a variant-like data structure, [basi
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_bson](decode_bson.md)
+[try_decode_bson](try_decode_bson.md)   (1.4.0)
 
 [basic_bson_cursor](basic_bson_cursor.md)
 

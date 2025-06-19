@@ -5,27 +5,28 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <typename T,typename Source>
-T decode_csv(const Source& s, 
-    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (1)
+template <typename T,typename CharsLike>
+T decode_csv(const CharsLike& s, 
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (1)
 
 template <typename T,typename CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
-    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (2)
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (2)
 
-template <typename T,typename InputIt>
-T decode_csv(InputIt first, InputIt last,
-    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (3) (since 0.153.0)
-
-template <typename T,typename Source,typename Allocator,typename TempAllocator>
+template <typename T,typename CharsLike,typename Allocator,typename TempAllocator>
 T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
-    const Source& s,
-    const basic_csv_decode_options<Source::value_type>& options = basic_csv_decode_options<Source::value_type>()); (4)
+    const CharsLike& s,                                                                      (3)
+    const basic_csv_decode_options<CharsLike::value_type>& options = 
+        basic_csv_decode_options<CharsLike::value_type>()); 
 
 template <typename T,typename CharT,typename Allocator,typename TempAllocator>
 T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
     std::basic_istream<CharT>& is,
-    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());                           (5)
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());     (4)
+
+template <typename T,typename InputIt>
+T decode_csv(InputIt first, InputIt last,
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (5) (since 0.153.0)
 ```
 
 (1) Reads CSV data from a contiguous character sequence into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
