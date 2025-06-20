@@ -198,7 +198,7 @@ namespace jsoncons {
     template <typename Key,typename T,typename CharT=char>
     class staj_object_iterator
     {
-        using char_type = typename CharT;
+        using char_type = CharT;
         using key_type = std::basic_string<char_type>;
         using value_type = std::pair<key_type,T>;
         using difference_type = std::ptrdiff_t;
