@@ -37,7 +37,7 @@ void book_extensibility_example()
 
     std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
 
-    /*auto book_list = ja.as<std::list<ns::book>>();
+    auto book_list = ja.as<std::list<ns::book>>();
 
     std::cout << "(6)" << '\n';
     for (auto b : book_list)
@@ -45,7 +45,7 @@ void book_extensibility_example()
         std::cout << b.author << ", " 
                   << b.title << ", " 
                   << b.price << '\n';
-    }*/
+    }
 }
 
 void book_extensibility_example2()
