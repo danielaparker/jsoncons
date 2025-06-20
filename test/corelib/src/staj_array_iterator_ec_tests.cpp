@@ -182,14 +182,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_AMN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_AMN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 
@@ -198,14 +199,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_NMN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_NMN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 
@@ -214,14 +216,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_ACGN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_ACGN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 
@@ -230,14 +233,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_NCGN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_NCGN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 
@@ -246,14 +250,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_AGSN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_AGSN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 
@@ -262,14 +267,15 @@ TEST_CASE("json validator tests")
         std::error_code ec;
         jsoncons::json_string_cursor cursor(input, ec);
 
-        auto view = jsoncons::staj_array<ns::employee_NGSN>(cursor);
+        auto iter = jsoncons::staj_array_iterator<ns::employee_NGSN>(cursor, ec);
 
-        for (auto it = view.begin(ec); it != view.end(); it.increment(ec))
+        while (iter != end(iter))
         {
             if (!ec)
             {
-                auto val = *it;
+                auto val = *iter;
             }
+            iter.increment(ec);
         }
     }
 }

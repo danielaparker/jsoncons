@@ -128,12 +128,12 @@ add_executable(unit_tests
                corelib/src/reflect/reflect_traits_gen_functional_tests.cpp
                corelib/src/reflect/reflect_traits_gen_limit_tests.cpp
                corelib/src/reflect/reflect_traits_gen_tests.cpp
-               corelib/src/reflect/reflect_traits_gen_validation_tests.cpp 
                corelib/src/reflect/reflect_traits_name_gen_tests.cpp
                corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/short_string_tests.cpp
                corelib/src/source_adaptor_tests.cpp
                corelib/src/source_tests.cpp
+               corelib/src/staj_array_iterator_ec_tests.cpp 
                corelib/src/staj_iterator_tests.cpp
                corelib/src/string_to_double_tests.cpp
                corelib/src/try_decode_json_tests.cpp

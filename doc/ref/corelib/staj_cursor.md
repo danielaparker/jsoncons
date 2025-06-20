@@ -49,15 +49,3 @@ Get the next event. If a parsing error is encountered, sets `ec`.
     virtual const ser_context& context() const = 0;
 Returns the current [context](ser_context.md)
 
-#### Non-member functions
-
-    template <typename T,typename CharT,typename Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
-    staj_array_view<Json,T> staj_array(basic_staj_cursor<CharT>& cursor);
-Create a view of the parse events as an array of items of type `T`. 
-The current event type must be `staj_event_type::begin_array`.
-
-    template <typename Key,typename T,typename CharT,typename Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
-    staj_object_view<Key, T, Json> staj_object(basic_staj_cursor<CharT>& cursor);
-Create a view of the parse events as an object of key-value pairs.
-The current event type must be `staj_event_type::begin_object`.
-

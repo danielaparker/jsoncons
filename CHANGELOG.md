@@ -30,6 +30,31 @@
         - `try_as_double`
         - `try_as_string_view`
 
+- Breaking changes to staj iterator classes
+
+    - Classes `staj_array_view` and `staj_object_view` and corresponding factories `staj_array` 
+       and `staj_object` have been removed.
+    - `staj_array_iterator` and `staj_object_iterator` objects are now constructed directly 
+      from a cursor rather than through one of these view objects.
+    - Classes `staj_array_iterator` and `staj_object_iterator` now have `begin` and `end`
+      non-member functions for range-based for loop support.  
+
+    We don't expect this change will affect many users. In any case the change is simple, e.g.
+    
+        auto view = staj_object<std::string,json>(cursor);
+        for (const auto& key_val : view)
+        {
+            // ...
+        }
+
+    becomes
+    
+        auto iter = staj_object_iterator<std::string,json>(cursor);
+        for (const auto& key_val : iter)
+        {
+            // ...
+        }
+
 1.3.2 
 -----
 

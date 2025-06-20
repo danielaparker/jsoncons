@@ -289,11 +289,12 @@ int main()
 
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<ojson>(cursor);
+    auto iter = staj_array_iterator<ojson>(cursor);
 
     auto print_options = json_options{}
         .float_format(float_chars_format::fixed);
-    for (const auto& item : view)
+
+    for (const auto& item : iter)
     {
         std::cout << pretty_print(item, print_options) << "\n";
     }
@@ -329,10 +330,10 @@ int main()
         .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<record_type>(cursor);
+    auto iter = staj_array_iterator<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : view)
+    for (const auto& record : iter)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }

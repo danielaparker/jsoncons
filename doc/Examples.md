@@ -987,8 +987,9 @@ int main()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<json>(cursor);
-    for (const auto& j : view)
+    //auto iter = staj_array<json>(cursor);        // (until 1.4.0)
+    auto iter = staj_array_iterator<json>(cursor); // (since 1.4.0)
+    for (const auto& j : iter)
     {
         std::cout << pretty_print(j) << "\n";
     }
@@ -1037,8 +1038,9 @@ int main()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<ns::book>(cursor);
-    for (const auto& book : view)
+    //auto iter = staj_array<ns::book>(cursor);        // (until 1.4.0)
+    auto iter = staj_array_iterator<ns::book>(cursor); // (since 1.4.0)
+    for (const auto& book : iter)
     {
         std::cout << book.author << ", " << book.title << "\n";
     }
@@ -3485,11 +3487,11 @@ int main()
     byte_string bytes2 = j["EncodedByteString"].as<byte_string>();
     std::cout << "(2) " << bytes2 << "\n\n";
 
-    // Retrieve a byte string view  to access the memory that's holding the byte string
+    // Retrieve a byte string iter  to access the memory that's holding the byte string
     byte_string_view bsv3 = j["ByteString"].as<byte_string_view>();
     std::cout << "(3) " << bsv3 << "\n\n";
 
-    // Can't retrieve a byte string view of a text string 
+    // Can't retrieve a byte string iter of a text string 
     try
     {
         byte_string_view bsv4 = j["EncodedByteString"].as<byte_string_view>();
