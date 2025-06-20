@@ -419,7 +419,7 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> from_string_radix(const CharT* data, size_type length, uint8_t radix)
+    static basic_bigint<Allocator> parse_radix(const CharT* data, size_type length, uint8_t radix)
     {
         if (!(radix >= 2 && radix <= 16u))
         {
