@@ -33,11 +33,11 @@ void book_extensibility_example()
     json ja = book_array;
 
     std::cout << "(4) " << std::boolalpha 
-                        << ja.is<std::vector<ns::book>>() << "\n\n";
+                        << ja.is<std::list<ns::book>>() << "\n\n";
 
     std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
 
-    auto book_list = ja.as<std::list<ns::book>>();
+    /*auto book_list = ja.as<std::list<ns::book>>();
 
     std::cout << "(6)" << '\n';
     for (auto b : book_list)
@@ -45,7 +45,7 @@ void book_extensibility_example()
         std::cout << b.author << ", " 
                   << b.title << ", " 
                   << b.price << '\n';
-    }
+    }*/
 }
 
 void book_extensibility_example2()
@@ -129,6 +129,8 @@ namespace jsoncons {
 template <typename Json>
 struct json_type_traits<Json, own_vector> 
 {
+    using allocator_type = typename Json::allocator_type;
+
     static bool is(const Json& j) noexcept
     { 
         return j.is_object() && j.size() % 2 == 0;
@@ -144,7 +146,7 @@ struct json_type_traits<Json, own_vector>
         }
         return v;
     }
-    static Json to_json(const own_vector& val){
+    static Json to_json(const own_vector& val, const allocator_type& alloc){
         Json j;
         for (std::size_t i=0;i<val.size();i+=2){
             j[std::to_string(val[i])] = val[i + 1];

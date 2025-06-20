@@ -182,7 +182,7 @@ namespace jsoncons {
             return val;
         }
         static Json to_json(const ns::book& val, 
-                            allocator_type alloc=allocator_type())
+           const allocator_type& alloc=allocator_type())
         {
             Json j(json_object_arg, semantic_tag::none, alloc);
             j.try_emplace("author", val.author);

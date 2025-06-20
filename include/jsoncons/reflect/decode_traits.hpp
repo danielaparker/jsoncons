@@ -64,6 +64,34 @@ struct decode_traits
     }
 };
 
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<ext_traits::is_basic_json<T>::value
+>::type>
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+    
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        
+        std::size_t line = cursor.line(); 
+        std::size_t column = cursor.column();
+        using json_type = T;
+        auto j = try_to_json<json_type>(cursor, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        auto conv_res = reflect::json_conv_traits<json_type, value_type>::try_as(j);
+
+        return conv_res ? result_type(std::move(*conv_res)) : result_type(jsoncons::unexpect, 
+            conv_res.error().code(), conv_res.error().message_arg(), line, column);
+    }
+};
+
 // specializations
 
 // primitive
