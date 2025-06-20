@@ -1578,7 +1578,7 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / millis_in_second;
@@ -1588,7 +1588,7 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / nanos_in_second;
@@ -1666,7 +1666,7 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / nanos_in_milli;

@@ -891,7 +891,7 @@ private:
         }
         else if (r.error_code() == std::errc::result_out_of_range)
         {
-            bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
+            bigint n = bigint::parse_radix(s.data(), s.length(), 16);
             write_bignum(n);
             end_value();
         }
