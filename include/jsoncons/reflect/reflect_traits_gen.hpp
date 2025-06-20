@@ -73,7 +73,7 @@ struct json_traits_helper
         {
             return conversion_result<T>(unexpect, conv_errc::conversion_failed);
         }
-        return conversion_result<T>(std::move(result.value()));
+        return conversion_result<T>(std::move(*result));
     } 
 
     template <typename U> 

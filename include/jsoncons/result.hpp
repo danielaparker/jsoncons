@@ -12,6 +12,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/conv_error.hpp>
+#include <cassert>
 
 namespace jsoncons {
     
@@ -174,15 +175,6 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad result access"));
     }
 
-    E error() &
-    {
-        if (!has_value_)
-        {
-            return this->error_;
-        }
-        JSONCONS_THROW(std::runtime_error("Bad result access"));
-    }
-
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
     {
         if (has_value_)
@@ -192,32 +184,74 @@ public:
         JSONCONS_THROW(std::runtime_error("Bad result access"));
     }
 
-    const T* operator->() const noexcept
+    JSONCONS_CPP14_CONSTEXPR T&& value() &&
+    {
+        if (has_value_)
+        {
+            return std::move(this->value_);
+        }
+        JSONCONS_THROW(std::runtime_error("Bad result access"));
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const T&& value() const &&
+    {
+        if (has_value_)
+        {
+            return std::move(this->value_);
+        }
+        JSONCONS_THROW(std::runtime_error("Bad result access"));
+    }
+
+    JSONCONS_CPP14_CONSTEXPR E& error() & noexcept
+    {
+        assert(!has_value_);
+        return this->error_;
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const E& error() const& noexcept
+    {
+        assert(!has_value_);
+        return this->error_;
+    }
+
+    JSONCONS_CPP14_CONSTEXPR E&& error() && noexcept
+    {
+        assert(!has_value_);
+        return std::move(this->error_);
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const E&& error() const && noexcept
+    {
+        assert(!has_value_);
+        return std::move(this->error_);
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const T* operator->() const noexcept
     {
         return std::addressof(this->value_);
     }
 
-    T* operator->() noexcept
+    JSONCONS_CPP14_CONSTEXPR T* operator->() noexcept
     {
         return std::addressof(this->value_);
     }
 
-    const T& operator*() const & noexcept
+    JSONCONS_CPP14_CONSTEXPR const T& operator*() const & noexcept
     {
         return this->value_;
     }
 
-    T& operator*() & noexcept
+    JSONCONS_CPP14_CONSTEXPR T& operator*() & noexcept
     {
         return this->value_;
     }
 
-    const T&& operator*() const && noexcept
+    JSONCONS_CPP14_CONSTEXPR const T&& operator*() const && noexcept
     {
         return this->value_;
     }
 
-    T&& operator*() && noexcept
+    JSONCONS_CPP14_CONSTEXPR T&& operator*() && noexcept
     {
         return this->value_;
     }

@@ -3383,18 +3383,18 @@ namespace jsoncons {
             }
         }
 
-        template <typename IntegerType>
-        conversion_result<IntegerType> try_as_integer() const
+        template <typename T>
+        conversion_result<T> try_as_integer() const
         {
-            using result_type = conversion_result<IntegerType>;
+            using result_type = conversion_result<T>;
             
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    IntegerType val;
-                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
+                    T val;
+                    auto result = jsoncons::utility::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
                         return result_type(unexpect, conv_errc::not_integer);
@@ -3402,28 +3402,28 @@ namespace jsoncons {
                     return val;
                 }
                 case json_storage_kind::half_float:
-                    return result_type(static_cast<IntegerType>(cast<half_storage>().value()));
+                    return result_type(static_cast<T>(cast<half_storage>().value()));
                 case json_storage_kind::float64:
-                    return result_type(static_cast<IntegerType>(cast<double_storage>().value()));
+                    return result_type(static_cast<T>(cast<double_storage>().value()));
                 case json_storage_kind::int64:
-                    return result_type(static_cast<IntegerType>(cast<int64_storage>().value()));
+                    return result_type(static_cast<T>(cast<int64_storage>().value()));
                 case json_storage_kind::uint64:
-                    return result_type(static_cast<IntegerType>(cast<uint64_storage>().value()));
+                    return result_type(static_cast<T>(cast<uint64_storage>().value()));
                 case json_storage_kind::boolean:
-                    return result_type(static_cast<IntegerType>(cast<bool_storage>().value() ? 1 : 0));
+                    return result_type(static_cast<T>(cast<bool_storage>().value() ? 1 : 0));
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().template try_as_integer<IntegerType>();
+                    return cast<json_const_reference_storage>().value().template try_as_integer<T>();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().template try_as_integer<IntegerType>();
+                    return cast<json_reference_storage>().value().template try_as_integer<T>();
                 default:
                     return result_type(unexpect, conv_errc::not_integer);
             }
         }
 
-        template <typename IntegerType>
-        IntegerType as_integer() const
+        template <typename T>
+        T as_integer() const
         {
-            auto result = try_as_integer<IntegerType>();
+            auto result = try_as_integer<T>();
             if (!result)
             {
                 JSONCONS_THROW(conv_error(result.error().code()));
@@ -3431,27 +3431,27 @@ namespace jsoncons {
             return *result;
         }
 
-        template <typename IntegerType>
-        typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
+        template <typename T>
+        typename std::enable_if<ext_traits::is_signed_integer<T>::value && sizeof(T) <= sizeof(int64_t),bool>::type
         is_integer() const noexcept
         {
             switch (storage_kind())
             {
                 case json_storage_kind::int64:
-                    return (as_integer<int64_t>() >= (ext_traits::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<IntegerType>::max)());
+                    return (as_integer<int64_t>() >= (ext_traits::integer_limits<T>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::uint64:
-                    return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<IntegerType>::max)());
+                    return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().template is_integer<IntegerType>();
+                    return cast<json_const_reference_storage>().value().template is_integer<T>();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().template is_integer<IntegerType>();
+                    return cast<json_reference_storage>().value().template is_integer<T>();
                 default:
                     return false;
             }
         }
 
-        template <typename IntegerType>
-        typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
+        template <typename T>
+        typename std::enable_if<ext_traits::is_signed_integer<T>::value && sizeof(int64_t) < sizeof(T),bool>::type
         is_integer() const noexcept
         {
             switch (storage_kind())
@@ -3459,18 +3459,18 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    IntegerType val;
-                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
+                    T val;
+                    auto result = jsoncons::utility::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
-                    return (as_integer<int64_t>() >= (ext_traits::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<IntegerType>::max)());
+                    return (as_integer<int64_t>() >= (ext_traits::integer_limits<T>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::uint64:
-                    return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<IntegerType>::max)());
+                    return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().template is_integer<IntegerType>();
+                    return cast<json_const_reference_storage>().value().template is_integer<T>();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().template is_integer<IntegerType>();
+                    return cast<json_reference_storage>().value().template is_integer<T>();
                 default:
                     return false;
             }

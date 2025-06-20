@@ -43,6 +43,10 @@ provides allocators for result data and temporary allocations.
 (5) Reads BSON data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](bson_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) or support jsoncons reflection traits.
 
+#### Return value
+
+[read_result<T>](read_result.md)
+
 #### Exceptions
 
 Any overload may throw `std::bad_alloc` if memory allocation fails.

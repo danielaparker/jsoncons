@@ -42,6 +42,10 @@ provides allocators for result data and temporary allocations.
 
 (5) Reads JSON from the range [first,last) into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 
+#### Return value
+
+[read_result<T>](read_result.md)
+
 #### Exceptions
 
 No exceptions thrown by jsoncons library.

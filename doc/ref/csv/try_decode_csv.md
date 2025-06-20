@@ -45,6 +45,10 @@ Type 'T' must be an instantiation of [basic_json](../basic_json.md) or support j
 
 Returns a value of type `T`.
 
+#### Return value
+
+[read_result<T>](read_result.md)
+
 #### Exceptions
 
 Any overload may throw `std::bad_alloc` if memory allocation fails.
