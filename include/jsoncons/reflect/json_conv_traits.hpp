@@ -1442,11 +1442,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             switch (j.type())
             {
                 case json_type::string_value:
-                    if (!jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length()))
-                    {
-                        return result_type(jsoncons::unexpect, conv_errc::not_bigint);
-                    }
-                    return result_type(basic_bigint<Allocator>::parse(j.as_string_view().data(), j.as_string_view().length()));
+                {
+                    auto sv = j.as_string_view();
+                    std::error_code ec;
+                    auto val = basic_bigint<Allocator>::parse(sv.data(), sv.length(), ec);
+                    return ec? result_type(jsoncons::unexpect, conv_errc::not_bigint) : result_type(std::move(val));
+                }
                 case json_type::half_value:
                 case json_type::double_value:
                 {
@@ -1727,7 +1728,9 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::parse(sv.data(), sv.length());
+                        std::error_code ec;
+                        auto n = bigint::parse(sv.data(), sv.length(), ec);
+                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / millis_in_second;
@@ -1737,7 +1740,9 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::parse(sv.data(), sv.length());
+                        std::error_code ec;
+                        auto n = bigint::parse(sv.data(), sv.length(), ec);
+                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / nanos_in_second;
@@ -1839,7 +1844,10 @@ namespace variant_detail
                         {
                             return result_type(unexpect, conv_errc::not_epoch);
                         }
-                        bigint n = bigint::parse((*res).data(), (*res).length());
+                        auto sv = *res;
+                        std::error_code ec;
+                        auto n = bigint::parse(sv.data(), sv.length(), ec);
+                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / nanos_in_milli;

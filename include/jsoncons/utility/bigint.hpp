@@ -17,6 +17,7 @@
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
 #include <string> // std::string
+#include <system_error>
 #include <type_traits> // std::enable_if
 #include <vector> // std::vector
 
@@ -382,6 +383,12 @@ public:
     }
 
     template <typename CharT>
+    static basic_bigint<Allocator> parse(const CharT* s, std::error_code& ec)
+    {
+        return parse(s, std::char_traits<CharT>::length(s), ec);
+    }
+
+    template <typename CharT>
     static basic_bigint<Allocator> parse(const CharT* data, size_type length)
     {
         bool neg;
@@ -407,6 +414,45 @@ public:
                     break;
                 default:
                     JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
+            }
+        }
+
+        if (neg)
+        {
+            v.common_stor_.is_negative_ = true;
+        }
+
+        return v;
+    }
+
+    template <typename CharT>
+    static basic_bigint<Allocator> parse(const CharT* data, size_type length, std::error_code& ec)
+    {
+        ec.clear();
+        bool neg;
+        if (*data == '-')
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+        else
+        {
+            neg = false;
+        }
+
+        basic_bigint<Allocator> v = 0;
+        for (size_type i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    v = (v * 10u) + (uint64_t)(c - '0');
+                    break;
+                default:
+                    ec = std::make_error_code(std::errc::invalid_argument);
+                    return basic_bigint<Allocator>{};
             }
         }
 
