@@ -40,19 +40,19 @@ public:
 
     read_error& operator=(read_error&& other) = default;
     
-    const std::error_code& code() const
+    const std::error_code& code() const noexcept
     {
         return ec_;
     }
-    const std::string& message_arg() const 
+    const std::string& message_arg() const noexcept
     {
         return message_arg_;
     }
-    std::size_t line() const
+    std::size_t line() const noexcept
     {
         return line_;
     }
-    std::size_t column() const
+    std::size_t column() const noexcept
     {
         return column_;
     }
