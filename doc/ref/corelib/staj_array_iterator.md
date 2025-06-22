@@ -230,7 +230,7 @@ int main()
     {
         if (ec)
         {
-            std::cout << "Fail\n";
+            std::cout << "Fail: " << ec.message() << "\n";
         }
         else
         {
@@ -244,7 +244,7 @@ int main()
 ```
 Output:
 ```
-Fail
+Fail: Unable to convert into the provided type
 id: 23, name: , age: 36
 id: 24, name: Jane Doe, age: 34
 ```

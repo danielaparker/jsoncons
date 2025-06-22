@@ -6,7 +6,7 @@ to work with the data in a number of ways:
 
 - As a variant-like, allocator-aware, data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements jsoncons reflection traits
 
 - With cursor-level access to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
