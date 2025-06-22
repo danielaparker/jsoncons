@@ -169,3 +169,82 @@ Output:
 102, Bill Skeleton, Line manager
 ```
 
+#### Non-throwing overloads
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+namespace ns {
+
+struct employee
+{
+    std::string name;
+    uint64_t id;
+    int age;
+};
+
+} // namespace ns
+
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::employee,
+    (name, "Name"),
+    (id, "Id"),
+    (age, "Age", JSONCONS_RDWR,
+        [](int age) noexcept
+        {
+            return age >= 16 && age <= 68;
+        }
+        )
+)
+
+int main()
+{
+    const std::string input = R"(
+    [
+      {
+        "Name" : "John Smith",
+        "Id" : 22,
+        "Age" : 345
+      },
+      {
+        "Name" : "",
+        "Id" : 23,
+        "Age" : 36
+      },
+      {
+        "Name" : "Jane Doe",
+        "Id" : 24,
+        "Age" : 34
+      }
+    ]
+    )";
+
+    std::error_code ec;
+    jsoncons::json_string_cursor cursor(input, ec);
+
+    auto iter = jsoncons::staj_array_iterator<ns::employee>(cursor, ec);
+    auto last = end(iter);
+
+    while (iter != last)
+    {
+        if (ec)
+        {
+            std::cout << "Fail\n";
+        }
+        else
+        {
+            std::cout << "id: " << iter->id 
+                      << ", name: " << iter->name 
+                      << ", age: " << iter->age << "\n";
+        }
+        iter.increment(ec);
+    }
+}
+```
+Output:
+```
+Fail
+id: 23, name: , age: 36
+id: 24, name: Jane Doe, age: 34
+```

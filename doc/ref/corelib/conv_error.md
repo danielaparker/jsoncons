@@ -1,7 +1,7 @@
 ### jsoncons::conv_error
 
 ```cpp
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/conv_error.hpp>
 ```
 
 <br>
@@ -21,6 +21,8 @@ std::exception
     conv_error(std::error_code ec, const char* what_arg);
 
     conv_error(const conv_error& other);
+
+    conv_error(conv_error&& other);
 
 #### Member functions
 

@@ -73,7 +73,6 @@ namespace jsoncons {
             else if (cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next(ec);
-                if (JSONCONS_UNLIKELY(ec)) {done_ = true;}
             }
             else
             {
