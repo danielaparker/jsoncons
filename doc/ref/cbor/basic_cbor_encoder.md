@@ -70,7 +70,7 @@ Reset encoder to write a new value to a new sink
     void int64_value_with_tag(int64_t value, uint64_t raw_tag);            // (since 1.2.0) 
 
 
-#### Inherited from [jsoncons::basic_json_visitor](../basic_json_visitor.md)
+#### Inherited from [jsoncons::basic_json_visitor](../corelib/basic_json_visitor.md)
 
     void flush();                                                  (1)
 
@@ -553,4 +553,4 @@ d9 04 10 82 82 02 03 86 02 04 08 04 10 19 01 00
 
 ### See also
 
-[byte_string_view](../byte_string_view.md)
+[byte_string_view](../corelib/byte_string_view.md)

@@ -1,14 +1,17 @@
-### jsoncons::basic_json::as
+### jsoncons::basic_json::as, jsoncons::basic_json::try_as
 
 ```cpp
 template <typename T>
-T as() const; (1)
+T as() const;                                       (1)
 
 template <typename T>
-T as(byte_string_arg_t, semantic_tag hint) const; (2)
+conversion_result<T> try_as() const;                (2) (since 1.4.0)
+
+template <typename T>
+T as(byte_string_arg_t, semantic_tag hint) const;   (3)
 ```
 
-(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
+(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../corelib/json_type_traits.md).
 
     std::string as<std::string>() const noexcept
 If value is string, returns value, otherwise returns result of [dump](dump.md).

@@ -27,6 +27,34 @@
 
 namespace jsoncons {
 
+template <typename CharT>
+struct to_bigint_result
+{
+    const CharT* ptr;
+    std::errc ec;
+    constexpr to_bigint_result(const CharT* ptr_)
+        : ptr(ptr_), ec(std::errc())
+    {
+    }
+    constexpr to_bigint_result(const CharT* ptr_, std::errc ec_)
+        : ptr(ptr_), ec(ec_)
+    {
+    }
+
+    to_bigint_result(const to_bigint_result&) = default;
+
+    to_bigint_result& operator=(const to_bigint_result&) = default;
+
+    constexpr explicit operator bool() const noexcept
+    {
+        return ec == std::errc();
+    }
+    std::error_code error_code() const
+    {
+        return make_error_code(ec);
+    }
+};
+
 /*
 This implementation is based on Chapter 2 and Appendix A of
 Ammeraal, L. (1996) Algorithms and Data Structures in C++,
@@ -1682,6 +1710,67 @@ private:
         n |= n >> 16u;
         n |= n >> 32u;
         return n + 1;
+    }
+
+    template <typename CharT>
+    friend to_bigint_result<CharT> to_bigint(const CharT* s, basic_bigint& val, int radix = 10)
+    {
+        return to_bigint(s, std::char_traits<CharT>::length(s), val, radix);
+    }
+
+    template <typename CharT>
+    friend to_bigint_result<CharT> to_bigint(const CharT* s, size_type length, basic_bigint& val, int radix = 10)
+    {
+        if (!(radix >= 2 && radix <= 16))
+        {
+            JSONCONS_THROW(std::runtime_error("Unsupported radix"));
+        }
+
+        const CharT* cur = s;
+        const CharT* last = s + length;
+
+        bool neg;
+        if (*cur == '-')
+        {
+            neg = true;
+            cur++;
+        }
+        else
+        {
+            neg = false;
+        }
+
+        while (cur < last)
+        {
+            CharT c = *cur;
+            uint64_t d;
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    d = (uint64_t)(c - '0');
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    d = (uint64_t)(c - ('a' - 10u));
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    d = (uint64_t)(c - ('A' - 10u));
+                    break;
+                default:
+                    return to_bigint_result<CharT>(cur, std::errc::invalid_argument);
+            }
+            if ((int)d >= radix)
+            {
+                return to_bigint_result<CharT>(cur, std::errc::invalid_argument);
+            }
+            val = (val * radix) + d;
+            ++cur;
+        }
+
+        if ( neg )
+        {
+            val.common_stor_.is_negative_ = true;
+        }
+        return to_bigint_result<CharT>(cur, std::errc{});
     }
 };
 

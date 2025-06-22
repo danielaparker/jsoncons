@@ -14,27 +14,27 @@ void encode_bson(const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (2)
 
 template <typename T,typename ByteContainer>
-void encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
+void encode_bson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& jval, ByteContainer& cont,
     const bson_decode_options& options = bson_decode_options());            (3) (since 0.171.0) 
 
 template <typename T>
-void encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
+void encode_bson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (4) (since 0.171.0)
 ```
 
 (1) Writes a value of type T into a byte container in the BSON data format, using the specified (or defaulted) [options](bson_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [json_type_traits](../json_type_traits.md). 
+or support jsoncons reflection traits. 
 Type `ByteContainer` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the BSON data format, using the specified (or defaulted) [options](bson_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [json_type_traits](../json_type_traits.md). 
+or support jsoncons reflection traits. 
 
-Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument.
+Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../corelib/allocator_set.md) is passed as an additional argument.
 
 ### Examples
 

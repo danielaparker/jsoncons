@@ -1531,53 +1531,77 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return result_type(cast<json_reference_storage>().value().as_string_view());
                 default:
-                   return result_type(unexpect, conv_errc::not_double);
+                   return result_type(unexpect, conv_errc::not_string);
             }
         }
 
-        template <typename BAllocator=std::allocator<uint8_t>>
-        basic_byte_string<BAllocator> as_byte_string() const
+        template <typename BytesAlloc=std::allocator<uint8_t>>
+        conversion_result<basic_byte_string<BytesAlloc>> try_as_byte_string() const
         {
-            using byte_string_type = basic_byte_string<BAllocator>;
-            std::error_code ec;
+            using byte_string_type = basic_byte_string<BytesAlloc>;
+            using result_type = conversion_result<byte_string_type>;
 
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
+                    std::error_code ec;
                     value_converter<jsoncons::string_view, byte_string_type> converter;
                     byte_string_type v = converter.convert(as_string_view(),tag(), ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
-                        JSONCONS_THROW(ser_error(ec));
+                        return result_type(unexpect, ec);
                     }
-                    return v;
+                    return result_type(v);
                 }
                 case json_storage_kind::byte_str:
-                    return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
+                    return result_type(in_place, cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
                 case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().as_byte_string();
+                    return cast<json_const_reference_storage>().value().template try_as_byte_string<BytesAlloc>();
                 case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().as_byte_string();
+                    return cast<json_reference_storage>().value().template try_as_byte_string<BytesAlloc>();
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+                    return result_type(unexpect, conv_errc::not_byte_string);
+            }
+        }
+
+        template <typename BytesAlloc=std::allocator<uint8_t>>
+        basic_byte_string<BytesAlloc> as_byte_string() const
+        {
+            auto result = try_as_byte_string<BytesAlloc>();
+            if (!result)
+            {
+                JSONCONS_THROW(conv_error(result.error().code()));
+            }
+            return *result;
+        }
+
+        conversion_result<byte_string_view> try_as_byte_string_view() const
+        {
+            using result_type = conversion_result<byte_string_view>;
+
+            switch (storage_kind())
+            {
+                case json_storage_kind::byte_str:
+                    return result_type(in_place, cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
+                case json_storage_kind::json_const_reference:
+                    return cast<json_const_reference_storage>().value().try_as_byte_string_view();
+                case json_storage_kind::json_reference:
+                    return cast<json_reference_storage>().value().try_as_byte_string_view();
+                default:
+                    return result_type(unexpect, conv_errc::not_byte_string);
             }
         }
 
         byte_string_view as_byte_string_view() const
         {
-            switch (storage_kind())
+            auto result = try_as_byte_string_view();
+            if (!result)
             {
-                case json_storage_kind::byte_str:
-                    return byte_string_view(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
-                case json_storage_kind::json_const_reference:
-                    return cast<json_const_reference_storage>().value().as_byte_string_view();
-                case json_storage_kind::json_reference:
-                    return cast<json_reference_storage>().value().as_byte_string_view();
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+                JSONCONS_THROW(conv_error(result.error().code()));
             }
+            return *result;
         }
 
         int compare(const basic_json& rhs) const noexcept
@@ -1910,14 +1934,14 @@ namespace jsoncons {
             return decoder.get_result();
         }
 
-        template <typename Source,typename TempAllocator >
+        template <typename Source,typename TempAlloc >
         static
          typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-            parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const Source& source, 
+            parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
-            basic_json_parser<char_type,TempAllocator> parser(options, alloc_set.get_temp_allocator());
+            basic_json_parser<char_type,TempAlloc> parser(options, alloc_set.get_temp_allocator());
 
             auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
             if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
@@ -1948,15 +1972,15 @@ namespace jsoncons {
             return parse(jsoncons::basic_string_view<char_type>(source), options);
         }
 
-        template <typename TempAllocator >
-        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const char_type* source, 
+        template <typename TempAlloc >
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, const char_type* source, 
             const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             return parse(alloc_set, jsoncons::basic_string_view<char_type>(source), options);
         }
 
-        template <typename TempAllocator >
-        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
+        template <typename TempAlloc >
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
             const char_type* str, std::size_t length,
             const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
@@ -1979,8 +2003,8 @@ namespace jsoncons {
             return decoder.get_result();
         }
 
-        template <typename TempAllocator >
-        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, std::basic_istream<char_type>& is, 
+        template <typename TempAlloc >
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, std::basic_istream<char_type>& is, 
             const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
@@ -2012,8 +2036,8 @@ namespace jsoncons {
             return decoder.get_result();
         }
 
-        template <typename InputIt,typename TempAllocator >
-        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, InputIt first, InputIt last, 
+        template <typename InputIt,typename TempAlloc >
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, InputIt first, InputIt last, 
                                 const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
@@ -3587,16 +3611,16 @@ namespace jsoncons {
             return *result;
         }
 
-        template <typename SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
+        template <typename CharsAlloc=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,CharsAlloc> as_string() const 
         {
-            return as_string(SAllocator());
+            return as_string(CharsAlloc());
         }
 
-        template <typename SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
+        template <typename CharsAlloc=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,CharsAlloc> as_string(const CharsAlloc& alloc) const 
         {
-            using string_type2 = std::basic_string<char_type,char_traits_type,SAllocator>;
+            using string_type2 = std::basic_string<char_type,char_traits_type,CharsAlloc>;
 
             std::error_code ec;
             switch (storage_kind())

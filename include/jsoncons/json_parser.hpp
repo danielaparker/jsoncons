@@ -103,7 +103,7 @@ enum class parse_number_state : uint8_t
     exp3
 };
 
-template <typename CharT,typename TempAllocator  = std::allocator<char>>
+template <typename CharT,typename TempAlloc  = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
 public:
@@ -120,7 +120,7 @@ private:
         }
     };
 
-    using temp_allocator_type = TempAllocator;
+    using temp_allocator_type = TempAlloc;
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;
 
@@ -162,26 +162,26 @@ private:
     basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
-    basic_json_parser(const TempAllocator& temp_alloc = TempAllocator())
+    basic_json_parser(const TempAlloc& temp_alloc = TempAlloc())
         : basic_json_parser(basic_json_decode_options<char_type>(), default_json_parsing(), temp_alloc)
     {
     }
 
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+                      const TempAlloc& temp_alloc = TempAlloc())
         : basic_json_parser(basic_json_decode_options<char_type>(), err_handler, temp_alloc)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<char_type>& options, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+                      const TempAlloc& temp_alloc = TempAlloc())
         : basic_json_parser(options, options.err_handler(), temp_alloc)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<char_type>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+                      const TempAlloc& temp_alloc = TempAlloc())
        : max_nesting_depth_(options.max_nesting_depth()),
          allow_trailing_comma_(options.allow_trailing_comma()),
          allow_comments_(options.allow_comments()),

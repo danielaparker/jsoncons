@@ -16,27 +16,27 @@ void encode_csv(const T& val, std::basic_ostream<CharT>& os,
         = basic_csv_encode_options<CharT>());                               (2)
 
 template <typename T,typename CharContainer>
-void encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
+void encode_csv(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& val, CharContainer& cont, 
     const basic_csv_encode_options<CharContainer::value_type>& options 
         = basic_csv_encode_options<CharContainer::value_type>());           (3) (since 0.171.0)
 
 template <typename T,typename CharT>
-void encode_csv(const allocator_set<Allocator,TempAllocator>& alloc_set,
+void encode_csv(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& val, std::basic_ostream<CharT>& os, 
     const basic_csv_encode_options<CharT>& options 
         = basic_csv_encode_options<CharT>());                               (4) (since 0.171.0)
 ```
 
 (1) Writes a value of type T into a character container in the CSV data format, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
-or support [json_type_traits](../json_type_traits.md). 
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
+or support jsoncons reflection traits. 
 
 (2) Writes a value of type T into an output stream in the CSV data format, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
-or support [json_type_traits](../json_type_traits.md). 
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
+or support jsoncons reflection traits. 
 
-Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument.
+Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../corelib/allocator_set.md) is passed as an additional argument.
 
 ### Examples
 

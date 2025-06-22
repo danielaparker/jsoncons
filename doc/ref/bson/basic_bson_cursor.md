@@ -281,9 +281,9 @@ Graham Greene
 
 ### See also
 
-[staj_event](../basic_staj_event.md)  
+[staj_event](../corelib/basic_staj_event.md)  
 
-[staj_array_iterator](../staj_array_iterator.md)  
+[staj_array_iterator](../corelib/staj_array_iterator.md)  
 
-[staj_object_iterator](../staj_object_iterator.md)  
+[staj_object_iterator](../corelib/staj_object_iterator.md)  
 

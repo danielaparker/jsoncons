@@ -13,44 +13,79 @@ template <typename T,typename CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (2)
 
-template <typename T,typename CharsLike,typename Allocator,typename TempAllocator>
-T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
+template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+T decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
     const CharsLike& s,                                                                      (3)
     const basic_csv_decode_options<CharsLike::value_type>& options = 
         basic_csv_decode_options<CharsLike::value_type>()); 
 
-template <typename T,typename CharT,typename Allocator,typename TempAllocator>
-T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
+template <typename T,typename CharT,typename Alloc,typename TempAlloc>
+T decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
     std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());     (4)
 
 template <typename T,typename InputIt>
 T decode_csv(InputIt first, InputIt last,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (5) (since 0.153.0)
+
+template <typename T,typename CharsLike>
+read_result<T> try_decode_csv(const CharsLike& s, 
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (6) (since 1.4.0)
+
+template <typename T,typename CharT>
+read_result<T> try_decode_csv(std::basic_istream<CharT>& is, 
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (7) (since 1.4.0)
+
+template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+    const CharsLike& s,                                                                      (8) (since 1.4.0)
+    const basic_csv_decode_options<CharsLike::value_type>& options = 
+        basic_csv_decode_options<CharsLike::value_type>()); 
+
+template <typename T,typename CharT,typename Alloc,typename TempAlloc>
+read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+    std::basic_istream<CharT>& is,
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());     (9) (since 1.4.0)
+
+template <typename T,typename InputIt>
+read_result<T> try_decode_csv(InputIt first, InputIt last,
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (10) (since 1.4.0)
 ```
 
 (1) Reads CSV data from a contiguous character sequence into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
-or support [json_type_traits](../json_type_traits.md).
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
+or support jsoncons reflection traits.
 
 (2) Reads CSV data from an input stream into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
-or support [json_type_traits](../json_type_traits.md).
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
+or support jsoncons reflection traits.
 
 (3) Reads CSV data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
-or support [json_type_traits](../json_type_traits.md).
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
+or support jsoncons reflection traits.
 
-Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument and
+Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../corelib/allocator_set.md) is passed as an additional argument and
 provides allocators for result data and temporary allocations.
 
+(6)-(10) Non-throwing versions of (1)-(5)
+
 #### Return value
+
+(1)-(5) Deserialized value
+
+(6)-(10) [read_result<T>](../corelib/read_result.md)
+
+#### Exceptions
+
+(1)-(5) Throw [ser_error](../corelib/ser_error.md) if read fails.
+
+Any overload may throw `std::bad_alloc` if memory allocation fails.
 
 Returns a value of type `T`.
 
 #### Exceptions
 
-Throws a [ser_error](../ser_error.md) if parsing fails, and a [conv_error](conv_error.md) if type conversion fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails, and a [conv_error](conv_error.md) if type conversion fails.
 
 ### Examples
 
@@ -359,7 +394,7 @@ Output:
 }
 ```
 
-#### Convert a CSV source to a C++ data structure that satisfies [json_type_traits](../json_type_traits.md) requirements, and back
+#### Convert a CSV source to a C++ data structure that satisfies [json_type_traits](../corelib/json_type_traits.md) requirements, and back
 
 ```cpp
 #include <jsoncons/json.hpp>

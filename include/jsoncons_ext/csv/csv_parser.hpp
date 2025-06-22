@@ -102,10 +102,10 @@ struct default_csv_parsing
 
 namespace detail {
 
-    template <typename CharT,typename TempAllocator >
+    template <typename CharT,typename TempAlloc >
     class parse_event
     {
-        using temp_allocator_type = TempAllocator;
+        using temp_allocator_type = TempAlloc;
         using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
         using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
@@ -124,7 +124,7 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(staj_event_type event_type, semantic_tag tag, const TempAlloc& alloc)
             : event_type(event_type), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -132,7 +132,7 @@ namespace detail {
         {
         }
 
-        parse_event(const string_view_type& value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(const string_view_type& value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::string_value), 
               string_value(value.data(),value.length(),alloc), 
               byte_string_value(alloc),
@@ -140,7 +140,7 @@ namespace detail {
         {
         }
 
-        parse_event(const byte_string_view& value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(const byte_string_view& value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::byte_string_value), 
               string_value(alloc),
               byte_string_value(value.data(),value.size(),alloc), 
@@ -148,7 +148,7 @@ namespace detail {
         {
         }
 
-        parse_event(bool value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(bool value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::bool_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -157,7 +157,7 @@ namespace detail {
         {
         }
 
-        parse_event(int64_t value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(int64_t value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::int64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -166,7 +166,7 @@ namespace detail {
         {
         }
 
-        parse_event(uint64_t value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(uint64_t value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::uint64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -175,7 +175,7 @@ namespace detail {
         {
         }
 
-        parse_event(double value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(double value, semantic_tag tag, const TempAlloc& alloc)
             : event_type(staj_event_type::double_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -226,23 +226,23 @@ namespace detail {
         }
     };
 
-    template <typename CharT,typename TempAllocator >
+    template <typename CharT,typename TempAlloc >
     class m_columns_filter : public basic_json_visitor<CharT>
     {
     public:
         using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
         using char_type = CharT;
-        using temp_allocator_type = TempAllocator;
+        using temp_allocator_type = TempAlloc;
 
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
         using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
 
         using string_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type>;
-        using parse_event_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event<CharT,TempAllocator>>;
-        using parse_event_vector_type = std::vector<parse_event<CharT,TempAllocator>, parse_event_allocator_type>;
+        using parse_event_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event<CharT,TempAlloc>>;
+        using parse_event_vector_type = std::vector<parse_event<CharT,TempAlloc>, parse_event_allocator_type>;
         using parse_event_vector_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event_vector_type>;
     private:
-        TempAllocator alloc_;
+        TempAlloc alloc_;
         std::size_t name_index_{0};
         int level_{0};
         int level2_{0};
@@ -254,7 +254,7 @@ namespace detail {
         std::vector<parse_event_vector_type,parse_event_vector_allocator_type> cached_events_;
     public:
 
-        m_columns_filter(const TempAllocator& alloc)
+        m_columns_filter(const TempAlloc& alloc)
             : alloc_(alloc),
               column_names_(alloc),
               cached_events_(alloc)
@@ -532,7 +532,7 @@ namespace detail {
 
 } // namespace detail
 
-template <typename CharT,typename TempAllocator =std::allocator<char>>
+template <typename CharT,typename TempAlloc =std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
@@ -549,7 +549,7 @@ private:
         }
     };
 
-    using temp_allocator_type = TempAllocator;
+    using temp_allocator_type = TempAlloc;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
@@ -599,7 +599,7 @@ private:
     int mark_level_{0};
     std::size_t header_line_offset_{0};
 
-    detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
+    detail::m_columns_filter<CharT,TempAlloc> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
@@ -609,7 +609,7 @@ private:
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
 public:
-    basic_csv_parser(const TempAllocator& alloc = TempAllocator())
+    basic_csv_parser(const TempAlloc& alloc = TempAlloc())
        : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(),
                           alloc)
@@ -617,7 +617,7 @@ public:
     }
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
-                     const TempAllocator& alloc = TempAllocator())
+                     const TempAlloc& alloc = TempAlloc())
         : basic_csv_parser(options, 
                            default_csv_parsing(),
                            alloc)
@@ -625,7 +625,7 @@ public:
     }
 
     basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const TempAllocator& alloc = TempAllocator())
+                     const TempAlloc& alloc = TempAlloc())
         : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                            err_handler,
                            alloc)
@@ -634,7 +634,7 @@ public:
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const TempAllocator& alloc = TempAllocator())
+                     const TempAlloc& alloc = TempAlloc())
        : alloc_(alloc),
          state_(csv_parse_state::start),
          err_handler_(err_handler),

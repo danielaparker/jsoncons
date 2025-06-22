@@ -5,6 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <jsoncons/json.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/decode_json.hpp>
 #include <jsoncons/encode_json.hpp>
 #include <sstream>
@@ -304,7 +305,29 @@ TEST_CASE("json_conv_traits as std::pair tests")
 
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(j);
         REQUIRE_FALSE(result);
-        REQUIRE(jsoncons::conv_errc::not_integer == result.error().code());
+        CHECK(jsoncons::conv_errc::not_integer == result.error().code());
+        //std::cout << result.error() << "\n\n";
+    }
+}
+
+TEST_CASE("json_conv_traits as jsoncons::byte_string")
+{
+    SECTION("success")
+    {
+        jsoncons::json j(jsoncons::byte_string_arg, std::string("Hello World"), jsoncons::semantic_tag::none);
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::byte_string>::try_as(j);
+        REQUIRE(result);
+        CHECK((jsoncons::byte_string{'H','e','l','l','o',' ','W','o','r','l','d'} == *result));
+        //std::cout << result.error() << "\n\n";
+    }
+    SECTION("error")
+    {
+        jsoncons::json j(100);
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json, jsoncons::byte_string>::try_as(j);
+        REQUIRE(!result);
+        CHECK(jsoncons::conv_errc::not_byte_string == result.error().code());
         //std::cout << result.error() << "\n\n";
     }
 }

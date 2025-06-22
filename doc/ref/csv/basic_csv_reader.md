@@ -6,7 +6,7 @@
 template<
     typename CharT,
     typename Source=jsoncons::stream_source<CharT>,
-    typename TempAllocator=std::allocator<char>>
+    typename TempAlloc=std::allocator<char>>
 class basic_csv_reader 
 ```
 
@@ -37,42 +37,42 @@ source_type                |Source
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor, 
-                     const TempAllocator& alloc = TempAllocator()); (1)
+                     const TempAlloc& alloc = TempAlloc()); (1)
 
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options, 
-                     const TempAllocator& alloc = TempAllocator()); (2)
+                     const TempAlloc& alloc = TempAlloc()); (2)
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const TempAllocator& alloc = TempAllocator()); (3)
+                     const TempAlloc& alloc = TempAlloc()); (3)
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const TempAllocator& alloc = TempAllocator()); (4)
+                     const TempAlloc& alloc = TempAlloc()); (4)
 
 (1) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
-and a [basic_json_visitor](../basic_json_visitor.md) that receives
+and a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
 JSON events. Uses default [basic_csv_options](basic_csv_options.md).
 
-(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [basic_json_visitor](../basic_json_visitor.md) that receives
+(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
 JSON events, and [basic_csv_options](basic_csv_options.md).
 
-(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../basic_json_visitor.md) that receives
-JSON events and the specified [JSON parsing error handling](../err_handler.md).
+(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
+JSON events and the specified [JSON parsing error handling](../corelib/err_handler.md).
 Uses default [basic_csv_options](basic_csv_options.md).
 
-(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../basic_json_visitor.md) that receives
+(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
 JSON events, [basic_csv_options](basic_csv_options.md),
-and the specified [JSON parsing error handling](../err_handler.md).
+and the specified [JSON parsing error handling](../corelib/err_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source or 
 visitor passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.
@@ -89,8 +89,8 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [basic_json_visitor](../basic_json_visitor.md), such as a [json_decoder](json_decoder.md).
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [basic_json_visitor](../corelib/basic_json_visitor.md), such as a [json_decoder](json_decoder.md).
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 ### Examples
 

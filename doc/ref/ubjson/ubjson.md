@@ -1,11 +1,10 @@
 ## ubjson extension
 
 The ubjson extension implements encode to and decode from the [Universal Binary JSON Specification](http://ubjson.org/) data format.
-You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
-data structures, using [json_type_traits](../json_type_traits.md).
+You can either parse into or serialize from a variant-like data structure, [basic_json](../corelib/basic_json.md), or your own
+data structures, using [json_type_traits](../corelib/json_type_traits.md).
 
-[decode_ubjson](decode_ubjson.md)
-[try_decode_ubjson](try_decode_ubjson.md)   (since 1.4.0)
+[decode_ubjson, try_decode_json](decode_ubjson.md)
 
 [basic_ubjson_cursor](basic_ubjson_cursor.md)
 
@@ -65,7 +64,7 @@ jsoncons allows you to work with the UBJSON data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
+- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits.md) 
 
 - With [cursor-level access](doc/ref/ubjson/basic_ubjson_cursor.md) to a stream of parse events
 

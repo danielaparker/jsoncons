@@ -18,45 +18,45 @@ template <typename InputIt>
 static basic_json parse(InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (5) 
 
-template <typename Source,typename TempAllocator>
-static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
+template <typename Source,typename TempAlloc>
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
     const Source& source, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (6) (since 0.171.0)
 
-template <typename TempAllocator>
-static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
+template <typename TempAlloc>
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
     const char_type* str, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (7) (since 0.171.0)
 
-template <typename TempAllocator>
-static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
+template <typename TempAlloc>
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
     const char_type* str, std::size_t length, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (8) (since 0.177.0)
 
-template <typename TempAllocator>
-static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
+template <typename TempAlloc>
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
     std::basic_istream<char_type>& is, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (9) (since 0.171.0)
 
-template <typename InputIt,typename TempAllocator>
-static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
+template <typename InputIt,typename TempAlloc>
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
     InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (10) (since 0.171.0)
 ```
 (1) Parses JSON data from a contiguous character sequence provided by `source` and returns a `basic_json` value. 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 (2) Parses JSON data from a null-terminated character string and returns a `basic_json` value. 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 (3) Parses JSON data from a string and length and returns a `basic_json` value. 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 (4) Parses JSON data from an input stream and returns a `basic_json` value. 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 (5) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../corelib/ser_error.md) if parsing fails.
 
 (6)-(10) Same as (1)-(5), except they accept an [allocator_set](allocator_set.md) argument.
 

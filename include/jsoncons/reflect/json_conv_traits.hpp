@@ -1246,7 +1246,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T,
-                            typename std::enable_if<ext_traits::is_basic_byte_string<T>::value>::type>
+        typename std::enable_if<ext_traits::is_basic_byte_string<T>::value>::type>
     {
     public:
         using allocator_type = typename Json::allocator_type;
@@ -1259,7 +1259,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         { 
-            return result_type(j.template as_byte_string<typename T::allocator_type>());
+            return j.template try_as_byte_string<typename T::allocator_type>();
         }
         
         static Json to_json(const T& val, 
@@ -1271,8 +1271,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename ValueType>
     struct json_conv_traits<Json, std::shared_ptr<ValueType>,
-                            typename std::enable_if<!is_json_conv_traits_declared<std::shared_ptr<ValueType>>::value &&
-                                                    !std::is_polymorphic<ValueType>::value
+        typename std::enable_if<!is_json_conv_traits_declared<std::shared_ptr<ValueType>>::value &&
+                                !std::is_polymorphic<ValueType>::value
     >::type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -1404,7 +1404,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static result_type try_as(const Json& j)
         {
-            return result_type(j.as_byte_string_view());
+            return result_type(j.try_as_byte_string_view());
         }
         
         static Json to_json(const byte_string_view& val, const allocator_type& alloc = allocator_type())
@@ -1445,8 +1445,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 {
                     auto sv = j.as_string_view();
                     std::error_code ec;
-                    auto val = basic_bigint<Allocator>::parse(sv.data(), sv.length(), ec);
-                    return ec? result_type(jsoncons::unexpect, conv_errc::not_bigint) : result_type(std::move(val));
+                    basic_bigint<Allocator> val;
+                    auto r = to_bigint(sv.data(), sv.length(), val);
+                    if (JSONCONS_UNLIKELY(!r))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_bigint);
+                    }
+                    return result_type(std::move(val));
                 }
                 case json_type::half_value:
                 case json_type::double_value:
@@ -1728,9 +1733,9 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        std::error_code ec;
-                        auto n = bigint::parse(sv.data(), sv.length(), ec);
-                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
+                        bigint n;
+                        auto r = to_bigint(sv.data(), sv.length(), n);
+                        if (!r) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / millis_in_second;
@@ -1740,9 +1745,9 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        std::error_code ec;
-                        auto n = bigint::parse(sv.data(), sv.length(), ec);
-                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
+                        bigint n;
+                        auto r = to_bigint(sv.data(), sv.length(), n);
+                        if (!r) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / nanos_in_second;
@@ -1839,15 +1844,10 @@ namespace variant_detail
                     }
                     case semantic_tag::epoch_nano:
                     {
-                        auto res = j.try_as_string_view();
-                        if (!res)
-                        {
-                            return result_type(unexpect, conv_errc::not_epoch);
-                        }
-                        auto sv = *res;
-                        std::error_code ec;
-                        auto n = bigint::parse(sv.data(), sv.length(), ec);
-                        if (ec) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
+                        auto sv = j.as_string_view();
+                        bigint n;
+                        auto r = to_bigint(sv.data(), sv.length(), n);
+                        if (!r) {return result_type(jsoncons::unexpect, conv_errc::not_epoch);}
                         if (n != 0)
                         {
                             n = n / nanos_in_milli;

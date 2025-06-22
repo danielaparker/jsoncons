@@ -27,7 +27,7 @@ bool is_array() const noexcept; (11)
 bool is_object() const noexcept; (12)
 ```
 
-(1) Generic `is` equivalent to type `T`. Returns `true` if the json value is the same as type `T` according to [json_type_traits](../json_type_traits.md), `false` otherwise.  
+(1) Generic `is` equivalent to type `T`. Returns `true` if the json value is the same as type `T` according to [json_type_traits](../corelib/json_type_traits.md), `false` otherwise.  
 
     bool is<X<T>> const noexcept
 If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits.md), `false` otherwise.

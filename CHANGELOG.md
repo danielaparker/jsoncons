@@ -23,12 +23,7 @@
         - `try_decode_msgpack`
         - `try_decode_ubjson`
 
-    - New non-throwing accessors for `basic_json` that return a `std::expected`-like result,
-
-        - `try_as<T>()`
-        - `try_as_integer<T>`
-        - `try_as_double`
-        - `try_as_string_view`
+    - New non-throwing accessor `try_as<T>()` for `basic_json` that return a `std::expected`-like result,
 
 - Breaking changes to staj iterator classes
 
