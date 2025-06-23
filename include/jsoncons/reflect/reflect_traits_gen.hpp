@@ -962,11 +962,11 @@ else \
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    try_encode_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -1602,11 +1602,11 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    try_encode_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
 }
 
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
