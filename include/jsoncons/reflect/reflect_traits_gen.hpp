@@ -1073,7 +1073,6 @@ namespace reflect { \
         static const std::pair<EnumType,basic_string_view<CharT>>* values() \
         { \
             using char_type = CharT; \
-            using string_view_type = basic_string_view<char_type>; \
             static const std::pair<EnumType,basic_string_view<CharT>> values[] = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_ENUM_PAIR, ,,, __VA_ARGS__)\
             };\
