@@ -403,7 +403,7 @@ else \
     } \
 } 
 
-#define JSONCONS_MEMBER_TRAITS_BASE(ToJ,EnMem,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
+#define JSONCONS_MEMBER_TRAITS_BASE(ToJson,Encode,NumTemplateParams,ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -445,7 +445,7 @@ namespace reflect { \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_FOR_EACH(ToJ, ,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(ToJson, ,,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -467,7 +467,7 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
-            JSONCONS_VARIADIC_FOR_EACH(EnMem, ,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
         } \
@@ -623,7 +623,7 @@ else \
     } \
 }    
 
-#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJ,EnMem, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
+#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Encode, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -663,7 +663,7 @@ namespace reflect { \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_FOR_EACH(ToJ,,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(ToJson,,,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -685,7 +685,7 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_SIZE, ,,, __VA_ARGS__) \
             encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
-            JSONCONS_VARIADIC_FOR_EACH(EnMem, ,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
         } \
@@ -1326,7 +1326,7 @@ else \
         val.Getter(), encoder, ec); \
 } 
 
-#define JSONCONS_GETTER_SETTER_TRAITS_BASE(ToJ,NumTemplateParams, ClassType,GetPrefix,SetPrefix,NumMandatoryParams1,NumMandatoryParams2, ...)  \
+#define JSONCONS_GETTER_SETTER_TRAITS_BASE(ToJson,NumTemplateParams, ClassType,GetPrefix,SetPrefix,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -1368,7 +1368,7 @@ namespace reflect { \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_FOR_EACH(ToJ, ,GetPrefix,SetPrefix, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(ToJson, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -1483,7 +1483,7 @@ else \
 else \
   {json_traits_helper<Json>::set_optional_json_member(Name, Into(class_instance.Getter()), ajson);}
  
-#define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJ, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
+#define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -1523,7 +1523,7 @@ namespace reflect { \
         static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_FOR_EACH(ToJ,,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_FOR_EACH(ToJson,,,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
