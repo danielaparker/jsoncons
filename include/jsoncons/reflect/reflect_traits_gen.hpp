@@ -77,22 +77,22 @@ struct json_traits_helper
     } 
 
     template <typename U> 
-    static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
+    static void set_optional_json_member(string_view_type key, const std::shared_ptr<U>& val, Json& j) 
     { 
         if (val) j.try_emplace(key, val); 
     } 
     template <typename U> 
-    static void set_optional_json_member(const string_view_type& key, const std::unique_ptr<U>& val, Json& j) 
+    static void set_optional_json_member(string_view_type key, const std::unique_ptr<U>& val, Json& j) 
     { 
         if (val) j.try_emplace(key, val); 
     } 
     template <typename U> 
-    static void set_optional_json_member(const string_view_type& key, const jsoncons::optional<U>& val, Json& j) 
+    static void set_optional_json_member(string_view_type key, const jsoncons::optional<U>& val, Json& j) 
     { 
         if (val) j.try_emplace(key, val); 
     } 
     template <typename U> 
-    static void set_optional_json_member(const string_view_type& key, const U& val, Json& j) 
+    static void set_optional_json_member(string_view_type key, const U& val, Json& j) 
     { 
         j.try_emplace(key, val); 
     } 
@@ -546,14 +546,14 @@ namespace reflect { \
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name) \
   {ajson.try_emplace(Name,class_instance.Member);} \
 else \
-  {json_traits_helper<Json>::set_optional_json_member(Name,class_instance.Member, ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(string_view_type(Name),class_instance.Member, ajson);}
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match,,)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, From) \
   {ajson.try_emplace(Name, Into(class_instance.Member));} \
 else \
-  {json_traits_helper<Json>::set_optional_json_member(Name, Into(class_instance.Member), ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(string_view_type(Name), Into(class_instance.Member), ajson);}
 
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
@@ -567,33 +567,33 @@ else \
 #define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name) \
     { \
-        try_encode_member(basic_string_view<char_type>(Name), val.Member, encoder, ec); \
+        try_encode_member(string_view_type(Name), val.Member, encoder, ec); \
     } \
     else \
     { \
-        try_encode_optional_member(basic_string_view<char_type>(Name), val.Member, encoder, ec); \
+        try_encode_optional_member(string_view_type(Name), val.Member, encoder, ec); \
     }    
 #define JSONCONS_N_MEMBER_NAME_ENCODE_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match,,)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); \
+    try_encode_member(string_view_type(Name), Into(val.Member), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); \
+    try_encode_optional_member(string_view_type(Name), Into(val.Member), encoder, ec); \
 }    
 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_ENCODE_NAME_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name) \
-     try_encode_member(basic_string_view<char_type>(Name), val.Member, encoder, ec); 
+     try_encode_member(string_view_type(Name), val.Member, encoder, ec); 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_3(Member, Name, Mode) JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, From) \
-    try_encode_member(basic_string_view<char_type>(Name), Into(val.Member), encoder, ec); 
+    try_encode_member(string_view_type(Name), Into(val.Member), encoder, ec); 
 
 #define JSONCONS_MEMBER_NAME_COUNT(P1, P2, P3, Seq, Count) JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
@@ -680,6 +680,7 @@ namespace reflect { \
             std::error_code& ec) \
         { \
             using char_type = CharT; \
+            using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
             std::size_t object_size{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_COUNT, ,,, __VA_ARGS__) \
@@ -905,7 +906,7 @@ namespace reflect { \
   ajson.try_emplace(Name,class_instance.Getter() ); \
 } \
 else { \
-  json_traits_helper<Json>::set_optional_json_member(Name,class_instance.Getter(), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(string_view_type(Name),class_instance.Getter(), ajson); \
 }
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name)
@@ -915,7 +916,57 @@ else { \
   ajson.try_emplace(Name, Into(class_instance.Getter()) ); \
 } \
 else { \
-  json_traits_helper<Json>::set_optional_json_member(Name, Into(class_instance.Getter()), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(string_view_type(Name), Into(class_instance.Getter()), ajson); \
+}
+
+#define JSONCONS_CTOR_GETTER_NAME_COUNT(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name) \
+{ \
+    ++object_size; \
+} \
+else \
+{ \
+    if (is_optional_value_set(val.Getter())) \
+    { \
+        ++object_size; \
+    } \
+}    
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name)
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name)
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_COUNT_6(Getter, Name, Mode, Match, Into, )
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_6(Getter, Name, Mode, Match, Into, From) \
+{ \
+    ++object_size; \
+} \
+else \
+{ \
+    if (is_optional_value_set(val.Getter())) \
+    { \
+        ++object_size; \
+    } \
+}    
+
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name) \
+{ \
+    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+} \
+else \
+{ \
+    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
+}
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name)
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name)
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, )
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, From) \
+{ \
+    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+} \
+else \
+{ \
+    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -952,6 +1003,30 @@ namespace reflect { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
+        } \
+    }; \
+    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct encode_traits<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    { \
+        using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+        constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
+        template <typename CharT> \
+        static void try_encode(const value_type& val, \
+            basic_json_visitor<CharT>& encoder, \
+            std::error_code& ec) \
+        { \
+            using char_type = CharT; \
+            using string_view_type = basic_string_view<char_type>; \
+            (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::size_t object_size{0}; \
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_COUNT,,,, __VA_ARGS__) \
+            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_ENCODE,,,, __VA_ARGS__) \
+            encoder.end_object(ser_context(), ec); \
+            if (JSONCONS_UNLIKELY(ec)) {return;} \
         } \
     }; \
 } \
@@ -998,6 +1073,7 @@ namespace reflect { \
         static const std::pair<EnumType,basic_string_view<CharT>>* values() \
         { \
             using char_type = CharT; \
+            using string_view_type = basic_string_view<char_type>; \
             static const std::pair<EnumType,basic_string_view<CharT>> values[] = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_ENUM_PAIR, ,,, __VA_ARGS__)\
             };\
@@ -1012,7 +1088,7 @@ namespace reflect { \
         using result_type = conversion_result<enum_type>; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
-        using string_view_type = jsoncons::basic_string_view<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<EnumType,string_view_type>; \
         \
@@ -1097,7 +1173,7 @@ namespace reflect { \
             std::error_code& ec) \
         { \
             using char_type = CharT; \
-            using string_view_type = jsoncons::basic_string_view<char_type>; \
+            using string_view_type = basic_string_view<char_type>; \
             using mapped_type = std::pair<EnumType,string_view_type>; \
             static const char_type empty_string[] = {0}; \
             auto first = reflect_type_properties<EnumType>::values<char_type>(); \
@@ -1158,7 +1234,7 @@ namespace reflect { \
         using result_type = conversion_result<enum_type>; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
-        using string_view_type = jsoncons::basic_string_view<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<EnumType,string_view_type>; \
         \
@@ -1241,7 +1317,7 @@ namespace reflect { \
             std::error_code& ec) \
         { \
             using char_type = CharT; \
-            using string_view_type = jsoncons::basic_string_view<char_type>; \
+            using string_view_type = basic_string_view<char_type>; \
             using mapped_type = std::pair<EnumType,string_view_type>; \
             static const char_type empty_string[] = {0}; \
             auto first = reflect_type_properties<EnumType>::values<char_type>(); \
@@ -1477,13 +1553,13 @@ namespace reflect { \
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_3(Getter, Setter, Name) \
   ajson.try_emplace(Name,class_instance.Getter()); \
 else \
-  {json_traits_helper<Json>::set_optional_json_member(Name,class_instance.Getter(), ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(string_view_type(Name),class_instance.Getter(), ajson);}
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_5(Getter, Setter, Name, Mode, Match) JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_7(Getter, Setter, Name, Mode, Match, Into, From) \
   ajson.try_emplace(Name, Into(class_instance.Getter())); \
 else \
-  {json_traits_helper<Json>::set_optional_json_member(Name, Into(class_instance.Getter()), ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(string_view_type(Name), Into(class_instance.Getter()), ajson);}
  
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
@@ -1516,22 +1592,22 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_3(Getter, Setter, Name) \
 { \
-    try_encode_member(Name, val.Getter(), encoder, ec); \
+    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member(Name, val.Getter(), encoder, ec); \
+    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
 }
  
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(Name, val.Getter(), encoder, ec); \
+    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
 } \
 else \
 { \
-    try_encode_optional_member(Name, val.Getter(), encoder, ec); \
+    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
 }
 
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -1591,6 +1667,7 @@ namespace reflect { \
             std::error_code& ec) \
         { \
             using char_type = CharT; \
+            using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
             std::size_t object_size{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_COUNT,,,, __VA_ARGS__) \
