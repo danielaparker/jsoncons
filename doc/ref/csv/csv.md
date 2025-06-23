@@ -2,7 +2,7 @@
 
 The csv extension implements decode from and encode to the [CSV format](https://www.rfc-editor.org/rfc/rfc4180.txt)
 
-[decode_csv](decode_csv.md)
+[decode_csv, try_decode_csv](decode_csv.md)
 
 [basic_csv_cursor](basic_csv_cursor.md)
 
@@ -33,9 +33,9 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
 jsoncons allows you to work with the CSV data similarly to JSON data:
 
-- As a variant-like data structure, [basic_json](../basic_json.md) 
+- As a variant-like data structure, [basic_json](../corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits.md)
 
 - With [cursor-level access](doc/ref/csv/basic_csv_cursor.md) to a stream of parse events
 
@@ -96,8 +96,8 @@ EUR_LIBOR_06M, 2015-10-27, 0.0000001
 #### As a strongly typed C++ data structure
 
 jsoncons supports transforming CSV data into C++ data structures. The functions decode_csv and encode_csv convert strings or streams of 
-CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../json_type_traits.md) defined. 
-jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../json_type_traits.md) 
+CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../corelib/json_type_traits.md) defined. 
+jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../corelib/json_type_traits.md) 
 in the jsoncons namespace.
 ```cpp
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -279,7 +279,7 @@ end_object
 end_array
 ```
 
-You can use a [staj_array_iterator](../staj_array_iterator.md) to group the CSV parse events into [basic_json](../basic_json.md) records:
+You can use a [staj_array_iterator](../corelib/staj_array_iterator.md) to group the CSV parse events into [basic_json](../corelib/basic_json.md) records:
 ```cpp
 int main()
 {
@@ -288,11 +288,12 @@ int main()
 
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<ojson>(cursor);
+    auto iter = staj_array_iterator<ojson>(cursor);
 
     auto print_options = json_options{}
         .float_format(float_chars_format::fixed);
-    for (const auto& item : view)
+
+    for (const auto& item : iter)
     {
         std::cout << pretty_print(item, print_options) << "\n";
     }
@@ -328,10 +329,10 @@ int main()
         .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<record_type>(cursor);
+    auto iter = staj_array_iterator<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : view)
+    for (const auto& record : iter)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }

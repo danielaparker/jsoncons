@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UTILITY_TO_NUMBER_HPP
-#define JSONCONS_UTILITY_TO_NUMBER_HPP
+#ifndef JSONCONS_UTILITY_READ_NUMBER_HPP
+#define JSONCONS_UTILITY_READ_NUMBER_HPP
 
 #include <cctype>
 #include <cstddef>
@@ -262,7 +262,7 @@ bool is_base16(const CharT* s, std::size_t length)
     
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-decstr_to_integer(const CharT* s, std::size_t length, T& value)
+dec_to_integer(const CharT* s, std::size_t length, T& value)
 {
     if (length == 0)
     {
@@ -324,7 +324,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& value)
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-decstr_to_integer(const CharT* s, std::size_t length, T& value)
+dec_to_integer(const CharT* s, std::size_t length, T& value)
 {
     if (length == 0)
     {
@@ -338,7 +338,7 @@ decstr_to_integer(const CharT* s, std::size_t length, T& value)
     using U = typename ext_traits::make_unsigned<T>::type;
 
     U num;
-    auto ru = decstr_to_integer(s, length, num);
+    auto ru = dec_to_integer(s, length, num);
     if (ru.ec != std::errc())
     {
         return to_number_result<CharT>(ru.ptr, ru.ec);
@@ -611,11 +611,11 @@ to_integer(const CharT* s, T& n)
     return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s), n);
 }
 
-// hexstr_to_integer
+// hex_to_integer
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-hexstr_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(ext_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -699,7 +699,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
-hexstr_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(ext_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -743,11 +743,11 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
     return to_number_result<CharT>(s, std::errc());
 }
 
-// to_double
+// decstr_to_double
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val) 
+    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val) 
     {
         const char* cur = s+length;
         const auto res = std::from_chars(s, cur, val);
@@ -758,7 +758,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{res.ptr,res.ec};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
     {
         std::string buf(length,'0');
         for (size_t i = 0; i < length; ++i)
@@ -776,7 +776,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
+    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -794,7 +794,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
     {
         static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -815,7 +815,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
+    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
@@ -833,7 +833,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
     {
         locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
@@ -853,7 +853,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 
 #else
 
-    inline to_number_result<char> to_double(const char* s, std::size_t length, double& val)
+    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
     {
         const char* cur = s+length;
         char *end = nullptr;
@@ -882,7 +882,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{str_end};
     }
 
-    inline to_number_result<wchar_t> to_double(const wchar_t* s, std::size_t length, double& val)
+    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
     {
         const wchar_t* cur = s+length;
         wchar_t *end = nullptr;
@@ -911,7 +911,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<wchar_t>{str_end};
     }
     
-    inline to_number_result<char> to_double(char* s, std::size_t length)
+    inline to_number_result<char> decstr_to_double(char* s, std::size_t length)
     {
         char* cur = s+length;
         char *end = nullptr;
@@ -937,7 +937,7 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
         return to_number_result<char>{end};
     }
 
-    inline to_number_result<wchar_t> to_double(wchar_t* s, std::size_t length)
+    inline to_number_result<wchar_t> decstr_to_double(wchar_t* s, std::size_t length)
     {
         wchar_t* cur = s+length;
         wchar_t *end = nullptr;
@@ -1026,4 +1026,4 @@ hexstr_to_integer(const CharT* s, std::size_t length, T& n)
 } // namespace utility
 } // namespace jsoncons
 
-#endif // JSONCONS_UTILITY_TO_NUMBER_HPP
+#endif // JSONCONS_UTILITY_READ_NUMBER_HPP

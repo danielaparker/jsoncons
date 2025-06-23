@@ -5,7 +5,7 @@
 
 template<
     typename T,
-    typename Json
+    typename CharT=char
     >
 class staj_array_iterator
 ```
@@ -20,7 +20,7 @@ it becomes equal to the default-constructed iterator.
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`char_type`|Json::char_type
+`char_type`|CharT
 `value_type`|`T`
 `difference_type`|`std::ptrdiff_t`
 `pointer`|`value_type*`
@@ -29,12 +29,14 @@ Member type                         |Definition
 
 #### Constructors
 
-    staj_array_iterator() noexcept; (1)
+    staj_array_iterator() noexcept;                              (1)
 
-    staj_array_iterator(staj_array_view<T, Json>& view); (2)
+    staj_array_iterator(basic_staj_cursor<char_type>& cursor);   (2)
 
-    staj_array_iterator(staj_array_view<T, Json>& view,
-                        std::error_code& ec); (3)
+    staj_array_iterator(basic_staj_cursor<char_type>& cursor,   
+        std::error_code& ec);                                    (3)
+
+    staj_array_iterator(const staj_array_iterator& iter);        (4)
 
 (1) Constructs the end iterator
 
@@ -47,6 +49,8 @@ Member type                         |Definition
     following the current stream event `begin_array`. If there is no such element,
     returns the end iterator. If a parsing error is encountered, returns the end iterator 
     and sets `ec`.
+
+(4) Copy constructor
 
 #### Member functions
 
@@ -61,11 +65,23 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-    template <typename T,typename Json>
-    bool operator==(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
+    template <typename T,typename CharT>
+    staj_array_iterator<T,CharT> begin(staj_array_iterator<T,CharT> iter);    (1)
 
-    template <typename Json,typename T>
-    bool operator!=(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
+    template <typename T,typename CharT>
+    staj_array_iterator<T,CharT> end(staj_array_iterator<T,CharT>) noexcept;  (2)
+
+    template <typename T, typename CharT>
+    bool operator==(const staj_array_iterator<T, CharT>& a,                   (3)
+        const staj_array_iterator<T, CharT>& b);
+
+    template <typename T, typename CharT>
+    bool operator!=(const staj_array_iterator<T, CharT>& a,                   (4)  
+        const staj_array_iterator<T, CharT>& b);
+
+(1)-(2) For range-based for loop support.
+
+(3)-(4) As required by LegacyInputIterator
 
 ### Examples
 
@@ -93,9 +109,9 @@ int main()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<json>(cursor);
+    auto iter = staj_array_iterator<json>(cursor);
 
-    for (const auto& j : view)
+    for (const auto& j : iter)
     {
         std::cout << pretty_print(j) << "\n";
     }
@@ -138,9 +154,9 @@ int main()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<ns::employee>(cursor);
+    auto iter = staj_array_iterator<ns::employee>(cursor);
 
-    for (const auto& val : view)
+    for (const auto& val : iter)
     {
         std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
     }
@@ -153,3 +169,82 @@ Output:
 102, Bill Skeleton, Line manager
 ```
 
+#### Non-throwing overloads
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+namespace ns {
+
+struct employee
+{
+    std::string name;
+    uint64_t id;
+    int age;
+};
+
+} // namespace ns
+
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::employee,
+    (name, "Name"),
+    (id, "Id"),
+    (age, "Age", JSONCONS_RDWR,
+        [](int age) noexcept
+        {
+            return age >= 16 && age <= 68;
+        }
+        )
+)
+
+int main()
+{
+    const std::string input = R"(
+    [
+      {
+        "Name" : "John Smith",
+        "Id" : 22,
+        "Age" : 345
+      },
+      {
+        "Name" : "",
+        "Id" : 23,
+        "Age" : 36
+      },
+      {
+        "Name" : "Jane Doe",
+        "Id" : 24,
+        "Age" : 34
+      }
+    ]
+    )";
+
+    std::error_code ec;
+    jsoncons::json_string_cursor cursor(input, ec);
+
+    auto iter = jsoncons::staj_array_iterator<ns::employee>(cursor, ec);
+    auto last = end(iter);
+
+    while (iter != last)
+    {
+        if (ec)
+        {
+            std::cout << "Fail: " << ec.message() << "\n";
+        }
+        else
+        {
+            std::cout << "id: " << iter->id 
+                      << ", name: " << iter->name 
+                      << ", age: " << iter->age << "\n";
+        }
+        iter.increment(ec);
+    }
+}
+```
+Output:
+```
+Fail: Unable to convert into the provided type
+id: 23, name: , age: 36
+id: 24, name: Jane Doe, age: 34
+```

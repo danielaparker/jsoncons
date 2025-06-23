@@ -29,7 +29,7 @@ that is called for each schema violation. Writes a JSONPatch document to the out
 parameter.
 
 (5) Validates input JSON against a JSON Schema and writes the validation messages
-to a [json_visitor](../../corelib/basic_json_visitor.md).
+to a [json_visitor](../corelib/basic_json_visitor.md).
 
 #### Parameters
 
@@ -53,7 +53,7 @@ schema.</td>
   </tr>
   <tr>
     <td>visitor</td>
-    <td>A [json_visitor](../../corelib/basic_json_visitor.md) that receives JSON events 
+    <td>A [json_visitor](../corelib/basic_json_visitor.md) that receives JSON events 
     corresponding to an array of validation messages.</td> 
   </tr>
 </table>
@@ -64,7 +64,7 @@ None.
 
 #### Exceptions
 
-(1) - (2) Throws a [validation_error](../validation_error.md) for the first schema violation.
+(1) - (2) Throws a [validation_error](validation_error.md) for the first schema violation.
 
 ### Examples
 

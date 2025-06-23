@@ -18,7 +18,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -313,7 +313,13 @@ namespace msgpack {
                 }
                 case semantic_tag::epoch_milli:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n;
+                    auto result = to_bigint(sv.data(), sv.length(), n);
+                    if (!result)
+                    {
+                        ec = msgpack_errc::invalid_timestamp;
+                        JSONCONS_VISITOR_RETURN;
+                    }
                     if (n != 0)
                     {
                         bigint q;
@@ -335,7 +341,13 @@ namespace msgpack {
                 }
                 case semantic_tag::epoch_nano:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n;
+                    auto result = to_bigint(sv.data(), sv.length(), n);
+                    if (!result)
+                    {
+                        ec = msgpack_errc::invalid_timestamp;
+                        JSONCONS_VISITOR_RETURN;
+                    }
                     if (n != 0)
                     {
                         bigint q;

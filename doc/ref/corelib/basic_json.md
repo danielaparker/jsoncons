@@ -195,7 +195,7 @@ for their storage, otherwise attempts to return a default constructed allocator.
     <td>Checks if a basic_json value matches a type.</td> 
   </tr>
   <tr>
-    <td><a href="json/as.md">as</a></td>
+    <td><a href="json/as.md">as<br>try_as</a></td>
     <td>Attempts to convert a basic_json value to a value of a type.</td> 
   </tr>
   <tr>

@@ -6,7 +6,7 @@
 template<
     typename CharT,
     typename Source=jsoncons::stream_source<CharT>,
-    typename TempAllocator=std::allocator<char>
+    typename TempAlloc=std::allocator<char>
 >
 class basic_json_reader 
 ```
@@ -40,47 +40,47 @@ string_view_type           |
 
     template <typename Sourceable>
     explicit basic_json_reader(Sourceable&& source,                      (1)
-        const TempAllocator& alloc = TempAllocator());         
+        const TempAlloc& alloc = TempAlloc());         
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
         const basic_json_options<CharT>& options, 
-        const TempAllocator& alloc = TempAllocator());                   (2)
+        const TempAlloc& alloc = TempAlloc());                   (2)
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
         std::function<bool(json_errc,const ser_context&)> err_handler,   (3)   (deprecated in 0.171.0) 
-        const TempAllocator& alloc = TempAllocator());                    
+        const TempAlloc& alloc = TempAlloc());                    
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
         const basic_json_options<CharT>& options,                        (4)   (deprecated in 0.171.0) 
         std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAllocator& alloc = TempAllocator()); 
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,                               (5)
         basic_json_visitor<CharT>& visitor, 
-        const TempAllocator& alloc = TempAllocator()); 
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
         basic_json_visitor<CharT>& visitor,                              (6)
         const basic_json_options<CharT>& options, 
-        const TempAllocator& alloc = TempAllocator()); 
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
         basic_json_visitor<CharT>& visitor,                              (7)   (deprecated in 0.171.0) 
         std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAllocator& alloc = TempAllocator()); 
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
         basic_json_visitor<CharT>& visitor,                              (8)   (deprecated in 0.171.0)
         const basic_json_options<CharT>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAllocator& alloc = TempAllocator()); 
+        const TempAlloc& alloc = TempAlloc()); 
 
 Constructors (1)-(4) use a default [basic_json_visitor](basic_json_visitor.md) that discards the JSON parse events, and are for validation only.
 

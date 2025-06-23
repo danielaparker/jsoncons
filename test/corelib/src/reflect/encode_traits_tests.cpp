@@ -22,7 +22,7 @@ namespace encode_traits_tests {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
 
         book() = default;
         book(const book&) = default;

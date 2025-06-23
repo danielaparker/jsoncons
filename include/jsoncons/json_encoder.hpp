@@ -761,7 +761,7 @@ namespace detail {
                 case byte_string_chars_format::base16:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = encode_base16(b.begin(),b.end(),sink_);
+                    std::size_t length = bytes_to_base16(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -769,7 +769,7 @@ namespace detail {
                 case byte_string_chars_format::base64:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = encode_base64(b.begin(), b.end(), sink_);
+                    std::size_t length = bytes_to_base64(b.begin(), b.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -777,7 +777,7 @@ namespace detail {
                 case byte_string_chars_format::base64url:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = encode_base64url(b.begin(),b.end(),sink_);
+                    std::size_t length = bytes_to_base64url(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -975,7 +975,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -991,14 +991,14 @@ namespace detail {
                         sink_.push_back('~');
                         ++column_;
                     }
-                    std::size_t length = encode_base64(v.begin(), v.end(), sink_);
+                    std::size_t length = bytes_to_base64(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length+2);
                     break;
                 }
                 case bignum_format_kind::base64url:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1014,7 +1014,7 @@ namespace detail {
                         sink_.push_back('~');
                         ++column_;
                     }
-                    std::size_t length = encode_base64url(v.begin(), v.end(), sink_);
+                    std::size_t length = bytes_to_base64url(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length+2);
                     break;
@@ -1295,7 +1295,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1310,13 +1310,13 @@ namespace detail {
                     {
                         sink_.push_back('~');
                     }
-                    encode_base64(v.begin(), v.end(), sink_);
+                    bytes_to_base64(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
                 case bignum_format_kind::base64url:
                 {
-                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    bigint n = bigint::parse(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1331,7 +1331,7 @@ namespace detail {
                     {
                         sink_.push_back('~');
                     }
-                    encode_base64url(v.begin(), v.end(), sink_);
+                    bytes_to_base64url(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
@@ -1445,21 +1445,21 @@ namespace detail {
                 case byte_string_chars_format::base16:
                 {
                     sink_.push_back('\"');
-                    encode_base16(b.begin(),b.end(),sink_);
+                    bytes_to_base16(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     break;
                 }
                 case byte_string_chars_format::base64:
                 {
                     sink_.push_back('\"');
-                    encode_base64(b.begin(), b.end(), sink_);
+                    bytes_to_base64(b.begin(), b.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
                 case byte_string_chars_format::base64url:
                 {
                     sink_.push_back('\"');
-                    encode_base64url(b.begin(),b.end(),sink_);
+                    bytes_to_base64url(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     break;
                 }

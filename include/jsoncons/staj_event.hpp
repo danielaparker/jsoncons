@@ -23,7 +23,6 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -443,7 +442,7 @@ private:
             case staj_event_type::string_value:
             {
                 double val{0};
-                jsoncons::utility::to_double(value_.string_data_, length_, val);
+                jsoncons::utility::decstr_to_double(value_.string_data_, length_, val);
                 return val;
             }
             case staj_event_type::double_value:

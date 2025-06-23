@@ -46,9 +46,9 @@ void staj_array_iterator_example()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<json>(cursor);
+    auto iter = staj_array_iterator<json>(cursor);
 
-    for (const auto& j : view)
+    for (const auto& j : iter)
     {
         std::cout << pretty_print(j) << "\n";
     }
@@ -61,9 +61,9 @@ void staj_array_iterator_example2()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<ns::employee>(cursor);
+    auto iter = staj_array_iterator<ns::employee>(cursor);
 
-    for (const auto& val : view)
+    for (const auto& val : iter)
     {
         std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
     }
@@ -74,9 +74,9 @@ void staj_object_iterator_example()
 {
     json_string_cursor cursor(object_example);
 
-    auto view = staj_object<std::string,json>(cursor);
+    auto iter = staj_object_iterator<std::string,json>(cursor);
 
-    for (const auto& kv : view)
+    for (const auto& kv : iter)
     {
         std::cout << kv.first << ":\n" << pretty_print(kv.second) << "\n";
     }

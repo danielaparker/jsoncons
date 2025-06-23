@@ -646,16 +646,16 @@ void grouped_into_basic_json_records()
 
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<jsoncons::ojson>(cursor);
-    auto it = view.begin();
-    auto end = view.end();
+    auto iter = jsoncons::staj_array_iterator<jsoncons::ojson>(cursor);
+    auto last = end(iter);
 
     auto print_options = jsoncons::json_options{}
         .float_format(jsoncons::float_chars_format::fixed);
-    while (it != end)
+
+    while (iter != last)
     {
-        std::cout << pretty_print(*it, print_options) << "\n";
-        ++it;
+        std::cout << pretty_print(*iter, print_options) << "\n";
+        ++iter;
     }
 }
 
@@ -667,10 +667,11 @@ void grouped_into_strongly_typed_records()
         .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
 
-    auto view = staj_array<record_type>(cursor);
+    auto iter = jsoncons::staj_array_iterator<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : view)
+
+    for (const auto& record : iter)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }

@@ -538,21 +538,6 @@ namespace ext_traits {
     template <typename E, std::size_t N>
     struct is_std_array<std::array<E, N>> : std::true_type {};
 
-    // is_array_like
-
-    template <typename T,typename Enable=void>
-    struct is_array_like : std::false_type {};
-
-    template <typename T>
-    struct is_array_like<T, 
-                          typename std::enable_if<is_detected<container_value_type_t,T>::value &&
-                                                  is_detected<container_allocator_type_t,T>::value &&
-                                                  !is_std_array<T>::value && 
-                                                  !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
-                                                  !is_map_like<T>::value 
-    >::type> 
-        : std::true_type {};
-
     // is_constructible_from_const_pointer_and_size
 
     template <typename T,typename Enable=void>
@@ -610,6 +595,33 @@ namespace ext_traits {
     struct has_data_and_size
     {
         static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
+    };
+
+    // is_array_like
+
+    template <typename T,typename Enable=void>
+    struct is_array_like : std::false_type {};
+
+    template <typename T>
+    struct is_array_like<T, 
+        typename std::enable_if<is_detected<container_value_type_t,T>::value &&
+                                is_detected<container_allocator_type_t,T>::value &&
+                                !is_std_array<T>::value && 
+                                !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
+                                !is_map_like<T>::value 
+    >::type> 
+        : std::true_type {};
+
+    template <typename Container>
+    struct is_array_like_with_size
+    {
+        static constexpr bool value = is_array_like<Container>::value && has_size<Container>::value;
+    };
+
+    template <typename Container>
+    struct is_array_like_without_size
+    {
+        static constexpr bool value = is_array_like<Container>::value && !has_size<Container>::value;
     };
 
     // is_byte_sequence

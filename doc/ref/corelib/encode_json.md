@@ -31,15 +31,15 @@ void encode_json_pretty(const T& val, std::basic_ostream<CharT>& os,
 template <typename T,typename CharT>
 void encode_json(const T& val, basic_json_visitor<CharT>& encoder);             (5)
 
-template <typename T,typename CharContainer,typename Allocator,typename TempAllocator>
-void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+template <typename T,typename CharContainer,typename Alloc,typename TempAlloc>
+void encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& val, CharContainer& cont, 
     const basic_json_encode_options<CharContainer::value_type>& options  
         = basic_json_encode_options<CharContainer::value_type>(),
     indenting indent = indenting::no_indent);                                   (6) (since 0.171.0)
 
-template <typename T,typename CharT,typename Allocator,typename TempAllocator>                                             
-void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+template <typename T,typename CharT,typename Alloc,typename TempAlloc>                                             
+void encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
     const T& val, std::basic_ostream<CharT>& os, 
     const basic_json_encode_options<CharT>& options  
         = basic_json_encode_options<CharT>(),

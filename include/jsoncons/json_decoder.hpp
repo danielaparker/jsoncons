@@ -22,7 +22,7 @@
 
 namespace jsoncons {
 
-template <typename Json,typename TempAllocator =std::allocator<char>>
+template <typename Json,typename TempAlloc =std::allocator<char>>
 class json_decoder final : public basic_json_visitor<typename Json::char_type>
 {
 public:
@@ -54,7 +54,7 @@ private:
         ~structure_info() = default;
     };
 
-    using temp_allocator_type = TempAllocator;
+    using temp_allocator_type = TempAlloc;
     using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<index_key_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  

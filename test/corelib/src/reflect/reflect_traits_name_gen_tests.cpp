@@ -18,37 +18,37 @@ using namespace jsoncons;
 namespace {
 namespace ns {
 
-    struct book1a
+    struct book_all_m
     {
         std::string author;
         std::string title;
         double price;
 
-        book1a()
+        book_all_m()
             : author(""), title(""), price(0)
         {
         }
 
-        book1a(const std::string& author, const std::string& title, double price)
+        book_all_m(const std::string& author, const std::string& title, double price)
             : author(author), title(title), price(price)
         {
         }
     };
 
-    struct book1b
+    struct bool_all_m_a
     {
         std::string author;
         std::string title;
         double price;
     };
 
-    class book2a
+    class book_all_cg
     {
         std::string author_;
         std::string title_;
         double price_;
     public:
-        book2a(const std::string& author,
+        book_all_cg(const std::string& author,
               const std::string& title,
               double price)
             : author_(author), title_(title), price_(price)
@@ -71,7 +71,7 @@ namespace ns {
         }
     };
 
-    class book2b
+    class book_2_cg
     {
         std::string author_;
         std::string title_;
@@ -79,7 +79,7 @@ namespace ns {
         std::string isbn_;
         jsoncons::optional<std::string> publisher_;
     public:
-        book2b(const std::string& author,
+        book_2_cg(const std::string& author,
               const std::string& title,
               double price,
               const std::string& isbn,
@@ -115,18 +115,18 @@ namespace ns {
         }
     };
 
-    class book3a
+    class book_all_gs
     {
         std::string author_;
         std::string title_;
         double price_;
     public:
-        book3a()
+        book_all_gs()
             : price_(0)
         {
         }
 
-        book3a(const std::string& author,
+        book_all_gs(const std::string& author,
               const std::string& title,
               double price)
             : author_(author), title_(title), price_(price)
@@ -164,19 +164,19 @@ namespace ns {
         }
     };
 
-    class book3b
+    class book_2_gs
     {
         std::string author_;
         std::string title_;
         double price_;
         std::string isbn_;
     public:
-        book3b()
+        book_2_gs()
             : author_(), title_(), price_(), isbn_()
         {
         }
 
-        book3b(const std::string& author,
+        book_2_gs(const std::string& author,
               const std::string& title,
               double price,
               const std::string& isbn)
@@ -299,13 +299,13 @@ namespace ns {
 } // ns
 } // namespace 
 
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book_all_m,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bool_all_m_a,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Person1, 1, (name, "n"), (surname, "sn"))
-JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::book2a, (author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::book2b, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"), (publisher, "Publisher"))
-JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::book3a, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
-JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::book3b, 2, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"),(get_isbn,set_isbn,"Isbn"))
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::book_all_cg, (author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::book_2_cg, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"), (publisher, "Publisher"))
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::book_all_gs, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::book_2_gs, 2, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"),(get_isbn,set_isbn,"Isbn"))
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
@@ -316,9 +316,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book1a book{an_author, a_title, a_price};
+    ns::book_all_m book{an_author, a_title, a_price};
 
-    SECTION("book1a")
+    SECTION("success")
     {
         std::string s;
 
@@ -326,7 +326,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 
         json j = decode_json<json>(s);
 
-        REQUIRE(j.is<ns::book1a>() == true);
+        REQUIRE(j.is<ns::book_all_m>() == true);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -336,11 +336,64 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 
         CHECK(j == j2);
 
-        ns::book1a val = j.as<ns::book1a>();
+        ns::book_all_m val = j.as<ns::book_all_m>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
+    }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(json_errc::expected_colon == result.error().code()                         );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("unexpected JSON")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::missing_required_member == result.error().code());
+        CHECK("ns::book_all_m" == result.error().message_arg());
+    }
+    SECTION("invalid JSON value")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" : "foo"
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 } 
 
@@ -350,9 +403,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book1b book{an_author, a_title, a_price};
+    ns::bool_all_m_a book{an_author, a_title, a_price};
 
-    SECTION("book1b")
+    SECTION("bool_all_m_a")
     {
         std::string s;
 
@@ -360,7 +413,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
 
         json j = decode_json<json>(s);
 
-        REQUIRE(j.is<ns::book1b>() == true);
+        REQUIRE(j.is<ns::bool_all_m_a>() == true);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -370,7 +423,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
 
         CHECK(j == j2);
 
-        ns::book1b val = j.as<ns::book1b>();
+        ns::bool_all_m_a val = j.as<ns::bool_all_m_a>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -491,12 +544,12 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book2a>();
+        bool val = j.is<ns::book_all_cg>();
         CHECK(val);
     }
     SECTION("to_json")
     {
-        ns::book2a book(an_author,a_title,a_price);
+        ns::book_all_cg book(an_author,a_title,a_price);
 
         json j(book);
 
@@ -512,11 +565,65 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book2a book = j.as<ns::book2a>();
+        ns::book_all_cg book = j.as<ns::book_all_cg>();
 
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
+    }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
+        REQUIRE_FALSE(result);
+        CHECK(json_errc::expected_colon == result.error().code()                         );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("unexpected JSON")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
+        REQUIRE_FALSE(result);
+        //CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
+        REQUIRE_FALSE(result);
+        //CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        //CHECK("ns::book_all_cg" == result.error().message_arg());
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("invalid JSON value")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" : "foo"
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 
@@ -533,12 +640,12 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS tests")
         j["Author"] = an_author;
         j["Title"] = a_title;
 
-        CHECK(j.is<ns::book2b>());
-        CHECK_FALSE(j.is<ns::book2a>());
+        CHECK(j.is<ns::book_2_cg>());
+        CHECK_FALSE(j.is<ns::book_all_cg>());
 
         std::string buffer;
         j.dump(buffer);
-        auto book = decode_json<ns::book2b>(buffer);
+        auto book = decode_json<ns::book_2_cg>(buffer);
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == double());
@@ -547,7 +654,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS tests")
 
     SECTION("encode_json")
     {
-        ns::book2b book(an_author, a_title, a_price, an_isbn, jsoncons::optional<std::string>());
+        ns::book_2_cg book(an_author, a_title, a_price, an_isbn, jsoncons::optional<std::string>());
 
         std::string buffer;
         encode_json_pretty(book, buffer);
@@ -576,7 +683,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book3a>();
+        bool val = j.is<ns::book_all_gs>();
         CHECK(val);
     }
 
@@ -587,7 +694,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book3a book = j.as<ns::book3a>();
+        ns::book_all_gs book = j.as<ns::book_all_gs>();
 
         CHECK(book.get_author() == an_author);
         CHECK(book.get_title() == a_title);
@@ -596,7 +703,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
 
     SECTION("to_json")
     {
-        ns::book3a book(an_author,a_title,a_price);
+        ns::book_all_gs book(an_author,a_title,a_price);
 
         json j(book);
 
@@ -604,9 +711,63 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
         CHECK(j["Title"].as<std::string>() == a_title);
         CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
     }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(json_errc::expected_colon == result.error().code()                         );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("unexpected JSON")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
+        REQUIRE_FALSE(result);
+        //CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
+        REQUIRE_FALSE(result);
+        //CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        //CHECK("ns::book_all_cg" == result.error().message_arg());
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("invalid JSON value")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" : "foo"
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
+    }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests 2")
+TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -620,7 +781,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests 2")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book3b>();
+        bool val = j.is<ns::book_2_gs>();
         CHECK(val);
     }
 
@@ -631,16 +792,16 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests 2")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book3b book = j.as<ns::book3b>();
+        ns::book_2_gs book = j.as<ns::book_2_gs>();
 
-        CHECK(book.get_author() == an_author);
-        CHECK(book.get_title() == a_title);
-        CHECK(book.get_price() == Approx(a_price).epsilon(0.001));
+        CHECK(an_author == book.get_author());
+        CHECK(a_title == book.get_title());
+        CHECK(Approx(a_price).epsilon(0.001) == book.get_price());
     }
 
     SECTION("to_json")
     {
-        ns::book3b book(an_author,a_title,a_price, an_isbn);
+        ns::book_2_gs book(an_author,a_title,a_price, an_isbn);
 
         json j(book);
 
@@ -656,16 +817,70 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests 2")
         j["Author"] = an_author;
         j["Title"] = a_title;
 
-        CHECK(j.is<ns::book3b>());
-        CHECK_FALSE(j.is<ns::book3a>());
+        CHECK(j.is<ns::book_2_gs>());
+        CHECK_FALSE(j.is<ns::book_all_gs>());
 
         std::string buffer;
         j.dump(buffer);
-        auto book = decode_json<ns::book3b>(buffer);
+        auto book = decode_json<ns::book_2_gs>(buffer);
         CHECK(book.get_author() == an_author);
         CHECK(book.get_title() == a_title);
         CHECK(book.get_price() == double());
         CHECK(book.get_isbn() == std::string());
+    }
+    SECTION("parsing error")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(json_errc::expected_colon == result.error().code());
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("unexpected JSON")
+    {
+        std::string input = R"(["Haruki Murakami", "Kafka on the Shore", 25.17])";
+
+        auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::expected_object == result.error().code());
+        //std::cout << result.error() << "\n";
+    }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Price" : 25.17        
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::missing_required_member == result.error().code());
+        CHECK("ns::book_2_gs" == result.error().message_arg());
+    }
+    SECTION("invalid JSON value")
+    {
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami", 
+    "Title" : "Kafka on the Shore",
+    "Price" : "foo"
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
+        REQUIRE_FALSE(result);
+        CHECK("ns::book_2_gs" == result.error().message_arg());
+        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        //std::cout << result.error() << "\n";
     }
 }
 

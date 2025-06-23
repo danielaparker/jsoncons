@@ -5,7 +5,7 @@
 
 template< 
     typename CharT,
-    typename TempAllocator = std::allocator<char>
+    typename TempAlloc = std::allocator<char>
 > class basic_json_parser;
 ```
 
@@ -30,21 +30,21 @@ wjson_parser    |`jsoncons::basic_json_parser<wchar_t,std::allocator<char>>`
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-temp_allocator_type        |TempAllocator
+temp_allocator_type        |TempAlloc
 
 #### Constructors
 
-    basic_json_parser(const TempAllocator& temp_alloc = TempAllocator());                      (1)
+    basic_json_parser(const TempAlloc& temp_alloc = TempAlloc());                      (1)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        const TempAllocator& temp_alloc = TempAllocator());                                    (2)
+        const TempAlloc& temp_alloc = TempAlloc());                                    (2)
 
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAllocator& temp_alloc = TempAllocator());                                    (3)   (deprecated since 0.171.0)
+        const TempAlloc& temp_alloc = TempAlloc());                                    (3)   (deprecated since 0.171.0)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
         std::function<bool(json_errc,const ser_context&)> err_handler,                         (4)   (deprecated since 0.171.0) 
-        const TempAllocator& temp_alloc = TempAllocator());                       
+        const TempAlloc& temp_alloc = TempAlloc());                       
 
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)

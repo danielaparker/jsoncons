@@ -11,7 +11,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
@@ -63,8 +63,8 @@ namespace jsonpath {
         expr.evaluate(root, callback, options);
     }
 
-    template <typename Json,typename TempAllocator >
-    Json json_query(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
+    template <typename Json,typename TempAlloc >
+    Json json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
         const Json& root, const typename Json::string_view_type& path, 
         result_options options = result_options(),
         const custom_functions<Json>& functions = custom_functions<Json>())
@@ -73,9 +73,9 @@ namespace jsonpath {
         return expr.evaluate(root, options);
     }
 
-    template <typename Json,typename Callback,typename TempAllocator >
+    template <typename Json,typename Callback,typename TempAlloc >
     typename std::enable_if<ext_traits::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
-    json_query(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
+    json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
         const Json& root, const typename Json::string_view_type& path, 
         Callback callback,
         result_options options = result_options(),
@@ -86,7 +86,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
+    typename std::enable_if<reflect::is_json_conv_traits_specialized<Json,T>::value,void>::type
         json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value,
                      const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -112,9 +112,9 @@ namespace jsonpath {
         expr.evaluate(context, root, path_node_type{}, root, callback, options);
     }
 
-    template <typename Json,typename T,typename TempAllocator >
-    typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
-        json_replace(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
+    template <typename Json,typename T,typename TempAlloc >
+    typename std::enable_if<reflect::is_json_conv_traits_specialized<Json,T>::value,void>::type
+        json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
             Json& root, const typename Json::string_view_type& path, T&& new_value,
             const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -166,9 +166,9 @@ namespace jsonpath {
         expr.evaluate(context, root, path_node_type{}, root, f, options);
     }
 
-    template <typename Json,typename BinaryCallback,typename TempAllocator >
+    template <typename Json,typename BinaryCallback,typename TempAlloc >
     typename std::enable_if<ext_traits::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
-    json_replace(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
+    json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
         Json& root, const typename Json::string_view_type& path , BinaryCallback callback, 
         const custom_functions<Json>& funcs = custom_functions<Json>())
     {

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<!-- jsoncons::basic_json - basic support -->
+
+	<Type Name="jsoncons::key_value&lt;*,*&gt;" IncludeView="jsonconsHelper">
+		<DisplayString> {value_} </DisplayString>
+		<Expand>
+			<Item Name="type">(json_storage_kind)value_.common_stor_.storage_kind_</Item>
+			<Item Name="key">key_</Item>
+			<Item Name="value">value_</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="std::vector&lt;jsoncons::key_value&lt;*,*&gt;,*&gt;">
+		<Intrinsic Name="size" Expression="(size_t)(_Mypair._Myval2._Mylast - _Mypair._Myval2._Myfirst)" />
+		<DisplayString>{{ items={size()} }}</DisplayString>
+		<Expand>
+			<CustomListItems>
+				<Variable Name="i" InitialValue="0"/>
+				<Size>size()</Size>
+				<Loop>
+					<Item Name="{i}:{_Mypair._Myval2._Myfirst[i].key_}">_Mypair._Myval2._Myfirst[i]</Item>
+					<Exec>i++</Exec>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+	
+	<Type Name="jsoncons::basic_json&lt;*&gt;">
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::boolean">{bool_stor_.val_}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::int64">{int64_stor_.val_}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::uint64">{uint64_stor_.val_}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::float64">{double_stor_.val_}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::half_float">{half_stor_.val_}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::short_str">{short_string_stor_.data_,s}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::long_str">{long_string_stor_.ptr_-&gt;p_,s}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::byte_str">{byte_string_stor_.ptr_-&gt;p_,s}</DisplayString>
+		<DisplayString Condition="common_stor_.storage_kind_ == json_storage_kind::array">{array_stor_.ptr_-&gt;elements_}</DisplayString>
+		<Expand>
+			<ArrayItems Condition="common_stor_.storage_kind_ == json_storage_kind::array">
+				<Size>array_stor_.ptr_-&gt;elements_._Mypair._Myval2._Mylast - array_stor_.ptr_-&gt;elements_._Mypair._Myval2._Myfirst</Size>
+				<ValuePointer>array_stor_.ptr_-&gt;elements_._Mypair._Myval2._Myfirst</ValuePointer>
+			</ArrayItems>
+			<ExpandedItem Condition="common_stor_.storage_kind_ == json_storage_kind::object">object_stor_.ptr_->members_</ExpandedItem>
+		</Expand>
+	</Type>
+
+</AutoVisualizer>

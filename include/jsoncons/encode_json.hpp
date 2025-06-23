@@ -11,7 +11,7 @@
 #include <system_error>
 #include <tuple>
 
-#include <jsoncons/encode_traits.hpp>
+#include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
@@ -104,10 +104,10 @@ namespace jsoncons {
 
     // to string with allocator_set
 
-    template <typename T,typename CharContainer,typename Allocator,typename TempAllocator >
+    template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
         ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
-    encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
@@ -117,20 +117,20 @@ namespace jsoncons {
 
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAllocator> encoder(cont, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
         }
         else
         {
-            basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>,TempAllocator> encoder(cont, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
         }
     }
 
-    template <typename T,typename CharContainer,typename Allocator,typename TempAllocator >
+    template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
-    encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
@@ -140,13 +140,13 @@ namespace jsoncons {
 
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAllocator> encoder(cont, options,
+            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options,
                 alloc_set.get_temp_allocator());
             encode_json(val, encoder);
         }
         else
         {
-            basic_json_encoder<char_type, jsoncons::string_sink<CharContainer>, TempAllocator> encoder(cont, options, 
+            basic_json_encoder<char_type, jsoncons::string_sink<CharContainer>, TempAlloc> encoder(cont, options, 
                 alloc_set.get_temp_allocator());
             encode_json(val, encoder);
         }
@@ -154,40 +154,40 @@ namespace jsoncons {
 
     // to stream with allocator_set
 
-    template <typename T,typename CharT,typename Allocator,typename TempAllocator >
+    template <typename T,typename CharT,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value>::type
-    encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
         indenting indent = indenting::no_indent)
     {
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
         }
         else
         {
-            basic_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
         }
     }
 
-    template <typename T,typename CharT,typename Allocator,typename TempAllocator >
+    template <typename T,typename CharT,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type
-    encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
         indenting indent = indenting::no_indent)
     {
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
             encode_json(val, encoder);
         }
         else
         {
-            basic_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
             encode_json(val, encoder);
         }
     }
@@ -198,7 +198,7 @@ namespace jsoncons {
     void encode_json(const T& val, basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
-        encode_traits<T,CharT>::encode(val, encoder, basic_json<CharT>(), ec);
+        reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));

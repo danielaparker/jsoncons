@@ -15,10 +15,8 @@
 #include <memory> // std::allocator
 #include <system_error>
 
-#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -26,6 +24,7 @@
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {
@@ -689,6 +688,11 @@ public:
     virtual void next(std::error_code& ec) = 0;
 
     virtual const ser_context& context() const = 0;
+    
+    virtual std::size_t line() const = 0;
+
+    virtual std::size_t column() const = 0;
+    
 };
 
 template <typename CharT>
@@ -751,6 +755,16 @@ public:
         return cursor_->context();
     }
 
+    std::size_t line() const override
+    {
+        return cursor_->line();
+    }
+
+    std::size_t column() const override
+    {
+        return cursor_->column();
+    }
+
     friend
     basic_staj_filter_view<CharT> operator|(basic_staj_filter_view& cursor, 
                                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
@@ -758,6 +772,217 @@ public:
         return basic_staj_filter_view<CharT>(cursor, pred);
     }
 };
+template <typename Json>
+Json to_basic_json_single(basic_staj_cursor<typename Json::char_type>& cursor, 
+    std::error_code& ec)
+{
+    switch (cursor.current().event_type())
+    {
+        case staj_event_type::string_value:
+            return Json{cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag()};
+        case staj_event_type::byte_string_value:
+            return Json{byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag()};
+        case staj_event_type::null_value:
+            return Json{null_arg};
+        case staj_event_type::bool_value:
+            return Json{cursor.current().template get<bool>(ec), cursor.current().tag()};
+        case staj_event_type::int64_value:
+            return Json{cursor.current().template get<std::int64_t>(ec), cursor.current().tag()};
+        case staj_event_type::uint64_value:
+            return Json{cursor.current().template get<std::uint64_t>(ec), cursor.current().tag()};
+        case staj_event_type::half_value:
+            return Json{half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag()};
+        case staj_event_type::double_value:
+            return Json{cursor.current().template get<double>(ec), cursor.current().tag()};
+        default:
+            ec = conv_errc::conversion_failed; 
+            return Json{};
+    }
+}
+
+template <typename Json>
+Json to_basic_json_container(basic_staj_cursor<typename Json::char_type>& cursor,
+    std::error_code& ec)
+{
+    auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
+        Json(json_object_arg) : Json(json_array_arg);
+    std::vector<Json*> stack;
+    stack.push_back(std::addressof(cont));
+    std::basic_string<typename Json::char_type> key;
+    if (cursor.current().event_type() == staj_event_type::begin_object)
+    {
+        goto begin_object;
+    }
+    goto begin_array;
+    
+begin_object:    
+    cursor.next(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return Json{};
+    }
+    while (!cursor.done() && !stack.empty())
+    {
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::begin_object:
+            {
+                auto result = stack.back()->try_emplace(key, json_object_arg);
+                stack.push_back(std::addressof(result.first->value()));
+                goto begin_object;
+            }
+            case staj_event_type::begin_array:
+            {
+                auto result = stack.back()->try_emplace(key, json_array_arg);
+                stack.push_back(std::addressof(result.first->value()));
+                goto begin_array;
+            }
+            case staj_event_type::key:
+                key = cursor.current().template get<std::basic_string<typename Json::char_type>>(ec);
+                break;
+            case staj_event_type::string_value:
+                stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::byte_string_value:
+                stack.back()->try_emplace(key, byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::null_value:
+                stack.back()->try_emplace(key, null_arg);
+                break;
+            case staj_event_type::bool_value:
+                stack.back()->try_emplace(key, cursor.current().template get<bool>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::int64_value:
+                stack.back()->try_emplace(key, cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::uint64_value:
+                stack.back()->try_emplace(key, cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::half_value:
+                stack.back()->try_emplace(key, half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::double_value:
+                stack.back()->try_emplace(key, cursor.current().template get<double>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::end_object:
+                stack.pop_back();
+                if (stack.empty())
+                {
+                    return cont;
+                }
+                if (stack.back()->type() == json_type::object_value)
+                {
+                    goto begin_object;
+                }
+                goto begin_array;
+                break;
+            default:
+                ec = conv_errc::conversion_failed; 
+                return Json{};
+        }
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return Json{};
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return Json{};
+        }
+    }
+    return cont;
+
+begin_array:    
+    cursor.next(ec);
+    if (JSONCONS_UNLIKELY(ec))
+    {
+        return Json{};
+    }
+    while (!cursor.done() && !stack.empty())
+    {
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::begin_object:
+            {
+                auto& result = stack.back()->emplace_back(json_object_arg);
+                stack.push_back(std::addressof(result));
+                goto begin_object;
+            }
+            case staj_event_type::begin_array:
+            {
+                auto& result = stack.back()->emplace_back(json_array_arg);
+                stack.push_back(std::addressof(result));
+                goto begin_array;
+            }
+            case staj_event_type::string_value:
+                stack.back()->emplace_back(cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::byte_string_value:
+                stack.back()->emplace_back(byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::null_value:
+                stack.back()->emplace_back(null_arg);
+                break;
+            case staj_event_type::bool_value:
+                stack.back()->emplace_back(cursor.current().template get<bool>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::int64_value:
+                stack.back()->emplace_back(cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::uint64_value:
+                stack.back()->emplace_back(cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::half_value:
+                stack.back()->emplace_back(half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::double_value:
+                stack.back()->emplace_back(cursor.current().template get<double>(ec), cursor.current().tag());
+                break;
+            case staj_event_type::end_array:
+                stack.pop_back();
+                if (stack.empty())
+                {
+                    return cont;
+                }
+                if (stack.back()->type() == json_type::object_value)
+                {
+                    goto begin_object;
+                }
+                goto begin_array;
+                break;
+            default:
+                ec = conv_errc::conversion_failed; 
+                return Json{};
+        }
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return Json{};
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return Json{};
+        }
+    }
+    
+    JSONCONS_UNREACHABLE();
+}
+
+template <typename Json>
+Json try_to_json(basic_staj_cursor<typename Json::char_type>& cursor, 
+    std::error_code& ec)
+{
+    if (JSONCONS_UNLIKELY(is_end_container(cursor.current().event_type())))
+    {
+        ec = conv_errc::conversion_failed; 
+        return Json{};
+    }
+    if (!is_begin_container(cursor.current().event_type()))
+    {
+        return to_basic_json_single<Json>(cursor, ec);
+    }
+    return to_basic_json_container<Json>(cursor, ec);
+}
 
 using staj_event = basic_staj_event<char>;
 using wstaj_event = basic_staj_event<wchar_t>;

@@ -503,12 +503,9 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
 
-        book() :
-            price(0)
-        {
-        }
+        book() = default;
 
         book(const std::string& author, 
              const std::string& title, 
@@ -550,11 +547,11 @@ TEST_CASE("staj event as object")
         cursor.next();
         CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_type::double_value == cursor.current().event_type());
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
         CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
         CHECK(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
@@ -566,11 +563,11 @@ TEST_CASE("staj event as object")
         cursor.next();
         CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_type::double_value == cursor.current().event_type());
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
         CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
         CHECK(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();

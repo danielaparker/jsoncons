@@ -45,7 +45,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 
 #### search function
 
-[jsoncons::jmespath::search](search.md) takes two arguments, a [basic_json](../basic_json.md) 
+[jsoncons::jmespath::search](search.md) takes two arguments, a [basic_json](../corelib/basic_json.md) 
 and a JMESPath expression string, and returns a `basic_json` result. This is the simplest way to
 compile and evaluate a JMESPath expression.
 

@@ -33,7 +33,7 @@ Type                |Definition
 
 ### Implemented interfaces
 
-[basic_staj_cursor](../staj_cursor.md)
+[basic_staj_cursor](../corelib/staj_cursor.md)
 
 #### Constructors
 
@@ -65,7 +65,7 @@ Type                |Definition
         std::error_code& ec);                                                
 
 Constructors (1) reads from a character sequence or stream and throws a 
-[ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.
+[ser_error](../corelib/ser_error.md) if a parsing error is encountered while processing the initial event.
 
 Constructors (2)-(5) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
@@ -85,12 +85,12 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 Checks if there are no more events.
 
     const basic_staj_event& current() const override;
-Returns the current [basic_staj_event](../staj_event.md).
+Returns the current [basic_staj_event](../corelib/staj_event.md).
 
     void read_to(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, throws a [ser_error](../ser_error.md).
+to stop. If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
@@ -100,13 +100,13 @@ to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;
 Advances to the next event. If a parsing error is encountered, throws a 
-[ser_error](../ser_error.md).
+[ser_error](../corelib/ser_error.md).
 
     void next(std::error_code& ec) override;
 Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
-Returns the current [context](../ser_context.md)
+Returns the current [context](../corelib/ser_context.md)
 
     void reset();
 Reset cursor to read another value from the same source
@@ -125,9 +125,9 @@ Reset cursor to read new value from a new sources
 
 ### See also
 
-[basic_staj_event](../basic_staj_event.md)  
+[basic_staj_event](../corelib/basic_staj_event.md)  
 
-[staj_array_iterator](../staj_array_iterator.md)  
+[staj_array_iterator](../corelib/staj_array_iterator.md)  
 
-[staj_object_iterator](../staj_object_iterator.md)  
+[staj_object_iterator](../corelib/staj_object_iterator.md)  
 

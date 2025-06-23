@@ -14,7 +14,7 @@ using jsoncons::wjson;
 using jsoncons::decode_json;
 using jsoncons::encode_json;
 
-TEST_CASE("json_type_traits string tests")
+TEST_CASE("json_conv_traits string tests")
 {
     SECTION("test 1")
     {
@@ -40,7 +40,7 @@ TEST_CASE("json_type_traits string tests")
     }
 }
 
-TEST_CASE("json_type_traits vector of string tests")
+TEST_CASE("json_conv_traits vector of string tests")
 {
     SECTION("test 1")
     {

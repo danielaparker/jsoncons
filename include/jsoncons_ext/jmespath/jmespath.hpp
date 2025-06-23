@@ -23,7 +23,7 @@
 #include <map>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
@@ -2392,7 +2392,7 @@ namespace detail {
                         }
                         auto s = arg0.as_string();
                         double d{0};
-                        auto result3 = jsoncons::utility::to_double(s.c_str(), s.length(), d);
+                        auto result3 = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), d);
                         if (result3)
                         {
                             return *context.create_json(d);
@@ -2999,6 +2999,16 @@ namespace detail {
             {
                 if (!val.is_array())
                 {
+                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                    Json j(json_const_pointer_arg, evaluate_tokens(val, token_list_, new_context, ec));
+                    if (is_true(j))
+                    {
+                        reference jj = this->apply_expressions(val, context, ec);
+                        if (!jj.is_null())
+                        {
+                            return jj;
+                        }
+                    }
                     return context.null_value();
                 }
                 auto result = context.create_json(json_array_arg);

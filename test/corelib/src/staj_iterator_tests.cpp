@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jtaj_array_view tests")
+TEST_CASE("staj_array_iterator tests")
 {
     std::string s = R"(
     [
@@ -45,26 +45,26 @@ TEST_CASE("jtaj_array_view tests")
     {
         json_string_cursor cursor(s);
 
-        auto view = staj_array<json>(cursor);
+        auto iter = staj_array_iterator<json>(cursor);
 
-        auto it = view.begin();
-        auto end = view.end();
-        CHECK_FALSE((it == end));
+        auto it = begin(iter);
+        auto last = end(iter);
+        CHECK_FALSE((it == last));
 
         const auto& j1 = *it;
         REQUIRE(j1.is_object());
         CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
         ++it;
-        CHECK_FALSE((it == end));
+        CHECK_FALSE((it == last));
 
         const auto& j2 = *it;
         CHECK(j2["firstName"].as<std::string>() == std::string("Catherine"));
         ++it;
-        CHECK_FALSE((it == end));
+        CHECK_FALSE((it == last));
         const auto& j3 = *it;
         CHECK(j3["firstName"].as<std::string>() == std::string("William"));
         ++it;
-        CHECK((it == end));
+        CHECK((it == last));
         CHECK_NOTHROW(cursor.check_done());
     }
 
@@ -121,28 +121,28 @@ TEST_CASE("object_iterator test")
     {
         std::istringstream is(s);
         json_stream_cursor cursor(is);
-        auto view = staj_object<std::string,json>(cursor);
+        auto iter = staj_object_iterator<std::string,json>(cursor);
 
-        auto it = view.begin();
-        auto end = view.end();
-        CHECK_FALSE((it == end));
+        auto it = begin(iter);
+        auto last = end(iter);
+        CHECK_FALSE((it == last));
 
         const auto& p1 = *it;
         CHECK(p1.second.as<int>() == 100);
         ++it;
-        CHECK_FALSE((it == end));
+        CHECK_FALSE((it == last));
         const auto& p2 = *it;
         CHECK(p2.second.as<std::string>() == std::string("Tom"));
         ++it;
-        CHECK_FALSE((it == end));
+        CHECK_FALSE((it == last));
         const auto& p3 = *it;
         CHECK(p3.second.as<std::string>() == std::string("Cochrane"));
         ++it;
-        CHECK_FALSE((it == end));
+        CHECK_FALSE((it == last));
         const auto& p4 = *it;
         CHECK(p4.second.as<int>() == 55);
         ++it;
-        CHECK((it == end));
+        CHECK((it == last));
         CHECK_NOTHROW(cursor.check_done());
     }
 
@@ -151,17 +151,17 @@ TEST_CASE("object_iterator test")
         std::string str = R"({ "prop": { "nested": 123} })";
         std::istringstream is(str);
         json_stream_cursor cursor(is);
-        auto view = staj_object<std::string, json>(cursor);
+        auto iter = staj_object_iterator<std::string,json>(cursor);
 
-        auto it = view.begin();
-        auto end = view.end();
-        CHECK_FALSE((it == end));
+        auto it = begin(iter);
+        auto last = end(iter);
+        CHECK_FALSE((it == last));
 
         //const auto& p1 = *it;
         //std::cout << p1.first << ": " << p1.second << "\n";
         //CHECK(p1.second.as<int>() == 100);
         ++it;
-        CHECK((it == end));
+        CHECK((it == last));
         CHECK_NOTHROW(cursor.check_done());
     }
 }

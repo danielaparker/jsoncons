@@ -456,7 +456,7 @@ namespace jsonschema {
             {
                 auto s = instance.template as<jsoncons::string_view>();
                 std::string content;
-                auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
+                auto retval = jsoncons::base64_to_bytes(s.begin(), s.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -527,7 +527,7 @@ namespace jsonschema {
             if (content_encoding_ == "base64")
             {
                 std::string content;
-                auto retval = jsoncons::decode_base64(str.begin(), str.end(), content);
+                auto retval = jsoncons::base64_to_bytes(str.begin(), str.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
                     return walk_result::advance;
@@ -1568,9 +1568,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 > n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1664,9 +1664,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 >= n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1760,9 +1760,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 < n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(
@@ -1856,9 +1856,9 @@ namespace jsonschema {
             else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
             {
                 auto sv1 = instance.as_string_view();
-                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                bigint n1 = bigint::parse(sv1.data(), sv1.length());
                 auto s2 = value_.as_string();
-                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                bigint n2 = bigint::parse(s2.data(), s2.length());
                 if (n1 <= n2)
                 {
                     walk_result result = reporter.error(this->make_validation_message(

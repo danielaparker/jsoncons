@@ -16,7 +16,6 @@
 
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>

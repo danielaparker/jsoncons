@@ -51,7 +51,7 @@ mapping_kind|Indicates what [mapping kind](csv_mapping_kind.md) to use when pars
 max_lines|Maximum number of lines to read.|&nbsp;|Unlimited
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
-float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to CSV.|&nbsp;|[float_chars_format::general](float_chars_format.md).
+float_format| |Overrides [floating point format](../corelib/float_chars_format.md) when serializing to CSV.|&nbsp;|[float_chars_format::general](float_chars_format.md).
 precision|&nbsp;|Overrides floating point precision when serializing csv from json.|Shortest representation.
 
 Aliases for common character types are provided:
@@ -108,7 +108,7 @@ Sets a number replacement for `Infinity` when writing JSON
 Sets a number replacement for `Negative Infinity` when writing JSON
 
     basic_csv_options& float_format(float_chars_format value);
-Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
+Overrides [floating point format](../corelib/float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 
     basic_csv_options& precision(int8_t value);
 Overrides floating point precision when serializing csv from json. The default is shortest representation.

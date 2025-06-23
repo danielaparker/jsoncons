@@ -1,10 +1,10 @@
 ### bson extension
 
 The bson extension implements decode from and encode to the [Binary JSON](http://bsonspec.org/) data format.
-You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
-data structures, using [json_type_traits](../json_type_traits.md).
+You can either parse into or serialize from a variant-like data structure, [basic_json](../corelib/basic_json.md), or your own
+data structures, using [json_type_traits](../corelib/json_type_traits.md).
 
-[decode_bson](decode_bson.md)
+[decode_bson, try_decode_bson](decode_bson.md)
 
 [basic_bson_cursor](basic_bson_cursor.md)
 
@@ -291,7 +291,7 @@ Output:
 
 ### See also
 
-[byte_string_view](../byte_string_view.md)
+[byte_string_view](../corelib/byte_string_view.md)
 
 
 ### Acknowledgements

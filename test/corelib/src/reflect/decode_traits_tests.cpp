@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+#include <jsoncons/reflect/decode_traits.hpp>
+
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -21,26 +23,23 @@ TEST_CASE("decode_traits primitive")
     {
         std::string input = R"(1000)";
 
-        json_decoder<json> decoder;
         std::error_code ec;
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<uint64_t,char>::decode(cursor,decoder,ec);
+        auto result = reflect::decode_traits<uint64_t>::try_decode(cursor);
+        REQUIRE(result);
 
-        CHECK(val == 1000);
+        CHECK(result.value() == 1000);
     }
     SECTION("vector of uint64_t")
     {
-        using test_type = std::vector<uint64_t>;
-
         std::string input = R"([1000,1001,1002])";
 
-        json_decoder<json> decoder;
-        std::error_code ec;
-
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
+        auto result = reflect::decode_traits<std::vector<uint64_t>>::try_decode(cursor);
+        REQUIRE(result);
 
+        std::vector<uint64_t>& val(*result);
         REQUIRE(3 == val.size());
         CHECK(val[0] == 1000);
         CHECK(val[1] == 1001);
@@ -58,13 +57,11 @@ TEST_CASE("decode_traits std::string")
     {
         std::string input = R"("Hello World")";
 
-        json_decoder<json> decoder;
-        std::error_code ec;
-
         json_string_cursor cursor(input);
-        auto val = decode_traits<std::string,char>::decode(cursor,decoder,ec);
+        auto result = reflect::decode_traits<std::string>::try_decode(cursor);
+        REQUIRE(result);
 
-        CHECK((val == "Hello World"));
+        CHECK((*result == "Hello World"));
     }
 }
 
@@ -72,45 +69,42 @@ TEST_CASE("decode_traits std::pair")
 {
     SECTION("std::pair<std::string,std::string>")
     {
-        std::string input = R"(["first","second"])";
-        using test_type = std::pair<std::string,std::string>;
+        using value_type = std::pair<std::string,std::string>;
 
-        json_decoder<json> decoder;
-        std::error_code ec;
+        std::string input = R"(["first","second"])";
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
+        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        REQUIRE(result);
 
-        CHECK((val == test_type("first","second")));
+        value_type& val(*result);
+        CHECK((val == value_type("first","second")));
     }
     SECTION("vector of std::pair<std::string,std::string>")
     {
         std::string input = R"([["first","second"],["one","two"]])";
-        using test_type = std::vector<std::pair<std::string,std::string>>;
-
-        json_decoder<json> decoder;
-        std::error_code ec;
+        using value_type = std::vector<std::pair<std::string,std::string>>;
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
-        REQUIRE_FALSE(ec);
+        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        REQUIRE(result);
+
+        value_type& val(*result);
 
         REQUIRE(2 == val.size());
-        CHECK((val[0] == test_type::value_type("first","second")));
-        CHECK((val[1] == test_type::value_type("one","two")));
+        CHECK((val[0] == value_type::value_type("first","second")));
+        CHECK((val[1] == value_type::value_type("one","two")));
     }
     SECTION("map of std::string-std::pair<int,double>")
     {
         std::string input = R"({"foo": [100,1.5],"bar" : [200,2.5]})";
-        using test_type = std::map<std::string,std::pair<int,double>>;
-
-        json_decoder<json> decoder;
-        std::error_code ec;
+        using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
+        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        REQUIRE(result);
 
-        REQUIRE_FALSE(ec);
+        value_type& val(*result);
 
         REQUIRE(2 == val.size());
         REQUIRE(val.count("foo") > 0);
@@ -123,15 +117,12 @@ TEST_CASE("decode_traits std::pair")
     SECTION("Conversion error")
     {
         std::string input = R"({"foo": [100,1.5,30],"bar" : [200,2.5]])";
-        using test_type = std::map<std::string,std::pair<int,double>>;
-
-        json_decoder<json> decoder;
-        std::error_code ec;
+        using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
-
-        CHECK(ec == conv_errc::not_pair);
+        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        REQUIRE_FALSE(result);
+        CHECK(conv_errc::not_pair == result.error().code());
     }
 }
 
@@ -140,14 +131,11 @@ TEST_CASE("decode_traits deserialization errors")
     SECTION("Expected comma or right brace")
     {
         std::string input = R"({"foo": [100,1.5],"bar" : [200,2.5]])";
-        using test_type = std::map<std::string,std::pair<int,double>>;
-
-        json_decoder<json> decoder;
-        std::error_code ec;
+        using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
-
-        CHECK(ec == json_errc::expected_comma_or_rbrace);
+        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        REQUIRE_FALSE(result);
+        CHECK(json_errc::expected_comma_or_rbrace == result.error().code());
     }
 }

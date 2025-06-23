@@ -20,7 +20,7 @@ template <typename CharT>
 void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;
-    encode_base64(input.begin(),input.end(),result);
+    bytes_to_base64(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -28,7 +28,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_str
     }
 
     std::vector<uint8_t> output;
-    decode_base64(result.begin(), result.end(), output);
+    base64_to_bytes(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -40,7 +40,7 @@ template <typename CharT>
 void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;
-    encode_base64url(input.begin(),input.end(),result);
+    bytes_to_base64url(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -48,7 +48,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_
     }
 
     std::vector<uint8_t> output; 
-    decode_base64url(result.begin(), result.end(), output);
+    base64url_to_bytes(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -60,7 +60,7 @@ template <typename CharT>
 void check_encode_base16(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;
-    encode_base16(input.begin(),input.end(), result);
+    bytes_to_base16(input.begin(),input.end(), result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -68,7 +68,7 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::basic_str
     }
 
     std::vector<uint8_t> output;
-    auto res = decode_base16(result.begin(), result.end(), output);
+    auto res = base16_to_bytes(result.begin(), result.end(), output);
     REQUIRE(res.ec == conv_errc::success);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)

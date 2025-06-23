@@ -45,7 +45,7 @@ namespace jsoncons {
     struct is_json_type_traits_declared : public std::false_type
     {};
 
-    // json_type_traits
+    // json_type_traits 
 
     template <typename T>
     struct unimplemented : std::false_type
@@ -1578,7 +1578,7 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / millis_in_second;
@@ -1588,7 +1588,7 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / nanos_in_second;
@@ -1656,7 +1656,7 @@ namespace variant_detail
                     {
                         auto sv = j.as_string_view();
                         Rep n{0};
-                        auto result = jsoncons::utility::decstr_to_integer(sv.data(), sv.size(), n);
+                        auto result = jsoncons::utility::dec_to_integer(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();
@@ -1666,7 +1666,7 @@ namespace variant_detail
                     case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
-                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        bigint n = bigint::parse(sv.data(), sv.length());
                         if (n != 0)
                         {
                             n = n / nanos_in_milli;
@@ -1819,7 +1819,7 @@ namespace variant_detail
             {
                 jsoncons::string_view sv = j.as_string_view();
                 null_back_insertable_byte_container cont;
-                auto result = decode_base16(sv.begin(), sv.end(), cont);
+                auto result = base16_to_bytes(sv.begin(), sv.end(), cont);
                 return result.ec == conv_errc::success ? true : false;
             }
             return false;
@@ -1844,7 +1844,7 @@ namespace variant_detail
                 else
                 {
                     jsoncons::string_view sv = j.as_string_view();
-                    auto result = decode_base16(sv.begin(), sv.end(), bits);
+                    auto result = base16_to_bytes(sv.begin(), sv.end(), bits);
                     if (result.ec != conv_errc::success)
                     {
                         JSONCONS_THROW(conv_error(conv_errc::not_bitset));

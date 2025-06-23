@@ -16,15 +16,22 @@ std::exception
 
     ser_error(std::error_code ec);
 
+    ser_error(std::error_code ec, const std::string& what_arg);
+
     ser_error(std::error_code ec, std::size_t position);
 
-    ser_error(std::error_code ec,
-                        std::size_t line,
-                        std::size_t column);
+    ser_error(std::error_code ec, const std::string& what_arg, std::size_t position);
+
+    ser_error(std::error_code ec, std::size_t line, std::size_t column);
+
+    ser_error(std::error_code ec, const std::string& what_arg, std::size_t line, std::size_t column);
 
     ser_error(const ser_error& other);
 
 #### Member functions
+
+    const char* what() const noexcept
+Constructs an error message, including line and column position
 
     std::size_t line() const noexcept
 Returns the line number to the end of the text where the exception occurred.
@@ -33,9 +40,6 @@ Line numbers start at 1.
     std::size_t column() const noexcept
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
-
-    const char* what() const noexcept
-Constructs an error message, including line and column position
 
 #### Inherited from std::system_error
 

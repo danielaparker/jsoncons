@@ -6,7 +6,7 @@ to work with the data in a number of ways:
 
 - As a variant-like, allocator-aware, data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements jsoncons reflection traits
 
 - With cursor-level access to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -71,7 +71,7 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 [Get started with HealthImaging image sets and image frames using an AWS SDK](https://docs.aws.amazon.com/healthimaging/latest/devguide/example_medical-imaging_Scenario_ImageSetsAndFrames_section.html)
 
-[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://mtmorgan.github.io/rjsoncons/)&nbsp;&nbsp;&nbsp;[CoppeliaSim](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
+[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://mtmorgan.github.io/rjsoncons/)&nbsp;&nbsp;&nbsp;[CoppeliaSim](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)&nbsp;&nbsp;&nbsp;[reflect-cpp](https://github.com/getml/reflect-cpp?tab=readme-ov-file#serialization-formats)
 
 ## Get jsoncons
 

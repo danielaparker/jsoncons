@@ -16,7 +16,7 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        double price;
+        double price{0};
     };
 
 } // namespace ns
@@ -213,8 +213,8 @@ void iterate_over_complete_objects1()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<json>(cursor);
-    for (const auto& j : view)
+    auto iter = staj_array_iterator<json>(cursor);
+    for (const auto& j : iter)
     {
         std::cout << pretty_print(j) << "\n";
     }
@@ -227,8 +227,8 @@ void iterate_over_complete_objects2()
 
     json_stream_cursor cursor(is);
 
-    auto view = staj_array<ns::book>(cursor);
-    for (const auto& book : view)
+    auto iter = staj_array_iterator<ns::book>(cursor);
+    for (const auto& book : iter)
     {
         std::cout << book.author << ", " << book.title << "\n";
     }

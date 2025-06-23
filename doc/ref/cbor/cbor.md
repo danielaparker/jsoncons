@@ -1,10 +1,10 @@
 ## cbor extension
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
-You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
-data structures, using [json_type_traits](../json_type_traits.md).
+You can either parse into or serialize from a variant-like data structure, [basic_json](../corelib/basic_json.md), or your own
+data structures, using [json_type_traits](../corelib/json_type_traits.md).
 
-[decode_cbor](decode_cbor.md)
+[decode_cbor, try_decode_cbor](decode_cbor.md)
 
 [basic_cbor_cursor](basic_cbor_cursor.md)
 
@@ -155,9 +155,9 @@ const std::vector<uint8_t> data = {
 
 jsoncons allows you to work with the CBOR data similarly to JSON data:
 
-- As a variant-like data structure, [basic_json](../basic_json.md) 
+- As a variant-like data structure, [basic_json](../corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
+- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits.md) 
 
 - With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 
@@ -644,4 +644,4 @@ Output:
 
 ### See also
 
-[byte_string_view](../byte_string_view.md)
+[byte_string_view](../corelib/byte_string_view.md)

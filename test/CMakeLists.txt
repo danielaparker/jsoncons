@@ -59,98 +59,37 @@ endif()
 target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
-               fuzz_regression/src/fuzz_regression_tests.cpp
                bson/src/bson_cursor_tests.cpp
-               bson/src/bson_encoder_tests.cpp
-               bson/src/bson_reader_tests.cpp
                bson/src/bson_decimal128_tests.cpp
+               bson/src/bson_encoder_tests.cpp
                bson/src/bson_oid_tests.cpp
+               bson/src/bson_reader_tests.cpp
                bson/src/bson_test_suite.cpp
                bson/src/encode_decode_bson_tests.cpp
                cbor/src/cbor_bitset_traits_tests.cpp
                cbor/src/cbor_cursor_tests.cpp
-               cbor/src/cbor_event_reader_tests.cpp
                cbor/src/cbor_encoder_tests.cpp
+               cbor/src/cbor_event_reader_tests.cpp
                cbor/src/cbor_event_visitor_tests.cpp
                cbor/src/cbor_reader_tests.cpp
                cbor/src/cbor_tests.cpp
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
-               csv/src/csv_reader_tests.cpp
-               csv/src/csv_cursor_tests.cpp
-               csv/src/csv_subfield_tests.cpp
-               csv/src/csv_tests.cpp
-               csv/src/encode_decode_csv_tests.cpp
-               jmespath/src/jmespath_custom_function_tests.cpp
-               jmespath/src/jmespath_expression_tests.cpp
-               jmespath/src/jmespath_let_tests.cpp
-               jmespath/src/jmespath_tests.cpp
-               mergepatch/src/mergepatch_test_suite.cpp
-               jsonpatch/src/jsonpatch_test_suite.cpp
-               jsonpatch/src/jsonpatch_tests.cpp
-               jsonpath/src/jsonpath_flatten_tests.cpp
-               jsonpath/src/jsonpath_function_tests.cpp
-               jsonpath/src/path_node_tests.cpp
-               jsonpath/src/json_location_tests.cpp
-               jsonpath/src/json_location_parser_tests.cpp
-               jsonpath/src/jsonpath_custom_function_tests.cpp
-               jsonpath/src/jsonpath_json_query_tests.cpp
-               jsonpath/src/jsonpath_expression_tests.cpp
-               jsonpath/src/jsonpath_json_replace_tests.cpp
-               jsonpath/src/jsonpath_select_paths_tests.cpp
-               jsonpath/src/jsonpath_test_suite.cpp
-               jsonpath/src/jsonpath_stateful_allocator_tests.cpp
-               jsonpointer/src/jsonpointer_flatten_tests.cpp
-               jsonpointer/src/jsonpointer_tests.cpp
-               jsonschema/src/abort_early_tests.cpp
-               jsonschema/src/custom_message_tests.cpp
-               jsonschema/src/json_schema_walk_tests.cpp
-               jsonschema/src/format_validator_tests.cpp
-               jsonschema/src/validation_report_tests.cpp
-               jsonschema/src/dynamic_ref_tests.cpp
-               jsonschema/src/jsonschema_defaults_tests.cpp
-               jsonschema/src/jsonschema_draft4_tests.cpp
-               jsonschema/src/jsonschema_draft6_tests.cpp
-               jsonschema/src/jsonschema_draft7_tests.cpp
-               jsonschema/src/jsonschema_draft201909_tests.cpp
-               jsonschema/src/jsonschema_draft202012_tests.cpp
-               jsonschema/src/schema_version_tests.cpp
-               msgpack/src/decode_msgpack_tests.cpp
-               msgpack/src/encode_msgpack_tests.cpp
-               msgpack/src/msgpack_bitset_traits_tests.cpp
-               msgpack/src/msgpack_cursor_tests.cpp
-               msgpack/src/msgpack_event_reader_tests.cpp
-               msgpack/src/msgpack_encoder_tests.cpp
-               msgpack/src/msgpack_tests.cpp
-               msgpack/src/msgpack_timestamp_tests.cpp
-               corelib/src/source_adaptor_tests.cpp
-               corelib/src/value_converter_tests.cpp
-               corelib/src/decode_traits_tests.cpp
                corelib/src/detail/optional_tests.cpp
                corelib/src/detail/span_tests.cpp
                corelib/src/detail/string_view_tests.cpp
-               corelib/src/utility/byte_string_tests.cpp
-               corelib/src/utility/heap_string_tests.cpp
-               corelib/src/utility/bigint_tests.cpp
-               corelib/src/utility/uri_tests.cpp
-               corelib/src/utility/extension_traits_tests.cpp
-               corelib/src/utility/unicode_conv_tests.cpp
-               corelib/src/utility/to_number_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
-               corelib/src/encode_traits_tests.cpp
-               corelib/src/json_parser_recovery_tests.cpp
                corelib/src/json_array_tests.cpp
                corelib/src/json_as_tests.cpp
+               corelib/src/json_assignment_tests.cpp
                corelib/src/json_bitset_traits_tests.cpp
                corelib/src/json_checker_tests.cpp
                corelib/src/json_compare_tests.cpp
                corelib/src/json_const_pointer_arg_tests.cpp
-               corelib/src/json_pointer_arg_tests.cpp
-               corelib/src/json_assignment_tests.cpp
                corelib/src/json_constructor_tests.cpp
                corelib/src/json_cursor_tests.cpp
                corelib/src/json_encoder_tests.cpp
@@ -162,35 +101,99 @@ add_executable(unit_tests
                corelib/src/json_line_split_tests.cpp
                corelib/src/json_literal_operator_tests.cpp
                corelib/src/json_object_tests.cpp
-               corelib/src/ojson_object_tests.cpp
                corelib/src/json_options_tests.cpp
                corelib/src/json_parser_error_tests.cpp
                corelib/src/json_parser_position_tests.cpp
+               corelib/src/json_parser_recovery_tests.cpp
                corelib/src/json_parser_tests.cpp
+               corelib/src/json_pointer_arg_tests.cpp
                corelib/src/json_push_back_tests.cpp
                corelib/src/json_reader_exception_tests.cpp
                corelib/src/json_reader_tests.cpp
                corelib/src/json_storage_tests.cpp
                corelib/src/json_swap_tests.cpp
-               corelib/src/json_traits_macro_functional_tests.cpp
-               corelib/src/json_traits_macro_tests.cpp
-               corelib/src/json_traits_macro_limit_tests.cpp
-               corelib/src/json_traits_name_macro_tests.cpp
-               corelib/src/json_type_traits_chrono_tests.cpp
-               corelib/src/json_type_traits_container_tests.cpp
-               corelib/src/json_type_traits_tests.cpp
-               corelib/src/json_validation_tests.cpp 
                corelib/src/jsoncons_tests.cpp
                corelib/src/JSONTestSuite_tests.cpp
+               corelib/src/ojson_object_tests.cpp
                corelib/src/ojson_tests.cpp
                corelib/src/parse_string_tests.cpp
-               corelib/src/short_string_tests.cpp
-               corelib/src/source_tests.cpp
-               corelib/src/staj_iterator_tests.cpp
                corelib/src/polymorphic_allocator_tests.cpp
+               corelib/src/reflect/decode_traits_tests.cpp
+               corelib/src/reflect/encode_traits_tests.cpp
+               corelib/src/reflect/json_conv_traits_chrono_tests.cpp
+               corelib/src/reflect/json_conv_traits_string_tests.cpp
+               corelib/src/reflect/json_conv_traits_tests.cpp
+               corelib/src/reflect/json_type_traits_tests.cpp
+               corelib/src/reflect/reflect_traits_container_tests.cpp
+               corelib/src/reflect/reflect_traits_gen_functional_tests.cpp
+               corelib/src/reflect/reflect_traits_gen_limit_tests.cpp
+               corelib/src/reflect/reflect_traits_gen_tests.cpp
+               corelib/src/reflect/reflect_traits_name_gen_tests.cpp
                corelib/src/scoped_allocator_adaptor_tests.cpp
+               corelib/src/short_string_tests.cpp
+               corelib/src/source_adaptor_tests.cpp
+               corelib/src/source_tests.cpp
+               corelib/src/staj_array_iterator_ec_tests.cpp 
+               corelib/src/staj_iterator_tests.cpp
                corelib/src/string_to_double_tests.cpp
+               corelib/src/try_decode_json_tests.cpp
+               corelib/src/utility/bigint_tests.cpp
+               corelib/src/utility/byte_string_tests.cpp
+               corelib/src/utility/extension_traits_tests.cpp
+               corelib/src/utility/heap_string_tests.cpp
+               corelib/src/utility/read_number_tests.cpp
+               corelib/src/utility/unicode_conv_tests.cpp
+               corelib/src/utility/uri_tests.cpp
+               corelib/src/value_converter_tests.cpp
                corelib/src/wjson_tests.cpp
+               csv/src/csv_cursor_tests.cpp
+               csv/src/csv_reader_tests.cpp
+               csv/src/csv_subfield_tests.cpp
+               csv/src/csv_tests.cpp
+               csv/src/encode_decode_csv_tests.cpp
+               fuzz_regression/src/fuzz_regression_tests.cpp
+               jmespath/src/jmespath_custom_function_tests.cpp
+               jmespath/src/jmespath_expression_tests.cpp
+               jmespath/src/jmespath_let_tests.cpp
+               jmespath/src/jmespath_tests.cpp
+               jsonpatch/src/jsonpatch_test_suite.cpp
+               jsonpatch/src/jsonpatch_tests.cpp
+               jsonpath/src/json_location_parser_tests.cpp
+               jsonpath/src/json_location_tests.cpp
+               jsonpath/src/jsonpath_custom_function_tests.cpp
+               jsonpath/src/jsonpath_expression_tests.cpp
+               jsonpath/src/jsonpath_flatten_tests.cpp
+               jsonpath/src/jsonpath_function_tests.cpp
+               jsonpath/src/jsonpath_json_query_tests.cpp
+               jsonpath/src/jsonpath_json_replace_tests.cpp
+               jsonpath/src/jsonpath_select_paths_tests.cpp
+               jsonpath/src/jsonpath_stateful_allocator_tests.cpp
+               jsonpath/src/jsonpath_test_suite.cpp
+               jsonpath/src/path_node_tests.cpp
+               jsonpointer/src/jsonpointer_flatten_tests.cpp
+               jsonpointer/src/jsonpointer_tests.cpp
+               jsonschema/src/abort_early_tests.cpp
+               jsonschema/src/custom_message_tests.cpp
+               jsonschema/src/dynamic_ref_tests.cpp
+               jsonschema/src/format_validator_tests.cpp
+               jsonschema/src/json_schema_walk_tests.cpp
+               jsonschema/src/jsonschema_defaults_tests.cpp
+               jsonschema/src/jsonschema_draft201909_tests.cpp
+               jsonschema/src/jsonschema_draft202012_tests.cpp
+               jsonschema/src/jsonschema_draft4_tests.cpp
+               jsonschema/src/jsonschema_draft6_tests.cpp
+               jsonschema/src/jsonschema_draft7_tests.cpp
+               jsonschema/src/schema_version_tests.cpp
+               jsonschema/src/validation_report_tests.cpp
+               mergepatch/src/mergepatch_test_suite.cpp
+               msgpack/src/decode_msgpack_tests.cpp
+               msgpack/src/encode_msgpack_tests.cpp
+               msgpack/src/msgpack_bitset_traits_tests.cpp
+               msgpack/src/msgpack_cursor_tests.cpp
+               msgpack/src/msgpack_encoder_tests.cpp
+               msgpack/src/msgpack_event_reader_tests.cpp
+               msgpack/src/msgpack_tests.cpp
+               msgpack/src/msgpack_timestamp_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp

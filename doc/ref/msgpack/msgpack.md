@@ -1,10 +1,10 @@
 ### msgpack extension
 
 The msgpack extension implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) data format.
-You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
-data structures, using [json_type_traits](../json_type_traits.md).
+You can either parse into or serialize from a variant-like data structure, [basic_json](../corelib/basic_json.md), or your own
+data structures, using [json_type_traits](../corelib/json_type_traits.md).
 
-[decode_msgpack](decode_msgpack.md)
+[decode_msgpack, try_decode_msgpack](decode_msgpack.md)
 
 [basic_msgpack_cursor](basic_msgpack_cursor.md)
 

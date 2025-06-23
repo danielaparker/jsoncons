@@ -22,7 +22,7 @@ Constructs a `cbor_options` with default values.
     void max_nesting_depth(int depth)
 The maximum nesting depth allowed when decoding and encoding CBOR. 
 Default is 1024. Parsing can have an arbitrarily large depth
-limited only by available memory. Serializing a [basic_json](../basic_json.md) to
+limited only by available memory. Serializing a [basic_json](../corelib/basic_json.md) to
 CBOR is limited by stack size.
 
     cbor_options& pack_strings(bool value)

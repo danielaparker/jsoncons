@@ -1,0 +1,764 @@
+// Copyright 2013-2025 Daniel Parker
+// Distributed under the Boost license, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// See https://github.com/danielaparker/jsoncons for latest version
+
+#ifndef JSONCONS_REFLECT_DECODE_TRAITS_HPP
+#define JSONCONS_REFLECT_DECODE_TRAITS_HPP
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <type_traits> // std::enable_if, std::true_type, std::false_type
+#include <utility>
+#include <vector>
+
+#include <jsoncons/allocator_set.hpp>
+#include <jsoncons/basic_json.hpp>
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/read_result.hpp>
+#include <jsoncons/semantic_tag.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/staj_event.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
+
+namespace jsoncons {
+namespace reflect {
+
+// decode_traits
+
+template <typename T,typename Enable = void>
+struct decode_traits
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+    
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        
+        std::size_t line = cursor.line(); 
+        std::size_t column = cursor.column();
+        using json_type = basic_json<CharT>;
+        auto j = try_to_json<json_type>(cursor, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        auto conv_res = reflect::json_conv_traits<json_type, value_type>::try_as(j);
+
+        return conv_res ? result_type(std::move(*conv_res)) : result_type(jsoncons::unexpect, 
+            conv_res.error().code(), conv_res.error().message_arg(), line, column);
+    }
+};
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<ext_traits::is_basic_json<T>::value
+>::type>
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+    
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        
+        std::size_t line = cursor.line(); 
+        std::size_t column = cursor.column();
+        using json_type = T;
+        auto j = try_to_json<json_type>(cursor, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        auto conv_res = reflect::json_conv_traits<json_type, value_type>::try_as(j);
+
+        return conv_res ? result_type(std::move(*conv_res)) : result_type(jsoncons::unexpect, 
+            conv_res.error().code(), conv_res.error().message_arg(), line, column);
+    }
+};
+
+// specializations
+
+// primitive
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<ext_traits::is_primitive<T>::value
+>::type>
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        
+        T v = cursor.current().template get<value_type>(ec);
+        return ec ? result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()} : result_type{std::move(v)};
+    }
+};
+
+// string
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<ext_traits::is_string<T>::value>::type>
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor,
+        typename std::enable_if<std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
+    {
+        std::error_code ec;
+
+        T v = cursor.current().template get<value_type>(ec);
+        return ec ? result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()} : result_type{std::move(v)};
+    }
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor,
+        typename std::enable_if<!std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
+    {
+        std::error_code ec;
+
+        auto val = cursor.current().template get<std::basic_string<CharT>>(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        else
+        {
+            T s;
+            unicode_traits::convert(val.data(), val.size(), s);
+            return result_type{std::move(s)};
+        }
+    }
+};
+
+// std::pair
+
+template <typename T1,typename T2>
+struct decode_traits<std::pair<T1, T2>>
+{
+    using value_type = std::pair<T1, T2>;
+    using result_type = read_result<value_type>;
+    
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        if (cursor.current().event_type() != staj_event_type::begin_array)
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column());
+        }
+        cursor.next(ec); // skip past array
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+
+        auto r1 = decode_traits<T1>::try_decode(cursor);
+        if (JSONCONS_UNLIKELY(!r1))
+        {
+            return result_type(r1.error());
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec)) 
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        auto r2 = decode_traits<T2>::try_decode(cursor);
+        if (JSONCONS_UNLIKELY(!r2)) 
+        {
+            return result_type(r2.error());
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+
+        if (cursor.current().event_type() != staj_event_type::end_array)
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column()); 
+        }
+        return result_type{std::make_pair(std::move(*r1), std::move(*r2))};
+    }
+};
+
+// vector like
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+             ext_traits::is_array_like<T>::value &&
+             ext_traits::is_back_insertable<T>::value &&
+             !ext_traits::is_typed_array<T>::value 
+>::type>
+{
+    using element_type = typename T::value_type;
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        T v;
+
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        if (cursor.current().event_type() != staj_event_type::begin_array)
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
+        }
+        cursor.next(ec);
+        if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
+        while (cursor.current().event_type() != staj_event_type::end_array && !ec)
+        {
+            auto r = decode_traits<element_type>::try_decode(cursor);
+            if (!r)
+            {
+                return result_type(r.error()); 
+            }
+            v.push_back(std::move(*r));
+            //std::cout << "read next 10\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
+        }
+        return result_type{std::move(v)};
+    }
+};
+
+template <typename T>
+struct typed_array_visitor : public default_json_visitor
+{
+    T& v_;
+    int level_{0};
+public:
+    using element_type = typename T::value_type;
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    typed_array_visitor(T& v)
+        : default_json_visitor(), v_(v)
+    {
+    }
+private:
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, 
+        const ser_context&, 
+        std::error_code& ec) override
+    {      
+        if (++level_ != 1)
+        {
+            ec = conv_errc::not_vector;
+            JSONCONS_VISITOR_RETURN;
+        }
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t size, 
+        semantic_tag, 
+        const ser_context&, 
+        std::error_code& ec) override
+    {
+        if (++level_ != 1)
+        {
+            ec = conv_errc::not_vector;
+            JSONCONS_VISITOR_RETURN;
+        }
+        if (size > 0)
+        {
+            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v_, size);
+        }
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
+        std::error_code& ec) override
+    {
+        if (level_ != 1)
+        {
+            ec = conv_errc::not_vector;
+            JSONCONS_VISITOR_RETURN;
+        }
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
+        semantic_tag, 
+        const ser_context&,
+        std::error_code&) override
+    {
+        v_.push_back(static_cast<element_type>(value));
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
+        semantic_tag,
+        const ser_context&,
+        std::error_code&) override
+    {
+        v_.push_back(static_cast<element_type>(value));
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
+        semantic_tag,
+        const ser_context&,
+        std::error_code&) override
+    {
+        visit_half_(typename std::integral_constant<bool, std::is_integral<element_type>::value>::type(), value);
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    void visit_half_(std::true_type, uint16_t value)
+    {
+        v_.push_back(static_cast<element_type>(value));
+    }
+
+    void visit_half_(std::false_type, uint16_t value)
+    {
+        v_.push_back(static_cast<element_type>(binary::decode_half(value)));
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
+        semantic_tag,
+        const ser_context&,
+        std::error_code&) override
+    {
+        v_.push_back(static_cast<element_type>(value));
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const element_type>& data,  
+        semantic_tag,
+        const ser_context&,
+        std::error_code&) override
+    {
+        v_ = std::vector<element_type>(data.begin(),data.end());
+        JSONCONS_VISITOR_RETURN;
+    }
+
+    static
+    void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static
+    void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+             ext_traits::is_array_like<T>::value &&
+             ext_traits::is_back_insertable_byte_container<T>::value &&
+             ext_traits::is_typed_array<T>::value
+>::type>
+{
+    using element_type = typename T::value_type;
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::byte_string_value:
+            {
+                auto bytes = cursor.current().template get<byte_string_view>(ec);
+                if (!ec) 
+                {
+                    T v;
+                    if (cursor.current().size() > 0)
+                    {
+                        reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                    }
+                    for (auto ch : bytes)
+                    {
+                        v.push_back(static_cast<element_type>(ch));
+                    }
+                    cursor.next(ec);
+                    return result_type{std::move(v)};
+                }
+                else
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
+            }
+            case staj_event_type::begin_array:
+            {
+                T v;
+                if (cursor.current().size() > 0)
+                {
+                    reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                }
+                typed_array_visitor<T> visitor(v);
+                cursor.read_to(visitor, ec);
+                return result_type{std::move(v)};
+            }
+            default:
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
+            }
+        }
+    }
+
+    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+             ext_traits::is_array_like<T>::value &&
+             ext_traits::is_back_insertable<T>::value &&
+             !ext_traits::is_back_insertable_byte_container<T>::value &&
+             ext_traits::is_typed_array<T>::value
+>::type>
+{
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        switch (cursor.current().event_type())
+        {
+            case staj_event_type::begin_array:
+            {
+                T v;
+                if (cursor.current().size() > 0)
+                {
+                    reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                }
+                typed_array_visitor<T> visitor(v);
+                cursor.read_to(visitor, ec);
+                return result_type{std::move(v)};
+            }
+            default:
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
+            }
+        }
+    }
+
+    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+// set like
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+             ext_traits::is_array_like<T>::value &&
+             !ext_traits::is_back_insertable<T>::value &&
+             ext_traits::is_insertable<T>::value 
+>::type>
+{
+    using element_type = typename T::value_type;
+    using value_type = T;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+        T v;
+
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        if (cursor.current().event_type() != staj_event_type::begin_array)
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
+        }
+        if (cursor.current().size() > 0)
+        {
+            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+        }
+        cursor.next(ec);
+        while (cursor.current().event_type() != staj_event_type::end_array && !ec)
+        {
+            auto r = decode_traits<element_type>::try_decode(cursor);
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            v.insert(std::move(*r));
+            if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
+            //std::cout << "cursor.next 20\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
+        }
+        return result_type{std::move(v)};
+    }
+
+    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+// std::array
+
+template <typename T, std::size_t N>
+struct decode_traits<std::array<T,N>>
+{
+    using element_type = typename std::array<T,N>::value_type;
+    using value_type = typename std::array<T,N>;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        std::array<T,N> v;
+        cursor.array_expected(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        v.fill(T{});
+        if (cursor.current().event_type() != staj_event_type::begin_array)
+        {
+            return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+        }
+        cursor.next(ec);
+        for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
+        {
+            auto r = decode_traits<element_type>::try_decode(cursor);
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            v[i] = std::move(*r);
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) 
+            {
+                return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+            }
+        }
+        return v;
+    }
+};
+
+// map like
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+                            ext_traits::is_map_like<T>::value &&
+                            ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
+>::type>
+{
+    using mapped_type = typename T::mapped_type;
+    using value_type = T;
+    using key_type = typename T::key_type;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        T val;
+        if (cursor.current().event_type() != staj_event_type::begin_object)
+        {
+            return result_type{read_error{conv_errc::not_map, cursor.line(), cursor.column()}}; 
+        }
+        if (cursor.current().size() > 0)
+        {
+            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
+        }
+        cursor.next(ec);
+
+        while (cursor.current().event_type() != staj_event_type::end_object && !ec)
+        {
+            if (cursor.current().event_type() != staj_event_type::key)
+            {
+                return result_type{read_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
+            }
+            auto key = cursor.current().template get<key_type>(ec);
+            if (JSONCONS_UNLIKELY(ec)) 
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+            //std::cout << "cursor.next 200\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) 
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+            auto r = decode_traits<mapped_type>::try_decode(cursor);
+            if (!r)
+            {
+                return result_type(r.error());
+            }
+            val.emplace(std::move(key), std::move(*r));
+            //std::cout << "cursor.next 300\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) 
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+        }
+        return result_type{std::move(val)};
+    }
+
+    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+template <typename T>
+struct decode_traits<T,
+    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
+                            ext_traits::is_map_like<T>::value &&
+                            std::is_integral<typename T::key_type>::value
+>::type>
+{
+    using mapped_type = typename T::mapped_type;
+    using value_type = T;
+    using key_type = typename T::key_type;
+    using result_type = read_result<value_type>;
+
+    template <typename CharT>
+    static result_type try_decode(basic_staj_cursor<CharT>& cursor)
+    {
+        std::error_code ec;
+
+        T val;
+        if (cursor.current().event_type() != staj_event_type::begin_object)
+        {
+            return result_type{read_error{conv_errc::not_map, cursor.line(), cursor.column()}}; 
+        }
+        if (cursor.current().size() > 0)
+        {
+            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
+        }
+        cursor.next(ec);
+
+        while (cursor.current().event_type() != staj_event_type::end_object && !ec)
+        {
+            if (cursor.current().event_type() != staj_event_type::key)
+            {
+                return result_type{read_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
+            }
+            auto s = cursor.current().template get<jsoncons::basic_string_view<CharT>>(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+            key_type n{0};
+            auto r = jsoncons::utility::to_integer(s.data(), s.size(), n); 
+            if (r.ec != std::errc())
+            {
+                return result_type{read_error{json_errc::invalid_number, cursor.line(), cursor.column()}}; 
+            }
+            //std::cout << "cursor.next 500\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+            auto r1 = decode_traits<mapped_type>::try_decode(cursor);
+            if (!r1)
+            {
+                return result_type(r1.error());
+            }
+            val.emplace(n, std::move(*r1));
+            //std::cout << "cursor.next 600\n";
+            cursor.next(ec);
+            if (JSONCONS_UNLIKELY(ec)) 
+            {
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
+            }
+        }
+        return result_type{std::move(val)};
+    }
+
+    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+    {
+        v.reserve(new_cap);
+    }
+
+    static void reserve_storage(std::false_type, T&, std::size_t)
+    {
+    }
+};
+
+} // namespace reflect
+} // namespace jsoncons
+
+#endif // JSONCONS_REFLECT_DECODE_TRAITS_HPP
+

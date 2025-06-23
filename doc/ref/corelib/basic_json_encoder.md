@@ -62,7 +62,7 @@ Reset encoder to write another value to the same sink
     void reset(Sink&& sink)
 Reset encoder to write a new value to a new sink
 
-#### Inherited from [basic_json_visitor](../basic_json_visitor.md)
+#### Inherited from [basic_json_visitor](../corelib/basic_json_visitor.md)
 
     void flush(); (1)
 
@@ -361,4 +361,4 @@ Output:
 
 ### See also
 
-[byte_string_view](../byte_string_view.md)
+[byte_string_view](../corelib/byte_string_view.md)

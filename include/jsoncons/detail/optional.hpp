@@ -171,7 +171,7 @@ namespace detail
             return *this;
         }
 
-        optional& operator=(optional&& other )
+        optional& operator=(optional&& other ) noexcept
         {
             if (other)
             {

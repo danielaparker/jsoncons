@@ -21,7 +21,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -1576,7 +1576,7 @@ namespace detail {
                     }
                     auto s = arg0.as_string();
                     double d;
-                    auto result = jsoncons::utility::to_double(s.c_str(), s.length(), d);
+                    auto result = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), d);
                     if (result.ec == std::errc::invalid_argument)
                     {
                         return value_type::null();

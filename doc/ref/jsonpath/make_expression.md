@@ -24,19 +24,19 @@ jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
     const custom_functions<Json>& funcs, std::error_code& ec);                          (3) (since 0.164.0)
 ```
 ```cpp
-template <typename Json,typename TempAllocator>                                              (4) (since 0.170.0)
-jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
+template <typename Json,typename TempAlloc>                                              (4) (since 0.170.0)
+jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
     Json::string_view_type& expr,
     const custom_functions<Json>& funcs = custom_functions<Json>());                
 ```
 ```cpp
-template <typename Json,typename TempAllocator>                                              (5) (since 0.170.0)
-jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
+template <typename Json,typename TempAlloc>                                              (5) (since 0.170.0)
+jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
     Json::string_view_type& expr, std::error_code& ec);                
 ```
 ```cpp
-template <typename Json,typename TempAllocator>                                              (6) (since 0.170.0)
-jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
+template <typename Json,typename TempAlloc>                                              (6) (since 0.170.0)
+jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
     Json::string_view_type& expr,
     const custom_functions<Json>& funcs, std::error_code& ec);                
 ```

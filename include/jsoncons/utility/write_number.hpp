@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/grisu3.hpp>
-#include <jsoncons/utility/to_number.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -307,7 +307,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, length, x);
+        auto res = decstr_to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;
@@ -344,7 +344,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, length, x);
+        auto res = decstr_to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;
@@ -415,7 +415,7 @@ namespace utility {
             return false;
         }
         double x{0};
-        auto res = to_double(buffer, length, x);
+        auto res = decstr_to_double(buffer, length, x);
         if (res.ec == std::errc::invalid_argument)
         {
             return false;

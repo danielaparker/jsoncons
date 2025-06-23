@@ -97,7 +97,7 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     {
         std::string s = "-18446744073709551617";
         jsoncons::json doc(s,  jsoncons::semantic_tag::bigint);
-        CHECK(bool(doc.as<jsoncons::bigint>() == jsoncons::bigint::from_string(s)));
+        CHECK(bool(doc.as<jsoncons::bigint>() == jsoncons::bigint::parse(s)));
     }
 }
 
@@ -109,7 +109,7 @@ TEST_CASE("json::as<__int128>()")
     std::string s1 = "-18446744073709551617";
 
     __int128 n;
-    auto result = jsoncons::utility::decstr_to_integer(s1.data(),s1.size(), n);
+    auto result = jsoncons::utility::dec_to_integer(s1.data(),s1.size(), n);
     REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
@@ -131,7 +131,7 @@ TEST_CASE("json::as<unsigned __int128>()")
 
     unsigned __int128 n;
 
-    auto result = jsoncons::utility::decstr_to_integer(s1.data(),s1.size(), n);
+    auto result = jsoncons::utility::dec_to_integer(s1.data(),s1.size(), n);
     REQUIRE(result.ec == std::errc());
 
     jsoncons::json doc(s1);
