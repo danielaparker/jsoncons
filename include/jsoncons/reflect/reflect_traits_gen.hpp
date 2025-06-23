@@ -728,7 +728,6 @@ namespace reflect { \
   _r ## Getter ? std::move(*_r ## Getter) : typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type()
 
 #define JSONCONS_CTOR_GETTER_TO_JSON(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Count)
-
 #define JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Count) \
 if ((num_params-Count) < num_mandatory_params2) { \
        ajson.try_emplace(json_object_name_members<value_type>::Getter(char_type{}),class_instance.Getter() ); \
@@ -736,6 +735,32 @@ if ((num_params-Count) < num_mandatory_params2) { \
 else { \
   json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::Getter(char_type{}),class_instance.Getter(), ajson); \
 }
+
+#define JSONCONS_CTOR_GETTER_COUNT(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_COUNT_LAST(Prefix, P2, P3, Getter, Count)
+#define JSONCONS_CTOR_GETTER_COUNT_LAST(Prefix, P2, P3, Getter, Count) \
+if ((num_params-Count) < num_mandatory_params2) \
+{ \
+    ++object_size; \
+} \
+else \
+{ \
+    if (is_optional_value_set(val.Getter())) \
+    { \
+        ++object_size; \
+    } \
+} 
+
+#define JSONCONS_CTOR_GETTER_ENCODE(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Count)
+#define JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Count) \
+if ((num_params-Count) < num_mandatory_params2) \
+{ \
+    try_encode_member(json_object_name_members<value_type>::Getter(char_type{}), val.Getter(), encoder, ec); \
+} \
+else \
+{ \
+    try_encode_optional_member(json_object_name_members<value_type>::Getter(char_type{}), \
+        val.Getter(), encoder, ec); \
+} 
 
 #define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, ClassType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons { \
@@ -773,6 +798,29 @@ namespace reflect { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_TO_JSON, ,,, __VA_ARGS__) \
             return ajson; \
+        } \
+    }; \
+    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct encode_traits<ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    { \
+        using value_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+        constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
+        template <typename CharT> \
+        static void try_encode(const value_type& val, \
+            basic_json_visitor<CharT>& encoder, \
+            std::error_code& ec) \
+        { \
+            using char_type = CharT; \
+            (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::size_t object_size{0}; \
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_COUNT, ,,, __VA_ARGS__) \
+            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_ENCODE, ,,, __VA_ARGS__) \
+            encoder.end_object(ser_context(), ec); \
+            if (JSONCONS_UNLIKELY(ec)) {return;} \
         } \
     }; \
 } \
