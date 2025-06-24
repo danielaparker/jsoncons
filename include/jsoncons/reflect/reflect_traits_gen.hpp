@@ -393,13 +393,13 @@ if ((num_params-Count) < num_mandatory_params2) \
 #define JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Member)) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 } 
 
@@ -463,9 +463,9 @@ namespace reflect { \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_COUNT, ,,, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -599,13 +599,13 @@ else \
 #define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_MEMBER_NAME_COUNT_2(Member, Name) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Member)) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 #define JSONCONS_MEMBER_NAME_COUNT_3(Member, Name, Mode) JSONCONS_MEMBER_NAME_COUNT_2(Member, Name)
@@ -613,13 +613,13 @@ else \
 #define JSONCONS_MEMBER_NAME_COUNT_5(Member, Name, Mode, Match, Into) JSONCONS_MEMBER_NAME_COUNT_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_MEMBER_NAME_COUNT_6(Member, Name, Mode, Match, Into, From) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Member)) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 
@@ -682,9 +682,9 @@ namespace reflect { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_COUNT, ,,, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -741,13 +741,13 @@ else { \
 #define JSONCONS_CTOR_GETTER_COUNT_LAST(Prefix, P2, P3, Getter, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 } 
 
@@ -815,9 +815,9 @@ namespace reflect { \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_COUNT, ,,, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_ENCODE, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -923,13 +923,13 @@ else { \
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name)
@@ -937,13 +937,13 @@ else \
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_COUNT_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_6(Getter, Name, Mode, Match, Into, From) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 
@@ -1020,9 +1020,9 @@ namespace reflect { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_COUNT,,,, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -1378,13 +1378,13 @@ else \
 #define JSONCONS_N_GETTER_SETTER_COUNT_(Prefix, Getter, Setter, Property, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 } 
 
@@ -1461,9 +1461,9 @@ namespace reflect { \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_COUNT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_ENCODE, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
@@ -1564,26 +1564,26 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_3(Getter, Setter, Name) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_COUNT_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_COUNT_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_7(Getter, Setter, Name, Mode, Match, Into, From) \
 { \
-    ++object_size; \
+    ++member_count; \
 } \
 else \
 { \
     if (is_optional_value_set(val.Getter())) \
     { \
-        ++object_size; \
+        ++member_count; \
     } \
 }    
 
@@ -1668,9 +1668,9 @@ namespace reflect { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
-            std::size_t object_size{0}; \
+            std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_COUNT,,,, __VA_ARGS__) \
-            encoder.begin_object(object_size, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return;} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
