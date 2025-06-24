@@ -147,7 +147,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements jsoncons reflection traits
 
 - With [cursor-level access](doc/ref/corelib/basic_json_cursor.md) to a stream of parse events
 
@@ -215,10 +215,9 @@ Marilyn C, 0.9
 jsoncons supports transforming JSON texts into C++ data structures. 
 The functions [decode_json](doc/ref/corelib/decode_json.md) and [encode_json](doc/ref/corelib/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](doc/ref/corelib/json_type_traits.md) 
+Decode and encode work for all C++ classes that implement jsoncons reflection traits.
 defined. jsoncons already supports many types in the standard library, 
-and your own types will be supported too if you specialize `json_type_traits`
+and your own types will be supported too if you specialize [json_type_traits](doc/ref/corelib/json_type_traits.md)
 in the `jsoncons` namespace. 
 
 ```cpp
