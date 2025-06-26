@@ -14,12 +14,12 @@ void encode_msgpack(const T& jval, std::ostream& os,
     const msgpack_decode_options& options = msgpack_decode_options());         (2)
 
 template <typename T,typename ByteContainer>
-void encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, ByteContainer& cont,
     const msgpack_decode_options& options = msgpack_decode_options());         (3) (since 0.171.0)
 
 template <typename T>
-void encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, std::ostream& os,
     const msgpack_decode_options& options = msgpack_decode_options());         (4) (since 0.171.0)
 ```

@@ -159,7 +159,7 @@ try_decode_ubjson(InputIt first, InputIt last,
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
-try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
               const BytesLike& v, 
               const ubjson_decode_options& options = ubjson_decode_options())
 {
@@ -167,9 +167,9 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     using result_type = read_result<value_type>;
 
     std::error_code ec;   
-    json_decoder<T,TempAlloc> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+    json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-    basic_ubjson_reader<jsoncons::bytes_source,TempAlloc> reader(v, adaptor, options, alloc_set.get_temp_allocator());
+    basic_ubjson_reader<jsoncons::bytes_source,TempAlloc> reader(v, adaptor, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -185,7 +185,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
-try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
               const BytesLike& v, 
               const ubjson_decode_options& options = ubjson_decode_options())
 {
@@ -193,7 +193,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     using result_type = read_result<value_type>;
 
     std::error_code ec;   
-    basic_ubjson_cursor<bytes_source,TempAlloc> cursor(std::allocator_arg, alloc_set.get_temp_allocator(), v, options, ec);
+    basic_ubjson_cursor<bytes_source,TempAlloc> cursor(std::allocator_arg, aset.get_temp_allocator(), v, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
@@ -204,7 +204,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
 
 template <typename T,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
-try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
               std::istream& is, 
               const ubjson_decode_options& options = ubjson_decode_options())
 {
@@ -212,9 +212,9 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     using result_type = read_result<value_type>;
 
     std::error_code ec;   
-    json_decoder<T,TempAlloc> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+    json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-    basic_ubjson_reader<jsoncons::binary_stream_source,TempAlloc> reader(is, adaptor, options, alloc_set.get_temp_allocator());
+    basic_ubjson_reader<jsoncons::binary_stream_source,TempAlloc> reader(is, adaptor, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -229,7 +229,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
 
 template <typename T,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
-try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
               std::istream& is, 
               const ubjson_decode_options& options = ubjson_decode_options())
 {
@@ -237,7 +237,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
     using result_type = read_result<value_type>;
 
     std::error_code ec;   
-    basic_ubjson_cursor<binary_stream_source,TempAlloc> cursor(std::allocator_arg, alloc_set.get_temp_allocator(), is, options, ec);
+    basic_ubjson_cursor<binary_stream_source,TempAlloc> cursor(std::allocator_arg, aset.get_temp_allocator(), is, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};

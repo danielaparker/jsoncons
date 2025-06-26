@@ -16,13 +16,13 @@ void encode_csv(const T& val, std::basic_ostream<CharT>& os,
         = basic_csv_encode_options<CharT>());                               (2)
 
 template <typename T,typename CharContainer>
-void encode_csv(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
     const basic_csv_encode_options<CharContainer::value_type>& options 
         = basic_csv_encode_options<CharContainer::value_type>());           (3) (since 0.171.0)
 
 template <typename T,typename CharT>
-void encode_csv(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
     const basic_csv_encode_options<CharT>& options 
         = basic_csv_encode_options<CharT>());                               (4) (since 0.171.0)

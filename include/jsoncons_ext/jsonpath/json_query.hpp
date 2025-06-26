@@ -64,24 +64,24 @@ namespace jsonpath {
     }
 
     template <typename Json,typename TempAlloc >
-    Json json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
+    Json json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
         const Json& root, const typename Json::string_view_type& path, 
         result_options options = result_options(),
         const custom_functions<Json>& functions = custom_functions<Json>())
     {
-        auto expr = make_expression<Json>(alloc_set, path, functions);
+        auto expr = make_expression<Json>(aset, path, functions);
         return expr.evaluate(root, options);
     }
 
     template <typename Json,typename Callback,typename TempAlloc >
     typename std::enable_if<ext_traits::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
-    json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
+    json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
         const Json& root, const typename Json::string_view_type& path, 
         Callback callback,
         result_options options = result_options(),
         const custom_functions<Json>& functions = custom_functions<Json>())
     {
-        auto expr = make_expression<Json>(alloc_set, path, functions);
+        auto expr = make_expression<Json>(aset, path, functions);
         expr.evaluate(root, callback, options);
     }
 
@@ -114,7 +114,7 @@ namespace jsonpath {
 
     template <typename Json,typename T,typename TempAlloc >
     typename std::enable_if<reflect::is_json_conv_traits_specialized<Json,T>::value,void>::type
-        json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
+        json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
             Json& root, const typename Json::string_view_type& path, T&& new_value,
             const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -126,11 +126,11 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, alloc_set.get_allocator());
-        evaluator_type evaluator{alloc_set.get_allocator()};
+        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, aset.get_allocator());
+        evaluator_type evaluator{aset.get_allocator()};
         path_expression_type expr = evaluator.compile(*resources, path);
 
-        jsoncons::jsonpath::detail::eval_context<Json,reference> context{alloc_set.get_allocator()};
+        jsoncons::jsonpath::detail::eval_context<Json,reference> context{aset.get_allocator()};
         auto callback = [&new_value](const path_node_type&, reference v)
         {
             v = Json(std::forward<T>(new_value), semantic_tag::none);
@@ -168,7 +168,7 @@ namespace jsonpath {
 
     template <typename Json,typename BinaryCallback,typename TempAlloc >
     typename std::enable_if<ext_traits::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
-    json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& alloc_set, 
+    json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
         Json& root, const typename Json::string_view_type& path , BinaryCallback callback, 
         const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -180,11 +180,11 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, alloc_set.get_allocator());
-        evaluator_type evaluator{alloc_set.get_allocator()};
+        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, aset.get_allocator());
+        evaluator_type evaluator{aset.get_allocator()};
         path_expression_type expr = evaluator.compile(*resources, path);
 
-        jsoncons::jsonpath::detail::eval_context<Json,reference> context{alloc_set.get_allocator()};
+        jsoncons::jsonpath::detail::eval_context<Json,reference> context{aset.get_allocator()};
 
         auto f = [&callback](const path_node_type& path, reference val)
         {

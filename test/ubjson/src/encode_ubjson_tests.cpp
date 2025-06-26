@@ -221,7 +221,7 @@ TEST_CASE("encode_ubjson allocator_set overloads")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto alloc_set = temp_allocator_only(temp_alloc);
+    auto aset = temp_allocator_only(temp_alloc);
 
     SECTION("json, stream")
     {
@@ -230,8 +230,8 @@ TEST_CASE("encode_ubjson allocator_set overloads")
 
         std::string s;
         std::stringstream ss(s);
-        ubjson::encode_ubjson(alloc_set, person, ss);
-        json other = ubjson::decode_ubjson<json>(alloc_set, ss);
+        ubjson::encode_ubjson(aset, person, ss);
+        json other = ubjson::decode_ubjson<json>(aset, ss);
         CHECK(other == person);
     }
     SECTION("custom, stream")
@@ -240,8 +240,8 @@ TEST_CASE("encode_ubjson allocator_set overloads")
 
         std::string s;
         std::stringstream ss(s);
-        ubjson::encode_ubjson(alloc_set, person, ss);
-        ns::Person other = ubjson::decode_ubjson<ns::Person>(alloc_set, ss);
+        ubjson::encode_ubjson(aset, person, ss);
+        ns::Person other = ubjson::decode_ubjson<ns::Person>(aset, ss);
         CHECK(other.name == person.name);
     }
 }

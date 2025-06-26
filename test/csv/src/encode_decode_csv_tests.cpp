@@ -258,7 +258,7 @@ TEST_CASE("encode_csv allocator_set overloads")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto alloc_set = temp_allocator_only(temp_alloc);
+    auto aset = temp_allocator_only(temp_alloc);
 
     json persons(json_array_arg);
 
@@ -275,8 +275,8 @@ TEST_CASE("encode_csv allocator_set overloads")
         auto options = jsoncons::csv::csv_options{}
             .assume_header(true);
         options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
-        csv::encode_csv(/*alloc_set,*/ persons, ss, options);
-        json other = csv::decode_csv<json>(/*alloc_set,*/ ss, options);
+        csv::encode_csv(/*aset,*/ persons, ss, options);
+        json other = csv::decode_csv<json>(/*aset,*/ ss, options);
         CHECK(other == persons);
     }
     SECTION("custom, stream")
@@ -286,8 +286,8 @@ TEST_CASE("encode_csv allocator_set overloads")
         auto options = jsoncons::csv::csv_options{}
             .assume_header(true);
         options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
-        csv::encode_csv(/*alloc_set,*/ persons, ss, options);
-        auto other = csv::decode_csv<std::vector<ns::Person>>(/*alloc_set,*/ ss, options);
+        csv::encode_csv(/*aset,*/ persons, ss, options);
+        auto other = csv::decode_csv<std::vector<ns::Person>>(/*aset,*/ ss, options);
         REQUIRE(1 == other.size());
         CHECK(other[0].name == persons[0].at("name").as_string());
     }

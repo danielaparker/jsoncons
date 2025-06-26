@@ -195,7 +195,7 @@ TEST_CASE("encode_cbor allocator_set")
     MyScopedAllocator<char> result_alloc(1);
     MyScopedAllocator<char> temp_alloc(2);
 
-    auto alloc_set = combine_allocators(result_alloc, temp_alloc);
+    auto aset = combine_allocators(result_alloc, temp_alloc);
 
     SECTION("json, stream")
     {
@@ -204,8 +204,8 @@ TEST_CASE("encode_cbor allocator_set")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
-        cust_json other = cbor::decode_cbor<cust_json>(alloc_set,ss);
+        cbor::encode_cbor(aset, person, ss);
+        cust_json other = cbor::decode_cbor<cust_json>(aset,ss);
         CHECK(other == person);
     }
     /* SECTION("custom, stream")
@@ -214,8 +214,8 @@ TEST_CASE("encode_cbor allocator_set")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
-        ns::Person other = cbor::decode_cbor<ns::Person>(alloc_set,ss);
+        cbor::encode_cbor(aset, person, ss);
+        ns::Person other = cbor::decode_cbor<ns::Person>(aset,ss);
         CHECK(other.name == person.name);
     }*/
 }
@@ -224,7 +224,7 @@ TEST_CASE("encode_cbor allocator_set for temp only")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto alloc_set = temp_allocator_only(temp_alloc);
+    auto aset = temp_allocator_only(temp_alloc);
 
     SECTION("json, stream")
     {
@@ -233,8 +233,8 @@ TEST_CASE("encode_cbor allocator_set for temp only")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
-        json other = cbor::decode_cbor<json>(alloc_set,ss);
+        cbor::encode_cbor(aset, person, ss);
+        json other = cbor::decode_cbor<json>(aset,ss);
         CHECK(other == person);
     }
     SECTION("custom, stream")
@@ -243,8 +243,8 @@ TEST_CASE("encode_cbor allocator_set for temp only")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
-        ns::Person other = cbor::decode_cbor<ns::Person>(alloc_set,ss);
+        cbor::encode_cbor(aset, person, ss);
+        ns::Person other = cbor::decode_cbor<ns::Person>(aset,ss);
         CHECK(other.name == person.name);
     }
 }

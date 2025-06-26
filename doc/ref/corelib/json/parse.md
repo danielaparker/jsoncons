@@ -19,27 +19,27 @@ static basic_json parse(InputIt first, InputIt last,
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (5) 
 
 template <typename Source,typename TempAlloc>
-static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, 
     const Source& source, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (6) (since 0.171.0)
 
 template <typename TempAlloc>
-static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset,
     const char_type* str, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (7) (since 0.171.0)
 
 template <typename TempAlloc>
-static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset,
     const char_type* str, std::size_t length, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (8) (since 0.177.0)
 
 template <typename TempAlloc>
-static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, 
     std::basic_istream<char_type>& is, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (9) (since 0.171.0)
 
 template <typename InputIt,typename TempAlloc>
-static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set,
+static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset,
     InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (10) (since 0.171.0)
 ```

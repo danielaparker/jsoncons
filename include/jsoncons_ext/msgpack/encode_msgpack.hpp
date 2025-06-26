@@ -87,12 +87,12 @@ namespace msgpack {
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set, const T& j, 
+    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, const T& j, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_msgpack_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
+        basic_msgpack_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
@@ -100,11 +100,11 @@ namespace msgpack {
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set, 
+    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& val, ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
-        basic_msgpack_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
+        basic_msgpack_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
         std::error_code ec;
         reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -115,25 +115,25 @@ namespace msgpack {
 
     template <typename T,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set, 
+    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& j, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
     template <typename T,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set, 
+    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& val, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
-        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
         std::error_code ec;
         reflect::encode_traits<T>::try_encode(val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))

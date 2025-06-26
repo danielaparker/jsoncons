@@ -14,13 +14,13 @@ T decode_csv(std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (2)
 
 template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
-T decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+T decode_csv(allocator_set<Alloc,TempAlloc> aset,
     const CharsLike& s,                                                                      (3)
     const basic_csv_decode_options<CharsLike::value_type>& options = 
         basic_csv_decode_options<CharsLike::value_type>()); 
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
-T decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+T decode_csv(allocator_set<Alloc,TempAlloc> aset,
     std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());     (4)
 
@@ -37,13 +37,13 @@ read_result<T> try_decode_csv(std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (7) (since 1.4.0)
 
 template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> aset,
     const CharsLike& s,                                                                      (8) (since 1.4.0)
     const basic_csv_decode_options<CharsLike::value_type>& options = 
         basic_csv_decode_options<CharsLike::value_type>()); 
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> alloc_set,
+read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> aset,
     std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());     (9) (since 1.4.0)
 

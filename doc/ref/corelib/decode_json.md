@@ -16,13 +16,13 @@ T decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (2)
 
 template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
-T decode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+T decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const CharsLike& s,
     const basic_json_decode_options<CharsLike::value_type>& options 
         = basic_json_decode_options<CharsLike::value_type>());                                  (3) (since 0.171.0)
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
-T decode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+T decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (4) (since 0.171.0)
 
@@ -40,13 +40,13 @@ read_result<T> try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (7) since 1.4.0
 
 template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const CharsLike& s,
     const basic_json_decode_options<CharsLike::value_type>& options 
         = basic_json_decode_options<CharsLike::value_type>());                                  (8) (since 1.4.0)
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (9) (since 1.4.0)
 

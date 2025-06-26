@@ -107,7 +107,7 @@ namespace jsoncons {
     template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
         ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
-    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
@@ -117,12 +117,12 @@ namespace jsoncons {
 
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
             val.dump(encoder);
         }
         else
         {
-            basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
             val.dump(encoder);
         }
     }
@@ -130,7 +130,7 @@ namespace jsoncons {
     template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
-    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
@@ -141,13 +141,13 @@ namespace jsoncons {
         if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options,
-                alloc_set.get_temp_allocator());
+                aset.get_temp_allocator());
             encode_json(val, encoder);
         }
         else
         {
             basic_json_encoder<char_type, jsoncons::string_sink<CharContainer>, TempAlloc> encoder(cont, options, 
-                alloc_set.get_temp_allocator());
+                aset.get_temp_allocator());
             encode_json(val, encoder);
         }
     }
@@ -156,38 +156,38 @@ namespace jsoncons {
 
     template <typename T,typename CharT,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value>::type
-    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
         indenting indent = indenting::no_indent)
     {
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
             val.dump(encoder);
         }
         else
         {
-            basic_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
             val.dump(encoder);
         }
     }
 
     template <typename T,typename CharT,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type
-    encode_json(const allocator_set<Alloc,TempAlloc>& alloc_set,
+    encode_json(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
         indenting indent = indenting::no_indent)
     {
         if (indent == indenting::no_indent)
         {
-            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
             encode_json(val, encoder);
         }
         else
         {
-            basic_json_encoder<CharT,TempAlloc> encoder(os, options, alloc_set.get_temp_allocator());
+            basic_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
             encode_json(val, encoder);
         }
     }

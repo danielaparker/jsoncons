@@ -1937,11 +1937,11 @@ namespace jsoncons {
         template <typename Source,typename TempAlloc >
         static
          typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-            parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, const Source& source, 
+            parse(const allocator_set<allocator_type,TempAlloc>& aset, const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
-            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
-            basic_json_parser<char_type,TempAlloc> parser(options, alloc_set.get_temp_allocator());
+            json_decoder<basic_json> decoder(aset.get_allocator(), aset.get_temp_allocator());
+            basic_json_parser<char_type,TempAlloc> parser(options, aset.get_temp_allocator());
 
             auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
             if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
@@ -1973,18 +1973,18 @@ namespace jsoncons {
         }
 
         template <typename TempAlloc >
-        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, const char_type* source, 
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, const char_type* source, 
             const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
-            return parse(alloc_set, jsoncons::basic_string_view<char_type>(source), options);
+            return parse(aset, jsoncons::basic_string_view<char_type>(source), options);
         }
 
         template <typename TempAlloc >
-        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, 
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, 
             const char_type* str, std::size_t length,
             const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
-            return parse(alloc_set, jsoncons::basic_string_view<char_type>(str, length), options);
+            return parse(aset, jsoncons::basic_string_view<char_type>(str, length), options);
         }
 
         // from stream
@@ -2004,11 +2004,11 @@ namespace jsoncons {
         }
 
         template <typename TempAlloc >
-        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, std::basic_istream<char_type>& is, 
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, std::basic_istream<char_type>& is, 
             const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
-            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
-            basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
+            json_decoder<basic_json> decoder(aset.get_allocator(), aset.get_temp_allocator());
+            basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options, aset.get_temp_allocator());
             reader.read_next();
             reader.check_done();
             if (JSONCONS_UNLIKELY(!decoder.is_valid()))
@@ -2037,13 +2037,13 @@ namespace jsoncons {
         }
 
         template <typename InputIt,typename TempAlloc >
-        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& alloc_set, InputIt first, InputIt last, 
+        static basic_json parse(const allocator_set<allocator_type,TempAlloc>& aset, InputIt first, InputIt last, 
                                 const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
-            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+            json_decoder<basic_json> decoder(aset.get_allocator(), aset.get_temp_allocator());
             basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),
                 std::forward<InputIt>(last)), 
-                decoder, options, alloc_set.get_temp_allocator());
+                decoder, options, aset.get_temp_allocator());
             reader.read_next();
             reader.check_done();
             if (JSONCONS_UNLIKELY(!decoder.is_valid()))

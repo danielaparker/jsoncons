@@ -205,14 +205,14 @@ TEST_CASE("encode decode bson source with temp_allocator")
             0x00};
 
     MyScopedAllocator<char> temp_alloc(2);
-    auto alloc_set = temp_allocator_only(temp_alloc);    
+    auto aset = temp_allocator_only(temp_alloc);    
 
     SECTION("from bytes")
     {
-        auto j = bson::decode_bson<ojson>(alloc_set, input);
+        auto j = bson::decode_bson<ojson>(aset, input);
 
         std::vector<uint8_t> buffer;
-        bson::encode_bson(alloc_set, j, buffer);
+        bson::encode_bson(aset, j, buffer);
         CHECK(buffer == input);
     }
 
@@ -221,10 +221,10 @@ TEST_CASE("encode decode bson source with temp_allocator")
         std::string s(reinterpret_cast<const char*>(input.data()), input.size());
         std::stringstream is(std::move(s));
 
-        auto j = bson::decode_bson<ojson>(alloc_set, is);
+        auto j = bson::decode_bson<ojson>(aset, is);
 
         std::vector<uint8_t> buffer;
-        bson::encode_bson(alloc_set, j, buffer);
+        bson::encode_bson(aset, j, buffer);
         CHECK(buffer == input);
     }
 

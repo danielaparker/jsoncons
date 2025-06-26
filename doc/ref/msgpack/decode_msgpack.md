@@ -12,12 +12,12 @@ T decode_msgpack(std::istream& is,
     const msgpack_decode_options& options = msgpack_decode_options());           (2)
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc>
-T decode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+T decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesLike& source,
     const msgpack_decode_options& options = msgpack_decode_options());           (3) (since 0.171.0)
 
 template <typename T,typename Alloc,typename TempAlloc>
-T decode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+T decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is,
     const msgpack_decode_options& options = msgpack_decode_options());           (4) (since 0.171.0)
 
@@ -34,12 +34,12 @@ read_result<T> try_decode_msgpack(std::istream& is,
     const msgpack_decode_options& options = msgpack_decode_options());           (7) (since 1.4.0)
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+read_result<T> try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesLike& source,
     const msgpack_decode_options& options = msgpack_decode_options());           (8) (since 1.4.0)
 
 template <typename T,typename Alloc,typename TempAlloc>
-read_result<T> try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& alloc_set,
+read_result<T> try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is,
     const msgpack_decode_options& options = msgpack_decode_options());           (9) (since 1.4.0)
 

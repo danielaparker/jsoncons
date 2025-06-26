@@ -33,14 +33,14 @@ void json_query(const Json& root value,
 
 ```cpp
 template <typename Json,typename TempAlloc>                                              
-Json json_query(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
+Json json_query(const allocator_set<Json::allocator_type,TempAlloc>& aset, 
     const Json& root value, const Json::string_view_type& expr,        (3) (since 0.170.0)
     result_options options = result_options(),
     const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
 ```cpp
 template <typename Json,typename BinaryCallback,typename TempAlloc>                        
-void json_query(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
+void json_query(const allocator_set<Json::allocator_type,TempAlloc>& aset, 
     const Json& root value, const Json::string_view_type& expr,        (4) (since 0.170.0)
     BinaryCallback callback,
     result_options options = result_options(),

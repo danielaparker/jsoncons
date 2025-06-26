@@ -14,12 +14,12 @@ void encode_ubjson(const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (2)
 
 template <typename T,typename ByteContainer>
-void encode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, ByteContainer& cont,
     const ubjson_decode_options& options = ubjson_decode_options());        (3) (since 0.171.0)
 
 template <typename T>
-void encode_ubjson(const allocator_set<Alloc,TempAlloc>& alloc_set,
+void encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (4) (since 0.171.0)
 ```

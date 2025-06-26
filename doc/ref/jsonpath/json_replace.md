@@ -34,14 +34,14 @@ void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback
 ```
 ```cpp
 template <typename Json,typename T,typename TempAlloc>
-void json_replace(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
+void json_replace(const allocator_set<Json::allocator_type,TempAlloc>& aset, 
     Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.171.0)
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
 ```cpp
 template <typename Json,typename BinaryCallback,typename TempAlloc>                                                   
-void json_replace(const allocator_set<Json::allocator_type,TempAlloc>& alloc_set, 
+void json_replace(const allocator_set<Json::allocator_type,TempAlloc>& aset, 
     Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.171.0)
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
