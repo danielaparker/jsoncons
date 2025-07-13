@@ -3,6 +3,8 @@
 
 - Fixed bug:
 
+    - Git Issue #622: fixed jmespath issue with uri resolution in patternProperties
+
     - Git Issue #620: Issue with JSONPath filter expression fixed through PR #621
 
 - Enhancements:
