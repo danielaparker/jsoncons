@@ -350,14 +350,6 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "dynamic_ref_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
-            //std::cout << "results:\n";
-            //for (const auto& s : results)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
-
             auto rit = context.dynamic_scope().rbegin();
             auto rend = context.dynamic_scope().rend();
 
@@ -1448,11 +1440,6 @@ namespace jsonschema {
                 {
                     return result;
                 }
-                //std::cout << "local_results2:\n";
-                //for (const auto& s : local_results2.evaluated_items)
-                //{
-                //    std::cout << "    " << s << "\n";
-                //}
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
@@ -1460,12 +1447,6 @@ namespace jsonschema {
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
             }
-
-            //std::cout << "local_results1:\n";
-            //for (const auto& s : local_results1.evaluated_items)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
 
             if (count == validators_.size())
             {
@@ -2165,11 +2146,6 @@ namespace jsonschema {
                 {
                     return result;
                 }
-                //std::cout << "if: evaluated properties\n";
-                //for (auto& item : results.evaluated_properties)
-                //{
-                //    std::cout << "  " << item << "\n";
-                //}
                 if (local_reporter.errors.empty()) 
                 {
                     results.merge(local_results);
@@ -2181,11 +2157,6 @@ namespace jsonschema {
                         {
                             return result;
                         }
-                        //std::cout << "then: evaluated properties\n";
-                        //for (auto& item : results.evaluated_properties)
-                        //{
-                        //    std::cout << "  " << item << "\n";
-                        //}
                     }
                 } 
                 else 
@@ -2198,11 +2169,6 @@ namespace jsonschema {
                         {
                             return result;
                         }
-                        //std::cout << "else: evaluated properties\n";
-                        //for (auto& item : results.evaluated_properties)
-                        //{
-                        //    std::cout << "  " << item << "\n";
-                        //}
                     }
                 }
             }
@@ -2405,12 +2371,6 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& /*patch*/) const final
         {
-            //std::cout << "type_validator.do_validate " << context.eval_path().string() << instance << "\n";
-            //for (auto& type : expected_types_ )
-            //{
-            //    std::cout << "    " << to_string(type) << "\n";
-            //}
-
             eval_context<Json> this_context(context, this->keyword_name());
 
             bool is_type_found = expected_types_.empty();
@@ -2583,13 +2543,6 @@ namespace jsonschema {
                 return walk_result::advance;
             }
 
-            //std::cout << "results:\n";
-            //for (const auto& s : results)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
-
             eval_context<Json> this_context(context, this->keyword_name());
 
             for (const auto& prop : instance.object_range()) 
@@ -2638,13 +2591,6 @@ namespace jsonschema {
                     }
                 }
             }
-            //std::cout << "properties_validator end[" << context.eval_path().string() << "," << this->schema_location().string() << "]";
-            //std::cout << "results:\n";
-            //for (const auto& s : results)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
             return walk_result::advance;
         }
 
@@ -3908,13 +3854,6 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "unevaluated_properties_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
-            //std::cout << "results:\n";
-            //for (const auto& s : results.evaluated_properties_)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
             if (!instance.is_object())
             {
                 return walk_result::advance;
@@ -4019,13 +3958,6 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]";
-            //std::cout << "results:\n";
-            //for (const auto& s : results.evaluated_items)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
             if (!instance.is_array())
             {
                 return walk_result::advance;
