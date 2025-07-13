@@ -169,3 +169,30 @@ to_array("gw:GWallInfo"."gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGr
     }
 }
 
+TEST_CASE("jmespath issue 620")
+{
+    SECTION("function with 1 arg")
+    {
+        std::string doc = R"(
+{
+    "parent": {
+        "child": {
+            "a" : { "kind": "a" },
+            "b" : { "kind": "b" },
+            "c" : { "kind": "b" },
+            "d" : { "kind": "c" }
+        }
+    }
+}
+        )";
+
+        auto expected = jsoncons::json::parse(R"(["b", "b"])");
+
+        auto compiled = jmespath::make_expression<jsoncons::json>("parent.child.*.kind[?@=='b']");
+        auto result = compiled.evaluate(doc);
+        std::cout << result << "\n";
+
+        //CHECK(expected == result);
+    }
+}
+
