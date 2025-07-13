@@ -183,6 +183,7 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_draft4_tests.cpp
                jsonschema/src/jsonschema_draft6_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
+               jsonschema/src/jsonschema_keyword_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                jsonschema/src/validation_report_tests.cpp
                mergepatch/src/mergepatch_test_suite.cpp

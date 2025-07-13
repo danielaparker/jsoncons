@@ -87,10 +87,11 @@ namespace jsonschema {
             
             for (const auto& prop : sch.object_range())
             {
+                std::string sub_keys[] = {keyword};
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
-                        factory_->make_cross_draft_schema_validator(context, prop.value(), {}, anchor_dict)));
+                        factory_->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
                 
             }
 
