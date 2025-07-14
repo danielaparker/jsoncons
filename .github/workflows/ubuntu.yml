@@ -203,14 +203,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['3.8', '3.9', '4', '5', '6', '7']
+        compiler: ['4', '5', '6', '7','8','9', '10', '11', '12', '13', '14', '15-bullseye']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@6b3e96a9bc9976b8b546346fdd102effedae0ca8 # v4.02
+        uses: lukka/get-cmake@latest
       - name: cmake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       - name: build
