@@ -203,12 +203,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['8','9', '10', '11', '12', '13', '14', '15-bullseye']
+        compiler: ['10', '11', '12', '13', '14', '15-bullseye']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
