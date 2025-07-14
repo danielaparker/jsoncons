@@ -203,7 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['12', '13', '14', '15-bullseye']
+        compiler: ['11','12', '13', '14', '15-bullseye']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
