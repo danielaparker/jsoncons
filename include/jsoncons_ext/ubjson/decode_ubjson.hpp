@@ -67,7 +67,7 @@ try_decode_ubjson(const BytesLike& v,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
 }
 
 template <typename T>
@@ -109,7 +109,7 @@ try_decode_ubjson(std::istream& is,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -151,7 +151,7 @@ try_decode_ubjson(InputIt first, InputIt last,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -199,7 +199,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -243,7 +243,7 @@ try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(cursor);
+    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
 }
 
 template <typename T, typename... Args>

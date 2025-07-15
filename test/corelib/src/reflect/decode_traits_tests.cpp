@@ -26,7 +26,7 @@ TEST_CASE("decode_traits primitive")
         std::error_code ec;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<uint64_t>::try_decode(cursor);
+        auto result = reflect::decode_traits<uint64_t>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK(result.value() == 1000);
@@ -36,7 +36,7 @@ TEST_CASE("decode_traits primitive")
         std::string input = R"([1000,1001,1002])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<std::vector<uint64_t>>::try_decode(cursor);
+        auto result = reflect::decode_traits<std::vector<uint64_t>>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         std::vector<uint64_t>& val(*result);
@@ -58,7 +58,7 @@ TEST_CASE("decode_traits std::string")
         std::string input = R"("Hello World")";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<std::string>::try_decode(cursor);
+        auto result = reflect::decode_traits<std::string>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK((*result == "Hello World"));
@@ -74,7 +74,7 @@ TEST_CASE("decode_traits std::pair")
         std::string input = R"(["first","second"])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -86,7 +86,7 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::vector<std::pair<std::string,std::string>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -101,7 +101,7 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -120,7 +120,7 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(conv_errc::not_pair == result.error().code());
     }
@@ -134,7 +134,7 @@ TEST_CASE("decode_traits deserialization errors")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(cursor);
+        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(json_errc::expected_comma_or_rbrace == result.error().code());
     }

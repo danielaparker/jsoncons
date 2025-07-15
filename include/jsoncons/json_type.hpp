@@ -105,11 +105,15 @@ namespace jsoncons {
     
     JSONCONS_INLINE_CONSTEXPR null_type null_arg{};
     
-    struct temp_allocator_arg_t
+    struct temp_alloc_arg_t
     {
-        explicit temp_allocator_arg_t() = default; 
+        explicit temp_alloc_arg_t() = default; 
     };
     
+    JSONCONS_INLINE_CONSTEXPR temp_alloc_arg_t temp_alloc_arg{};
+
+    using temp_allocator_arg_t = temp_alloc_arg_t;
+
     JSONCONS_INLINE_CONSTEXPR temp_allocator_arg_t temp_allocator_arg{};
     
     struct half_arg_t

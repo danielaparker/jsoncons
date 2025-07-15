@@ -39,7 +39,7 @@ namespace jsoncons {
         using iterator_category = std::input_iterator_tag;
         
     private:
-        basic_staj_cursor<char_type>* cursor_{nullptr};
+        basic_staj_cursor<char_type>* cursor_ptr_{nullptr};
         jsoncons::optional<T> value_;
         bool done_{true};
     public:
@@ -47,13 +47,13 @@ namespace jsoncons {
         staj_array_iterator() noexcept = default;
 
         staj_array_iterator(basic_staj_cursor<char_type>& cursor)
-            : cursor_(std::addressof(cursor)), done_(false)
+            : cursor_ptr_(std::addressof(cursor)), done_(false)
         {
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
             }
-            else if (cursor_->current().event_type() == staj_event_type::begin_array)
+            else if (cursor_ptr_->current().event_type() == staj_event_type::begin_array)
             {
                 next();
             }
@@ -64,13 +64,13 @@ namespace jsoncons {
         }
 
         staj_array_iterator(basic_staj_cursor<char_type>& cursor, std::error_code& ec)
-            : cursor_(std::addressof(cursor)), done_(false)
+            : cursor_ptr_(std::addressof(cursor)), done_(false)
         {
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
             }
-            else if (cursor_->current().event_type() == staj_event_type::begin_array)
+            else if (cursor_ptr_->current().event_type() == staj_event_type::begin_array)
             {
                 next(ec);
             }
@@ -143,7 +143,7 @@ namespace jsoncons {
             next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
-                JSONCONS_THROW(ser_error(ec, cursor_->context().line(), cursor_->context().column()));
+                JSONCONS_THROW(ser_error(ec, cursor_ptr_->context().line(), cursor_ptr_->context().column()));
             }
         }
 
@@ -154,23 +154,23 @@ namespace jsoncons {
             {
                 return;
             }
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
                 return;
             }
-            cursor_->next(ec);
+            cursor_ptr_->next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 done_ = true;
                 return;
             }
-            if (JSONCONS_UNLIKELY(cursor_->current().event_type() == staj_event_type::end_array))
+            if (JSONCONS_UNLIKELY(cursor_ptr_->current().event_type() == staj_event_type::end_array))
             {
                 done_ = true;
                 return;
             }
-            auto result = reflect::decode_traits<T>::try_decode(*cursor_);
+            auto result = reflect::decode_traits<T>::try_decode(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();
@@ -206,7 +206,7 @@ namespace jsoncons {
         using iterator_category = std::input_iterator_tag;
 
     private:
-        basic_staj_cursor<char_type>* cursor_{nullptr};
+        basic_staj_cursor<char_type>* cursor_ptr_{nullptr};
         jsoncons::optional<value_type> key_value_;
         bool done_{true};
     public:
@@ -214,13 +214,13 @@ namespace jsoncons {
         staj_object_iterator() noexcept = default;
 
         staj_object_iterator(basic_staj_cursor<char_type>& cursor)
-            : cursor_(std::addressof(cursor)), done_(false)
+            : cursor_ptr_(std::addressof(cursor)), done_(false)
         {
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
             }
-            else if (cursor_->current().event_type() == staj_event_type::begin_object)
+            else if (cursor_ptr_->current().event_type() == staj_event_type::begin_object)
             {
                 next();
             }
@@ -231,13 +231,13 @@ namespace jsoncons {
         }
 
         staj_object_iterator(basic_staj_cursor<char_type>& cursor, std::error_code& ec)
-                : cursor_(std::addressof(cursor)), done_(false)
+                : cursor_ptr_(std::addressof(cursor)), done_(false)
         {
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
             }
-            else if (cursor_->current().event_type() == staj_event_type::begin_object)
+            else if (cursor_ptr_->current().event_type() == staj_event_type::begin_object)
             {
                 next(ec);
                 if (JSONCONS_UNLIKELY(ec)) {done_ = true;}
@@ -311,7 +311,7 @@ namespace jsoncons {
             next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
-                JSONCONS_THROW(ser_error(ec, cursor_->context().line(), cursor_->context().column()));
+                JSONCONS_THROW(ser_error(ec, cursor_ptr_->context().line(), cursor_ptr_->context().column()));
             }
         }
 
@@ -321,32 +321,32 @@ namespace jsoncons {
             {
                 return;
             }
-            if (cursor_->done())
+            if (cursor_ptr_->done())
             {
                 done_ = true;
                 return;
             }
             
-            cursor_->next(ec);
+            cursor_ptr_->next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 done_ = true;
                 return;
             }
-            if (JSONCONS_UNLIKELY(cursor_->current().event_type() == staj_event_type::end_object))
+            if (JSONCONS_UNLIKELY(cursor_ptr_->current().event_type() == staj_event_type::end_object))
             {
                 done_ = true;
                 return;
             }
-            JSONCONS_ASSERT(cursor_->current().event_type() == staj_event_type::key);
-            auto key = cursor_->current(). template get<key_type>();
-            cursor_->next(ec);
+            JSONCONS_ASSERT(cursor_ptr_->current().event_type() == staj_event_type::key);
+            auto key = cursor_ptr_->current(). template get<key_type>();
+            cursor_ptr_->next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 done_ = true;
                 return;
             }
-            auto result = reflect::decode_traits<T>::try_decode(*cursor_);
+            auto result = reflect::decode_traits<T>::try_decode(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();

@@ -62,6 +62,30 @@ allocator_set<std::allocator<char>,TempAlloc> temp_allocator_only(const TempAllo
     return allocator_set<std::allocator<char>,TempAlloc>(std::allocator<char>(), temp_alloc);
 }
 
+inline
+allocator_set<std::allocator<char>,std::allocator<char>> make_alloc_set()
+{
+    return allocator_set<std::allocator<char>,std::allocator<char>>(std::allocator<char>(), std::allocator<char>());
+}
+
+template <typename Alloc>
+allocator_set<Alloc,std::allocator<char>> make_alloc_set(const Alloc& alloc)
+{
+    return allocator_set<Alloc,std::allocator<char>>(alloc, std::allocator<char>());
+}
+
+template <typename Alloc,typename TempAlloc >
+allocator_set<Alloc,TempAlloc> make_alloc_set(const Alloc& alloc, const TempAlloc& temp_alloc)
+{
+    return allocator_set<Alloc,TempAlloc>(alloc, temp_alloc);
+}
+
+template <typename TempAlloc >
+allocator_set<std::allocator<char>,TempAlloc> make_alloc_set(temp_alloc_arg_t, const TempAlloc& temp_alloc)
+{
+    return allocator_set<std::allocator<char>,TempAlloc>(std::allocator<char>(), temp_alloc);
+}
+
 } // namespace jsoncons
 
 #endif // JSONCONS_ALLOCATOR_SET_HPP

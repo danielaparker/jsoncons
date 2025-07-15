@@ -1199,8 +1199,8 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
-        template <typename CharT> \
-        static result_type try_decode(basic_staj_cursor<CharT>& cursor) \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1384,8 +1384,8 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
-        template <typename CharT> \
-        static result_type try_decode(basic_staj_cursor<CharT>& cursor) \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
