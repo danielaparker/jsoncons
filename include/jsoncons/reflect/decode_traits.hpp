@@ -392,7 +392,7 @@ struct decode_traits<T,
     using result_type = read_result<value_type>;
 
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
