@@ -32,7 +32,7 @@ template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const BytesLike& v, 
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -57,7 +57,7 @@ template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const BytesLike& v, 
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -75,7 +75,7 @@ try_decode_bson(const BytesLike& v,
 template <typename T>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(std::istream& is, 
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -99,7 +99,7 @@ try_decode_bson(std::istream& is,
 template <typename T>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(std::istream& is, 
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -117,7 +117,7 @@ try_decode_bson(std::istream& is,
 template <typename T,typename InputIt>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(InputIt first, InputIt last,
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -141,7 +141,7 @@ try_decode_bson(InputIt first, InputIt last,
 template <typename T,typename InputIt>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(InputIt first, InputIt last,
-            const bson_decode_options& options = bson_decode_options())
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -162,8 +162,8 @@ template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-            const BytesLike& v, 
-            const bson_decode_options& options = bson_decode_options())
+    const BytesLike& v, 
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -188,8 +188,8 @@ template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-            const BytesLike& v, 
-            const bson_decode_options& options = bson_decode_options())
+    const BytesLike& v, 
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -201,14 +201,14 @@ try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::decode_traits<T>::try_decode(aset, cursor);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-            std::istream& is, 
-            const bson_decode_options& options = bson_decode_options())
+    std::istream& is, 
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -232,8 +232,8 @@ try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 template <typename T,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-            std::istream& is, 
-            const bson_decode_options& options = bson_decode_options())
+    std::istream& is, 
+    const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -245,7 +245,7 @@ try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::decode_traits<T>::try_decode(aset, cursor);
 }
 
 template <typename T, typename... Args>

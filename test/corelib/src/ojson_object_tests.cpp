@@ -348,14 +348,14 @@ TEST_CASE("cust_json.merge test with order_preserving_policy and statefule alloc
 {
     MyScopedAllocator<char> alloc(1);
 
-    cust_json doc = cust_json::parse(combine_allocators(alloc), R"(
+    cust_json doc = cust_json::parse(make_alloc_set(alloc), R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const cust_json source = cust_json::parse(combine_allocators(alloc), R"(
+    const cust_json source = cust_json::parse(make_alloc_set(alloc), R"(
     {
         "a" : 2,
         "c" : 3,
@@ -367,7 +367,7 @@ TEST_CASE("cust_json.merge test with order_preserving_policy and statefule alloc
 
     SECTION("merge doc with source")
     {
-        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(make_alloc_set(alloc), R"(
         {
             "a" : 1,
             "b" : 2,
@@ -382,7 +382,7 @@ TEST_CASE("cust_json.merge test with order_preserving_policy and statefule alloc
 
     SECTION("merge doc")
     {
-        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(make_alloc_set(alloc), R"(
 {"a":1,"b":2,"c":3,"d":4,"e":6}
         )");
         doc.merge(doc.object_range().begin()+1,source);
@@ -478,14 +478,14 @@ TEST_CASE("cust_json merge_or_update test")
 {
     MyScopedAllocator<char> alloc(1);
 
-    cust_json doc = cust_json::parse(combine_allocators(alloc), R"(
+    cust_json doc = cust_json::parse(make_alloc_set(alloc), R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const cust_json source = cust_json::parse(combine_allocators(alloc), R"(
+    const cust_json source = cust_json::parse(make_alloc_set(alloc), R"(
     {
         "a" : 2,
         "c" : 3
@@ -494,7 +494,7 @@ TEST_CASE("cust_json merge_or_update test")
 
     SECTION("merge_or_update source into doc")
     {
-        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(make_alloc_set(alloc), R"(
         {
             "a" : 2,
             "b" : 2,
@@ -507,7 +507,7 @@ TEST_CASE("cust_json merge_or_update test")
 
     SECTION("merge_or_update source into doc at pos 1")
     {
-        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(make_alloc_set(alloc), R"(
         {
             "a" : 2,
             "b" : 2,

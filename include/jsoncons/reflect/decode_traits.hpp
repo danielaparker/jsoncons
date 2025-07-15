@@ -45,14 +45,14 @@ struct decode_traits
     using result_type = read_result<value_type>;
     
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&,
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset,
         basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         
         std::size_t line = cursor.line(); 
         std::size_t column = cursor.column();
-        using json_type = basic_json<CharT>;
+        using json_type = basic_json<CharT,sorted_policy,TempAlloc>;
         auto j = try_to_json<json_type>(cursor, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
@@ -74,7 +74,7 @@ struct decode_traits<T,
     using result_type = read_result<value_type>;
     
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         

@@ -1390,7 +1390,7 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         encode_json(val, s, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1), s);
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1), s);
         CHECK(val2 == val);
     }
 
@@ -1398,7 +1398,7 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         encode_json(val, s, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        s, json_options());
         CHECK(val2 == val);
     }
@@ -1408,7 +1408,7 @@ TEST_CASE("hiking_reputation")
         std::string s;
         auto options = json_options{};
         encode_json(val, s, options, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        s, options);
         CHECK(val2 == val);
     }
@@ -1442,7 +1442,7 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         encode_json_pretty(val, os);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        os, json_options());
         CHECK(val2 == val);
     }
@@ -1451,7 +1451,7 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         encode_json_pretty(val, os);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        os, json_options());
         CHECK(val2 == val);
     }
@@ -1461,7 +1461,7 @@ TEST_CASE("hiking_reputation")
         std::stringstream os;
         auto options = json_options{};
         encode_json_pretty(val, os, options);
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_only(alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        os, options);
         CHECK(val2 == val);
     }

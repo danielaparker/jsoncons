@@ -205,7 +205,7 @@ TEST_CASE("encode decode bson source with temp_allocator")
             0x00};
 
     MyScopedAllocator<char> temp_alloc(2);
-    auto aset = temp_allocator_only(temp_alloc);    
+    auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);    
 
     SECTION("from bytes")
     {

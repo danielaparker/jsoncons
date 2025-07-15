@@ -221,7 +221,7 @@ TEST_CASE("encode_ubjson allocator_set overloads")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto aset = temp_allocator_only(temp_alloc);
+    auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);
 
     SECTION("json, stream")
     {

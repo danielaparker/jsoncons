@@ -174,14 +174,14 @@ namespace jsonpath {
         evaluator_type evaluator;
         auto expr = evaluator.compile(*resources, path);
 
-        return jsonpath_expression<Json>(jsoncons::combine_allocators(), 
+        return jsonpath_expression<Json>(jsoncons::make_alloc_set(), 
             std::move(resources), std::move(const_expr), std::move(expr));
     }
 
     template <typename Json>
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, std::error_code& ec)
     {
-        return make_expression<Json>(jsoncons::combine_allocators(), expr, custom_functions<Json>(), ec);
+        return make_expression<Json>(jsoncons::make_alloc_set(), expr, custom_functions<Json>(), ec);
     }
 
     template <typename Json,typename TempAlloc >

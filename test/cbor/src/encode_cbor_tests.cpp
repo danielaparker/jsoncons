@@ -195,7 +195,7 @@ TEST_CASE("encode_cbor allocator_set")
     MyScopedAllocator<char> result_alloc(1);
     MyScopedAllocator<char> temp_alloc(2);
 
-    auto aset = combine_allocators(result_alloc, temp_alloc);
+    auto aset = make_alloc_set(result_alloc, temp_alloc);
 
     SECTION("json, stream")
     {
@@ -224,7 +224,7 @@ TEST_CASE("encode_cbor allocator_set for temp only")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto aset = temp_allocator_only(temp_alloc);
+    auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);
 
     SECTION("json, stream")
     {

@@ -61,7 +61,7 @@ TEST_CASE("jsonpath stateful allocator test")
         cust_json j = decoder.get_result();
 
         jsoncons::string_view p{"$..book[?(@.category == 'fiction')].title"};
-        auto expr = jsoncons::jsonpath::make_expression<cust_json>(combine_allocators(myAlloc), p);  
+        auto expr = jsoncons::jsonpath::make_expression<cust_json>(make_alloc_set(myAlloc), p);  
         auto result = expr.evaluate(j);
 
         CHECK(2 == result.size());
@@ -80,7 +80,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
         cust_json j = decoder.get_result();
 
-        auto result = jsoncons::jsonpath::json_query(combine_allocators(myAlloc), 
+        auto result = jsoncons::jsonpath::json_query(make_alloc_set(myAlloc), 
             j,"$..book[?(@.category == 'fiction')].title");
 
         CHECK(2 == result.size());
@@ -99,7 +99,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
         cust_json j = decoder.get_result();
 
-        jsonpath::json_query(combine_allocators(myAlloc), 
+        jsonpath::json_query(make_alloc_set(myAlloc), 
             j, "$..book[?(@.title == 'Sword of Honour')].title", 
             [](const jsoncons::string_view&, const cust_json& title) 
             {
@@ -119,11 +119,11 @@ TEST_CASE("jsonpath stateful allocator test")
 
         cust_json j = decoder.get_result();
 
-        auto res = jsonpath::json_query(combine_allocators(myAlloc), j, "$..book[?(@.price==12.99)].price");
+        auto res = jsonpath::json_query(make_alloc_set(myAlloc), j, "$..book[?(@.price==12.99)].price");
 
         //std::cout << "res:\n" << pretty_print(res) << "\n\n";
 
-        jsonpath::json_replace(combine_allocators(myAlloc),
+        jsonpath::json_replace(make_alloc_set(myAlloc),
             j,"$..book[?(@.price==12.99)].price", 30.9);
 
         //std::cout << "j:\n" << pretty_print(j) << "\n\n"; 
@@ -144,7 +144,7 @@ TEST_CASE("jsonpath stateful allocator test")
         cust_json j = decoder.get_result();
 
         // make a discount on all books
-        jsonpath::json_replace(combine_allocators(myAlloc),
+        jsonpath::json_replace(make_alloc_set(myAlloc),
             j, "$.store.book[*].price",
             [](const jsoncons::string_view&, cust_json& price) 
             {
