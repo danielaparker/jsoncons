@@ -831,13 +831,17 @@ read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename Json, typename Alloc, typename TempAlloc>
-Json to_json_container(const allocator_set<Alloc,TempAlloc>& aset, 
-    basic_staj_cursor<typename Json::char_type>& cursor,
-    std::error_code& ec)
+read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset, 
+    basic_staj_cursor<typename Json::char_type>& cursor)
 {
+    using result_type = read_result<Json>;
+    using json_ptr_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<Json*>;
+
+    std::error_code ec;
+
     auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
         Json(json_object_arg, aset.get_allocator()) : Json(json_array_arg, aset.get_allocator());
-    std::vector<Json*> stack;
+    std::vector<Json*,json_ptr_allocator_type> stack(aset.get_temp_allocator());
     stack.push_back(std::addressof(cont));
     std::basic_string<typename Json::char_type> key;
     if (cursor.current().event_type() == staj_event_type::begin_object)
@@ -850,7 +854,7 @@ begin_object:
     cursor.next(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return Json{};
+        return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
     }
     while (!cursor.done() && !stack.empty())
     {
@@ -870,36 +874,68 @@ begin_object:
             }
             case staj_event_type::key:
                 key = cursor.current().template get<std::basic_string<typename Json::char_type>>(ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::string_value:
                 stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::byte_string_value:
                 stack.back()->try_emplace(key, byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::null_value:
                 stack.back()->try_emplace(key, null_arg);
                 break;
             case staj_event_type::bool_value:
                 stack.back()->try_emplace(key, cursor.current().template get<bool>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::int64_value:
                 stack.back()->try_emplace(key, cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::uint64_value:
                 stack.back()->try_emplace(key, cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::half_value:
                 stack.back()->try_emplace(key, half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::double_value:
                 stack.back()->try_emplace(key, cursor.current().template get<double>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::end_object:
                 stack.pop_back();
                 if (stack.empty())
                 {
-                    return cont;
+                    return result_type(std::move(cont));
                 }
                 if (stack.back()->type() == json_type::object_value)
                 {
@@ -908,26 +944,21 @@ begin_object:
                 goto begin_array;
                 break;
             default:
-                ec = conv_errc::conversion_failed; 
-                return Json{};
-        }
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            return Json{};
+                return result_type(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return Json{};
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
     }
-    return cont;
+    return result_type(std::move(cont));
 
 begin_array:    
     cursor.next(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return Json{};
+        return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
     }
     while (!cursor.done() && !stack.empty())
     {
@@ -947,27 +978,55 @@ begin_array:
             }
             case staj_event_type::string_value:
                 stack.back()->emplace_back(cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::byte_string_value:
                 stack.back()->emplace_back(byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::null_value:
                 stack.back()->emplace_back(null_arg);
                 break;
             case staj_event_type::bool_value:
                 stack.back()->emplace_back(cursor.current().template get<bool>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::int64_value:
                 stack.back()->emplace_back(cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::uint64_value:
                 stack.back()->emplace_back(cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::half_value:
                 stack.back()->emplace_back(half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::double_value:
                 stack.back()->emplace_back(cursor.current().template get<double>(ec), cursor.current().tag());
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
                 break;
             case staj_event_type::end_array:
                 stack.pop_back();
@@ -982,17 +1041,12 @@ begin_array:
                 goto begin_array;
                 break;
             default:
-                ec = conv_errc::conversion_failed; 
-                return Json{};
-        }
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            return Json{};
+                return result_type(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            return Json{};
+            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
     }
     
@@ -1014,7 +1068,7 @@ read_result<Json> try_to_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return to_json_single<Json>(aset, cursor);
     }
-    auto j = to_json_container<Json>(aset, cursor, ec);
+    auto j = to_json_container<Json>(aset, cursor);
     return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
 }
 
