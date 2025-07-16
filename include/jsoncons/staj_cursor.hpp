@@ -1072,6 +1072,12 @@ read_result<Json> try_to_json(const allocator_set<Alloc,TempAlloc>& aset,
     return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
 }
 
+template <typename Json>
+read_result<Json> try_to_json(basic_staj_cursor<typename Json::char_type>& cursor)
+{
+    return try_to_json<Json>(allocator_set<typename Json::allocator_type, std::allocator<char>>(), cursor);
+}
+
 using staj_event = basic_staj_event<char>;
 using wstaj_event = basic_staj_event<wchar_t>;
 

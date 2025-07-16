@@ -142,17 +142,18 @@ TEST_CASE("cursor try_to_json")
         std::string s = R"("foo")"; 
         jsoncons::json_string_cursor cursor(s);
         std::error_code ec;
-        auto j = jsoncons::try_to_json<jsoncons::json>(cursor, ec);
-        REQUIRE_FALSE(ec);
-        std::cout << j << "\n";
+        auto res = jsoncons::try_to_json<jsoncons::json>(cursor);
+        REQUIRE(res);
+        std::cout << res.value() << "\n";
     }
     SECTION("array")
     {
         std::string s = R"([false, 1, "foo"])";
         jsoncons::json_string_cursor cursor(s);
         std::error_code ec;
-        auto j = jsoncons::try_to_json<jsoncons::ojson>(cursor, ec);
-        REQUIRE_FALSE(ec);
+        auto res = jsoncons::try_to_json<jsoncons::ojson>(cursor);
+        REQUIRE(res);
+        jsoncons::ojson& j(res.value());
         REQUIRE(j.is_array());
         //std::cout << j << "\n";
     }
@@ -161,8 +162,9 @@ TEST_CASE("cursor try_to_json")
         std::string s = R"([[null, false, true], [1.5, 123456]])";
         jsoncons::json_string_cursor cursor(s);
         std::error_code ec;
-        auto j = jsoncons::try_to_json<jsoncons::json>(cursor, ec);
-        REQUIRE_FALSE(ec);
+        auto res = jsoncons::try_to_json<jsoncons::json>(cursor);
+        REQUIRE(res);
+        jsoncons::json& j(res.value());
         REQUIRE(j.is_array());
         //std::cout << j << "\n";
     }
@@ -177,10 +179,11 @@ TEST_CASE("cursor try_to_json")
     )";
         jsoncons::json_string_cursor cursor(s);
         std::error_code ec;
-        auto j = jsoncons::try_to_json<jsoncons::ojson>(cursor, ec);
-        REQUIRE_FALSE(ec);
+        auto res = jsoncons::try_to_json<jsoncons::ojson>(cursor);
+        REQUIRE(res);
+        jsoncons::ojson& j(res.value());
         REQUIRE(j.is_object());
-        std::cout << j << "\n";
+        std::cout << res.value() << "\n";
     }
     SECTION("object with nested containers")
     {
@@ -196,9 +199,10 @@ TEST_CASE("cursor try_to_json")
     )";
         jsoncons::json_string_cursor cursor(s);
         std::error_code ec;
-        auto j = jsoncons::try_to_json<jsoncons::json>(cursor, ec);
-        REQUIRE_FALSE(ec);
+        auto res = jsoncons::try_to_json<jsoncons::json>(cursor);
+        REQUIRE(res);
+        jsoncons::json& j(res.value());
         REQUIRE(j.is_object());
-        std::cout << j << "\n";
+        std::cout << res.value() << "\n";
     }
 }
