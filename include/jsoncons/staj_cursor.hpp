@@ -15,6 +15,7 @@
 #include <memory> // std::allocator
 #include <system_error>
 
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -773,40 +774,69 @@ public:
         return basic_staj_filter_view<CharT>(cursor, pred);
     }
 };
-template <typename Json>
-Json to_basic_json_single(basic_staj_cursor<typename Json::char_type>& cursor, 
-    std::error_code& ec)
+
+template <typename Json,typename Alloc,typename TempAlloc>
+read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset, 
+    basic_staj_cursor<typename Json::char_type>& cursor)
 {
+    using result_type = read_result<Json>;
+
+    std::error_code ec;
     switch (cursor.current().event_type())
     {
         case staj_event_type::string_value:
-            return Json{cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag()};
+        {
+            auto j = Json{cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag(), 
+                aset.get_allocator()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::byte_string_value:
-            return Json{byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag()};
+        {
+            auto j = Json{byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag(), aset.get_allocator()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::null_value:
-            return Json{null_arg};
+        {
+            auto j = Json{null_arg};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::bool_value:
-            return Json{cursor.current().template get<bool>(ec), cursor.current().tag()};
+        {
+            auto j = Json{cursor.current().template get<bool>(ec), cursor.current().tag()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::int64_value:
-            return Json{cursor.current().template get<std::int64_t>(ec), cursor.current().tag()};
+        {
+            auto j = Json{cursor.current().template get<std::int64_t>(ec), cursor.current().tag()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::uint64_value:
-            return Json{cursor.current().template get<std::uint64_t>(ec), cursor.current().tag()};
+        {
+            auto j = Json{cursor.current().template get<std::uint64_t>(ec), cursor.current().tag()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::half_value:
-            return Json{half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag()};
+        {
+            auto j = Json{half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         case staj_event_type::double_value:
-            return Json{cursor.current().template get<double>(ec), cursor.current().tag()};
+        {
+            auto j = Json{cursor.current().template get<double>(ec), cursor.current().tag()};
+            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
         default:
-            ec = conv_errc::conversion_failed; 
-            return Json{};
+            return result_type(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
     }
 }
 
-template <typename Json>
-Json to_basic_json_container(basic_staj_cursor<typename Json::char_type>& cursor,
+template <typename Json, typename Alloc, typename TempAlloc>
+Json to_json_container(const allocator_set<Alloc,TempAlloc>& aset, 
+    basic_staj_cursor<typename Json::char_type>& cursor,
     std::error_code& ec)
 {
     auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
-        Json(json_object_arg) : Json(json_array_arg);
+        Json(json_object_arg, aset.get_allocator()) : Json(json_array_arg, aset.get_allocator());
     std::vector<Json*> stack;
     stack.push_back(std::addressof(cont));
     std::basic_string<typename Json::char_type> key;
@@ -969,21 +999,23 @@ begin_array:
     JSONCONS_UNREACHABLE();
 }
 
-template <typename Json>
-read_result<Json> try_to_json(basic_staj_cursor<typename Json::char_type>& cursor)
+template <typename Json, typename Alloc, typename TempAlloc>
+read_result<Json> try_to_json(const allocator_set<Alloc,TempAlloc>& aset, 
+    basic_staj_cursor<typename Json::char_type>& cursor)
 {
+    using result_type = read_result<Json>;
+
     if (JSONCONS_UNLIKELY(is_end_container(cursor.current().event_type())))
     {
-        return read_result<Json>(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
     }
     std::error_code ec;
     if (!is_begin_container(cursor.current().event_type()))
     {
-        auto j = to_basic_json_single<Json>(cursor, ec);
-        return !ec ? read_result<Json>(std::move(j)) : read_result<Json>(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        return to_json_single<Json>(aset, cursor);
     }
-    auto j = to_basic_json_container<Json>(cursor, ec);
-    return !ec ? read_result<Json>(std::move(j)) : read_result<Json>(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+    auto j = to_json_container<Json>(aset, cursor, ec);
+    return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
 }
 
 using staj_event = basic_staj_event<char>;
