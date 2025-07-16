@@ -18,6 +18,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/read_result.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
@@ -969,19 +970,20 @@ begin_array:
 }
 
 template <typename Json>
-Json try_to_json(basic_staj_cursor<typename Json::char_type>& cursor, 
-    std::error_code& ec)
+read_result<Json> try_to_json(basic_staj_cursor<typename Json::char_type>& cursor)
 {
     if (JSONCONS_UNLIKELY(is_end_container(cursor.current().event_type())))
     {
-        ec = conv_errc::conversion_failed; 
-        return Json{};
+        return read_result<Json>(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
     }
+    std::error_code ec;
     if (!is_begin_container(cursor.current().event_type()))
     {
-        return to_basic_json_single<Json>(cursor, ec);
+        auto j = to_basic_json_single<Json>(cursor, ec);
+        return !ec ? read_result<Json>(std::move(j)) : read_result<Json>(jsoncons::unexpect, ec, cursor.line(), cursor.column());
     }
-    return to_basic_json_container<Json>(cursor, ec);
+    auto j = to_basic_json_container<Json>(cursor, ec);
+    return !ec ? read_result<Json>(std::move(j)) : read_result<Json>(jsoncons::unexpect, ec, cursor.line(), cursor.column());
 }
 
 using staj_event = basic_staj_event<char>;
