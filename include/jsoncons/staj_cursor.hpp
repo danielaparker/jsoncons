@@ -836,7 +836,8 @@ read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset,
     using result_type = read_result<Json>;
     using json_ptr_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<Json*>;
     using char_type = typename Json::char_type;
-    using key_type = std::basic_string<char_type,std::char_traits<char_type>,TempAlloc>;
+    using char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+    using key_type = std::basic_string<char_type,std::char_traits<char_type>, char_allocator_type>;
 
     std::error_code ec;
 
