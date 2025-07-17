@@ -2441,41 +2441,47 @@ namespace jsoncons {
         }
 
         template <typename T,
-                  class = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
+                  typename = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val)
             : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val))
         {
         }
 
         template <typename T,
-                  class = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
+                  typename = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val, const Allocator& alloc)
             : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val,alloc))
         {
         }
 
-        basic_json(const string_type& s)
-            : basic_json(s.data(), s.size(), semantic_tag::none, s.get_allocator())
+        template <typename SAlloc>
+        basic_json(const std::basic_string<char_type,std::char_traits<char_type>,SAlloc>& s, 
+            semantic_tag tag = semantic_tag::none)
+            : basic_json(s.data(), s.size(), tag, Allocator())
         {
         }
 
-        basic_json(const string_view_type& s)
-            : basic_json(s.data(), s.size(), semantic_tag::none, allocator_type())
+        template <typename SAlloc>
+        basic_json(const std::basic_string<char_type, std::char_traits<char_type>, SAlloc>& s, 
+            const allocator_type& alloc)
+            : basic_json(s.data(), s.size(), semantic_tag::none, alloc)
+        {
+        }
+
+        template <typename SAlloc>
+        basic_json(const std::basic_string<char_type, std::char_traits<char_type>, SAlloc>& s, 
+            semantic_tag tag, const allocator_type& alloc)
+            : basic_json(s.data(), s.size(), tag, alloc)
+        {
+        }
+
+        basic_json(const string_view_type& s, semantic_tag tag = semantic_tag::none)
+            : basic_json(s.data(), s.size(), tag, allocator_type())
         {
         }
 
         basic_json(const string_view_type& s, const allocator_type& alloc)
             : basic_json(s.data(), s.size(), semantic_tag::none, alloc)
-        {
-        }
-
-        basic_json(const string_type& s, semantic_tag tag)
-            : basic_json(s.data(), s.size(), tag, s.get_allocator())
-        {
-        }
-
-        basic_json(const string_type& s, semantic_tag tag, const allocator_type& alloc)
-            : basic_json(s.data(), s.size(), tag, alloc)
         {
         }
 
@@ -2495,16 +2501,8 @@ namespace jsoncons {
         }
 
         basic_json(const char_type* s, std::size_t length, semantic_tag tag = semantic_tag::none)
+            : basic_json(s, length, tag, Allocator())
         {
-            if (length <= short_string_storage::max_length)
-            {
-                construct<short_string_storage>(s, static_cast<uint8_t>(length), tag);
-            }
-            else
-            {
-                auto ptr = create_long_string(allocator_type{}, s, length);
-                construct<long_string_storage>(ptr, tag);
-            }
         }
 
         basic_json(const char_type* s, std::size_t length, semantic_tag tag, const Allocator& alloc)
@@ -2637,11 +2635,6 @@ namespace jsoncons {
         basic_json(bool val, semantic_tag tag, const Allocator&)
         {
             construct<bool_storage>(val,tag);
-        }
-
-        basic_json(const string_view_type& sv, semantic_tag tag)
-            : basic_json(sv.data(), sv.length(), tag, allocator_type())
-        {
         }
 
         basic_json(const string_view_type& sv, semantic_tag tag, const allocator_type& alloc)
