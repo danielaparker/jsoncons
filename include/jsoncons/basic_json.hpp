@@ -2287,7 +2287,7 @@ namespace jsoncons {
             construct<object_storage>(ptr, tag);
         }
 
-        explicit basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
+        basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
         {
             auto ptr = create_array(alloc);
             construct<array_storage>(ptr, semantic_tag::none);

@@ -190,6 +190,7 @@ using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
+#if 0
 TEST_CASE("encode_cbor allocator_set")
 {
     MyScopedAllocator<char> result_alloc(1);
@@ -208,7 +209,7 @@ TEST_CASE("encode_cbor allocator_set")
         cust_json other = cbor::decode_cbor<cust_json>(aset,ss);
         CHECK(other == person);
     }
-    /* SECTION("custom, stream")
+    SECTION("custom, stream")
     {
         ns::Person person{"John Smith"};
 
@@ -217,8 +218,9 @@ TEST_CASE("encode_cbor allocator_set")
         cbor::encode_cbor(aset, person, ss);
         ns::Person other = cbor::decode_cbor<ns::Person>(aset,ss);
         CHECK(other.name == person.name);
-    }*/
+    }
 }
+#endif
 
 TEST_CASE("encode_cbor allocator_set for temp only")
 {

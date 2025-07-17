@@ -137,6 +137,7 @@ add_executable(unit_tests
                corelib/src/staj_iterator_tests.cpp
                corelib/src/string_to_double_tests.cpp
                corelib/src/try_decode_json_tests.cpp
+               corelib/src/try_to_json_tests.cpp
                corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/byte_string_tests.cpp
                corelib/src/utility/extension_traits_tests.cpp

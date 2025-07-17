@@ -11,10 +11,74 @@
 #include <type_traits>
 #include <utility>
 
+template <typename T>
+class mock_stateful_allocator : protected std::allocator<T>
+{
+public:
+    using value_type = T;
+    using size_type = std::size_t;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using reference = T&;
+    using const_reference = const T&;
+    using difference_type = std::ptrdiff_t;
+    using propagate_on_container_copy_assignment = std::true_type;
+    using propagate_on_container_move_assignment = std::true_type;
+    using propagate_on_container_swap = std::true_type;
+    using is_always_equal = std::false_type;
+
+    std::size_t id_;
+
+    mock_stateful_allocator() = delete;
+
+    mock_stateful_allocator(int id) noexcept
+        : std::allocator<T>(), id_(id)
+    {
+    }
+    mock_stateful_allocator(const mock_stateful_allocator& other) noexcept
+        : std::allocator<T>(), id_(other.id_)
+    {
+    }
+    template< class U >
+    mock_stateful_allocator(const mock_stateful_allocator<U>& other) noexcept
+        : std::allocator<T>(), id_(other.id_)
+    {
+    }
+
+    T* allocate(size_type n) 
+    {
+        return std::allocator<T>::allocate(n);
+    }
+
+    void deallocate(T* ptr, size_type n) noexcept 
+    {
+        std::allocator<T>::deallocate(ptr, n);
+    }
+
+    template <typename U>
+    struct rebind
+    {
+        using other = mock_stateful_allocator<U>;
+    };
+
+    friend bool operator==(const mock_stateful_allocator& lhs, const mock_stateful_allocator& rhs) noexcept
+    {
+        return lhs.id_ == rhs.id_;
+    }
+
+    friend bool operator!=(const mock_stateful_allocator& lhs, const mock_stateful_allocator& rhs) noexcept
+    {
+        return lhs.id_ != rhs.id_;
+    }
+};
+
 // From http://coliru.stacked-crooked.com/a/cfd0c5c5021596ad
 
 template <typename T>
 class free_list_allocator {
+    template <typename U>
+    friend class free_list_allocator;
+
     union node {
         node* next;
         alignas(alignof(T)) unsigned char storage[sizeof(T)];
@@ -36,12 +100,25 @@ class free_list_allocator {
 public:
     using value_type = T;
     using size_type = std::size_t;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using reference = T&;
+    using const_reference = const T&;
+    using difference_type = std::ptrdiff_t;
+    using propagate_on_container_copy_assignment = std::true_type;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
+    using is_always_equal = std::false_type;
     
     free_list_allocator(int id) noexcept 
         : id_(id) {}
     free_list_allocator(const free_list_allocator& other) noexcept : id_(other.id_) {}
+    template <typename U>
+    free_list_allocator(free_list_allocator<U>&& other) noexcept : id_(other.id())
+    {
+        other.id_ = -1;                                                       
+        other.list = nullptr;
+    }
     template <typename U>
     free_list_allocator(const free_list_allocator<U>& other) noexcept : id_(other.id()) {}
     free_list_allocator(free_list_allocator&& other) noexcept : id_(other.id_), list(other.list) {
@@ -112,11 +189,6 @@ public:
     {
         using other = free_list_allocator<U>;
     };
-    using pointer = T*;
-    using const_pointer = const T*;
-    using reference = T&;
-    using const_reference = const T&;
-    using difference_type = std::ptrdiff_t;
 };
 
 #endif

@@ -48,21 +48,20 @@ struct decode_traits
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset,
         basic_staj_cursor<CharT>& cursor)
     {
-        std::error_code ec;
-        
         std::size_t line = cursor.line(); 
         std::size_t column = cursor.column();
 
         using json_type = basic_json<CharT,sorted_policy,TempAlloc>;
         auto j_result = try_to_json<json_type>(make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), cursor);
-        if (JSONCONS_UNLIKELY(!j_result))
-        {
-            return result_type(std::move(j_result.error()));
-        }
-        auto as_result = reflect::json_conv_traits<json_type, value_type>::try_as(*j_result);
+        //if (JSONCONS_UNLIKELY(!j_result))
+        //{
+        //    return result_type(std::move(j_result.error()));
+        //}
+        //auto as_result = reflect::json_conv_traits<json_type, value_type>::try_as(*j_result);
 
-        return as_result ? result_type(std::move(*as_result)) 
-            : result_type(unexpect, as_result.error().code(), as_result.error().message_arg(), line, column);
+        //return as_result ? result_type(std::move(*as_result)) 
+        //    : result_type(unexpect, as_result.error().code(), as_result.error().message_arg(), line, column);
+        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, line, column);
     }
 };
 
@@ -77,20 +76,12 @@ struct decode_traits<T,
     template <typename CharT,typename Alloc,typename TempAlloc>
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
-        std::error_code ec;
-        
-        std::size_t line = cursor.line(); 
-        std::size_t column = cursor.column();
-        using json_type = T;
-        auto j_result = try_to_json<json_type>(make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), cursor);
+        auto j_result = try_to_json<T>(aset, cursor);
         if (JSONCONS_UNLIKELY(!j_result))
         {
             return result_type(std::move(j_result.error()));
         }
-        auto as_result = reflect::json_conv_traits<json_type, value_type>::try_as(*j_result);
-
-        return as_result ? result_type(std::move(*as_result)) 
-            : result_type(unexpect, as_result.error().code(), as_result.error().message_arg(), line, column);
+        return j_result;
     }
 };
 

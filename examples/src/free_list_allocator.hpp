@@ -15,6 +15,9 @@
 
 template <typename T>
 class free_list_allocator {
+    template <typename U>   
+    friend class free_list_allocator;
+
     union node {
         node* next;
         alignas(alignof(T)) unsigned char storage[sizeof(T)];
