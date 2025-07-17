@@ -22,7 +22,7 @@ public:
     using reference = T&;
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
-    using propagate_on_container_copy_assignment = std::true_type;
+    using propagate_on_container_copy_assignment = std::false_type;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
     using is_always_equal = std::false_type;
@@ -105,7 +105,7 @@ public:
     using reference = T&;
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
-    using propagate_on_container_copy_assignment = std::true_type;
+    using propagate_on_container_copy_assignment = std::false_type;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
     using is_always_equal = std::false_type;
