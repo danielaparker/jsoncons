@@ -118,9 +118,9 @@ TEST_CASE("try_to_json with temp allocator")
         using my_json = jsoncons::basic_json<char, jsoncons::sorted_policy, my_allocator_type>;
         using vec_allocator_type = typename std::allocator_traits<my_allocator_type>:: template rebind_alloc<my_json>;
 
-        std::cout << "is convertible: " << std::is_convertible_v<my_allocator_type, my_allocator_type> << "\n";
-        std::cout << "uses allocator: " << std::uses_allocator_v<my_json, my_allocator_type> << "\n";
-        std::cout << "array uses allocator: " << std::uses_allocator_v<my_json::array::value_type, my_json::array::allocator_type> << "\n";
+        REQUIRE(std::is_convertible<my_allocator_type, my_allocator_type>::value);
+        REQUIRE(std::uses_allocator<my_json, my_allocator_type>::value);
+        REQUIRE(std::uses_allocator<my_json::array::value_type, my_json::array::allocator_type>::value);
 
         my_allocator_type alloc{1};
         std::vector<my_json, vec_allocator_type> v(alloc);
