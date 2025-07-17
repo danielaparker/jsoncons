@@ -53,15 +53,16 @@ struct decode_traits
 
         using json_type = basic_json<CharT,sorted_policy,TempAlloc>;
         auto j_result = try_to_json<json_type>(make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), cursor);
-        //if (JSONCONS_UNLIKELY(!j_result))
-        //{
-        //    return result_type(std::move(j_result.error()));
-        //}
-        //auto as_result = reflect::json_conv_traits<json_type, value_type>::try_as(*j_result);
-
-        //return as_result ? result_type(std::move(*as_result)) 
-        //    : result_type(unexpect, as_result.error().code(), as_result.error().message_arg(), line, column);
-        return result_type(jsoncons::unexpect, conv_errc::conversion_failed, line, column);
+        if (JSONCONS_UNLIKELY(!j_result))
+        {
+            return result_type(jsoncons::unexpect, j_result.error().code(), j_result.error().message_arg(), line, column);
+        }
+        auto c_result = (*j_result).try_as<T>();
+        if (JSONCONS_UNLIKELY(!c_result))
+        {
+            return result_type(jsoncons::unexpect, c_result.error().code(), c_result.error().message_arg(), line, column);
+        }
+        return result_type(std::move(*c_result));
     }
 };
 

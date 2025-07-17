@@ -797,8 +797,7 @@ read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset,
         }
         case staj_event_type::null_value:
         {
-            auto j = Json{null_arg};
-            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+            return result_type(Json{null_arg});
         }
         case staj_event_type::bool_value:
         {
@@ -1063,13 +1062,11 @@ read_result<Json> try_to_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return result_type(jsoncons::unexpect, conv_errc::conversion_failed, cursor.line(), cursor.column());
     }
-    std::error_code ec;
     if (!is_begin_container(cursor.current().event_type()))
     {
         return to_json_single<Json>(aset, cursor);
     }
-    auto j = to_json_container<Json>(aset, cursor);
-    return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+    return to_json_container<Json>(aset, cursor);
 }
 
 template <typename Json>
