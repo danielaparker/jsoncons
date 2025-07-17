@@ -57,7 +57,7 @@ struct decode_traits
         {
             return result_type(jsoncons::unexpect, j_result.error().code(), j_result.error().message_arg(), line, column);
         }
-        auto c_result = (*j_result).try_as<T>();
+        auto c_result = (*j_result).template try_as<T>();
         if (JSONCONS_UNLIKELY(!c_result))
         {
             return result_type(jsoncons::unexpect, c_result.error().code(), c_result.error().message_arg(), line, column);
