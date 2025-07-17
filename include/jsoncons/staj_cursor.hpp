@@ -835,6 +835,8 @@ read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using result_type = read_result<Json>;
     using json_ptr_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<Json*>;
+    using char_type = typename Json::char_type;
+    using key_type = std::basic_string<char_type,std::char_traits<char_type>,TempAlloc>;
 
     std::error_code ec;
 
@@ -842,7 +844,7 @@ read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset,
         Json(json_object_arg, aset.get_allocator()) : Json(json_array_arg, aset.get_allocator());
     std::vector<Json*,json_ptr_allocator_type> stack(aset.get_temp_allocator());
     stack.push_back(std::addressof(cont));
-    std::basic_string<typename Json::char_type> key;
+    key_type key(aset.get_temp_allocator());
     if (cursor.current().event_type() == staj_event_type::begin_object)
     {
         goto begin_object;
@@ -872,14 +874,14 @@ begin_object:
                 goto begin_array;
             }
             case staj_event_type::key:
-                key = cursor.current().template get<std::basic_string<typename Json::char_type>>(ec);
+                key = key_type(cursor.current().template get<basic_string_view<char_type>>(ec), aset.get_temp_allocator());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
             case staj_event_type::string_value:
-                stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<char_type>>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
@@ -976,7 +978,7 @@ begin_array:
                 goto begin_array;
             }
             case staj_event_type::string_value:
-                stack.back()->emplace_back(cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag());
+                stack.back()->emplace_back(cursor.current().template get<jsoncons::basic_string_view<char_type>>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
