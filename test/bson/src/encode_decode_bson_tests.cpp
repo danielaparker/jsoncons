@@ -180,11 +180,11 @@ TEST_CASE("bson encode array")
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
-#include <common/free_list_allocator.hpp>
+#include <common/mock_stateful_allocator.hpp>
 #include <scoped_allocator>
 
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("encode decode bson source with temp_allocator")

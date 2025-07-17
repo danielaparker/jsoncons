@@ -79,7 +79,7 @@ TEST_CASE("cursor try_to_json")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
-#include <common/free_list_allocator.hpp>
+#include <common/mock_stateful_allocator.hpp>
 #include <jsoncons/json_type.hpp>
 
 template <typename T>

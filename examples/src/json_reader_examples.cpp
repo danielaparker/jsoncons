@@ -7,13 +7,13 @@
 #include <map>
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include "free_list_allocator.hpp"
+#include "mock_stateful_allocator.hpp"
 #include <scoped_allocator>
 
 using namespace jsoncons;
 
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 
 class MyIterator
 {

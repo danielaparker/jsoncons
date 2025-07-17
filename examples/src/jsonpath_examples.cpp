@@ -6,7 +6,7 @@
 
 #include <jsoncons/json.hpp>
 
-#include "free_list_allocator.hpp"
+#include "mock_stateful_allocator.hpp"
 #include <scoped_allocator>
 #include <string_view>
 #include <fstream>
@@ -14,7 +14,7 @@
 #include <cassert>
 
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 
 // for brevity
 namespace jsonpath = jsoncons::jsonpath;

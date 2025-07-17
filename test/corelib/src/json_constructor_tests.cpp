@@ -208,19 +208,19 @@ TEST_CASE("json constructor with pmr allocator")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
-#include <common/free_list_allocator.hpp>
+#include <common/mock_stateful_allocator.hpp>
 
 TEST_CASE("json constructor with scoped_allocator")
 {
-    using cust_allocator = std::scoped_allocator_adaptor<free_list_allocator<char>>;
+    using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<char>>;
     using cust_json = basic_json<char,sorted_policy,cust_allocator>;
 
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);
 
-    REQUIRE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_swap::value);
-    REQUIRE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_move_assignment::value);
-    REQUIRE_FALSE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_copy_assignment::value);
+    REQUIRE(std::allocator_traits<mock_stateful_allocator<char>>::propagate_on_container_swap::value);
+    REQUIRE(std::allocator_traits<mock_stateful_allocator<char>>::propagate_on_container_move_assignment::value);
+    REQUIRE_FALSE(std::allocator_traits<mock_stateful_allocator<char>>::propagate_on_container_copy_assignment::value);
 
     const char* long_key1 = "Key too long for short string";
     const char* long_string1 = "String too long for short string";
