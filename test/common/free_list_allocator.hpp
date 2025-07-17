@@ -12,7 +12,7 @@
 #include <utility>
 
 template <typename T>
-class mock_stateful_allocator : protected std::allocator<T>
+class mock_stateful_allocator
 {
 public:
     using value_type = T;
@@ -27,32 +27,41 @@ public:
     using propagate_on_container_swap = std::true_type;
     using is_always_equal = std::false_type;
 
+    std::allocator<T> impl_;
     std::size_t id_;
 
     mock_stateful_allocator() = delete;
 
     mock_stateful_allocator(int id) noexcept
-        : std::allocator<T>(), id_(id)
+        : id_(id)
     {
     }
     mock_stateful_allocator(const mock_stateful_allocator& other) noexcept
-        : std::allocator<T>(), id_(other.id_)
+        : id_(other.id_)
     {
     }
     template< class U >
     mock_stateful_allocator(const mock_stateful_allocator<U>& other) noexcept
-        : std::allocator<T>(), id_(other.id_)
+        : id_(other.id_)
     {
+    }
+
+    mock_stateful_allocator& operator = (const mock_stateful_allocator& other) = delete;
+
+    mock_stateful_allocator& operator = (mock_stateful_allocator&& other) noexcept {
+        id_ = other.id_;
+        other.id_ = -1;
+        return *this;
     }
 
     T* allocate(size_type n) 
     {
-        return std::allocator<T>::allocate(n);
+        return impl_.allocate(n);
     }
 
     void deallocate(T* ptr, size_type n) noexcept 
     {
-        std::allocator<T>::deallocate(ptr, n);
+        impl_.deallocate(ptr, n);
     }
 
     template <typename U>
