@@ -2276,8 +2276,17 @@ namespace jsoncons {
         template <typename InputIt>
         basic_json(json_object_arg_t, 
                    InputIt first, InputIt last, 
-                   semantic_tag tag = semantic_tag::none,
-                   const Allocator& alloc = Allocator()) 
+                   semantic_tag tag = semantic_tag::none) 
+        {
+            auto ptr = create_object(Allocator(), first, last);
+            construct<object_storage>(ptr, tag);
+        }
+
+        template <typename InputIt>
+        basic_json(json_object_arg_t, 
+                   InputIt first, InputIt last, 
+                   semantic_tag tag,
+                   const Allocator& alloc) 
         {
             auto ptr = create_object(alloc, first, last);
             construct<object_storage>(ptr, tag);
@@ -2285,10 +2294,17 @@ namespace jsoncons {
 
         basic_json(json_object_arg_t, 
                    std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
-                   semantic_tag tag = semantic_tag::none, 
-                   const Allocator& alloc = Allocator()) 
+                   semantic_tag tag = semantic_tag::none) 
         {
-            //construct<object_storage>(object(init,alloc), tag);
+            auto ptr = create_object(Allocator(), init);
+            construct<object_storage>(ptr, tag);
+        }
+
+        basic_json(json_object_arg_t, 
+                   std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
+                   semantic_tag tag, 
+                   const Allocator& alloc) 
+        {
             auto ptr = create_object(alloc, init);
             construct<object_storage>(ptr, tag);
         }
@@ -2306,15 +2322,29 @@ namespace jsoncons {
         }
 
         basic_json(json_array_arg_t, std::size_t count, const basic_json& value,
-            semantic_tag tag = semantic_tag::none, const Allocator& alloc = Allocator()) 
+            semantic_tag tag = semantic_tag::none) 
+        {
+            auto ptr = create_array(Allocator(), count, value);
+            construct<array_storage>(ptr, tag);
+        }
+
+        basic_json(json_array_arg_t, std::size_t count, const basic_json& value,
+            semantic_tag tag, const Allocator& alloc) 
         {
             auto ptr = create_array(alloc, count, value);
             construct<array_storage>(ptr, tag);
         }
 
         basic_json(json_array_arg_t, 
+            semantic_tag tag) 
+        {
+            auto ptr = create_array(Allocator());
+            construct<array_storage>(ptr, tag);
+        }
+
+        basic_json(json_array_arg_t, 
             semantic_tag tag, 
-            const Allocator& alloc = Allocator()) 
+            const Allocator& alloc) 
         {
             auto ptr = create_array(alloc);
             construct<array_storage>(ptr, tag);
@@ -2323,8 +2353,17 @@ namespace jsoncons {
         template <typename InputIt>
         basic_json(json_array_arg_t, 
                    InputIt first, InputIt last, 
-                   semantic_tag tag = semantic_tag::none, 
-                   const Allocator& alloc = Allocator()) 
+                   semantic_tag tag = semantic_tag::none) 
+        {
+            auto ptr = create_array(Allocator(), first, last);
+            construct<array_storage>(ptr, tag);
+        }
+
+        template <typename InputIt>
+        basic_json(json_array_arg_t, 
+                   InputIt first, InputIt last, 
+                   semantic_tag tag, 
+                   const Allocator& alloc) 
         {
             auto ptr = create_array(alloc, first, last);
             construct<array_storage>(ptr, tag);
@@ -2332,8 +2371,16 @@ namespace jsoncons {
 
         basic_json(json_array_arg_t, 
                    std::initializer_list<basic_json> init, 
-                   semantic_tag tag = semantic_tag::none, 
-                   const Allocator& alloc = Allocator()) 
+                   semantic_tag tag = semantic_tag::none) 
+        {
+            auto ptr = create_array(Allocator(), init);
+            construct<array_storage>(ptr, tag);
+        }
+
+        basic_json(json_array_arg_t, 
+                   std::initializer_list<basic_json> init, 
+                   semantic_tag tag, 
+                   const Allocator& alloc) 
         {
             auto ptr = create_array(alloc, init);
             construct<array_storage>(ptr, tag);
@@ -2412,7 +2459,12 @@ namespace jsoncons {
         {
         }
 
-        basic_json(const string_view_type& s, const allocator_type& alloc = allocator_type())
+        basic_json(const string_view_type& s)
+            : basic_json(s.data(), s.size(), semantic_tag::none, allocator_type())
+        {
+        }
+
+        basic_json(const string_view_type& s, const allocator_type& alloc)
             : basic_json(s.data(), s.size(), semantic_tag::none, alloc)
         {
         }
@@ -2534,7 +2586,24 @@ namespace jsoncons {
         }
 
         template <typename IntegerType>
-        basic_json(IntegerType val, semantic_tag, const Allocator& alloc = Allocator(),
+        basic_json(IntegerType val, semantic_tag,
+                   typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
+        {
+            std::basic_string<CharT> s;
+            jsoncons::utility::from_integer(val, s);
+            if (s.length() <= short_string_storage::max_length)
+            {
+                construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
+            }
+            else
+            {
+                auto ptr = create_long_string(Allocator(), s.data(), s.length());
+                construct<long_string_storage>(ptr, semantic_tag::bigint);
+            }
+        }
+
+        template <typename IntegerType>
+        basic_json(IntegerType val, semantic_tag, const Allocator& alloc,
                    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
@@ -2570,7 +2639,12 @@ namespace jsoncons {
             construct<bool_storage>(val,tag);
         }
 
-        basic_json(const string_view_type& sv, semantic_tag tag, const allocator_type& alloc = allocator_type())
+        basic_json(const string_view_type& sv, semantic_tag tag)
+            : basic_json(sv.data(), sv.length(), tag, allocator_type())
+        {
+        }
+
+        basic_json(const string_view_type& sv, semantic_tag tag, const allocator_type& alloc)
             : basic_json(sv.data(), sv.length(), tag, alloc)
         {
         }
@@ -2578,11 +2652,22 @@ namespace jsoncons {
         template <typename Source>
         basic_json(byte_string_arg_t, const Source& source, 
                    semantic_tag tag = semantic_tag::none,
-                   const Allocator& alloc = Allocator(),
                    typename std::enable_if<ext_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
             
+            auto ptr = create_byte_string(Allocator(), bytes.data(), bytes.size(), 0);
+            construct<byte_string_storage>(ptr, tag);
+        }
+
+        template <typename Source>
+        basic_json(byte_string_arg_t, const Source& source, 
+                   semantic_tag tag,
+                   const Allocator& alloc,
+                   typename std::enable_if<ext_traits::is_byte_sequence<Source>::value,int>::type = 0)
+        {
+            auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
+
             auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), 0);
             construct<byte_string_storage>(ptr, tag);
         }
@@ -2590,13 +2675,36 @@ namespace jsoncons {
         template <typename Source>
         basic_json(byte_string_arg_t, const Source& source, 
                    uint64_t ext_tag,
-                   const Allocator& alloc = Allocator(),
+                   typename std::enable_if<ext_traits::is_byte_sequence<Source>::value,int>::type = 0)
+        {
+            auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
+
+            auto ptr = create_byte_string(Allocator(), bytes.data(), bytes.size(), ext_tag);
+            construct<byte_string_storage>(ptr, semantic_tag::ext);
+        }
+
+        template <typename Source>
+        basic_json(byte_string_arg_t, const Source& source, 
+                   uint64_t ext_tag,
+                   const Allocator& alloc,
                    typename std::enable_if<ext_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
 
             auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), ext_tag);
             construct<byte_string_storage>(ptr, semantic_tag::ext);
+        }
+
+        template <typename InputIterator>
+        basic_json(InputIterator first, InputIterator last)
+            : basic_json(json_array_arg,first,last,Allocator())
+        {
+        }
+
+        template <typename InputIterator>
+        basic_json(InputIterator first, InputIterator last, const Allocator& alloc)
+            : basic_json(json_array_arg,first,last,alloc)
+        {
         }
 
         ~basic_json() noexcept
@@ -4461,12 +4569,6 @@ namespace jsoncons {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type2>> encoder(s);
             dump(encoder);
             return s;
-        }
-
-        template <typename InputIterator>
-        basic_json(InputIterator first, InputIterator last, const Allocator& alloc = Allocator())
-            : basic_json(json_array_arg,first,last,alloc)
-        {
         }
 
         object_range_type object_range()
