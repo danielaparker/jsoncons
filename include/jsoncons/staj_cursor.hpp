@@ -875,12 +875,15 @@ begin_object:
                 goto begin_array;
             }
             case staj_event_type::key:
-                key = key_type(cursor.current().template get<basic_string_view<char_type>>(ec), aset.get_temp_allocator());
+            {
+                auto sv = cursor.current().template get<basic_string_view<char_type>>(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
+                key = key_type(sv.data(), sv.length(), aset.get_temp_allocator());
                 break;
+            }
             case staj_event_type::string_value:
                 stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<char_type>>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
