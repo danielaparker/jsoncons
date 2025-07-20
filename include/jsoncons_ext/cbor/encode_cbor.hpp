@@ -44,7 +44,7 @@ namespace cbor {
     {
         basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
         std::error_code ec;
-        reflect::encode_traits<T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -73,7 +73,7 @@ namespace cbor {
     {
         cbor_stream_encoder encoder(os, options);
         std::error_code ec;
-        reflect::encode_traits<T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -108,7 +108,7 @@ namespace cbor {
     {
         basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
         std::error_code ec;
-        reflect::encode_traits<T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));
@@ -139,7 +139,7 @@ namespace cbor {
     {
         basic_cbor_encoder<binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
         std::error_code ec;
-        reflect::encode_traits<T>::try_encode(val, encoder, ec);
+        reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec));

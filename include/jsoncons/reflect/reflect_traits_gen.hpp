@@ -103,7 +103,7 @@ void try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_
     std::error_code& ec) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(val, encoder, ec); 
+    encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec); 
 } 
 
 template <typename CharT, typename T> 
@@ -113,7 +113,7 @@ void try_encode_optional_member(const basic_string_view<CharT>& key, const std::
     if (val) 
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
     }
 } 
 template <typename CharT, typename T> 
@@ -123,7 +123,7 @@ void try_encode_optional_member(const basic_string_view<CharT>& key, const std::
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
     }
 } 
 template <typename CharT, typename T> 
@@ -133,7 +133,7 @@ void try_encode_optional_member(const basic_string_view<CharT>& key, const jsonc
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(*val, encoder, ec); 
+        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
     }
 } 
 template <typename CharT, typename T> 
@@ -141,7 +141,7 @@ void try_encode_optional_member(const basic_string_view<CharT>& key, const T& va
     std::error_code& ec) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(val, encoder, ec); 
+    encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec); 
 } 
 
 template <typename T> 
@@ -456,8 +456,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -674,8 +674,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -808,8 +808,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -1012,8 +1012,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -1166,8 +1166,8 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -1351,8 +1351,8 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -1536,8 +1536,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
@@ -1742,8 +1742,8 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        template <typename CharT> \
-        static void try_encode(const value_type& val, \
+        template <typename CharT,typename Alloc,typename TempAlloc> \
+        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder, \
             std::error_code& ec) \
         { \
