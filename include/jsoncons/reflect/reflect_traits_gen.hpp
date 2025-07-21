@@ -428,7 +428,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_MEMBER_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
             value_type class_instance{}; \
@@ -643,7 +644,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             const char* class_name = # ClassName; \
             std::error_code ec; \
@@ -788,7 +790,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_GET,ClassName,,, __VA_ARGS__) \
@@ -989,7 +992,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             const char* class_name = # ClassName; \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
@@ -1110,7 +1114,8 @@ namespace reflect { \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             if (!is(ajson)) return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType); \
             auto rs = ajson.try_as_string_view(); \
@@ -1296,7 +1301,8 @@ namespace reflect { \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             auto rs = ajson.try_as_string_view(); \
             if (!rs) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, # EnumType);} \
@@ -1508,7 +1514,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_MEMBER_IS, ,GetPrefix,SetPrefix, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
             value_type class_instance{}; \
@@ -1711,7 +1718,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GETTER_SETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static result_type try_as(const Json& ajson) \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) \
         { \
             const char* class_name = # ClassName; \
             std::error_code ec; \
@@ -1823,7 +1831,8 @@ namespace reflect { \
             return false; \
         } \
 \
-        static result_type try_as(const Json& ajson) { \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(std::shared_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(std::shared_ptr<BaseClass>()); \
@@ -1845,7 +1854,8 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
             return false; \
         } \
-        static result_type try_as(const Json& ajson) { \
+        template <typename Alloc,typename TempAlloc> \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(std::unique_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(std::unique_ptr<BaseClass>()); \

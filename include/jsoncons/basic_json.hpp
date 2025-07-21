@@ -3435,7 +3435,7 @@ namespace jsoncons {
         typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,T>::type
         as() const
         {
-            auto r = reflect::json_conv_traits<basic_json,T>::try_as(*this);
+            auto r = reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
             if (!r)
             {
                 JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
@@ -3447,7 +3447,14 @@ namespace jsoncons {
         typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
         try_as() const
         {
-            return reflect::json_conv_traits<basic_json,T>::try_as(*this);
+            return reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
+        }
+
+        template <typename T, typename Alloc, typename TempAlloc>
+        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
+        try_as(const allocator_set<Alloc,TempAlloc>& aset) const
+        {
+            return reflect::json_conv_traits<basic_json,T>::try_as(aset, *this);
         }
 
         template <typename T>

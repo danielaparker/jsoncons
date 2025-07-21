@@ -6,6 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/decode_json.hpp>
 #include <jsoncons/encode_json.hpp>
 #include <sstream>
@@ -37,7 +38,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto j = jsoncons::json::parse(R"("foo")");
         REQUIRE(j.is_string());
     
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,double>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,double>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_double == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -47,7 +48,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto j = jsoncons::json::parse(R"("foo")");
         REQUIRE(j.is_string());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,int64_t>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,int64_t>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_integer == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -57,7 +58,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto j = jsoncons::json::parse(R"(100)");
         REQUIRE(j.is_number());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::string_view>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::string_view>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_string == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -78,7 +79,7 @@ TEST_CASE("json_conv_traits as std::vector<T> tests")
 
         auto j = jsoncons::json::parse(s);
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_vector == result.error().code());
     }
@@ -103,7 +104,7 @@ TEST_CASE("json_conv_traits as std::vector<T> tests")
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
         CHECK("ns::book: price" == result.error().message_arg());
@@ -120,7 +121,7 @@ TEST_CASE("json_conv_traits as std::map<string,T> tests")
 
         auto j = jsoncons::json::parse(s);
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_map == result.error().code());
     }
@@ -145,7 +146,7 @@ TEST_CASE("json_conv_traits as std::map<string,T> tests")
         REQUIRE(j.is_object());
         REQUIRE(2 == j.size());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
         CHECK("ns::book: price" == result.error().message_arg());
@@ -175,7 +176,7 @@ TEST_CASE("json_conv_traits as std::map<int,T> tests")
         REQUIRE(j.is_object());
         REQUIRE(2 == j.size());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<int,ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<int,ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
     }
     SECTION("invalid key")
@@ -199,7 +200,7 @@ TEST_CASE("json_conv_traits as std::map<int,T> tests")
         REQUIRE(j.is_object());
         REQUIRE(2 == j.size());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<int,ns::book>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<int,ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_integer == result.error().code());
     }
@@ -239,7 +240,7 @@ TEST_CASE("json_conv_traits as std::tuple tests")
 
         auto j = jsoncons::json::parse(str);
         REQUIRE(j.is_array());
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<qualifying_result>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<qualifying_result>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
     }
 
@@ -273,7 +274,7 @@ TEST_CASE("json_conv_traits as std::tuple tests")
 
         auto j = jsoncons::json::parse(str);
         REQUIRE(j.is_array());
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<qualifying_result>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<qualifying_result>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
     }
 }
@@ -284,7 +285,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
     {
         auto j = jsoncons::json::parse(R"("foo")");
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_pair == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -293,7 +294,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
     {
         auto j = jsoncons::json::parse(R"(["foo"])");
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_pair == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -303,7 +304,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
         auto j = jsoncons::json::parse(R"([10,"foo"])");
         REQUIRE(j.is_array());
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_integer == result.error().code());
         //std::cout << result.error() << "\n\n";
@@ -316,7 +317,7 @@ TEST_CASE("json_conv_traits as jsoncons::byte_string")
     {
         jsoncons::json j(jsoncons::byte_string_arg, std::string("Hello World"), jsoncons::semantic_tag::none);
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::byte_string>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
         CHECK((jsoncons::byte_string{'H','e','l','l','o',' ','W','o','r','l','d'} == *result));
         //std::cout << result.error() << "\n\n";
@@ -325,7 +326,7 @@ TEST_CASE("json_conv_traits as jsoncons::byte_string")
     {
         jsoncons::json j(100);
 
-        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json, jsoncons::byte_string>::try_as(j);
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json, jsoncons::byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(!result);
         CHECK(jsoncons::conv_errc::not_byte_string == result.error().code());
         //std::cout << result.error() << "\n\n";

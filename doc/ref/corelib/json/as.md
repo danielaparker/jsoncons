@@ -2,13 +2,16 @@
 
 ```cpp
 template <typename T>
-T as() const;                                       (1)
+T as() const;                                                   (1)
 
 template <typename T>
-conversion_result<T> try_as() const;                (2) (since 1.4.0)
+conversion_result<T> try_as() const;                            (2) (since 1.4.0)
 
 template <typename T>
-T as(byte_string_arg_t, semantic_tag hint) const;   (3)
+conversion_result<T> try_as(const allocator_set& aset) const;   (3) (since 1.4.0)
+
+template <typename T>
+T as(byte_string_arg_t, semantic_tag hint) const;               (4)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../corelib/json_type_traits.md).
@@ -22,7 +25,7 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
     as<X<std::string,T>>()
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
-(2) Get as byte string with hint. This overload only participates in overload resolution if `uint8_t` is convertible to `T::value_type`.
+(4) Get as byte string with hint. This overload only participates in overload resolution if `uint8_t` is convertible to `T::value_type`.
 If the json type is a string, converts string according to its `semantic_tag`, or if there is none, uses `hint`.
 
 ### Examples
