@@ -208,11 +208,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_integer<T>();
         }
 
-        static Json to_json(T val)
-        {
-            return Json(val, semantic_tag::none);
-        }
-
         static Json to_json(T val, const allocator_type&)
         {
             return Json(val, semantic_tag::none);
@@ -265,10 +260,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             return result_type(static_cast<T>(*result));
         }
-        static Json to_json(T val)
-        {
-            return Json(val, semantic_tag::none);
-        }
         static Json to_json(T val, const allocator_type&)
         {
             return Json(val, semantic_tag::none);
@@ -285,10 +276,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return j.is_object();
         }
-        static Json to_json(const json_object& o)
-        {
-            return Json(o,semantic_tag::none);
-        }
         static Json to_json(const json_object& o, const allocator_type&)
         {
             return Json(o,semantic_tag::none);
@@ -304,10 +291,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static bool is(const Json& j) noexcept
         {
             return j.is_array();
-        }
-        static Json to_json(const json_array& a)
-        {
-            return Json(a, semantic_tag::none);
         }
         static Json to_json(const json_array& a, const allocator_type&)
         {
@@ -329,10 +312,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
             return result_type{j};
-        }
-        static Json to_json(const Json& val)
-        {
-            return val;
         }
         static Json to_json(const Json& val, const allocator_type&)
         {
@@ -359,10 +338,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             return result_type{jsoncons::null_type()};
         }
-        static Json to_json(jsoncons::null_type)
-        {
-            return Json(jsoncons::null_type{}, semantic_tag::none);
-        }
         static Json to_json(jsoncons::null_type, const allocator_type&)
         {
             return Json(jsoncons::null_type{}, semantic_tag::none);
@@ -383,10 +358,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
             return result_type{j.as_bool()};
-        }
-        static Json to_json(bool val)
-        {
-            return Json(val, semantic_tag::none);
         }
         static Json to_json(bool val, const allocator_type&)
         {
@@ -412,10 +383,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return result_type{j.as_bool()};
         }
-        static Json to_json(bool val)
-        {
-            return Json(val, semantic_tag::none);
-        }
         static Json to_json(bool val, const allocator_type&)
         {
             return Json(val, semantic_tag::none);
@@ -436,10 +403,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
             return result_type{j.as_bool()};
-        }
-        static Json to_json(bool val)
-        {
-            return Json(val, semantic_tag::none);
         }
         static Json to_json(bool val, const allocator_type&)
         {
@@ -465,11 +428,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
             return result_type{jsoncons::in_place, j.as_string()};
-        }
-
-        static Json to_json(const T& val)
-        {
-            return Json(val, semantic_tag::none);
         }
 
         static Json to_json(const T& val, const allocator_type& alloc)
@@ -502,14 +460,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(val));
         }
 
-        static Json to_json(const T& val)
-        {
-            std::basic_string<char_type> s;
-            unicode_traits::convert(val.data(), val.size(), s);
-
-            return Json(s, semantic_tag::none);
-        }
-
         static Json to_json(const T& val, const allocator_type& alloc)
         {
             std::basic_string<char_type> s;
@@ -537,11 +487,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             auto result = j.try_as_string_view();
             return result ? result_type(in_place, result.value().data(), result.value().size()) : result_type(unexpect, conv_errc::not_string); 
-        }
-
-        static Json to_json(const T& val)
-        {
-            return Json(val, semantic_tag::none);
         }
 
         static Json to_json(const T& val, const allocator_type& alloc)
@@ -656,22 +601,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         template <typename Container = T>
         static typename std::enable_if<!ext_traits::is_std_byte<typename Container::value_type>::value,Json>::type
-        to_json(const T& val)
-        {
-            Json j(json_array_arg);
-            auto first = std::begin(val);
-            auto last = std::end(val);
-            std::size_t size = std::distance(first,last);
-            j.reserve(size);
-            for (auto it = first; it != last; ++it)
-            {
-                j.push_back(*it);
-            }
-            return j;
-        }
-
-        template <typename Container = T>
-        static typename std::enable_if<!ext_traits::is_std_byte<typename Container::value_type>::value,Json>::type
         to_json(const T& val, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
@@ -683,14 +612,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 j.push_back(*it);
             }
-            return j;
-        }
-
-        template <typename Container = T>
-        static typename std::enable_if<ext_traits::is_std_byte<typename Container::value_type>::value,Json>::type
-        to_json(const T& val)
-        {
-            Json j(byte_string_arg, val);
             return j;
         }
 
@@ -766,20 +687,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        static Json to_json(const T& val)
-        {
-            Json j(json_array_arg);
-            auto first = std::begin(val);
-            auto last = std::end(val);
-            std::size_t size = std::distance(first,last);
-            j.reserve(size);
-            for (auto it = first; it != last; ++it)
-            {
-                j.push_back(*it);
-            }
-            return j;
-        }
-
         static Json to_json(const T& val, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
@@ -853,20 +760,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        static Json to_json(const T& val)
-        {
-            Json j(json_array_arg);
-            auto first = std::begin(val);
-            auto last = std::end(val);
-            std::size_t size = std::distance(first,last);
-            j.reserve(size);
-            for (auto it = first; it != last; ++it)
-            {
-                j.push_back(*it);
-            }
-            return j;
-        }
-
         static Json to_json(const T& val, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
@@ -927,17 +820,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 buff[i] = std::move(*res);
             }
             return result_type(std::move(buff));
-        }
-
-        static Json to_json(const std::array<E, N>& val)
-        {
-            Json j(json_array_arg);
-            j.reserve(N);
-            for (auto it = val.begin(); it != val.end(); ++it)
-            {
-                j.push_back(*it);
-            }
-            return j;
         }
 
         static Json to_json(const std::array<E, N>& val, 
@@ -1002,12 +884,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(result));
         }
 
-        static Json to_json(const T& val)
-        {
-            Json j(json_object_arg, val.begin(), val.end());
-            return j;
-        }
-
         static Json to_json(const T& val, const allocator_type& alloc)
         {
             Json j(json_object_arg, val.begin(), val.end(), semantic_tag::none, alloc);
@@ -1067,28 +943,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(result));
         }
 
-        static Json to_json(const T& val) 
-        {
-            Json j(json_object_arg);
-            j.reserve(val.size());
-            for (const auto& item : val)
-            {
-                auto temp = json_conv_traits<Json,key_type>::to_json(item.first);
-                if (temp.is_string_view())
-                {
-                    auto sv = temp.as_string_view();
-                    j.try_emplace(typename Json::key_type(sv.data(), sv.length()), item.second);
-                }
-                else
-                {
-                    typename Json::key_type key;
-                    temp.dump(key);
-                    j.try_emplace(std::move(key), item.second);
-                }
-            }
-            return j;
-        }
-
         static Json to_json(const T& val, const allocator_type& alloc) 
         {
             Json j(json_object_arg, semantic_tag::none, alloc);
@@ -1146,7 +1000,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
             static void to_json(const Tuple& tuple, Json& j)
             {
-                j.push_back(json_conv_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
+                j.push_back(json_conv_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple), std::allocator<char>()));
                 next::to_json(tuple, j);
             }
         };
@@ -1196,14 +1050,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             return result_type(std::move(val));
         }
-         
-        static Json to_json(const std::tuple<E...>& val)
-        {
-            Json j(json_array_arg);
-            j.reserve(sizeof...(E));
-            helper::to_json(val, j);
-            return j;
-        }
 
         static Json to_json(const std::tuple<E...>& val,
                             const allocator_type& alloc)
@@ -1246,15 +1092,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             return result_type(std::make_pair<T1,T2>(std::move(*res1), std::move(*res2)));
         }
-        
-        static Json to_json(const std::pair<T1,T2>& val)
-        {
-            Json j(json_array_arg);
-            j.reserve(2);
-            j.push_back(val.first);
-            j.push_back(val.second);
-            return j;
-        }
 
         static Json to_json(const std::pair<T1, T2>& val, const allocator_type& alloc)
         {
@@ -1285,8 +1122,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_byte_string<typename T::allocator_type>();
         }
         
-        static Json to_json(const T& val, 
-                            const allocator_type& alloc)
+        static Json to_json(const T& val, const allocator_type& alloc)
         {
             return Json(byte_string_arg, val, semantic_tag::none, alloc);
         }
@@ -1321,8 +1157,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::make_shared<ValueType>(std::move(r.value())));
         }
 
-        static Json to_json(const std::shared_ptr<ValueType>& ptr, 
-            const allocator_type& alloc)
+        static Json to_json(const std::shared_ptr<ValueType>& ptr, const allocator_type& alloc)
         {
             if (ptr.get() != nullptr) 
             {
@@ -1365,8 +1200,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(jsoncons::make_unique<ValueType>(std::move(r.value())));
         }
 
-        static Json to_json(const std::unique_ptr<ValueType>& ptr,
-            const allocator_type& alloc)
+        static Json to_json(const std::unique_ptr<ValueType>& ptr, const allocator_type& alloc)
         {
             if (ptr.get() != nullptr) 
             {
@@ -1408,8 +1242,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(jsoncons::optional<T>(std::move(r.value())));
         }
         
-        static Json to_json(const jsoncons::optional<T>& val, 
-            const allocator_type& alloc)
+        static Json to_json(const jsoncons::optional<T>& val, const allocator_type& alloc)
         {
             return val.has_value() ? Json(*val, alloc) : Json::null();
         }
@@ -1501,13 +1334,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     return result_type(jsoncons::unexpect, conv_errc::not_bigint);
             }
         }
-        
-        static Json to_json(const basic_bigint<Allocator>& val)
-        {
-            std::basic_string<char_type> s;
-            val.write_string(s);
-            return Json(s,semantic_tag::bigint);
-        }
 
         static Json to_json(const basic_bigint<Allocator>& val, const allocator_type&)
         {
@@ -1564,20 +1390,6 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 return result_type(jsoncons::unexpect, conv_errc::not_array);
             }
         }
-        
-        static Json to_json(const std::valarray<T>& val)
-        {
-            Json j(json_array_arg);
-            auto first = std::begin(val);
-            auto last = std::end(val);
-            std::size_t size = std::distance(first,last);
-            j.reserve(size);
-            for (auto it = first; it != last; ++it)
-            {
-                j.push_back(*it);
-            }
-            return j;
-        } 
 
         static Json to_json(const std::valarray<T>& val, const allocator_type& alloc)
         {
@@ -1681,16 +1493,7 @@ namespace variant_detail
             return result_type(variant_detail::as_variant<0,Json,variant_type, VariantTypes...>(j)); 
         }
 
-        static Json to_json(const std::variant<VariantTypes...>& var)
-        {
-            Json j(json_array_arg);
-            variant_detail::variant_to_json_visitor<Json> visitor(j);
-            std::visit(visitor, var);
-            return j;
-        }
-
-        static Json to_json(const std::variant<VariantTypes...>& var,
-                            const allocator_type& alloc)
+        static Json to_json(const std::variant<VariantTypes...>& var, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
             variant_detail::variant_to_json_visitor<Json> visitor(j);
@@ -1723,7 +1526,7 @@ namespace variant_detail
             return from_json_(j);
         }
 
-        static Json to_json(const duration_type& val, const allocator_type& = allocator_type())
+        static Json to_json(const duration_type& val, const allocator_type&)
         {
             return to_json_(val);
         }
@@ -2009,7 +1812,7 @@ namespace variant_detail
             return result_type(nullptr);
         }
 
-        static Json to_json(const std::nullptr_t&, const allocator_type& = allocator_type())
+        static Json to_json(const std::nullptr_t&, const allocator_type&)
         {
             return Json::null();
         }
@@ -2105,8 +1908,7 @@ namespace variant_detail
             }
         }
 
-        static Json to_json(const std::bitset<N>& val, 
-                            const allocator_type& alloc)
+        static Json to_json(const std::bitset<N>& val, const allocator_type& alloc)
         {
             std::vector<uint8_t> bits;
 
