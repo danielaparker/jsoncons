@@ -1010,7 +1010,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(const T& val, const allocator_type& alloc)
         {
-            Json j(json_object_arg, val.begin(), val.end(), alloc);
+            Json j(json_object_arg, val.begin(), val.end(), semantic_tag::none, alloc);
             return j;
         }
     };
