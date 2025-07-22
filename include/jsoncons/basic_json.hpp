@@ -2443,7 +2443,7 @@ namespace jsoncons {
         template <typename T,
                   typename = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val, std::allocator<char>()))
         {
         }
 
@@ -2708,7 +2708,7 @@ namespace jsoncons {
         template <typename T>
         basic_json& operator=(const T& val)
         {
-            *this = reflect::json_conv_traits<basic_json,T>::to_json(val);
+            *this = reflect::json_conv_traits<basic_json,T>::to_json(val, std::allocator<char>());
             return *this;
         }
 
