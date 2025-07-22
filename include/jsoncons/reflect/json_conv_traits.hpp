@@ -36,6 +36,7 @@
 #include <jsoncons/value_converter.hpp>
 #include <jsoncons/conversion_result.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_uses_allocator.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
   #include <variant>
@@ -164,10 +165,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return result_type{j.as_cstring()};
         }
-        template <typename ... Args>
-        static Json to_json(const char_type* s, Args&&... args)
+
+        template <typename Alloc = std::allocator<char>>
+        static Json to_json(const char_type* s, const Alloc& alloc = Alloc())
         {
-            return Json(s, semantic_tag::none, std::forward<Args>(args)...);
+            return make_json_using_allocator<Json>(alloc, s, semantic_tag::none);
         }
     };
 
@@ -181,10 +183,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return j.is_string();
         }
-        template <typename ... Args>
-        static Json to_json(const char_type* s, Args&&... args)
+
+        template <typename Alloc = std::allocator<char>>
+        static Json to_json(const char_type* s, const Alloc& alloc = Alloc())
         {
-            return Json(s, semantic_tag::none, std::forward<Args>(args)...);
+            return make_json_using_allocator<Json>(alloc, s, semantic_tag::none);
         }
     };
 
@@ -496,7 +499,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template<typename Alloc,typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
-            auto s = j.as_string();
+            auto s = j.as_string_view();
             T val;
             unicode_traits::convert(s.data(), s.size(), val);
             return result_type(std::move(val));
