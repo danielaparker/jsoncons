@@ -242,7 +242,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(T val, const allocator_type& alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, val, semantic_tag::none);
         }
     };
 
@@ -477,7 +477,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(const T& val, const allocator_type& alloc)
         {
-            return Json(val, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, val, semantic_tag::none);
         }
     };
 
@@ -517,7 +517,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             std::basic_string<char_type> s;
             unicode_traits::convert(val.data(), val.size(), s);
-            return Json(s, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, s, semantic_tag::none);
         }
     };
 
@@ -549,7 +549,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(const T& val, const allocator_type& alloc)
         {
-            return Json(val, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, val, semantic_tag::none);
         }
     };
 
@@ -1013,8 +1013,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(const T& val, const allocator_type& alloc)
         {
-            Json j(json_object_arg, val.begin(), val.end(), alloc);
-            return j;
+            return make_json_using_allocator<Json>(json_object_arg, val.begin(), val.end(), semantic_tag::none);
         }
     };
 
@@ -1094,7 +1093,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static Json to_json(const T& val, const allocator_type& alloc) 
         {
-            Json j(json_object_arg, semantic_tag::none, alloc);
+            Json j = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none);
             j.reserve(val.size());
             for (const auto& item : val)
             {
@@ -1291,7 +1290,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static Json to_json(const T& val, 
                             const allocator_type& alloc = allocator_type())
         {
-            return Json(byte_string_arg, val, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, byte_string_arg, val, semantic_tag::none);
         }
     };
 
@@ -1414,7 +1413,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static Json to_json(const jsoncons::optional<T>& val, 
             const allocator_type& alloc = allocator_type())
         {
-            return val.has_value() ? Json(*val, alloc) : Json::null();
+            return val.has_value() ? make_json_using_allocator<Json>(alloc, *val, semantic_tag::none) : Json::null();
         }
     };
 
@@ -1439,7 +1438,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         
         static Json to_json(const byte_string_view& val, const allocator_type& alloc = allocator_type())
         {
-            return Json(byte_string_arg, val, semantic_tag::none, alloc);
+            return make_json_using_allocator<Json>(alloc, byte_string_arg, val, semantic_tag::none);
         }
     };
 
