@@ -2440,15 +2440,13 @@ namespace jsoncons {
             construct<object_storage>(ptr, tag);
         }
 
-        template <typename T,
-                  typename = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
+        template <typename T>
         basic_json(const T& val)
             : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val, std::allocator<char>()))
         {
         }
 
-        template <typename T,
-                  typename = typename std::enable_if<!ext_traits::is_basic_json<T>::value>::type>
+        template <typename T>
         basic_json(const T& val, const Allocator& alloc)
             : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(val,alloc))
         {
