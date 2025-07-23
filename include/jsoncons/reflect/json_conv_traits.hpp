@@ -537,7 +537,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         template <typename Container = T,typename Alloc, typename TempAlloc>
         static typename std::enable_if<!ext_traits::is_byte<typename Container::value_type>::value,result_type>::type
-        try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (!j.is_array())
             {
@@ -547,7 +547,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
             for (const auto& item : j.array_range())
             {
-                auto res = item.template try_as<value_type>();
+                auto res = item.template try_as<value_type>(aset);
                 if (JSONCONS_UNLIKELY(!res))
                 {
                     return result_type(jsoncons::unexpect, res.error().code(), res.error().message_arg());
@@ -562,7 +562,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         template <typename Container = T,typename Alloc, typename TempAlloc>
         static typename std::enable_if<ext_traits::is_byte<typename Container::value_type>::value,result_type>::type
-        try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             std::error_code ec;
             if (j.is_array())
@@ -571,7 +571,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
-                    auto res = item.template try_as<value_type>();
+                    auto res = item.template try_as<value_type>(aset);
                     if (JSONCONS_UNLIKELY(!res))
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
@@ -671,14 +671,14 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_array())
             {
                 T result;
                 for (const auto& item : j.array_range())
                 {
-                    auto res = item.template try_as<value_type>();
+                    auto res = item.template try_as<value_type>(aset);
                     if (JSONCONS_UNLIKELY(!res))
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
@@ -741,7 +741,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_array())
             {
@@ -751,7 +751,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 auto end = j.array_range().rend();
                 for (; it != end; ++it)
                 {
-                    auto res = (*it).template try_as<value_type>();
+                    auto res = (*it).template try_as<value_type>(aset);
                     if (JSONCONS_UNLIKELY(!res))
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_vector);
@@ -810,7 +810,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             std::array<E, N> buff;
             if (j.size() != N)
@@ -819,7 +819,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             for (std::size_t i = 0; i < N; i++)
             {
-                auto res = j[i].template try_as<E>();
+                auto res = j[i].template try_as<E>(aset);
                 if (JSONCONS_UNLIKELY(!res))
                 {
                     return result_type(jsoncons::unexpect, conv_errc::not_array);
@@ -871,7 +871,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (!j.is_object())
             {
@@ -880,7 +880,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             T result;
             for (const auto& item : j.object_range())
             {
-                auto res = item.value().template try_as<mapped_type>();
+                auto res = item.value().template try_as<mapped_type>(aset);
                 if (!res)
                 {
                     return result_type(jsoncons::unexpect, res.error().code(), res.error().message_arg());
@@ -993,22 +993,24 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 }
             }
 
-            static void try_as(Tuple& tuple, const Json& j, std::error_code& ec)
+            template <typename Alloc,typename TempAlloc>
+            static void try_as(Tuple& tuple, const allocator_set<Alloc,TempAlloc>& aset, const Json& j, std::error_code& ec)
             {
-                auto res = j[Size-Pos].template try_as<element_type>();
+                auto res = j[Size-Pos].template try_as<element_type>(aset);
                 if (!res)
                 {
                     ec = res.error().code();
                     return;
                 }
                 std::get<Size-Pos>(tuple) = *res;
-                next::try_as(tuple, j, ec);
+                next::try_as(tuple, aset, j, ec);
             }
 
-            static void to_json(const Tuple& tuple, Json& j)
+            template <typename Alloc>
+            static void to_json(const Tuple& tuple, Json& j, const Alloc& alloc)
             {
-                j.push_back(json_conv_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple), std::allocator<char>()));
-                next::to_json(tuple, j);
+                j.push_back(json_conv_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple), alloc));
+                next::to_json(tuple, j, alloc);
             }
         };
 
@@ -1020,11 +1022,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 return true;
             }
 
-            static void try_as(Tuple&, const Json&, std::error_code&)
+            template <typename Alloc, typename TempAlloc>
+            static void try_as(Tuple&, const allocator_set<Alloc,TempAlloc>&, const Json&, std::error_code&)
             {
             }
 
-            static void to_json(const Tuple&, Json&)
+            template <typename Alloc>
+            static void to_json(const Tuple&, Json&, const Alloc&)
             {
             }
         };
@@ -1045,11 +1049,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             std::error_code ec;
             std::tuple<E...> val;
-            helper::try_as(val, j, ec);
+            helper::try_as(val, aset, j, ec);
             if (ec)
             {
                 return result_type(unexpect, ec);
@@ -1062,7 +1066,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             Json j = make_json_using_allocator<Json>(alloc, json_array_arg, semantic_tag::none);
             j.reserve(sizeof...(E));
-            helper::to_json(val, j);
+            helper::to_json(val, j, alloc);
             return j;
         }
     };
@@ -1079,18 +1083,18 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (!j.is_array() || j.size() != 2)
             {
                 return result_type(unexpect, conv_errc::not_pair);
             }
-            auto res1 = j[0].template try_as<T1>();
+            auto res1 = j[0].template try_as<T1>(aset);
             if (!res1)
             {
                 return result_type(unexpect, res1.error().code());
             }
-            auto res2 = j[1].template try_as<T2>();
+            auto res2 = j[1].template try_as<T2>(aset);
             if (!res2)
             {
                 return result_type(unexpect, res2.error().code());
@@ -1148,13 +1152,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j) 
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
         {
             if (j.is_null())
             {
                 return result_type(std::shared_ptr<ValueType>(nullptr));
             }
-            auto r = j.template try_as<ValueType>();
+            auto r = j.template try_as<ValueType>(aset);
             if (!r)
             {
                 return result_type(r.error());
@@ -1190,13 +1194,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j) 
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
         {
             if (j.is_null())
             {
                 return result_type(std::unique_ptr<ValueType>(nullptr));
             }
-            auto r = j.template try_as<ValueType>();
+            auto r = j.template try_as<ValueType>(aset);
             if (!r)
             {
                 return result_type(r.error());
@@ -1231,13 +1235,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         { 
             if (j.is_null())
             {
                 return result_type(jsoncons::optional<T>());
             }
-            auto r = j.template try_as<T>();
+            auto r = j.template try_as<T>(aset);
             if (!r)
             {
                 return result_type(r.error());
@@ -1300,7 +1304,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             switch (j.type())
             {
@@ -1319,17 +1323,17 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 case json_type::half_value:
                 case json_type::double_value:
                 {
-                    auto res = j.template try_as<int64_t>();
+                    auto res = j.template try_as<int64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 case json_type::int64_value:
                 {
-                    auto res = j.template try_as<int64_t>();
+                    auto res = j.template try_as<int64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 case json_type::uint64_value:
                 {
-                    auto res = j.template try_as<uint64_t>();
+                    auto res = j.template try_as<uint64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
                 default:
@@ -1371,14 +1375,14 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_array())
             {
                 std::valarray<T> v(j.size());
                 for (std::size_t i = 0; i < j.size(); ++i)
                 {
-                    auto res = j[i].template try_as<T>();
+                    auto res = j[i].template try_as<T>(aset);
                     if (JSONCONS_UNLIKELY(!res))
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_array);

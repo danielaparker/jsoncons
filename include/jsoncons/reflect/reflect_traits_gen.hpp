@@ -416,7 +416,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -443,9 +442,10 @@ namespace reflect { \
             } \
             return result_type(std::move(class_instance)); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(ToJson, ,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -632,7 +632,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -662,9 +661,10 @@ namespace reflect { \
             } \
             return result_type(std::move(class_instance)); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(ToJson,,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -778,7 +778,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -797,9 +796,10 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_GET,ClassName,,, __VA_ARGS__) \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_TO_JSON, ,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -980,7 +980,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -1002,9 +1001,10 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_GET,ClassName,,, __VA_ARGS__) \
             return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -1092,7 +1092,6 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = basic_string_view<char_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<value_type,string_view_type>; \
         \
         static bool is(const Json& ajson) noexcept \
@@ -1145,7 +1144,8 @@ namespace reflect { \
             } \
             return result_type((*it).first); \
         } \
-        static Json to_json(value_type class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(value_type class_instance, const Alloc& alloc) \
         { \
             static constexpr char_type empty_string[] = {0}; \
             auto first = reflect_type_properties<value_type>::values<char_type>(); \
@@ -1164,7 +1164,7 @@ namespace reflect { \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, # EnumType)); \
                 } \
             } \
-            return Json((*it).second,alloc); \
+            return make_json_using_allocator<Json>(alloc, (*it).second, semantic_tag::none); \
         } \
     }; \
     template <> struct encode_traits<EnumType> \
@@ -1280,7 +1280,6 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = basic_string_view<char_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<value_type,string_view_type>; \
         \
         static bool is(const Json& ajson) noexcept \
@@ -1331,7 +1330,8 @@ namespace reflect { \
             } \
             return (*it).first; \
         } \
-        static Json to_json(value_type class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(value_type class_instance, const Alloc& alloc) \
         { \
             static constexpr char_type empty_string[] = {0}; \
             auto first = reflect_type_properties<value_type>::values<char_type>(); \
@@ -1350,7 +1350,7 @@ namespace reflect { \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, # EnumType)); \
                 } \
             } \
-            return Json((*it).second,alloc); \
+            return make_json_using_allocator<Json>(alloc, (*it).second, semantic_tag::none); \
         } \
     }; \
     template <> struct encode_traits<EnumType> \
@@ -1502,7 +1502,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -1529,9 +1528,10 @@ namespace reflect { \
             } \
             return result_type(std::move(class_instance)); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(ToJson, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return ajson; \
         } \
@@ -1706,7 +1706,6 @@ namespace reflect { \
     { \
         using value_type = ClassName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -1736,9 +1735,10 @@ namespace reflect { \
             } \
             return result_type(std::move(class_instance)); \
         } \
-        static Json to_json(const value_type& class_instance, allocator_type alloc=allocator_type()) \
+        template <typename Alloc> \
+        static Json to_json(const value_type& class_instance, const Alloc& alloc) \
         { \
-            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            Json ajson = make_json_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(ToJson,,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -1795,27 +1795,27 @@ namespace reflect { \
 #define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, P2, P3, DerivedClass, Count)  if (ajson.template is<DerivedClass>()) return true;
 
 #define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) { \
-  auto result = ajson.template try_as<DerivedClass>(); \
+  auto result = ajson.template try_as<DerivedClass>(aset); \
   if (result) {return result_type(jsoncons::make_unique<DerivedClass>(std::move(*result)));} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) { \
-  auto result = ajson.template try_as<DerivedClass>(); \
+  auto result = ajson.template try_as<DerivedClass>(aset); \
   if (result) {return result_type(jsoncons::make_unique<DerivedClass>(std::move(*result)));} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) { \
-  auto result = ajson.template try_as<DerivedClass>(); \
+  auto result = ajson.template try_as<DerivedClass>(aset); \
   if (result) {return result_type(std::make_shared<DerivedClass>(std::move(*result)));} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) { \
-  auto result = ajson.template try_as<DerivedClass>(); \
+  auto result = ajson.template try_as<DerivedClass>(aset); \
   if (result) {return result_type(std::make_shared<DerivedClass>(std::move(*result)));} \
 } /**/
  
-#define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
-#define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
+#define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return make_json_using_allocator<Json>(alloc, *p);}
+#define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return make_json_using_allocator<Json>(alloc, *p);}
 
 #define JSONCONS_POLYMORPHIC_TRAITS(BaseClass, ...)  \
 namespace jsoncons { \
@@ -1824,7 +1824,6 @@ namespace reflect { \
     struct json_conv_traits<Json, std::shared_ptr<BaseClass>> { \
         using value_type = std::shared_ptr<BaseClass>; \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
@@ -1832,13 +1831,14 @@ namespace reflect { \
         } \
 \
         template <typename Alloc,typename TempAlloc> \
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) { \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(std::shared_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(std::shared_ptr<BaseClass>()); \
         } \
 \
-        static Json to_json(const std::shared_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
+        template <typename Alloc> \
+        static Json to_json(const std::shared_ptr<BaseClass>& ptr, const Alloc& alloc) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
@@ -1848,19 +1848,19 @@ namespace reflect { \
     struct json_conv_traits<Json, std::unique_ptr<BaseClass>> { \
         using value_type = std::unique_ptr<BaseClass>; \
         using result_type = conversion_result<value_type>; \
-        using allocator_type = typename Json::allocator_type; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
             return false; \
         } \
         template <typename Alloc,typename TempAlloc> \
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& ajson) { \
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(std::unique_ptr<BaseClass>()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(std::unique_ptr<BaseClass>()); \
         } \
-        static Json to_json(const std::unique_ptr<BaseClass>& ptr, allocator_type=allocator_type()) { \
+        template <typename Alloc> \
+        static Json to_json(const std::unique_ptr<BaseClass>& ptr, const Alloc& alloc) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
