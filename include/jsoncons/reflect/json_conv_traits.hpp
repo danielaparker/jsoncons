@@ -1461,7 +1461,7 @@ namespace variant_detail
       }
       else
       {
-          return as_variant<N+1, Json, Variant, U...>(j);
+          return as_variant<N+1, Json, Variant, U...>(aset, j);
       }
     }
 
