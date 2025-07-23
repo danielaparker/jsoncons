@@ -1438,14 +1438,14 @@ namespace variant_detail
       }
     }
 
-    template<int N,typename Json,typename Variant,typename Alloc,typename TempAlloc,VariantTypes,typename ... Args>
+    template<int N,typename Json,typename Variant,typename Alloc,typename TempAlloc,typename ... Args>
     typename std::enable_if<N == std::variant_size_v<Variant>, conversion_result<Variant>>::type
     as_variant(const allocator_set<Alloc,TempAlloc>&, const Json& /*j*/)
     {
         return conversion_result<Variant>(jsoncons::unexpect, conv_errc::not_variant);
     }
 
-    template<std::size_t N,typename Json,typename Variant,typename Alloc,typename TempAlloc,VariantTypes,typename T,typename ... U>
+    template<std::size_t N,typename Json,typename Variant,typename Alloc,typename TempAlloc,typename T,typename ... U>
     typename std::enable_if<N < std::variant_size_v<Variant>, conversion_result<Variant>>::type
     as_variant(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
     {
