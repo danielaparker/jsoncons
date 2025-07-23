@@ -1438,21 +1438,21 @@ namespace variant_detail
       }
     }
 
-    template<int N,typename Json,typename Variant,typename ... Args>
+    template<int N,typename Json,typename Variant,Alloc,TempAlloc,VariantTypes,typename ... Args>
     typename std::enable_if<N == std::variant_size_v<Variant>, conversion_result<Variant>>::type
-    as_variant(const Json& /*j*/)
+    as_variant(const allocator_set<Alloc,TempAlloc>&, const Json& /*j*/)
     {
         return conversion_result<Variant>(jsoncons::unexpect, conv_errc::not_variant);
     }
 
-    template<std::size_t N,typename Json,typename Variant,typename T,typename ... U>
+    template<std::size_t N,typename Json,typename Variant,Alloc,TempAlloc,VariantTypes,typename T,typename ... U>
     typename std::enable_if<N < std::variant_size_v<Variant>, conversion_result<Variant>>::type
-    as_variant(const Json& j)
+    as_variant(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
     {
         using result_type = conversion_result<Variant>;
         if (j.template is<T>())
       {
-          auto res = j.template try_as<T>();
+          auto res = j.template try_as<T>(aset);
           if (JSONCONS_UNLIKELY(!res))
           {
               return result_type(jsoncons::unexpect, conv_errc::not_variant);
@@ -1494,9 +1494,9 @@ namespace variant_detail
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            return result_type(variant_detail::as_variant<0,Json,variant_type, VariantTypes...>(j)); 
+            return result_type(variant_detail::as_variant<0,Json,variant_type,Alloc,TempAlloc,VariantTypes...>(aset, j)); 
         }
 
         template <typename Alloc>
@@ -1528,21 +1528,21 @@ namespace variant_detail
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            return from_json_(j);
+            return from_json_(aset, j);
         }
 
         template <typename Alloc>
-        static Json to_json(const duration_type& val, const Alloc&)
+        static Json to_json(const duration_type& val, const Alloc& alloc)
         {
-            return to_json_(val);
+            return to_json_(val, alloc);
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc, typename TempAlloc, typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, result_type>::type
-        from_json_(const Json& j)
+        from_json_(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_int64() || j.is_uint64() || j.is_double())
             {
@@ -1598,7 +1598,7 @@ namespace variant_detail
                     }
                     default:
                     {
-                        auto res = j.template try_as<Rep>();
+                        auto res = j.template try_as<Rep>(aset);
                         if (!res)
                         {
                             return result_type(unexpect, conv_errc::not_epoch);
@@ -1613,10 +1613,10 @@ namespace variant_detail
             }
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc, typename TempAlloc, typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value, result_type>::type
-        from_json_(const Json& j)
+        from_json_(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_int64() || j.is_uint64())
             {
@@ -1698,7 +1698,7 @@ namespace variant_detail
                     }
                     default:
                     {
-                        auto res = j.template try_as<Rep>();
+                        auto res = j.template try_as<Rep>(aset);
                         if (!res)
                         {
                             return result_type(unexpect, conv_errc::not_epoch);
@@ -1713,10 +1713,10 @@ namespace variant_detail
             }
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc, typename TempAlloc, typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value, result_type>::type
-        from_json_(const Json& j)
+        from_json_(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             if (j.is_int64() || j.is_uint64() || j.is_double())
             {
@@ -1750,7 +1750,7 @@ namespace variant_detail
             }
             else if (j.is_string())
             {
-                auto res = j.template try_as<Rep>();
+                auto res = j.template try_as<Rep>(aset);
                 if (!res)
                 {
                     return result_type(unexpect, conv_errc::not_epoch);
@@ -1773,28 +1773,28 @@ namespace variant_detail
             }
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
-        to_json_(const duration_type& val)
+        to_json_(const duration_type& val, const Alloc& alloc)
         {
-            return Json(val.count(), semantic_tag::epoch_second);
+            return make_json_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_second);
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value,Json>::type
-        to_json_(const duration_type& val)
+        to_json_(const duration_type& val, const Alloc& alloc)
         {
-            return Json(val.count(), semantic_tag::epoch_milli);
+            return make_json_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_milli);
         }
 
-        template <typename PeriodT=Period>
+        template <typename Alloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value,Json>::type
-        to_json_(const duration_type& val)
+        to_json_(const duration_type& val, const Alloc& alloc)
         {
-            return Json(val.count(), semantic_tag::epoch_nano);
+            return make_json_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_nano);
         }
     };
 
