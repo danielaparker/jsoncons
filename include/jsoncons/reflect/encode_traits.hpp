@@ -42,7 +42,7 @@ public:
         basic_json_visitor<CharT>& encoder,
         std::error_code& ec)
     {
-        auto j = json_conv_traits<basic_json<CharT,order_preserving_policy,TempAlloc>,T>::to_json(val, aset.get_temp_allocator());
+        auto j = json_conv_traits<basic_json<CharT,order_preserving_policy,TempAlloc>,T>::to_json(aset.get_temp_allocator(), val);
         j.dump(encoder, ec);
     }
 };
