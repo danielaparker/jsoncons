@@ -318,9 +318,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc>
-        static Json to_json(const Json& val, const Alloc&)
+        static Json to_json(const Json& val, const Alloc& alloc)
         {
-            return val;
+            return make_json_using_allocator<Json>(alloc, val);
         }
     };
 
