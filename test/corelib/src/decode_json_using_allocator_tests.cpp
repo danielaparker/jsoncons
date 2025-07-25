@@ -38,21 +38,17 @@ TEST_CASE("decode_json using allocator")
         //CHECK("1" == result[0].c_str());
     }
 
-    /*SECTION("convert_vector_test")
+    SECTION("convert_vector_test")
     {
         std::vector<cust_string, cust_allocator_type> v{aset.get_allocator()};
-        using element_type = std::vector<cust_string, cust_allocator_type>::value_type;
-
-        cust_allocator_type a = aset.get_allocator();
-        v.push_back(element_type(a));
 
         std::string str = R"(["1","2","3"])";
 
-        //auto result = jsoncons::try_decode_json<std::vector<cust_string_type,cust_allocator_type>>(aset, str);
-        //REQUIRE(result);
+        auto result = jsoncons::try_decode_json<std::vector<cust_string,cust_allocator_type>>(aset, str);
+        REQUIRE(result);
         //REQUIRE(3 == result.size());
         //CHECK("1" == result[0].c_str());
-    }*/
+    }
 }
 
 #endif

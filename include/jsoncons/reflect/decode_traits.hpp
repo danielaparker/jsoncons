@@ -209,7 +209,7 @@ struct decode_traits<std::pair<T1, T2>>
         {
             return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column()); 
         }
-        return result_type{std::make_pair(std::move(*r1), std::move(*r2))};
+        return result_type{make_obj_using_allocator<value_type>(aset.get_allocator(), std::move(*r1), std::move(*r2))};
     }
 };
 
@@ -230,7 +230,7 @@ struct decode_traits<T,
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
-        T v(aset.get_allocator());
+        T v(make_obj_using_allocator<T>(aset.get_allocator()));
 
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
