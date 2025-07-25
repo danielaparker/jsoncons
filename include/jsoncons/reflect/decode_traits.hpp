@@ -116,6 +116,8 @@ struct decode_traits<T,
 {
     using value_type = T;
     using result_type = read_result<value_type>;
+    using char_type = typename T::value_type;
+    using string_view_type = basic_string_view<char_type>;
 
     template <typename CharT,typename Alloc,typename TempAlloc>
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor,
@@ -123,14 +125,23 @@ struct decode_traits<T,
     {
         std::error_code ec;
 
-        T v = cursor.current().template get<value_type>(ec);
-        return ec ? result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()} : result_type{std::move(v)};
+        auto sv = cursor.current().template get<string_view_type>(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
+        }
+
+        return result_type{in_place, sv.data(), sv.size()};
     }
 
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor,
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, 
+        basic_staj_cursor<CharT>& cursor,
         typename std::enable_if<!std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
+        using temp_char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+        using buffer_type = std::basic_string<char_type,std::char_traits<char_type>,temp_char_allocator_type>; 
+
         std::error_code ec;
 
         auto val = cursor.current().template get<std::basic_string<CharT>>(ec);
@@ -138,12 +149,9 @@ struct decode_traits<T,
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        else
-        {
-            T s;
-            unicode_traits::convert(val.data(), val.size(), s);
-            return result_type{std::move(s)};
-        }
+        buffer_type buf(aset.get_temp_allocator());;
+        unicode_traits::convert(val.data(), val.size(), buf);
+        return result_type{in_place, buf.data(), buf.size()};
     }
 };
 
@@ -221,7 +229,7 @@ struct decode_traits<T,
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
-        T v;
+        T v(aset.get_allocator());
 
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -242,7 +250,8 @@ struct decode_traits<T,
                 return result_type(r.error()); 
             }
             v.push_back(std::move(*r));
-            //std::cout << "read next 10\n";
+            //v.push_back(/*element_type(aset.get_allocator())*/);
+            //v.emplace_back(1,'a');
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         }
