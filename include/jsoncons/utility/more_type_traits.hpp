@@ -27,6 +27,12 @@
 
 namespace jsoncons {
 namespace ext_traits {
+  
+    template <typename T>
+    struct is_std_pair : public std::false_type {};
+
+    template <typename S, typename T>
+    struct is_std_pair<std::pair<S, T> > : public std::true_type {};
 
     // is_char8
     template <typename CharT,typename Enable=void>

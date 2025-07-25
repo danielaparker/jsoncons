@@ -120,7 +120,8 @@ struct decode_traits<T,
     using string_view_type = basic_string_view<char_type>;
 
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor,
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, 
+        basic_staj_cursor<CharT>& cursor,
         typename std::enable_if<std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
         std::error_code ec;
@@ -131,7 +132,7 @@ struct decode_traits<T,
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
         }
 
-        return result_type{in_place, sv.data(), sv.size()};
+        return result_type{make_obj_using_allocator<T>(aset.get_allocator(), sv.data(), sv.size())};
     }
 
     template <typename CharT,typename Alloc,typename TempAlloc>

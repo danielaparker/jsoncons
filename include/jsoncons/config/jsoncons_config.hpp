@@ -59,13 +59,18 @@ namespace jsoncons {
 #  define JSONCONS_FALLTHROUGH
 #endif
         
+#include <jsoncons/detail/obj_uses_allocator.hpp>
+namespace jsoncons {
+using jsoncons::detail::make_obj_using_allocator;
+} // namespace jsoncons
+
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
 using jsoncons::detail::basic_string_view;
 using string_view = jsoncons::detail::string_view;
 using wstring_view = jsoncons::detail::wstring_view;
-}
+} // namespace jsoncons
 #else 
 #include <string_view>
 namespace jsoncons {
