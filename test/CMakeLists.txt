@@ -82,6 +82,7 @@ add_executable(unit_tests
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
+               corelib/src/decode_json_using_allocator_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
                corelib/src/json_array_tests.cpp
                corelib/src/json_as_tests.cpp

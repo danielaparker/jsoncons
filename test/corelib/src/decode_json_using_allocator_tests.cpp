@@ -38,7 +38,7 @@ TEST_CASE("decode_json using allocator")
         //CHECK("1" == result[0].c_str());
     }
 
-    SECTION("convert_vector_test")
+    SECTION("decode vector of string test")
     {
         std::vector<cust_string, cust_allocator_type> v{aset.get_allocator()};
 
@@ -46,8 +46,18 @@ TEST_CASE("decode_json using allocator")
 
         auto result = jsoncons::try_decode_json<std::vector<cust_string,cust_allocator_type>>(aset, str);
         REQUIRE(result);
-        //REQUIRE(3 == result.size());
+        REQUIRE(3 == result->size());
         //CHECK("1" == result[0].c_str());
+    }
+
+    SECTION("decode pair test")
+    {
+        std::string str = R"(["1",2])";
+
+        auto result = jsoncons::try_decode_json<std::pair<cust_string, int>>(aset, str);
+        REQUIRE(result);
+        CHECK(std::string("1") == result->first.c_str());
+        CHECK(2 == result->second);
     }
 }
 
