@@ -395,7 +395,8 @@ struct decode_traits<T,
     using result_type = read_result<value_type>;
 
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, 
+        basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -430,13 +431,30 @@ struct decode_traits<T,
             }
             case staj_event_type::begin_array:
             {
-                T v;
+                T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 if (cursor.current().size() > 0)
                 {
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                 }
-                typed_array_visitor<T> visitor(v);
-                cursor.read_to(visitor, ec);
+                cursor.next(ec);
+                while (cursor.current().event_type() != staj_event_type::end_array && !ec)
+                {
+                    auto r = decode_traits<element_type>::try_decode(aset, cursor);
+                    if (!r)
+                    {
+                        return result_type(r.error());
+                    }
+                    v.push_back(*r);
+                    //v[i] = std::move(*r);
+                    cursor.next(ec);
+                }
+                if (JSONCONS_UNLIKELY(ec)) 
+                {
+                    return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                }
+
+                //typed_array_visitor<T> visitor(v);
+                //cursor.read_to(visitor, ec);
                 return result_type{std::move(v)};
             }
             default:
@@ -465,11 +483,12 @@ struct decode_traits<T,
              ext_traits::is_typed_array<T>::value
 >::type>
 {
+    using element_type = typename T::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
     template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
+    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -482,13 +501,29 @@ struct decode_traits<T,
         {
             case staj_event_type::begin_array:
             {
-                T v;
+                T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 if (cursor.current().size() > 0)
                 {
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                 }
-                typed_array_visitor<T> visitor(v);
-                cursor.read_to(visitor, ec);
+                cursor.next(ec);
+                while (cursor.current().event_type() != staj_event_type::end_array && !ec)
+                {
+                    auto r = decode_traits<element_type>::try_decode(aset, cursor);
+                    if (!r)
+                    {
+                        return result_type(r.error());
+                    }
+                    v.push_back(*r);
+                    //v[i] = std::move(*r);
+                    cursor.next(ec);
+                }
+                if (JSONCONS_UNLIKELY(ec)) 
+                {
+                    return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                }
+                //typed_array_visitor<T> visitor(v);
+                //cursor.read_to(visitor, ec);
                 return result_type{std::move(v)};
             }
             default:

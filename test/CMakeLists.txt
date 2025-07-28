@@ -73,9 +73,9 @@ add_executable(unit_tests
                #cbor/src/cbor_event_visitor_tests.cpp
                #cbor/src/cbor_reader_tests.cpp
                #cbor/src/cbor_tests.cpp
-               #cbor/src/cbor_typed_array_tests.cpp
-               #cbor/src/decode_cbor_tests.cpp
-               #cbor/src/encode_cbor_tests.cpp
+               cbor/src/cbor_typed_array_tests.cpp
+               cbor/src/decode_cbor_tests.cpp
+               cbor/src/encode_cbor_tests.cpp
                #corelib/src/detail/optional_tests.cpp
                #corelib/src/detail/span_tests.cpp
                #corelib/src/detail/string_view_tests.cpp
