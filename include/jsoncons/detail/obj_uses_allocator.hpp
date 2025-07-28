@@ -29,8 +29,9 @@ template <typename T, typename Alloc>
 typename std::enable_if<ext_traits::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc)
 {
-    return std::pair<typename T::first_type,typename T::second_type>(make_obj_using_allocator<typename T::first_type>(alloc), 
-        make_obj_using_allocator<typename T::second_type>(alloc));
+    return std::pair<typename T::first_type,typename T::second_type>(
+        jsoncons::detail::make_obj_using_allocator<typename T::first_type>(alloc), 
+        jsoncons::detail::make_obj_using_allocator<typename T::second_type>(alloc));
 }
 
 template <typename T, typename Alloc, typename U, typename V>
@@ -38,8 +39,8 @@ typename std::enable_if<ext_traits::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, U&& u, V&& v)
 {
     return std::pair<typename T::first_type,typename T::second_type>(
-        make_obj_using_allocator<typename T::first_type>(alloc,std::forward<U>(u)), 
-        make_obj_using_allocator<typename T::second_type>(alloc,std::forward<V>(v)));
+        jsoncons::detail::make_obj_using_allocator<typename T::first_type>(alloc,std::forward<U>(u)), 
+        jsoncons::detail::make_obj_using_allocator<typename T::second_type>(alloc,std::forward<V>(v)));
 }
 
 template <typename T, typename Alloc, typename U, typename V>
@@ -47,8 +48,8 @@ typename std::enable_if<ext_traits::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, const std::pair<U,V>& pr)
 {
     return std::pair<typename T::first_type,typename T::second_type>(
-        make_obj_using_allocator<typename T::first_type>(alloc,pr.first), 
-        make_obj_using_allocator<typename T::second_type>(alloc,pr.second));
+        jsoncons::detail::make_obj_using_allocator<typename T::first_type>(alloc,pr.first), 
+        jsoncons::detail::make_obj_using_allocator<typename T::second_type>(alloc,pr.second));
 }
 
 template <typename T, typename Alloc, typename U, typename V>
@@ -56,8 +57,8 @@ typename std::enable_if<ext_traits::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, std::pair<U,V>&& pr)
 {
     return std::pair<typename T::first_type,typename T::second_type>(
-        make_obj_using_allocator<typename T::first_type>(alloc,std::move(pr.first)), 
-        make_obj_using_allocator<typename T::second_type>(alloc,std::move(pr.second)));
+        jsoncons::detail::make_obj_using_allocator<typename T::first_type>(alloc,std::move(pr.first)), 
+        jsoncons::detail::make_obj_using_allocator<typename T::second_type>(alloc,std::move(pr.second)));
 }
 
 } // namespace detail
