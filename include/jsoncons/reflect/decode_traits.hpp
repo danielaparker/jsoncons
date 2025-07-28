@@ -615,7 +615,7 @@ struct decode_traits<T,
         T val;
         if (cursor.current().event_type() != staj_event_type::begin_object)
         {
-            return result_type{read_error{conv_errc::not_map, cursor.line(), cursor.column()}}; 
+            return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; 
         }
         if (cursor.current().size() > 0)
         {
@@ -627,7 +627,7 @@ struct decode_traits<T,
         {
             if (cursor.current().event_type() != staj_event_type::key)
             {
-                return result_type{read_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
+                return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }
             auto s = cursor.current().template get<jsoncons::basic_string_view<CharT>>(ec);
             if (JSONCONS_UNLIKELY(ec))
@@ -638,7 +638,7 @@ struct decode_traits<T,
             auto r = jsoncons::utility::to_integer(s.data(), s.size(), n); 
             if (r.ec != std::errc())
             {
-                return result_type{read_error{json_errc::invalid_number, cursor.line(), cursor.column()}}; 
+                return result_type{jsoncons::unexpect, json_errc::invalid_number, cursor.line(), cursor.column()}; 
             }
             //std::cout << "cursor.next 500\n";
             cursor.next(ec);
