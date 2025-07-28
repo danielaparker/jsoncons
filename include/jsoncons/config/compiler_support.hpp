@@ -36,7 +36,7 @@
 #   endif
 #   else
 #       define JSONCONS_GCC_AVAILABLE(major, minor, patch) 0
-# 
+#endif
 
 #if defined(__clang__)
 #   define JSONCONS_CLANG_AVAILABLE(major, minor, patch) \
