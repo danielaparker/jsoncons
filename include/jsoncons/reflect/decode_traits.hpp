@@ -617,7 +617,7 @@ template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
-                            ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
+                            ext_traits::is_string<typename T::key_type>::value
 >::type>
 {
     using mapped_type = typename T::mapped_type;
