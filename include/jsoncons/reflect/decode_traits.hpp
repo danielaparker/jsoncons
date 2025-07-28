@@ -187,7 +187,7 @@ struct decode_traits<std::pair<T1, T2>>
         auto r1 = decode_traits<T1>::try_decode(aset, cursor);
         if (JSONCONS_UNLIKELY(!r1))
         {
-            return result_type(r1.error());
+            return result_type(jsoncons::unexpect, r1.error());
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) 
@@ -197,7 +197,7 @@ struct decode_traits<std::pair<T1, T2>>
         auto r2 = decode_traits<T2>::try_decode(aset, cursor);
         if (JSONCONS_UNLIKELY(!r2)) 
         {
-            return result_type(r2.error());
+            return result_type(jsoncons::unexpect, r2.error());
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -248,7 +248,7 @@ struct decode_traits<T,
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
-                return result_type(r.error()); 
+                return result_type(jsoncons::unexpect, r.error()); 
             }
             v.push_back(std::move(*r));
             //v.push_back(/*element_type(aset.get_allocator())*/);
@@ -257,128 +257,6 @@ struct decode_traits<T,
             if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         }
         return result_type{std::move(v)};
-    }
-};
-
-template <typename T>
-struct typed_array_visitor : public default_json_visitor
-{
-    T& v_;
-    int level_{0};
-public:
-    using element_type = typename T::value_type;
-    using value_type = T;
-    using result_type = read_result<value_type>;
-
-    typed_array_visitor(T& v)
-        : default_json_visitor(), v_(v)
-    {
-    }
-private:
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, 
-        const ser_context&, 
-        std::error_code& ec) override
-    {      
-        if (++level_ != 1)
-        {
-            ec = conv_errc::not_vector;
-            JSONCONS_VISITOR_RETURN;
-        }
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t size, 
-        semantic_tag, 
-        const ser_context&, 
-        std::error_code& ec) override
-    {
-        if (++level_ != 1)
-        {
-            ec = conv_errc::not_vector;
-            JSONCONS_VISITOR_RETURN;
-        }
-        if (size > 0)
-        {
-            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v_, size);
-        }
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
-        std::error_code& ec) override
-    {
-        if (level_ != 1)
-        {
-            ec = conv_errc::not_vector;
-            JSONCONS_VISITOR_RETURN;
-        }
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
-        semantic_tag, 
-        const ser_context&,
-        std::error_code&) override
-    {
-        v_.push_back(static_cast<element_type>(value));
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
-        semantic_tag,
-        const ser_context&,
-        std::error_code&) override
-    {
-        v_.push_back(static_cast<element_type>(value));
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
-        semantic_tag,
-        const ser_context&,
-        std::error_code&) override
-    {
-        visit_half_(typename std::integral_constant<bool, std::is_integral<element_type>::value>::type(), value);
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    void visit_half_(std::true_type, uint16_t value)
-    {
-        v_.push_back(static_cast<element_type>(value));
-    }
-
-    void visit_half_(std::false_type, uint16_t value)
-    {
-        v_.push_back(static_cast<element_type>(binary::decode_half(value)));
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
-        semantic_tag,
-        const ser_context&,
-        std::error_code&) override
-    {
-        v_.push_back(static_cast<element_type>(value));
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const element_type>& data,  
-        semantic_tag,
-        const ser_context&,
-        std::error_code&) override
-    {
-        v_ = std::vector<element_type>(data.begin(),data.end());
-        JSONCONS_VISITOR_RETURN;
-    }
-
-    static
-    void reserve_storage(std::true_type, T& v, std::size_t new_cap)
-    {
-        v.reserve(new_cap);
-    }
-
-    static
-    void reserve_storage(std::false_type, T&, std::size_t)
-    {
     }
 };
 
@@ -442,7 +320,7 @@ struct decode_traits<T,
                     auto r = decode_traits<element_type>::try_decode(aset, cursor);
                     if (!r)
                     {
-                        return result_type(r.error());
+                        return result_type(jsoncons::unexpect, r.error());
                     }
                     v.push_back(*r);
                     //v[i] = std::move(*r);
@@ -450,11 +328,9 @@ struct decode_traits<T,
                 }
                 if (JSONCONS_UNLIKELY(ec)) 
                 {
-                    return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                    return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
                 }
 
-                //typed_array_visitor<T> visitor(v);
-                //cursor.read_to(visitor, ec);
                 return result_type{std::move(v)};
             }
             default:
@@ -512,7 +388,7 @@ struct decode_traits<T,
                     auto r = decode_traits<element_type>::try_decode(aset, cursor);
                     if (!r)
                     {
-                        return result_type(r.error());
+                        return result_type(jsoncons::unexpect, r.error());
                     }
                     v.push_back(*r);
                     //v[i] = std::move(*r);
@@ -520,10 +396,8 @@ struct decode_traits<T,
                 }
                 if (JSONCONS_UNLIKELY(ec)) 
                 {
-                    return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                    return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
                 }
-                //typed_array_visitor<T> visitor(v);
-                //cursor.read_to(visitor, ec);
                 return result_type{std::move(v)};
             }
             default:
@@ -560,7 +434,7 @@ struct decode_traits<T,
     static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
-        T v;
+        T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
 
         cursor.array_expected(ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -581,7 +455,7 @@ struct decode_traits<T,
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
-                return result_type(r.error());
+                return result_type(jsoncons::unexpect, r.error());
             }
             v.insert(std::move(*r));
             if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
@@ -622,10 +496,9 @@ struct decode_traits<std::array<T,N>>
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        v.fill(T{});
         if (cursor.current().event_type() != staj_event_type::begin_array)
         {
-            return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+            return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
         }
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
@@ -633,13 +506,13 @@ struct decode_traits<std::array<T,N>>
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
-                return result_type(r.error());
+                return result_type(jsoncons::unexpect, r.error());
             }
             v[i] = std::move(*r);
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
-                return result_type{read_error{conv_errc::not_vector, cursor.line(), cursor.column()}}; 
+                return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
             }
         }
         return v;
@@ -668,7 +541,7 @@ struct decode_traits<T,
         auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
         if (cursor.current().event_type() != staj_event_type::begin_object)
         {
-            return result_type{read_error{conv_errc::not_map, cursor.line(), cursor.column()}}; 
+            return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; 
         }
         if (cursor.current().size() > 0)
         {
@@ -680,12 +553,12 @@ struct decode_traits<T,
         {
             if (cursor.current().event_type() != staj_event_type::key)
             {
-                return result_type{read_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
+                return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }
             auto r1 = decode_traits<key_type>::try_decode(aset, cursor);
             if (!r1)
             {
-                return result_type(r1.error());
+                return result_type(jsoncons::unexpect, r1.error());
             }
             if (JSONCONS_UNLIKELY(ec)) 
             {
@@ -699,7 +572,7 @@ struct decode_traits<T,
             auto r2 = decode_traits<mapped_type>::try_decode(aset, cursor);
             if (!r2)
             {
-                return result_type(r2.error());
+                return result_type(jsoncons::unexpect, r2.error());
             }
             val.emplace(std::move(*r1), std::move(*r2));
             //std::cout << "cursor.next 300\n";
@@ -776,7 +649,7 @@ struct decode_traits<T,
             auto r1 = decode_traits<mapped_type>::try_decode(aset, cursor);
             if (!r1)
             {
-                return result_type(r1.error());
+                return result_type(jsoncons::unexpect, r1.error());
             }
             val.emplace(n, std::move(*r1));
             //std::cout << "cursor.next 600\n";

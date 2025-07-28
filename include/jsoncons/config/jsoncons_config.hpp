@@ -58,8 +58,29 @@ namespace jsoncons {
 #else
 #  define JSONCONS_FALLTHROUGH
 #endif
+
+#if !defined(JSONCONS_HAS_STD_EXPECTED)
+  #include <jsoncons/detail/result.hpp>
+  namespace jsoncons {
+  using jsoncons::detail::result;
+  using jsoncons::detail::in_place_t;
+  using jsoncons::detail::in_place;
+  using jsoncons::detail::unexpect_t;
+  using jsoncons::detail::unexpect;
+  } // namespace jsoncons
+#else
+  #include <expected>
+  namespace jsoncons {
+  template <typename R,typename E>
+  using result = std::expected<R,E>;
+  using in_place_t = std::in_place_t;
+  JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
+  using unexpect_t = std::unexpect_t;
+  JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
+  } // namespace jsoncons
+#endif
         
-#include <jsoncons/detail/obj_uses_allocator.hpp>
+#include <jsoncons/detail/make_obj_using_allocator.hpp>
 namespace jsoncons {
 using jsoncons::detail::make_obj_using_allocator;
 } // namespace jsoncons

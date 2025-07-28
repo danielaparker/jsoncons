@@ -5,6 +5,8 @@
 
 #include <map>
 #include <vector>
+#include <set>
+#include <string>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -45,11 +47,39 @@ TEST_CASE("decode_json using allocator")
         cust_allocator_type alloc(1);
         auto aset = make_alloc_set(alloc);
 
-        std::vector<cust_string, cust_allocator_type> v{aset.get_allocator()};
-
         std::string str = R"(["1","2","3"])";
 
         auto result = jsoncons::try_decode_json<std::vector<cust_string,cust_allocator_type>>(aset, str);
+        REQUIRE(result);
+        REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
+    }
+
+    SECTION("decode vector of char test")
+    {
+        using cust_allocator_type = cust_allocator<char>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"([1,2,3])";
+
+        auto result = jsoncons::try_decode_json<std::vector<char,cust_allocator_type>>(aset, str);
+        REQUIRE(result);
+        REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
+    }
+
+    SECTION("decode vector of int test")
+    {
+        using cust_allocator_type = cust_allocator<int>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"([1,2,3])";
+
+        auto result = jsoncons::try_decode_json<std::vector<int, cust_allocator_type>>(aset, str);
         REQUIRE(result);
         REQUIRE(3 == result->size());
         //CHECK("1" == result[0].c_str());
@@ -80,6 +110,36 @@ TEST_CASE("decode_json using allocator")
         std::string str = R"({"1" : "1", "2" : "2", "3" : "3"})";
 
         auto result = jsoncons::try_decode_json<std::map<cust_string,cust_string,std::less<cust_string>,cust_allocator_type>>(aset, str);
+        REQUIRE(result);
+        REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
+    }
+
+    /*SECTION("decode std::array of string")
+    {
+        using cust_allocator_type = cust_allocator<char>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"([1,2,3])";
+
+        auto result = jsoncons::try_decode_json<std::array<cust_string, 3>>(aset, str);
+        REQUIRE(result);
+        REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
+    }*/
+
+    SECTION("decode set of string")
+    {
+        using cust_allocator_type = cust_allocator<cust_string>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1","2","3"])";
+
+        auto result = jsoncons::try_decode_json<std::set<cust_string,std::less<cust_string>,cust_allocator_type>>(aset, str);
         REQUIRE(result);
         REQUIRE(3 == result->size());
         //CHECK("1" == result[0].c_str());

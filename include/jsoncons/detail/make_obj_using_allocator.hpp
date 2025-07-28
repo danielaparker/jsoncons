@@ -1,5 +1,5 @@
-#ifndef JSONCONS_DETAIL_OBJ_USES_ALLOCATOR
-#define JSONCONS_DETAIL_OBJ_USES_ALLOCATOR 
+#ifndef JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR
+#define JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR 
 
 #include <new>			// for placement operator new
 #include <tuple>		// for tuple, make_tuple, make_from_tuple
@@ -10,10 +10,19 @@ namespace jsoncons {
 namespace detail {
 
 template <typename T, typename Alloc, typename... Args>
-typename std::enable_if<!ext_traits::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value, T>::type
+typename std::enable_if<!ext_traits::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
+    && std::is_constructible<T, Args...,Alloc>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, Args&&... args)
 {
     return T(std::forward<Args>(args)..., alloc);
+}
+
+template <typename T, typename Alloc, typename... Args>
+typename std::enable_if<!ext_traits::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
+    && std::is_constructible<T,std::allocator_arg_t,Alloc,Args...>::value, T>::type
+make_obj_using_allocator(const Alloc& alloc, Args&&... args)
+{
+    return T(std::allocator_arg, alloc, std::forward<Args>(args)...);
 }
 
 template <typename T, typename Alloc, typename... Args>
@@ -64,4 +73,4 @@ make_obj_using_allocator(const Alloc& alloc, std::pair<U,V>&& pr)
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_OBJ_USES_ALLOCATOR
+#endif // JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR

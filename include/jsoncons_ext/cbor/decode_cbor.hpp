@@ -43,11 +43,11 @@ try_decode_cbor(const BytesLike& v,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -86,11 +86,11 @@ try_decode_cbor(std::istream& is,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -128,11 +128,11 @@ try_decode_cbor(InputIt first, InputIt last,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -174,11 +174,11 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -219,11 +219,11 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_RESULT_HPP    
-#define JSONCONS_RESULT_HPP    
+#ifndef JSONCONS_DETAIL_RESULT_HPP    
+#define JSONCONS_DETAIL_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -15,6 +15,7 @@
 #include <cassert>
 
 namespace jsoncons {
+namespace detail {
     
 struct in_place_t
 {
@@ -50,29 +51,17 @@ public:
         construct(value);
     }
 
-     result(T&& value) noexcept
-         : has_value_(true)
-     {
-         construct(std::move(value));
-     }
-
-     template <typename... Args>    
-     result(in_place_t, Args&& ... args) noexcept
-         : has_value_(true)
-     {
-         ::new (&value_) T(std::forward<Args>(args)...);
-     }
-
-     result(const E& err)
-        : has_value_(false)
+    result(T&& value) noexcept
+        : has_value_(true)
     {
-        ::new (&error_) E(err);
+        construct(std::move(value));
     }
 
-    result(E&& err) noexcept
-        : has_value_(false)
+    template <typename... Args>    
+    result(in_place_t, Args&& ... args) noexcept
+        : has_value_(true)
     {
-        ::new (&error_) E(std::move(err));
+        ::new (&value_) T(std::forward<Args>(args)...);
     }
 
     template <typename... Args>    
@@ -335,6 +324,7 @@ swap(result<T,E>& lhs, result<T,E>& rhs) noexcept
     lhs.swap(rhs);
 }
 
-} // jsoncons
+} // namespace detail
+} // namespace jsoncons
 
-#endif // JSONCONS_RESULT_HPP
+#endif // JSONCONS_DETAIL_RESULT_HPP

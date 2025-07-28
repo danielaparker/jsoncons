@@ -42,11 +42,11 @@ try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename Chars
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -87,11 +87,11 @@ try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<Cha
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -130,11 +130,11 @@ try_decode_csv(InputIt first, InputIt last,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -181,11 +181,11 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }
@@ -231,11 +231,11 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
-        return result_type{read_error{ec, reader.line(), reader.column()}};
+        return result_type{jsoncons::unexpect, ec, reader.line(), reader.column()};
     }
     if (JSONCONS_UNLIKELY(!decoder.is_valid()))
     {
-        return result_type{ read_error{conv_errc::conversion_failed, reader.line(), reader.column()} };
+        return result_type{jsoncons::unexpect, conv_errc::conversion_failed, reader.line(), reader.column()};
     }
     return result_type{decoder.get_result()};
 }

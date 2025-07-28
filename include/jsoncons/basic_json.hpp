@@ -1531,7 +1531,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return result_type(cast<json_reference_storage>().value().as_string_view());
                 default:
-                   return result_type(unexpect, conv_errc::not_string);
+                   return result_type(jsoncons::unexpect, conv_errc::not_string);
             }
         }
 
@@ -1551,7 +1551,7 @@ namespace jsoncons {
                     byte_string_type v = converter.convert(as_string_view(),tag(), ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
-                        return result_type(unexpect, ec);
+                        return result_type(jsoncons::unexpect, ec);
                     }
                     return result_type(v);
                 }
@@ -1562,7 +1562,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().template try_as_byte_string<BytesAlloc>();
                 default:
-                    return result_type(unexpect, conv_errc::not_byte_string);
+                    return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
             }
         }
 
@@ -1590,7 +1590,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().try_as_byte_string_view();
                 default:
-                    return result_type(unexpect, conv_errc::not_byte_string);
+                    return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
             }
         }
 
@@ -3539,7 +3539,7 @@ namespace jsoncons {
                     auto result = jsoncons::utility::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
-                        return result_type(unexpect, conv_errc::not_integer);
+                        return result_type(jsoncons::unexpect, conv_errc::not_integer);
                     }
                     return val;
                 }
@@ -3558,7 +3558,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().template try_as_integer<T>();
                 default:
-                    return result_type(unexpect, conv_errc::not_integer);
+                    return result_type(jsoncons::unexpect, conv_errc::not_integer);
             }
         }
 
@@ -3680,7 +3680,7 @@ namespace jsoncons {
                         auto result = jsoncons::utility::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            return result_type(unexpect, conv_errc::not_double);
+                            return result_type(jsoncons::unexpect, conv_errc::not_double);
                         }
                     }
                     else if (JSONCONS_UNLIKELY(len > 3 && s[0] == '-' && s[1] == '0' && (s[2] == 'x' || s[2] == 'X')))
@@ -3688,7 +3688,7 @@ namespace jsoncons {
                         auto result = jsoncons::utility::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            return result_type(unexpect, conv_errc::not_double);
+                            return result_type(jsoncons::unexpect, conv_errc::not_double);
                         }
                     }
                     else
@@ -3696,7 +3696,7 @@ namespace jsoncons {
                         auto result = jsoncons::utility::decstr_to_double(as_cstring(), as_string_view().length(), x);
                         if (result.ec == std::errc::invalid_argument)
                         {
-                            return result_type(unexpect, conv_errc::not_double);
+                            return result_type(jsoncons::unexpect, conv_errc::not_double);
                         }
                     }
                     
@@ -3715,7 +3715,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().try_as_double();
                 default:
-                    return result_type(unexpect, conv_errc::not_double);
+                    return result_type(jsoncons::unexpect, conv_errc::not_double);
             }
         }
 
