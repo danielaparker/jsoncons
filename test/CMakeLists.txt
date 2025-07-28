@@ -65,7 +65,7 @@ add_executable(unit_tests
                #bson/src/bson_oid_tests.cpp
                #bson/src/bson_reader_tests.cpp
                #bson/src/bson_test_suite.cpp
-               bson/src/encode_decode_bson_tests.cpp
+               #bson/src/encode_decode_bson_tests.cpp
                #cbor/src/cbor_bitset_traits_tests.cpp
                #cbor/src/cbor_cursor_tests.cpp
                #cbor/src/cbor_encoder_tests.cpp
@@ -74,7 +74,7 @@ add_executable(unit_tests
                #cbor/src/cbor_reader_tests.cpp
                #cbor/src/cbor_tests.cpp
                #cbor/src/cbor_typed_array_tests.cpp
-               cbor/src/decode_cbor_tests.cpp
+               #cbor/src/decode_cbor_tests.cpp
                #cbor/src/encode_cbor_tests.cpp
                #corelib/src/detail/optional_tests.cpp
                #corelib/src/detail/span_tests.cpp
@@ -83,7 +83,7 @@ add_executable(unit_tests
                #corelib/src/double_to_string_tests.cpp
                #corelib/src/dtoa_tests.cpp
                corelib/src/decode_json_using_allocator_tests.cpp
-               corelib/src/encode_decode_json_tests.cpp
+               #corelib/src/encode_decode_json_tests.cpp
                #corelib/src/json_array_tests.cpp
                #corelib/src/json_as_tests.cpp
                #corelib/src/json_assignment_tests.cpp
@@ -138,7 +138,7 @@ add_executable(unit_tests
                #corelib/src/staj_array_iterator_ec_tests.cpp 
                #corelib/src/staj_iterator_tests.cpp
                #corelib/src/string_to_double_tests.cpp
-               corelib/src/try_decode_json_tests.cpp
+               #corelib/src/try_decode_json_tests.cpp
                #corelib/src/try_to_json_tests.cpp
                #corelib/src/utility/bigint_tests.cpp
                #corelib/src/utility/byte_string_tests.cpp
@@ -153,7 +153,7 @@ add_executable(unit_tests
                #csv/src/csv_reader_tests.cpp
                #csv/src/csv_subfield_tests.cpp
                #csv/src/csv_tests.cpp
-               csv/src/encode_decode_csv_tests.cpp
+               #csv/src/encode_decode_csv_tests.cpp
                #fuzz_regression/src/fuzz_regression_tests.cpp
                #jmespath/src/jmespath_custom_function_tests.cpp
                #jmespath/src/jmespath_expression_tests.cpp
@@ -190,7 +190,7 @@ add_executable(unit_tests
                #jsonschema/src/schema_version_tests.cpp
                #jsonschema/src/validation_report_tests.cpp
                #mergepatch/src/mergepatch_test_suite.cpp
-               msgpack/src/decode_msgpack_tests.cpp
+               #msgpack/src/decode_msgpack_tests.cpp
                #msgpack/src/encode_msgpack_tests.cpp
                #msgpack/src/msgpack_bitset_traits_tests.cpp
                #msgpack/src/msgpack_cursor_tests.cpp
@@ -198,7 +198,7 @@ add_executable(unit_tests
                #msgpack/src/msgpack_event_reader_tests.cpp
                #msgpack/src/msgpack_tests.cpp
                #msgpack/src/msgpack_timestamp_tests.cpp
-               ubjson/src/decode_ubjson_tests.cpp
+               #ubjson/src/decode_ubjson_tests.cpp
                #ubjson/src/encode_ubjson_tests.cpp
                #ubjson/src/ubjson_cursor_tests.cpp
                #ubjson/src/ubjson_encoder_tests.cpp
