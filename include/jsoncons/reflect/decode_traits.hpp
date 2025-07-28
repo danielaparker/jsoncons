@@ -80,7 +80,7 @@ struct decode_traits<T,
         auto j_result = try_to_json<T>(aset, cursor);
         if (JSONCONS_UNLIKELY(!j_result))
         {
-            return result_type(std::move(j_result.error()));
+            return result_type(jsoncons::unexpect, std::move(j_result.error()));
         }
         return j_result;
     }
