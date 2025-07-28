@@ -456,7 +456,7 @@ namespace jsoncons {
 
 #if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 #if defined(__clang__) && !JSONCONS_CLANG_AVAILABLE(11,0,0)
-#elif defined(__GNUC__) && !JSONCONS_GCC_AVAILABLE(12,0,0)
+#elif defined(__GNUC__) && !JSONCONS_GCC_AVAILABLE(10,0,0)
 #else
 #define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
 #endif
