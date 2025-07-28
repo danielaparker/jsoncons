@@ -630,7 +630,7 @@ struct decode_traits<T,
     {
         std::error_code ec;
 
-        T val;
+        auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
         if (cursor.current().event_type() != staj_event_type::begin_object)
         {
             return result_type{read_error{conv_errc::not_map, cursor.line(), cursor.column()}}; 
@@ -647,23 +647,26 @@ struct decode_traits<T,
             {
                 return result_type{read_error{json_errc::expected_key, cursor.line(), cursor.column()}}; 
             }
-            auto key = cursor.current().template get<key_type>(ec);
+            auto r1 = decode_traits<key_type>::try_decode(aset, cursor);
+            if (!r1)
+            {
+                return result_type(r1.error());
+            }
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
             }
-            //std::cout << "cursor.next 200\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
                 return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
             }
-            auto r = decode_traits<mapped_type>::try_decode(aset, cursor);
-            if (!r)
+            auto r2 = decode_traits<mapped_type>::try_decode(aset, cursor);
+            if (!r2)
             {
-                return result_type(r.error());
+                return result_type(r2.error());
             }
-            val.emplace(std::move(key), std::move(*r));
+            val.emplace(std::move(*r1), std::move(*r2));
             //std::cout << "cursor.next 300\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 

@@ -19,15 +19,15 @@ template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
 
-using cust_allocator_type = cust_allocator<cust_string>;
-
 TEST_CASE("decode_json using allocator")
 {
-    cust_allocator_type alloc(1);
-    auto aset = make_alloc_set(alloc);
-
     SECTION("decode string test")
     {
+        using cust_allocator_type = cust_allocator<cust_string>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
         cust_string s{aset.get_allocator()};
 
         std::string str = R"("Hello World")";
@@ -40,6 +40,11 @@ TEST_CASE("decode_json using allocator")
 
     SECTION("decode vector of string test")
     {
+        using cust_allocator_type = cust_allocator<cust_string>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
         std::vector<cust_string, cust_allocator_type> v{aset.get_allocator()};
 
         std::string str = R"(["1","2","3"])";
@@ -52,12 +57,32 @@ TEST_CASE("decode_json using allocator")
 
     SECTION("decode pair test")
     {
+        using cust_allocator_type = cust_allocator<cust_string>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
         std::string str = R"(["1",2])";
 
         auto result = jsoncons::try_decode_json<std::pair<cust_string, int>>(aset, str);
         REQUIRE(result);
         CHECK(std::string("1") == result->first.c_str());
         CHECK(2 == result->second);
+    }
+
+    SECTION("decode map string -> string test")
+    {
+        using cust_allocator_type = cust_allocator<std::pair<const cust_string,cust_string>>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"({"1" : "1", "2" : "2", "3" : "3"})";
+
+        auto result = jsoncons::try_decode_json<std::map<cust_string,cust_string,std::less<cust_string>,cust_allocator_type>>(aset, str);
+        REQUIRE(result);
+        REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
     }
 }
 
