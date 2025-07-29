@@ -23,7 +23,8 @@
 namespace jsoncons {
 
 template <typename InputIt,typename Container>
-typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value
+    && ext_traits::is_string<Container>::value,size_t>::type
 bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
 {
     switch (tag)
@@ -35,6 +36,15 @@ bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
         default:
             return bytes_to_base64url(first, last, str);
     }
+}
+
+template <typename InputIt,typename Container>
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value
+    && !ext_traits::is_string<Container>::value,size_t>::type
+bytes_to_string(InputIt first, InputIt last, semantic_tag, Container& str)
+{
+    str.insert(str.end(), first, last);
+    return std::size_t(last - first);
 }
 
 template <typename From,typename Into,typename Enable = void>
