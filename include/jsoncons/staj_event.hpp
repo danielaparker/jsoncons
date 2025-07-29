@@ -31,7 +31,7 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
-#include <jsoncons/value_converter.hpp>
+#include <jsoncons/conversion.hpp>
 
 namespace jsoncons {
 
@@ -366,9 +366,10 @@ public:
         {
             case staj_event_type::byte_string_value:
             {
-                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                bytes_to_string(value_.byte_string_data_, value_.byte_string_data_+length_, tag(), s);
-                return s;
+                auto v = jsoncons::make_obj_using_allocator<T>(alloc, 
+                    value_.byte_string_data_, 
+                    value_.byte_string_data_+length_);
+                return v;
             }
             case staj_event_type::string_value:
             {

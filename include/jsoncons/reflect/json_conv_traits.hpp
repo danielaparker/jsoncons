@@ -33,7 +33,7 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
-#include <jsoncons/value_converter.hpp>
+#include <jsoncons/conversion.hpp>
 #include <jsoncons/conversion_result.hpp>
 #include <jsoncons/json_type_traits.hpp>
 
@@ -846,10 +846,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     // map like
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_map_like<T>::value &&
-                                                    ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_map_like<T>::value &&
+                                ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         using mapped_type = typename T::mapped_type;
@@ -900,11 +900,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_map_like<T>::value &&
-                                                    !ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_map_like<T>::value &&
+                                !ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         using mapped_type = typename T::mapped_type;

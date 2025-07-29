@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_VALUE_CONVERTER_HPP
-#define JSONCONS_VALUE_CONVERTER_HPP
+#ifndef JSONCONS_CONVERSION_HPP
+#define JSONCONS_CONVERSION_HPP
 
 #include <memory>
 #include <string>
@@ -36,15 +36,6 @@ bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
         default:
             return bytes_to_base64url(first, last, str);
     }
-}
-
-template <typename InputIt,typename Container>
-typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value
-    && !ext_traits::is_string<Container>::value,size_t>::type
-bytes_to_string(InputIt first, InputIt last, semantic_tag, Container& str)
-{
-    str.insert(str.end(), first, last);
-    return std::size_t(last - first);
 }
 
 template <typename From,typename Into,typename Enable = void>
@@ -366,5 +357,5 @@ public:
 
 } // namespace jsoncons
 
-#endif // JSONCONS_VALUE_CONVERTER_HPP
+#endif // JSONCONS_CONVERSION_HPP
 
