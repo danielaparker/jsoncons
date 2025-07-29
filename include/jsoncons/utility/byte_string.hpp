@@ -101,9 +101,7 @@ namespace detail {
     template <typename InputIt,typename F,typename Container>
     typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
     base64_to_bytes_generic(InputIt first, InputIt last, 
-                          const uint8_t reverse_alphabet[256],
-                          F f,
-                          Container& result)
+        const uint8_t reverse_alphabet[256], F f, Container& result)
     {
         uint8_t a4[4], a3[3];
         uint8_t i = 0;
@@ -236,8 +234,7 @@ namespace detail {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
         auto retval = jsoncons::detail::base64_to_bytes_generic(first, last, reverse_alphabet, 
-                                                              is_base64url<typename std::iterator_traits<InputIt>::value_type>, 
-                                                              result);
+            is_base64url<typename std::iterator_traits<InputIt>::value_type>, result);
         return retval.ec == conv_errc::success ? retval : to_bytes_result<InputIt>{retval.it, conv_errc::not_base64url};
     }
 
@@ -264,8 +261,7 @@ namespace detail {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
         auto retval = jsoncons::detail::base64_to_bytes_generic(first, last, reverse_alphabet, 
-                                                             is_base64<typename std::iterator_traits<InputIt>::value_type>, 
-                                                             result);
+            is_base64<typename std::iterator_traits<InputIt>::value_type>, result);
         return retval.ec == conv_errc::success ? retval : to_bytes_result<InputIt>{retval.it, conv_errc::not_base64};
     }
 

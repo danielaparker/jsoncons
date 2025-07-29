@@ -85,7 +85,7 @@ TEST_CASE("json_reference array tests")
         json expected = json::parse(R"( [1, "two", "four"] )");
 
         json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
         j[2] = "four";
 
         CHECK(expected == v);
@@ -93,7 +93,7 @@ TEST_CASE("json_reference array tests")
     SECTION("const operator[]")
     {
         const json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
 
         CHECK("three" == v[2]);
     }
@@ -114,26 +114,26 @@ TEST_CASE("json_reference array tests")
     SECTION("copy")
     {
         json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
 
         json j2(v);
-        CHECK(j2.storage_kind() == json_storage_kind::json_reference);
+        CHECK(j2.storage_kind() == json_storage_kind::json_ref);
     }
     SECTION("assignment")
     {
         json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
 
         json j2;
         j2 = v;
-        CHECK(j2.storage_kind() == json_storage_kind::json_reference);
+        CHECK(j2.storage_kind() == json_storage_kind::json_ref);
     }
     SECTION("push_back")
     {
         json expected = json::parse(R"( [1, "two", "three", "four"] )");
 
         json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
         j.push_back("four");
         
         CHECK(expected == v);
@@ -143,7 +143,7 @@ TEST_CASE("json_reference array tests")
         json expected = json::parse(R"( [1, "two", "three", "four"] )");
 
         json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_ref);
         j.emplace_back("four");
 
         CHECK(expected == v);

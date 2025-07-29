@@ -20,8 +20,9 @@ TEST_CASE("test json_storage_kind")
         CHECK(is_trivial_storage(json_storage_kind::half_float));
         CHECK(is_trivial_storage(json_storage_kind::short_str));
         CHECK(is_trivial_storage(json_storage_kind::empty_object));
-        CHECK(is_trivial_storage(json_storage_kind::json_const_reference));
-        CHECK(is_trivial_storage(json_storage_kind::json_reference));
+        CHECK(is_trivial_storage(json_storage_kind::json_const_ref));
+        CHECK(is_trivial_storage(json_storage_kind::json_ref));
+        CHECK(is_trivial_storage(json_storage_kind::str_ref));
         CHECK_FALSE(is_trivial_storage(json_storage_kind::long_str));
         CHECK_FALSE(is_trivial_storage(json_storage_kind::byte_str));
         CHECK_FALSE(is_trivial_storage(json_storage_kind::array));
@@ -35,9 +36,10 @@ TEST_CASE("test json_storage_kind")
         CHECK_FALSE(is_string_storage(json_storage_kind::int64));
         CHECK_FALSE(is_string_storage(json_storage_kind::half_float));
         CHECK(is_string_storage(json_storage_kind::short_str));
+        CHECK(is_string_storage(json_storage_kind::str_ref));
         CHECK_FALSE(is_string_storage(json_storage_kind::empty_object));
-        CHECK_FALSE(is_string_storage(json_storage_kind::json_const_reference));
-        CHECK_FALSE(is_string_storage(json_storage_kind::json_reference));
+        CHECK_FALSE(is_string_storage(json_storage_kind::json_const_ref));
+        CHECK_FALSE(is_string_storage(json_storage_kind::json_ref));
         CHECK(is_string_storage(json_storage_kind::long_str));
         CHECK_FALSE(is_string_storage(json_storage_kind::byte_str));
         CHECK_FALSE(is_string_storage(json_storage_kind::array));

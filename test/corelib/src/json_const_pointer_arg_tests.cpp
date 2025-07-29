@@ -51,19 +51,19 @@ TEST_CASE("json_const_reference array tests")
     SECTION("copy")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_const_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_const_ref);
 
         json j2(v);
-        CHECK(j2.storage_kind() == json_storage_kind::json_const_reference);
+        CHECK(j2.storage_kind() == json_storage_kind::json_const_ref);
     }
     SECTION("assignment")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_const_reference);
+        CHECK(v.storage_kind() == json_storage_kind::json_const_ref);
 
         json j2;
         j2 = v;
-        CHECK(j2.storage_kind() == json_storage_kind::json_const_reference);
+        CHECK(j2.storage_kind() == json_storage_kind::json_const_ref);
     }
 }
 

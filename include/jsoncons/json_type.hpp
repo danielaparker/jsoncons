@@ -172,7 +172,7 @@ namespace jsoncons {
 
     enum class json_storage_kind : uint8_t 
     {
-        null = 0,                 // 0000
+        str_ref = 0,              // 0000
         boolean = 1,              // 0001
         int64 = 2,                // 0010
         uint64 = 3,               // 0011
@@ -180,8 +180,9 @@ namespace jsoncons {
         float64 = 5,              // 0101
         half_float = 6,           // 0110
         short_str = 7,            // 0111
-        json_const_reference = 8, // 1000    
-        json_reference = 9,       // 1001    
+        json_const_ref = 8,       // 1000    
+        json_ref = 9,             // 1001 
+        null = 10,                // 1010   
         byte_str = 12,            // 1100  
         object = 13,              // 1101
         array = 14,               // 1110
@@ -191,7 +192,7 @@ namespace jsoncons {
     inline bool is_string_storage(json_storage_kind storage_kind) noexcept
     {
         static const uint8_t mask{ uint8_t(json_storage_kind::short_str) & uint8_t(json_storage_kind::long_str) };
-        return (uint8_t(storage_kind) & mask) == mask;
+        return (uint8_t(storage_kind) & mask) == mask || !uint8_t(storage_kind);
     }
 
     inline bool is_trivial_storage(json_storage_kind storage_kind) noexcept
@@ -281,12 +282,12 @@ namespace jsoncons {
                 os << object_value;
                 break;
             }
-            case json_storage_kind::json_const_reference:
+            case json_storage_kind::json_const_ref:
             {
                 os << json_const_reference;
                 break;
             }
-            case json_storage_kind::json_reference:
+            case json_storage_kind::json_ref:
             {
                 os << json_reference;
                 break;

@@ -848,7 +848,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_conv_traits<Json, T, 
         typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
                                 ext_traits::is_map_like<T>::value &&
-                                ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                ext_traits::is_string<typename T::key_type>::value &&
                                 is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
@@ -902,7 +902,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_conv_traits<Json, T, 
         typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
                                 ext_traits::is_map_like<T>::value &&
-                                !ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                !ext_traits::is_string<typename T::key_type>::value &&
                                 is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
                                 is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
@@ -932,18 +932,23 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& val) 
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& val) 
         {
             T result;
             for (const auto& item : val.object_range())
             {
                 Json j(item.key());
-                auto r = json_conv_traits<Json,key_type>::try_as(make_alloc_set(), j);
-                if (!r)
+                auto r1 = json_conv_traits<Json,key_type>::try_as(aset, j);
+                if (!r1)
                 {
-                    return result_type(jsoncons::unexpect, r.error());
+                    return result_type(jsoncons::unexpect, r1.error());
                 }
-                result.emplace(std::move(r.value()), item.value().template as<mapped_type>());
+                auto r2 = item.value().template as<mapped_type>(aset);
+                if (!r2)
+                {
+                    return result_type(jsoncons::unexpect, r2.error());
+                }
+                result.emplace(std::move(r1.value()), std::move(*r2));
             }
 
             return result_type(std::move(result));
