@@ -420,11 +420,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_string<T>::value &&
-                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_string<T>::value &&
+                                std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using result_type = conversion_result<T>;
+        using char_type = typename T::value_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -432,9 +433,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template<typename Alloc,typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            return result_type{jsoncons::in_place, j.as_string()};
+            auto s = j.template as_string<typename T::allocator_type>(aset.get_allocator());
+            return result_type{std::move(s)};
         }
 
         template <typename Alloc>
@@ -446,9 +448,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_string<T>::value &&
-                                                    !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_string<T>::value &&
+                                !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using char_type = typename Json::char_type;
         using result_type = conversion_result<T>;
@@ -1000,7 +1002,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     ec = res.error().code();
                     return;
                 }
-                std::get<Size-Pos>(tuple) = *res;
+                std::get<Size-Pos>(tuple) = std::move(*res);
                 next::try_as(tuple, aset, j, ec);
             }
 
@@ -1036,10 +1038,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_conv_traits<Json, std::tuple<E...>>
     {
     private:
+        using value_type = std::tuple<E...>;
         using helper = tuple_detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
 
     public:
-        using result_type = conversion_result<std::tuple<E...>>;
+        using result_type = conversion_result<value_type>;
 
         static bool is(const Json& j) noexcept
         {
@@ -1050,9 +1053,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
             std::error_code ec;
-            std::tuple<E...> val;
+            std::tuple<E...> val(std::allocator_arg, aset.get_allocator());
             helper::try_as(val, aset, j, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return result_type(jsoncons::unexpect, ec);
             }

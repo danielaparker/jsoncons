@@ -16,13 +16,14 @@ using namespace jsoncons;
 #include <scoped_allocator>
 #include <common/mock_stateful_allocator.hpp>
 
-using char_allocator_type = mock_stateful_allocator<char>;
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
 
 TEST_CASE("decode_json using allocator")
 {
+    using char_allocator_type = mock_stateful_allocator<char>;
+    using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
     SECTION("decode string test")
     {
         using cust_allocator_type = cust_allocator<cust_string>;
@@ -98,6 +99,22 @@ TEST_CASE("decode_json using allocator")
         REQUIRE(result);
         CHECK(std::string("1") == result->first.c_str());
         CHECK(2 == result->second);
+    }
+
+    SECTION("decode tuple")
+    {
+        using cust_allocator_type = cust_allocator<cust_string>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1",2,true])";
+
+        std::tuple<cust_string, int, bool> tup(std::allocator_arg, aset.get_allocator());
+
+        auto result = jsoncons::try_decode_json<std::tuple<cust_string, int, bool>>(aset, str);
+        //REQUIRE(result);
+        //CHECK(std::string("1") == std::get<0>(*result).c_str());
     }
 
     SECTION("decode map string -> string test")

@@ -3735,10 +3735,15 @@ namespace jsoncons {
             return as_string(CharsAlloc());
         }
 
-        template <typename CharsAlloc=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type> as_string() const 
+        {
+            return as_string(std::allocator()); 
+        }
+
+        template <typename CharsAlloc>
         std::basic_string<char_type,char_traits_type,CharsAlloc> as_string(const CharsAlloc& alloc) const 
         {
-            using string_type2 = std::basic_string<char_type,char_traits_type,CharsAlloc>;
+            using value_type = std::basic_string<char_type,char_traits_type,CharsAlloc>;
 
             std::error_code ec;
             switch (storage_kind())
@@ -3746,23 +3751,32 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    return string_type2(as_string_view().data(),as_string_view().length(),alloc);
+                    return make_obj_using_allocator<value_type>(alloc, as_string_view().data(), as_string_view().length());
                 }
                 case json_storage_kind::byte_str:
                 {
-                    value_converter<byte_string_view,string_type2> converter;
-                    auto s = converter.convert(as_byte_string_view(), tag(), ec);
-                    if (JSONCONS_UNLIKELY(ec))
+                    auto bstr = as_byte_string_view();
+                    value_type s = make_obj_using_allocator<value_type>(alloc);
+                    switch (tag())
                     {
-                        JSONCONS_THROW(ser_error(ec));
+                        case semantic_tag::base64:
+                            bytes_to_base64(bstr.begin(), bstr.end(), s);
+                            break;
+                        case semantic_tag::base16:
+                            bytes_to_base16(bstr.begin(), bstr.end(), s);
+                            break;
+                        default:
+                            bytes_to_base64url(bstr.begin(), bstr.end(), s);
+                            break;
                     }
+
                     return s;
                 }
                 case json_storage_kind::array:
                 {
-                    string_type2 s(alloc);
+                    value_type s = make_obj_using_allocator<value_type>(alloc);
                     {
-                        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type2>> encoder(s);
+                        basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
                         dump(encoder);
                     }
                     return s;
@@ -3773,8 +3787,8 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().as_string(alloc);
                 default:
                 {
-                    string_type2 s(alloc);
-                    basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type2>> encoder(s);
+                    value_type s = make_obj_using_allocator<value_type>(alloc);
+                    basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
                     dump(encoder);
                     return s;
                 }
