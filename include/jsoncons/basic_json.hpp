@@ -3751,30 +3751,18 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    return make_obj_using_allocator<value_type>(alloc, as_string_view().data(), as_string_view().length());
+                    return jsoncons::make_obj_using_allocator<value_type>(alloc, as_string_view().data(), as_string_view().length());
                 }
                 case json_storage_kind::byte_str:
                 {
                     auto bstr = as_byte_string_view();
-                    value_type s = make_obj_using_allocator<value_type>(alloc);
-                    switch (tag())
-                    {
-                        case semantic_tag::base64:
-                            bytes_to_base64(bstr.begin(), bstr.end(), s);
-                            break;
-                        case semantic_tag::base16:
-                            bytes_to_base16(bstr.begin(), bstr.end(), s);
-                            break;
-                        default:
-                            bytes_to_base64url(bstr.begin(), bstr.end(), s);
-                            break;
-                    }
-
+                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
+                    bytes_to_string(bstr.begin(), bstr.end(), tag(), s);
                     return s;
                 }
                 case json_storage_kind::array:
                 {
-                    value_type s = make_obj_using_allocator<value_type>(alloc);
+                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
                     {
                         basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
                         dump(encoder);
@@ -3787,7 +3775,7 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().as_string(alloc);
                 default:
                 {
-                    value_type s = make_obj_using_allocator<value_type>(alloc);
+                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
                     basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
                     dump(encoder);
                     return s;
