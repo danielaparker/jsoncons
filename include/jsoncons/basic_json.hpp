@@ -3737,7 +3737,7 @@ namespace jsoncons {
 
         std::basic_string<char_type,char_traits_type> as_string() const 
         {
-            return as_string(std::allocator<char>()); 
+            return as_string(std::allocator<char_type>()); 
         }
 
         template <typename CharsAlloc>
