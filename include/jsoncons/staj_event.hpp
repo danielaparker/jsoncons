@@ -268,7 +268,7 @@ public:
 
     template <typename T,typename Allocator,typename CharT_ = CharT>
     typename std::enable_if<ext_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-    get_(Allocator,std::error_code& ec) const
+    get_(Allocator alloc,std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -280,8 +280,9 @@ public:
             }
             case staj_event_type::byte_string_value:
             {
-                value_converter<jsoncons::byte_string_view,T> converter;
-                return converter.convert(byte_string_view(value_.byte_string_data_,length_),tag(),ec);
+                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
+                bytes_to_string(value_.byte_string_data_, value_.byte_string_data_+length_, tag(), s);
+                return s;
             }
             case staj_event_type::uint64_value:
             {
@@ -359,16 +360,18 @@ public:
     template <typename T,typename Allocator>
     typename std::enable_if<ext_traits::is_array_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
-    get_(Allocator, std::error_code& ec) const
+    get_(Allocator alloc, std::error_code& ec) const
     {
         switch (event_type_)
         {
-        case staj_event_type::byte_string_value:
+            case staj_event_type::byte_string_value:
             {
-                value_converter<byte_string_view,T> converter;
-                return converter.convert(byte_string_view(value_.byte_string_data_, length_), tag(), ec);
+                auto v = jsoncons::make_obj_using_allocator<T>(alloc, 
+                    value_.byte_string_data_, 
+                    value_.byte_string_data_+length_);
+                return v;
             }
-        case staj_event_type::string_value:
+            case staj_event_type::string_value:
             {
                 value_converter<jsoncons::basic_string_view<CharT>,T> converter;
                 return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
