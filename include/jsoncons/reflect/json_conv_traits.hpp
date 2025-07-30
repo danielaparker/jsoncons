@@ -425,6 +425,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using result_type = conversion_result<T>;
+        using char_type = typename T::value_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -432,9 +433,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template<typename Alloc,typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            return result_type{jsoncons::in_place, j.as_string()};
+            using char_allocator_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<char_type>;
+            auto s = j.template as_string<char_allocator_type>(aset.get_allocator());
+            return result_type{jsoncons::unexpect, jsoncons::conv_errc::conversion_failed};
         }
 
         template <typename Alloc>
@@ -846,7 +849,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_conv_traits<Json, T, 
                             typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
                                                     ext_traits::is_map_like<T>::value &&
-                                                    ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                                    ext_traits::is_string<typename T::key_type>::value &&
                                                     is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
@@ -902,7 +905,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_conv_traits<Json, T, 
                             typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
                                                     ext_traits::is_map_like<T>::value &&
-                                                    !ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                                    !ext_traits::is_string<typename T::key_type>::value &&
                                                     is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
                                                     is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >

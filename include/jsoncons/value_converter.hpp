@@ -48,7 +48,7 @@ namespace jsoncons {
     };
 
     // From any byte sequence, Into string
-    template <typename From,typename Into>
+    /*template <typename From,typename Into>
     class value_converter<From, Into, 
         typename std::enable_if<ext_traits::is_byte_sequence<From>::value && !ext_traits::is_string_or_string_view<From>::value &&
             ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
@@ -102,7 +102,7 @@ namespace jsoncons {
 
             return ws;
         }
-    };
+    };*/
 
     // From byte string, Into byte string
     template <typename From,typename Into>
