@@ -31,7 +31,7 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
-#include <jsoncons/value_converter.hpp>
+#include <jsoncons/conversion.hpp>
 
 namespace jsoncons {
 

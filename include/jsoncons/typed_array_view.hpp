@@ -20,7 +20,7 @@
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/value_converter.hpp>
+#include <jsoncons/conversion.hpp>
 
 namespace jsoncons {
 

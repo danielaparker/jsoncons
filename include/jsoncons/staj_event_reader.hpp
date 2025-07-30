@@ -26,7 +26,7 @@
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/value_converter.hpp>
+#include <jsoncons/conversion.hpp>
 
 namespace jsoncons {
 
