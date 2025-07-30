@@ -435,8 +435,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template<typename Alloc,typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            using char_allocator_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<char_type>;
-            auto s = j.template as_string<char_allocator_type>(aset.get_allocator());
+            auto s = j.template as_string<typename T::allocator_type>(aset.get_allocator());
             return result_type{std::move(s)};
         }
 
