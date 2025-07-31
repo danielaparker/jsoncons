@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <forward_list>
+#include <list>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -61,6 +62,23 @@ TEST_CASE("decode_json using allocator")
     {
         using cust_allocator_type = cust_allocator<cust_string>;
         using value_type = std::forward_list<cust_string,cust_allocator_type>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1","2","3"])";
+
+        auto result = jsoncons::try_decode_json<value_type>(aset, str);
+        REQUIRE(result);
+        value_type& val(*result);
+        REQUIRE(!val.empty());
+        //CHECK("1" == result[0].c_str());
+    }
+
+    SECTION("std::list of string")
+    {
+        using cust_allocator_type = cust_allocator<cust_string>;
+        using value_type = std::list<cust_string,cust_allocator_type>;
 
         cust_allocator_type alloc(1);
         auto aset = make_alloc_set(alloc);
