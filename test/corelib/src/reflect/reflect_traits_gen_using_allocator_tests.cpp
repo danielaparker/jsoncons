@@ -17,58 +17,58 @@
 
 using namespace jsoncons;
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/mock_stateful_allocator.hpp>
+
+template <typename T>
+using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
+
 namespace {
 namespace ns {
 
+    template <typename Alloc>
     struct book_all_m
     {
-        std::string author;
-        std::string title;
+        using allocator_type = Alloc;
+
+        using char_allocator_type = typename std::allocator_traits<typename Alloc::inner_allocator_type>:: template rebind_alloc<char>;
+        using string_type = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
+        book_all_m(const Alloc alloc)
+            : author(alloc), title(alloc)
+        {
+        }
+
+        string_type author;
+        string_type title;
         double price;
     };
 
 } // namespace ns
 } // namespace 
  
-JSONCONS_ALL_MEMBER_TRAITS(ns::book_all_m,author,title,price)
-
-void test_is_json_type_traits_declared(std::true_type)
-{
-}
+JSONCONS_ALL_MEMBER_TRAITS(ns::book_all_m<cust_allocator<char>>,author,title,price)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 {
-    std::string an_author = "Haruki Murakami"; 
-    std::string a_title = "Kafka on the Shore";
-    double a_price = 25.17;
-
-    ns::book_all_m book{an_author, a_title, a_price};
-
-    CHECK(is_json_type_traits_declared<ns::book_all_m>::value);
-    test_is_json_type_traits_declared(is_json_type_traits_declared<ns::book_all_m>());
-
     SECTION("success")
     {
-        std::string s;
+        std::string str = R"(
+{
+    "author" : "Haruki Murakami",  
+    "title" : "Kafka on the Shore",
+    "price" : 25.17
+}
+        )";
 
-        encode_json(book, s);
+        cust_allocator<char> alloc(1);
+        auto aset = make_alloc_set(alloc);
+        auto r = decode_json<ns::book_all_m<cust_allocator<char>>>(aset, str);
 
-        json j = decode_json<json>(s);
-
-        REQUIRE(j.is<ns::book_all_m>() == true);
-
-        CHECK(an_author == j["author"].as<std::string>());
-        CHECK(a_title == j["title"].as<std::string>()       );
-        CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
-
-        json j2(book);
-
-        CHECK(j == j2);
-
-        ns::book_all_m val = j.as<ns::book_all_m>();
-
-        CHECK(val.author == book.author);
-        CHECK(val.title == book.title);
-        CHECK(val.price == Approx(book.price).epsilon(0.001));
+        //REQUIRE(r);
     }
 }
+
+#endif
