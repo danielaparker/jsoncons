@@ -214,4 +214,61 @@ TEST_CASE("from diff with null and lossless number")
     check_patch(j1,patch,std::error_code(),j2);
 }
 
+TEST_CASE("replace_root_with_object_via_add")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "add", "path" : "", "value": {} }])");
+    json expected = json::parse(R"({})");
+    check_patch(target, patch, std::error_code(), expected);
+}
 
+TEST_CASE("replace_root_with_object_via_replace")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "replace", "path" : "", "value": {} }])");
+    json expected = json::parse(R"({})");
+    check_patch(target, patch, std::error_code(), expected);
+}
+
+TEST_CASE("remove_root")
+{
+    json target = json::parse(R"({})");
+    json patch = json::parse(R"([{ "op" : "remove", "path" : "" }])");
+    json expected = target;
+    check_patch(target, patch, jsonpatch::jsonpatch_errc::remove_failed, expected);
+}
+
+TEST_CASE("test_root")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "test", "path" : "", "value": { "child" : [ "a", "b", "c", "d" ] } }])");
+    json expected = target;
+    check_patch(target, patch, std::error_code(), expected);
+}
+
+TEST_CASE("move_child_to_root")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "move", "path" : "", "from": "/child" }])");
+    json expected = json::parse(R"([ "a", "b", "c", "d" ])");
+    check_patch(target, patch, std::error_code(), expected);
+}
+
+TEST_CASE("move_root_to_child")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "move", "path" : "/child", "from": "" }])");
+    json expected = target;
+    check_patch(target, patch, jsonpatch::jsonpatch_errc::move_failed, expected);
+}
+
+TEST_CASE("copy_root_to_child")
+{
+    json target = json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    json patch = json::parse(R"([{ "op" : "copy", "path" : "/child_copy", "from": "" }])");
+    json expected = json::parse(R"(
+        { "child" : [ "a", "b", "c", "d" ],
+          "child_copy" : { "child" : [ "a", "b", "c", "d" ] } }
+    )");
+    check_patch(target, patch, std::error_code(), expected);
+}
