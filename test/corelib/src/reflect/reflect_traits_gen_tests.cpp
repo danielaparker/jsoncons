@@ -562,7 +562,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); // isbn is optional
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
 
@@ -654,7 +654,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); // isbn is optional
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
         CHECK_FALSE(j.contains("isbn"));
@@ -685,7 +685,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); 
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
         REQUIRE(j.contains("isbn"));
@@ -781,7 +781,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
         json j(book);
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
     }
@@ -881,7 +881,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
 
         json j(book);
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
         CHECK(j["isbn"].as<std::string>() == an_isbn);
@@ -924,7 +924,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
 
         json j = json::parse(buffer);
 
-        CHECK(an_author == j["author"].as<std::string>()         );
+        CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
         CHECK(j["isbn"].as<std::string>() == an_isbn);

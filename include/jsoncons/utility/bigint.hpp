@@ -643,7 +643,7 @@ public:
     {
         if ( this != &y )
         {
-            resize( y.length() );
+            resize( y.length());
             common_stor_.is_negative_ = y.is_negative();
             if ( y.length() > 0 )
             {
@@ -657,7 +657,7 @@ public:
     {
         const uint64_t* y_data = y.data();
         
-        if ( is_negative() != y.is_negative() )
+        if ( is_negative() != y.is_negative())
             return *this -= -y;
         uint64_t d;
         uint64_t carry = 0;
@@ -671,7 +671,7 @@ public:
                 break;
             d = this_data[i] + carry;
             carry = d < carry;
-            if ( i < y.length() )
+            if ( i < y.length())
             {
                 this_data[i] = d + y_data[i];
                 if ( this_data[i] < d )
@@ -688,7 +688,7 @@ public:
     {
         const uint64_t* y_data = y.data();
 
-        if ( is_negative() != y.is_negative() )
+        if ( is_negative() != y.is_negative())
             return *this += -y;
         if ( (!is_negative() && y > *this) || (is_negative() && y < *this) )
             return *this = -(y - *this);
@@ -792,7 +792,7 @@ public:
                     for ( jA=0; jA < x.length(); jA++ )
                     {
                         jB = i - jA;
-                        if ( jB >= 0 && jB < y.length() )
+                        if ( jB >= 0 && jB < y.length())
                         {
                             DDproduct( x_data[jA], y_data[jB], hi, lo );
                             sumLo_old = sumLo;
@@ -858,7 +858,7 @@ public:
     basic_bigint& operator>>=(uint64_t k)
     {
         size_type q = size_type(k / basic_type_bits);
-        if ( q >= length() )
+        if ( q >= length())
         {
             resize( 0 );
             return *this;
@@ -917,9 +917,9 @@ public:
 
     basic_bigint& operator|=( const basic_bigint<Allocator>& a )
     {
-        if ( length() < a.length() )
+        if ( length() < a.length())
         {
-            resize( a.length() );
+            resize( a.length());
         }
 
         const uint64_t* qBegin = a.begin();
@@ -938,9 +938,9 @@ public:
 
     basic_bigint& operator^=( const basic_bigint<Allocator>& a )
     {
-        if ( length() < a.length() )
+        if ( length() < a.length())
         {
-            resize( a.length() );
+            resize( a.length());
         }
 
         const uint64_t* qBegin = a.begin();
@@ -961,7 +961,7 @@ public:
     {
         size_type old_length = length();
 
-        resize( (std::min)( length(), a.length() ) );
+        resize( (std::min)( length(), a.length()) );
 
         const uint64_t* pBegin = begin();
         uint64_t* p = end() - 1;
@@ -1129,7 +1129,7 @@ public:
                         break;
                 }
             } 
-            while ( v.length() );
+            while ( v.length());
             if (is_negative())
             {
                 data.push_back('-');
@@ -1375,7 +1375,7 @@ public:
 
     friend basic_bigint<Allocator> abs( const basic_bigint<Allocator>& a )
     {
-        if ( a.is_negative() )
+        if ( a.is_negative())
         {
             return -a;
         }
@@ -1432,14 +1432,14 @@ public:
     {
         const uint64_t* y_data = y.data();
 
-        if ( is_negative() != y.is_negative() )
+        if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
         int code = 0;
         if ( length() == 0 && y.length() == 0 )
             code = 0;
-        else if ( length() < y.length() )
+        else if ( length() < y.length())
             code = -1;
-        else if ( length() > y.length() )
+        else if ( length() > y.length())
             code = +1;
         else
         {

@@ -130,6 +130,7 @@ add_executable(unit_tests
                corelib/src/reflect/reflect_traits_gen_functional_tests.cpp
                corelib/src/reflect/reflect_traits_gen_limit_tests.cpp
                corelib/src/reflect/reflect_traits_gen_tests.cpp
+               corelib/src/reflect/reflect_traits_gen_using_allocator_tests.cpp
                corelib/src/reflect/reflect_traits_name_gen_tests.cpp
                corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/short_string_tests.cpp

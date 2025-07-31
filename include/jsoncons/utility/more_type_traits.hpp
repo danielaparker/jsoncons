@@ -747,7 +747,7 @@ namespace impl {
     <
         Container, Element, 
         typename std::enable_if<has_data<Container>::value>::type>
-            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data() )>::type(*)[], Element(*)[]>
+            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data())>::type(*)[], Element(*)[]>
     {};
 
     template <typename T>

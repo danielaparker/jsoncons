@@ -838,7 +838,7 @@ namespace jsoncons {
             {
                 auto pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
                                             Comp());   
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     members_.emplace_back(*it);
                 }
@@ -874,7 +874,7 @@ namespace jsoncons {
                     pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
                                           Comp());        
                 }
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     members_.emplace_back(*it);
                     hint = members_.begin() + (members_.size() - 1);
@@ -904,7 +904,7 @@ namespace jsoncons {
             {
                 auto pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
                                             Comp());   
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     members_.emplace_back(*it);
                 }
@@ -940,7 +940,7 @@ namespace jsoncons {
                     pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
                                           Comp());        
                 }
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     members_.emplace_back(*it);
                     hint = members_.begin() + (members_.size() - 1);
@@ -1452,7 +1452,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = find((*it).key());
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     try_emplace((*it).key(),std::move((*it).value()));
                 }
@@ -1517,7 +1517,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = find((*it).key());
-                if (pos == members_.end() )
+                if (pos == members_.end())
                 {
                     insert_or_assign((*it).key(),std::move((*it).value()));
                 }

@@ -75,7 +75,7 @@ void decode_mult_dim_row_major()
 
 void encode_decode_large_typed_array()
 {
-    std::ios_base::fmtflags f( std::cout.flags() );
+    std::ios_base::fmtflags f( std::cout.flags());
 
     std::vector<float> x(15000000);
     for (std::size_t i = 0; i < x.size(); ++i)
@@ -131,7 +131,7 @@ void encode_mult_dim_array()
 
 void encode_half_array()
 {
-    std::ios_base::fmtflags f( std::cout.flags() );
+    std::ios_base::fmtflags f( std::cout.flags());
 
     std::vector<uint8_t> buffer;
 
