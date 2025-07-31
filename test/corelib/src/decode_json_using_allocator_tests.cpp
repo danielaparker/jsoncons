@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <forward_list>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -16,13 +17,14 @@ using namespace jsoncons;
 #include <scoped_allocator>
 #include <common/mock_stateful_allocator.hpp>
 
-using char_allocator_type = mock_stateful_allocator<char>;
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
 
 TEST_CASE("decode_json using allocator")
 {
+    using char_allocator_type = mock_stateful_allocator<char>;
+    using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
     SECTION("decode string test")
     {
         using cust_allocator_type = cust_allocator<cust_string>;
@@ -40,7 +42,7 @@ TEST_CASE("decode_json using allocator")
         //CHECK("1" == result[0].c_str());
     }
 
-    SECTION("decode vector of string test")
+    SECTION("std::vector of string")
     {
         using cust_allocator_type = cust_allocator<cust_string>;
 
@@ -52,6 +54,23 @@ TEST_CASE("decode_json using allocator")
         auto result = jsoncons::try_decode_json<std::vector<cust_string,cust_allocator_type>>(aset, str);
         REQUIRE(result);
         REQUIRE(3 == result->size());
+        //CHECK("1" == result[0].c_str());
+    }
+
+    SECTION("std::forward_list of string")
+    {
+        using cust_allocator_type = cust_allocator<cust_string>;
+        using value_type = std::forward_list<cust_string,cust_allocator_type>;
+
+        cust_allocator_type alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1","2","3"])";
+
+        auto result = jsoncons::try_decode_json<value_type>(aset, str);
+        REQUIRE(result);
+        value_type& val(*result);
+        REQUIRE(!val.empty());
         //CHECK("1" == result[0].c_str());
     }
 

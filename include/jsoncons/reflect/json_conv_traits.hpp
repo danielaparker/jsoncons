@@ -676,7 +676,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             if (j.is_array())
             {
-                T result;
+                T result = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 for (const auto& item : j.array_range())
                 {
                     auto res = item.template try_as<value_type>(aset);
@@ -746,7 +746,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             if (j.is_array())
             {
-                T result;
+                T result = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
 
                 auto it = j.array_range().rbegin();
                 auto end = j.array_range().rend();
