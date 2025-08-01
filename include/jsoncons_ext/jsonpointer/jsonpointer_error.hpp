@@ -55,7 +55,8 @@ enum class jsonpointer_errc
     unexpected_end_of_input,
     argument_to_unflatten_invalid,
     invalid_flattened_key,
-    invalid_uri_escaped_data
+    invalid_uri_escaped_data,
+    expected_location
 };
 
 class jsonpointer_error_category_impl
@@ -92,6 +93,8 @@ public:
                 return "Argument to unflatten must be an object";
             case jsonpointer_errc::invalid_flattened_key:
                 return "Flattened key is invalid";
+            case jsonpointer_errc::expected_location:
+                return "Expected location";
             default:
                 return "Unknown jsonpointer error";
         }
