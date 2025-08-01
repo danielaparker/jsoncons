@@ -664,6 +664,12 @@ namespace jsonpointer {
              bool create_if_missing,
              std::error_code& ec)
     {
+        if (location.empty())
+        {
+            root = std::forward<T>(value);
+            return;
+        }
+
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
@@ -801,6 +807,7 @@ namespace jsonpointer {
     {
         if (location.empty())
         {
+            root = std::forward<T>(value);
             return;
         }
         Json* current = std::addressof(root);
