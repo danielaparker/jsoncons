@@ -56,7 +56,7 @@ enum class jsonpointer_errc
     argument_to_unflatten_invalid,
     invalid_flattened_key,
     invalid_uri_escaped_data,
-    expected_location
+    cannot_remove_root
 };
 
 class jsonpointer_error_category_impl
@@ -93,8 +93,8 @@ public:
                 return "Argument to unflatten must be an object";
             case jsonpointer_errc::invalid_flattened_key:
                 return "Flattened key is invalid";
-            case jsonpointer_errc::expected_location:
-                return "Expected location";
+            case jsonpointer_errc::cannot_remove_root:
+                return "Cannot remove root of target document";
             default:
                 return "Unknown jsonpointer error";
         }

@@ -951,7 +951,7 @@ namespace jsonpointer {
     {
         if (location.empty())
         {
-            ec = jsonpointer_errc::expected_location;
+            ec = jsonpointer_errc::cannot_remove_root;
             return;
         }
 
