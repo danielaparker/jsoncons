@@ -938,6 +938,11 @@ namespace jsonpointer {
     template <typename Json>
     void remove(Json& root, const basic_json_pointer<typename Json::char_type>& location, std::error_code& ec)
     {
+        if (location.empty())
+        {
+            return;
+        }
+
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
