@@ -664,6 +664,12 @@ namespace jsonpointer {
              bool create_if_missing,
              std::error_code& ec)
     {
+        if (location.empty())
+        {
+            root = std::forward<T>(value);
+            return;
+        }
+
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
@@ -799,6 +805,11 @@ namespace jsonpointer {
                        bool create_if_missing,
                        std::error_code& ec)
     {
+        if (location.empty())
+        {
+            root = std::forward<T>(value);
+            return;
+        }
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
@@ -938,6 +949,12 @@ namespace jsonpointer {
     template <typename Json>
     void remove(Json& root, const basic_json_pointer<typename Json::char_type>& location, std::error_code& ec)
     {
+        if (location.empty())
+        {
+            ec = jsonpointer_errc::cannot_remove_root;
+            return;
+        }
+
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
@@ -1042,6 +1059,11 @@ namespace jsonpointer {
                  bool create_if_missing,
                  std::error_code& ec)
     {
+        if (location.empty())
+        {
+            root = std::forward<T>(value);
+            return;
+        }
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
