@@ -128,7 +128,7 @@ namespace jsoncons {
             random_access_iterator_wrapper& operator=(random_access_iterator_wrapper&&) = default;
 
             template <typename Iter,
-                      class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
+                      typename=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
             random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other)
                 : it_(other.it_), has_value_(other.has_value_)
             {

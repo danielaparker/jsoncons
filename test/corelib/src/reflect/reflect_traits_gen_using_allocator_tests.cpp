@@ -100,20 +100,22 @@ struct book_3_m
     string_type author;
     string_type title;
     double price;
-    string_type isbn;
+    jsoncons::optional<string_type> isbn;
 
     book_3_m(const Alloc& alloc)
-        : author(alloc), title(alloc), isbn(alloc)
+        : author(alloc), title(alloc), isbn()
     {
     }
 
     book_3_m(const book_3_m& other, const Alloc& alloc)
-        : author(other.author, alloc), title(other.title, alloc), price(other.price), isbn(other.isbn, alloc)
+        : author(other.author, alloc), title(other.title, alloc), price(other.price), 
+        isbn(other.isbn ? jsoncons::optional<string_type>(jsoncons::in_place, *other.isbn, alloc) : other.isbn)
     {
     }
 
     book_3_m(book_3_m&& other, const Alloc& alloc)
-        : author(std::move(other.author), alloc), title(std::move(other.title), alloc), price(other.price), isbn(std::move(other.isbn), alloc)
+        : author(std::move(other.author), alloc), title(std::move(other.title), alloc), price(other.price), 
+        isbn(other.isbn ? jsoncons::optional<string_type>(jsoncons::in_place, std::move(*other.isbn), alloc) : std::move(other.isbn))
     {
     }
 };

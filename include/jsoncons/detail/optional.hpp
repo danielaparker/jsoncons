@@ -154,11 +154,11 @@ namespace detail
         {
         }
 
-        template< class... Args >
-        explicit optional(jsoncons::detail::in_place_t, Args&&... args,
-            typename std::enable_if<std::is_constructible<T, Args...>::value,int>::type = 0)
+        template<typename... Args, 
+            typename = typename std::enable_if<std::is_constructible<T, Args...>::value,int>::type>
+        optional(jsoncons::detail::in_place_t, Args&&... args) 
+          : has_value_(true), value_(std::forward<Args>(args)...)
         {
-            ::new (&value_) T(std::forward<Args>(args)...);
         }
 
         ~optional() noexcept
