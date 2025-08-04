@@ -9,7 +9,7 @@
 
 #include <system_error>
 #include <type_traits>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <cassert>
 

@@ -577,4 +577,16 @@ namespace binary {
 } // namespace jsoncons
 // allow to disable exceptions
 
+#if defined(JSONCONS_HAS_2017)
+#  define JSONCONS_FALLTHROUGH [[fallthrough]]
+#elif defined(__clang__)
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__) && ((__GNUC__ >= 7))
+#  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
+#elif defined (__GNUC__)
+#  define JSONCONS_FALLTHROUGH // FALLTHRU
+#else
+#  define JSONCONS_FALLTHROUGH
+#endif
+
 #endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
