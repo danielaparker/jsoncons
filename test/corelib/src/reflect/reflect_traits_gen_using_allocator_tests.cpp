@@ -203,6 +203,8 @@ JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(1, ns::book_all_gs, get, set, Author, Titl
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,cust_allocator<char>>;
+
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 {
 
@@ -210,7 +212,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
     {
         using book_type = ns::book_all_m<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
 
-        std::string str = R"(
+        std::string input = R"(
 {
     "author" : "Haruki Murakami",  
     "title" : "Kafka on the Shore",
@@ -220,9 +222,16 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
-        auto r = try_decode_json<book_type>(aset, str);
+        auto r = try_decode_json<book_type>(aset, input);
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 
     SECTION("vector of book")
@@ -230,22 +239,21 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
         using book_type = ns::book_all_m<cust_allocator<char>>;
         using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
 
-        std::string str = R"(
+        std::string input = R"(
 [
     {
-        "title" : "Kafka on the Shore",
         "author" : "Haruki Murakami",
+        "title" : "Kafka on the Shore",
         "price" : 25.17
     },
     {
-        "title" : "Pulp",
         "author" : "Charles Bukowski",
-        "price" : 12,  
-        "isbn" : "1852272007"  
+        "title" : "Pulp",
+        "price" : 12  
     },
     {
-        "title" : "Cutter's Way",
         "author" : "Ivan Passer",
+        "title" : "Cutter's Way",
         "price" : 15.0
     }
 ]
@@ -253,9 +261,16 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, str);
+        auto r = try_decode_json<book_collection_type>(aset, input);
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 }
 
@@ -266,7 +281,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
     {
         using book_type = ns::book_all_m_name<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
 
-        std::string str = R"(
+        std::string input = R"(
 {
     "Author" : "Haruki Murakami",  
     "Title" : "Kafka on the Shore",
@@ -276,8 +291,15 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
 
         cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
-        auto r = try_decode_json<book_type>(aset, str);
+        auto r = try_decode_json<book_type>(aset, input);
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 
     SECTION("vector of book")
@@ -285,21 +307,21 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
         using book_type = ns::book_all_m_name<cust_allocator<char>>;
         using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
 
-        std::string str = R"(
+        std::string input = R"(
 [
     {
-        "Title" : "Kafka on the Shore",
         "Author" : "Haruki Murakami",
+        "Title" : "Kafka on the Shore",
         "Price" : 25.17
     },
     {
-        "Title" : "Pulp",
         "Author" : "Charles Bukowski",
+        "Title" : "Pulp",
         "Price" : 12  
     },
     {
-        "Title" : "Cutter's Way",
         "Author" : "Ivan Passer",
+        "Title" : "Cutter's Way",
         "Price" : 15.0
     }
 ]
@@ -307,9 +329,16 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, str);
+        auto r = try_decode_json<book_collection_type>(aset, input);
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 }
 
@@ -320,7 +349,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
     {
         using book_type = ns::book_3_m<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
 
-        std::string str = R"(
+        std::string input = R"(
 {
     "author" : "Haruki Murakami",  
     "title" : "Kafka on the Shore",
@@ -330,8 +359,15 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
-        auto r = try_decode_json<book_type>(aset, str);
+        auto r = try_decode_json<book_type>(aset, input);
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 
     SECTION("vector of book")
@@ -339,22 +375,22 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
         using book_type = ns::book_3_m<cust_allocator<char>>;
         using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
 
-        std::string str = R"(
+        std::string input = R"(
 [
     {
-        "title" : "Kafka on the Shore",
         "author" : "Haruki Murakami",
+        "title" : "Kafka on the Shore",
         "price" : 25.17
     },
     {
-        "title" : "Pulp",
         "author" : "Charles Bukowski",  
-        "isbn" : "1852272007",
-        "price" : 12.0
+        "title" : "Pulp",
+        "price" : 12.0,
+        "isbn" : "1852272007"
     },
     {
-        "title" : "Cutter's Way",
         "author" : "Ivan Passer",
+        "title" : "Cutter's Way",
         "price" : 15.0
     }
 ]
@@ -362,9 +398,16 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, str);
+        auto r = try_decode_json<book_collection_type>(aset, input);
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 }
 
@@ -375,7 +418,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
     {
         using book_type = ns::book_all_gs<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
 
-        std::string str = R"(
+        std::string input = R"(
 {
     "Author" : "Haruki Murakami",  
     "Title" : "Kafka on the Shore",
@@ -385,13 +428,20 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
 
         cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
-        auto r = try_decode_json<book_type>(aset, str);
+        auto r = try_decode_json<book_type>(aset, input);
         if (!r)
         {
             std::cout << "Err: " << r.error() << "\n";
         }
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 
     SECTION("vector of book")
@@ -399,21 +449,21 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
         using book_type = ns::book_all_gs<cust_allocator<char>>;
         using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
 
-        std::string str = R"(
+        std::string input = R"(
 [
     {
-        "Title" : "Kafka on the Shore",
         "Author" : "Haruki Murakami",
+        "Title" : "Kafka on the Shore",
         "Price" : 25.17
     },
     {
-        "Title" : "Pulp",
         "Author" : "Charles Bukowski",
+        "Title" : "Pulp",
         "Price" : 12  
     },
     {
-        "Title" : "Cutter's Way",
         "Author" : "Ivan Passer",
+        "Title" : "Cutter's Way",
         "Price" : 15.0
     }
 ]
@@ -421,9 +471,16 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, str);
+        auto r = try_decode_json<book_collection_type>(aset, input);
 
         REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
     }
 }
 
