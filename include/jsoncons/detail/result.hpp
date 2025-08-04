@@ -10,19 +10,13 @@
 #include <system_error>
 #include <type_traits>
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/detail/utility.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <cassert>
 
 namespace jsoncons {
 namespace detail {
     
-struct in_place_t
-{
-    explicit in_place_t() = default; 
-};
-
-JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
-
 struct unexpect_t
 {
     explicit unexpect_t() = default; 
@@ -57,7 +51,7 @@ public:
     }
 
     template <typename... Args>    
-    result(in_place_t, Args&& ... args) noexcept
+    result(jsoncons::detail::in_place_t, Args&& ... args) noexcept
         : has_value_(true)
     {
         ::new (&value_) T(std::forward<Args>(args)...);

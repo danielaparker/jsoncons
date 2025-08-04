@@ -13,6 +13,7 @@
 #include <utility> // std::swap
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/detail/utility.hpp>
 
 namespace jsoncons 
 { 
@@ -151,6 +152,13 @@ namespace detail
                                                  !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<T2>(value))
         {
+        }
+
+        template< class... Args >
+        explicit optional(jsoncons::detail::in_place_t, Args&&... args,
+            typename std::enable_if<std::is_constructible<T, Args...>::value,int>::type = 0)
+        {
+            ::new (&value_) T(std::forward<Args>(args)...);
         }
 
         ~optional() noexcept
