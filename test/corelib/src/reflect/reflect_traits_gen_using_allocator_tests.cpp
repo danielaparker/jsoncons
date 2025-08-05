@@ -210,7 +210,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 
     SECTION("book")
     {
-        using book_type = ns::book_all_m<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
+        using book_type = ns::book_all_m<cust_allocator<char>>;
 
         std::string input = R"(
 {
@@ -279,7 +279,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
 
     SECTION("book")
     {
-        using book_type = ns::book_all_m_name<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
+        using book_type = ns::book_all_m_name<cust_allocator<char>>;
 
         std::string input = R"(
 {
@@ -347,7 +347,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
 
     SECTION("book")
     {
-        using book_type = ns::book_3_m<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
+        using book_type = ns::book_3_m<cust_allocator<char>>;
 
         std::string input = R"(
 {
@@ -416,7 +416,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
 
     SECTION("book")
     {
-        using book_type = ns::book_all_gs<std::scoped_allocator_adaptor<mock_stateful_allocator<char>>>;
+        using book_type = ns::book_all_gs<cust_allocator<char>>;
 
         std::string input = R"(
 {
