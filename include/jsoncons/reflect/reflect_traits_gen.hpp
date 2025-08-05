@@ -729,7 +729,7 @@ namespace reflect { \
 
 #define JSONCONS_CTOR_GETTER_AS(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count),
 #define JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count) \
-  _r ## Getter ? std::move(*_r ## Getter) : typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type()
+  _r ## Getter ? std::move(*_r ## Getter) : jsoncons::make_obj_using_allocator<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type>(aset.get_allocator())
 
 #define JSONCONS_CTOR_GETTER_TO_JSON(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Count)
 #define JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Count) \
@@ -795,7 +795,7 @@ namespace reflect { \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_GET,ClassName,,, __VA_ARGS__) \
-            return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
+            return result_type(make_obj_using_allocator<value_type>(aset.get_allocator(), JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) )); \
         } \
         template <typename Alloc> \
         static Json to_json(const Alloc& alloc, const value_type& class_instance) \
