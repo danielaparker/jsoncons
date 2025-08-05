@@ -795,7 +795,7 @@ namespace reflect { \
         { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, # ClassName); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_GET,ClassName,,, __VA_ARGS__) \
-            return result_type(make_obj_using_allocator<value_type>(aset.get_allocator(), JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) )); \
+            return result_type(jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator(), JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) )); \
         } \
         template <typename Alloc> \
         static Json to_json(const Alloc& alloc, const value_type& class_instance) \
