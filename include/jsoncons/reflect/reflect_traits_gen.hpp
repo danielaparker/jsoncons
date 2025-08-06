@@ -901,7 +901,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, Match, Into, ))
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match, Into, From))
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name, Mode, Match, Into, From) \
-  _r ## Getter ? From(std::move(*_r ## Getter)) : From(typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type())
+  _r ## Getter ? From(std::move(*_r ## Getter)) : From(jsoncons::make_obj_using_allocator<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset.get_allocator()))
 
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
@@ -1000,7 +1000,7 @@ namespace reflect { \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_MATCH,,,, __VA_ARGS__)\
             std::size_t index = 0; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_GET,ClassName,,, __VA_ARGS__) \
-            return value_type ( JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
+            return result_type(jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator(), JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__))); \
         } \
         template <typename Alloc> \
         static Json to_json(const Alloc& alloc, const value_type& class_instance) \

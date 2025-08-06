@@ -248,6 +248,64 @@ public:
     }
 };
 
+template <typename Alloc>
+class book_all_cg_name
+{
+public:
+    using allocator_type = Alloc;
+
+    using char_allocator_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<char>;
+    using string_type = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+private:
+    string_type author_;
+    string_type title_;
+    double price_{0};
+public:
+    book_all_cg_name(const string_type& author,
+          const string_type& title,
+          double price,
+          const allocator_type& alloc)
+        : author_(author, alloc), title_(title, alloc), price_(price)
+    {
+    }
+
+    book_all_cg_name(const book_all_cg_name&) = default;
+
+    book_all_cg_name(const book_all_cg_name& other, const Alloc& alloc)
+        : author_(other.author_, alloc), 
+          title_(other.title_, alloc), 
+          price_(other.price_)
+    {
+    }
+
+    book_all_cg_name(book_all_cg_name&&) = default;
+
+    book_all_cg_name(book_all_cg_name&& other, const Alloc& alloc)
+        : author_(std::move(other.author_), alloc), 
+          title_(std::move(other.title_), alloc), 
+          price_(other.price_)
+    {
+    }
+
+    book_all_cg_name& operator=(const book_all_cg_name&) = default;
+    book_all_cg_name& operator=(book_all_cg_name&&) = default;
+
+    const string_type& author() const
+    {
+        return author_;
+    }
+
+    const string_type& title() const
+    {
+        return title_;
+    }
+
+    double price() const
+    {
+        return price_;
+    }
+};
+
 } // namespace ns
 } // namespace 
  
@@ -259,6 +317,7 @@ JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1, ns::book_all_m_name,(author,"Author"),(ti
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(1, ns::book_all_gs, get, set, Author, Title, Price)
 
 JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS(1, ns::book_all_cg, author, title, price)
+JSONCONS_TPL_ALL_CTOR_GETTER_NAME_TRAITS(1, ns::book_all_cg_name, (author,"Author"),(title,"Title"),(price,"Price"))
 
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
@@ -598,6 +657,79 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
         "author" : "Ivan Passer",
         "title" : "Cutter's Way",
         "price" : 15.0
+    }
+]
+        )";
+
+        cust_allocator<book_type> alloc(1);
+        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto r = try_decode_json<book_collection_type>(aset, input);
+
+        REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
+    }
+}
+
+TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
+{
+
+    SECTION("book")
+    {
+        using book_type = ns::book_all_cg_name<cust_allocator<char>>;
+
+        std::string input = R"(
+{
+    "Author" : "Haruki Murakami",  
+    "Title" : "Kafka on the Shore",
+    "Price" : 25.17
+}
+        )";
+
+        cust_allocator<char> alloc(1);
+        auto aset = make_alloc_set(alloc);
+        auto r = try_decode_json<book_type>(aset, input);
+        if (!r)
+        {
+            std::cout << "Err: " << r.error() << "\n";
+        }
+
+        REQUIRE(r);
+
+        std::string output;
+        encode_json(aset, *r, output);
+
+        auto j1 = ojson::parse(input);
+        auto j2 = ojson::parse(output);
+        CHECK(j1 == j2);
+    }
+
+    SECTION("vector of book")
+    {
+        using book_type = ns::book_all_cg_name<cust_allocator<char>>;
+        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+
+        std::string input = R"(
+[
+    {
+        "Author" : "Haruki Murakami",
+        "Title" : "Kafka on the Shore",
+        "Price" : 25.17
+    },
+    {
+        "Author" : "Charles Bukowski",
+        "Title" : "Pulp",
+        "Price" : 12  
+    },
+    {
+        "Author" : "Ivan Passer",
+        "Title" : "Cutter's Way",
+        "Price" : 15.0
     }
 ]
         )";
