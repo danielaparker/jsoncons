@@ -37,6 +37,11 @@ private:
         T value_;
     };
 public:
+    template <typename U=T>
+    result(typename std::enable_if<std::is_default_constructible<U>::value, int>::type = 0)
+        : result(T{})
+    {
+    }
 
     result(const T& value) 
         : has_value_(true)
@@ -306,6 +311,149 @@ private:
         else 
         {
             construct(std::move(u));
+        }
+    }
+};
+
+template <typename E>
+class result<void,E>
+{
+public:
+    using value_type = void;
+    using error_type = E;
+private:
+    bool has_value_;
+    union {
+        char dummy_;
+        E error_;
+    };
+public:
+
+    result()
+        : has_value_(true), dummy_{}
+    {
+    }
+
+    template <typename... Args>    
+    result(unexpect_t, Args&& ... args) noexcept
+        : has_value_(false)
+    {
+        ::new (&error_) E(std::forward<Args>(args)...);
+    }
+    
+    // copy constructors
+    result(const result<void,E>& other) 
+        : has_value_(other.has_value()), dummy_{}
+    {
+        if (!other)
+        {
+            ::new (&error_) E(other.error_);
+        }
+    }
+
+    // move constructors
+    result(result<void,E>&& other) noexcept
+        : has_value_(other.has_value()), dummy_{}
+    {
+        if (!other)
+        {
+            ::new (&error_) E(other.error_);
+        }
+    }
+
+    ~result() noexcept
+    {
+        destroy();
+    }
+
+    result& operator=(const result& other)
+    {
+        if (other)
+        {
+            assign(*other);
+        }
+        else
+        {
+            destroy();
+            ::new (&error_) E(other.error_);
+        }
+        return *this;
+    }
+
+    result& operator=(result&& other)
+    {
+        if (other)
+        {
+            assign(std::move(*other));
+        }
+        else
+        {
+            destroy();
+            ::new (&error_) E(other.error_);
+        }
+        return *this;
+    }
+
+    constexpr operator bool() const noexcept
+    {
+        return has_value_;
+    }
+    
+    constexpr bool has_value() const noexcept
+    {
+        return has_value_;
+    }
+
+    JSONCONS_CPP14_CONSTEXPR E& error() & noexcept
+    {
+        assert(!has_value_);
+        return this->error_;
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const E& error() const& noexcept
+    {
+        assert(!has_value_);
+        return this->error_;
+    }
+
+    JSONCONS_CPP14_CONSTEXPR E&& error() && noexcept
+    {
+        assert(!has_value_);
+        return std::move(this->error_);
+    }
+
+    JSONCONS_CPP14_CONSTEXPR const E&& error() const && noexcept
+    {
+        assert(!has_value_);
+        return std::move(this->error_);
+    }
+
+    void swap(result& other) noexcept
+    {
+        const bool contains_a_value = has_value();
+        if (contains_a_value == other.has_value())
+        {
+            if (contains_a_value)
+            {
+                using std::swap;
+                swap(**this, *other);
+            }
+        }
+        else
+        {
+            result& source = contains_a_value ? *this : other;
+            result& target = contains_a_value ? other : *this;
+            target = result<void,E>(*source);
+            source.destroy();
+            source.error_ = target.error_;
+        }
+    }
+private:
+    void destroy() noexcept 
+    {
+        if (!has_value_) 
+        {
+            error_.~E();
         }
     }
 };
