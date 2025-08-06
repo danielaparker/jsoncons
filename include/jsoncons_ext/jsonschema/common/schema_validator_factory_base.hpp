@@ -158,7 +158,7 @@ namespace jsonschema {
                     }
                     else
                     {
-                        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema '" + loc.base().string() + "'" ));
+                        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema '" + loc.string() + "'" ));
                     }
                 }
             }
