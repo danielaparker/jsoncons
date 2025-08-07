@@ -11,14 +11,15 @@
 #include <system_error> 
 #include <type_traits> 
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/reflect/encode_traits.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/write_result.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
@@ -29,7 +30,7 @@ namespace msgpack {
     template <typename T,typename ByteContainer>
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const T& j, 
+    try_encode_msgpack(const T& j, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -42,7 +43,7 @@ namespace msgpack {
     template <typename T,typename ByteContainer>
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const T& val, 
+    try_encode_msgpack(const T& val, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -57,7 +58,7 @@ namespace msgpack {
 
     template <typename T>
     typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const T& j, 
+    try_encode_msgpack(const T& j, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -69,7 +70,7 @@ namespace msgpack {
 
     template <typename T>
     typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const T& val, 
+    try_encode_msgpack(const T& val, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -87,7 +88,7 @@ namespace msgpack {
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, const T& j, 
+    try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, const T& j, 
                    ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -100,7 +101,7 @@ namespace msgpack {
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                             ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
+    try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& val, ByteContainer& cont, 
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
@@ -115,7 +116,7 @@ namespace msgpack {
 
     template <typename T,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
+    try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& j, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -128,7 +129,7 @@ namespace msgpack {
 
     template <typename T,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
-    encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
+    try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& val, 
                    std::ostream& os, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -141,6 +142,17 @@ namespace msgpack {
             JSONCONS_THROW(ser_error(ec));
         }
     }
+
+template <typename... Args>
+void encode_msgpack(Args&& ... args)
+{
+    /*auto result = */try_encode_msgpack(std::forward<Args>(args)...); 
+    /*if (!result)
+    {
+        JSONCONS_THROW(ser_error(result.error().code(), result.error().line(), result.error().column()));
+    }*/
+    //return std::move(*result);
+}
 
 } // namespace msgpack
 } // namespace jsoncons

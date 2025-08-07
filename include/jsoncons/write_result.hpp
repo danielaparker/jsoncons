@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_CONVERSION_RESULT_HPP    
-#define JSONCONS_CONVERSION_RESULT_HPP    
+#ifndef JSONCONS_WRITE_RESULT_HPP    
+#define JSONCONS_WRITE_RESULT_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -15,27 +15,27 @@
 
 namespace jsoncons {
 
-class conversion_error
+class write_error
 {
     std::error_code ec_;
     std::string message_arg_;
 public:
-    conversion_error(std::error_code ec)
+    write_error(std::error_code ec)
         : ec_(ec)
     {
     }
-    conversion_error(std::error_code ec, const jsoncons::string_view& message_arg)
+    write_error(std::error_code ec, const jsoncons::string_view& message_arg)
         : ec_(ec), message_arg_(message_arg)
     {
     }
 
-    conversion_error(const conversion_error& other) = default;
+    write_error(const write_error& other) = default;
 
-    conversion_error(conversion_error&& other) = default;
+    write_error(write_error&& other) = default;
 
-    conversion_error& operator=(const conversion_error& other) = default;
+    write_error& operator=(const write_error& other) = default;
 
-    conversion_error& operator=(conversion_error&& other) = default;
+    write_error& operator=(write_error&& other) = default;
     
     std::error_code code() const
     {
@@ -49,7 +49,7 @@ public:
 };
 
 inline
-std::string to_string(const conversion_error& err)
+std::string to_string(const write_error& err)
 {
     std::string str{err.message_arg()};
     if (!str.empty())
@@ -61,15 +61,15 @@ std::string to_string(const conversion_error& err)
 }
 
 inline
-std::ostream& operator<<(std::ostream& os, const conversion_error& err)
+std::ostream& operator<<(std::ostream& os, const write_error& err)
 {
     os << to_string(err);
     return os;
 }
 
 template <typename T>
-using conversion_result = result<T,conversion_error>;
+using write_result = result<T,write_error>;
 
-} // namespace jsoncons
+} // jsoncons
 
-#endif // JSONCONS_CONVERSION_RESULT_HPP
+#endif // JSONCONS_WRITE_RESULT_HPP

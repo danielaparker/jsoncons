@@ -19,6 +19,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/write_result.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
@@ -26,123 +27,134 @@
 namespace jsoncons { 
 namespace bson {
 
-    template <typename T,typename ByteContainer>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_bson(const T& j, 
-                ByteContainer& cont, 
-                const bson_encode_options& options = bson_encode_options())
-    {
-        using char_type = typename T::char_type;
-        basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
-        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-        j.dump(adaptor);
-    }
+template <typename T,typename ByteContainer>
+typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+try_encode_bson(const T& j, 
+            ByteContainer& cont, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    using char_type = typename T::char_type;
+    basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
+    auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
+    j.dump(adaptor);
+}
 
-    template <typename T,typename ByteContainer>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_bson(const T& val, 
-                ByteContainer& cont, 
-                const bson_encode_options& options = bson_encode_options())
+template <typename T,typename ByteContainer>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+try_encode_bson(const T& val, 
+            ByteContainer& cont, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
+    std::error_code ec;
+    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
-        std::error_code ec;
-        reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
+        JSONCONS_THROW(ser_error(ec));
     }
+}
 
-    template <typename T>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
-    encode_bson(const T& j, 
-                std::ostream& os, 
-                const bson_encode_options& options = bson_encode_options())
-    {
-        using char_type = typename T::char_type;
-        bson_stream_encoder encoder(os, options);
-        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-        j.dump(adaptor);
-    }
+template <typename T>
+typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
+try_encode_bson(const T& j, 
+            std::ostream& os, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    using char_type = typename T::char_type;
+    bson_stream_encoder encoder(os, options);
+    auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
+    j.dump(adaptor);
+}
 
-    template <typename T>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
-    encode_bson(const T& val, 
-                std::ostream& os, 
-                const bson_encode_options& options = bson_encode_options())
+template <typename T>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
+try_encode_bson(const T& val, 
+            std::ostream& os, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    bson_stream_encoder encoder(os, options);
+    std::error_code ec;
+    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        bson_stream_encoder encoder(os, options);
-        std::error_code ec;
-        reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
+        JSONCONS_THROW(ser_error(ec));
     }
-  
-    // with temp_allocator_rag
+}
 
-    template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
-    typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-                const T& j, 
-                ByteContainer& cont, 
-                const bson_encode_options& options = bson_encode_options())
-    {
-        using char_type = typename T::char_type;
-        basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-        j.dump(adaptor);
-    }
+// with temp_allocator_rag
 
-    template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                            ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
-    encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-                const T& val, 
-                ByteContainer& cont, 
-                const bson_encode_options& options = bson_encode_options())
-    {
-        basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-        std::error_code ec;
-        reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
-    }
+template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
+typename std::enable_if<ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
+            const T& j, 
+            ByteContainer& cont, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    using char_type = typename T::char_type;
+    basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
+    auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
+    j.dump(adaptor);
+}
 
-    template <typename T,typename Alloc,typename TempAlloc >
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
-    encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-                const T& j, 
-                std::ostream& os, 
-                const bson_encode_options& options = bson_encode_options())
+template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
+typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
+            const T& val, 
+            ByteContainer& cont, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    basic_bson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
+    std::error_code ec;
+    reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        using char_type = typename T::char_type;
-        basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-        j.dump(adaptor);
+        JSONCONS_THROW(ser_error(ec));
     }
+}
 
-    template <typename T,typename Alloc,typename TempAlloc >
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
-    encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-                const T& val, 
-                std::ostream& os, 
-                const bson_encode_options& options = bson_encode_options())
+template <typename T,typename Alloc,typename TempAlloc >
+typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
+try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
+            const T& j, 
+            std::ostream& os, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    using char_type = typename T::char_type;
+    basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
+    auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
+    j.dump(adaptor);
+}
+
+template <typename T,typename Alloc,typename TempAlloc >
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
+try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
+            const T& val, 
+            std::ostream& os, 
+            const bson_encode_options& options = bson_encode_options())
+{
+    basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
+    std::error_code ec;
+    reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
+    if (JSONCONS_UNLIKELY(ec))
     {
-        basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        std::error_code ec;
-        reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
+        JSONCONS_THROW(ser_error(ec));
     }
+}
+
+template <typename... Args>
+void encode_bson(Args&& ... args)
+{
+    /*auto result = */try_encode_bson(std::forward<Args>(args)...); 
+    /*if (!result)
+    {
+        JSONCONS_THROW(ser_error(result.error().code(), result.error().line(), result.error().column()));
+    }*/
+    //return std::move(*result);
+}
       
 } // namespace bson
 } // namespace jsoncons

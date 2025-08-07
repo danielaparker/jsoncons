@@ -92,6 +92,6 @@ std::ostream& operator<<(std::ostream& os, const read_error& err)
 template <typename T>
 using read_result = result<T,read_error>;
 
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_READ_RESULT_HPP
