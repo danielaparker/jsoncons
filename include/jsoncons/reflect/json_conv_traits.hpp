@@ -544,7 +544,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 return result_type(jsoncons::unexpect, conv_errc::not_vector);
             }
-            T result;
+            T result{jsoncons::make_obj_using_allocator<T>(aset.get_allocator())};
             visit_reserve_(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(),result,j.size());
             for (const auto& item : j.array_range())
             {

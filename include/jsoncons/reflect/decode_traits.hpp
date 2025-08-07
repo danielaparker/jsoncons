@@ -252,8 +252,6 @@ struct decode_traits<T,
                 return result_type(jsoncons::unexpect, r.error()); 
             }
             v.push_back(std::move(*r));
-            //v.push_back(/*element_type(aset.get_allocator())*/);
-            //v.emplace_back(1,'a');
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         }

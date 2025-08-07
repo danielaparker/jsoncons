@@ -11,6 +11,8 @@
 #include <jsoncons/encode_json.hpp>
 #include <sstream>
 #include <vector>
+#include <forward_list>
+#include <list>
 #include <utility>
 #include <ctime>
 #include <cstdint>
@@ -46,6 +48,63 @@ TEST_CASE("json_conv_traits using allocator tests")
         REQUIRE(3 == j.size());
 
         auto r2 = j.try_as<std::map<cust_string, cust_string, std::less<cust_string>, cust_allocator<std::pair<const cust_string,cust_string>>>>(aset);
+        REQUIRE(r2);
+    }
+    SECTION("std::vector")
+    {
+        using char_allocator_type = mock_stateful_allocator<char>;
+        using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
+        cust_allocator<char> alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1", "2", "3"])";
+
+        auto r1 = jsoncons::try_decode_json<cust_json>(aset, str);
+        REQUIRE(r1);
+        cust_json& j(*r1);
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
+
+        auto r2 = j.try_as<std::vector<cust_string, cust_allocator<cust_string>>>(aset);
+        REQUIRE(r2);
+    }
+    SECTION("std::forward_list")
+    {
+        using char_allocator_type = mock_stateful_allocator<char>;
+        using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
+        cust_allocator<char> alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1", "2", "3"])";
+
+        auto r1 = jsoncons::try_decode_json<cust_json>(aset, str);
+        REQUIRE(r1);
+        cust_json& j(*r1);
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
+
+        auto r2 = j.try_as<std::forward_list<cust_string, cust_allocator<cust_string>>>(aset);
+        REQUIRE(r2);
+    }
+    SECTION("std::list")
+    {
+        using char_allocator_type = mock_stateful_allocator<char>;
+        using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+
+        cust_allocator<char> alloc(1);
+        auto aset = make_alloc_set(alloc);
+
+        std::string str = R"(["1", "2", "3"])";
+
+        auto r1 = jsoncons::try_decode_json<cust_json>(aset, str);
+        REQUIRE(r1);
+        cust_json& j(*r1);
+        REQUIRE(j.is_array());
+        REQUIRE(3 == j.size());
+
+        auto r2 = j.try_as<std::list<cust_string, cust_allocator<cust_string>>>(aset);
         REQUIRE(r2);
     }
 }
