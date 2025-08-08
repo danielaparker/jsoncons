@@ -15,7 +15,6 @@
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/write_result.hpp>
 
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
@@ -26,136 +25,129 @@ namespace cbor {
 
 template <typename T,typename ByteContainer>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const T& j, 
-            ByteContainer& cont, 
-            const cbor_encode_options& options = cbor_encode_options())
+    ByteContainer& cont, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     using char_type = typename T::char_type;
     basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    j.dump(adaptor);
+    std::error_code ec;
+    j.dump(adaptor, ec);
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 template <typename T,typename ByteContainer>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const T& val, ByteContainer& cont, 
             const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 // stream
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
+typename std::enable_if<ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const T& j, 
-            std::ostream& os, 
-            const cbor_encode_options& options = cbor_encode_options())
+    std::ostream& os, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     using char_type = typename T::char_type;
     cbor_stream_encoder encoder(os, options);
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    j.dump(adaptor);
+    std::error_code ec;
+    j.dump(adaptor, ec);
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const T& val, 
-            std::ostream& os, 
-            const cbor_encode_options& options = cbor_encode_options())
+    std::ostream& os, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     cbor_stream_encoder encoder(os, options);
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
-
-// temp_allocator_arg
 
 // to bytes 
 
 template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const T& j, 
-            ByteContainer& cont, 
-            const cbor_encode_options& options = cbor_encode_options())
+    const T& j, 
+    ByteContainer& cont, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     using char_type = typename T::char_type;
     basic_cbor_encoder<bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    j.dump(adaptor);
+    std::error_code ec;
+    j.dump(adaptor, ec);
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const T& val, 
-            ByteContainer& cont, 
-            const cbor_encode_options& options = cbor_encode_options())
+    const T& val, 
+    ByteContainer& cont, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 // stream
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,void>::type 
+typename std::enable_if<ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const T& j, 
-            std::ostream& os, 
-            const cbor_encode_options& options = cbor_encode_options())
+    const T& j, 
+    std::ostream& os, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     using char_type = typename T::char_type;
     basic_cbor_encoder<binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    j.dump(adaptor);
+    std::error_code ec;
+    j.dump(adaptor, ec);
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,void>::type 
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const T& val, 
-            std::ostream& os, 
-            const cbor_encode_options& options = cbor_encode_options())
+    const T& val, 
+    std::ostream& os, 
+    const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    if (JSONCONS_UNLIKELY(ec))
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
+    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
 }
 
 template <typename... Args>
 void encode_cbor(Args&& ... args)
 {
-    /*auto result = */try_encode_cbor(std::forward<Args>(args)...); 
-    /*if (!result)
+    auto r = try_encode_cbor(std::forward<Args>(args)...); 
+    if (!r)
     {
-        JSONCONS_THROW(ser_error(result.error().code(), result.error().line(), result.error().column()));
-    }*/
-    //return std::move(*result);
+        JSONCONS_THROW(ser_error(r.error()));
+    }
 }
 
 } // namespace cbor

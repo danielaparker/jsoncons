@@ -2912,8 +2912,7 @@ namespace jsoncons {
 
         template <typename CharContainer>
         typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
-        dump(CharContainer& cont, 
-                  std::error_code& ec) const
+        dump(CharContainer& cont, std::error_code& ec) const
         {
             basic_compact_json_encoder<char_type,jsoncons::string_sink<CharContainer>> encoder(cont);
             dump(encoder, ec);
