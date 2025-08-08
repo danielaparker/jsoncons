@@ -90,7 +90,7 @@ std::ostream& operator<<(std::ostream& os, const read_error& err)
 }
 
 template <typename T>
-using read_result = result<T,read_error>;
+using read_result = expected<T,read_error>;
 
 } // namespace jsoncons
 

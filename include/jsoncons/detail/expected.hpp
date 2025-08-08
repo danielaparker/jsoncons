@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_DETAIL_RESULT_HPP    
-#define JSONCONS_DETAIL_RESULT_HPP    
+#ifndef JSONCONS_DETAIL_EXPECTED_HPP    
+#define JSONCONS_DETAIL_EXPECTED_HPP    
 
 #include <system_error>
 #include <type_traits>
@@ -25,7 +25,7 @@ struct unexpect_t
 JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
 
 template <typename T, typename E>
-class result
+class expected
 {
 public:
     using value_type = T;
@@ -38,39 +38,39 @@ private:
     };
 public:
     template <typename U=T>
-    result(typename std::enable_if<std::is_default_constructible<U>::value, int>::type = 0)
-        : result(T{})
+    expected(typename std::enable_if<std::is_default_constructible<U>::value, int>::type = 0)
+        : expected(T{})
     {
     }
 
-    result(const T& value) 
+    expected(const T& value) 
         : has_value_(true)
     {
         construct(value);
     }
 
-    result(T&& value) noexcept
+    expected(T&& value) noexcept
         : has_value_(true)
     {
         construct(std::move(value));
     }
 
     template <typename... Args>    
-    result(jsoncons::detail::in_place_t, Args&& ... args) noexcept
+    expected(jsoncons::detail::in_place_t, Args&& ... args) noexcept
         : has_value_(true)
     {
         ::new (&value_) T(std::forward<Args>(args)...);
     }
 
     template <typename... Args>    
-    result(unexpect_t, Args&& ... args) noexcept
+    expected(unexpect_t, Args&& ... args) noexcept
         : has_value_(false)
     {
         ::new (&error_) E(std::forward<Args>(args)...);
     }
     
     // copy constructors
-    result(const result<T,E>& other) 
+    expected(const expected<T,E>& other) 
         : has_value_(other.has_value())
     {
         if (other)
@@ -84,7 +84,7 @@ public:
     }
 
     // move constructors
-    result(result<T,E>&& other) noexcept
+    expected(expected<T,E>&& other) noexcept
         : has_value_(other.has_value())
     {
         if (other)
@@ -97,12 +97,12 @@ public:
         }
     }
 
-    ~result() noexcept
+    ~expected() noexcept
     {
         destroy();
     }
 
-    result& operator=(const result& other)
+    expected& operator=(const expected& other)
     {
         if (other)
         {
@@ -116,7 +116,7 @@ public:
         return *this;
     }
 
-    result& operator=(result&& other)
+    expected& operator=(expected&& other)
     {
         if (other)
         {
@@ -131,13 +131,13 @@ public:
     }
 
     // value assignment
-    result& operator=(const T& v)
+    expected& operator=(const T& v)
     {
         assign(v);
         return *this;
     }
 
-    result& operator=(T&& v)
+    expected& operator=(T&& v)
     {
         assign(std::move(v));
         return *this;
@@ -159,7 +159,7 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad result access"));
+        JSONCONS_THROW(std::runtime_error("Bad expected access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T& value() const &
@@ -168,7 +168,7 @@ public:
         {
             return this->value_;
         }
-        JSONCONS_THROW(std::runtime_error("Bad result access"));
+        JSONCONS_THROW(std::runtime_error("Bad expected access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR T&& value() &&
@@ -177,7 +177,7 @@ public:
         {
             return std::move(this->value_);
         }
-        JSONCONS_THROW(std::runtime_error("Bad result access"));
+        JSONCONS_THROW(std::runtime_error("Bad expected access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR const T&& value() const &&
@@ -186,7 +186,7 @@ public:
         {
             return std::move(this->value_);
         }
-        JSONCONS_THROW(std::runtime_error("Bad result access"));
+        JSONCONS_THROW(std::runtime_error("Bad expected access"));
     }
 
     JSONCONS_CPP14_CONSTEXPR E& error() & noexcept
@@ -243,7 +243,7 @@ public:
         return this->value_;
     }
 
-    void swap(result& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+    void swap(expected& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
                                         std::is_nothrow_swappable<T>::value*/)
     {
         const bool contains_a_value = has_value();
@@ -257,9 +257,9 @@ public:
         }
         else
         {
-            result& source = contains_a_value ? *this : other;
-            result& target = contains_a_value ? other : *this;
-            target = result<T,E>(*source);
+            expected& source = contains_a_value ? *this : other;
+            expected& target = contains_a_value ? other : *this;
+            target = expected<T,E>(*source);
             source.destroy();
             source.error_ = target.error_;
         }
@@ -316,7 +316,7 @@ private:
 };
 
 template <typename E>
-class result<void,E>
+class expected<void,E>
 {
 public:
     using value_type = void;
@@ -329,20 +329,20 @@ private:
     };
 public:
 
-    result()
+    expected()
         : has_value_(true), dummy_{}
     {
     }
 
     template <typename... Args>    
-    result(unexpect_t, Args&& ... args) noexcept
+    expected(unexpect_t, Args&& ... args) noexcept
         : has_value_(false)
     {
         ::new (&error_) E(std::forward<Args>(args)...);
     }
     
     // copy constructors
-    result(const result<void,E>& other) 
+    expected(const expected<void,E>& other) 
         : has_value_(other.has_value()), dummy_{}
     {
         if (!other)
@@ -352,7 +352,7 @@ public:
     }
 
     // move constructors
-    result(result<void,E>&& other) noexcept
+    expected(expected<void,E>&& other) noexcept
         : has_value_(other.has_value()), dummy_{}
     {
         if (!other)
@@ -361,12 +361,12 @@ public:
         }
     }
 
-    ~result() noexcept
+    ~expected() noexcept
     {
         destroy();
     }
 
-    result& operator=(const result& other)
+    expected& operator=(const expected& other)
     {
         if (other)
         {
@@ -380,7 +380,7 @@ public:
         return *this;
     }
 
-    result& operator=(result&& other)
+    expected& operator=(expected&& other)
     {
         if (other)
         {
@@ -428,7 +428,7 @@ public:
         return std::move(this->error_);
     }
 
-    void swap(result& other) noexcept
+    void swap(expected& other) noexcept
     {
         const bool contains_a_value = has_value();
         if (contains_a_value == other.has_value())
@@ -441,9 +441,9 @@ public:
         }
         else
         {
-            result& source = contains_a_value ? *this : other;
-            result& target = contains_a_value ? other : *this;
-            target = result<void,E>(*source);
+            expected& source = contains_a_value ? *this : other;
+            expected& target = contains_a_value ? other : *this;
+            target = expected<void,E>(*source);
             source.destroy();
             source.error_ = target.error_;
         }
@@ -460,7 +460,7 @@ private:
 
 template <typename T,typename E>
 typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
-swap(result<T,E>& lhs, result<T,E>& rhs) noexcept
+swap(expected<T,E>& lhs, expected<T,E>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
@@ -468,4 +468,4 @@ swap(result<T,E>& lhs, result<T,E>& rhs) noexcept
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_RESULT_HPP
+#endif // JSONCONS_DETAIL_EXPECTED_HPP

@@ -68,7 +68,7 @@ std::ostream& operator<<(std::ostream& os, const conversion_error& err)
 }
 
 template <typename T>
-using conversion_result = result<T,conversion_error>;
+using conversion_result = expected<T,conversion_error>;
 
 } // namespace jsoncons
 

@@ -54,9 +54,9 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 } // namespace jsoncons
 
 #if !defined(JSONCONS_HAS_STD_EXPECTED)
-  #include <jsoncons/detail/result.hpp>
+  #include <jsoncons/detail/expected.hpp>
   namespace jsoncons {
-  using jsoncons::detail::result;
+  using jsoncons::detail::expected;
   using jsoncons::detail::unexpect_t;
   using jsoncons::detail::unexpect;
   } // namespace jsoncons
@@ -64,7 +64,7 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
   #include <expected>
   namespace jsoncons {
   template <typename R,typename E>
-  using result = std::expected<R,E>;
+  using expected = std::expected<R,E>;
   using unexpect_t = std::unexpect_t;
   JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
   } // namespace jsoncons

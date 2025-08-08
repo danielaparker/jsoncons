@@ -23,7 +23,7 @@ namespace ubjson {
 
 template <typename T,typename ByteContainer>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const T& j, 
     ByteContainer& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -33,12 +33,12 @@ try_encode_ubjson(const T& j,
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     std::error_code ec;
     j.dump(adaptor, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T,typename ByteContainer>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const T& val, 
     ByteContainer& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -46,11 +46,11 @@ try_encode_ubjson(const T& val,
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
+typename std::enable_if<ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const T& j, 
     std::ostream& os, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -60,11 +60,11 @@ try_encode_ubjson(const T& j,
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     std::error_code ec;
     j.dump(adaptor, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const T& val, 
     std::ostream& os, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -72,14 +72,14 @@ try_encode_ubjson(const T& val,
     ubjson_stream_encoder encoder(os, options);
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 // with temp_allocator_arg_t
 
 template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j, 
     ByteContainer& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -89,12 +89,12 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j,
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     std::error_code ec;
     j.dump(adaptor, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,result<void,std::error_code>>::type 
+                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val, 
     ByteContainer& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -102,11 +102,11 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val,
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
+typename std::enable_if<ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const T& j, 
     std::ostream& os, 
@@ -117,11 +117,11 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     std::error_code ec;
     j.dump(adaptor, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,result<void,std::error_code>>::type 
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, 
     std::ostream& os, 
@@ -130,7 +130,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     std::error_code ec;
     reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    return ec ? result<void,std::error_code>{jsoncons::unexpect, ec} : result<void,std::error_code>{};
+    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
 }
 
 template <typename... Args>
