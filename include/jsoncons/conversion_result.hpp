@@ -46,24 +46,23 @@ public:
     {
         return message_arg_;
     }
-};
 
-inline
-std::string to_string(const conversion_error& err)
-{
-    std::string str{err.message_arg()};
-    if (!str.empty())
+    std::string message() const
     {
-        str.append(": ");
+        std::string str{message_arg_};
+        if (!str.empty())
+        {
+            str.append(": ");
+        }
+        str.append(ec_.message());
+        return str;
     }
-    str.append(err.code().message());
-    return str;
-}
+};
 
 inline
 std::ostream& operator<<(std::ostream& os, const conversion_error& err)
 {
-    os << to_string(err);
+    os << err.message();
     return os;
 }
 

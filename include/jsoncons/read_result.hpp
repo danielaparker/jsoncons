@@ -56,36 +56,35 @@ public:
     {
         return column_;
     }
-};
 
-inline
-std::string to_string(const read_error& err)
-{
-    std::string str(err.message_arg());
-    if (!str.empty())
+    std::string message() const
     {
-        str.append(": ");
+        std::string str(message_arg_);
+        if (!str.empty())
+        {
+            str.append(": ");
+        }
+        str.append(ec_.message());
+        if (line_ != 0 && column_ != 0)
+        {
+            str.append(" at line ");
+            str.append(std::to_string(line_));
+            str.append(" and column ");
+            str.append(std::to_string(column_));
+        }
+        else if (column_ != 0)
+        {
+            str.append(" at position ");
+            str.append(std::to_string(column_));
+        }
+        return str;
     }
-    str.append(err.code().message());
-    if (err.line() != 0 && err.column() != 0)
-    {
-        str.append(" at line ");
-        str.append(std::to_string(err.line()));
-        str.append(" and column ");
-        str.append(std::to_string(err.column()));
-    }
-    else if (err.column() != 0)
-    {
-        str.append(" at position ");
-        str.append(std::to_string(err.column()));
-    }
-    return str;
-}
+};
 
 inline
 std::ostream& operator<<(std::ostream& os, const read_error& err)
 {
-    os << to_string(err);
+    os << err.message();
     return os;
 }
 
