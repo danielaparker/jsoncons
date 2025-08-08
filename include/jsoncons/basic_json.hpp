@@ -3008,6 +3008,13 @@ namespace jsoncons {
             visitor.flush();
         }
 
+        expected<void,std::error_code> try_dump(basic_json_visitor<char_type>& visitor) const
+        {
+            auto r = try_dump_noflush(visitor);
+            visitor.flush();
+            return r;
+        }
+
         bool is_null() const noexcept
         {
             switch (storage_kind())
@@ -3124,18 +3131,19 @@ namespace jsoncons {
 
         bool is_string() const noexcept
         {
-            switch (storage_kind())
+            if (is_string_storage(storage_kind()))
             {
-                case json_storage_kind::short_str:
-                case json_storage_kind::long_str:
-                    return true;
-                case json_storage_kind::json_const_ref:
-                    return cast<json_const_reference_storage>().value().is_string();
-                case json_storage_kind::json_ref:
-                    return cast<json_reference_storage>().value().is_string();
-                default:
-                    return false;
+                return true;
             }
+            if (storage_kind() == json_storage_kind::json_const_ref)
+            {
+                return cast<json_const_reference_storage>().value().is_string();
+            }
+            if (storage_kind() == json_storage_kind::json_ref)
+            {
+                return cast<json_const_reference_storage>().value().is_string();
+            }
+            return false;
         }
 
         bool is_string_view() const noexcept
@@ -4706,6 +4714,82 @@ namespace jsoncons {
                 case json_storage_kind::json_ref:
                     return cast<json_reference_storage>().value().dump_noflush(visitor, ec);
                 default:
+                    break;
+            }
+        }
+
+        expected<void,std::error_code> try_dump_noflush(basic_json_visitor<char_type>& visitor, std::error_code& ec) const
+        {
+            std::error_code ec;
+            const ser_context context{};
+            switch (storage_kind())
+            {
+                case json_storage_kind::short_str:
+                case json_storage_kind::long_str:
+                    visitor.string_value(as_string_view(), tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::byte_str:
+                    if (tag() == semantic_tag::ext)
+                    {
+                        visitor.byte_string_value(as_byte_string_view(), ext_tag(), context, ec);
+                    }
+                    else
+                    {
+                        visitor.byte_string_value(as_byte_string_view(), tag(), context, ec);
+                    }
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::half_float:
+                    visitor.half_value(cast<half_storage>().value(), tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::float64:
+                    visitor.double_value(cast<double_storage>().value(), 
+                                         tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::int64:
+                    visitor.int64_value(cast<int64_storage>().value(), tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::uint64:
+                    visitor.uint64_value(cast<uint64_storage>().value(), tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::boolean:
+                    visitor.bool_value(cast<bool_storage>().value(), tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::null:
+                    visitor.null_value(tag(), context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::empty_object:
+                    visitor.begin_object(0, tag(), context, ec);
+                    visitor.end_object(context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                case json_storage_kind::object:
+                {
+                    visitor.begin_object(size(), tag(), context, ec);
+                    const object& o = cast<object_storage>().value();
+                    for (auto it = o.begin(); it != o.end(); ++it)
+                    {
+                        visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
+                        (*it).value().dump_noflush(visitor, ec);
+                    }
+                    visitor.end_object(context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                }
+                case json_storage_kind::array:
+                {
+                    visitor.begin_array(size(), tag(), context, ec);
+                    const array& o = cast<array_storage>().value();
+                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
+                    {
+                        (*it).dump_noflush(visitor, ec);
+                    }
+                    visitor.end_array(context, ec);
+                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                }
+                case json_storage_kind::json_const_ref:
+                    return cast<json_const_reference_storage>().value().try_dump_noflush(visitor);
+                case json_storage_kind::json_ref:
+                    return cast<json_reference_storage>().value().try_dump_noflush(visitor);
+                default:
+                    JSONCONS_UNREACHABLE();
                     break;
             }
         }

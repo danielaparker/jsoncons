@@ -11,7 +11,6 @@
 #include <type_traits>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/utility.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <cassert>
 
 namespace jsoncons {
