@@ -100,49 +100,50 @@ struct json_traits_helper
 };
 
 template <typename CharT, typename T> 
-void try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
-    std::error_code& ec) 
+expected<void,std::error_code> try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec); 
+    return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
 } 
 
 template <typename CharT, typename T> 
-void try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder,
-    std::error_code& ec) 
+expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val) 
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
-} 
+    return expected<void,std::error_code>{}; 
+}
+ 
 template <typename CharT, typename T> 
-void try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder,
-    std::error_code& ec) 
+expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
-} 
+    return expected<void,std::error_code>{}; 
+}
+ 
 template <typename CharT, typename T> 
-void try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder,
-    std::error_code& ec) 
+expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
         encoder.key(key);
-        encode_traits<T>::try_encode(make_alloc_set(), *val, encoder, ec); 
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
+    return expected<void,std::error_code>{}; 
 } 
+
 template <typename CharT, typename T> 
-void try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder,
-    std::error_code& ec) 
+expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     encoder.key(key);
-    encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec); 
+    return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
 } 
 
 template <typename T> 
@@ -378,17 +379,19 @@ using identity = reflect::identity;
 #define JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
     { \
-        try_encode_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder, ec); \
+        auto r = try_encode_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder); \
+        if (JSONCONS_UNLIKELY(!r)) {return r;} \
     } \
     else \
     { \
-        try_encode_optional_member(json_object_name_members<value_type>::Member(char_type{}), \
-            val.Member, encoder, ec); \
+        auto r = try_encode_optional_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder); \
+        if (JSONCONS_UNLIKELY(!r)) {return r;} \
     }
 
 #define JSONCONS_ALL_MEMBER_ENCODE(Prefix, P2, P3, Member, Count) JSONCONS_ALL_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count) \
-    try_encode_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder, ec); 
+    {auto r = try_encode_member(json_object_name_members<value_type>::Member(char_type{}), val.Member, encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 
 #define JSONCONS_MEMBER_COUNT(Prefix, P2, P3, Member, Count) JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Count) \
@@ -459,19 +462,20 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
+            std::error_code ec; \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \
@@ -569,33 +573,37 @@ else \
 #define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name) \
     { \
-        try_encode_member(string_view_type(Name), val.Member, encoder, ec); \
+        auto r = try_encode_member(string_view_type(Name), val.Member, encoder); \
+        if (JSONCONS_UNLIKELY(!r)) {return r;} \
     } \
     else \
     { \
-        try_encode_optional_member(string_view_type(Name), val.Member, encoder, ec); \
+        auto r = try_encode_optional_member(string_view_type(Name), val.Member, encoder); \
+        if (JSONCONS_UNLIKELY(!r)) {return r;} \
     }    
 #define JSONCONS_N_MEMBER_NAME_ENCODE_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match,,)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(string_view_type(Name), Into(val.Member), encoder, ec); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Member), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), Into(val.Member), encoder, ec); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Member), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }    
 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_ENCODE_NAME_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name) \
-     try_encode_member(string_view_type(Name), val.Member, encoder, ec); 
+     {auto r = try_encode_member(string_view_type(Name), val.Member, encoder); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_3(Member, Name, Mode) JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, From) \
-    try_encode_member(string_view_type(Name), Into(val.Member), encoder, ec); 
+    {auto r = try_encode_member(string_view_type(Name), val.Member, encoder); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 
 #define JSONCONS_MEMBER_NAME_COUNT(P1, P2, P3, Seq, Count) JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
@@ -678,20 +686,21 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \
@@ -758,12 +767,13 @@ else \
 #define JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    try_encode_member(json_object_name_members<value_type>::Getter(char_type{}), val.Getter(), encoder, ec); \
+    auto r = try_encode_member(json_object_name_members<value_type>::Getter(char_type{}), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(json_object_name_members<value_type>::Getter(char_type{}), \
-        val.Getter(), encoder, ec); \
+    auto r = try_encode_optional_member(json_object_name_members<value_type>::Getter(char_type{}), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
 #define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, ClassName,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -813,19 +823,20 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_ENCODE, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \
@@ -955,22 +966,26 @@ else \
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name) \
 { \
-    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ClassName,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -1018,20 +1033,21 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_COUNT,,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \
@@ -1173,14 +1189,14 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             using mapped_type = std::pair<value_type,string_view_type>; \
             static const char_type empty_string[] = {0}; \
+            std::error_code ec; \
             auto first = reflect_type_properties<value_type>::values<char_type>(); \
             auto last = first + reflect_type_properties<value_type>::count; \
             auto it = std::find_if(first, last, \
@@ -1191,14 +1207,16 @@ namespace reflect { \
                 if (val == value_type()) \
                 { \
                     encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                    if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+                    return expected<void,std::error_code>{}; \
                 } \
                 else \
                 { \
-                    ec = conv_errc::conversion_failed; \
+                    return expected<void,std::error_code>{unexpect, conv_errc::conversion_failed}; \
                 } \
-                return; \
             } \
             encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
     template <> struct decode_traits<EnumType> \
@@ -1359,14 +1377,14 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             using mapped_type = std::pair<value_type,string_view_type>; \
             static const char_type empty_string[] = {0}; \
+            std::error_code ec; \
             auto first = reflect_type_properties<value_type>::values<char_type>(); \
             auto last = first + reflect_type_properties<value_type>::count; \
             auto it = std::find_if(first, last, \
@@ -1377,14 +1395,16 @@ namespace reflect { \
                 if (val == value_type()) \
                 { \
                     encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                    if (JSONCONS_UNLIKELY(ec)) return expected<void,std::error_code>{unexpect, ec}; \
+                    return expected<void,std::error_code>{}; \
                 } \
                 else \
                 { \
-                    ec = conv_errc::conversion_failed; \
+                    return expected<void,std::error_code>{unexpect, conv_errc::conversion_failed}; \
                 } \
-                return; \
             } \
             encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
     template <> struct decode_traits<EnumType> \
@@ -1482,12 +1502,13 @@ else \
 #define JSONCONS_N_GETTER_SETTER_ENCODE_(Prefix, Getter, Setter, Property, Count) \
 if ((num_params-Count) < num_mandatory_params2) \
 { \
-    try_encode_member(json_object_name_members<value_type>::Property(char_type{}), val.Getter(), encoder, ec); \
+    auto r = try_encode_member(json_object_name_members<value_type>::Property(char_type{}), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(json_object_name_members<value_type>::Property(char_type{}), \
-        val.Getter(), encoder, ec); \
+    auto r = try_encode_optional_member(json_object_name_members<value_type>::Property(char_type{}), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
 #define JSONCONS_GETTER_SETTER_TRAITS_BASE(ToJson,NumTemplateParams, ClassName,GetPrefix,SetPrefix,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -1545,19 +1566,20 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_COUNT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_ENCODE, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \
@@ -1681,22 +1703,26 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_3(Getter, Setter, Name) \
 { \
-    try_encode_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), val.Getter(), encoder, ec); \
+    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
  
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, From) \
 { \
-    try_encode_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder, ec); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder); \
+    if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, ClassName,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -1752,20 +1778,21 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static void try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& encoder, \
-            std::error_code& ec) \
+        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
             (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; \
+            std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_COUNT,,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return;} \
+            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            return expected<void,std::error_code>{}; \
         } \
     }; \
 } \

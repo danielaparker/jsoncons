@@ -4718,7 +4718,7 @@ namespace jsoncons {
             }
         }
 
-        expected<void,std::error_code> try_dump_noflush(basic_json_visitor<char_type>& visitor, std::error_code& ec) const
+        expected<void,std::error_code> try_dump_noflush(basic_json_visitor<char_type>& visitor) const
         {
             std::error_code ec;
             const ser_context context{};
@@ -4769,9 +4769,17 @@ namespace jsoncons {
                     {
                         visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
                         (*it).value().dump_noflush(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return expected<void,std::error_code>{unexpect, ec};
+                        }
                     }
                     visitor.end_object(context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return expected<void,std::error_code>{unexpect, ec};
+                    }
+                    return expected<void,std::error_code>{};
                 }
                 case json_storage_kind::array:
                 {
@@ -4779,10 +4787,18 @@ namespace jsoncons {
                     const array& o = cast<array_storage>().value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
-                        (*it).dump_noflush(visitor, ec);
+                        auto r = (*it).try_dump_noflush(visitor);
+                        if (JSONCONS_UNLIKELY(!r))
+                        {
+                            return r;
+                        }
                     }
                     visitor.end_array(context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return expected<void,std::error_code>{unexpect, ec};
+                    }
+                    return expected<void,std::error_code>{};
                 }
                 case json_storage_kind::json_const_ref:
                     return cast<json_const_reference_storage>().value().try_dump_noflush(visitor);

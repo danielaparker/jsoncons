@@ -201,10 +201,9 @@ try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
 template <typename T,typename CharT>
 expected<void,std::error_code> try_encode_json(const T& val, basic_json_visitor<CharT>& encoder)
 {
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
+    auto r = reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
     encoder.flush();
-    return ec ? expected<void, std::error_code>{jsoncons::unexpect, ec} : expected<void, std::error_code>{};
+    return r;
 }
 
 // encode_json_pretty

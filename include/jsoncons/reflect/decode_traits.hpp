@@ -58,6 +58,7 @@ struct decode_traits
         {
             return result_type(jsoncons::unexpect, r1.error().code(), r1.error().message_arg(), line, column);
         }
+        std::cout << "try_decode: " << *r1 << "\n";
         auto r2 = (*r1).template try_as<T>(aset);
         if (JSONCONS_UNLIKELY(!r2))
         {

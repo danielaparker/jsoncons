@@ -30,9 +30,7 @@ try_encode_csv(const T& j, CharContainer& cont, const basic_csv_encode_options<t
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(cont,options);
-    std::error_code ec;
-    j.dump(encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(encoder);
 }
 
 template <typename T,typename CharContainer>
@@ -42,9 +40,7 @@ try_encode_csv(const T& val, CharContainer& cont, const basic_csv_encode_options
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(cont,options);
-    std::error_code ec;
-    reflect::encode_traits<T,char_type>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T,char_type>::try_encode(make_alloc_set(), val, encoder);
 }
 
 template <typename T,typename CharT>
@@ -53,9 +49,7 @@ try_encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
-    std::error_code ec;
-    j.dump(encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(encoder);
 }
 
 template <typename T,typename CharT>
@@ -64,9 +58,7 @@ try_encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_enco
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 // with aset.get_temp_allocator()ator_arg_t
@@ -79,9 +71,7 @@ try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    std::error_code ec;
-    j.dump(encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(encoder);
 }
 
 template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
@@ -92,33 +82,27 @@ try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    std::error_code ec;
-    reflect::encode_traits<T,char_type>::try_encode(aset, val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T,char_type>::try_encode(aset, val, encoder);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
-           const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
+    const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    std::error_code ec;
-    j.dump(encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(encoder);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
 try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
-           const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
+    const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
 }
 
 template <typename... Args>

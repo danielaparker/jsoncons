@@ -31,9 +31,7 @@ try_encode_ubjson(const T& j,
     using char_type = typename T::char_type;
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    std::error_code ec;
-    j.dump(adaptor, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(adaptor);
 }
 
 template <typename T,typename ByteContainer>
@@ -44,9 +42,7 @@ try_encode_ubjson(const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 template <typename T>
@@ -58,9 +54,7 @@ try_encode_ubjson(const T& j,
     using char_type = typename T::char_type;
     ubjson_stream_encoder encoder(os, options);
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    std::error_code ec;
-    j.dump(adaptor, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(adaptor);
 }
 
 template <typename T>
@@ -70,9 +64,7 @@ try_encode_ubjson(const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     ubjson_stream_encoder encoder(os, options);
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 // with temp_allocator_arg_t
@@ -87,9 +79,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j,
     using char_type = typename T::char_type;
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    std::error_code ec;
-    j.dump(adaptor, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(adaptor);
 }
 
 template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
@@ -100,9 +90,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -115,9 +103,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     using char_type = typename T::char_type;
     basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
-    std::error_code ec;
-    j.dump(adaptor, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return j.try_dump(adaptor);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -128,9 +114,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    std::error_code ec;
-    reflect::encode_traits<T>::try_encode(aset, val, encoder, ec);
-    return ec ? expected<void,std::error_code>{jsoncons::unexpect, ec} : expected<void,std::error_code>{};
+    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
 }
 
 template <typename... Args>
