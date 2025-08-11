@@ -58,7 +58,6 @@ struct decode_traits
         {
             return result_type(jsoncons::unexpect, r1.error().code(), r1.error().message_arg(), line, column);
         }
-        std::cout << "try_decode: " << *r1 << "\n";
         auto r2 = (*r1).template try_as<T>(aset);
         if (JSONCONS_UNLIKELY(!r2))
         {
@@ -459,7 +458,6 @@ struct decode_traits<T,
             }
             v.insert(std::move(*r));
             if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
-            //std::cout << "cursor.next 20\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
         }
@@ -520,7 +518,6 @@ struct decode_traits<T,
             }
             v.push_front(std::move(*r));
             if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
-            //std::cout << "cursor.next 20\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
         }
@@ -636,7 +633,6 @@ struct decode_traits<T,
                 return result_type(jsoncons::unexpect, r2.error());
             }
             val.emplace(std::move(*r1), std::move(*r2));
-            //std::cout << "cursor.next 300\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
@@ -701,7 +697,6 @@ struct decode_traits<T,
             {
                 return result_type{jsoncons::unexpect, json_errc::invalid_number, cursor.line(), cursor.column()}; 
             }
-            //std::cout << "cursor.next 500\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -713,7 +708,6 @@ struct decode_traits<T,
                 return result_type(jsoncons::unexpect, r1.error());
             }
             val.emplace(n, std::move(*r1));
-            //std::cout << "cursor.next 600\n";
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
