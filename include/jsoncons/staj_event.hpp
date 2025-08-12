@@ -170,7 +170,8 @@ class basic_staj_event
     } value_;
     std::size_t length_{0};
 public:
-    using string_view_type = jsoncons::basic_string_view<CharT>;
+    using char_type = CharT;
+    using string_view_type = jsoncons::basic_string_view<char_type>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), value_()
@@ -270,6 +271,10 @@ public:
     typename std::enable_if<ext_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get_(Allocator alloc,std::error_code& ec) const
     {
+        constexpr const char_type* true_constant = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
+        constexpr const char_type* false_constant = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
+        constexpr const char_type* null_constant = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
+
         switch (event_type_)
         {
             case staj_event_type::key:
@@ -291,28 +296,32 @@ public:
             }
             case staj_event_type::int64_value:
             {
-                value_converter<int64_t,T> converter;
-                return converter.convert(value_.int64_value_, tag(), ec);
+                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
+                jsoncons::utility::from_integer(value_.int64_value_, s);
+                return s;
             }
             case staj_event_type::half_value:
             {
-                value_converter<half_arg_t,T> converter;
-                return converter.convert(value_.half_value_, tag(), ec);
+                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
+                jsoncons::utility::write_double f{float_chars_format::general,0};
+                double x = binary::decode_half(value_.half_value_);
+                f(x, s);
+                return s;
             }
             case staj_event_type::double_value:
             {
-                value_converter<double,T> converter;
-                return converter.convert(value_.double_value_, tag(), ec);
+                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
+                jsoncons::utility::write_double f{float_chars_format::general,0};
+                f(value_.double_value_, s);
+                return s;
             }
             case staj_event_type::bool_value:
             {
-                value_converter<bool,T> converter;
-                return converter.convert(value_.bool_value_,tag(),ec);
+                return jsoncons::make_obj_using_allocator<T>(alloc, value_.bool_value_ ? true_constant : false_constant);
             }
             case staj_event_type::null_value:
             {
-                value_converter<null_type,T> converter;
-                return converter.convert(tag(), ec);
+                return jsoncons::make_obj_using_allocator<T>(alloc, null_constant);
             }
             default:
             {

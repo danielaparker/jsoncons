@@ -584,21 +584,17 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_byte_string_view())
             {
-                value_converter<byte_string_view,T> converter;
-                auto v = converter.convert(j.as_byte_string_view(),j.tag(), ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    JSONCONS_THROW(conv_error(ec));
-                }
-                return v;
+                auto bs = j.as_byte_string_view();
+                return T{bs.begin(), bs.end()};
             }
             else if (j.is_string())
             {
-                value_converter<basic_string_view<char>,T> converter;
-                auto v = converter.convert(j.as_string_view(),j.tag(), ec);
-                if (JSONCONS_UNLIKELY(ec))
+                T v{};
+                auto sv = j.as_string_view();
+                auto r = string_to_bytes(sv.begin(), sv.end(), j.tag(), v);
+                if (JSONCONS_UNLIKELY(r.ec != conv_errc{}))
                 {
-                    JSONCONS_THROW(conv_error(ec));
+                    JSONCONS_THROW(conv_error(r.ec));
                 }
                 return v;
             }

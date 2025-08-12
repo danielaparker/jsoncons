@@ -584,13 +584,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_byte_string_view())
             {
-                value_converter<byte_string_view,T> converter;
-                auto v = converter.convert(j.as_byte_string_view(),j.tag(), ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return result_type(jsoncons::unexpect, ec);
-                }
-                return v;
+                auto bs = j.as_byte_string_view();
+                auto v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator(), bs.begin(), bs.end()); 
+                return result_type(std::move(v));
             }
             else if (j.is_string())
             {
