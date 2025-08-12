@@ -1546,40 +1546,12 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    std::error_code ec;
                     byte_string_type bytes = jsoncons::make_obj_using_allocator<byte_string_type>(aset.get_allocator());
                     auto sv = as_string_view();
-                    switch (tag())
+                    auto res = string_to_bytes(sv.begin(), sv.end(), tag(), bytes);
+                    if (res.ec != conv_errc::success)
                     {
-                        case semantic_tag::base16:
-                        {
-                            auto res = base16_to_bytes(sv.begin(), sv.end(), bytes);
-                            if (res.ec != conv_errc::success)
-                            {
-                                ec = conv_errc::not_byte_string;
-                            }
-                            break;
-                        }
-                        case semantic_tag::base64:
-                        {
-                            base64_to_bytes(sv.begin(), sv.end(), bytes);
-                            break;
-                        }
-                        case semantic_tag::base64url:
-                        {
-                            base64url_to_bytes(sv.begin(), sv.end(), bytes);
-                            break;
-                        }
-                        default:
-                        {
-                            ec = conv_errc::not_byte_string;
-                            break;
-                        }
-                    }
-
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        return result_type(jsoncons::unexpect, ec);
+                        return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
                     }
                     return result_type(std::move(bytes));
                 }

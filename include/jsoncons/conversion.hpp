@@ -38,6 +38,23 @@ bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
     }
 }
 
+template <typename InputIt,typename Container>
+typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type
+string_to_bytes(InputIt first, InputIt last, semantic_tag tag, Container& bytes)
+{
+    switch (tag)
+    {
+        case semantic_tag::base16:
+            return base16_to_bytes(first, last, bytes);
+        case semantic_tag::base64:
+            return base64_to_bytes(first, last, bytes);
+        case semantic_tag::base64url:
+            return base64url_to_bytes(first, last, bytes);
+        default:
+            return to_bytes_result<InputIt>{first, conv_errc::conversion_failed};
+    }
+}
+
 template <typename From,typename Into,typename Enable = void>
 class value_converter
 {

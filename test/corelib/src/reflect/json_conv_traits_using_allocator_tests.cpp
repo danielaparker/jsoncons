@@ -109,10 +109,9 @@ TEST_CASE("json_conv_traits using allocator tests")
     }
     SECTION("basic_byte_string")
     {
-        using char_allocator_type = mock_stateful_allocator<char>;
-        using byte_string_type = basic_byte_string<cust_allocator<char>>;
+        using byte_string_type = basic_byte_string<cust_allocator<uint8_t>>;
 
-        cust_allocator<char> alloc(1);
+        cust_allocator<uint8_t> alloc(1);
         auto aset = make_alloc_set(alloc);
 
         cust_json j{byte_string{'H','e','l','l','o'}, aset.get_allocator()};
