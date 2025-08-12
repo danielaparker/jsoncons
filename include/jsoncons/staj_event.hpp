@@ -275,8 +275,7 @@ public:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                value_converter<jsoncons::basic_string_view<CharT>,T> converter;
-                return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
+                return jsoncons::make_obj_using_allocator<T>(alloc, value_.string_data_, length_);
             }
             case staj_event_type::byte_string_value:
             {
@@ -286,8 +285,9 @@ public:
             }
             case staj_event_type::uint64_value:
             {
-                value_converter<uint64_t,T> converter;
-                return converter.convert(value_.uint64_value_, tag(), ec);
+                auto s = jsoncons::make_obj_using_allocator<T>(alloc);
+                jsoncons::utility::from_integer(value_.uint64_value_, s);
+                return s;
             }
             case staj_event_type::int64_value:
             {
