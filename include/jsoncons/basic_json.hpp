@@ -3497,23 +3497,25 @@ namespace jsoncons {
                         case semantic_tag::base64:
                         case semantic_tag::base64url:
                         {
-                            value_converter<jsoncons::basic_string_view<char_type>,T> converter;
-                            T v = converter.convert(as_string_view(),tag(), ec);
-                            if (JSONCONS_UNLIKELY(ec))
+                            T v;
+                            auto sv = as_string_view();
+                            auto r = string_to_bytes(sv.begin(), sv.end(), tag(), v);
+                            if (JSONCONS_UNLIKELY(r.ec != conv_errc{}))
                             {
-                                JSONCONS_THROW(ser_error(ec));
+                                JSONCONS_THROW(ser_error(conv_errc::not_byte_string));
                             }
                             return v;
                         }
                         default:
                         {
-                            value_converter<jsoncons::basic_string_view<char_type>, T> converter;
-                            T v = converter.convert(as_string_view(), hint, ec);
-                            if (JSONCONS_UNLIKELY(ec))
+                            T v;
+                            auto sv = as_string_view();
+                            auto r = string_to_bytes(sv.begin(), sv.end(), hint, v);
+                            if (JSONCONS_UNLIKELY(r.ec != conv_errc{}))
                             {
-                                JSONCONS_THROW(ser_error(ec));
+                                JSONCONS_THROW(ser_error(conv_errc::not_byte_string));
                             }
-                            return T(v.begin(),v.end());
+                            return v;
                         }
                         break;
                     }

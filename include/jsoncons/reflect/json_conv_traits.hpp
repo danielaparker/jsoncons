@@ -594,13 +594,14 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_string())
             {
-                value_converter<basic_string_view<char>,T> converter;
-                auto v = converter.convert(j.as_string_view(),j.tag(), ec);
-                if (JSONCONS_UNLIKELY(ec))
+                T v;
+                auto sv = j.as_string_view();
+                auto r = string_to_bytes(sv.begin(), sv.end(), j.tag(), v);
+                if (JSONCONS_UNLIKELY(r.ec != conv_errc{}))
                 {
-                    return result_type(jsoncons::unexpect, ec);
+                    return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
                 }
-                return v;
+                return result_type(std::move(v));
             }
             else
             {

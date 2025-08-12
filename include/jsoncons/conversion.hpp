@@ -80,63 +80,6 @@ public:
     }
 };
 
-// From any byte sequence, Into string
-/*template <typename From,typename Into>
-class value_converter<From, Into, 
-    typename std::enable_if<ext_traits::is_byte_sequence<From>::value && !ext_traits::is_string_or_string_view<From>::value &&
-        ext_traits::is_string<Into>::value>::type> : value_converter_base<Into>
-{
-public:
-    using allocator_type = typename value_converter_base<Into>::allocator_type;
-
-    template <typename CharT = typename Into::value_type>
-    typename std::enable_if<ext_traits::is_narrow_character<CharT>::value,Into>::type
-    convert(const From& value, semantic_tag tag, std::error_code&)
-    {
-        Into s(this->get_allocator());
-        switch (tag)
-        {
-            case semantic_tag::base64:
-                bytes_to_base64(value.begin(), value.end(), s);
-                break;
-            case semantic_tag::base16:
-                bytes_to_base16(value.begin(), value.end(), s);
-                break;
-            default:
-                bytes_to_base64url(value.begin(), value.end(), s);
-                break;
-        }
-        return s;
-    }
-    template <typename CharT = typename Into::value_type>
-    typename std::enable_if<ext_traits::is_wide_character<CharT>::value,Into>::type
-    convert(const From& value, semantic_tag tag, std::error_code& ec)
-    {
-        std::string s;
-        switch (tag)
-        {
-            case semantic_tag::base64:
-                bytes_to_base64(value.begin(), value.end(), s);
-                break;
-            case semantic_tag::base16:
-                bytes_to_base16(value.begin(), value.end(), s);
-                break;
-            default:
-                bytes_to_base64url(value.begin(), value.end(), s);
-                break;
-        }
-
-        Into ws(this->get_allocator());
-        auto retval = unicode_traits::convert(s.data(), s.size(), ws);
-        if (retval.ec != unicode_traits::conv_errc())
-        {
-            ec = conv_errc::not_wide_char;
-        }
-
-        return ws;
-    }
-};*/
-
 // From byte string, Into byte string
 template <typename From,typename Into>
 class value_converter<From, Into, 
@@ -193,6 +136,8 @@ public:
         return ws;
     }
 };
+
+/*
 
 // From string, Into byte_string
 template <typename From,typename Into>
@@ -281,6 +226,7 @@ public:
         return bytes;
     }
 };
+*/
 
 // From integer, Into string
 template <typename From,typename Into>
