@@ -373,8 +373,13 @@ public:
             }
             case staj_event_type::string_value:
             {
-                value_converter<jsoncons::basic_string_view<CharT>,T> converter;
-                return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
+                auto v = jsoncons::make_obj_using_allocator<T>(alloc);
+                auto r = string_to_bytes(value_.string_data_, value_.string_data_+length_, tag(), v);
+                if (r.ec != conv_errc{})
+                {
+                    ec = conv_errc::not_byte_string;
+                }
+                return v;
             }
             default:
                 ec = conv_errc::not_byte_string;
