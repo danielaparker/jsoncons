@@ -36,13 +36,12 @@ TEST_CASE("convert into list-like")
 {
     SECTION("from string")
     {
-        value_converter<jsoncons::string_view, std::vector<uint8_t>> converter;
-
         std::vector<uint8_t> expected = {'f','o','o','b','a','r'};
 
-        std::error_code ec;
-        std::vector<uint8_t> v = converter.convert(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, ec);
-        REQUIRE(!ec); 
+        jsoncons::string_view sv("Zm9vYmFy");
+        std::vector<uint8_t> v;
+        auto r = string_to_bytes(sv.begin(), sv.end(), semantic_tag::base64url, v);
+        REQUIRE(r.ec != conv_errc{});
         
         CHECK(expected == v);
     }
