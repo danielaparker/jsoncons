@@ -41,7 +41,7 @@ TEST_CASE("convert into list-like")
         jsoncons::string_view sv("Zm9vYmFy");
         std::vector<uint8_t> v;
         auto r = string_to_bytes(sv.begin(), sv.end(), semantic_tag::base64url, v);
-        REQUIRE(r.ec != conv_errc{});
+        REQUIRE(r.ec == conv_errc{});
         
         CHECK(expected == v);
     }
