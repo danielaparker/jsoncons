@@ -1133,9 +1133,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         { 
-            return j.template try_as_byte_string<typename T::allocator_type>();
+            return j.template try_as_byte_string<T>(aset);
         }
         
         template <typename Alloc>

@@ -1535,10 +1535,10 @@ namespace jsoncons {
             }
         }
 
-        template <typename BytesAlloc=std::allocator<uint8_t>>
-        conversion_result<basic_byte_string<BytesAlloc>> try_as_byte_string() const
+        template <typename T,typename Alloc, typename TempAlloc>
+        conversion_result<T> try_as_byte_string(const allocator_set<Alloc,TempAlloc>& aset) const
         {
-            using byte_string_type = basic_byte_string<BytesAlloc>;
+            using byte_string_type = T;
             using result_type = conversion_result<byte_string_type>;
 
             switch (storage_kind())
@@ -1547,20 +1547,53 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     std::error_code ec;
-                    value_converter<jsoncons::string_view, byte_string_type> converter;
-                    byte_string_type v = converter.convert(as_string_view(),tag(), ec);
+                    byte_string_type bytes = jsoncons::make_obj_using_allocator<byte_string_type>(aset.get_allocator());
+                    auto sv = as_string_view();
+                    switch (tag())
+                    {
+                        case semantic_tag::base16:
+                        {
+                            auto res = base16_to_bytes(sv.begin(), sv.end(), bytes);
+                            if (res.ec != conv_errc::success)
+                            {
+                                ec = conv_errc::not_byte_string;
+                            }
+                            break;
+                        }
+                        case semantic_tag::base64:
+                        {
+                            base64_to_bytes(sv.begin(), sv.end(), bytes);
+                            break;
+                        }
+                        case semantic_tag::base64url:
+                        {
+                            base64url_to_bytes(sv.begin(), sv.end(), bytes);
+                            break;
+                        }
+                        default:
+                        {
+                            ec = conv_errc::not_byte_string;
+                            break;
+                        }
+                    }
+
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return result_type(jsoncons::unexpect, ec);
                     }
-                    return result_type(v);
+                    return result_type(std::move(bytes));
                 }
                 case json_storage_kind::byte_str:
-                    return result_type(in_place, cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
+                {
+                    auto& bs = cast<byte_string_storage>();
+                    auto val = jsoncons::make_obj_using_allocator<byte_string_type>(aset.get_allocator(), 
+                        bs.data(), bs.length());
+                    return result_type(std::move(val));
+                }
                 case json_storage_kind::json_const_ref:
-                    return cast<json_const_reference_storage>().value().template try_as_byte_string<BytesAlloc>();
+                    return cast<json_const_reference_storage>().value().template try_as_byte_string<T>(aset);
                 case json_storage_kind::json_ref:
-                    return cast<json_reference_storage>().value().template try_as_byte_string<BytesAlloc>();
+                    return cast<json_reference_storage>().value().template try_as_byte_string<T>(aset);
                 default:
                     return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
             }
@@ -3441,6 +3474,18 @@ namespace jsoncons {
         as() const
         {
             auto r = reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
+            if (!r)
+            {
+                JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
+            }
+            return std::move(r.value());
+        }
+
+        template <typename T, typename Alloc, typename TempAlloc>
+        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,T>::type
+        as(const allocator_set<Alloc,TempAlloc>& aset) const
+        {
+            auto r = reflect::json_conv_traits<basic_json,T>::try_as(aset, *this);
             if (!r)
             {
                 JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));

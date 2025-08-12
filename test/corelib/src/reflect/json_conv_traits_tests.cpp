@@ -31,6 +31,8 @@ namespace ns {
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
+using namespace jsoncons;
+
 TEST_CASE("json_conv_traits single error tests")
 {   
     SECTION("double")
@@ -61,6 +63,16 @@ TEST_CASE("json_conv_traits single error tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::string_view>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_string == result.error().code());
+        //std::cout << result.error() << "\n\n";
+    }
+    SECTION("byte_string")
+    {
+        json j{byte_string{'H','e','l','l','o'}};
+        REQUIRE(j.is<byte_string>());
+
+        auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,byte_string>::try_as(jsoncons::make_alloc_set(), j);
+        REQUIRE(result);
+        CHECK(j.as<byte_string>() == *result);
         //std::cout << result.error() << "\n\n";
     }
 }
