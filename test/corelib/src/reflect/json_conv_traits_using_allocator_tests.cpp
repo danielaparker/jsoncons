@@ -110,20 +110,20 @@ TEST_CASE("json_conv_traits using allocator tests")
     SECTION("basic_byte_string")
     {
         using char_allocator_type = mock_stateful_allocator<char>;
-        using cust_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+        using byte_string_type = basic_byte_string<cust_allocator<char>>;
 
         cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
 
         cust_json j{byte_string{'H','e','l','l','o'}, aset.get_allocator()};
-        REQUIRE(j.is<basic_byte_string<cust_allocator<char>>>());
+        REQUIRE(j.is<byte_string_type>());
 
-        auto result = jsoncons::reflect::json_conv_traits<cust_json,basic_byte_string<cust_allocator<char>>>::try_as(aset, j);
+        auto result = jsoncons::reflect::json_conv_traits<cust_json,byte_string_type>::try_as(aset, j);
         REQUIRE(result);
-        auto r = j.try_as<basic_byte_string<cust_allocator<char>>>(aset);
+        auto r = j.try_as<byte_string_type>(aset);
         REQUIRE(r);
         CHECK(*r == *result);
-        CHECK(j.as<basic_byte_string<cust_allocator<char>>>(aset) == *result);
+        CHECK(j.as<byte_string_type>(aset) == *result);
         //std::cout << result.error() << "\n\n";
     }
 }
