@@ -22,7 +22,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/byte_string.hpp>

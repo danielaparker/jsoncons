@@ -33,7 +33,7 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
-#include <jsoncons/conversion.hpp>
+#include <jsoncons/utility/conversion.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
   #include <variant>

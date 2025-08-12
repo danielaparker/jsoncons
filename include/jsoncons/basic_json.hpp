@@ -42,7 +42,7 @@
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
@@ -3013,7 +3013,7 @@ namespace jsoncons {
             visitor.flush();
         }
 
-        expected<void,std::error_code> try_dump(basic_json_visitor<char_type>& visitor) const
+        write_result try_dump(basic_json_visitor<char_type>& visitor) const
         {
             auto r = try_dump_noflush(visitor);
             visitor.flush();
@@ -4737,7 +4737,7 @@ namespace jsoncons {
             }
         }
 
-        expected<void,std::error_code> try_dump_noflush(basic_json_visitor<char_type>& visitor) const
+        write_result try_dump_noflush(basic_json_visitor<char_type>& visitor) const
         {
             std::error_code ec;
             const ser_context context{};
@@ -4746,7 +4746,7 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                     visitor.string_value(as_string_view(), tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::byte_str:
                     if (tag() == semantic_tag::ext)
                     {
@@ -4756,30 +4756,30 @@ namespace jsoncons {
                     {
                         visitor.byte_string_value(as_byte_string_view(), tag(), context, ec);
                     }
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::half_float:
                     visitor.half_value(cast<half_storage>().value(), tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::float64:
                     visitor.double_value(cast<double_storage>().value(), 
                                          tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::int64:
                     visitor.int64_value(cast<int64_storage>().value(), tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::uint64:
                     visitor.uint64_value(cast<uint64_storage>().value(), tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::boolean:
                     visitor.bool_value(cast<bool_storage>().value(), tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::null:
                     visitor.null_value(tag(), context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::empty_object:
                     visitor.begin_object(0, tag(), context, ec);
                     visitor.end_object(context, ec);
-                    return ec ? expected<void,std::error_code>{unexpect, ec} : expected<void,std::error_code>{};
+                    return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::object:
                 {
                     visitor.begin_object(size(), tag(), context, ec);
@@ -4790,15 +4790,15 @@ namespace jsoncons {
                         (*it).value().dump_noflush(visitor, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
-                            return expected<void,std::error_code>{unexpect, ec};
+                            return write_result{unexpect, ec};
                         }
                     }
                     visitor.end_object(context, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
-                        return expected<void,std::error_code>{unexpect, ec};
+                        return write_result{unexpect, ec};
                     }
-                    return expected<void,std::error_code>{};
+                    return write_result{};
                 }
                 case json_storage_kind::array:
                 {
@@ -4815,9 +4815,9 @@ namespace jsoncons {
                     visitor.end_array(context, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
-                        return expected<void,std::error_code>{unexpect, ec};
+                        return write_result{unexpect, ec};
                     }
-                    return expected<void,std::error_code>{};
+                    return write_result{};
                 }
                 case json_storage_kind::json_const_ref:
                     return cast<json_const_reference_storage>().value().try_dump_noflush(visitor);

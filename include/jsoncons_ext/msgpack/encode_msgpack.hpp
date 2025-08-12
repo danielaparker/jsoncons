@@ -17,6 +17,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
@@ -28,7 +29,7 @@ namespace msgpack {
 
     template <typename T,typename ByteContainer>
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
     try_encode_msgpack(const T& j, 
         ByteContainer& cont, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -41,7 +42,7 @@ namespace msgpack {
 
     template <typename T,typename ByteContainer>
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
     try_encode_msgpack(const T& val, 
         ByteContainer& cont, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -51,7 +52,7 @@ namespace msgpack {
     }
 
     template <typename T>
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type 
     try_encode_msgpack(const T& j, 
         std::ostream& os, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -63,7 +64,7 @@ namespace msgpack {
     }
 
     template <typename T>
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type 
     try_encode_msgpack(const T& val, 
         std::ostream& os, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -76,7 +77,7 @@ namespace msgpack {
 
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
     try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, const T& j, 
         ByteContainer& cont, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -89,7 +90,7 @@ namespace msgpack {
 
     template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
     typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,expected<void,std::error_code>>::type 
+    ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
     try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
         const T& val, ByteContainer& cont, 
         const msgpack_encode_options& options = msgpack_encode_options())
@@ -99,7 +100,7 @@ namespace msgpack {
     }
 
     template <typename T,typename Alloc,typename TempAlloc >
-    typename std::enable_if<ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
+    typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type 
     try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
         const T& j, 
         std::ostream& os, 
@@ -112,7 +113,7 @@ namespace msgpack {
     }
 
     template <typename T,typename Alloc,typename TempAlloc >
-    typename std::enable_if<!ext_traits::is_basic_json<T>::value,expected<void,std::error_code>>::type 
+    typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type 
     try_encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset, 
                    const T& val, 
                    std::ostream& os, 

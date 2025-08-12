@@ -20,7 +20,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
 #include <jsoncons/staj_cursor.hpp>

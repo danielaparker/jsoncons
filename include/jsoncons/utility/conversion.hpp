@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONVERSION_HPP
-#define JSONCONS_CONVERSION_HPP
+#ifndef JSONCONS_UTILITY_CONVERSION_HPP
+#define JSONCONS_UTILITY_CONVERSION_HPP
 
 #include <memory>
 #include <string>
@@ -57,5 +57,5 @@ string_to_bytes(InputIt first, InputIt last, semantic_tag tag, Container& bytes)
 
 } // namespace jsoncons
 
-#endif // JSONCONS_CONVERSION_HPP
+#endif // JSONCONS_UTILITY_CONVERSION_HPP
 

@@ -144,6 +144,7 @@ add_executable(unit_tests
                corelib/src/try_to_json_tests.cpp
                corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/byte_string_tests.cpp
+               corelib/src/utility/conversion_tests.cpp
                corelib/src/utility/extension_traits_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
                corelib/src/utility/read_number_tests.cpp

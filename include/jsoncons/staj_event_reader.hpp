@@ -21,12 +21,12 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/conversion.hpp>
+#include <jsoncons/utility/conversion.hpp>
 
 namespace jsoncons {
 

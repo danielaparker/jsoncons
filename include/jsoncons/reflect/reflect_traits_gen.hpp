@@ -19,7 +19,7 @@
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 #define JSONCONS_RDONLY(X)
@@ -100,47 +100,47 @@ struct json_traits_helper
 };
 
 template <typename CharT, typename T> 
-expected<void,std::error_code> try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
+write_result try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     encoder.key(key);
     return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
 } 
 
 template <typename CharT, typename T> 
-expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val) 
     {
         encoder.key(key);
         return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
-    return expected<void,std::error_code>{}; 
+    return write_result{}; 
 }
  
 template <typename CharT, typename T> 
-expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
         encoder.key(key);
         return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
-    return expected<void,std::error_code>{}; 
+    return write_result{}; 
 }
  
 template <typename CharT, typename T> 
-expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
         encoder.key(key);
         return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
-    return expected<void,std::error_code>{}; 
+    return write_result{}; 
 } 
 
 template <typename CharT, typename T> 
-expected<void,std::error_code> try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     encoder.key(key);
     return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
@@ -462,7 +462,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             std::error_code ec; \
@@ -471,11 +471,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \
@@ -686,7 +686,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -696,11 +696,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \
@@ -823,7 +823,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -832,11 +832,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_COUNT, ,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_ENCODE, ,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \
@@ -1033,7 +1033,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1043,11 +1043,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_COUNT,,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \
@@ -1189,7 +1189,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1207,16 +1207,16 @@ namespace reflect { \
                 if (val == value_type()) \
                 { \
                     encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
-                    if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-                    return expected<void,std::error_code>{}; \
+                    if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+                    return write_result{}; \
                 } \
                 else \
                 { \
-                    return expected<void,std::error_code>{unexpect, conv_errc::conversion_failed}; \
+                    return write_result{unexpect, conv_errc::conversion_failed}; \
                 } \
             } \
             encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
-            return expected<void,std::error_code>{}; \
+            return write_result{}; \
         } \
     }; \
     template <> struct decode_traits<EnumType> \
@@ -1377,7 +1377,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1395,16 +1395,16 @@ namespace reflect { \
                 if (val == value_type()) \
                 { \
                     encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
-                    if (JSONCONS_UNLIKELY(ec)) return expected<void,std::error_code>{unexpect, ec}; \
-                    return expected<void,std::error_code>{}; \
+                    if (JSONCONS_UNLIKELY(ec)) return write_result{unexpect, ec}; \
+                    return write_result{}; \
                 } \
                 else \
                 { \
-                    return expected<void,std::error_code>{unexpect, conv_errc::conversion_failed}; \
+                    return write_result{unexpect, conv_errc::conversion_failed}; \
                 } \
             } \
             encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
-            return expected<void,std::error_code>{}; \
+            return write_result{}; \
         } \
     }; \
     template <> struct decode_traits<EnumType> \
@@ -1566,7 +1566,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1575,11 +1575,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_COUNT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_ENCODE, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \
@@ -1778,7 +1778,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
         template <typename CharT,typename Alloc,typename TempAlloc> \
-        static expected<void,std::error_code> try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1788,11 +1788,11 @@ namespace reflect { \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_COUNT,,,, __VA_ARGS__) \
             encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_ENCODE,,,, __VA_ARGS__) \
             encoder.end_object(ser_context(), ec); \
-            if (JSONCONS_UNLIKELY(ec)) {return expected<void,std::error_code>{unexpect, ec};} \
-            return expected<void,std::error_code>{}; \
+            if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
+            return write_result{}; \
         } \
     }; \
 } \

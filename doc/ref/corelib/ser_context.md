@@ -1,7 +1,7 @@
 ### jsoncons::ser_context
 
 ```cpp
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 
 class ser_context;
 ```

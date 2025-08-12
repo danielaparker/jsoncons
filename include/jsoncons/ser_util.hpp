@@ -2,17 +2,48 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://github.com/danielaparker/jsoncons2 for latest version
+// See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_READ_RESULT_HPP    
-#define JSONCONS_READ_RESULT_HPP    
+#ifndef JSONCONS_SER_UTIL_HPP
+#define JSONCONS_SER_UTIL_HPP
 
+#include <cstddef>
 #include <system_error>
-#include <type_traits>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
+
+class ser_context
+{
+public:
+    virtual ~ser_context() = default;
+
+    virtual size_t line() const
+    {
+        return 0;
+    }
+
+    virtual size_t column() const
+    {
+        return 0;
+    }
+
+    virtual size_t position() const
+    {
+        return 0;
+    }
+
+    virtual size_t begin_position() const
+    {
+        return 0;
+    }
+
+    virtual size_t end_position() const
+    {
+        return 0;
+    }
+};
 
 class read_error
 {
@@ -91,6 +122,8 @@ std::ostream& operator<<(std::ostream& os, const read_error& err)
 template <typename T>
 using read_result = expected<T,read_error>;
 
+using write_result = jsoncons::expected<void, std::error_code>;
+
 } // namespace jsoncons
 
-#endif // JSONCONS_READ_RESULT_HPP
+#endif // JSONCONS_SER_UTIL_HPP

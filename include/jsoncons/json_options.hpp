@@ -15,7 +15,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 
 namespace jsoncons {
 

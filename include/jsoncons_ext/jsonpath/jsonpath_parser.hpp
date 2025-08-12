@@ -19,7 +19,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/ser_context.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
