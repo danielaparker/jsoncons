@@ -108,7 +108,7 @@ void cbor_reputon_example()
     const ojson& reputons = j2["reputons"];
 
     std::cout << "(2)\n";
-    for (auto element : reputons.array_range())
+    for (const auto& element : reputons.array_range())
     {
         std::cout << element.at("rated").as<std::string>() << ", ";
         std::cout << element.at("rating").as<double>() << "\n";
