@@ -460,18 +460,22 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template<typename Alloc,typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            auto s = j.as_string_view();
-            T val;
-            unicode_traits::convert(s.data(), s.size(), val);
+            if (!j.is_string())
+            {
+                return result_type{jsoncons::unexpect, conv_errc::not_string};
+            }
+            auto sv = j.as_string_view();
+            T val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+            unicode_traits::convert(sv.data(), sv.size(), val);
             return result_type(std::move(val));
         }
 
         template <typename Alloc>
         static Json to_json(const Alloc& alloc, const T& val)
         {
-            std::basic_string<char_type> s;
+            std::basic_string<char_type> s; // use temp_allocator
             unicode_traits::convert(val.data(), val.size(), s);
             return jsoncons::make_obj_using_allocator<Json>(alloc, s, semantic_tag::none);
         }
