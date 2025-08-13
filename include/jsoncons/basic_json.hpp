@@ -901,10 +901,10 @@ namespace jsoncons {
                 {
                     if (cast<array_storage>().ptr_ != nullptr)
                     {
-                        auto& storage = cast<array_storage>();
-                        typename array_storage::allocator_type alloc{storage.ptr_->get_allocator()};
-                        std::allocator_traits<typename array_storage::allocator_type>::destroy(alloc, ext_traits::to_plain_pointer(storage.ptr_));
-                        std::allocator_traits<typename array_storage::allocator_type>::deallocate(alloc, storage.ptr_,1);
+                        auto& stor = cast<array_storage>();
+                        typename array_storage::allocator_type alloc{stor.ptr_->get_allocator()};
+                        std::allocator_traits<typename array_storage::allocator_type>::destroy(alloc, ext_traits::to_plain_pointer(stor.ptr_));
+                        std::allocator_traits<typename array_storage::allocator_type>::deallocate(alloc, stor.ptr_,1);
                     }
                     break;
                 }
@@ -912,10 +912,10 @@ namespace jsoncons {
                 {
                     if (cast<object_storage>().ptr_ != nullptr)
                     {
-                        auto& storage = cast<object_storage>();
-                        typename object_storage::allocator_type alloc{storage.ptr_->get_allocator()};
-                        std::allocator_traits<typename object_storage::allocator_type>::destroy(alloc, ext_traits::to_plain_pointer(storage.ptr_));
-                        std::allocator_traits<typename object_storage::allocator_type>::deallocate(alloc, storage.ptr_,1);
+                        auto& stor = cast<object_storage>();
+                        typename object_storage::allocator_type alloc{stor.ptr_->get_allocator()};
+                        std::allocator_traits<typename object_storage::allocator_type>::destroy(alloc, ext_traits::to_plain_pointer(stor.ptr_));
+                        std::allocator_traits<typename object_storage::allocator_type>::deallocate(alloc, stor.ptr_,1);
                     }
                     break;
                 }
@@ -1187,17 +1187,17 @@ namespace jsoncons {
                 {
                     case json_storage_kind::long_str:
                     {
-                        const auto& storage = other.cast<long_string_storage>();
-                        auto ptr = create_long_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
-                            storage.data(), storage.length());
+                        const auto& stor = other.cast<long_string_storage>();
+                        auto ptr = create_long_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(stor.get_allocator()),
+                            stor.data(), stor.length());
                         construct<long_string_storage>(ptr, other.tag());
                         break;
                     }
                     case json_storage_kind::byte_str:
                     {
-                        const auto& storage = other.cast<byte_string_storage>();
-                        auto ptr = create_byte_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
-                            storage.data(), storage.length(), storage.ext_tag());
+                        const auto& stor = other.cast<byte_string_storage>();
+                        auto ptr = create_byte_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(stor.get_allocator()),
+                            stor.data(), stor.length(), stor.ext_tag());
                         construct<byte_string_storage>(ptr, other.tag());
                         break;
                     }
@@ -1536,20 +1536,31 @@ namespace jsoncons {
         }
 
         template <typename T,typename Alloc, typename TempAlloc>
-        conversion_result<T> try_as_byte_string(const allocator_set<Alloc,TempAlloc>& aset) const
+        typename std::enable_if<ext_traits::is_basic_byte_string<T>::value,conversion_result<T>>::type
+        try_as_byte_string(const allocator_set<Alloc,TempAlloc>& aset) const
         {
-            using byte_string_type = T;
-            using result_type = conversion_result<byte_string_type>;
+            using value_type = T;
+            using result_type = conversion_result<value_type>;
 
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
+                {
+                    value_type bytes = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
+                    const auto& stor = cast<short_string_storage>();
+                    auto res = string_to_bytes(stor.data(), stor.data()+stor.length(), tag(), bytes);
+                    if (JSONCONS_UNLIKELY(res.ec != conv_errc{}))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
+                    }
+                    return result_type(std::move(bytes));
+                }
                 case json_storage_kind::long_str:
                 {
-                    byte_string_type bytes = jsoncons::make_obj_using_allocator<byte_string_type>(aset.get_allocator());
-                    auto sv = as_string_view();
-                    auto res = string_to_bytes(sv.begin(), sv.end(), tag(), bytes);
-                    if (res.ec != conv_errc::success)
+                    value_type bytes = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
+                    const auto& stor = cast<long_string_storage>();
+                    auto res = string_to_bytes(stor.data(), stor.data()+stor.length(), tag(), bytes);
+                    if (JSONCONS_UNLIKELY(res.ec != conv_errc{}))
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_byte_string);
                     }
@@ -1558,7 +1569,7 @@ namespace jsoncons {
                 case json_storage_kind::byte_str:
                 {
                     auto& bs = cast<byte_string_storage>();
-                    auto val = jsoncons::make_obj_using_allocator<byte_string_type>(aset.get_allocator(), 
+                    auto val = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator(), 
                         bs.data(), bs.length());
                     return result_type(std::move(val));
                 }
@@ -1574,7 +1585,7 @@ namespace jsoncons {
         template <typename BytesAlloc=std::allocator<uint8_t>>
         basic_byte_string<BytesAlloc> as_byte_string() const
         {
-            auto result = try_as_byte_string<BytesAlloc>();
+            auto result = try_as_byte_string<basic_byte_string<BytesAlloc>>(make_alloc_set(BytesAlloc()));
             if (!result)
             {
                 JSONCONS_THROW(conv_error(result.error().code()));
@@ -3766,6 +3777,52 @@ namespace jsoncons {
             return as_string(std::allocator<char_type>()); 
         }
 
+        template <typename T,typename Alloc, typename TempAlloc>
+        typename std::enable_if<ext_traits::is_string<T>::value &&
+                               std::is_same<char_type,typename T::value_type>::value,conversion_result<T>>::type
+        try_as_string(const allocator_set<Alloc,TempAlloc>& aset) const
+        {
+            using value_type = T;
+            using result_type = conversion_result<value_type>;
+
+            switch (storage_kind())
+            {
+                case json_storage_kind::short_str:
+                {
+                    auto& stor = cast<short_string_storage>();
+                    return result_type(jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator(), stor.data(), stor.length()));
+                }
+                case json_storage_kind::long_str:
+                {
+                    auto& stor = cast<long_string_storage>();
+                    return result_type(jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator(), stor.data(), stor.length()));
+                }
+                case json_storage_kind::byte_str:
+                {
+                    auto& stor = cast<byte_string_storage>();
+                    value_type s = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
+                    bytes_to_string(stor.data(), stor.data()+stor.length(), tag(), s);
+                    return result_type(std::move(s));
+                }
+                case json_storage_kind::json_const_ref:
+                    return cast<json_const_reference_storage>().value().template try_as_string<T>(aset);
+                case json_storage_kind::json_ref:
+                    return cast<json_reference_storage>().value().template try_as_string<T>(aset);
+                default:
+                {
+                    value_type s = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
+                    basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>,TempAlloc> encoder(s, aset.get_temp_allocator());
+                    std::error_code ec;
+                    dump(encoder, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return result_type(jsoncons::unexpect, ec);
+                    }
+                    return result_type(std::move(s));
+                }
+            }
+        }
+
         template <typename CharsAlloc>
         std::basic_string<char_type,char_traits_type,CharsAlloc> as_string(const CharsAlloc& alloc) const 
         {
@@ -3784,15 +3841,6 @@ namespace jsoncons {
                     auto bstr = as_byte_string_view();
                     value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
                     bytes_to_string(bstr.begin(), bstr.end(), tag(), s);
-                    return s;
-                }
-                case json_storage_kind::array:
-                {
-                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
-                    {
-                        basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
-                        dump(encoder);
-                    }
                     return s;
                 }
                 case json_storage_kind::json_const_ref:

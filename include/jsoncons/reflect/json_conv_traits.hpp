@@ -420,9 +420,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_string<T>::value &&
-                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_string<T>::value &&
+                                std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using result_type = conversion_result<T>;
         using char_type = typename T::value_type;
@@ -435,8 +435,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template<typename Alloc,typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            auto s = j.template as_string<typename T::allocator_type>(aset.get_allocator());
-            return result_type{std::move(s)};
+            return j.template try_as_string<T>(aset);
         }
 
         template <typename Alloc>
