@@ -970,9 +970,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 }
                 else
                 {
-                    auto key = jsoncons::make_obj_using_allocator<key_type>(alloc);
+                    auto key = jsoncons::make_obj_using_allocator<typename Json::key_type>(alloc);
                     temp.dump(key);
-                    j.try_emplace(std::move(key), item.second, alloc);
+                    j.try_emplace(std::move(key), item.second);
                 }
             }
             return j;
