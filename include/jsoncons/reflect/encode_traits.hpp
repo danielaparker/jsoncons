@@ -137,13 +137,14 @@ struct encode_traits<T,
     template <typename CharT, typename Alloc, typename TempAlloc>
     static
     typename std::enable_if<!std::is_same<typename T::value_type, CharT>::value,write_result>::type
-        try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
+        try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val,
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
-        std::basic_string<CharT> s;
+        using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
+        std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
         unicode_traits::convert(val.data(), val.size(), s);
-        encoder.string_value(s, semantic_tag::none, ser_context(), ec);
+        encoder.string_value(basic_string_view<CharT>(s.data(), s.length()), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -384,9 +385,10 @@ struct encode_traits<T,
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            std::basic_string<CharT> s;
+            using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
+            std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
             jsoncons::utility::from_integer((*it).first,s);
-            encoder.key(s);
+            encoder.key(basic_string_view<CharT>(s.data(), s.size()));
             auto r = encode_traits<mapped_type>::try_encode(aset, (*it).second, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
