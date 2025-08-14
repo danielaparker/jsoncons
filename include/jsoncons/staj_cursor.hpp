@@ -796,7 +796,7 @@ read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset,
         }
         case staj_event_type::null_value:
         {
-            return result_type(Json{null_arg});
+            return result_type(Json{null_arg, semantic_tag::none});
         }
         case staj_event_type::bool_value:
         {
