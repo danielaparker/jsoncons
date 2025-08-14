@@ -2458,7 +2458,7 @@ namespace jsoncons {
 
         template <typename T>
         basic_json(const T& val)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(allocator_type()), val))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(), val))
         {
         }
 
@@ -2722,7 +2722,7 @@ namespace jsoncons {
         template <typename T>
         basic_json& operator=(const T& val)
         {
-            *this = reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(allocator_type()), val);
+            *this = reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(), val);
             return *this;
         }
 
