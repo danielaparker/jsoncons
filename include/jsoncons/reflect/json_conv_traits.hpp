@@ -228,7 +228,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template<typename Alloc,typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
         {
-            return result_type(j.template as_integer<T>());
+            return j.template try_as_integer<T>();
         }
 
         template <typename Alloc>
@@ -240,7 +240,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json, typename T>
     struct json_conv_traits<Json, T,
-                            typename std::enable_if<std::is_floating_point<T>::value
+        typename std::enable_if<std::is_floating_point<T>::value
     >::type>
     {
         using result_type = conversion_result<T>;
@@ -317,9 +317,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const Json& val)
+        static Json to_json(const Alloc& alloc, const Json& j)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val);
+            return jsoncons::make_obj_using_allocator<Json>(alloc, j);
         }
     };
 
@@ -846,10 +846,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     // map like
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_map_like<T>::value &&
-                                                    ext_traits::is_string<typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_map_like<T>::value &&
+                                ext_traits::is_string<typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         using mapped_type = typename T::mapped_type;
@@ -914,14 +914,14 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         using key_type = typename T::key_type;
         using result_type = conversion_result<T>;
 
-        static bool is(const Json& val) noexcept 
+        static bool is(const Json& j) noexcept 
         {
-            if (!val.is_object())
+            if (!j.is_object())
                 return false;
-            for (const auto& item : val.object_range())
+            for (const auto& item : j.object_range())
             {
-                Json j(item.key());
-                if (!j.template is<key_type>())
+                Json k(item.key());
+                if (!k.template is<key_type>())
                 {
                     return false;
                 }
@@ -934,13 +934,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& val) 
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
         {
-            T result;
-            for (const auto& item : val.object_range())
+            auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+            for (const auto& item : j.object_range())
             {
-                auto j = jsoncons::make_obj_using_allocator<Json>(val.get_allocator(), item.key());
-                auto r1 = j.template try_as<key_type>(aset);
+                auto k = jsoncons::make_obj_using_allocator<Json>(j.get_allocator(), item.key());
+                auto r1 = k.template try_as<key_type>(aset);
                 if (!r1)
                 {
                     return result_type(jsoncons::unexpect, r1.error());
@@ -950,10 +950,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 {
                     return result_type(jsoncons::unexpect, r2.error());
                 }
-                result.emplace(std::move(*r1), std::move(*r2));
+                val.emplace(std::move(*r1), std::move(*r2));
             }
 
-            return result_type(std::move(result));
+            return result_type(std::move(val));
         }
 
         template <typename Alloc>
@@ -971,9 +971,9 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 }
                 else
                 {
-                    typename Json::key_type key(alloc);
+                    auto key = jsoncons::make_obj_using_allocator<typename Json::key_type>(alloc);
                     temp.dump(key);
-                    j.try_emplace(std::move(key), item.second, alloc);
+                    j.try_emplace(std::move(key), item.second);
                 }
             }
             return j;
