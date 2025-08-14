@@ -901,11 +901,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_map_like<T>::value &&
-                                                    !ext_traits::is_string<typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_map_like<T>::value &&
+                                !ext_traits::is_string<typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         using mapped_type = typename T::mapped_type;
@@ -919,7 +919,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 return false;
             for (const auto& item : j.object_range())
             {
-                Json k(item.key());
+                Json k{cstr_ref_arg, item.key().c_str()};
                 if (!k.template is<key_type>())
                 {
                     return false;
@@ -938,7 +938,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             T val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
             for (const auto& item : j.object_range())
             {
-                auto k = jsoncons::make_obj_using_allocator<Json>(j.get_allocator(), item.key());
+                Json k{cstr_ref_arg, item.key().c_str()};
                 auto r1 = k.template try_as<key_type>(aset);
                 if (!r1)
                 {
@@ -970,7 +970,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 }
                 else
                 {
-                    typename Json::key_type key(alloc);
+                    auto key = jsoncons::make_obj_using_allocator<key_type>(alloc);
                     temp.dump(key);
                     j.try_emplace(std::move(key), item.second, alloc);
                 }

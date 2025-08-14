@@ -13,6 +13,22 @@ using namespace jsoncons;
 
 TEST_CASE("basic_json object == basic_json object")
 {
+    SECTION("short_str,long_str,cstr_ref")
+    {
+        json j1{"Hello"};
+        json j2{"String too long for short string"};
+        json j3{cstr_ref_arg, "Hello"};
+
+        REQUIRE(j1.is_string());
+        REQUIRE(j2.is_string());
+        REQUIRE(j3.is_string());
+        CHECK(j1 == j3);
+        CHECK(j3 == j3);
+        CHECK_FALSE(j2 == j3);
+        CHECK(j3 < j2);
+        CHECK(j2 > j3);
+    }
+
     SECTION("empty, empty")
     {
         json o1;

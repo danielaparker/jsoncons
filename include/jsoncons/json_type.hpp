@@ -143,6 +143,13 @@ namespace jsoncons {
     };
     
     JSONCONS_INLINE_CONSTEXPR byte_string_arg_t byte_string_arg{};
+
+    struct cstr_ref_arg_t
+    {
+        explicit cstr_ref_arg_t() = default; 
+    };
+
+    JSONCONS_INLINE_CONSTEXPR cstr_ref_arg_t cstr_ref_arg{};
     
     struct json_const_pointer_arg_t
     {
@@ -172,7 +179,7 @@ namespace jsoncons {
 
     enum class json_storage_kind : uint8_t 
     {
-        null = 0,                 // 0000
+        cstr_ref = 0,             // 0000
         boolean = 1,              // 0001
         int64 = 2,                // 0010
         uint64 = 3,               // 0011
@@ -180,8 +187,9 @@ namespace jsoncons {
         float64 = 5,              // 0101
         half_float = 6,           // 0110
         short_str = 7,            // 0111
-        json_const_ref = 8, // 1000    
-        json_ref = 9,       // 1001    
+        json_const_ref = 8,       // 1000    
+        json_ref = 9,             // 1001 
+        null = 10,                // 1010   
         byte_str = 12,            // 1100  
         object = 13,              // 1101
         array = 14,               // 1110
@@ -191,7 +199,7 @@ namespace jsoncons {
     inline bool is_string_storage(json_storage_kind storage_kind) noexcept
     {
         static const uint8_t mask{ uint8_t(json_storage_kind::short_str) & uint8_t(json_storage_kind::long_str) };
-        return (uint8_t(storage_kind) & mask) == mask;
+        return (uint8_t(storage_kind) & mask) == mask || !uint8_t(storage_kind);
     }
 
     inline bool is_trivial_storage(json_storage_kind storage_kind) noexcept
@@ -212,12 +220,13 @@ namespace jsoncons {
         static constexpr const CharT* double_value = JSONCONS_CSTRING_CONSTANT(CharT, "double");
         static constexpr const CharT* short_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "short_string");
         static constexpr const CharT* long_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "string");
+        static constexpr const CharT* str_ref_value = JSONCONS_CSTRING_CONSTANT(CharT, "cstr_ref");
         static constexpr const CharT* byte_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string");
         static constexpr const CharT* array_value = JSONCONS_CSTRING_CONSTANT(CharT, "array");
         static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty_object");
         static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
-        static constexpr const CharT* json_const_ref = JSONCONS_CSTRING_CONSTANT(CharT, "json_const_ref");
-        static constexpr const CharT* json_ref = JSONCONS_CSTRING_CONSTANT(CharT, "json_ref");
+        static constexpr const CharT* json_const_reference = JSONCONS_CSTRING_CONSTANT(CharT, "json_const_ref");
+        static constexpr const CharT* json_reference = JSONCONS_CSTRING_CONSTANT(CharT, "json_ref");
 
         switch (storage)
         {
@@ -261,6 +270,11 @@ namespace jsoncons {
                 os << long_string_value;
                 break;
             }
+            case json_storage_kind::cstr_ref:
+            {
+                os << str_ref_value;
+                break;
+            }
             case json_storage_kind::byte_str:
             {
                 os << byte_string_value;
@@ -283,12 +297,12 @@ namespace jsoncons {
             }
             case json_storage_kind::json_const_ref:
             {
-                os << json_const_ref;
+                os << json_const_reference;
                 break;
             }
             case json_storage_kind::json_ref:
             {
-                os << json_ref;
+                os << json_reference;
                 break;
             }
         }
