@@ -1352,7 +1352,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const basic_bigint<Allocator>& val)
         {
             using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
-            std::basic_string<char_type,std::char_traits<char_type,temp_alloc_type>> s(aset.get_temp_allocator());
+            std::basic_string<char_type,std::char_traits<char_type>,temp_alloc_type> s{aset.get_temp_allocator()};
             val.write_string(s);
             return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::bigint);
         }
