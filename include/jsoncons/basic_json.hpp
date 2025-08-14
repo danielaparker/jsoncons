@@ -2458,13 +2458,13 @@ namespace jsoncons {
 
         template <typename T>
         basic_json(const T& val)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(std::allocator<char>(), val))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(allocator_type()), val))
         {
         }
 
         template <typename T>
         basic_json(const T& val, const Allocator& alloc)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(alloc, val))
+            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(alloc), val))
         {
         }
 
@@ -2722,7 +2722,7 @@ namespace jsoncons {
         template <typename T>
         basic_json& operator=(const T& val)
         {
-            *this = reflect::json_conv_traits<basic_json,T>::to_json(std::allocator<char>(), val);
+            *this = reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(allocator_type()), val);
             return *this;
         }
 

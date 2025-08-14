@@ -80,10 +80,10 @@ namespace reflect {
             }
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return json_type_traits<Json,T>::to_json(val, alloc);
+            return json_type_traits<Json,T>::to_json(val, aset.get_allocator());
         }
     };
 
@@ -164,10 +164,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{j.as_cstring()};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const char_type* s)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const char_type* s)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, s, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::none);
         }
     };
 
@@ -181,10 +181,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_string();
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const char_type* s)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const char_type* s)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, s, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::none);
         }
     };
 
@@ -207,8 +207,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_integer<T>();
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, T val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, T val)
         {
             return Json(val, semantic_tag::none);
         }
@@ -231,10 +231,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_integer<T>();
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, T val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, T val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val, semantic_tag::none);
         }
     };
 
@@ -260,8 +260,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(static_cast<T>(*result));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, T val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, T val)
         {
             return Json(val, semantic_tag::none);
         }
@@ -277,8 +277,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_object();
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, const json_object& o)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const json_object& o)
         {
             return Json(o,semantic_tag::none);
         }
@@ -294,8 +294,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_array();
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, const json_array& a)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const json_array& a)
         {
             return Json(a, semantic_tag::none);
         }
@@ -316,10 +316,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{j};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const Json& j)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, j);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), j);
         }
     };
 
@@ -342,8 +342,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{jsoncons::null_type()};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, jsoncons::null_type)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, jsoncons::null_type)
         {
             return Json(jsoncons::null_type{}, semantic_tag::none);
         }
@@ -364,8 +364,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{j.as_bool()};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, bool val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, bool val)
         {
             return Json(val, semantic_tag::none);
         }
@@ -389,8 +389,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{j.as_bool()};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, bool val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, bool val)
         {
             return Json(val, semantic_tag::none);
         }
@@ -411,8 +411,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type{j.as_bool()};
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, bool val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, bool val)
         {
             return Json(val, semantic_tag::none);
         }
@@ -438,10 +438,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_string<T>(aset);
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val, semantic_tag::none);
         }
     };
 
@@ -472,12 +472,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(val));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            std::basic_string<char_type> s; // use temp_allocator
+            using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+            std::basic_string<char_type,std::char_traits<char_type>,temp_alloc_type> s(aset.get_temp_allocator());
             unicode_traits::convert(val.data(), val.size(), s);
-            return jsoncons::make_obj_using_allocator<Json>(alloc, s, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::none);
         }
     };
 
@@ -501,10 +502,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result ? result_type(in_place, result.value().data(), result.value().size()) : result_type(unexpect, conv_errc::not_string); 
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val, semantic_tag::none);
         }
     };
 
@@ -608,11 +609,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        template <typename Alloc, typename Container = T>
+        template <typename Alloc, typename TempAlloc, typename Container = T>
         static typename std::enable_if<!ext_traits::is_std_byte<typename Container::value_type>::value,Json>::type
-        to_json(const Alloc& alloc, const T& val)
+        to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            Json j(json_array_arg, alloc);
+            auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg);
             auto first = std::begin(val);
             auto last = std::end(val);
             std::size_t size = std::distance(first, last);
@@ -624,12 +625,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j;
         }
 
-        template <typename Alloc, typename Container = T>
+        template <typename Alloc,typename TempAlloc,typename Container = T>
         static typename std::enable_if<ext_traits::is_std_byte<typename Container::value_type>::value,Json>::type
-        to_json(const Alloc& alloc, const T& val)
+        to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            Json j(byte_string_arg, val, semantic_tag::none, alloc);
-            return j;
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), byte_string_arg, val, semantic_tag::none);
         }
 
         static void visit_reserve_(std::true_type, T& v, std::size_t size)
@@ -695,10 +695,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            Json j(json_array_arg, alloc);
+            auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg);
             auto first = std::begin(val);
             auto last = std::end(val);
             std::size_t size = std::distance(first, last);
@@ -768,10 +768,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            Json j(json_array_arg, alloc);
+            auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg);
             auto first = std::begin(val);
             auto last = std::end(val);
             std::size_t size = std::distance(first, last);
@@ -830,10 +830,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(buff));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::array<E, N>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::array<E, N>& val)
         {
-            Json j(json_array_arg, alloc);
+            auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg);
             j.reserve(N);
             for (auto it = val.begin(); it != val.end(); ++it)
             {
@@ -893,10 +893,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(result));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, json_object_arg, val.begin(), val.end(), semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, val.begin(), val.end(), semantic_tag::none);
         }
     };
 
@@ -956,22 +956,22 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(val));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val) 
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val) 
         {
-            Json j = jsoncons::make_obj_using_allocator<Json>(alloc, json_object_arg, semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none);
             j.reserve(val.size());
             for (const auto& item : val)
             {
-                auto temp = json_conv_traits<Json, key_type>::to_json(alloc, item.first);
+                auto temp = json_conv_traits<Json, key_type>::to_json(aset, item.first);
                 if (temp.is_string_view())
                 {
                     auto sv = temp.as_string_view();
-                    j.try_emplace(typename Json::key_type(sv.data(), sv.length(), alloc), item.second);
+                    j.try_emplace(jsoncons::make_obj_using_allocator<typename Json::key_type>(aset.get_allocator(), sv.data(), sv.length()), item.second);
                 }
                 else
                 {
-                    auto key = jsoncons::make_obj_using_allocator<typename Json::key_type>(alloc);
+                    auto key = jsoncons::make_obj_using_allocator<typename Json::key_type>(aset.get_allocator());
                     temp.dump(key);
                     j.try_emplace(std::move(key), item.second);
                 }
@@ -1013,11 +1013,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 next::try_as(tuple, aset, j, ec);
             }
 
-            template <typename Alloc>
-            static void to_json(const Alloc& alloc, const Tuple& tuple, Json& j)
+            template <typename Alloc, typename TempAlloc>
+            static void to_json(const allocator_set<Alloc,TempAlloc>& aset, const Tuple& tuple, Json& j)
             {
-                j.push_back(json_conv_traits<Json, element_type>::to_json(alloc, std::get<Size-Pos>(tuple)));
-                next::to_json(alloc, tuple, j);
+                j.push_back(json_conv_traits<Json, element_type>::to_json(aset, std::get<Size-Pos>(tuple)));
+                next::to_json(aset, tuple, j);
             }
         };
 
@@ -1034,8 +1034,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
             }
 
-            template <typename Alloc>
-            static void to_json(const Alloc&, const Tuple&, Json&)
+            template <typename Alloc, typename TempAlloc>
+            static void to_json(const allocator_set<Alloc,TempAlloc>&, const Tuple&, Json&)
             {
             }
         };
@@ -1068,12 +1068,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::move(val));
         }
          
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::tuple<E...>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::tuple<E...>& val)
         {
-            Json j = jsoncons::make_obj_using_allocator<Json>(alloc, json_array_arg, semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
             j.reserve(sizeof...(E));
-            helper::to_json(alloc, val, j);
+            helper::to_json(aset, val, j);
             return j;
         }
     };
@@ -1109,10 +1109,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::make_pair<T1,T2>(std::move(*res1), std::move(*res2)));
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::pair<T1, T2>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::pair<T1, T2>& val)
         {
-            Json j = jsoncons::make_obj_using_allocator<Json>(alloc, json_array_arg, semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
             j.reserve(2);
             j.push_back(val.first);
             j.push_back(val.second);
@@ -1138,10 +1138,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.template try_as_byte_string<T>(aset);
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const T& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, byte_string_arg, val, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), byte_string_arg, val, semantic_tag::none);
         }
     };
 
@@ -1173,12 +1173,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(std::make_shared<ValueType>(std::move(r.value())));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::shared_ptr<ValueType>& ptr)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::shared_ptr<ValueType>& ptr)
         {
             if (ptr.get() != nullptr) 
             {
-                return jsoncons::make_obj_using_allocator<Json>(alloc, *ptr, semantic_tag::none);
+                return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *ptr, semantic_tag::none);
             }
             else 
             {
@@ -1215,12 +1215,12 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(jsoncons::make_unique<ValueType>(std::move(r.value())));
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::unique_ptr<ValueType>& ptr)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::unique_ptr<ValueType>& ptr)
         {
             if (ptr.get() != nullptr) 
             {
-                return jsoncons::make_obj_using_allocator<Json>(alloc, *ptr, semantic_tag::none);
+                return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *ptr, semantic_tag::none);
             }
             else 
             {
@@ -1256,10 +1256,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(jsoncons::optional<T>(std::move(r.value())));
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const jsoncons::optional<T>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const jsoncons::optional<T>& val)
         {
-            return val.has_value() ? jsoncons::make_obj_using_allocator<Json>(alloc, *val, semantic_tag::none) : Json::null();
+            return val.has_value() ? jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *val, semantic_tag::none) : Json::null();
         }
     };
 
@@ -1280,10 +1280,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             return result_type(j.try_as_byte_string_view());
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const byte_string_view& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const byte_string_view& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, byte_string_arg, val, semantic_tag::none);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), byte_string_arg, val, semantic_tag::none);
         }
     };
 
@@ -1348,12 +1348,13 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const basic_bigint<Allocator>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const basic_bigint<Allocator>& val)
         {
-            std::basic_string<char_type> s;
+            using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+            std::basic_string<char_type,std::char_traits<char_type,temp_alloc_type>> s(aset.get_temp_allocator());
             val.write_string(s);
-            return jsoncons::make_obj_using_allocator<Json>(alloc, s, semantic_tag::bigint);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::bigint);
         }
     };
 
@@ -1404,10 +1405,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
         
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::valarray<T>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::valarray<T>& val)
         {
-            Json j = jsoncons::make_obj_using_allocator<Json>(alloc, json_array_arg, semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
             auto first = std::begin(val);
             auto last = std::end(val);
             std::size_t size = std::distance(first,last);
@@ -1506,10 +1507,10 @@ namespace variant_detail
             return result_type(variant_detail::as_variant<0,Json,variant_type,Alloc,TempAlloc,VariantTypes...>(aset, j)); 
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::variant<VariantTypes...>& var)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::variant<VariantTypes...>& var)
         {
-            Json j = jsoncons::make_obj_using_allocator<Json>(alloc, json_array_arg, semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
             variant_detail::variant_to_json_visitor<Json> visitor(j);
             std::visit(visitor, var);
             return j;
@@ -1539,10 +1540,10 @@ namespace variant_detail
             return from_json_(aset, j);
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const duration_type& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const duration_type& val)
         {
-            return to_json_(alloc, val);
+            return to_json_(aset, val);
         }
 
         template <typename Alloc, typename TempAlloc, typename PeriodT=Period>
@@ -1779,28 +1780,28 @@ namespace variant_detail
             }
         }
 
-        template <typename Alloc,typename PeriodT=Period>
+        template <typename Alloc,typename TempAlloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
-        to_json_(const Alloc& alloc, const duration_type& val)
+        to_json_(const allocator_set<Alloc,TempAlloc>& aset, const duration_type& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_second);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val.count(), semantic_tag::epoch_second);
         }
 
-        template <typename Alloc,typename PeriodT=Period>
+        template <typename Alloc,typename TempAlloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value,Json>::type
-        to_json_(const Alloc& alloc, const duration_type& val)
+        to_json_(const allocator_set<Alloc,TempAlloc>& aset, const duration_type& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_milli);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val.count(), semantic_tag::epoch_milli);
         }
 
-        template <typename Alloc,typename PeriodT=Period>
+        template <typename Alloc,typename TempAlloc,typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value,Json>::type
-        to_json_(const Alloc& alloc, const duration_type& val)
+        to_json_(const allocator_set<Alloc,TempAlloc>& aset, const duration_type& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(alloc, val.count(), semantic_tag::epoch_nano);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), val.count(), semantic_tag::epoch_nano);
         }
     };
 
@@ -1825,8 +1826,8 @@ namespace variant_detail
             return result_type(nullptr);
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc&, const std::nullptr_t&)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const std::nullptr_t&)
         {
             return Json::null();
         }
@@ -1921,10 +1922,11 @@ namespace variant_detail
             }
         }
 
-        template <typename Alloc>
-        static Json to_json(const Alloc& alloc, const std::bitset<N>& val)
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::bitset<N>& val)
         {
-            std::vector<uint8_t> bits;
+            using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<uint8_t>;
+            std::vector<uint8_t,temp_alloc_type> bits(aset.get_temp_allocator());
 
             uint8_t byte = 0;
             uint8_t mask = 0x80;
@@ -1952,7 +1954,7 @@ namespace variant_detail
                 bits.push_back(byte);
             }
 
-            return jsoncons::make_obj_using_allocator<Json>(alloc, byte_string_arg, bits, semantic_tag::base16);
+            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), byte_string_arg, bits, semantic_tag::base16);
         }
     };
 

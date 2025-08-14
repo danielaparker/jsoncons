@@ -39,7 +39,8 @@ public:
         const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
-        auto j = json_conv_traits<basic_json<CharT,order_preserving_policy,TempAlloc>,T>::to_json(aset.get_temp_allocator(), val);
+        auto j = json_conv_traits<basic_json<CharT,order_preserving_policy,TempAlloc>,T>::to_json(
+            make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), val);
         return j.try_dump(encoder);
     }
 };
