@@ -529,7 +529,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             bool result = j.is_array();
             if (result)
             {
-                for (auto e : j.array_range())
+                for (const auto& e : j.array_range())
                 {
                     if (!e.template is<value_type>())
                     {
@@ -679,7 +679,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             bool result = j.is_array();
             if (result)
             {
-                for (auto e : j.array_range())
+                for (const auto& e : j.array_range())
                 {
                     if (!e.template is<value_type>())
                     {
@@ -756,7 +756,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             bool result = j.is_array();
             if (result)
             {
-                for (auto e : j.array_range())
+                for (const auto& e : j.array_range())
                 {
                     if (!e.template is<value_type>())
                     {
@@ -832,7 +832,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             bool result = j.is_array() && j.size() == N;
             if (result)
             {
-                for (auto e : j.array_range())
+                for (const auto& e : j.array_range())
                 {
                     if (!e.template is<value_type>())
                     {
@@ -899,7 +899,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         static bool is(const Json& j) noexcept
         {
             bool result = j.is_object();
-            for (auto member : j.object_range())
+            for (const auto& member : j.object_range())
             {
                 if (!member.value().template is<mapped_type>())
                 {
@@ -1358,7 +1358,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             bool result = j.is_array();
             if (result)
             {
-                for (auto e : j.array_range())
+                for (const auto& e : j.array_range())
                 {
                     if (!e.template is<T>())
                     {

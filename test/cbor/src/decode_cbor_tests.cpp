@@ -112,7 +112,7 @@ TEST_CASE("cbor_view_test")
     }
     //std::cout << '\n';
 
-    for (auto element : reputons.array_range())
+    for (const auto& element : reputons.array_range())
     {
         json j = element;
         //std::cout << j << '\n';
