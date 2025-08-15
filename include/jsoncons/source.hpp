@@ -767,7 +767,7 @@ namespace jsoncons {
                 std::size_t actual = 0;
                 while (actual < n)
                 {
-                    typename Source::value_type c;
+                    typename Source::value_type c{};
                     if (source.read(&c,1) != 1)
                     {
                         break;
