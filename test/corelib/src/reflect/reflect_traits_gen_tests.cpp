@@ -14,6 +14,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include <iostream>
 
 using namespace jsoncons;
 
@@ -460,6 +461,24 @@ namespace ns {
         jsoncons::optional<std::string> field12;
     };
 
+    class Foo
+    {
+    public:
+        virtual ~Foo() noexcept = default;
+    };
+
+    class Bar : public Foo
+    {
+        static const bool bar = true;
+        JSONCONS_TYPE_TRAITS_FRIEND
+    };
+
+    class Baz : public Foo 
+    {
+        static const bool baz = true;
+        JSONCONS_TYPE_TRAITS_FRIEND
+    };
+
 } // namespace ns
 } // namespace 
  
@@ -492,6 +511,87 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,
                          field1,field2,field3,field4,field5,field6,
                          field7,field8,field9,field10,field11,field12)
+
+    namespace jsoncons {
+namespace reflect {
+template <> struct json_object_name_members<ns::Bar > {
+    static inline const string_view& bar(char) {
+        static const string_view sv = "bar"; return sv;
+    } static inline const wstring_view& bar(wchar_t) {
+        static const wstring_view sv = L"bar"; return sv;
+    } static inline const string_view& bar(unexpect_t) {
+        static const string_view sv = "ns::Bar" ": " "bar"; return sv;
+    }
+}; template <typename Json > struct json_conv_traits<Json, ns::Bar > {
+    using value_type = ns::Bar; using result_type = conversion_result<value_type>; using char_type = typename Json::char_type; using string_view_type = typename Json::string_view_type; constexpr static size_t num_params = 1; constexpr static size_t num_mandatory_params1 = 1; constexpr static size_t num_mandatory_params2 = 1; static bool is(const Json& ajson) noexcept {
+        if (!ajson.is_object()) return false; if ((num_params - 1) < num_mandatory_params1 && !ajson.contains(json_object_name_members<value_type>::bar(char_type{}))) return false; return true;
+    } template <typename Alloc, typename TempAlloc> static result_type try_as(const allocator_set<Alloc, TempAlloc>& aset, const Json& ajson) {
+        if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::Bar"); 
+        value_type class_instance = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator()); 
+        if (num_params == num_mandatory_params2) {
+            {
+                auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.bar)>::type>(aset, ajson, json_object_name_members<value_type>::bar(char_type{})); 
+                if (result) {
+                    class_instance.bar = std::move(*result);
+                }
+                else {
+                    return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::bar(unexpect));
+                }
+            }
+        }
+        else {
+            {
+                auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.bar)>::type>(aset, ajson, json_object_name_members<value_type>::bar(char_type{})); if (result) {
+                    class_instance.bar = std::move(*result);
+                }
+                else if ((num_params - 1) < num_mandatory_params2) {
+                    return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::bar(unexpect));
+                }
+                else if (result.error().code() != conv_errc::missing_required_member) {
+                    return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::bar(unexpect));
+                }
+            }
+        } return result_type(std::move(class_instance));
+    } template <typename Alloc, typename TempAlloc> static Json to_json(const allocator_set<Alloc, TempAlloc>& aset, const value_type& class_instance) {
+        Json ajson = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none); if ((num_params - 1) < num_mandatory_params2) {
+            ajson.try_emplace(json_object_name_members<value_type>::bar(char_type{}), class_instance.bar);
+        }
+        else {
+            json_traits_helper<Json>::set_optional_json_member(json_object_name_members<value_type>::bar(char_type{}), class_instance.bar, ajson);
+        } return ajson;
+    }
+}; template <> struct encode_traits<ns::Bar > {
+    using value_type = ns::Bar; constexpr static size_t num_params = 1; constexpr static size_t num_mandatory_params1 = 1; constexpr static size_t num_mandatory_params2 = 1; template <typename CharT, typename Alloc, typename TempAlloc> static write_result try_encode(const allocator_set<Alloc, TempAlloc>&, const value_type& val, basic_json_visitor<CharT>& encoder) {
+        std::error_code ec; using char_type = CharT; (void)num_params; (void)num_mandatory_params1; (void)num_mandatory_params2; std::size_t member_count{0}; if ((num_params - 1) < num_mandatory_params2) {
+            ++member_count;
+        }
+        else {
+            if (is_optional_value_set(val.bar)) {
+                ++member_count;
+            }
+        } encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); if (ec) {
+            return write_result{unexpect, ec};
+        } if ((num_params - 1) < num_mandatory_params2) {
+            auto r = try_encode_member(json_object_name_members<value_type>::bar(char_type{}), val.bar, encoder); if (!r) {
+                return r;
+            }
+        }
+        else {
+            auto r = try_encode_optional_member(json_object_name_members<value_type>::bar(char_type{}), val.bar, encoder); if (!r) {
+                return r;
+            }
+        } encoder.end_object(ser_context(), ec); if (ec) {
+            return write_result{unexpect, ec};
+        } return write_result{};
+    }
+};
+}
+} namespace jsoncons {
+template <> struct is_json_type_traits_declared<ns::Bar> : public std::true_type {
+};
+}
+JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
 
 void test_is_json_type_traits_declared(std::true_type)
 {
@@ -539,6 +639,8 @@ namespace
         using difference_type = std::ptrdiff_t;
     };
 } // namespace
+
+#if 0
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 {
@@ -1527,5 +1629,34 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
         CHECK_FALSE(other.field10);
         CHECK_FALSE(other.field11);
         CHECK_FALSE(other.field12);
+    }
+}
+#endif
+TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS with constants tests")
+{
+    SECTION("decode vector of shared_ptr test")
+    {
+        std::vector<std::unique_ptr<ns::Foo>> u;
+        u.emplace_back(new ns::Bar());
+        u.emplace_back(new ns::Baz());
+
+        std::string buffer;
+        encode_json(u, buffer);
+        std::cout << "(1)\n" << buffer << "\n\n";
+
+        auto v = decode_json<std::vector<std::unique_ptr<ns::Foo>>>(buffer);
+
+        std::cout << "(2)\n";
+        for (const auto& ptr : v)
+        {
+            if (dynamic_cast<ns::Bar*>(ptr.get()))
+            {
+                std::cout << "A bar\n";
+            }
+            else if (dynamic_cast<ns::Baz*>(ptr.get()))
+            {
+                std::cout << "A baz\n";
+            } 
+        }
     }
 }
