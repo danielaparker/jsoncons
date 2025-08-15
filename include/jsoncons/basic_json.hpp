@@ -3820,7 +3820,7 @@ namespace jsoncons {
             auto r = try_as_string<value_type>(make_alloc_set(alloc));
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error.code()));
+                JSONCONS_THROW(conv_error(r.error().code()));
             }
             return *r;
         }
