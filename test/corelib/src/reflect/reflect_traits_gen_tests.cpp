@@ -469,15 +469,19 @@ namespace ns {
 
     class Bar : public Foo
     {
-        static const bool bar = true;
+        static const bool bar;
         JSONCONS_TYPE_TRAITS_FRIEND
     };
 
+    const bool Bar::bar = true;
+
     class Baz : public Foo 
     {
-        static const bool baz = true;
+        static const bool baz;
         JSONCONS_TYPE_TRAITS_FRIEND
     };
+
+    const bool Baz::baz = true;
 
 } // namespace ns
 } // namespace 
@@ -1563,21 +1567,14 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS with constants tests")
 
         std::string buffer;
         encode_json(u, buffer);
-        std::cout << "(1)\n" << buffer << "\n\n";
+        //std::cout << "(1)\n" << buffer << "\n\n";
 
         auto v = decode_json<std::vector<std::unique_ptr<ns::Foo>>>(buffer);
 
-        std::cout << "(2)\n";
-        for (const auto& ptr : v)
-        {
-            if (dynamic_cast<ns::Bar*>(ptr.get()))
-            {
-                std::cout << "A bar\n";
-            }
-            else if (dynamic_cast<ns::Baz*>(ptr.get()))
-            {
-                std::cout << "A baz\n";
-            } 
-        }
+        REQUIRE(v.size() == 2);
+        CHECK(dynamic_cast<ns::Bar*>(v[0].get()) != nullptr);
+        CHECK(dynamic_cast<ns::Baz*>(v[0].get()) == nullptr);
+        CHECK(dynamic_cast<ns::Baz*>(v[1].get()) != nullptr);
+        CHECK(dynamic_cast<ns::Bar*>(v[1].get()) == nullptr);
     }
 }

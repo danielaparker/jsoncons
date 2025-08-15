@@ -3767,17 +3767,6 @@ namespace jsoncons {
             return *result;
         }
 
-        template <typename CharsAlloc=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,CharsAlloc> as_string() const 
-        {
-            return as_string(CharsAlloc());
-        }
-
-        std::basic_string<char_type,char_traits_type> as_string() const 
-        {
-            return as_string(std::allocator<char_type>()); 
-        }
-
         template <typename T,typename Alloc, typename TempAlloc>
         typename std::enable_if<ext_traits::is_string<T>::value &&
                                std::is_same<char_type,typename T::value_type>::value,conversion_result<T>>::type
@@ -3828,34 +3817,23 @@ namespace jsoncons {
         std::basic_string<char_type,char_traits_type,CharsAlloc> as_string(const CharsAlloc& alloc) const 
         {
             using value_type = std::basic_string<char_type,char_traits_type,CharsAlloc>;
-
-            std::error_code ec;
-            switch (storage_kind())
+            auto r = try_as_string<value_type>(make_alloc_set(alloc));
+            if (!r)
             {
-                case json_storage_kind::short_str:
-                case json_storage_kind::long_str:
-                {
-                    return jsoncons::make_obj_using_allocator<value_type>(alloc, as_string_view().data(), as_string_view().length());
-                }
-                case json_storage_kind::byte_str:
-                {
-                    auto bstr = as_byte_string_view();
-                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
-                    bytes_to_string(bstr.begin(), bstr.end(), tag(), s);
-                    return s;
-                }
-                case json_storage_kind::json_const_ref:
-                    return cast<json_const_reference_storage>().value().as_string(alloc);
-                case json_storage_kind::json_ref:
-                    return cast<json_reference_storage>().value().as_string(alloc);
-                default:
-                {
-                    value_type s = jsoncons::make_obj_using_allocator<value_type>(alloc);
-                    basic_compact_json_encoder<char_type,jsoncons::string_sink<value_type>> encoder(s);
-                    dump(encoder);
-                    return s;
-                }
+                JSONCONS_THROW(conv_error(r.error.code()));
             }
+            return *r;
+        }
+
+        template <typename CharsAlloc=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,CharsAlloc> as_string() const 
+        {
+            return as_string(CharsAlloc());
+        }
+
+        std::basic_string<char_type,char_traits_type> as_string() const 
+        {
+            return as_string(std::allocator<char_type>()); 
         }
 
         const char_type* as_cstring() const
