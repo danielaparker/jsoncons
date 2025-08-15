@@ -535,7 +535,7 @@ namespace reflect { \
   Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 #define JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
   if (result) { \
-    set_member(std::move(*result), class_instance.Member); \
+    set_member(From(std::move(*result)), class_instance.Member); \
   } \
   else if (index < num_mandatory_params2) {return result_type(jsoncons::unexpect, result.error().code(), class_name);} \
   else if (result.error().code() != conv_errc::missing_required_member){return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
@@ -553,7 +553,7 @@ namespace reflect { \
   Mode(JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 #define JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
   if (result) { \
-    set_member(std::move(*result), class_instance.Member); \
+    set_member(From(std::move(*result)), class_instance.Member); \
   } \
   else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
 
