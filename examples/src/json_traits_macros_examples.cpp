@@ -59,10 +59,11 @@ namespace ns {
         std::string author;
         std::string title;
         double price{0};
-        Book2() = default;
 
         JSONCONS_TYPE_TRAITS_FRIEND
     public:
+        Book2() = default;
+
         BookCategory get_category() const {return category;}
 
         const std::string& get_author() const {return author;}
