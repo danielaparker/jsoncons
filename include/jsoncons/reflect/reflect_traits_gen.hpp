@@ -55,6 +55,16 @@ template <typename T>
 struct reflect_type_properties
 {};
 
+template <typename T> 
+static void set_member(const T&&, const T&) 
+{ 
+} 
+template <typename T> 
+static void set_member(T&& val, T& result) 
+{ 
+    result = std::move(val); 
+} 
+
 template <typename Json>
 struct json_traits_helper
 {
@@ -351,7 +361,7 @@ using identity = reflect::identity;
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) { \
   auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Member)>::type>(aset, ajson, json_object_name_members<value_type>::Member(char_type{})); \
   if (result) { \
-    class_instance.Member = std::move(* result); \
+    set_member(std::move(*result), class_instance.Member); \
   } \
   else if ((num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
   else if (result.error().code() != conv_errc::missing_required_member){return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
@@ -361,7 +371,7 @@ using identity = reflect::identity;
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) { \
   auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Member)>::type>(aset, ajson, json_object_name_members<value_type>::Member(char_type{})); \
   if (result) { \
-    class_instance.Member = std::move(* result); \
+    set_member(std::move(*result), class_instance.Member); \
   } \
   else {return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
 }
@@ -525,7 +535,7 @@ namespace reflect { \
   Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 #define JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
   if (result) { \
-    {class_instance.Member = From(std::move(* result));} \
+    set_member(std::move(*result), class_instance.Member); \
   } \
   else if (index < num_mandatory_params2) {return result_type(jsoncons::unexpect, result.error().code(), class_name);} \
   else if (result.error().code() != conv_errc::missing_required_member){return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
@@ -543,7 +553,7 @@ namespace reflect { \
   Mode(JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 #define JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
   if (result) { \
-    {class_instance.Member = From(std::move(* result));} \
+    set_member(std::move(*result), class_instance.Member); \
   } \
   else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
 
