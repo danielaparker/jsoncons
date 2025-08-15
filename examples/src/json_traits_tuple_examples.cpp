@@ -14,6 +14,7 @@
 #include <vector>
 #include <list>
 #include <iomanip>
+#include <iostream>
 
 using namespace jsoncons;
 

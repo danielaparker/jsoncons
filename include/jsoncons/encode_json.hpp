@@ -7,7 +7,7 @@
 #ifndef JSONCONS_ENCODE_JSON_HPP
 #define JSONCONS_ENCODE_JSON_HPP
 
-#include <iostream>
+#include <ostream>
 #include <system_error>
 #include <tuple>
 

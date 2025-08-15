@@ -5,6 +5,7 @@
 #include <cstdlib> //std::system
 #include <jsoncons/json.hpp>
 #include <scoped_allocator>
+#include <iostream>
 
 using shmem_allocator = boost::interprocess::allocator<int,
     boost::interprocess::managed_shared_memory::segment_manager>;

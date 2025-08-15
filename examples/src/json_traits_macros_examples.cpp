@@ -7,6 +7,7 @@
 #include <list>
 #include <iomanip>
 #include <jsoncons/json.hpp>
+#include <iostream>
 
 namespace { 
 namespace ns {

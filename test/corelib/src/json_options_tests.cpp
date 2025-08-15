@@ -8,6 +8,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

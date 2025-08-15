@@ -6,6 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <utility>

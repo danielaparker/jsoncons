@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <cassert>
+#include <iostream>
 #include "sample_types.hpp"
 
 namespace csv = jsoncons::csv;

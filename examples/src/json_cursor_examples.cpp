@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 using namespace jsoncons;
 

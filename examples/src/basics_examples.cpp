@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp>
 
 #include <fstream>
+#include <iostream>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;

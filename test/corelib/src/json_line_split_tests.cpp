@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 
 using namespace jsoncons;
 using namespace jsoncons::literals;

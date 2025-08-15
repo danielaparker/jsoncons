@@ -5,7 +5,6 @@
 #define MOCK_STATEFUL_ALLOCATOR
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <list>
 #include <type_traits>

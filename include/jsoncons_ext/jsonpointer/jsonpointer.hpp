@@ -8,8 +8,8 @@
 #define JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 
 #include <cstddef>
-#include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <system_error> // system_error
 #include <type_traits> // std::enable_if, std::true_type
@@ -361,7 +361,7 @@ namespace jsonpointer {
         }
 
         friend std::basic_ostream<CharT>&
-        operator<<( std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& p )
+        operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& p )
         {
             os << p.to_string();
             return os;

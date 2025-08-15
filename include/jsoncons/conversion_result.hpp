@@ -7,8 +7,10 @@
 #ifndef JSONCONS_CONVERSION_RESULT_HPP    
 #define JSONCONS_CONVERSION_RESULT_HPP    
 
+#include <ostream>
 #include <system_error>
 #include <type_traits>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/conv_error.hpp>

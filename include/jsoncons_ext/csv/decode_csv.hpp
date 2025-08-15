@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_CSV_DECODE_CSV_HPP
 #define JSONCONS_EXT_CSV_DECODE_CSV_HPP
 
+#include <istream>
 #include <type_traits>
 
 #include <jsoncons/allocator_set.hpp>

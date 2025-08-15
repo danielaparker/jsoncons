@@ -12,6 +12,7 @@
 #include <fstream>
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;

@@ -3,6 +3,8 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <catch/catch.hpp>
 
+#include <iostream>
+
 TEST_CASE("configuration")
 {
     #if defined(__clang__) 

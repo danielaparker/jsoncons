@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <exception>
 #include <functional>
-#include <iostream>
 #include <set>
 #include <string>
 #include <system_error>

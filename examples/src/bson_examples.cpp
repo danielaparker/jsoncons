@@ -8,6 +8,7 @@
 #include <string>
 #include <iomanip>
 #include <cassert>
+#include <iostream>
 
 using jsoncons::json;
 using jsoncons::ojson;

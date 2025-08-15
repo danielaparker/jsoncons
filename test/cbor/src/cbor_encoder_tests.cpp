@@ -17,6 +17,7 @@
 #include <limits>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

@@ -9,6 +9,7 @@
 #include <utility>
 #include <ctime>
 #include <map>
+#include <iostream>
 
 using namespace jsoncons;
 

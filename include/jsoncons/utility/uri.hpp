@@ -10,7 +10,7 @@
 #include <algorithm> 
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
+#include <ostream>
 #include <string> // std::string
 #include <system_error>
 #include <type_traits>

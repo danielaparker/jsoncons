@@ -14,6 +14,7 @@
 #include <utility>
 #include <ctime>
 #include <limits>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

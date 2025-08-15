@@ -10,6 +10,7 @@
 #include "sample_types.hpp"
 #include <string>
 #include <iomanip>
+#include <iostream>
 #include <cassert>
 
 using namespace jsoncons;

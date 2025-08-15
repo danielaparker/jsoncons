@@ -9,6 +9,7 @@
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

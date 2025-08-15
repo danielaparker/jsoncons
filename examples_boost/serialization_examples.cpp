@@ -4,6 +4,7 @@
 #include <string>
 #include <jsoncons/json.hpp>
 #include <iomanip>
+#include <iostream>
 #include <assert.h>
 #include <boost/multiprecision/cpp_int.hpp>
 

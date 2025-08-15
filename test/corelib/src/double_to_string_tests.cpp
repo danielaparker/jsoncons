@@ -5,6 +5,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include <catch/catch.hpp>
 

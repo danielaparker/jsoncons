@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <string>
+#include <iostream>
 
 namespace jmespath = jsoncons::jmespath;
 

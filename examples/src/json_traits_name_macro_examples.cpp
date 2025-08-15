@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <cassert>
+#include <iostream>
 #include <regex>
 #include <jsoncons/json.hpp>
 

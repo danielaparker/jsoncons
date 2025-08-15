@@ -8,7 +8,6 @@
 #define JSONCONS_EXT_JSONSCHEMA_DRAFT7_SCHEMA_VALIDATOR_FACTORY_7_HPP
 
 #include <cassert>
-#include <iostream>
 #include <set>
 #include <string>
 #include <unordered_map>

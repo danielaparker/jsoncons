@@ -6,6 +6,7 @@
 #include <jsoncons/staj_iterator.hpp>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include "sample_types.hpp"
 
 using namespace jsoncons;

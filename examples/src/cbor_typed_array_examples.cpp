@@ -11,6 +11,7 @@
 #include <string>
 #include <iomanip>
 #include <cassert>
+#include <iostream>
 
 using namespace jsoncons;
 

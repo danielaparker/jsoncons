@@ -190,7 +190,7 @@ TEST_CASE("jmespath issue 620")
 
         auto compiled = jmespath::make_expression<jsoncons::json>("parent.child.*.kind[?@=='b']");
         auto result = compiled.evaluate(doc);
-        std::cout << result << "\n";
+        //std::cout << result << "\n";
 
         //CHECK(expected == result);
     }

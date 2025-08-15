@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <iostream>
 
 using namespace jsoncons;    
 

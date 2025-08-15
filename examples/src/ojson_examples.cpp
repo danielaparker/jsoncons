@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <string>
+#include <iostream>
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;

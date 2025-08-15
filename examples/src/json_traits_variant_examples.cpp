@@ -7,6 +7,7 @@
 #include <list>
 #include <iomanip>
 #include <jsoncons/json.hpp>
+#include <iostream>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
 

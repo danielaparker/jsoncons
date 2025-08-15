@@ -15,6 +15,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

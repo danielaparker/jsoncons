@@ -4,6 +4,7 @@
 #include <jsoncons_ext/bson/bson.hpp>
 #include <jsoncons/json.hpp>
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <utility>

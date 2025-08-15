@@ -8,6 +8,7 @@
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons/json.hpp>
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <utility>

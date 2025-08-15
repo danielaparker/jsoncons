@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp>
 
 #include <iomanip>
+#include <iostream>
 
 using namespace jsoncons;
 

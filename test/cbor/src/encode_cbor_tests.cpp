@@ -7,6 +7,7 @@
 
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons/json.hpp>
+#include <iostream>
 #include <vector>
 #include <catch/catch.hpp>
 

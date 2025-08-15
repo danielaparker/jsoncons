@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <iomanip>
+#include <iostream>
 #include <jsoncons/json.hpp>
 
 namespace { 

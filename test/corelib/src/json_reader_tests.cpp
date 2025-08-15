@@ -3,6 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons; 

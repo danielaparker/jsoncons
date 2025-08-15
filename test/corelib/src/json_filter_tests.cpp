@@ -10,6 +10,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <iostream>
 #include <fstream>
 #include <catch/catch.hpp>
 

@@ -8,10 +8,11 @@
 #define JSONCONS_BASIC_JSON_HPP
 
 #include <algorithm> // std::swap
-#include <cstring>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <initializer_list> // std::initializer_list
+#include <istream> 
 #include <istream> // std::basic_istream
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator

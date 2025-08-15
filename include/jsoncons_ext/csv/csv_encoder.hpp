@@ -10,7 +10,6 @@
 #include <array> // std::array
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
-#include <ostream>
 #include <string>
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::move

@@ -13,6 +13,7 @@
 #include <regex>
 #include <jsoncons/json.hpp>
 #include <functional>
+#include <iostream>
 
 namespace {
 namespace ns {

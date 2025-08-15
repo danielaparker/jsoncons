@@ -13,7 +13,7 @@
 #include <cmath> // std::fmod
 #include <cstdint>
 #include <cstring> // std::memcpy
-#include <iostream>
+#include <ostream>
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
 #include <string> // std::string

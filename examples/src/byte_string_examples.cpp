@@ -3,6 +3,8 @@
 
 #include <jsoncons/json.hpp>
 
+#include <iostream>
+
 using namespace jsoncons; // For brevity
 
 void construct_json_byte_string()

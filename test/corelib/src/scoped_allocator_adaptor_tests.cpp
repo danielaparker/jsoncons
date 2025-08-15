@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 #include <cstddef>
 #include <catch/catch.hpp>
 

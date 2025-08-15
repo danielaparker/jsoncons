@@ -8,7 +8,6 @@
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 #include <jsoncons/json.hpp>
 
-#include <iostream>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -17,6 +16,7 @@
 #include <new>
 #include <unordered_set> // std::unordered_set
 #include <fstream>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

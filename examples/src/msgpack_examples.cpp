@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp>
 
 #include <string>
+#include <iostream>
 
 // For brevity
 using jsoncons::json;

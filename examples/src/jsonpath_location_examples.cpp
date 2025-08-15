@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 // for brevity
 using jsoncons::json; 

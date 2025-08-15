@@ -8,6 +8,7 @@
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <jsoncons/json.hpp>
 #include <vector>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;

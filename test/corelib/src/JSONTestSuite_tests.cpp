@@ -12,7 +12,6 @@
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <fstream>
-#include <iostream>
 #include <locale>
 
 #if (defined JSONCONS_HAS_FILESYSTEM && defined(_MSC_VER))

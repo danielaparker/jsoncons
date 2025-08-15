@@ -4,6 +4,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons/json.hpp>
 
+#include <iostream>
 #include <cassert>
 
 // for brevity

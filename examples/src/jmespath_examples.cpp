@@ -4,6 +4,7 @@
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 #include <jsoncons/json.hpp>
 
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <cassert>

@@ -6,6 +6,7 @@
 #include <deque>
 #include <map>
 #include <unordered_map>
+#include <iostream>
 
 using namespace jsoncons;
 

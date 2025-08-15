@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 #include <cstdint>
 
 using namespace jsoncons;

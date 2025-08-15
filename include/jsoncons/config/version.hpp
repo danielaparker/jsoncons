@@ -7,7 +7,7 @@
 #ifndef JSONCONS_CONFIG_VERSION_HPP
 #define JSONCONS_CONFIG_VERSION_HPP
  
-#include <iostream>
+#include <ostream>
     
 #define JSONCONS_VERSION_MAJOR 1
 #define JSONCONS_VERSION_MINOR 3

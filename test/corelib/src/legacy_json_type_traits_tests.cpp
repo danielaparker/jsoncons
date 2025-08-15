@@ -193,7 +193,7 @@ TEST_CASE("jsoncons::json_type_traits<unique_ptr>")
 TEST_CASE("test_own_vector")
 {
     jsoncons::json j = own_vector({0,9,8,7});
-    std::cout << j;
+    //std::cout << j;
 }
 */
 

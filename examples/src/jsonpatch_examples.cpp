@@ -3,6 +3,7 @@
 
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 #include <jsoncons/json.hpp>
+#include <iostream>
 
 using jsoncons::json;
 namespace jsonpatch = jsoncons::jsonpatch;

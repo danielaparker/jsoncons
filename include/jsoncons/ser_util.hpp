@@ -8,6 +8,7 @@
 #define JSONCONS_SER_UTIL_HPP
 
 #include <cstddef>
+#include <ostream>
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>

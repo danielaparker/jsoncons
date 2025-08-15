@@ -6,6 +6,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <vector>
+#include <iostream>
 
 #include <catch/catch.hpp>
 

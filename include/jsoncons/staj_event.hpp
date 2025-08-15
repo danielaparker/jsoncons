@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <functional> // std::function
 #include <ios>
+#include <ostream> 
 #include <memory> // std::allocator
 #include <system_error>
 #include <type_traits> // std::enable_if

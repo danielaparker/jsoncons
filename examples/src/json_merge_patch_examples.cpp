@@ -4,6 +4,8 @@
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 #include <jsoncons/json.hpp>
 
+#include <iostream>
+
 using jsoncons::json;
 namespace mergepatch = jsoncons::mergepatch;
 

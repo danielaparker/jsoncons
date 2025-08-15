@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
+#include <iostream>
 
 #include <catch/catch.hpp>
 
