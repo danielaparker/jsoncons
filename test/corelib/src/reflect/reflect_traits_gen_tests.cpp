@@ -563,8 +563,6 @@ namespace
     };
 } // namespace
 
-#if 0
-
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -1554,7 +1552,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
         CHECK_FALSE(other.field12);
     }
 }
-#endif
+
 TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS with constants tests")
 {
     SECTION("decode vector of shared_ptr test")

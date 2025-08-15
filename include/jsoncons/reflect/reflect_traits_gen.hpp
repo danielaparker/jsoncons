@@ -55,14 +55,14 @@ template <typename T>
 struct reflect_type_properties
 {};
 
-template <typename T> 
-static void set_member(const T&&, const T&) 
+template <typename T, typename U> 
+void set_member(const T&&, const U&) 
 { 
 } 
-template <typename T> 
-static void set_member(T&& val, T& result) 
+template <typename T, typename U> 
+void set_member(T&& val, U& result)
 { 
-    result = std::move(val); 
+    result = val; 
 } 
 
 template <typename Json>
