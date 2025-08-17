@@ -92,7 +92,7 @@ try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
 
     basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options,
         aset.get_temp_allocator());
-    return try_encode_json(val, encoder);
+    return try_encode_json(aset, val, encoder);
 }
 
 // to stream with allocator_set
@@ -103,7 +103,7 @@ write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
 {
     basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    return try_encode_json(val, encoder);
+    return try_encode_json(aset, val, encoder);
 }
 
 // encode_json_pretty
@@ -215,13 +215,13 @@ try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAlloc> encoder(cont, options,
             aset.get_temp_allocator());
-        return try_encode_json(val, encoder);
+        return try_encode_json(aset, val, encoder);
     }
     else
     {
         basic_json_encoder<char_type, jsoncons::string_sink<CharContainer>, TempAlloc> encoder(cont, options, 
             aset.get_temp_allocator());
-        return try_encode_json(val, encoder);
+        return try_encode_json(aset, val, encoder);
     }
 }
 
@@ -236,12 +236,12 @@ write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     if (indent == indenting::no_indent)
     {
         basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        return try_encode_json(val, encoder);
+        return try_encode_json(aset, val, encoder);
     }
     else
     {
         basic_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        return try_encode_json(val, encoder);
+        return try_encode_json(aset, val, encoder);
     }
 }
 
