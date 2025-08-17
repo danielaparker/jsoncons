@@ -45,6 +45,7 @@ install(TARGETS jsoncons
 
 # Makes the project importable from the build directory
 export(EXPORT ${PROJECT_NAME}-targets
+       NAMESPACE jsoncons::
        FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
 install(DIRECTORY ${JSONCONS_INCLUDE_DIR}/jsoncons
@@ -75,5 +76,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE jsoncons::
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 
