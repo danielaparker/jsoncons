@@ -19,6 +19,42 @@
 
 namespace jsoncons {
 
+// encode_json
+
+template <typename T,typename CharT>
+typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type
+    try_encode_json(const T& val, basic_json_visitor<CharT>& encoder)
+{
+    return val.try_dump(encoder);
+}
+
+template <typename T,typename CharT>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type
+    try_encode_json(const T& val, basic_json_visitor<CharT>& encoder)
+{
+    auto r = reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    encoder.flush();
+    return r;
+}
+
+template <typename T,typename Alloc,typename TempAlloc,typename CharT>
+typename std::enable_if<ext_traits::is_basic_json<T>::value, write_result>::type
+    try_encode_json(const allocator_set<Alloc,TempAlloc>&,
+    const T& val, basic_json_visitor<CharT>& encoder)
+{
+    return val.try_dump(encoder);
+}
+
+template <typename T, typename Alloc, typename TempAlloc, typename CharT>
+typename std::enable_if<!ext_traits::is_basic_json<T>::value, write_result>::type
+    try_encode_json(const allocator_set<Alloc, TempAlloc>& aset,
+    const T& val, basic_json_visitor<CharT>& encoder)
+{
+    auto r = reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    encoder.flush();
+    return r;
+}
+
 // to string
 
 template <typename T,typename CharContainer>
@@ -109,7 +145,7 @@ try_encode_json(const T& val, std::basic_ostream<CharT>& os,
 
 // to string with allocator_set
 
-template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
+template <typename T,typename CharContainer,typename Alloc,typename TempAlloc>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
     ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
 try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
@@ -195,16 +231,6 @@ try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
         basic_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
         return try_encode_json(val, encoder);
     }
-}
-
-// to encoder
-
-template <typename T,typename CharT>
-write_result try_encode_json(const T& val, basic_json_visitor<CharT>& encoder)
-{
-    auto r = reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
-    encoder.flush();
-    return r;
 }
 
 // encode_json_pretty
