@@ -1,5 +1,8 @@
 # jsoncons cmake module
-# This module sets the following variables in your project::
+#
+# This module adds target jsoncons::jsoncons
+#
+# It also sets the following variables in your project:
 #
 #   jsoncons_FOUND - true if jsoncons found on the system
 #   jsoncons_INCLUDE_DIRS - the directory containing jsoncons headers
@@ -7,7 +10,9 @@
 
 @PACKAGE_INIT@
 
-if(NOT TARGET @PROJECT_NAME@)
+if(NOT TARGET @PROJECT_NAME@::@PROJECT_NAME@)
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
-  get_target_property(@PROJECT_NAME@_INCLUDE_DIRS jsoncons INTERFACE_INCLUDE_DIRECTORIES)
+  get_target_property(@PROJECT_NAME@_INCLUDE_DIRS jsoncons::jsoncons INTERFACE_INCLUDE_DIRECTORIES)
+  # For compatibility with older versions
+  add_library(@PROJECT_NAME@ ALIAS @PROJECT_NAME@::@PROJECT_NAME@)
 endif()

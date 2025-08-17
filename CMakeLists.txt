@@ -45,14 +45,14 @@ install(TARGETS jsoncons
 
 # Makes the project importable from the build directory
 export(EXPORT ${PROJECT_NAME}-targets
+       NAMESPACE jsoncons::
        FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
 install(DIRECTORY ${JSONCONS_INCLUDE_DIR}/jsoncons
                   ${JSONCONS_INCLUDE_DIR}/jsoncons_ext
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-set(JSONCONS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for jsonconsConfig.cmake")
+set(JSONCONS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for jsonconsConfig.cmake")
 
 configure_package_config_file(cmake/Config.cmake
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
@@ -76,5 +76,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE jsoncons::
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 
