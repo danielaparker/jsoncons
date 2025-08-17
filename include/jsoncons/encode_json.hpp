@@ -106,11 +106,11 @@ write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     return try_encode_json(aset, val, encoder);
 }
 
-// encode_json_pretty
+// try_encode_json_pretty
 
 template <typename T,typename CharContainer>
 typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
-encode_json_pretty(const T& val,
+try_encode_json_pretty(const T& val,
     CharContainer& cont, 
     const basic_json_encode_options<typename CharContainer::value_type>& options = basic_json_encode_options<typename CharContainer::value_type>())
 {
@@ -120,7 +120,7 @@ encode_json_pretty(const T& val,
 }
 
 template <typename T,typename CharT>
-write_result encode_json_pretty(const T& val,
+write_result try_encode_json_pretty(const T& val,
     std::basic_ostream<CharT>& os, 
     const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
 {
@@ -135,7 +135,7 @@ write_result try_encode_json(const T& val, CharContainer& cont, indenting indent
 {
     if (indent == indenting::indent)
     {
-        return encode_json_pretty(val,cont);
+        return try_encode_json_pretty(val,cont);
     }
     else
     {
@@ -150,7 +150,7 @@ write_result try_encode_json(const T& val,
 {
     if (indent == indenting::indent)
     {
-        return encode_json_pretty(val, os);
+        return try_encode_json_pretty(val, os);
     }
     else
     {
@@ -251,6 +251,16 @@ template <typename... Args>
 void encode_json(Args&& ... args)
 {
     auto result = try_encode_json(std::forward<Args>(args)...); 
+    if (!result)
+    {
+        JSONCONS_THROW(ser_error(result.error()));
+    }
+}
+
+template <typename... Args>
+void encode_json_pretty(Args&& ... args)
+{
+    auto result = try_encode_json_pretty(std::forward<Args>(args)...); 
     if (!result)
     {
         JSONCONS_THROW(ser_error(result.error()));
