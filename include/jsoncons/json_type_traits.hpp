@@ -140,6 +140,8 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         typename std::enable_if<!jsoncons::detail::is_json_type_traits_unspecialized<Json,T>::value
     >::type> : std::true_type {};
 
+#if 0
+
     template <typename Json>
     struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
     {
@@ -1912,6 +1914,7 @@ namespace variant_detail
             return j;
         }
     };
+#endif
 
 } // namespace jsoncons
 
