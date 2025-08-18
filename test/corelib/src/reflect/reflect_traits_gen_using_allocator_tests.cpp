@@ -918,11 +918,13 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
 ]
     )"; 
 
-    const char* firstName0 = "John";
-    const char* lastName0 = "Smith";
+    cust_allocator<char> alloc(1);
+    using string_type = ns::Employee<cust_allocator<char>>::string_type;
+    string_type firstName0{"John", alloc};
+    string_type lastName0{"Smith", alloc};
     const double pay0 = 40000;
-    const char* firstName1 = "Jane";
-    const char* lastName1 = "Doe";
+    string_type firstName1{"Jane", alloc};
+    string_type lastName1{"Doe", alloc};
     const double pay1 = 30250;
 
     SECTION("decode vector of shared_ptr")
@@ -930,7 +932,6 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         using element_type = std::shared_ptr<ns::Employee<cust_allocator<char>>>;
         using value_type = std::vector<element_type,cust_allocator<element_type>>;
 
-        cust_allocator<char> alloc(1);
         auto aset = make_alloc_set(alloc);
         auto r = jsoncons::try_decode_json<value_type>(aset, input);
         REQUIRE(r);
