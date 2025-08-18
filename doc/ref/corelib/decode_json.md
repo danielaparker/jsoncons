@@ -80,7 +80,7 @@ or support [json_type_traits](json_type_traits.md).
 
 #### Exceptions
 
-(1)-(5) Throw [ser_error](ser_error.md) if read fails.
+(1)-(5) Throw [ser_error](ser_error.md) if decode fails.
 
 Any overload may throw `std::bad_alloc` if memory allocation fails.
 
