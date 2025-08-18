@@ -3,9 +3,8 @@
 ```cpp
 #include <jsoncons/ser_util.hpp>
 
-template <
-    typename T
-> class read_result
+template <typename T> 
+using read_result = jsoncons::expected<T,read_error>;
 ```
 
 #### Member types

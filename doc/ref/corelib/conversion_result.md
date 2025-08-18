@@ -3,9 +3,9 @@
 ```cpp
 #include <jsoncons/conversion_result.hpp>
 
-template <
-    typename T
-> class conversion_result
+
+template <typename T> 
+using conversion_result = jsoncons::expected<T,conversion_error>;
 ```
 
 #### Member types
