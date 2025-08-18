@@ -1844,12 +1844,12 @@ namespace reflect { \
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) { \
   auto result = ajson.template try_as<DerivedClass>(aset); \
-  if (result) {return result_type(std::make_shared<DerivedClass>(std::move(*result)));} \
+  if (result) {return result_type(std::allocate_shared<DerivedClass>(aset.get_allocator(), std::move(*result)));} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) { \
   auto result = ajson.template try_as<DerivedClass>(aset); \
-  if (result) {return result_type(std::make_shared<DerivedClass>(std::move(*result)));} \
+  if (result) {return result_type(std::allocate_shared<DerivedClass>(aset.get_allocator(), std::move(*result)));} \
 } /**/
  
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass, Count) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *p);}
