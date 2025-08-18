@@ -20,7 +20,7 @@ jobs:
       CXX: ${{ matrix.compiler }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: cmake
       run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On
 
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install_gcc
       run: |
            sudo apt update
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install_gcc
       run: |
            sudo apt update
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install_gcc
       run: |
            sudo apt update
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install_gcc
       run: |
            sudo apt update
@@ -121,7 +121,7 @@ jobs:
   #  runs-on: ubuntu-latest
   #
   #  steps:
-  #  - uses: actions/checkout@v4
+  #  - uses: actions/checkout@v5
   #  - name: install_gcc
   #    run: |
   #         sudo apt update
@@ -143,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install_gcc
       run: |
            sudo apt update
@@ -168,7 +168,7 @@ jobs:
         compiler: ['8','9','10','11','12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
@@ -187,7 +187,7 @@ jobs:
         compiler: ['12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
@@ -208,7 +208,7 @@ jobs:
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
@@ -229,7 +229,7 @@ jobs:
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
