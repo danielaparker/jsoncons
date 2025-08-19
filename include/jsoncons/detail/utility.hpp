@@ -29,16 +29,19 @@ namespace detail {
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 
 template <typename Alloc>
-struct allocator_delete : public Alloc
+struct allocator_delete  : public Alloc
 {
+    using allocator_type = Alloc;
     using pointer = typename std::allocator_traits<Alloc>::pointer;
 
-    allocator_delete(const Alloc& alloc) 
+    allocator_delete(const Alloc& alloc) noexcept
         : Alloc(alloc)
     {
     }
 
-    void operator()(pointer ptr) 
+    allocator_delete(const allocator_delete&) noexcept = default;
+
+    void operator()(pointer ptr) noexcept
     {
         using T = typename std::remove_reference<decltype(*ptr)>::type;
         ptr->~T();
