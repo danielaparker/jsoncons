@@ -1834,12 +1834,24 @@ namespace reflect { \
 
 #define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseClass, P2, P3, DerivedClass, Count) { \
   auto result = ajson.template try_as<DerivedClass>(aset); \
-  if (result) {return result_type(jsoncons::make_unique<DerivedClass>(std::move(*result)));} \
+  if (result) { \
+  auto d = jsoncons::make_obj_using_allocator<Deleter>(aset.get_allocator()); \
+  using rebind = typename std::allocator_traits<Alloc>::template rebind_alloc<DerivedClass>; \
+  auto alloc = rebind(aset.get_allocator()); \
+  auto* ptr = alloc.allocate(1); \
+  JSONCONS_TRY {ptr = new(ptr) DerivedClass(*result);} JSONCONS_CATCH(...) {alloc.deallocate(ptr,1); throw;} \
+  return result_type{value_type(ptr, d)};} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) { \
   auto result = ajson.template try_as<DerivedClass>(aset); \
-  if (result) {return result_type(jsoncons::make_unique<DerivedClass>(std::move(*result)));} \
+  if (result) { \
+  auto d = jsoncons::make_obj_using_allocator<Deleter>(aset.get_allocator()); \
+  using rebind = typename std::allocator_traits<Alloc>::template rebind_alloc<DerivedClass>; \
+  auto alloc = rebind(aset.get_allocator()); \
+  auto* ptr = alloc.allocate(1); \
+  JSONCONS_TRY {ptr = new(ptr) DerivedClass(*result);} JSONCONS_CATCH(...) {alloc.deallocate(ptr,1); throw;} \
+  return result_type{value_type(ptr, d)};} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) { \
@@ -1870,7 +1882,7 @@ namespace reflect { \
 \
         template <typename Alloc,typename TempAlloc> \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
-            if (!ajson.is_object()) return result_type(value_type()); \
+            if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(value_type()); \
         } \
@@ -1893,7 +1905,7 @@ namespace reflect { \
         } \
         template <typename Alloc,typename TempAlloc> \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
-            if (!ajson.is_object()) return result_type(value_type()); \
+            if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
             return result_type(value_type()); \
         } \

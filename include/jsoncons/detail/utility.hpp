@@ -28,6 +28,24 @@ namespace detail {
 
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 
+template <typename Alloc>
+struct allocator_delete : public Alloc
+{
+    using pointer = typename std::allocator_traits<Alloc>::pointer;
+
+    allocator_delete(const Alloc& alloc) 
+        : Alloc(alloc)
+    {
+    }
+
+    void operator()(pointer ptr) 
+    {
+        using T = typename std::remove_reference<decltype(*ptr)>::type;
+        ptr->~T();
+        this->deallocate(ptr, 1);
+    }
+};
+
 } // namespace detail
 } // namespace jsoncons
 
