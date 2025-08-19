@@ -952,6 +952,8 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         using element_type = std::unique_ptr<employee_type,jsoncons::detail::allocator_delete<cust_allocator<employee_type>>>;
         using value_type = std::vector<element_type,cust_allocator<element_type>>;
 
+        std::cout << "sizeof(employee_type) : " << sizeof(employee_type) << "\n";
+
         auto aset = make_alloc_set(alloc);
         auto r = jsoncons::try_decode_json<value_type>(aset, input);
         REQUIRE(r);

@@ -41,7 +41,9 @@ struct allocator_delete  : public Alloc
 
     allocator_delete(const allocator_delete&) noexcept = default;
 
-    void operator()(pointer ptr) noexcept
+    template <typename U>
+    typename std::enable_if<std::is_convertible<U,pointer>::value>::type
+    operator()(U ptr) noexcept
     {
         using T = typename std::remove_reference<decltype(*ptr)>::type;
         ptr->~T();
