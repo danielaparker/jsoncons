@@ -1870,13 +1870,13 @@ namespace reflect { \
 \
         template <typename Alloc,typename TempAlloc> \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
-            if (!ajson.is_object()) return result_type(std::shared_ptr<BaseClass>()); \
+            if (!ajson.is_object()) return result_type(value_type()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
-            return result_type(std::shared_ptr<BaseClass>()); \
+            return result_type(value_type()); \
         } \
 \
         template <typename Alloc,typename TempAlloc> \
-        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::shared_ptr<BaseClass>& ptr) { \
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const value_type& ptr) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
