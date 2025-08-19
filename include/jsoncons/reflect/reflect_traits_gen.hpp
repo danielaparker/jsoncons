@@ -1884,7 +1884,7 @@ namespace reflect { \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
-            return result_type(value_type()); \
+            return result_type(jsoncons::unexpect, conv_errc::conversion_failed); \
         } \
 \
         template <typename Alloc,typename TempAlloc> \
@@ -1907,7 +1907,7 @@ namespace reflect { \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::expected_object); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
-            return result_type(value_type()); \
+            return result_type(jsoncons::unexpect, conv_errc::conversion_failed); \
         } \
         template <typename Alloc,typename TempAlloc> \
         static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const value_type& ptr) { \
