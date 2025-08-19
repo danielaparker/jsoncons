@@ -1,6 +1,7 @@
 // Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license 
 
+#include <iostream>
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
@@ -13,7 +14,6 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include <iostream>
 #include <cstdint>
 
 using namespace jsoncons;

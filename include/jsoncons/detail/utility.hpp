@@ -9,6 +9,7 @@
 
 #include <utility>
 #include <jsoncons/config/compiler_support.hpp>
+//#include <iostream>
 
 namespace jsoncons {
 namespace detail {
@@ -46,8 +47,12 @@ struct allocator_delete  : public Alloc
     operator()(U ptr) noexcept
     {
         using T = typename std::remove_reference<decltype(*ptr)>::type;
+        using rebind = typename std::allocator_traits<allocator_type>:: template rebind_alloc<T>;
+
+        //std::cout << "Type of T: " << typeid(*ptr).name() << std::endl;
         ptr->~T();
-        this->deallocate(ptr, 1);
+        rebind alloc(*this);
+        alloc.deallocate(ptr, 1);
     }
 };
 
