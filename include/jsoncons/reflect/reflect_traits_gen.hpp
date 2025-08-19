@@ -92,8 +92,8 @@ struct json_traits_helper
     { 
         if (val) j.try_emplace(key, val); 
     } 
-    template <typename U> 
-    static void set_optional_json_member(string_view_type key, const std::unique_ptr<U>& val, Json& j) 
+    template <typename U,typename Deleter> 
+    static void set_optional_json_member(string_view_type key, const std::unique_ptr<U,Deleter>& val, Json& j) 
     { 
         if (val) j.try_emplace(key, val); 
     } 
@@ -127,8 +127,8 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
     return write_result{}; 
 }
  
-template <typename CharT, typename T> 
-write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
+template <typename CharT, typename T,typename Deleter> 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T,Deleter>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
@@ -161,8 +161,8 @@ bool is_optional_value_set(const std::shared_ptr<T>& val)
 { 
     return val ? true : false; 
 } 
-template <typename T> 
-bool is_optional_value_set(const std::unique_ptr<T>& val) 
+template <typename T,typename Deleter> 
+bool is_optional_value_set(const std::unique_ptr<T,Deleter>& val) 
 { 
     return val ? true : false;
 } 
@@ -1882,9 +1882,9 @@ namespace reflect { \
             return Json::null(); \
         } \
     }; \
-    template <typename Json> \
-    struct json_conv_traits<Json, std::unique_ptr<BaseClass>> { \
-        using value_type = std::unique_ptr<BaseClass>; \
+    template <typename Json,typename Deleter> \
+    struct json_conv_traits<Json, std::unique_ptr<BaseClass,Deleter>> { \
+        using value_type = std::unique_ptr<BaseClass,Deleter>; \
         using result_type = conversion_result<value_type>; \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
@@ -1893,12 +1893,12 @@ namespace reflect { \
         } \
         template <typename Alloc,typename TempAlloc> \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) { \
-            if (!ajson.is_object()) return result_type(std::unique_ptr<BaseClass>()); \
+            if (!ajson.is_object()) return result_type(value_type()); \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
-            return result_type(std::unique_ptr<BaseClass>()); \
+            return result_type(value_type()); \
         } \
         template <typename Alloc,typename TempAlloc> \
-        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const std::unique_ptr<BaseClass>& ptr) { \
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const value_type& ptr) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
