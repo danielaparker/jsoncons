@@ -48,9 +48,7 @@ struct allocator_delete  : public Alloc
     typename std::enable_if<std::is_convertible<T&,value_type&>::value>::type
     operator()(T* ptr) noexcept
     {
-        using rebind = typename std::allocator_traits<allocator_type>:: template rebind_alloc<T>;
-
-        std::cout << "Type of T: " << typeid(*ptr).name() << ", sizeof(T): " << sizeof(T) << std::endl;
+        //std::cout << "Type of T: " << typeid(*ptr).name() << ", sizeof(T): " << sizeof(T) << std::endl;
         //ptr->~T();
         //rebind alloc(*this);
         //alloc.deallocate(ptr, 1);
