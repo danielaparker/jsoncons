@@ -32,16 +32,21 @@ public:
     mock_stateful_allocator() = delete;
 
     mock_stateful_allocator(int id) noexcept
-        : id_(id)
+        : impl_(), id_(id)
     {
     }
-    mock_stateful_allocator(const mock_stateful_allocator& other) noexcept
-        : id_(other.id_)
+
+    mock_stateful_allocator(const mock_stateful_allocator<T>& other) noexcept
+        : impl_(), id_(other.id_)
     {
     }
-    template< class U >
+
+    template <typename U>
+    friend class mock_stateful_allocator;
+
+    template <typename U>
     mock_stateful_allocator(const mock_stateful_allocator<U>& other) noexcept
-        : id_(other.id_)
+        : impl_(), id_(other.id_)
     {
     }
 
@@ -61,6 +66,17 @@ public:
     void deallocate(T* ptr, size_type n) noexcept 
     {
         impl_.deallocate(ptr, n);
+    }
+
+    template <typename...Args>
+    void construct(T *c, Args... args)
+    {
+        impl_.construct(c, std::forward<Args>(args)...);
+    }
+
+    void destroy(T *c)
+    {
+        impl_.destroy(c);
     }
 
     template <typename U>
