@@ -63,20 +63,9 @@ public:
         return impl_.allocate(n);
     }
 
-    void deallocate(T* ptr, size_type n) noexcept 
+    void deallocate(T* ptr, size_type n) 
     {
         impl_.deallocate(ptr, n);
-    }
-
-    template <typename...Args>
-    void construct(T *c, Args... args)
-    {
-        impl_.construct(c, std::forward<Args>(args)...);
-    }
-
-    void destroy(T *c)
-    {
-        impl_.destroy(c);
     }
 
     template <typename U>
