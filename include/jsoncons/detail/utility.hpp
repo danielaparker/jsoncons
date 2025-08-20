@@ -33,6 +33,7 @@ template <typename Alloc>
 struct allocator_delete  : public Alloc
 {
     using allocator_type = Alloc;
+    using alloc_traits = std::allocator_traits<Alloc>;
     using pointer = typename std::allocator_traits<Alloc>::pointer;
     using value_type = typename std::allocator_traits<Alloc>::value_type;
 
@@ -50,10 +51,11 @@ struct allocator_delete  : public Alloc
         using rebind = typename std::allocator_traits<allocator_type>:: template rebind_alloc<T>;
 
         std::cout << "Type of T: " << typeid(*ptr).name() << ", sizeof(T): " << sizeof(T) << std::endl;
-        ptr->~T();
-        rebind alloc(*this);
-        alloc.deallocate(ptr, 1);
-    }
+        //ptr->~T();
+        //rebind alloc(*this);
+        //alloc.deallocate(ptr, 1);
+        alloc_traits::destroy(*this, ptr);
+        alloc_traits::deallocate(*this, ptr, 1);    }
 };
 
 } // namespace detail
