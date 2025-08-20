@@ -1839,7 +1839,7 @@ namespace reflect { \
   auto alloc = rebind(aset.get_allocator()); \
   auto* ptr = alloc.allocate(1); \
   JSONCONS_TRY {ptr = new(ptr) DerivedClass(*result);} JSONCONS_CATCH(...) {alloc.deallocate(ptr,1); throw;} \
-  return result_type{jsoncons::in_place, ptr, jsoncons::make_obj_using_allocator<Deleter>(aset.get_allocator())};} \
+  return result_type{jsoncons::in_place, ptr, jsoncons::make_obj_using_allocator<Deleter>(alloc)};} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseClass, P2, P3, DerivedClass, Count) { \
@@ -1849,7 +1849,7 @@ namespace reflect { \
   auto alloc = rebind(aset.get_allocator()); \
   auto* ptr = alloc.allocate(1); \
   JSONCONS_TRY {ptr = new(ptr) DerivedClass(*result);} JSONCONS_CATCH(...) {alloc.deallocate(ptr,1); throw;} \
-  return result_type{jsoncons::in_place, ptr, jsoncons::make_obj_using_allocator<Deleter>(aset.get_allocator())};} \
+  return result_type{jsoncons::in_place, ptr, jsoncons::make_obj_using_allocator<Deleter>(alloc)};} \
 } /**/
 
 #define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, P2, P3, DerivedClass, Count) { \

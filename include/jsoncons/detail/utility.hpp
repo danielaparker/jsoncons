@@ -53,7 +53,8 @@ struct allocator_delete  : public Alloc
         //rebind alloc(*this);
         //alloc.deallocate(ptr, 1);
         alloc_traits::destroy(*this, ptr);
-        alloc_traits::deallocate(*this, ptr, 1);    }
+        alloc_traits::deallocate(*this, ptr, 1);    
+    }
 };
 
 } // namespace detail
