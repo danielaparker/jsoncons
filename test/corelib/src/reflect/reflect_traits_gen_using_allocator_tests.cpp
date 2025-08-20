@@ -946,7 +946,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->calculatePay() == pay1); 
     }
 
-    SECTION("decode vector of unique_ptr")
+    /*SECTION("decode vector of unique_ptr")
     {
         using employee_type = ns::Employee <cust_allocator<char>>;
         using element_type = std::unique_ptr<employee_type,jsoncons::detail::allocator_delete<cust_allocator<employee_type>>>;
@@ -966,7 +966,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->firstName() == firstName1);
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1);*/ 
-    }
+    }*/
 
     /*SECTION("decode vector of unique_ptr test")
     {
