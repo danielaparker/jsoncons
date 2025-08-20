@@ -898,6 +898,41 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
     }
 }
 
+template <typename Alloc>
+struct allocator_delete  : public Alloc
+{
+    using allocator_type = Alloc;
+    using pointer = typename std::allocator_traits<Alloc>::pointer;
+
+    allocator_delete(const Alloc& alloc) noexcept
+        : Alloc(alloc)
+    {
+    }
+
+    allocator_delete(const allocator_delete&) noexcept = default;
+
+    void operator()(pointer ptr) noexcept
+    {
+        std::allocator_traits<Alloc>::destroy(*this, ptr);
+        auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<Alloc>*>(ptr);
+        if (hourly_ptr)
+        {
+            using hourly_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::HourlyEmployee<Alloc>>;
+            hourly_alloc_type alloc(*this);
+            alloc.deallocate(hourly_ptr, 1);
+            return;
+        }
+        auto commissioned_ptr = dynamic_cast<ns::CommissionedEmployee<Alloc>*>(ptr);
+        if (commissioned_ptr)
+        {
+            using commissioned_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::CommissionedEmployee<Alloc>>;
+            commissioned_alloc_type alloc(*this);
+            alloc.deallocate(commissioned_ptr, 1);
+            return;
+        }
+    }
+};
+
 TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
 {
     std::string input = R"(
@@ -946,10 +981,10 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->calculatePay() == pay1); 
     }
 
-    /*SECTION("decode vector of unique_ptr")
+    SECTION("decode vector of unique_ptr")
     {
         using employee_type = ns::Employee <cust_allocator<char>>;
-        using element_type = std::unique_ptr<employee_type,jsoncons::detail::allocator_delete<cust_allocator<employee_type>>>;
+        using element_type = std::unique_ptr<employee_type,allocator_delete<cust_allocator<employee_type>>>;
         using value_type = std::vector<element_type,cust_allocator<element_type>>;
 
         std::cout << "sizeof(employee_type) : " << sizeof(employee_type) << "\n";
@@ -966,7 +1001,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->firstName() == firstName1);
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1);*/ 
-    }*/
+    }
 
     /*SECTION("decode vector of unique_ptr test")
     {

@@ -13,6 +13,8 @@
 template <typename T>
 class mock_stateful_allocator
 {
+    std::allocator<T> impl_;
+    int id_;
 public:
     using value_type = T;
     using size_type = std::size_t;
@@ -25,9 +27,6 @@ public:
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
     using is_always_equal = std::false_type;
-
-    std::allocator<T> impl_;
-    int id_;
 
     mock_stateful_allocator() = delete;
 
@@ -50,13 +49,7 @@ public:
     {
     }
 
-    mock_stateful_allocator& operator = (const mock_stateful_allocator& other) = delete;
-
-    mock_stateful_allocator& operator = (mock_stateful_allocator&& other) noexcept {
-        id_ = other.id_;
-        other.id_ = -1;
-        return *this;
-    }
+    mock_stateful_allocator& operator = (const mock_stateful_allocator& other) = default;
 
     T* allocate(size_type n) 
     {
@@ -67,12 +60,6 @@ public:
     {
         impl_.deallocate(ptr, n);
     }
-
-    template <typename U>
-    struct rebind
-    {
-        using other = mock_stateful_allocator<U>;
-    };
 
     friend bool operator==(const mock_stateful_allocator& lhs, const mock_stateful_allocator& rhs) noexcept
     {
