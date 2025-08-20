@@ -9,7 +9,7 @@
 
 #include <utility>
 #include <jsoncons/config/compiler_support.hpp>
-//#include <iostream>
+#include <iostream>
 
 namespace jsoncons {
 namespace detail {
@@ -34,6 +34,7 @@ struct allocator_delete  : public Alloc
 {
     using allocator_type = Alloc;
     using pointer = typename std::allocator_traits<Alloc>::pointer;
+    using value_type = typename std::allocator_traits<Alloc>::value_type;
 
     allocator_delete(const Alloc& alloc) noexcept
         : Alloc(alloc)
@@ -42,14 +43,13 @@ struct allocator_delete  : public Alloc
 
     allocator_delete(const allocator_delete&) noexcept = default;
 
-    template <typename U>
-    typename std::enable_if<std::is_convertible<U,pointer>::value>::type
-    operator()(U ptr) noexcept
+    template <typename T>
+    typename std::enable_if<std::is_convertible<T&,value_type&>::value>::type
+    operator()(T* ptr) noexcept
     {
-        using T = typename std::remove_reference<decltype(*ptr)>::type;
         using rebind = typename std::allocator_traits<allocator_type>:: template rebind_alloc<T>;
 
-        //std::cout << "Type of T: " << typeid(*ptr).name() << std::endl;
+        std::cout << "Type of T: " << typeid(*ptr).name() << ", sizeof(T): " << sizeof(T) << std::endl;
         ptr->~T();
         rebind alloc(*this);
         alloc.deallocate(ptr, 1);
