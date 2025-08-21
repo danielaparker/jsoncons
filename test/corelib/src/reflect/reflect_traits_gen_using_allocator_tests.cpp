@@ -354,7 +354,7 @@ template <typename Alloc>
 class HourlyEmployee : public Employee<Alloc>
 {
 public:
-    using allocator_type = Alloc;
+    using allocator_type = typename Employee<Alloc>::allocator_type;
     using char_allocator_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<char>;
     using string_type = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
 private:
@@ -398,7 +398,7 @@ template <typename Alloc>
 class CommissionedEmployee : public Employee<Alloc>
 {
 public:
-    using allocator_type = Alloc;
+    using allocator_type = typename Employee<Alloc>::allocator_type;
     using char_allocator_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<char>;
     using string_type = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
 private:
@@ -918,23 +918,23 @@ struct allocator_delete  : public Alloc
 
         std::allocator_traits<Alloc>::destroy(*this, ptr);
 
-        auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<alloc_type>*>(ptr);
-        if (hourly_ptr)
+        if (auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<alloc_type>*>(ptr))
         {
-            //std::cout << "hourly\n";
+            std::cout << "hourly\n";
             using hourly_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::HourlyEmployee<alloc_type>>;
             hourly_alloc_type alloc(*this);
             alloc.deallocate(hourly_ptr, 1);
-            return;
         }
-        auto commissioned_ptr = dynamic_cast<ns::CommissionedEmployee<alloc_type>*>(ptr);
-        if (commissioned_ptr)
+        else if (auto commissioned_ptr = dynamic_cast<ns::CommissionedEmployee<alloc_type>*>(ptr))
         {
-            //std::cout << "commissioned\n";
+            std::cout << "commissioned\n";
             using commissioned_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::CommissionedEmployee<alloc_type>>;
             commissioned_alloc_type alloc(*this);
             alloc.deallocate(commissioned_ptr, 1);
-            return;
+        }
+        else
+        {
+            std::cout << "not deallocated\n";
         }
     }
 };
@@ -993,7 +993,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         using element_type = std::unique_ptr<employee_type,allocator_delete<cust_allocator<employee_type>>>;
         using value_type = std::vector<element_type,cust_allocator<element_type>>;
 
-        std::cout << "sizeof(employee_type) : " << sizeof(employee_type) << "\n";
+        //std::cout << "sizeof(employee_type) : " << sizeof(employee_type) << "\n";
 
         auto aset = make_alloc_set(alloc);
         auto r = jsoncons::try_decode_json<value_type>(aset, input);
@@ -1001,12 +1001,12 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         value_type& v{*r};
 
         REQUIRE(2 == v.size());
-        /*CHECK(v[0]->firstName() == firstName0);
+        CHECK(v[0]->firstName() == firstName0);
         CHECK(v[0]->lastName() == lastName0);
         CHECK(v[0]->calculatePay() == pay0);
         CHECK(v[1]->firstName() == firstName1);
         CHECK(v[1]->lastName() == lastName1);
-        CHECK(v[1]->calculatePay() == pay1);*/ 
+        CHECK(v[1]->calculatePay() == pay1);
     }
 
     /*SECTION("decode vector of unique_ptr test")
