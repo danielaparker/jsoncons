@@ -913,19 +913,25 @@ struct allocator_delete  : public Alloc
 
     void operator()(pointer ptr) noexcept
     {
+        using T = std::remove_reference_t<decltype(*ptr)>;
+        using alloc_type = typename T::allocator_type;
+
         std::allocator_traits<Alloc>::destroy(*this, ptr);
-        auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<Alloc>*>(ptr);
+
+        auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<alloc_type>*>(ptr);
         if (hourly_ptr)
         {
-            using hourly_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::HourlyEmployee<Alloc>>;
+            //std::cout << "hourly\n";
+            using hourly_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::HourlyEmployee<alloc_type>>;
             hourly_alloc_type alloc(*this);
             alloc.deallocate(hourly_ptr, 1);
             return;
         }
-        auto commissioned_ptr = dynamic_cast<ns::CommissionedEmployee<Alloc>*>(ptr);
+        auto commissioned_ptr = dynamic_cast<ns::CommissionedEmployee<alloc_type>*>(ptr);
         if (commissioned_ptr)
         {
-            using commissioned_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::CommissionedEmployee<Alloc>>;
+            //std::cout << "commissioned\n";
+            using commissioned_alloc_type = typename std::allocator_traits<Alloc>:: template rebind_alloc<ns::CommissionedEmployee<alloc_type>>;
             commissioned_alloc_type alloc(*this);
             alloc.deallocate(commissioned_ptr, 1);
             return;
