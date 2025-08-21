@@ -987,6 +987,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->calculatePay() == pay1); 
     }
 
+#if (!defined(__GNUC__) || JSONCONS_GCC_AVAILABLE(13,0,0))
     SECTION("decode vector of unique_ptr")
     {
         using employee_type = ns::Employee <cust_allocator<char>>;
@@ -1008,6 +1009,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1);
     }
+#endif
 
     /*SECTION("decode vector of unique_ptr test")
     {
