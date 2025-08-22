@@ -916,6 +916,9 @@ struct allocator_delete  : public Alloc
         using T = std::remove_reference_t<decltype(*ptr)>;
         using alloc_type = typename T::allocator_type;
 
+        std::cout << "type name: " << typeid(ptr).name() << "\n";
+        std::cout << "hourly type name: " << typeid(ns::HourlyEmployee<alloc_type>).name() << "\n";
+
         std::allocator_traits<Alloc>::destroy(*this, ptr);
 
         if (auto hourly_ptr = dynamic_cast<ns::HourlyEmployee<alloc_type>*>(ptr))
