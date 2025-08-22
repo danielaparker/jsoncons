@@ -123,7 +123,7 @@ TEST_CASE("json_conv_traits using allocator tests")
         REQUIRE(r);
         CHECK(*r == *result);
         CHECK(j.as<byte_string_type>(aset) == *result);
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
 }
 

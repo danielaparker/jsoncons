@@ -147,7 +147,7 @@ int main()
     auto result = bson::try_decode_bson<jsoncons::json>(input);
     if (!result)
     {
-        std::cout << result.error() << "\n";
+        std::cout << result.error() .message() << "\n";
         exit(1);
     }
     jsoncons::json& j(*result);

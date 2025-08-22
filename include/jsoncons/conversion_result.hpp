@@ -61,13 +61,6 @@ public:
     }
 };
 
-inline
-std::ostream& operator<<(std::ostream& os, const conversion_error& err)
-{
-    os << err.message();
-    return os;
-}
-
 template <typename T>
 using conversion_result = expected<T,conversion_error>;
 

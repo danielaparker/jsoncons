@@ -23,10 +23,7 @@ Line numbers start at 1.
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
 
-#### Non-member functions
-
-std::string to_string(const read_error& err);
-
-std::ostream& operator<<(std::ostream& os, const read_error& err);
+    std::string message() const;
+Returns an error message
 
 

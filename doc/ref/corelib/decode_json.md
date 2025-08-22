@@ -152,7 +152,7 @@ int main()
 
         auto result = jsoncons::try_decode_json<ns::book>(input);
         if (!result)
-            std::cout << "(1) " << result.error() << "\n\n";
+            std::cout << "(1) " << result.error().message() << "\n\n";
     }
 
     // Unexpected JSON
@@ -161,7 +161,7 @@ int main()
 
         auto result = jsoncons::try_decode_json<ns::book>(input);
         if (!result)
-            std::cout << "(2) " << result.error() << "\n\n";
+            std::cout << "(2) " << result.error() .message() << "\n\n";
     }
 
     // Missing required member
@@ -175,7 +175,7 @@ int main()
 
         auto result = jsoncons::try_decode_json<ns::book>(input);
         if (!result)
-            std::cout << "(3) " << result.error() << "\n\n";
+            std::cout << "(3) " << result.error() .message() << "\n\n";
     }
 
     // Invalid JSON
@@ -190,7 +190,7 @@ int main()
 
         auto result = jsoncons::try_decode_json<ns::book>(input);
         if (!result)
-            std::cout << "(4) " << result.error() << "\n\n";
+            std::cout << "(4) " << result.error() .message() << "\n\n";
     }
 
     // Success

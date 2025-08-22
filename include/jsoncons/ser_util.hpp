@@ -113,13 +113,6 @@ public:
     }
 };
 
-inline
-std::ostream& operator<<(std::ostream& os, const read_error& err)
-{
-    os << err.message();
-    return os;
-}
-
 template <typename T>
 using read_result = expected<T,read_error>;
 

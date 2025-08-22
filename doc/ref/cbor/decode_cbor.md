@@ -431,7 +431,7 @@ int main()
     auto result = cbor::try_decode_cbor<jsoncons::ojson>(v);
     if (!result)
     {
-        std::cout << result.error() << "\n";
+        std::cout << result.error() .message() << "\n";
         exit(1);
     }
     jsoncons::ojson& j2(*result);

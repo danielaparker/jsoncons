@@ -43,7 +43,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,double>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_double == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("int64_t")
     {
@@ -53,7 +53,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,int64_t>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_integer == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("string_view")
     {
@@ -63,7 +63,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::string_view>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_string == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("byte_string")
     {
@@ -73,7 +73,7 @@ TEST_CASE("json_conv_traits single error tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
         CHECK(j.as<byte_string>() == *result);
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
 }
 
@@ -300,7 +300,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_pair == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("not array of size 2")
     {
@@ -309,7 +309,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         REQUIRE(jsoncons::conv_errc::not_pair == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("invalid number")
     {
@@ -319,7 +319,7 @@ TEST_CASE("json_conv_traits as std::pair tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::pair<int,int>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_integer == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
 }
 
@@ -332,7 +332,7 @@ TEST_CASE("json_conv_traits as jsoncons::byte_string")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,jsoncons::byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
         CHECK((jsoncons::byte_string{'H','e','l','l','o',' ','W','o','r','l','d'} == *result));
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
     SECTION("error")
     {
@@ -341,6 +341,6 @@ TEST_CASE("json_conv_traits as jsoncons::byte_string")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json, jsoncons::byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(!result);
         CHECK(jsoncons::conv_errc::not_byte_string == result.error().code());
-        //std::cout << result.error() << "\n\n";
+        //std::cout << result.error() .message() << "\n\n";
     }
 }

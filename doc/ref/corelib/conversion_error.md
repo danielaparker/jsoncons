@@ -15,10 +15,7 @@ Returns an error code.
     const std::string& message_arg() const noexcept
 Returns an explanatory string
 
-#### Non-member functions
-
-std::string to_string(const read_error& err);
-
-std::ostream& operator<<(std::ostream& os, const read_error& err);
+    std::string message() const;
+Returns an error message
 
 
