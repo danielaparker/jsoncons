@@ -1,7 +1,7 @@
-### Eigen::Matrix example
+### Eigen::Matrix examples
 
 This example shows how to specialize [json_type_traits](json_type_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
-It defines separate `json_type_traits` class templates for the dynamic and fixed row/column cases.
+It defines separate `json_type_traits` class templates for the dynamic and fixed sized row/column cases.
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -154,57 +154,95 @@ struct json_conv_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynam
 } // namespace reflect
 } // namespace jsoncons
 
-int main() 
-{
-    auto m1 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Random(3, 4);
-    std::cout << "m1: " << '\n' << m1 << '\n';
 
-    jsoncons::json j{m1};
+#### Dynamic matrix example
 
-    std::cout << jsoncons::pretty_print(j) << "\n";
+using matrix_type = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 
-    assert((j.is<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>()));
-    auto result = j.try_as<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>();
-    if (!result)
-    {
-        std::cout << result.error().message() << "\n";
-        return 1;
-    }
-    auto& m2(*result);
+// Don't use auto here! (Random returns proxy)
+matrix_type m1 = matrix_type::Random(3, 4);
+std::cout << "(1) " << '\n' << m1 << "\n\n";
 
-    std::cout << "m2: " << '\n' << m2 << '\n';
+std::string buffer;
+auto options = jsoncons::json_options{}.array_array_line_splits(jsoncons::line_split_kind::same_line);
 
-    assert(m1 == m2);
+auto wresult = jsoncons::try_encode_json_pretty(m1, buffer, options);
+assert(wresult);
+
+std::cout << "(2) " << '\n' << buffer << "\n\n";
+
+auto rresult = jsoncons::try_decode_json<matrix_type>(buffer);
+assert(rresult);
+auto& m2(*rresult);
+
+assert(m1 == m2);
+
+auto j1 = jsoncons::json::parse(buffer);
+auto mresult = j1.try_as<matrix_type>();
+assert(mresult);
+auto& m3(*mresult);
+assert(m1 == m3);
+
+jsoncons::json j2{m1};
+assert(j1 == j2);
 }
 ```
 Output:
 ```
-m1:
+(1)
  -0.997497   0.617481  -0.299417    0.49321
   0.127171   0.170019   0.791925  -0.651784
  -0.613392 -0.0402539    0.64568   0.717887
+
+(2)
 [
-    [
-        -0.9974974822229682,
-        0.6174810022278512,
-        -0.2994170964690085,
-        0.4932096316415906
-    ],
-    [
-        0.12717062898648024,
-        0.1700186162907804,
-        0.7919248023926511,
-        -0.651783806878872
-    ],
-    [
-        -0.6133915219580676,
-        -0.04025391399884026,
-        0.6456801049836727,
-        0.717886898403882
-    ]
-]
-m2:
+    [-0.9974974822229682, 0.6174810022278512, -0.2994170964690085, 0.4932096316415906],
+    [0.12717062898648024, 0.1700186162907804, 0.7919248023926511, -0.651783806878872],
+    [-0.6133915219580676, -0.04025391399884026, 0.6456801049836727, 0.717886898403882]
+]```
+
+#### Fixed size matrix example
+
+using matrix_type = Eigen::Matrix<double, 3, 4>;
+
+// Don't use auto here! (Random returns proxy)
+matrix_type m1 = matrix_type::Random(3, 4);
+std::cout << "(1) " << '\n' << m1 << "\n\n";
+
+std::string buffer;
+auto options = jsoncons::json_options{}.array_array_line_splits(jsoncons::line_split_kind::same_line);
+
+auto wresult = jsoncons::try_encode_json_pretty(m1, buffer, options);
+assert(wresult);
+
+std::cout << "(2) " << '\n' << buffer << "\n\n";
+
+auto rresult = jsoncons::try_decode_json<matrix_type>(buffer);
+assert(rresult);
+auto& m2(*rresult);
+
+assert(m1 == m2);
+
+auto j1 = jsoncons::json::parse(buffer);
+auto mresult = j1.try_as<matrix_type>();
+assert(mresult);
+auto& m3(*mresult);
+assert(m1 == m3);
+
+jsoncons::json j2{m1};
+assert(j1 == j2);
+}
+```
+Output:
+```
+(1)
  -0.997497   0.617481  -0.299417    0.49321
   0.127171   0.170019   0.791925  -0.651784
  -0.613392 -0.0402539    0.64568   0.717887
- ```
+
+(2)
+[
+    [-0.9974974822229682, 0.6174810022278512, -0.2994170964690085, 0.4932096316415906],
+    [0.12717062898648024, 0.1700186162907804, 0.7919248023926511, -0.651783806878872],
+    [-0.6133915219580676, -0.04025391399884026, 0.6456801049836727, 0.717886898403882]
+]```

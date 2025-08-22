@@ -1,7 +1,7 @@
-### Eigen::Matrix example
+### Eigen::Matrix examples
 
 This example shows how to specialize [json_conv_traits](json_conv_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
-It defines separate `json_type_traits` class templates for the dynamic and fixed row/column cases.
+It defines separate `json_type_traits` class templates for the dynamic and fixed sized row/column cases.
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -145,52 +145,88 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynam
 };
 
 } // namespace jsoncons
+```
 
-int main() 
-{
-    auto m1 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Random(3, 4);
-    std::cout << "m1: " << '\n' << m1 << '\n';
+#### Dynamic matrix example
 
-    jsoncons::json j{m1};
+```cpp
+using matrix_type = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 
-    std::cout << jsoncons::pretty_print(j) << "\n";
+// Don't use auto here! (Random returns proxy)
+matrix_type m1 = matrix_type::Random(3, 4);
+std::cout << "(1) " << '\n' << m1 << "\n\n";
 
-    assert((j.is<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>()));
-    auto m2 = j.as<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>();
+std::string buffer;
+auto options = jsoncons::json_options{}.array_array_line_splits(jsoncons::line_split_kind::same_line);
 
-    std::cout << "m2: " << '\n' << m2 << '\n';
+jsoncons::encode_json_pretty(m1, buffer, options);
 
-    assert(m1 == m2);
-}
+std::cout << "(2) " << '\n' << buffer << "\n\n";
+
+auto m2 = jsoncons::decode_json<matrix_type>(buffer);
+
+assert(m1 == m2);
+
+auto j1 = jsoncons::json::parse(buffer);
+auto m3 = j1.as<matrix_type>();
+assert(m1 == m3);
+
+jsoncons::json j2{m1};
+assert(j1 == j2);
 ```
 Output:
 ```
-m1:
+(1)
  -0.997497   0.617481  -0.299417    0.49321
   0.127171   0.170019   0.791925  -0.651784
  -0.613392 -0.0402539    0.64568   0.717887
+
+(2)
 [
-    [
-        -0.9974974822229682,
-        0.6174810022278512,
-        -0.2994170964690085,
-        0.4932096316415906
-    ],
-    [
-        0.12717062898648024,
-        0.1700186162907804,
-        0.7919248023926511,
-        -0.651783806878872
-    ],
-    [
-        -0.6133915219580676,
-        -0.04025391399884026,
-        0.6456801049836727,
-        0.717886898403882
-    ]
+    [-0.9974974822229682, 0.6174810022278512, -0.2994170964690085, 0.4932096316415906],
+    [0.12717062898648024, 0.1700186162907804, 0.7919248023926511, -0.651783806878872],
+    [-0.6133915219580676, -0.04025391399884026, 0.6456801049836727, 0.717886898403882]
 ]
-m2:
+```
+
+#### Fixed-sized matrix example
+
+```cpp
+using matrix_type = Eigen::Matrix<double, 3, 4>;
+
+// Don't use auto here! (Random returns proxy)
+matrix_type m1 = matrix_type::Random(3, 4);
+std::cout << "(1) " << '\n' << m1 << "\n\n";
+
+std::string buffer;
+auto options = jsoncons::json_options{}.array_array_line_splits(jsoncons::line_split_kind::same_line);
+
+jsoncons::encode_json_pretty(m1, buffer, options);
+
+std::cout << "(2) " << '\n' << buffer << "\n\n";
+
+auto m2 = jsoncons::decode_json<matrix_type>(buffer);
+
+assert(m1 == m2);
+
+auto j1 = jsoncons::json::parse(buffer);
+auto m3 = j1.as<matrix_type>();
+assert(m1 == m3);
+
+jsoncons::json j2{m1};
+assert(j1 == j2);
+```
+Output:
+```
+(1)
  -0.997497   0.617481  -0.299417    0.49321
   0.127171   0.170019   0.791925  -0.651784
  -0.613392 -0.0402539    0.64568   0.717887
- ```
+
+(2)
+[
+    [-0.9974974822229682, 0.6174810022278512, -0.2994170964690085, 0.4932096316415906],
+    [0.12717062898648024, 0.1700186162907804, 0.7919248023926511, -0.651783806878872],
+    [-0.6133915219580676, -0.04025391399884026, 0.6456801049836727, 0.717886898403882]
+]
+```
