@@ -35,7 +35,7 @@ jsoncons allows you to work with the CSV data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](../corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits/json_type_traits.md)
 
 - With [cursor-level access](doc/ref/csv/basic_csv_cursor.md) to a stream of parse events
 
@@ -96,8 +96,8 @@ EUR_LIBOR_06M, 2015-10-27, 0.0000001
 #### As a strongly typed C++ data structure
 
 jsoncons supports transforming CSV data into C++ data structures. The functions decode_csv and encode_csv convert strings or streams of 
-CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../corelib/json_type_traits.md) defined. 
-jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../corelib/json_type_traits.md) 
+CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../corelib/json_type_traits/json_type_traits.md) defined. 
+jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../corelib/json_type_traits/json_type_traits.md) 
 in the jsoncons namespace.
 ```cpp
 #include <boost/date_time/gregorian/gregorian.hpp>

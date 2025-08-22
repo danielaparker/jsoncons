@@ -1808,7 +1808,7 @@ JSONCONS_TPL_N_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
 keep the same meaning for backwards compatibility, the `_STRICT_` names are deprecated 
 and renamed substituting `_ALL_` for `STRICT`.
 
-See [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
+See [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits/json_type_traits.md)
 for complete documentation of the convenience macros. 
 
 0.139.0
@@ -1958,7 +1958,7 @@ They have been renamed to
     JSONCONS_TPL_GETTER_SETTER_NAMED_TRAITS_DECL
     JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL
 
-See [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
+See [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits/json_type_traits.md)
 
 0.135.0
 --------

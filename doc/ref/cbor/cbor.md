@@ -2,7 +2,7 @@
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 You can either parse into or serialize from a variant-like data structure, [basic_json](../corelib/basic_json.md), or your own
-data structures, using [json_type_traits](../corelib/json_type_traits.md).
+data structures, using [json_type_traits](../corelib/json_type_traits/json_type_traits.md).
 
 [decode_cbor, try_decode_cbor](decode_cbor.md)
 
@@ -157,7 +157,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](../corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits.md) 
+- As a strongly typed C++ data structure that implements [json_type_traits](../corelib/json_type_traits/json_type_traits.md) 
 
 - With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 

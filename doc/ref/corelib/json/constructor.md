@@ -101,7 +101,7 @@ basic_json(json_pointer_arg, basic_json* ptr);                     (26) (since 1
 
 (5) Move with allocator
 
-(6) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md).
+(6) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits/json_type_traits.md).
 
 (7) Constructs a `basic_json` value from an unsigned integer and a [semantic_tag](../semantic_tag.md). This overload only participates in overload resolution if `Unsigned` is an unsigned integral type.
 
@@ -135,7 +135,7 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 
 (19) Constructs a json object with the contents of the initializer list `init`.
 
-(20) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
+(20) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits/json_type_traits.md) with allocator.
 
 (21) Constructs a `basic_json` value from a text string.
 

@@ -1604,7 +1604,7 @@ Key not found: 'ssn'
 jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](ref/decode_json.md) 
 and [encode_json](ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits.md) 
+[json_type_traits](ref/json_type_traits/json_type_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
@@ -1727,7 +1727,7 @@ Charles Bukowski, Pulp, 22.48
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-The jsoncons library includes a [json_type_traits](ref/json_type_traits.md) specialization for 
+The jsoncons library includes a [json_type_traits](ref/json_type_traits/json_type_traits.md) specialization for 
 `jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
 [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
@@ -1832,7 +1832,7 @@ Output:
 
 #### An example with std::shared_ptr and std::unique_ptr
 
-The jsoncons library includes [json_type_traits](ref/json_type_traits.md) specializations for 
+The jsoncons library includes [json_type_traits](ref/json_type_traits/json_type_traits.md) specializations for 
 `std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
 i.e., does not have any virtual functions, and if `T` is also specialized. Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
 In addition, users can implement `json_type_traits` for `std::shared_ptr` and `std::unique_ptr`
@@ -1956,7 +1956,7 @@ int main()
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[json_type_traits](ref/json_type_traits.md) for the enum type
+[json_type_traits](ref/json_type_traits/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -2083,7 +2083,7 @@ Marilyn C, 0.9, 1514862245
 #### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_CTOR_GETTER_TRAITS`
-to generate the [json_type_traits](ref/json_type_traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+to generate the [json_type_traits](ref/json_type_traits/json_type_traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
@@ -2995,7 +2995,7 @@ we use the function object `ns::rectangle_marker` to ouput the value
 this position cannot be a lambda expression (at least until C++20), 
 because jsoncons uses it in an unevaluated context, so it is
 provided as a variable containing a lambda expression instead.
-See [convenience macros](ref/json_type_traits/convenience-macros.md)
+See [convenience macros](ref/json_type_traits/reflect/reflect-traits-gen.md)
 for full details.   
 
 <div id="G13"/>

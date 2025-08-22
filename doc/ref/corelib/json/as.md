@@ -14,7 +14,7 @@ template <typename T>
 T as(byte_string_arg_t, semantic_tag hint) const;               (4)
 ```
 
-(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../corelib/json_type_traits.md).
+(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../corelib/json_type_traits/json_type_traits.md).
 
     std::string as<std::string>() const noexcept
 If value is string, returns value, otherwise returns result of [dump](dump.md).

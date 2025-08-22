@@ -29,7 +29,7 @@ to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits/json_type_traits.md)
 
 - With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/corelib/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -38,7 +38,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
 But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
 And it supports incremental parsing into a user's preferred form, using
-information about user types provided by specializations of [json_type_traits](doc/ref/corelib/json_type_traits.md).
+information about user types provided by specializations of [json_type_traits](doc/ref/corelib/json_type_traits/json_type_traits.md).
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
@@ -75,7 +75,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits/json_type_traits.md)
 
 - As a stream of parse events
 
@@ -145,7 +145,7 @@ jsoncons supports transforming JSON texts into C++ data structures.
 The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md) 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits/json_type_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
@@ -266,7 +266,7 @@ Marilyn C, 0.9, 1514862245
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[json_type_traits](doc/ref/corelib/json_type_traits.md) for the enum type
+[json_type_traits](doc/ref/corelib/json_type_traits/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from

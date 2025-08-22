@@ -42,8 +42,6 @@ And it includes convenience macros that make specializing `json_type_traits` for
 
 [Built-in Specializations](json_type_traits/built-in-specializations.md)
 
-[Convenience Macros](json_type_traits/convenience-macros.md)
-
 [Custom Specializations](json_type_traits/custom-specializations.md)
 
 

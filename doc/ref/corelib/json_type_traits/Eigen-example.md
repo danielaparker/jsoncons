@@ -1,0 +1,191 @@
+```cpp
+#include <jsoncons/json.hpp>
+#include <Eigen/Dense>
+#include <iostream>
+#include <cassert>
+
+namespace jsoncons {
+
+template <typename Json, typename Scalar, std::size_t RowsAtCompileTime, std::size_t ColsAtCompileTime>
+struct json_type_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>>
+{
+    using allocator_type = typename Json::allocator_type;
+    using matrix_type = Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>;
+
+    static bool is(const Json& val) noexcept
+    {
+        if (!val.is_array() || val.size() != RowsAtCompileTime)
+            return false;
+
+        for (std::size_t i = 0; i < val.size(); ++i)
+        {
+            const Json& row = val[i];
+            if (row.size() != ColsAtCompileTime)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static matrix_type as(const Json& val)
+    {
+        if (!val.is_array() || val.size() != RowsAtCompileTime || val[0].size() != ColsAtCompileTime)
+        {
+            return matrix_type{};
+        }
+
+        matrix_type m(RowsAtCompileTime, ColsAtCompileTime);
+
+        for (std::size_t i = 0; i < val.size(); ++i)
+        {
+            const Json& row = val[i];
+            if (row.size() != ColsAtCompileTime)
+            {
+                return matrix_type{};
+            }
+            for (std::size_t j = 0; j < row.size(); ++j)
+            {
+                m(i, j) = row[j].as<Scalar>();
+            }
+        }
+
+        return m;
+    }
+
+    static Json to_json(const matrix_type& m, const allocator_type& alloc = allocator_type{})
+    {
+        Json val{jsoncons::json_array_arg, alloc};
+        for (Eigen::Index i = 0; i < m.rows(); ++i)
+        {
+            Json row{jsoncons::json_array_arg};
+            for (Eigen::Index j = 0; j < m.cols(); ++j)
+            {
+                row.push_back(m(i, j));
+            }
+            val.push_back(std::move(row));
+        }
+
+        return val;
+    }
+};
+
+template <typename Json, typename Scalar>
+struct json_type_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>>
+{
+    using allocator_type = typename Json::allocator_type;
+    using matrix_type = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+
+    static bool is(const Json& val) noexcept
+    {
+        if (!val.is_array())
+            return false;
+
+        std::size_t cols = val[0].size();
+
+        for (std::size_t i = 0; i < val.size(); ++i)
+        {
+            const Json& row = val[i];
+            if (row.size() != cols)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static matrix_type as(const Json& val)
+    {
+        if (!val.is_array() || val.size() == 0 || val[0].size() == 0)
+        {
+            return matrix_type{};
+        }
+
+        std::size_t cols = val[0].size();
+        matrix_type m(val.size(), cols);
+
+        for (std::size_t i = 0; i < val.size(); ++i)
+        {
+            const Json& row = val[i];
+            if (row.size() != cols)
+            {
+                return matrix_type{};
+            }
+            for (std::size_t j = 0; j < row.size(); ++j)
+            {
+                m(i, j) = row[j].template as<Scalar>();
+            }
+        }
+
+        return m;
+    }
+
+    static Json to_json(const matrix_type& m, const allocator_type& alloc = allocator_type{})
+    {
+        Json val{jsoncons::json_array_arg, alloc};
+        for (Eigen::Index i = 0; i < m.rows(); ++i)
+        {
+            Json row{jsoncons::json_array_arg};
+            for (Eigen::Index j = 0; j < m.cols(); ++j)
+            {
+                row.push_back(m(i, j));
+            }
+            val.push_back(std::move(row));
+        }
+
+        return val;
+    }
+};
+
+} // namespace jsoncons
+
+int main() 
+{
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Random(3, 4);
+    std::cout << "m: " << std::endl << m << std::endl;
+
+    jsoncons::json j{m};
+
+    std::cout << jsoncons::pretty_print(j) << "\n";
+
+    assert((j.is<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>()));
+    auto m2 = j.as<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>();
+
+    std::cout << "m2: " << std::endl << m2 << std::endl;
+
+    assert(m2 == m);
+}
+```
+Output:
+```
+m:
+ -0.997497   0.617481  -0.299417    0.49321
+  0.127171   0.170019   0.791925  -0.651784
+ -0.613392 -0.0402539    0.64568   0.717887
+[
+    [
+        -0.9974974822229682,
+        0.6174810022278512,
+        -0.2994170964690085,
+        0.4932096316415906
+    ],
+    [
+        0.12717062898648024,
+        0.1700186162907804,
+        0.7919248023926511,
+        -0.651783806878872
+    ],
+    [
+        -0.6133915219580676,
+        -0.04025391399884026,
+        0.6456801049836727,
+        0.717886898403882
+    ]
+]
+m2:
+ -0.997497   0.617481  -0.299417    0.49321
+  0.127171   0.170019   0.791925  -0.651784
+ -0.613392 -0.0402539    0.64568   0.717887
+ ```
