@@ -699,7 +699,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
         auto r = try_decode_json<book_type>(aset, input);
         if (!r)
         {
-            std::cout << "Err: " << r.error() << "\n";
+            std::cout << "Err: " << r.error().message() << "\n";
         }
 
         REQUIRE(r);
@@ -772,7 +772,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
         auto r = try_decode_json<book_type>(aset, input);
         if (!r)
         {
-            std::cout << "Err: " << r.error() << "\n";
+            std::cout << "Err: " << r.error().message() << "\n";
         }
 
         REQUIRE(r);
@@ -845,7 +845,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
         auto r = try_decode_json<book_type>(aset, input);
         if (!r)
         {
-            std::cout << "Err: " << r.error() << "\n";
+            std::cout << "Err: " << r.error().message() << "\n";
         }
 
         REQUIRE(r);
