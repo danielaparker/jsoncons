@@ -1,3 +1,8 @@
+### Eigen::Matrix example
+
+This example shows how to specialize [json_conv_traits](json_conv_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+It defines separate `json_type_traits` class templates for the dynamic and fixed row/column cases.
+
 ```cpp
 #include <jsoncons/json.hpp>
 #include <Eigen/Dense>
@@ -12,14 +17,14 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
     using allocator_type = typename Json::allocator_type;
     using matrix_type = Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>;
 
-    static bool is(const Json& val) noexcept
+    static bool is(const Json& jval) noexcept
     {
-        if (!val.is_array() || val.size() != RowsAtCompileTime)
+        if (!jval.is_array() || jval.size() != RowsAtCompileTime)
             return false;
 
-        for (std::size_t i = 0; i < val.size(); ++i)
+        for (std::size_t i = 0; i < jval.size(); ++i)
         {
-            const Json& row = val[i];
+            const Json& row = jval[i];
             if (row.size() != ColsAtCompileTime)
             {
                 return false;
@@ -29,18 +34,18 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
         return true;
     }
 
-    static matrix_type as(const Json& val)
+    static matrix_type as(const Json& jval)
     {
-        if (!val.is_array() || val.size() != RowsAtCompileTime || val[0].size() != ColsAtCompileTime)
+        if (!jval.is_array() || jval.size() != RowsAtCompileTime || jval[0].size() != ColsAtCompileTime)
         {
             return matrix_type{};
         }
 
         matrix_type m(RowsAtCompileTime, ColsAtCompileTime);
 
-        for (std::size_t i = 0; i < val.size(); ++i)
+        for (std::size_t i = 0; i < jval.size(); ++i)
         {
-            const Json& row = val[i];
+            const Json& row = jval[i];
             if (row.size() != ColsAtCompileTime)
             {
                 return matrix_type{};
@@ -59,7 +64,7 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
         Json val{jsoncons::json_array_arg, alloc};
         for (Eigen::Index i = 0; i < m.rows(); ++i)
         {
-            Json row{jsoncons::json_array_arg};
+            Json row{jsoncons::json_array_arg, alloc};
             for (Eigen::Index j = 0; j < m.cols(); ++j)
             {
                 row.push_back(m(i, j));
@@ -127,7 +132,7 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynam
         Json val{jsoncons::json_array_arg, alloc};
         for (Eigen::Index i = 0; i < m.rows(); ++i)
         {
-            Json row{jsoncons::json_array_arg};
+            Json row{jsoncons::json_array_arg, alloc};
             for (Eigen::Index j = 0; j < m.cols(); ++j)
             {
                 row.push_back(m(i, j));
@@ -143,24 +148,24 @@ struct json_type_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynam
 
 int main() 
 {
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Random(3, 4);
-    std::cout << "m: " << std::endl << m << std::endl;
+    auto m1 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Random(3, 4);
+    std::cout << "m1: " << '\n' << m1 << '\n';
 
-    jsoncons::json j{m};
+    jsoncons::json j{m1};
 
     std::cout << jsoncons::pretty_print(j) << "\n";
 
     assert((j.is<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>()));
     auto m2 = j.as<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>();
 
-    std::cout << "m2: " << std::endl << m2 << std::endl;
+    std::cout << "m2: " << '\n' << m2 << '\n';
 
-    assert(m2 == m);
+    assert(m1 == m2);
 }
 ```
 Output:
 ```
-m:
+m1:
  -0.997497   0.617481  -0.299417    0.49321
   0.127171   0.170019   0.791925  -0.651784
  -0.613392 -0.0402539    0.64568   0.717887
