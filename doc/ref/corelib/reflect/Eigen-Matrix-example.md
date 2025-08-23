@@ -47,7 +47,8 @@ struct json_conv_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
         }
         if (jval.size() != RowsAtCompileTime)
         {
-            return result_type{jsoncons::unexpect, conv_errc::conversion_failed, "Expected " + std::to_string(RowsAtCompileTime) + " rows, found " + std::to_string(jval.size())};
+            return result_type{jsoncons::unexpect, conv_errc::conversion_failed, "Expected " + 
+                std::to_string(RowsAtCompileTime) + " rows, found " + std::to_string(jval.size())};
         }
 
         matrix_type m(RowsAtCompileTime, ColsAtCompileTime);
@@ -57,7 +58,8 @@ struct json_conv_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
             const Json& row = jval[i];
             if (row.size() != ColsAtCompileTime)
             {
-                return result_type{jsoncons::unexpect, conv_errc::conversion_failed, "Expected " + std::to_string(ColsAtCompileTime) + " columns, found " + std::to_string(row.size())};
+                return result_type{jsoncons::unexpect, conv_errc::conversion_failed, "Expected " + 
+                    std::to_string(ColsAtCompileTime) + " columns, found " + std::to_string(row.size())};
             }
             for (std::size_t j = 0; j < row.size(); ++j)
             {
