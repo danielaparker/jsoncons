@@ -168,6 +168,7 @@ struct json_conv_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynam
 
 #### Fixed size matrix example
 
+```cpp
 using matrix_type = Eigen::Matrix<double, 3, 4>;
 
 // Don't use auto here! (Random returns proxy)
@@ -222,6 +223,7 @@ Output:
 
 #### Dynamic matrix example
 
+```cpp
 using matrix_type = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 
 // Don't use auto here! (Random returns proxy)

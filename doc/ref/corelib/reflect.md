@@ -22,6 +22,6 @@ For backwards compatability, `json_conv_traits` defaults to `json_type_traits` i
 
 jsoncons includes some [convenience macros](reflect/reflect-traits-gen.md) for generating reflection traits classes.
 Until 1.4.0, these macros generated [json_type_traits](json_type_traits/json_type_traits.md) class templates. Since 1.4.0, they
-generate [json_conv_traits](reflect/json_conv_traits.md) class templates, as well as some other traits that provide streaming support.
+generate [json_conv_traits](reflect/json_conv_traits.md) class templates, as well as some additional traits that support streaming.
 
 
