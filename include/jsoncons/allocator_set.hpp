@@ -38,6 +38,8 @@ public:
     TempAlloc get_temp_allocator() const {return temp_alloc_;}
 };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 inline
 allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()
 {
@@ -61,6 +63,7 @@ allocator_set<std::allocator<char>,TempAlloc> temp_allocator_only(const TempAllo
 {
     return allocator_set<std::allocator<char>,TempAlloc>(std::allocator<char>(), temp_alloc);
 }
+#endif // !defined(JSONCONS_NO_DEPRECATED)
 
 inline
 allocator_set<std::allocator<char>,std::allocator<char>> make_alloc_set()

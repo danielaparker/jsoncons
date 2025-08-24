@@ -135,7 +135,7 @@ void using_polymorphic_allocator()
 
     try
     {
-        auto doc = pmr_json::parse(combine_allocators(alloc), json_text, json_options{});
+        auto doc = pmr_json::parse(make_alloc_set(alloc), json_text, json_options{});
         std::cout << pretty_print(doc) << "\n\n";
     }
     catch (const std::exception& ex)

@@ -33,6 +33,9 @@
       etc. produced JSON (or other formats) with object names in sorted order. After this release,
       they will produce JSON, BSON etc. with object names in the order that they appear as macro arguments. 
 
+    - The `allocator_set` helper functions `combine_allocators` and `temp_allocator_only` have been 
+    deprecated and will be removed in a future release. Instead use `make_alloc_set`.
+
 - Breaking change to staj iterator classes
 
     - Classes `staj_array_view` and `staj_object_view` and corresponding factories `staj_array` 

@@ -37,25 +37,51 @@ Returns an allocator object for for temporary allocations
 #### Helper functions
 
     template <typename Alloc,typename TempAlloc>
-    allocator_set<Alloc,TempAlloc> combine_allocators(
+    allocator_set<Alloc,TempAlloc> make_alloc_set(                                    (since 1.4.0)
         const Alloc& alloc, const TempAlloc& temp_alloc);
 
 Combines an allocator for result data and an allocator for temporary allocations into an `allocator_set` object,
 deducing the allocator types from the types of the arguments.
 
-    allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()
+    allocator_set<std::allocator<char>,std::allocator<char>> make_alloc_set()         (since 1.4.0)
+
 Creates an `allocator_set<std::allocator<char>,std::allocator<char>>` object with default allocators for result data
 and temporary allocations.
 
     template <typename Alloc>
-    allocator_set<Alloc,std::allocator<char>> combine_allocators(
-        const Alloc& alloc);
+    allocator_set<Alloc,std::allocator<char>> make_alloc_set(const Alloc& alloc)      (since 1.4.0)
 
 Creates an `allocator_set` with the provided allocator for result data and
 defaulting to a `std::allocator<char>` for temporary allocations. 
 
     template <typename TempAlloc>
-    allocator_set<std::allocator<char>,TempAlloc> temp_allocator_only(const TempAlloc& temp_alloc)
+    allocator_set<std::allocator<char>,TempAlloc> make_alloc_set(temp_alloc_arg_t,    (since 1.4.0)
+        const TempAlloc& temp_alloc) 
+
+Creates a `allocator_set` object, defaulting the result allocator type to `std::allocator<char>`
+and deducing the temp allocator type from the type of the `temp_alloc` argument.
+
+    template <typename Alloc,typename TempAlloc>
+    allocator_set<Alloc,TempAlloc> combine_allocators(                                (deprecated since 1.4.0)
+        const Alloc& alloc, const TempAlloc& temp_alloc);
+
+Combines an allocator for result data and an allocator for temporary allocations into an `allocator_set` object,
+deducing the allocator types from the types of the arguments.
+
+    allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()     (deprecated since 1.4.0)
+
+Creates an `allocator_set<std::allocator<char>,std::allocator<char>>` object with default allocators for result data
+and temporary allocations.
+
+    template <typename Alloc>
+    allocator_set<Alloc,std::allocator<char>> combine_allocators(const Alloc& alloc)  (deprecated since 1.4.0)
+
+Creates an `allocator_set` with the provided allocator for result data and
+defaulting to a `std::allocator<char>` for temporary allocations. 
+
+    template <typename TempAlloc>
+    allocator_set<std::allocator<char>,TempAlloc> temp_allocator_only(                (deprecated since 1.4.0)
+        const TempAlloc& temp_alloc) 
 
 Creates a `allocator_set` object, defaulting the result allocator type to `std::allocator<char>`
 and deducing the temp allocator type from the type of the `temp_alloc` argument.

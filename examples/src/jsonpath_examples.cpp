@@ -856,7 +856,7 @@ void make_expression_with_stateful_allocator()
     std::cout << pretty_print(doc) << "\n\n";
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsoncons::jsonpath::make_expression<cust_json>(jsoncons::combine_allocators(alloc), p);  
+    auto expr = jsoncons::jsonpath::make_expression<cust_json>(jsoncons::make_alloc_set(alloc), p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";

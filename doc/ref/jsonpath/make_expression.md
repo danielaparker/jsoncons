@@ -158,7 +158,7 @@ int main()
     my_json doc = decoder.get_result();
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsonpath::make_expression<my_json>(combine_allocators(alloc), p);  
+    auto expr = jsonpath::make_expression<my_json>(make_alloc_set(alloc), p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";
