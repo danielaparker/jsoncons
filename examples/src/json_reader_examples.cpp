@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include "mock_stateful_allocator.hpp"
+#include "common/mock_stateful_allocator.hpp"
 #include <scoped_allocator>
 
 using namespace jsoncons;

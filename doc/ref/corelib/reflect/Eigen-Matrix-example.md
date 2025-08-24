@@ -1,7 +1,7 @@
 ### Eigen::Matrix examples
 
-This example shows how to specialize [json_type_traits](json_type_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
-It defines separate `json_type_traits` class templates for the dynamic and fixed sized row/column cases.
+This example shows how to specialize [json_conv_traits](json_conv_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+It defines separate `json_conv_traits` class templates for the dynamic and fixed sized row/column cases.
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -198,7 +198,10 @@ if (!r3by3)
     std::cout << "(3) " << r3by3.error().message() << "\n\n";
 }
 
-auto j1 = jsoncons::json::parse(buffer);
+auto jresult = jsoncons::try_decode_json<jsoncons::json>(buffer);
+assert(jresult);
+auto j1(*jresult);
+
 auto mresult = j1.try_as<matrix_type>();
 assert(mresult);
 auto& m3(*mresult);
@@ -247,7 +250,10 @@ auto& m2(*rresult);
 
 assert(m1 == m2);
 
-auto j1 = jsoncons::json::parse(buffer);
+auto jresult = jsoncons::try_decode_json<jsoncons::json>(buffer);
+assert(jresult);
+auto j1(*jresult);
+
 auto mresult = j1.try_as<matrix_type>();
 assert(mresult);
 auto& m3(*mresult);
@@ -273,7 +279,8 @@ Output:
 
 ### See also
 
-[basic_json](../basic_json.md)
-[allocator_set](../allocator_set)
+[allocator_set](../allocator_set)  
 [decode_json, try_decode_json](../decode_json.md)  
 [encode_json, encode_json_pretty, try_encode_json, try_encode_json_pretty](../encode_json.md)  
+[basic_json](../basic_json.md)  
+

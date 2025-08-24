@@ -54,7 +54,7 @@ void jsonpath_tests(const std::string& fpath)
                 auto expression = jsoncons::jsonpath::make_expression<json>(expr);
                 if (test_case.contains("result"))
                 {
-                    jsonpath::result_options rflags = options | jsonpath::result_options::value;
+                    jsonpath::result_options rflags = options;
                     json actual = expression.evaluate(instance, rflags);
                     const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";

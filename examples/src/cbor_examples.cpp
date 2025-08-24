@@ -7,7 +7,7 @@
 
 #include <jsoncons/json.hpp>
 
-#include "sample_types.hpp"
+#include "common/sample_types.hpp"
 #include <string>
 #include <iomanip>
 #include <iostream>

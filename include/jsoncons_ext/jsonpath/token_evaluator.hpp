@@ -158,7 +158,11 @@ namespace jsonpath {
     };
     JSONCONS_INLINE_CONSTEXPR argument_arg_t argument_arg{};
 
-    enum class result_options {value=0, nodups=1, sort=2, sort_descending=4, path=8};
+    enum class result_options {
+#if !defined(JSONCONS_NO_DEPRECATED)
+        value=0, 
+#endif
+        nodups=1, sort=2, sort_descending=4, path=8};
 
     inline constexpr result_options operator~(result_options a)
     {

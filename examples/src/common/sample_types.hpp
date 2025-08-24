@@ -1,5 +1,5 @@
-#ifndef EXAMPLE_TYPES
-#define EXAMPLE_TYPES
+#ifndef SAMPLE_TYPES
+#define SAMPLE_TYPES
 
 #include <string>
 #include <vector>
@@ -176,9 +176,9 @@ namespace jsoncons {
         static ns::book as(const Json& j)
         {
             ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
+            val.author = j.at("author").as<std::string>();
+            val.title = j.at("title").as<std::string>();
+            val.price = j.at("price").as<double>();
             return val;
         }
         static Json to_json(const ns::book& val, 

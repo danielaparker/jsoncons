@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <cassert>
 #include <iostream>
-#include "sample_types.hpp"
+#include "common/sample_types.hpp"
 
 namespace csv = jsoncons::csv;
 
@@ -176,7 +176,7 @@ void csv_source_to_cpp_object()
 
     auto ooptions = csv::csv_options{}
         .column_names("Date,1Y,2Y,3Y,5Y");
-    csv::encode_csv<table_type>(table, output, ooptions);
+    csv::encode_csv(table, output, ooptions);
 
     std::cout << "(2)\n";
     std::cout << output << "\n";

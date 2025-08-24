@@ -176,7 +176,10 @@ assert(m1 == m2);
 auto m3by3 = jsoncons::decode_json<Eigen::Matrix<double, 3, 3>>(buffer);
 std::cout << "(3)\n" << m3by3 << "\n\n";
 
-auto j1 = jsoncons::json::parse(buffer);
+auto jresult = jsoncons::try_decode_json<jsoncons::json>(buffer);
+assert(jresult);
+auto j1(*jresult);
+
 auto m3 = j1.as<matrix_type>();
 assert(m1 == m3);
 
@@ -223,7 +226,10 @@ auto m2 = jsoncons::decode_json<matrix_type>(buffer);
 
 assert(m1 == m2);
 
-auto j1 = jsoncons::json::parse(buffer);
+auto jresult = jsoncons::try_decode_json<jsoncons::json>(buffer);
+assert(jresult);
+auto j1(*jresult);
+
 auto m3 = j1.as<matrix_type>();
 assert(m1 == m3);
 
@@ -247,7 +253,8 @@ Output:
 
 ### See also
 
-[basic_json](../basic_json.md)
-[allocator_set](../allocator_set)
+[allocator_set](../allocator_set)  
 [decode_json](../decode_json.md)  
 [encode_json, encode_json_pretty](../encode_json.md)  
+[basic_json](../basic_json.md)  
+

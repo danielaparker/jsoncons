@@ -6,7 +6,7 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 
-#include "sample_types.hpp"
+#include "common/sample_types.hpp"
 #include <jsoncons/json.hpp>
 
 #include <string>

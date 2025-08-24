@@ -280,7 +280,17 @@ using identity = reflect::identity;
     template <typename JSON,typename T,typename Enable> \
     friend struct jsoncons::reflect::json_conv_traits; \
     template <typename T,typename Enable> \
-    friend struct jsoncons::reflect::encode_traits;
+    friend struct jsoncons::reflect::encode_traits; \
+    template <typename T,typename Enable> \
+    friend struct jsoncons::reflect::decode_traits;
+
+#define JSONCONS_CONV_TRAITS_FRIEND \
+    template <typename JSON,typename T,typename Enable> \
+    friend struct jsoncons::reflect::json_conv_traits; \
+    template <typename T,typename Enable> \
+    friend struct jsoncons::reflect::encode_traits; \
+    template <typename T,typename Enable> \
+    friend struct jsoncons::reflect::decode_traits;
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_PP_EXPAND(Call(Expr, Id))
 

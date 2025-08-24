@@ -5,7 +5,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-#include "sample_types.hpp"
+#include "common/sample_types.hpp"
 #include <jsoncons/json.hpp>
 
 #include <string>

@@ -133,8 +133,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json,typename T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        ext_traits::is_array_like<T>::value && 
-        !is_json_conv_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
+        ext_traits::is_array_like<T>::value 
     >::type> : std::true_type {};
 
 } // namespace detail

@@ -34,7 +34,11 @@
       they will produce JSON, BSON etc. with object names in the order that they appear as macro arguments. 
 
     - The `allocator_set` helper functions `combine_allocators` and `temp_allocator_only` have been 
-    deprecated and will be removed in a future release. Instead use `make_alloc_set`.
+    deprecated and will be removed in a future release. Use `make_alloc_set` instead.
+
+    - The `jsoncons::csv::result_options::value` option has been deprecated and will be removed in a
+      future release. See [What does result_options::value do in json_query()?](https://github.com/danielaparker/jsoncons/discussions/613)
+      for the rationale for this change. Use `jsoncons::csv::result_options{}` instead.
 
 - Breaking change to staj iterator classes
 

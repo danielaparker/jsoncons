@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "sample_types.hpp"
+#include "common/sample_types.hpp"
 
 using namespace jsoncons;
 
