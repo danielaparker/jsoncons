@@ -15,6 +15,7 @@ jsoncons 1.4.0 introduces new trait definitions, [json_conv_traits](reflect/json
 non-throwing conversions and user-allocator construction. 
 
 See [Eigen::Matrix example](reflect/Eigen-Matrix-example.md) for an example of specializing `json_conv_traits` for an [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+
 See [User-allocator construction example](reflect/uses-allocator-construction-example.md) for an example that illustrates user-allocator construction for types with `json_conv_traits` defined. 
 
 For backwards compatability, `json_conv_traits` defaults to `json_type_traits` if a type conversion is undefined.  
