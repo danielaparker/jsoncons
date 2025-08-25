@@ -3,6 +3,8 @@
 
 - Fixed bug:
 
+    - Git PR #628: fixed uninitialized warning 
+
     - Git Issue #622: fixed jmespath issue with uri resolution in patternProperties
 
     - Git Issue #620: Issue with JSONPath filter expression fixed through PR #621
@@ -16,7 +18,10 @@
     - New `basic_json_options` member `lossless_bignum`. If `true`, reads out of range floating point numbers 
     as strings with tag `semantic_tag::bigdec`. Defaults to true.
 
-    - New non-throwing versions of the decode functions that return a `std::expected`-like result,
+    - New reflection trait definitions, `jsoncons::reflect::json_conv_traits`, that support non-throwing conversions and user-allocator construction.
+      These replace `jsoncons::json_type_traits`, but for backwards compatability, `json_conv_traits` defaults to `json_type_traits` if a type conversion is undefined.
+
+    - New non-throwing versions of the decode functions that return a `std::expected<T,read_error>`-like result,
 
         - `try_decode_json`
         - `try_decode_csv`
@@ -25,7 +30,16 @@
         - `try_decode_msgpack`
         - `try_decode_ubjson`
 
-    - New non-throwing accessor `try_as<T>()` for `basic_json` that return a `std::expected`-like result,
+    - New non-throwing versions of the encode functions that return a `std::expected<void,write_error>`-like result,
+
+        - `try_encode_json`
+        - `try_encode_csv`
+        - `try_encode_bson`
+        - `try_encode_cbor`
+        - `try_encode_msgpack`
+        - `try_encode_ubjson`
+
+    - New non-throwing accessor `try_as<T>()` for `basic_json` that return a `std::expected<T,conversion_error>`-like result,
 
 - Changes
 
@@ -34,11 +48,15 @@
       they will produce JSON, BSON etc. with object names in the order that they appear as macro arguments. 
 
     - The `allocator_set` helper functions `combine_allocators` and `temp_allocator_only` have been 
-    deprecated and will be removed in a future release. Use `make_alloc_set` instead.
+      deprecated and will be removed in a future release. Use `make_alloc_set` instead.
 
     - The `jsoncons::csv::result_options::value` option has been deprecated and will be removed in a
       future release. See [What does result_options::value do in json_query()?](https://github.com/danielaparker/jsoncons/discussions/613)
       for the rationale for this change. Use `jsoncons::csv::result_options{}` instead.
+
+    - `basic_json::dump` and `encode_json` overloads that take a `jsoncons::indenting` argument have been
+      deprecated and will be removed in a future release. Use the `_pretty` overloads (introduced in 0.155.0) 
+      for prettified output (line indentation.) 
 
 - Breaking change to staj iterator classes
 

@@ -1,4 +1,4 @@
-### jsoncons::decode_json, jsoncons::try_decode_json
+### jsoncons::decode_json, try_decode_json
 
 Decodes a JSON data format to a C++ data structure. `decode_json` will 
 work for all C++ classes that support jsoncons reflection traits.

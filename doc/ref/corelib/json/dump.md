@@ -1,41 +1,49 @@
-### `jsoncons::basic_json::dump`
+### jsoncons::basic_json::dump, jsoncons::basic_json::dump_pretty
 
 ```cpp
+
+void dump(basic_json_visitor<char_type>& visitor) const;    (1)
+
 template <CharContainer>
 void dump(CharContainer& cont,
-    const basic_json_encode_options<char_type>& options 
-        = basic_json_encode_options<char_type>(),
-    indenting = indenting::no_indent) const;                            (1)
-
-template <CharContainer>
-void dump(CharContainer& cont, indenting indent) const;                 
+    const basic_json_encode_options<char_type>& options     (2)
+        = basic_json_encode_options<char_type>()) const;                
 
 void dump(std::basic_ostream<char_type>& os, 
-    const basic_json_encode_options<char_type>& options 
-        = basic_json_encode_options<char_type>(),
-    indenting = indenting::no_indent) const;                            (2)
-
-void dump(std::basic_ostream<char_type>& os, indenting indent) const;   
+    const basic_json_encode_options<char_type>& options     (3)
+        = basic_json_encode_options<char_type>();                
 
 template <CharContainer>
 void dump_pretty(CharContainer& cont,
-    const basic_json_encode_options<char_type>& options 
-        = basic_json_encode_options<char_type>()) const;                (3)
+    const basic_json_encode_options<char_type>& options     (4)
+        = basic_json_encode_options<char_type>()) const;    
 
 void dump_pretty(std::basic_ostream<char_type>& os, 
-    const basic_json_encode_options<char_type>& options 
-        = basic_json_encode_options<char_type>()) const;                (4)
+    const basic_json_encode_options<char_type>& options     (5)
+        = basic_json_encode_options<char_type>()) const;    
 
-void dump(basic_json_visitor<char_type>& visitor) const;                (5)
+template <CharContainer>
+void dump(CharContainer& cont,
+    const basic_json_encode_options<char_type>& options,    (6) (deprecated since 1.4.0)
+    indenting) const;                            
+                                                            
+template <CharContainer>
+void dump(CharContainer& cont, indenting indent) const;     (7) (deprecated since 1.4.0)
+
+void dump(std::basic_ostream<char_type>& os,                (8) (deprecated since 1.4.0)
+    indenting indent) const;   
 ```
 
-(1) Dumps a json value to a character container with "minified" output.
+(1) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
 
-(2) Dumps a json value to an output stream with "minified" output.
+(2) Dumps a json value to a character container with "minified" output (single line.)
 
-Functions (3)-(4) are identical to (1)-(2) except indenting is on.
+(3) Dumps a json value to an output stream with "minified" output.
 
-(5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
+Functions (4)-(5) are identical to (2)-(3) except with "prettified" output (line indentation.)
+
+Functions (6)-(8) that take an `indenting` argument are for backward
+compatibility, prefer `dump_pretty`. 
 
 #### Exceptions
 

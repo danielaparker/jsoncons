@@ -6,114 +6,114 @@ have json reflection traites defined.
 ```cpp
 #include <jsoncons/encode_json.hpp>
 
+template <typename T,typename CharT>                                            (1)
+void encode_json(const T& val, basic_json_visitor<CharT>& encoder);              
+
 template <typename T,typename CharContainer>
 void encode_json(const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (1)
+    const basic_json_encode_options<CharContainer::value_type>& options         (2)
         = basic_json_encode_options<CharContainer::value_type>();               
 
 template <typename T,typename CharT>                                             
 void encode_json(const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (2)
+    const basic_json_encode_options<CharT>& options                             (3)
         = basic_json_encode_options<CharT>();                                    
 
 template <typename T,typename CharContainer,typename Alloc,typename TempAlloc>
 void encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (3) (since 0.171.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (4) (since 0.171.0)
         = basic_json_encode_options<CharContainer::value_type>();               
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>                                             
 void encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (4) (since 0.171.0)
+    const basic_json_encode_options<CharT>& options                             (5) (since 0.171.0)
         = basic_json_encode_options<CharT>());                                  
 
 template <typename T,typename CharContainer>
 void encode_json_pretty(const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (5) (since 0.155.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (6) (since 0.155.0)
         = basic_json_encode_options<CharContainer::value_type>());              
 
 template <typename T,typename CharT>
 void encode_json_pretty(const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (6) (since 0.155.0)        
+    const basic_json_encode_options<CharT>& options                             (7) (since 0.155.0)        
         = basic_json_encode_options<CharT>());                                  
+
+template <typename T,typename CharT>
+write_result try_encode_json(const T& val, basic_json_visitor<CharT>& encoder); (8) (since 1.4.0)
 
 template <typename T,typename CharContainer>
 void encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (7) (since 1.4.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (9) (since 1.4.0)
         = basic_json_encode_options<CharContainer::value_type>());              
 
 template <typename T,typename CharT>
 void encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (8) (since 1.4.0)
+    const basic_json_encode_options<CharT>& options                             (10) (since 1.4.0)
         = basic_json_encode_options<CharT>());                                          
-
-template <typename T,typename CharT>                                            (9)
-void encode_json(const T& val, basic_json_visitor<CharT>& encoder);              
 
 template <typename T,typename CharContainer>
 write_result try_encode_json(const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (10) (since 1.4.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (11) (since 1.4.0)
         = basic_json_encode_options<CharContainer::value_type>();               
 
 template <typename T,typename CharT>                                             
 write_result try_encode_json(const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (11) (since 1.4.0)
+    const basic_json_encode_options<CharT>& options                             (12) (since 1.4.0)
         = basic_json_encode_options<CharT>();                                   
 
 template <typename T,typename CharContainer,typename Alloc,typename TempAlloc>
 write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (12) (since 1.4.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (13) (since 1.4.0)
         = basic_json_encode_options<CharContainer::value_type>();               
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>                                             
 write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (13) (since 1.4.0)
+    const basic_json_encode_options<CharT>& options                             (14) (since 1.4.0)
         = basic_json_encode_options<CharT>());                                  
 
 template <typename T,typename CharContainer>
 write_result try_encode_json_pretty(const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (14) (since 1.4.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (15) (since 1.4.0)
         = basic_json_encode_options<CharContainer::value_type>());              
 
 template <typename T,typename CharT>
 write_result try_encode_json_pretty(const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (15) (since 1.4.0)
+    const basic_json_encode_options<CharT>& options                             (16) (since 1.4.0)
         = basic_json_encode_options<CharT>());                                  
 
 template <typename T,typename CharContainer>
 write_result try_encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
-    const basic_json_encode_options<CharContainer::value_type>& options         (16) (since 1.4.0)
+    const basic_json_encode_options<CharContainer::value_type>& options         (17) (since 1.4.0)
         = basic_json_encode_options<CharContainer::value_type>());              
 
 template <typename T,typename CharT>
 write_result try_encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options                             (17) (since 1.4.0)
+    const basic_json_encode_options<CharT>& options                             (18) (since 1.4.0)
         = basic_json_encode_options<CharT>());                                          
-
-template <typename T,typename CharT>
-write_result try_encode_json(const T& val, basic_json_visitor<CharT>& encoder); (18) (since 1.4.0)
 ```
 
-(1) Encode `val` to a character container in compact format using the specified (or defaulted) [options](basic_json_options.md).
+(1) Write val to an encoder
 
-(2) Encode `val` to an output stream in compact format (single line) using the specified (or defaulted) [options](basic_json_options.md).
+(2) Encode `val` to a character container with "minified" output (single line) using the specified (or defaulted) [options](basic_json_options.md).
 
-Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](allocator_set.md) is passed as an additional argument.
+(3) Encode `val` to an output stream in "minified" output using the specified (or defaulted) [options](basic_json_options.md).
 
-(5) Encode `val` to a character container with indentation using the specified (or defaulted) [options](basic_json_options.md).
+Functions (4)-(5) are identical to (2)-(3) except an [allocator_set](allocator_set.md) is passed as an additional argument.
 
-(6) Encode `val` to an output stream with indentation using the specified (or defaulted) [options](basic_json_options.md).
+(6) Encode `val` to a character container with "prettified" output (line indentation) using the specified (or defaulted) [options](basic_json_options.md).
 
-Functions (7)-(8) are identical to (5)-(6) except an [allocator_set](allocator_set.md) is passed as an additional argument.
+(7) Encode `val` to an output stream with "prettified" output using the specified (or defaulted) [options](basic_json_options.md).
 
-(9) Write val to an encoder
+Functions (8)-(9) are identical to (6)-(7) except an [allocator_set](allocator_set.md) is passed as an additional argument.
 
 (10)-(18) Non-throwing versions of (1)-(9)
 
@@ -121,6 +121,10 @@ Functions (7)-(8) are identical to (5)-(6) except an [allocator_set](allocator_s
 #### Parameters
 
 <table>
+  <tr>
+    <td>aset</td>
+    <td>[allocator_set](../allocator_set)</td> 
+  </tr>
   <tr>
     <td>val</td>
     <td>C++ data structure</td> 
@@ -136,10 +140,6 @@ Functions (7)-(8) are identical to (5)-(6) except an [allocator_set](allocator_s
   <tr>
     <td>os</td>
     <td>Output stream</td> 
-  </tr>
-  <tr>
-    <td>indenting</td>
-    <td><code>indenting::indent</code> to pretty print, <code>indenting::no_indent</code> for compact output</td> 
   </tr>
 </table>
 

@@ -2802,8 +2802,21 @@ namespace jsoncons {
         template <typename CharContainer>
         typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
         dump(CharContainer& cont,
-             const basic_json_encode_options<char_type>& options = basic_json_options<CharT>(),
-             indenting indent = indenting::no_indent) const
+             const basic_json_encode_options<char_type>& options = basic_json_options<CharT>()) const
+        {
+            std::error_code ec;
+            dump(cont, options, indenting::no_indent, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                JSONCONS_THROW(ser_error(ec));
+            }
+        }
+
+        template <typename CharContainer>
+        typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value>::type
+        dump(CharContainer& cont,
+             const basic_json_encode_options<char_type>& options,
+             indenting indent) const
         {
             std::error_code ec;
             dump(cont, options, indent, ec);
@@ -2827,8 +2840,19 @@ namespace jsoncons {
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-            const basic_json_encode_options<char_type>& options = basic_json_options<CharT>(),
-            indenting indent = indenting::no_indent) const
+            const basic_json_encode_options<char_type>& options = basic_json_options<CharT>()) const
+        {
+            std::error_code ec;
+            dump(os, options, indenting::no_indent, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                JSONCONS_THROW(ser_error(ec));
+            }
+        }
+
+        void dump(std::basic_ostream<char_type>& os, 
+            const basic_json_encode_options<char_type>& options,
+            indenting indent) const
         {
             std::error_code ec;
             dump(os, options, indent, ec);

@@ -281,7 +281,7 @@ Throws `std::domain_error` if not an object.
 
 <table border="0">
   <tr>
-    <td><a href="json/dump.md"</a>dump</td>
+    <td><a href="json/dump.md"</a>dump, dump_pretty</td>
     <td>Serializes basic_json value to a string, stream, or <a href="./basic_json_visitor.md">basic_json_visitor</a>.</td> 
   </tr>
 </table>

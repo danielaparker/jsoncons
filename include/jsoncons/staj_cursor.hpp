@@ -15,6 +15,7 @@
 #include <memory> // std::allocator
 #include <system_error>
 
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
@@ -785,13 +786,15 @@ read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset,
     {
         case staj_event_type::string_value:
         {
-            auto j = Json{cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec), cursor.current().tag(), 
-                aset.get_allocator()};
-            return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+            auto sv = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
+            if (ec) return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+            return result_type{jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(),
+                sv.data(), sv.length(), cursor.current().tag())};
         }
         case staj_event_type::byte_string_value:
         {
-            auto j = Json{byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag(), aset.get_allocator()};
+            auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), 
+                byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
         case staj_event_type::null_value:
@@ -841,7 +844,8 @@ read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset,
     std::error_code ec;
 
     auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
-        Json(json_object_arg, aset.get_allocator()) : Json(json_array_arg, aset.get_allocator());
+        jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none) : 
+        jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
     std::vector<Json*,json_ptr_allocator_type> stack(aset.get_temp_allocator());
     stack.push_back(std::addressof(cont));
     key_type key(aset.get_temp_allocator());
