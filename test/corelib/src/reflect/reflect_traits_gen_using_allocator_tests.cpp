@@ -505,7 +505,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_all_m<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -529,7 +529,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 
@@ -573,7 +573,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_all_m_name<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -597,7 +597,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 
@@ -641,7 +641,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_3_m<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -666,7 +666,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 
@@ -715,7 +715,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_all_gs<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -739,7 +739,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 
@@ -788,7 +788,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_all_cg<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -812,7 +812,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 
@@ -861,7 +861,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
     SECTION("vector of book")
     {
         using book_type = ns::book_all_cg_name<cust_allocator<char>>;
-        using book_collection_type = std::vector<book_type,cust_allocator<book_type>>;
+        using books_type = std::vector<book_type,cust_allocator<book_type>>;
 
         std::string input = R"(
 [
@@ -885,7 +885,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
 
         cust_allocator<book_type> alloc(1);
         auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
-        auto r = try_decode_json<book_collection_type>(aset, input);
+        auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
 

@@ -59,8 +59,8 @@ typename std::enable_if<!ext_traits::is_basic_json<T>::value, write_result>::typ
 template <typename T,typename CharContainer>
 typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
 try_encode_json(const T& val, CharContainer& cont, 
-    const basic_json_encode_options<typename CharContainer::value_type>& options = 
-    basic_json_encode_options<typename CharContainer::value_type>())
+    const basic_json_encode_options<typename CharContainer::value_type>& options 
+        = basic_json_encode_options<typename CharContainer::value_type>())
 {
     using char_type = typename CharContainer::value_type;
 
@@ -72,7 +72,8 @@ try_encode_json(const T& val, CharContainer& cont,
 
 template <typename T,typename CharT>
 write_result try_encode_json(const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
+    const basic_json_encode_options<CharT>& options 
+        = basic_json_encode_options<CharT>())
 {
     basic_compact_json_encoder<CharT> encoder(os, options);
     return try_encode_json(val, encoder);
@@ -84,8 +85,8 @@ template <typename T,typename CharContainer,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
 try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, CharContainer& cont, 
-    const basic_json_encode_options<typename CharContainer::value_type>& options = 
-    basic_json_encode_options<typename CharContainer::value_type>())
+    const basic_json_encode_options<typename CharContainer::value_type>& options 
+        = basic_json_encode_options<typename CharContainer::value_type>())
 {
     using char_type = typename CharContainer::value_type;
 
@@ -99,7 +100,8 @@ try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
 write_result try_encode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
+    const basic_json_encode_options<CharT>& options 
+        = basic_json_encode_options<CharT>())
 {
     basic_compact_json_encoder<CharT,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     return try_encode_json(aset, val, encoder);
@@ -111,7 +113,8 @@ template <typename T,typename CharContainer>
 typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
 try_encode_json_pretty(const T& val,
     CharContainer& cont, 
-    const basic_json_encode_options<typename CharContainer::value_type>& options = basic_json_encode_options<typename CharContainer::value_type>())
+    const basic_json_encode_options<typename CharContainer::value_type>& options 
+        = basic_json_encode_options<typename CharContainer::value_type>())
 {
     using char_type = typename CharContainer::value_type;
     basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>> encoder(cont, options);
@@ -121,10 +124,34 @@ try_encode_json_pretty(const T& val,
 template <typename T,typename CharT>
 write_result try_encode_json_pretty(const T& val,
     std::basic_ostream<CharT>& os, 
-    const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
+    const basic_json_encode_options<CharT>& options 
+        = basic_json_encode_options<CharT>())
 {
     basic_json_encoder<CharT> encoder(os, options);
     return try_encode_json(val, encoder);
+}
+
+template <typename T,typename CharContainer,typename Alloc,typename TempAlloc>
+typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
+try_encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset, const T& val,
+    CharContainer& cont, 
+    const basic_json_encode_options<typename CharContainer::value_type>& options 
+        = basic_json_encode_options<typename CharContainer::value_type>())
+{
+    using char_type = typename CharContainer::value_type;
+    basic_json_encoder<char_type,jsoncons::string_sink<CharContainer>> encoder(cont, options,
+        aset.get_temp_allocator());
+    return try_encode_json(aset, val, encoder);
+}
+
+template <typename T,typename CharT,typename Alloc,typename TempAlloc>
+write_result try_encode_json_pretty(const allocator_set<Alloc,TempAlloc>& aset,const T& val,
+    std::basic_ostream<CharT>& os, 
+    const basic_json_encode_options<CharT>& options 
+        = basic_json_encode_options<CharT>())
+{
+    basic_json_encoder<CharT> encoder(os, options, aset.get_temp_allocator());
+    return try_encode_json(aset, val, encoder);
 }
 
 // legacy
