@@ -330,8 +330,8 @@ void json_type_traits_optional_examples()
     std::string output1;
     std::string output2;
 
-    encode_json(val2, output2, indenting::indent);
-    encode_json(val1, output1, indenting::indent);
+    encode_json_pretty(val2, output2);
+    encode_json_pretty(val1, output1);
 
     std::cout << "(1)\n";
     std::cout << output1 << "\n\n";
@@ -400,7 +400,7 @@ void json_type_traits_book_examples()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -413,7 +413,7 @@ void json_type_traits_book_examples()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -426,7 +426,7 @@ void json_type_traits_book_examples()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -439,7 +439,7 @@ void json_type_traits_book_examples()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 

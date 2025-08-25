@@ -565,7 +565,7 @@ std::string s;
 
 j.dump(s); // compressed
 
-j.dump(s, indenting::indent); // pretty print
+j.dump_pretty(s); // pretty print
 ```
 
 <div id="B5"/>
@@ -605,7 +605,7 @@ j.dump(json_string);
 ```
 j.dump(std::cout); // compressed
 
-j.dump(std::cout, indenting::indent); // pretty print
+j.dump_pretty(std::cout); // pretty print
 ```
 or
 ```
@@ -1237,7 +1237,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1250,7 +1250,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1263,7 +1263,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1276,7 +1276,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1450,7 +1450,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1463,7 +1463,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1476,7 +1476,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1489,7 +1489,7 @@ int main()
                   << item.getPrice() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1698,7 +1698,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
+    encode_json_pretty(book_list, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1802,8 +1802,8 @@ int main()
     std::string output1;
     std::string output2;
 
-    encode_json(val2, output2, indenting::indent);
-    encode_json(val1, output1, indenting::indent);
+    encode_json_pretty(val2, output2);
+    encode_json_pretty(val1, output1);
 
     std::cout << "(1)\n";
     std::cout << output1 << "\n\n";
@@ -2054,7 +2054,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json(v, s, indenting::indent);
+    encode_json_pretty(v, s);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }

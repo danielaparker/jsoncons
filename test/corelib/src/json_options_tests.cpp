@@ -458,7 +458,7 @@ TEST_CASE("json_options line_indent")
             .spaces_around_comma(jsoncons::spaces_option::space_after)
             .line_splits(jsoncons::line_split_kind::same_line);
         std::string buffer;
-        jsoncons::encode_json(j_arr, buffer, options, jsoncons::indenting::indent);
+        jsoncons::encode_json_pretty(j_arr, buffer, options);
 
         CHECK(j_str == buffer);
     }
@@ -470,7 +470,7 @@ TEST_CASE("json_options line_indent")
             .spaces_around_comma(jsoncons::spaces_option::space_after)
             .line_splits(jsoncons::line_split_kind::same_line);
         std::string buffer;
-        jsoncons::encode_json(j_arr, buffer, options, jsoncons::indenting::indent);
+        jsoncons::encode_json_pretty(j_arr, buffer, options);
 
         CHECK(j_str == buffer);
     }

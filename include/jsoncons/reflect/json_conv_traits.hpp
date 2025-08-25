@@ -1258,7 +1258,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template <typename Alloc, typename TempAlloc>
         static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const jsoncons::optional<T>& val)
         {
-            return val.has_value() ? jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *val, semantic_tag::none) : Json::null();
+            return val.has_value() ? jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *val) : Json::null();
         }
     };
 

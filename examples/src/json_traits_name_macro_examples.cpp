@@ -37,11 +37,12 @@ namespace ns {
         BookCategory category_;
         std::string author_;
         std::string title_;
-        double price_;
-        Book2() = default;
+        double price_{0};
 
         JSONCONS_TYPE_TRAITS_FRIEND
     public:
+        Book2() = default;
+
         BookCategory category() const {return category_;}
 
         const std::string& author() const {return author_;}
@@ -281,7 +282,7 @@ void json_type_traits_book_examples()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -294,7 +295,7 @@ void json_type_traits_book_examples()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -307,7 +308,7 @@ void json_type_traits_book_examples()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -320,7 +321,7 @@ void json_type_traits_book_examples()
                   << item.getPrice() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 
@@ -352,7 +353,7 @@ void translate_ids_from_to_employees()
     std::cout << "\n";
 
     std::string output;
-    encode_json(company, output, indenting::indent);
+    encode_json_pretty(company, output);
     std::cout << "(2)\n" << output << "\n\n";
 }
 
@@ -382,7 +383,7 @@ void tidy_member()
     std::cout << "\n";
 
     std::string output;
-    encode_json(persons, output, indenting::indent);
+    encode_json_pretty(persons, output);
     std::cout << "(2)\n" << output << "\n";
 
 }

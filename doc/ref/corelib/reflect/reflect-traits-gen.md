@@ -383,7 +383,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
+    encode_json_pretty(book_list, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -509,7 +509,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json(v, s, indenting::indent);
+    encode_json_pretty(v, s);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -1676,7 +1676,7 @@ int main()
     std::cout << "\n";
 
     std::string output;
-    encode_json(company, output, indenting::indent);
+    encode_json_pretty(company, output);
     std::cout << "(2)\n" << output << "\n\n";
 }
 ```
@@ -1780,7 +1780,7 @@ int main()
     std::cout << "\n";
 
     std::string output;
-    jsoncons::encode_json(persons, output, indenting::indent);
+    jsoncons::encode_json_pretty(persons, output);
     std::cout << "(2)\n" << output << "\n";
 }
 ```

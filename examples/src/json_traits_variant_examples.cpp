@@ -235,7 +235,7 @@ void variant_example()
     }
 
     std::string output;
-    jsoncons::encode_json(basket, output, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(basket, output);
     std::cout << "(2)\n" << output << "\n\n";
 }
 
@@ -246,7 +246,7 @@ void variant_example2()
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
-    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(vars, buffer);
 
     std::cout << "(1)\n" << buffer << "\n\n";
 
@@ -281,7 +281,7 @@ void variant_example3()
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
-    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(vars, buffer);
 
     std::cout << "(1)\n" << buffer << "\n\n";
 
@@ -373,7 +373,7 @@ void distinguish_by_type()
     }
 
     std::string output;
-    jsoncons::encode_json(shapes, output, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(shapes, output);
     std::cout << "\n(2)\n" << output << "\n";
 }
 

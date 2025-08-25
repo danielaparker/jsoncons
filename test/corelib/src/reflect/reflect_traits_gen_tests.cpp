@@ -432,9 +432,8 @@ namespace ns {
         JSONCONS_TYPE_TRAITS_FRIEND
 
     public:
-        hiking_reputation()
-        {
-        }
+        hiking_reputation() = default;
+
         hiking_reputation(const std::string& application, const std::vector<hiking_reputon>& reputons)
             : application(application), reputons(reputons)
         {}
@@ -970,7 +969,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
         val.someString = "A string";
 
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         auto val2 = decode_json<value_type>(s);
 
@@ -989,7 +988,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
         val.aT2 = 2;
 
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         auto val2 = decode_json<value_type>(s);
 
@@ -1007,7 +1006,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
         val.aT2 = L"sss";
 
         std::wstring s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         auto val2 = decode_json<value_type>(s);
 
@@ -1027,7 +1026,7 @@ TEST_CASE("JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS tests")
         value_type val(std::make_pair(1,2), "A string");
 
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         auto val2 = decode_json<value_type>(s);
 
@@ -1399,7 +1398,7 @@ TEST_CASE("hiking_reputation")
     SECTION("2")
     {
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
         auto val2 = decode_json<ns::hiking_reputation>(s);
         CHECK(val2 == val);
     }
@@ -1416,7 +1415,7 @@ TEST_CASE("hiking_reputation")
     SECTION("4")
     {
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
         auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1), s);
         CHECK(val2 == val);
     }
@@ -1424,7 +1423,7 @@ TEST_CASE("hiking_reputation")
     SECTION("5")
     {
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
         auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
                                                        s, json_options());
         CHECK(val2 == val);

@@ -29,7 +29,7 @@ void tuple_example()
     };
 
     std::string json_data;
-    encode_json(results, json_data, indenting::indent);
+    encode_json_pretty(results, json_data);
     std::cout << json_data << "\n\n";
     auto results1 = decode_json<std::vector<qualifying_results_type>>(json_data);
     assert(results1 == results);

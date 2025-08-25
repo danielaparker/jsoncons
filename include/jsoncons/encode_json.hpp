@@ -8,14 +8,13 @@
 #define JSONCONS_ENCODE_JSON_HPP
 
 #include <ostream>
-#include <system_error>
-#include <tuple>
 
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/ser_util.hpp>
+#include <jsoncons/allocator_set.hpp>
 
 namespace jsoncons {
 

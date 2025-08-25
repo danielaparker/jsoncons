@@ -461,7 +461,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
         val.someString = "A string";
 
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         json j = decode_json<json>(s);
         CHECK(j["some-string"].as<std::string>() == val.someString);
@@ -486,7 +486,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
         val.aT2 = 2;
 
         std::string s;
-        encode_json(val, s, indenting::indent);
+        encode_json_pretty(val, s);
 
         json j = decode_json<json>(s);
         CHECK(1 == j["a-t1"].as<int>());
