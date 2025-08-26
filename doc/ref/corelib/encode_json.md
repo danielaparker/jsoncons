@@ -117,13 +117,12 @@ Functions (8)-(9) are identical to (6)-(7) except an [allocator_set](allocator_s
 
 (10)-(18) Non-throwing versions of (1)-(9)
 
-
 #### Parameters
 
 <table>
   <tr>
     <td>aset</td>
-    <td>[allocator_set](../allocator_set)</td> 
+    <td>[allocator_set](allocator_set.md)</td> 
   </tr>
   <tr>
     <td>val</td>

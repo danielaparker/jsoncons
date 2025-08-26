@@ -72,6 +72,27 @@ or support [json_type_traits](json_type_traits/json_type_traits.md).
 
 (6)-(10) Non-throwing versions of (1)-(5)
 
+#### Parameters
+
+<table>
+  <tr>
+    <td>aset</td>
+    <td>[allocator_set](allocator_set.md)</td> 
+  </tr>
+  <tr>
+    <td>s</td>
+    <td>Character sequence</td> 
+  </tr>
+  <tr>
+    <td>is</td>
+    <td>Input stream</td> 
+  </tr>
+  <tr>
+    <td>options</td>
+    <td>Deserialization options</td> 
+  </tr>
+</table>
+
 #### Return value
 
 (1)-(5) Deserialized value

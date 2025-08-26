@@ -215,7 +215,7 @@ int main()
 
 ### See also
 
-[allocator_set](../allocator_set)  
+[allocator_set](../allocator_set.md)  
 [decode_json, try_decode_json](../decode_json.md)  
 [encode_json, encode_json_pretty, try_encode_json, try_encode_json_pretty](../encode_json.md)  
 [basic_json](../basic_json.md)  
