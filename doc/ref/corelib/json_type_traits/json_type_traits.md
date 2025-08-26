@@ -40,8 +40,8 @@ try to convert `val` into a `Json` value.
 jsoncons includes specializiations for most types in the standard library. 
 And it includes convenience macros that make specializing `json_type_traits` for your own types easier.
 
-[Built-in Specializations](json_type_traits/built-in-specializations.md)
+[Built-in Specializations](built-in-specializations.md)
 
-[Custom Specializations](json_type_traits/custom-specializations.md)
+[Custom Specializations](custom-specializations.md)
 
 
