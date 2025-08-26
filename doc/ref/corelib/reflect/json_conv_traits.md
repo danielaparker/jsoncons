@@ -231,7 +231,7 @@ instead of `jsoncons::make_obj_using_allocator`.
 - To save typing and enhance readability, you can use the convenience macro `JSONCONS_ALL_MEMBER_TRAITS` to generate the traits classes,
 
 ```
-JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
+JSONCONS_TMPL_ALL_MEMBER_TRAITS(1, ns::book, author, title, price)
 ```
 
 
