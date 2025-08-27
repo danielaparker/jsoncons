@@ -51,7 +51,8 @@ macros that make specializing `json_conv_traits` for your own types easier.
 
 ### See also
 
-[conversion_result](../conversion_result.md)
+[allocator_set](../allocator_set.md)  
+[conversion_result](../conversion_result.md)  
 
 ### Examples
 
