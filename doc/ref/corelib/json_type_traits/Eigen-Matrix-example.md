@@ -1,6 +1,6 @@
 ### Eigen::Matrix examples
 
-This example shows how to specialize [json_conv_traits](json_conv_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+This example shows how to specialize [json_type_traits](json_type_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
 It defines separate `json_type_traits` class templates for the dynamic and fixed sized row/column cases.
 
 ```cpp
