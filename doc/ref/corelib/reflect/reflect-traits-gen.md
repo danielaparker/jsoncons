@@ -1092,7 +1092,6 @@ namespace ns {
 
     class Fruit 
     {
-    private:
         JSONCONS_TYPE_TRAITS_FRIEND
         std::string name_;
         Color color_;
@@ -1106,7 +1105,6 @@ namespace ns {
 
     class Fabric 
     {
-    private:
       JSONCONS_TYPE_TRAITS_FRIEND
       int size_;
       std::string material_;
@@ -1118,8 +1116,8 @@ namespace ns {
         }
     };
 
-    class Basket {
-     private:
+    class Basket 
+    {
       JSONCONS_TYPE_TRAITS_FRIEND
       std::string owner_;
       std::vector<std::variant<Fruit, Fabric>> items_;

@@ -1096,10 +1096,11 @@ namespace ns {
         std::string author;
         std::string title;
         double price{0};
-        Book2() = default;
 
         JSONCONS_TYPE_TRAITS_FRIEND
     public:
+        Book2() = default;
+
         BookCategory get_category() const {return category;}
 
         const std::string& get_author() const {return author;}
@@ -1343,10 +1344,11 @@ namespace ns {
         std::string author_;
         std::string title_;
         double price_;
-        Book2() = default;
 
         JSONCONS_TYPE_TRAITS_FRIEND
     public:
+        Book2() = default;
+
         BookCategory category() const {return category_;}
 
         const std::string& author() const {return author_;}
@@ -1538,21 +1540,19 @@ namespace ns {
 
     class Person
     {
-    public:
-        Person(const std::string& name, const std::string& surname,
-               const std::string& ssn, unsigned int age)
-           : name(name), surname(surname), ssn(ssn), age(age) { }
-
-    private:
         // Make json_type_traits specializations friends to give accesses to private members
         JSONCONS_TYPE_TRAITS_FRIEND
-
-        Person() : age(0) {}
 
         std::string name;
         std::string surname;
         std::string ssn;
-        unsigned int age;
+        unsigned int age{0};
+    public:
+        Person() = default;
+
+        Person(const std::string& name, const std::string& surname,
+               const std::string& ssn, unsigned int age)
+           : name(name), surname(surname), ssn(ssn), age(age) { }
     };
 
 } // namespace ns
@@ -2574,8 +2574,9 @@ namespace ns {
         }
     };
 
-    class Basket {
-     private:
+    class Basket 
+    {
+    private:
       JSONCONS_TYPE_TRAITS_FRIEND
       std::string owner_;
       std::vector<std::variant<Fruit, Fabric>> items_;

@@ -51,8 +51,15 @@ namespace ns {
 
     class Person
     {
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND
+
+        std::string name;
+        std::string surname;
+        std::string ssn;
+        unsigned int age{0};
     public:
-        Person() : age(0) {}
+        Person() = default;
 
         Person(const std::string& name, const std::string& surname,
                const std::string& ssn, unsigned int age)
@@ -64,15 +71,6 @@ namespace ns {
                    age == rhs.age;
         }
         bool operator!=(const Person& rhs) const { return !(rhs == *this); }
-
-    private:
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND
-
-        std::string name;
-        std::string surname;
-        std::string ssn;
-        unsigned int age;
     };
 
     enum class hiking_experience {beginner,intermediate,advanced};
