@@ -61,6 +61,7 @@ macros that make specializing `json_conv_traits` for your own types easier.
 ```cpp
 #include <jsoncons/json.hpp>
 #include <string>
+#include <optional>
 #include <iostream>
 #include <cassert>
 
@@ -145,10 +146,13 @@ struct json_conv_traits<Json, ns::OptionalExample>
     {
         Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg);
         j.try_emplace("text", val.text);
-        j.try_emplace("optional", val.optional ? *val.optional : nullptr);
+        if (val.optional)
+        {
+            j.try_emplace("optional", *val.optional);
+        }
         if (val.optional_skip)
         {
-            j.try_emplace("optional_skip", val.optional_skip);
+            j.try_emplace("optional_skip", *val.optional_skip);
         }
         return j;
     }
