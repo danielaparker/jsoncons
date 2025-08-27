@@ -1,4 +1,4 @@
-1.4.0 preview
+1.4.0
 -----
 
 - Fixed bug:
