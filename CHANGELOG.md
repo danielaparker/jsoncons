@@ -21,7 +21,7 @@
     - New reflection trait definitions, `jsoncons::reflect::json_conv_traits`, that support non-throwing conversions and user-allocator construction.
       These replace `jsoncons::json_type_traits`, but for backwards compatability, `json_conv_traits` defaults to `json_type_traits` if a type conversion is undefined.
 
-    - New non-throwing versions of the decode functions that return a `std::expected<T,read_error>`-like result,
+    - New non-throwing versions of the decode functions that return a `std::expected`-like result (like `std::expected<T,jsoncons::read_error>`),
 
         - `try_decode_json`
         - `try_decode_csv`
@@ -30,7 +30,7 @@
         - `try_decode_msgpack`
         - `try_decode_ubjson`
 
-    - New non-throwing versions of the encode functions that return a `std::expected<void,write_error>`-like result,
+    - New non-throwing versions of the encode functions that return a `std::expected`-like result (like `std::expected<void,jsoncons::write_error>`),
 
         - `try_encode_json`
         - `try_encode_csv`

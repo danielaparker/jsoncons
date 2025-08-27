@@ -13,12 +13,10 @@ and a value of some other type. `json_conv_traits` implementations must speciali
 template <typename Json,typename T,typename Enable=void>
 struct json_conv_traits
 {
-    using result_type = conversion_result<T>;
-
     static constexpr bool is(const Json& j) noexcept;
 
     template<typename Alloc,typename TempAlloc>
-    static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j);
+    static conversion_result<T> try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j);
 
     template <typename Alloc, typename TempAlloc>
     static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val);
@@ -37,9 +35,9 @@ type in the variant case.
 The function 
 
     template <typename Alloc, typename TempAlloc>
-    T try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
+    conversion_result<T> try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
 
-tries to convert `j` to a value of type `T`.
+tries to convert `j` to a value of type `T` and returns an `std::expected`-like result (like `std::expected<T,jsoncons::conversion_error>`.)
 
 The function 
 
@@ -50,6 +48,10 @@ tries to convert `val` into a `Json` value.
 
 jsoncons includes specializiations for most types in the standard library. And it includes convenience 
 macros that make specializing `json_conv_traits` for your own types easier.
+
+### See also
+
+[conversion_result](../conversion_result.md)
 
 ### Examples
 
