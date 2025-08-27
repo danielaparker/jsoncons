@@ -18,7 +18,7 @@
     - New `basic_json_options` member `lossless_bignum`. If `true`, reads out of range floating point numbers 
     as strings with tag `semantic_tag::bigdec`. Defaults to true.
 
-    - New reflection trait definitions, `jsoncons::reflect::json_conv_traits`, that support non-throwing conversions and user-allocator construction.
+    - New reflection trait definitions, `jsoncons::reflect::json_conv_traits`, that support non-throwing conversions and uses-allocator construction.
       These replace `jsoncons::json_type_traits`, but for backwards compatability, `json_conv_traits` defaults to `json_type_traits` if a type conversion is undefined.
 
     - New non-throwing versions of the decode functions that return a `std::expected`-like result (like `std::expected<T,jsoncons::read_error>`),

@@ -1,6 +1,7 @@
 ### Uses-allocator construction example (requires 1.4.0)
 
-This example illustrates user-allocator construction for types with `json_conv_traits` traits defined. In the
+This example illustrates [uses-allocator construction](https://en.cppreference.com/w/cpp/memory/uses_allocator.html) 
+for types with [json_conv_traits](json_conv_traits.md) traits defined. In the
 example, a user supplied stateful allocator is provided when invoking `jsoncons::try_decode_json`. This
 allocator is used for all result allocations, including the allocated memory for `std::shared_ptr<Employee<Alloc>>`
 and the string type member of `Employee<Alloc>`. A second allocator is provided for allocating memory for 
