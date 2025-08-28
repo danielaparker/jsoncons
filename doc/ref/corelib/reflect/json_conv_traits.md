@@ -374,7 +374,7 @@ Output:
 - If you're using C++20 or higher, you can use [std::make_obj_using_allocator](https://en.cppreference.com/w/cpp/memory/make_obj_using_allocator.html) 
 in `try_as` and `to_json` instead of `jsoncons::make_obj_using_allocator`.
 
-- To save typing and enhance readability, you can use the convenience macro `JSONCONS_ALL_MEMBER_TRAITS` to generate the traits classes,
+- To save typing and enhance readability, you can use the convenience macro `JSONCONS_TMPL_ALL_MEMBER_TRAITS` to generate the traits classes,
 
 ```
     JSONCONS_TMPL_ALL_MEMBER_TRAITS(1, ns::book, author, title, price)
