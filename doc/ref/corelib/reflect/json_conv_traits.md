@@ -160,9 +160,6 @@ struct json_conv_traits<Json, ns::OptionalExample>
 } // namespace reflect
 } // namespace jsoncons
 
-// Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
-//JSONCONS_N_MEMBER_TRAITS(OptionalExample, 1, text, optional, optional_skip);
-
 int main()
 {
     std::error_code ec;
