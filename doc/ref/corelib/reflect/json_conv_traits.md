@@ -97,7 +97,7 @@ struct json_conv_traits<Json, ns::OptionalExample>
 
         if (!j.is_object())
         {
-            return result_type(jsoncons::unexpect, conv_errc::not_object, "ns::OptionalExample");
+            return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::OptionalExample");
         }
 
         value_type val;
@@ -251,13 +251,13 @@ struct json_conv_traits<Json, ns::book<Alloc>>
             j.contains("title") && j.contains("price");
     }
     template <typename Alloc, typename TempAlloc>
-    static conversion_result<value_type> try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
+    static conversion_result<value_type> try_as(const allocator_set<Alloc, TempAlloc>& aset, const Json& j)
     {
         using result_type = conversion_result<value_type>;
 
         if (!j.is_object())
         {
-            return result_type(jsoncons::unexpect, conv_errc::not_object, "ns::book");
+            return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::book");
         }
 
         auto val = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
@@ -343,7 +343,7 @@ int main()
     )";
 
     cust_allocator<book_type> alloc(1);
-    auto aset = jsoncons::make_alloc_set<cust_allocator<book_type>>(alloc);
+    auto aset = jsoncons::make_alloc_set(alloc);
     auto rin = jsoncons::try_decode_json<books_type>(aset, input);
     assert(rin);
 

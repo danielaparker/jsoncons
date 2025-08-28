@@ -528,7 +528,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
@@ -596,7 +596,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
@@ -665,7 +665,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
@@ -738,7 +738,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
@@ -811,7 +811,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
@@ -884,7 +884,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
         )";
 
         cust_allocator<book_type> alloc(1);
-        auto aset = make_alloc_set<cust_allocator<book_type>>(alloc);
+        auto aset = make_alloc_set(alloc);
         auto r = try_decode_json<books_type>(aset, input);
 
         REQUIRE(r);
