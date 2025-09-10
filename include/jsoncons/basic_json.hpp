@@ -2169,9 +2169,9 @@ namespace jsoncons {
             return basic_json(array());
         }
 
-        static basic_json make_array(const array& alloc)
+        static basic_json make_array(const array& a)
         {
-            return basic_json(alloc);
+            return basic_json(a);
         }
 
         static basic_json make_array(const array& a, allocator_type alloc)
