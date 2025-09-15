@@ -364,7 +364,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 
         auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
         REQUIRE_FALSE(result);
-        CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        CHECK(jsoncons::conv_errc::not_map == result.error().code()                                    );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("missing member")
@@ -393,7 +393,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 
         auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
         REQUIRE_FALSE(result);
-        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
 } 
@@ -593,7 +593,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
-        //CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        //CHECK(jsoncons::conv_errc::not_map == result.error().code()                                    );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("missing member")
@@ -623,7 +623,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
-        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
 }
@@ -733,7 +733,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
         REQUIRE_FALSE(result);
-        //CHECK(jsoncons::conv_errc::expected_object == result.error().code()                                    );
+        //CHECK(jsoncons::conv_errc::not_map == result.error().code()                                    );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("missing member")
@@ -763,7 +763,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
         REQUIRE_FALSE(result);
-        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
 }
@@ -850,7 +850,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
         REQUIRE_FALSE(result);
-        CHECK(jsoncons::conv_errc::expected_object == result.error().code());
+        CHECK(jsoncons::conv_errc::not_map == result.error().code());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("missing member")
@@ -880,7 +880,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
         REQUIRE_FALSE(result);
         CHECK("ns::book_2_gs" == result.error().message_arg());
-        CHECK(conv_errc::conversion_failed == result.error().code()                         );
+        CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
 }

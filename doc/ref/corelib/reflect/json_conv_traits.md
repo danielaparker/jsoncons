@@ -97,7 +97,7 @@ struct json_conv_traits<Json, ns::OptionalExample>
 
         if (!j.is_object())
         {
-            return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::OptionalExample");
+            return result_type(jsoncons::unexpect, conv_errc::not_map, "ns::OptionalExample");
         }
 
         value_type val;
@@ -257,7 +257,7 @@ struct json_conv_traits<Json, ns::book<Alloc>>
 
         if (!j.is_object())
         {
-            return result_type(jsoncons::unexpect, conv_errc::expected_object, "ns::book");
+            return result_type(jsoncons::unexpect, conv_errc::not_map, "ns::book");
         }
 
         auto val = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator());
