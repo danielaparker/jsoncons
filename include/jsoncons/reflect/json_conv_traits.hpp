@@ -858,15 +858,18 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static bool is(const Json& j) noexcept
         {
-            bool result = j.is_object();
+            if (!j.is_object())
+            {
+                return false;
+            }
             for (const auto& member : j.object_range())
             {
                 if (!member.value().template is<mapped_type>())
                 {
-                    result = false;
+                    return false;
                 }
             }
-            return result;
+            return true;
         }
 
         template <typename Alloc, typename TempAlloc>
@@ -876,7 +879,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 return result_type(jsoncons::unexpect, conv_errc::not_map);
             }
-            T result = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+            auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
             for (const auto& item : j.object_range())
             {
                 auto key = jsoncons::make_obj_using_allocator<key_type>(aset.get_allocator(), 
@@ -886,26 +889,32 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 {
                     return result_type(jsoncons::unexpect, r2.error().code(), r2.error().message_arg());
                 }
-                result.emplace(std::move(key), std::move(*r2));
+                val.emplace(std::move(key), std::move(*r2));
             }
 
-            return result_type(std::move(result));
+            return result_type(std::move(val));
         }
 
         template <typename Alloc, typename TempAlloc>
         static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
-            return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, val.begin(), val.end(), semantic_tag::none);
+            Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none);
+            j.reserve(val.size());
+            for (const auto& item : val)
+            {
+                j.try_emplace(jsoncons::make_obj_using_allocator<typename Json::key_type>(aset.get_allocator(), item.first.data(), item.first.length()), item.second);
+            }
+            return j;
         }
     };
 
     template <typename Json,typename T>
     struct json_conv_traits<Json, T, 
-                            typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
-                                                    ext_traits::is_map_like<T>::value &&
-                                                    !ext_traits::is_string<typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
-                                                    is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && 
+                                ext_traits::is_map_like<T>::value &&
+                                !ext_traits::is_string<typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::key_type>::value &&
+                                is_json_conv_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         using mapped_type = typename T::mapped_type;
@@ -935,6 +944,11 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         template <typename Alloc, typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j) 
         {
+            if (!j.is_object())
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_map);
+            }
+
             auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
             for (const auto& item : j.object_range())
             {

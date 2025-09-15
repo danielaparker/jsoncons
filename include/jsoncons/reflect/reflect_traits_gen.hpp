@@ -82,7 +82,7 @@ struct json_traits_helper
         auto result = it->value().template try_as<T>(aset); 
         if (!result)
         {
-            return conversion_result<T>(unexpect, conv_errc::conversion_failed);
+            return conversion_result<T>(unexpect, result.error());
         }
         return conversion_result<T>(std::move(*result));
     } 

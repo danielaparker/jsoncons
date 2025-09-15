@@ -989,15 +989,12 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1); 
     }
-
 /*
     SECTION("decode vector of unique_ptr")
     {
         using employee_type = ns::Employee <cust_allocator<char>>;
         using element_type = std::unique_ptr<employee_type,allocator_delete<cust_allocator<employee_type>>>;
         using value_type = std::vector<element_type,cust_allocator<element_type>>;
-
-        std::cout << "sizeof(employee_type) : " << sizeof(employee_type) << "\n";
 
         auto aset = make_alloc_set(alloc);
         auto r = jsoncons::try_decode_json<value_type>(aset, input);
@@ -1012,26 +1009,26 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1);
     }
-*/
 
-    /*SECTION("decode vector of unique_ptr test")
+    SECTION("decode vector of unique_ptr test")
     {
 
-        auto v = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
+        auto v = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Employee<std::allocator<char>>>>>(input);
         REQUIRE(2 == v.size());
-        CHECK(v[0]->firstName() == firstName0);
-        CHECK(v[0]->lastName() == lastName0);
-        CHECK(v[0]->calculatePay() == pay0);
-        CHECK(v[1]->firstName() == firstName1);
-        CHECK(v[1]->lastName() == lastName1);
-        CHECK(v[1]->calculatePay() == pay1);
+        CHECK((v[0]->firstName() == firstName0));
+        CHECK((v[0]->lastName() == lastName0));
+        CHECK((v[0]->calculatePay() == pay0));
+        CHECK((v[1]->firstName() == firstName1));
+        CHECK((v[1]->lastName() == lastName1));
+        CHECK((v[1]->calculatePay() == pay1));
     }
+
     SECTION("encode vector of shared_ptr test")
     {
-        std::vector<std::shared_ptr<ns::Employee>> v;
+        std::vector<std::shared_ptr<ns::Employee<std::allocator<char>>>> v;
 
-        v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
-        v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
+        v.push_back(std::make_shared<ns::HourlyEmployee<std::allocator<char>>>("John", "Smith", 40.0, 1000));
+        v.push_back(std::make_shared<ns::CommissionedEmployee<std::allocator<char>>>("Jane", "Doe", 30000, 0.25, 1000));
 
         jsoncons::json j(v);
 
@@ -1040,16 +1037,17 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
     }
     SECTION("encode vector of unique_ptr test")
     {
-        std::vector<std::unique_ptr<ns::Employee>> v;
+        std::vector<std::unique_ptr<ns::Employee<std::allocator<char>>>> v;
 
-        v.emplace_back(new ns::HourlyEmployee("John", "Smith", 40.0, 1000));
-        v.emplace_back(new ns::CommissionedEmployee("Jane", "Doe", 30000, 0.25, 1000));
+        v.emplace_back(new ns::HourlyEmployee<std::allocator<char>>("John", "Smith", 40.0, 1000));
+        v.emplace_back(new ns::CommissionedEmployee<std::allocator<char>>("Jane", "Doe", 30000, 0.25, 1000));
 
         jsoncons::json j(v);
 
         json expected = json::parse(input);
         CHECK(expected == j);
-    }*/
+    }
+    */
 }
 
 #endif
