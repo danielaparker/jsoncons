@@ -482,6 +482,24 @@ TEST_CASE("json constructor tests")
         CHECK(j["string key too long for short string"].as_string_view() == jsoncons::string_view("string value too long for short string"));
         CHECK(v[0].value().is_null()); // moved
     }
+    SECTION("json from std::pair iterator")
+    {
+        using key_value_type = std::pair<std::string, json>;
+        std::vector<key_value_type> v = {key_value_type("string key too long for short string", "string value too long for short string"), key_value_type("and this one is also too long",2)};
+
+        json j{json_object_arg, std::move_iterator(v.begin()), std::move_iterator(v.end())};
+        CHECK(j["string key too long for short string"].as_string_view() == jsoncons::string_view("string value too long for short string"));
+        CHECK(v[0].second.is_null()); // moved
+    }
+    SECTION("ojson from std::pair iterator")
+    {
+        using key_value_type = std::pair<std::string, ojson>;
+        std::vector<key_value_type> v = {key_value_type("string key too long for short string", "string value too long for short string"), key_value_type("and this one is also too long",2)};
+
+        ojson j{json_object_arg, std::move_iterator(v.begin()), std::move_iterator(v.end())};
+        CHECK(j["string key too long for short string"].as_string_view() == jsoncons::string_view("string value too long for short string"));
+        CHECK(v[0].second.is_null()); // moved
+    }
 }
 TEST_CASE("json(string_view)")
 {
