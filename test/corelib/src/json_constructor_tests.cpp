@@ -214,6 +214,7 @@ TEST_CASE("json constructor with scoped_allocator")
 {
     using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<char>>;
     using cust_json = basic_json<char,sorted_policy,cust_allocator>;
+    using cust_ojson = basic_json<char,order_preserving_policy,cust_allocator>;
 
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);
@@ -353,11 +354,11 @@ TEST_CASE("json constructor with scoped_allocator")
         REQUIRE(alloc2 == j3.get_allocator()); 
     }        
 
-    SECTION("iterator constructor")
+    SECTION("sorted policy iterator constructor")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
-        /*cust_json j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
+        cust_json j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator());
         REQUIRE(3 == j1.size());
         CHECK(3 == j1.at("a"));
@@ -368,7 +369,24 @@ TEST_CASE("json constructor with scoped_allocator")
         REQUIRE(alloc1 == j2.get_allocator()); 
 
         cust_json j3{std::move(j2), alloc2};
-        REQUIRE(alloc2 == j3.get_allocator());*/ 
+        REQUIRE(alloc2 == j3.get_allocator());
+    }
+    SECTION("order preserving policy iterator constructor")
+    {
+        std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
+
+        cust_ojson j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        REQUIRE(3 == j1.size());
+        CHECK(3 == j1.at("a"));
+        CHECK(2 == j1.at("b"));
+        CHECK(1 == j1.at("c"));
+
+        cust_ojson j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_ojson j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator());
     }
 }
 
@@ -445,6 +463,24 @@ TEST_CASE("json constructor tests")
         REQUIRE(2 == j2.size());
         CHECK(1 == j2[0].as<int>());
         CHECK(2 == j2[1].as<int>());
+    }
+    SECTION("json from key_value iterator")
+    {
+        using key_value_type = key_value<std::string, json>;
+        std::vector<key_value_type> v = {key_value_type("string key too long for short string", "string value too long for short string"), key_value_type("and this one is also too long",2)};
+
+        json j{json_object_arg, std::move_iterator(v.begin()), std::move_iterator(v.end())};
+        CHECK(j["string key too long for short string"].as_string_view() == jsoncons::string_view("string value too long for short string"));
+        CHECK(v[0].value().is_null()); // moved
+    }
+    SECTION("ojson from key_value iterator")
+    {
+        using key_value_type = key_value<std::string, ojson>;
+        std::vector<key_value_type> v = {key_value_type("string key too long for short string", "string value too long for short string"), key_value_type("and this one is also too long",2)};
+
+        ojson j{json_object_arg, std::move_iterator(v.begin()), std::move_iterator(v.end())};
+        CHECK(j["string key too long for short string"].as_string_view() == jsoncons::string_view("string value too long for short string"));
+        CHECK(v[0].value().is_null()); // moved
     }
 }
 TEST_CASE("json(string_view)")
