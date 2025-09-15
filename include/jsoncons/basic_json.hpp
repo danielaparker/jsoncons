@@ -2169,9 +2169,9 @@ namespace jsoncons {
             return basic_json(array());
         }
 
-        static basic_json make_array(const array& alloc)
+        static basic_json make_array(const array& a)
         {
-            return basic_json(alloc);
+            return basic_json(a);
         }
 
         static basic_json make_array(const array& a, allocator_type alloc)
@@ -2435,6 +2435,12 @@ namespace jsoncons {
             construct<array_storage>(ptr, tag);
         }
 
+        basic_json(const array& val, semantic_tag tag, allocator_type alloc)
+        {
+            auto ptr = create_array(alloc, val);
+            construct<array_storage>(ptr, tag);
+        }
+
         basic_json(array&& val, semantic_tag tag = semantic_tag::none)
         {
             auto alloc = val.get_allocator();
@@ -2447,6 +2453,12 @@ namespace jsoncons {
             auto ptr = create_object(
                 std::allocator_traits<Allocator>::select_on_container_copy_construction(val.get_allocator()), 
                 val);
+            construct<object_storage>(ptr, tag);
+        }
+
+        basic_json(const object& val, semantic_tag tag, allocator_type alloc)
+        {
+            auto ptr = create_object(alloc, val);
             construct<object_storage>(ptr, tag);
         }
 
