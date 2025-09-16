@@ -716,7 +716,7 @@ namespace detail {
             }
             else
             {
-                //if (options_.bignum_format() != bignum_format_kind::raw)
+                //if (tag != semantic_tag::bigdec)
                 //    std::cout << "esc\n";
                 sink_.push_back('\"');
                 std::size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
@@ -1351,36 +1351,14 @@ namespace detail {
             }
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) final
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
                 sink_.push_back(',');
             }
 
-            switch (tag)
-            {
-                case semantic_tag::bigint:
-                    write_bignum_value(sv);
-                    break;
-                case semantic_tag::bigdec:
-                {
-                    // output lossless number
-                    if (options_.bignum_format() == bignum_format_kind::raw)
-                    {
-                        write_bignum_value(sv);
-                        break;
-                    }
-                    JSONCONS_FALLTHROUGH;
-                }
-                default:
-                {
-                    sink_.push_back('\"');
-                    jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
-                    sink_.push_back('\"');
-                    break;
-                }
-            }
+            write_string(sv, tag, context, ec);
 
             if (!stack_.empty())
             {
@@ -1413,8 +1391,8 @@ namespace detail {
             }
             else
             {
-                if (options_.bignum_format() != bignum_format_kind::raw)
-                    std::cout << "esc\n";
+                //if (tag != semantic_tag::bigdec)
+                //    std::cout << "esc\n";
                 sink_.push_back('\"');
                 jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
                 sink_.push_back('\"');
@@ -1422,9 +1400,9 @@ namespace detail {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                                  semantic_tag tag,
-                                  const ser_context&,
-                                  std::error_code&) final
+            semantic_tag tag,
+            const ser_context&,
+            std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {

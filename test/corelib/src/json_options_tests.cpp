@@ -476,6 +476,24 @@ TEST_CASE("json_options line_indent")
     }
 }
 
+TEST_CASE("json_options escape_solidus")
+{
+    SECTION("escape_solidus")
+    {
+        std::string j_str = R"(["1", "/2", 3, 4])";
+        jsoncons::json j_arr = jsoncons::json::parse(j_str);
+        auto options = json_options{}
+            .escape_solidus(true);
+
+        std::string expected = R"(["1","\/2",3,4])";
+        std::string buffer;
+        jsoncons::encode_json(j_arr, buffer, options);
+        std::cout << buffer << "\n";
+
+        CHECK(expected == buffer);
+    }
+}
+
 TEST_CASE("array_object with/without line_length_limit")
 {
     std::string s = R"(
