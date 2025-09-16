@@ -256,7 +256,7 @@ namespace jsoncons {
         template <typename T1,typename T2>
         key_value_type operator()(const std::pair<T1,T2>& p) 
         {
-            return key_value_type(p.first,p.second);
+            return key_value_type(KeyT(p.first), ValueT(p.second));
         }
 
         template <typename T1,typename T2, typename Alloc>
