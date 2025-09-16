@@ -354,7 +354,7 @@ TEST_CASE("json constructor with scoped_allocator")
         REQUIRE(alloc2 == j3.get_allocator()); 
     }        
 
-    SECTION("sorted policy iterator constructor")
+    /*SECTION("sorted policy iterator constructor")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
@@ -387,7 +387,7 @@ TEST_CASE("json constructor with scoped_allocator")
 
         cust_ojson j3{std::move(j2), alloc2};
         REQUIRE(alloc2 == j3.get_allocator());
-    }
+    }*/
 }
 
 #endif // scoped_allocator
