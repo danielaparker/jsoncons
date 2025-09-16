@@ -81,10 +81,6 @@ namespace jsoncons {
         value_type value_;
     public:
 
-        key_value() noexcept
-        {
-        }
-
         template <typename... Args>
         key_value(key_type&& name,  Args&& ... args) 
             : key_(std::move(name)), value_(std::forward<Args>(args)...)
@@ -249,7 +245,7 @@ namespace std
 namespace jsoncons {
 
     template <typename KeyT,typename ValueT>
-    struct get_key_value
+    struct make_key_value
     {
         using key_value_type = key_value<KeyT,ValueT>;
 
@@ -381,7 +377,7 @@ namespace jsoncons {
             members_.reserve(count);
             for (auto it = first; it != last; ++it)
             {
-                auto kv = get_key_value<KeyT,Json>()(*it);
+                auto kv = make_key_value<KeyT,Json>()(*it);
                 members_.emplace_back(std::move(kv));
             }
             std::stable_sort(members_.begin(),members_.end(),
@@ -400,7 +396,7 @@ namespace jsoncons {
             members_.reserve(count);
             for (auto it = first; it != last; ++it)
             {
-                auto kv = get_key_value<KeyT,Json>()(*it, alloc);
+                auto kv = make_key_value<KeyT,Json>()(*it, alloc);
                 members_.emplace_back(std::move(kv));
             }
             std::stable_sort(members_.begin(), members_.end(),
@@ -1097,7 +1093,7 @@ namespace jsoncons {
             std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                auto kv = get_key_value<KeyT,Json>()(*it);
+                auto kv = make_key_value<KeyT,Json>()(*it);
                 if (keys.find(kv.key()) == keys.end())
                 {
                     keys.emplace(kv.key());
@@ -1114,7 +1110,7 @@ namespace jsoncons {
             std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                auto kv = get_key_value<KeyT,Json>()(*it, alloc);
+                auto kv = make_key_value<KeyT,Json>()(*it, alloc);
                 if (keys.find(kv.key()) == keys.end())
                 {
                     keys.emplace(kv.key());
@@ -1361,7 +1357,7 @@ namespace jsoncons {
         {
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
+                members_.emplace_back(make_key_value<KeyT,Json>()(*it));
             }
         }
    
