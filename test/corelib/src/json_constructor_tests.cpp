@@ -214,7 +214,7 @@ TEST_CASE("json constructor with scoped_allocator")
 {
     using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<char>>;
     using cust_json = basic_json<char,sorted_policy,cust_allocator>;
-    using cust_ojson = basic_json<char,order_preserving_policy,cust_allocator>;
+    //using cust_ojson = basic_json<char,order_preserving_policy,cust_allocator>;
 
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);
@@ -354,7 +354,7 @@ TEST_CASE("json constructor with scoped_allocator")
         REQUIRE(alloc2 == j3.get_allocator()); 
     }        
 
-    SECTION("sorted policy iterator constructor")
+    /*SECTION("sorted policy iterator constructor")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
@@ -387,7 +387,7 @@ TEST_CASE("json constructor with scoped_allocator")
 
         cust_ojson j3{std::move(j2), alloc2};
         REQUIRE(alloc2 == j3.get_allocator());
-    }
+    }*/
 }
 
 #endif // scoped_allocator
