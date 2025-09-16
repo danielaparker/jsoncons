@@ -12,7 +12,6 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
-#include <variant>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -298,29 +297,6 @@ namespace ns {
         std::string surname;
     };
 
-    typedef std::variant<
-        std::unordered_map<std::string, std::string>,
-        std::unordered_map<std::string, std::unordered_map<std::string, std::string>>,
-        std::string,
-        std::vector<std::string>,
-        int64_t,
-        std::vector<int64_t>,
-        double,
-        std::vector<double>,
-        bool,
-        std::vector<bool>
-    >
-        VARIANTTYPE;
-
-    class SerialisableClass
-    {
-    public:
-        SerialisableClass() = default;
-
-        std::string m_sStr;
-        VARIANTTYPE m_data;
-    };
-
 } // ns
 } // namespace 
 
@@ -335,10 +311,6 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::book_2_gs, 2, (get_author,set_author,"A
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::SerialisableClass,
-    (m_sStr, "str"),
-    (m_data, "data")
-)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 {
@@ -909,10 +881,48 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
         REQUIRE_FALSE(result);
         CHECK("ns::book_2_gs" == result.error().message_arg());
-        CHECK(conv_errc::not_double == result.error().code()                         );
+        CHECK(conv_errc::not_double == result.error().code());
         //std::cout << result.error() .message() << "\n";
     }
 }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+
+#include <variant>
+
+namespace {
+namespace ns {
+
+    typedef std::variant<
+        std::unordered_map<std::string, std::string>,
+        std::unordered_map<std::string, std::unordered_map<std::string, std::string>>,
+        std::string,
+        std::vector<std::string>,
+        int64_t,
+        std::vector<int64_t>,
+        double,
+        std::vector<double>,
+        bool,
+        std::vector<bool>
+    >
+        VARIANTTYPE;
+
+    class SerialisableClass
+    {
+    public:
+        SerialisableClass() = default;
+
+        std::string m_sStr;
+        VARIANTTYPE m_data;
+    };
+
+} // ns
+} // namespace 
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::SerialisableClass,
+    (m_sStr, "str"),
+    (m_data, "data")
+)
 
 TEST_CASE("JSONCONS_All_MEMBER_NAME_TRAITS variant tests")
 {
@@ -949,3 +959,5 @@ TEST_CASE("JSONCONS_All_MEMBER_NAME_TRAITS variant tests")
         CHECK("value1" == m["key1"]);
     }
 }
+
+#endif
