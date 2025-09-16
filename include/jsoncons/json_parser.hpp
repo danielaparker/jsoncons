@@ -152,6 +152,7 @@ private:
     bool cursor_mode_{false};
     int mark_level_{0};
     
+    semantic_tag escape_tag_;
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> buffer_;
 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -692,6 +693,7 @@ public:
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
+                            escape_tag_ = semantic_tag::noesc;
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
@@ -877,6 +879,7 @@ public:
                             push_state(parse_state::member_name);
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
+                            escape_tag_ = semantic_tag::noesc;
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
@@ -934,6 +937,7 @@ public:
                             push_state(parse_state::member_name);
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
+                            escape_tag_ = semantic_tag::noesc;
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
@@ -1061,6 +1065,7 @@ public:
                             ++position_;
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
+                            escape_tag_ = semantic_tag::noesc;
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
@@ -1212,6 +1217,7 @@ public:
                             ++position_;
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
+                            escape_tag_ = semantic_tag::noesc;
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
@@ -1989,6 +1995,7 @@ text:
                     buffer_.append(sb,cur-sb);
                     position_ += (cur - sb + 1);
                     ++cur;
+                    escape_tag_ = semantic_tag{};
                     goto escape;
                 }
                 case '\"':
@@ -2533,7 +2540,7 @@ private:
                 }
                 else
                 {
-                    visitor.string_value(sv, semantic_tag::none, *this, ec);
+                    visitor.string_value(sv, escape_tag_, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 state_ = parse_state::expect_comma_or_end;
@@ -2549,7 +2556,7 @@ private:
                 }
                 else
                 {
-                    visitor.string_value(sv, semantic_tag::none, *this, ec);
+                    visitor.string_value(sv, escape_tag_, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 state_ = parse_state::accept;
