@@ -12,6 +12,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include <variant>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -297,8 +298,32 @@ namespace ns {
         std::string surname;
     };
 
+    typedef std::variant<
+        std::unordered_map<std::string, std::string>,
+        std::unordered_map<std::string, std::unordered_map<std::string, std::string>>,
+        std::string,
+        std::vector<std::string>,
+        int64_t,
+        std::vector<int64_t>,
+        double,
+        std::vector<double>,
+        bool,
+        std::vector<bool>
+    >
+        VARIANTTYPE;
+
+    class SerialisableClass
+    {
+    public:
+        SerialisableClass() = default;
+
+        std::string m_sStr;
+        VARIANTTYPE m_data;
+    };
+
 } // ns
 } // namespace 
+
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book_all_m,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bool_all_m_a,(author,"Author"),(title,"Title"),(price,"Price"))
@@ -310,6 +335,10 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::book_2_gs, 2, (get_author,set_author,"A
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::SerialisableClass,
+    (m_sStr, "str"),
+    (m_data, "data")
+)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 {
@@ -885,3 +914,38 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
     }
 }
 
+TEST_CASE("JSONCONS_All_MEMBER_NAME_TRAITS variant tests")
+{
+    SECTION("std::string")
+    {
+        std::string sJson1 = R"(
+    {
+        "str": "string_value1",
+        "data": "string_value2"
+    }
+        )";
+
+        ns::SerialisableClass w;
+        REQUIRE_NOTHROW(w = jsoncons::decode_json<ns::SerialisableClass>(sJson1));
+        std::string s;
+        REQUIRE_NOTHROW( s = std::get<std::string>(w.m_data));
+        CHECK("string_value2" == s);
+    }
+    SECTION("std::unordered_map<std::string, std::unordered_map<std::string, std::string>>")
+    {
+        std::string sJson2 = R"(
+    {
+        "str": "string_value",
+        "data": {
+            "key1": "value1"
+        }        
+    }
+        )";
+
+        ns::SerialisableClass w;
+        REQUIRE_NOTHROW(w = jsoncons::decode_json<ns::SerialisableClass>(sJson2));
+        std::unordered_map<std::string, std::string> m;
+        REQUIRE_NOTHROW(m = std::get<std::unordered_map<std::string, std::string>>(w.m_data));
+        CHECK("value1" == m["key1"]);
+    }
+}
