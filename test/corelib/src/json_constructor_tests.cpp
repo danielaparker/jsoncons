@@ -214,7 +214,7 @@ TEST_CASE("json constructor with scoped_allocator")
 {
     using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<char>>;
     using cust_json = basic_json<char,sorted_policy,cust_allocator>;
-    using cust_ojson = basic_json<char,order_preserving_policy,cust_allocator>;
+    //using cust_ojson = basic_json<char,order_preserving_policy,cust_allocator>;
 
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);
