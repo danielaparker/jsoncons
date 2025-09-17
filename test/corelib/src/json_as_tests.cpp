@@ -108,7 +108,7 @@ TEST_CASE("json::as<__int128>()")
 {
     std::string s1 = "-18446744073709551617";
 
-    __int128 n;
+    __int128 n{};
     auto result = jsoncons::utility::dec_to_integer(s1.data(),s1.size(), n);
     REQUIRE(result.ec == std::errc());
 
@@ -129,7 +129,7 @@ TEST_CASE("json::as<unsigned __int128>()")
 {
     std::string s1 = "18446744073709551616";
 
-    unsigned __int128 n;
+    unsigned __int128 n{};
 
     auto result = jsoncons::utility::dec_to_integer(s1.data(),s1.size(), n);
     REQUIRE(result.ec == std::errc());
