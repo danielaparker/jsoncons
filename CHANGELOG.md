@@ -1,3 +1,16 @@
+1.4.1
+-----
+
+This patch fixes some issues reported with v1.4.0
+
+- Fixed bug:
+
+    - Git PR #628: fixed uninitialized warning 
+    - Git Issue #631: Using std::variant with std::unordered_map can throw uncatchable exception 
+    - Git PR #633: Fix make_array() call 
+    - Git Issue #634: Regression in encode_json et al. from v1.3.2 to v1.4.0 with std::variant using std::map
+    - Git Issue #635: Support construction of sorted_json_object from moved-in pairs
+
 1.4.0
 -----
 
