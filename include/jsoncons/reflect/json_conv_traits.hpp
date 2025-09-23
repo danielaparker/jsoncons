@@ -74,10 +74,12 @@ namespace reflect {
             {
                 return result_type(json_type_traits<Json,T>::as(j));
             }
+	    #if !defined(JSONCONS_NO_EXCEPTIONS)
             JSONCONS_CATCH (const ser_error& ec)
             {
                 return result_type(jsoncons::unexpect, ec.code());
             }
+	    #endif
         }
 
         template <typename Alloc, typename TempAlloc>
