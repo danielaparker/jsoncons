@@ -13,6 +13,15 @@
 #define JSONCONS_VERSION_MINOR 4
 #define JSONCONS_VERSION_PATCH 1
 
+#define JSONCONS_VERSION_CONCAT_EX(major, minor, patch) \
+    # major ## "." ## # minor ## "." ## # patch
+
+#define JSONCONS_VERSION_CONCAT(major, minor, patch) \
+    JSONCONS_VERSION_CONCAT_EX(major, minor, patch)
+
+#define JSONCONS_VERSION_STRING                                 \
+    JSONCONS_VERSION_CONCAT(JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH)
+
 namespace jsoncons {
 
 struct versioning_info
@@ -27,7 +36,7 @@ struct versioning_info
            << ver.minor << '.'
            << ver.patch;
         return os;
-    }
+    } 
 }; 
 
 constexpr versioning_info version()
