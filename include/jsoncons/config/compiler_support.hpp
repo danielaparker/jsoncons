@@ -12,6 +12,25 @@
 #include <cstring> // std::memcpy
 #include <limits> // std::numeric_limits
 
+#if (!defined(JSONCONS_NO_EXCEPTIONS))
+// Check if exceptions are disabled.
+#  if defined( __cpp_exceptions) && __cpp_exceptions == 0
+#   define JSONCONS_NO_EXCEPTIONS 1
+#  endif
+#endif
+
+#if !defined(JSONCONS_NO_EXCEPTIONS)
+#if defined(__GNUC__) && !defined(__EXCEPTIONS)
+# define JSONCONS_NO_EXCEPTIONS 1
+#elif defined(_MSC_VER)
+#if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
+# define JSONCONS_NO_EXCEPTIONS 1
+#elif !defined(_CPPUNWIND)
+# define JSONCONS_NO_EXCEPTIONS 1
+#endif
+#endif
+#endif
+
 #if !defined(JSONCONS_NO_EXCEPTIONS)
     #define JSONCONS_THROW(exception) throw exception
     #define JSONCONS_RETHROW throw
@@ -245,26 +264,6 @@
 #   endif
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_FILESYSTEM)
-
-#if (!defined(JSONCONS_NO_EXCEPTIONS))
-// Check if exceptions are disabled.
-#  if defined( __cpp_exceptions) && __cpp_exceptions == 0
-#   define JSONCONS_NO_EXCEPTIONS 1
-#  endif
-#endif
-
-#if !defined(JSONCONS_NO_EXCEPTIONS)
-
-#if defined(__GNUC__) && !defined(__EXCEPTIONS)
-# define JSONCONS_NO_EXCEPTIONS 1
-#elif defined(_MSC_VER)
-#if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
-# define JSONCONS_NO_EXCEPTIONS 1
-#elif !defined(_CPPUNWIND)
-# define JSONCONS_NO_EXCEPTIONS 1
-#endif
-#endif
-#endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
    #if defined(__clang__) && defined(__cplusplus)
