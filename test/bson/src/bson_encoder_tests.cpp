@@ -238,14 +238,8 @@ TEST_CASE("serialize object to bson")
     encoder.end_object();
     encoder.flush();
 
-    JSONCONS_TRY
-    {
-        json result = bson::decode_bson<json>(v);
-    }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << '\n';
-    }
+    auto result = bson::try_decode_bson<json>(v);
+    REQUIRE(result);
 }
 
 struct bson_bytes_encoder_reset_test_fixture
