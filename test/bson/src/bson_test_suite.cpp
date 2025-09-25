@@ -43,7 +43,8 @@ TEST_CASE("bson c test suite")
         j.try_emplace("hello", "world"); 
 
         std::vector<char> bytes2;
-        REQUIRE_NOTHROW(bson::encode_bson(j, bytes2));
+        auto result = bson::try_encode_bson(j, bytes2);
+        REQUIRE(result);
         //std::cout << byte_string_view(bytes2) << "\n\n";
         //std::cout << byte_string_view(bytes) << "\n\n";
         CHECK(bytes2 == bytes);
