@@ -74,7 +74,7 @@ namespace reflect {
             {
                 return result_type(json_type_traits<Json,T>::as(j));
             }
-            JSONCONS_CATCH (const ser_error& ec)
+            JSONCONS_CATCH (...)
             {
                 return result_type(jsoncons::unexpect, conv_errc::conversion_failed );
             }
