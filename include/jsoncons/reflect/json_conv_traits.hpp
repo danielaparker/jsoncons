@@ -76,7 +76,7 @@ namespace reflect {
             }
             JSONCONS_CATCH (const ser_error& ec)
             {
-                return result_type(jsoncons::unexpect, ec.code());
+                return result_type(jsoncons::unexpect, conv_errc::conversion_failed );
             }
         }
 
