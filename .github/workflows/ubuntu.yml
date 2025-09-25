@@ -30,6 +30,30 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
+  github_20_no_exceptions: 
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - g++-12
+        build_type: [Debug, Release]
+
+    runs-on: ubuntu-latest
+
+    env:
+      CXX: ${{ matrix.compiler }}
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: cmake
+      run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On -fno_exceptions
+
+    - working-directory: build/
+      run: cmake --build . --config ubuntu-latest
+
+    - working-directory: build/
+      run: ctest -C ubuntu-latest --output-on-failure
+
   gcc_build:
     runs-on: ubuntu-latest
 
