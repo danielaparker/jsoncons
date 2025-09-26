@@ -519,4 +519,14 @@ TEST_CASE("cust_json merge_or_update test")
     }
 }
 
+#include <jsoncons/flat_hash_map.hpp>
+
+TEST_CASE("ujson tests")
+{
+    SECTION("test1")
+    {       	
+        ska::flat_hash_map<std::string, json> your_hash_map;
+    }
+}
+
 #endif
