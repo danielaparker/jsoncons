@@ -1,3 +1,10 @@
+1.4.2
+-----
+
+- Fixed bug:
+
+    - Git PR #638: Fixed issue with compiling with `-fno_exceptions`
+
 1.4.1
 -----
 
