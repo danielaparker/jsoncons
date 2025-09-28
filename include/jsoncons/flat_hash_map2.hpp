@@ -24,6 +24,156 @@
  
 namespace jsoncons {
 
+// key_value2
+
+template <typename KeyT,typename ValueT>
+class key_value2
+{
+public:
+    using key_type = KeyT;
+    using value_type = ValueT;
+    using string_view_type = typename value_type::string_view_type;
+    using allocator_type = typename ValueT::allocator_type;
+private:
+
+    key_type key_;
+    value_type value_;
+public:
+
+    key_value2(const KeyT& key, const ValueT& value)
+        : key_(key), value_(value)
+    {
+    }
+
+    template< class KT = KeyT, class VT = ValueT >
+    key_value2(KT&& key, VT&& value)
+        : key_(std::forward<KT>(key), std::forward<VT>(value))
+    {
+    }
+
+    template <typename... Args>
+    key_value2(key_type&& name,  Args&& ... args) 
+        : key_(std::move(name)), value_(std::forward<Args>(args)...)
+    {
+    }
+    key_value2(const key_value2& member)
+        : key_(member.key_), value_(member.value_)
+    {
+    }
+
+    key_value2(const key_value2& member, const allocator_type& alloc)
+        : key_(member.key_, alloc), value_(member.value_, alloc)
+    {
+    }
+
+    key_value2(key_value2&& member) noexcept
+        : key_(std::move(member.key_)), value_(std::move(member.value_))
+    {
+    }
+
+    key_value2(key_value2&& member, const allocator_type& alloc) noexcept
+        : key_(std::move(member.key_), alloc), value_(std::move(member.value_), alloc)
+    {
+    }
+
+    const key_type& key() const
+    {
+        return key_;
+    }
+
+    value_type& value()
+    {
+        return value_;
+    }
+
+    const value_type& value() const
+    {
+        return value_;
+    }
+
+    template <typename T>
+    void value(T&& newValue)
+    {
+        value_ = std::forward<T>(newValue);
+    }
+
+    void swap(key_value2& member) noexcept
+    {
+        key_.swap(member.key_);
+        value_.swap(member.value_);
+    }
+
+    key_value2& operator=(const key_value2& member)
+    {
+        if (this != & member)
+        {
+            key_ = member.key_;
+            value_ = member.value_;
+        }
+        return *this;
+    }
+
+    key_value2& operator=(key_value2&& member) noexcept
+    {
+        if (this != &member)
+        {
+            key_.swap(member.key_);
+            value_.swap(member.value_);
+        }
+        return *this;
+    }
+
+    void shrink_to_fit() 
+    {
+        key_.shrink_to_fit();
+        value_.shrink_to_fit();
+    }
+
+    friend bool operator==(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        return lhs.key_ == rhs.key_ && lhs.value_ == rhs.value_;
+    }
+
+    friend bool operator!=(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        return !(lhs == rhs);
+    }
+
+    friend bool operator<(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        if (lhs.key_ < rhs.key_)
+        {
+            return true;
+        }
+        if (lhs.key_ == rhs.key_ && lhs.value_ < rhs.value_)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    friend bool operator<=(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        return !(rhs < lhs);
+    }
+
+    friend bool operator>(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        return !(lhs <= rhs);
+    }
+
+    friend bool operator>=(const key_value2& lhs, const key_value2& rhs) noexcept
+    {
+        return !(lhs < rhs);
+    }
+
+    friend void swap(key_value2& a, key_value2& b) noexcept(
+        noexcept(std::declval<key_value2&>().swap(std::declval<key_value2&>()))) 
+    {
+        a.swap(b);
+    }
+};
+
 struct prime_number_hash_policy;
 struct power_of_two_hash_policy;
 struct fibonacci_hash_policy;
@@ -90,21 +240,21 @@ struct KeyOrValueHasher : functor_storage<size_t, hasher>
     }
     size_t operator()(const ValueT & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.first);
+        return static_cast<hasher_storage &>(*this)(value.key());
     }
     size_t operator()(const ValueT & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.first);
+        return static_cast<const hasher_storage &>(*this)(value.key());
     }
     template<typename F, typename S>
     size_t operator()(const std::pair<F, S> & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.first);
+        return static_cast<hasher_storage &>(*this)(value.key());
     }
     template<typename F, typename S>
     size_t operator()(const std::pair<F, S> & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.first);
+        return static_cast<const hasher_storage &>(*this)(value.key());
     }
 };
 template<typename KeyT, typename ValueT, typename KeyEqual>
@@ -122,40 +272,40 @@ struct KeyOrValueEquality : functor_storage<bool, KeyEqual>
     }
     bool operator()(const KeyT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
     }
     bool operator()(const ValueT & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs);
     }
     bool operator()(const ValueT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const KeyT & lhs, const std::pair<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const std::pair<F,S> & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs);
     }
     template<typename F, typename S>
     bool operator()(const ValueT & lhs, const std::pair<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const std::pair<F,S> & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename FL, typename SL, typename FR, typename SR>
     bool operator()(const std::pair<FL, SL> & lhs, const std::pair<FR, SR> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
 };
 static constexpr int8_t min_lookups = 4;
@@ -1334,31 +1484,31 @@ public:
 
     inline V & operator[](const K & key)
     {
-        return emplace(key, V()).first->second;
+        return emplace(key, convertible_to_value()).first->value();
     }
     inline V & operator[](K && key)
     {
-        return emplace(std::move(key), V{}).first->second;
+        return emplace(std::move(key), convertible_to_value()).first->value();
     }
     V & at(const K & key)
     {
         auto found = this->find(key);
         if (found == this->end())
             throw std::out_of_range("Argument passed to at() was not in the map.");
-        return found->second;
+        return found->value();
     }
     const V & at(const K & key) const
     {
         auto found = this->find(key);
         if (found == this->end())
             throw std::out_of_range("Argument passed to at() was not in the map.");
-        return found->second;
+        return found->value();
     }
 
     using Table::emplace;
     std::pair<typename Table::iterator, bool> emplace()
     {
-        return emplace(key_type(), V{});
+        return emplace(key_type(), convertible_to_value());
     }
     template<typename M>
     std::pair<typename Table::iterator, bool> insert_or_assign(const key_type & key, M && m)
@@ -1405,6 +1555,15 @@ public:
     {
         return !(lhs == rhs);
     }
+
+private:
+    struct convertible_to_value
+    {
+        operator V() const
+        {
+            return V();
+        }
+    };
 };
 
 template<typename T, typename H = std::hash<T>, typename E = std::equal_to<T>, typename A = std::allocator<T> >

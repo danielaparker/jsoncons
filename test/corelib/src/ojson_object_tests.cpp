@@ -9,6 +9,7 @@
 #include <ctime>
 #include <map>
 #include <iterator>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -518,15 +519,4 @@ TEST_CASE("cust_json merge_or_update test")
         CHECK(expected == doc);
     }
 }
-
-#include <jsoncons/flat_hash_map.hpp>
-
-TEST_CASE("ujson tests")
-{
-    SECTION("test1")
-    {       	
-        ska::flat_hash_map<std::string, json> your_hash_map;
-    }
-}
-
 #endif
