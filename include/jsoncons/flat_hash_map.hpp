@@ -15,6 +15,7 @@
 #include <iterator>
 #include <utility>
 #include <type_traits>
+#include <jsoncons/key_value.hpp>
 
 #ifdef _MSC_VER
 #define JSONCONS_NOINLINE2(...) __declspec(noinline) __VA_ARGS__
@@ -90,21 +91,21 @@ struct KeyOrValueHasher : functor_storage<size_t, hasher>
     }
     size_t operator()(const ValueT & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.first);
+        return static_cast<hasher_storage &>(*this)(value.key());
     }
     size_t operator()(const ValueT & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.first);
+        return static_cast<const hasher_storage &>(*this)(value.key());
     }
     template<typename F, typename S>
-    size_t operator()(const std::pair<F, S> & value)
+    size_t operator()(const key_value<F, S> & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.first);
+        return static_cast<hasher_storage &>(*this)(value.key());
     }
     template<typename F, typename S>
-    size_t operator()(const std::pair<F, S> & value) const
+    size_t operator()(const key_value<F, S> & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.first);
+        return static_cast<const hasher_storage &>(*this)(value.key());
     }
 };
 template<typename KeyT, typename ValueT, typename KeyEqual>
@@ -122,40 +123,40 @@ struct KeyOrValueEquality : functor_storage<bool, KeyEqual>
     }
     bool operator()(const KeyT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
     }
     bool operator()(const ValueT & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs);
     }
     bool operator()(const ValueT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
-    bool operator()(const KeyT & lhs, const std::pair<F,S> & rhs)
+    bool operator()(const KeyT & lhs, const key_value<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
     }
     template<typename F, typename S>
-    bool operator()(const std::pair<F,S> & lhs, const KeyT & rhs)
+    bool operator()(const key_value<F,S> & lhs, const KeyT & rhs)
     {
         return static_cast<equality_storage &>(*this)(lhs.first, rhs);
     }
     template<typename F, typename S>
-    bool operator()(const ValueT & lhs, const std::pair<F,S> & rhs)
+    bool operator()(const ValueT & lhs, const key_value<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
-    bool operator()(const std::pair<F,S> & lhs, const ValueT & rhs)
+    bool operator()(const key_value<F,S> & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
     template<typename FL, typename SL, typename FR, typename SR>
-    bool operator()(const std::pair<FL, SL> & lhs, const std::pair<FR, SR> & rhs)
+    bool operator()(const key_value<FL, SL> & lhs, const key_value<FR, SR> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs.first);
+        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
     }
 };
 static constexpr int8_t min_lookups = 4;
@@ -1297,30 +1298,30 @@ private:
     int8_t shift_ = 63;
 };
 
-template<typename K, typename V, typename H = std::hash<K>, typename E = std::equal_to<K>, typename A = std::allocator<std::pair<K,V> > >
+template<typename K, typename V, typename H = std::hash<K>, typename E = std::equal_to<K>, typename A = std::allocator<key_value<K,V> > >
 class flat_hash_map
         : public detailv3::sherwood_v3_table
         <
-            std::pair<K,V>,
+            key_value<K,V>,
             K,
             H,
-            detailv3::KeyOrValueHasher<K, std::pair<K,V>, H>,
+            detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
             E,
-            detailv3::KeyOrValueEquality<K, std::pair<K,V>, E>,
+            detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
             A,
-            typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<std::pair<K,V>>>
+            typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
         >
 {
     using Table = detailv3::sherwood_v3_table
     <
-        std::pair<K,V>,
+        key_value<K,V>,
         K,
         H,
-        detailv3::KeyOrValueHasher<K, std::pair<K,V>, H>,
+        detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
         E,
-        detailv3::KeyOrValueEquality<K, std::pair<K,V>, E>,
+        detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
         A,
-        typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<std::pair<K,V>>>
+        typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
     >;
 public:
 
@@ -1334,25 +1335,25 @@ public:
 
     inline V & operator[](const K & key)
     {
-        return emplace(key, V()).first->second;
+        return emplace(key, V()).first->value();
     }
     inline V & operator[](K && key)
     {
-        return emplace(std::move(key), V{}).first->second;
+        return emplace(std::move(key), V{}).first->value();
     }
     V & at(const K & key)
     {
         auto found = this->find(key);
         if (found == this->end())
             throw std::out_of_range("Argument passed to at() was not in the map.");
-        return found->second;
+        return found->value();
     }
     const V & at(const K & key) const
     {
         auto found = this->find(key);
         if (found == this->end())
             throw std::out_of_range("Argument passed to at() was not in the map.");
-        return found->second;
+        return found->value();
     }
 
     using Table::emplace;
@@ -1393,10 +1394,10 @@ public:
             return false;
         for (const typename Table::value_type & value : lhs)
         {
-            auto found = rhs.find(value.first);
+            auto found = rhs.find(value.key());
             if (found == rhs.end())
                 return false;
-            else if (value.second != found->second)
+            else if (value.value() != found->second)
                 return false;
         }
         return true;

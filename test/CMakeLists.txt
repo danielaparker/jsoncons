@@ -118,6 +118,7 @@ add_executable(unit_tests
                corelib/src/JSONTestSuite_tests.cpp
                corelib/src/legacy_json_type_traits_tests.cpp
                corelib/src/ojson_object_tests.cpp
+               corelib/src/ujson_object_tests.cpp
                corelib/src/ojson_tests.cpp
                corelib/src/parse_string_tests.cpp
                corelib/src/polymorphic_allocator_tests.cpp

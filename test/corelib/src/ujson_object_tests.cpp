@@ -20,7 +20,7 @@ TEST_CASE("ujson tests")
         my_hash_map["key2"] = json(20);
 
         auto it = my_hash_map.find("key1");
-        std::cout << it->first << ", " << it->second << "\n";
+        std::cout << it->key() << ", " << it->value() << "\n";
 
         std::cout << my_hash_map["key2"] << "\n";
     }
