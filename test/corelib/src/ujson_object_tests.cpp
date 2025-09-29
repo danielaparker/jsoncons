@@ -8,7 +8,7 @@
 
 using namespace jsoncons;
 
-/*TEST_CASE("ujson tests")
+TEST_CASE("ujson tests")
 {
     SECTION("test1")
     {
@@ -24,7 +24,7 @@ using namespace jsoncons;
 
         std::cout << my_hash_map["key2"] << "\n";
     }
-}*/
+}
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
@@ -55,8 +55,9 @@ struct MyHash
     }
 };
 
-using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<my_string>,std::equal_to<my_string>,MyScopedAllocator<key_value<my_string,json>>>;
+using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<jsoncons::string_view>,std::equal_to<my_string>,MyScopedAllocator<key_value<my_string,json>>>;
 
+#if 0
 TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
 {
     MyScopedAllocator<char> alloc(1);
@@ -71,6 +72,7 @@ TEST_CASE("cust_json.merge test with order_preserving_policy and statefule alloc
     std::cout << m["key2"] << "\n";
     */
 }
+#endif
 
 #endif
 
