@@ -11,7 +11,7 @@
     
 #define JSONCONS_VERSION_MAJOR 1
 #define JSONCONS_VERSION_MINOR 4
-#define JSONCONS_VERSION_PATCH 1
+#define JSONCONS_VERSION_PATCH 2
 
 #define JSONCONS_VERSION_CONCAT_EX(major, minor, patch) \
     # major ## "." ## # minor ## "." ## # patch
