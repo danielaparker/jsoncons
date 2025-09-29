@@ -530,7 +530,7 @@ public:
         int8_t distance_from_desired = 0;
         for (; current_entry->distance_from_desired >= distance_from_desired; ++current_entry, ++distance_from_desired)
         {
-            if (compares_equal(std::forward<Key>(key), current_entry->value.key()))
+            if (compares_equal(std::forward<Key>(key), current_entry->value))
                 return { { current_entry }, false };
         }
         return emplace_new_key(distance_from_desired, current_entry, std::forward<Key>(key), std::forward<Args>(args)...);
@@ -844,9 +844,9 @@ private:
         return static_cast<const ArgumentHash &>(*this)(key);
     }
     template<typename L, typename R>
-    bool compares_equal(L && lhs, R && rhs) 
+    bool compares_equal(L && lhs, R && rhs) const
     {
-        return static_cast<ArgumentEqual &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
+        return static_cast<const ArgumentEqual &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
     }
 
     struct convertible_to_iterator
