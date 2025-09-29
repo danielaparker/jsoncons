@@ -1183,7 +1183,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             {
                 return result_type(jsoncons::unexpect, r.error());
             }
-            return result_type(std::make_shared<ValueType>(std::move(r.value())));
+            return result_type(std::allocate_shared<ValueType>(aset.get_allocator(), std::move(r.value())));
         }
 
         template <typename Alloc, typename TempAlloc>
@@ -1191,7 +1191,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             if (ptr.get() != nullptr) 
             {
-                return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *ptr, semantic_tag::none);
+                return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *ptr);
             }
             else 
             {
