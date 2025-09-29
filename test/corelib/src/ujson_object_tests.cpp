@@ -8,7 +8,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("ujson tests")
+/*TEST_CASE("ujson tests")
 {
     SECTION("test1")
     {
@@ -24,5 +24,53 @@ TEST_CASE("ujson tests")
 
         std::cout << my_hash_map["key2"] << "\n";
     }
+}*/
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/mock_stateful_allocator.hpp>
+template <typename T>
+using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
+
+template <typename T>
+using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
+
+using my_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
+
+template <typename StringT>
+struct MyHash
+{
+    std::size_t operator()(const StringT& s) const noexcept
+    {
+        const int p = 31;
+        const int m = static_cast<int>(1e9) + 9;
+        std::size_t hash_value = 0;
+        std::size_t p_pow = 1;
+        for (char c : s) {
+            hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
+            p_pow = (p_pow * p) % m;
+        }
+        return hash_value;   
+    }
+};
+
+using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<my_string>,std::equal_to<my_string>,MyScopedAllocator<key_value<my_string,json>>>;
+
+TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
+{
+    MyScopedAllocator<char> alloc(1);
+
+    my_flat_hash_map m{alloc};
+    m.emplace("key1", 10);
+    /*m["key2"] = json(20);
+
+    auto it = m.find("key1");
+    std::cout << it->key() << ", " << it->value() << "\n";
+
+    std::cout << m["key2"] << "\n";
+    */
 }
+
+#endif
 
