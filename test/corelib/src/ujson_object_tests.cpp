@@ -15,7 +15,7 @@ TEST_CASE("ujson tests")
     }
     SECTION("test2")
     {       	
-        jsoncons::flat_hash_map<std::string, json> my_hash_map;
+        jsoncons::flat_hash_map<std::string, json, std::hash<jsoncons::string_view>> my_hash_map;
         my_hash_map.emplace("key1", 10);
         my_hash_map["key2"] = json(20);
 
@@ -55,24 +55,24 @@ struct MyHash
     }
 };
 
-using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<jsoncons::string_view>,std::equal_to<my_string>,MyScopedAllocator<key_value<my_string,json>>>;
+using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<jsoncons::string_view>,std::equal_to<jsoncons::string_view>,MyScopedAllocator<key_value<my_string,json>>>;
 
-#if 0
+//#if 0
 TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
 {
     MyScopedAllocator<char> alloc(1);
 
     my_flat_hash_map m{alloc};
     m.emplace("key1", 10);
-    /*m["key2"] = json(20);
+    //m["key2"] = json(20);
 
-    auto it = m.find("key1");
+    auto it = m.find(my_string("key1",alloc));
     std::cout << it->key() << ", " << it->value() << "\n";
 
-    std::cout << m["key2"] << "\n";
-    */
+    //std::cout << m["key2"] << "\n";
+    
 }
-#endif
+//#endif
 
 #endif
 

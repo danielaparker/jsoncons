@@ -79,13 +79,16 @@ struct KeyOrValueHasher : functor_storage<size_t, hasher>
         : hasher_storage(hash)
     {
     }
-    size_t operator()(const KeyT & key)
+
+    template <typename T>
+    size_t operator()(T&& key)
     {
-        return static_cast<hasher_storage &>(*this)(key);
+        return static_cast<hasher_storage &>(*this)(std::forward<T>(key));
     }
-    size_t operator()(const KeyT & key) const
+    template <typename T>
+    size_t operator()(T&& key) const
     {
-        return static_cast<const hasher_storage &>(*this)(key);
+        return static_cast<const hasher_storage &>(*this)(std::forward<T>(key));
     }
     size_t operator()(const ValueT & value)
     {
@@ -544,7 +547,7 @@ public:
         EntryPointer it = entries + ptrdiff_t(index);
         for (int8_t distance = 0; it->distance_from_desired >= distance; ++distance, ++it)
         {
-            if (compares_equal(key, it->value))
+            if (compares_equal(key, it->value.key()))
                 return { it };
         }
         return end();
@@ -577,12 +580,12 @@ public:
     template<typename Key, typename... Args>
     std::pair<iterator, bool> emplace(Key && key, Args &&... args)
     {
-        size_t index = hash_policy.index_for_hash(hash_object(key), num_slots_minus_one_);
+        size_t index = hash_policy.index_for_hash(hash_object(std::forward<Key>(key)), num_slots_minus_one_);
         EntryPointer current_entry = entries + ptrdiff_t(index);
         int8_t distance_from_desired = 0;
         for (; current_entry->distance_from_desired >= distance_from_desired; ++current_entry, ++distance_from_desired)
         {
-            if (compares_equal(key, current_entry->value))
+            if (compares_equal(std::forward<Key>(key), current_entry->value.key()))
                 return { { current_entry }, false };
         }
         return emplace_new_key(distance_from_desired, current_entry, std::forward<Key>(key), std::forward<Args>(args)...);
@@ -901,9 +904,9 @@ private:
         return static_cast<const Hasher &>(*this)(key);
     }
     template<typename L, typename R>
-    bool compares_equal(const L & lhs, const R & rhs)
+    bool compares_equal(L && lhs, R && rhs)
     {
-        return static_cast<Equal &>(*this)(lhs, rhs);
+        return static_cast<Equal &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
     }
 
     struct convertible_to_iterator
