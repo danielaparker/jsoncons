@@ -37,127 +37,91 @@ struct functor_storage : Functor
         : Functor(functor)
     {
     }
-    template<typename... Args>
+    /*template<typename... Args>
     Result operator()(Args &&... args)
     {
         return static_cast<Functor &>(*this)(std::forward<Args>(args)...);
-    }
+    }*/
     template<typename... Args>
     Result operator()(Args &&... args) const
     {
         return static_cast<const Functor &>(*this)(std::forward<Args>(args)...);
     }
 };
-template<typename Result, typename... Args>
-struct functor_storage<Result, Result (*)(Args...)>
-{
-    typedef Result (*function_ptr)(Args...);
-    function_ptr function;
-    functor_storage(function_ptr function)
-        : function(function)
-    {
-    }
-    Result operator()(Args... args) const
-    {
-        return function(std::forward<Args>(args)...);
-    }
-    operator function_ptr &()
-    {
-        return function;
-    }
-    operator const function_ptr &()
-    {
-        return function;
-    }
-};
+
 template<typename KeyT, typename ValueT, typename hasher>
-struct KeyOrValueHasher : functor_storage<size_t, hasher>
+struct KeyOrValueHasher : hasher
 {
-    typedef functor_storage<size_t, hasher> hasher_storage;
     KeyOrValueHasher() = default;
     KeyOrValueHasher(const hasher & hash)
-        : hasher_storage(hash)
+        : hasher(hash)
     {
     }
 
     template <typename T>
-    size_t operator()(T&& key)
-    {
-        return static_cast<hasher_storage &>(*this)(std::forward<T>(key));
-    }
-    template <typename T>
     size_t operator()(T&& key) const
     {
-        return static_cast<const hasher_storage &>(*this)(std::forward<T>(key));
-    }
-    size_t operator()(const ValueT & value)
-    {
-        return static_cast<hasher_storage &>(*this)(value.key());
+        return static_cast<const hasher &>(*this)(std::forward<T>(key));
     }
     size_t operator()(const ValueT & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.key());
-    }
-    template<typename F, typename S>
-    size_t operator()(const key_value<F, S> & value)
-    {
-        return static_cast<hasher_storage &>(*this)(value.key());
+        return static_cast<const hasher &>(*this)(value.key());
     }
     template<typename F, typename S>
     size_t operator()(const key_value<F, S> & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.key());
+        return static_cast<const hasher &>(*this)(value.key());
     }
 };
 template<typename KeyT, typename ValueT, typename KeyEqual>
-struct KeyOrValueEquality : functor_storage<bool, KeyEqual>
+struct KeyOrValueEquality : KeyEqual
 {
-    typedef functor_storage<bool, KeyEqual> equality_storage;
     KeyOrValueEquality() = default;
     KeyOrValueEquality(const KeyEqual & equality)
-        : equality_storage(equality)
+        : KeyEqual(equality)
     {
     }
-    bool operator()(const KeyT & lhs, const KeyT & rhs)
+
+    bool operator()(const KeyT & lhs, const KeyT & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs);
+        return static_cast<const KeyEqual &>(*this)(lhs, rhs);
     }
-    bool operator()(const KeyT & lhs, const ValueT & rhs)
+    bool operator()(const KeyT & lhs, const ValueT & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
+        return static_cast<const KeyEqual &>(*this)(lhs, rhs.key());
     }
-    bool operator()(const ValueT & lhs, const KeyT & rhs)
+    bool operator()(const ValueT & lhs, const KeyT & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs);
+        return static_cast<const KeyEqual &>(*this)(lhs.key(), rhs);
     }
-    bool operator()(const ValueT & lhs, const ValueT & rhs)
+    bool operator()(const ValueT & lhs, const ValueT & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
-    }
-    template<typename F, typename S>
-    bool operator()(const KeyT & lhs, const key_value<F,S> & rhs)
-    {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
+        return static_cast<const KeyEqual &>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
-    bool operator()(const key_value<F,S> & lhs, const KeyT & rhs)
+    bool operator()(const KeyT & lhs, const key_value<F,S> & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs);
+        return static_cast<const KeyEqual &>(*this)(lhs, rhs.key());
     }
     template<typename F, typename S>
-    bool operator()(const ValueT & lhs, const key_value<F,S> & rhs)
+    bool operator()(const key_value<F,S> & lhs, const KeyT & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<const KeyEqual &>(*this)(lhs.first, rhs);
     }
     template<typename F, typename S>
-    bool operator()(const key_value<F,S> & lhs, const ValueT & rhs)
+    bool operator()(const ValueT & lhs, const key_value<F,S> & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<const KeyEqual &>(*this)(lhs.key(), rhs.key());
+    }
+    template<typename F, typename S>
+    bool operator()(const key_value<F,S> & lhs, const ValueT & rhs) const
+    {
+        return static_cast<const KeyEqual &>(*this)(lhs.key(), rhs.key());
     }
     template<typename FL, typename SL, typename FR, typename SR>
-    bool operator()(const key_value<FL, SL> & lhs, const key_value<FR, SR> & rhs)
+    bool operator()(const key_value<FL, SL> & lhs, const key_value<FR, SR> & rhs) const
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<const KeyEqual &>(*this)(lhs.key(), rhs.key());
     }
 };
 static constexpr int8_t min_lookups = 4;
@@ -893,18 +857,18 @@ private:
         max_lookups_ = detailv3::min_lookups - 1;
     }
 
-    template<typename U>
+    /*template<typename U>
     size_t hash_object(const U & key)
     {
         return static_cast<Hasher &>(*this)(key);
-    }
+    }*/
     template<typename U>
     size_t hash_object(const U & key) const
     {
         return static_cast<const Hasher &>(*this)(key);
     }
     template<typename L, typename R>
-    bool compares_equal(L && lhs, R && rhs)
+    bool compares_equal(L && lhs, R && rhs) 
     {
         return static_cast<Equal &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
     }

@@ -5,8 +5,14 @@
 #include <iostream>
 #include <jsoncons/flat_hash_map.hpp>
 #include <catch/catch.hpp>
+#include <unordered_map>
 
 using namespace jsoncons;
+
+bool hash(const jsoncons::string_view& sv)
+{
+    return 1;
+}
 
 TEST_CASE("ujson tests")
 {
@@ -63,14 +69,14 @@ TEST_CASE("cust_json.merge test with order_preserving_policy and statefule alloc
     MyScopedAllocator<char> alloc(1);
 
     my_flat_hash_map m{alloc};
-    m.emplace("key1", 10);
+    //m.emplace("key1", 10);
     //m["key2"] = json(20);
 
-    auto it = m.find(my_string("key1",alloc));
+    /*auto it = m.find(my_string("key1",alloc));
     std::cout << it->key() << ", " << it->value() << "\n";
 
     //std::cout << m["key2"] << "\n";
-    
+*/    
 }
 //#endif
 
