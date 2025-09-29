@@ -29,25 +29,6 @@ struct fibonacci_hash_policy;
 
 namespace detailv3
 {
-template<typename Result, typename Functor>
-struct functor_storage : Functor
-{
-    functor_storage() = default;
-    functor_storage(const Functor & functor)
-        : Functor(functor)
-    {
-    }
-    /*template<typename... Args>
-    Result operator()(Args &&... args)
-    {
-        return static_cast<Functor &>(*this)(std::forward<Args>(args)...);
-    }*/
-    template<typename... Args>
-    Result operator()(Args &&... args) const
-    {
-        return static_cast<const Functor &>(*this)(std::forward<Args>(args)...);
-    }
-};
 
 template<typename KeyT, typename ValueT, typename hasher>
 struct KeyOrValueHasher : hasher
@@ -245,8 +226,8 @@ struct HashPolicySelector<T, void_t<typename T::hash_policy>>
     typedef typename T::hash_policy type;
 };
 
-template<typename T, typename FindKey, typename ArgumentHash, typename Hasher, typename ArgumentEqual, typename Equal, typename ArgumentAlloc, typename EntryAlloc>
-class sherwood_v3_table : private EntryAlloc, private Hasher, private Equal
+template<typename T, typename FindKey, typename ArgumentHash, typename ArgumentEqual, typename ArgumentAlloc, typename EntryAlloc>
+class sherwood_v3_table : private EntryAlloc, private ArgumentHash, private ArgumentEqual
 {
     using Entry = detailv3::sherwood_v3_entry<T>;
     using AllocatorTraits = std::allocator_traits<EntryAlloc>;
@@ -270,7 +251,7 @@ public:
     {
     }
     explicit sherwood_v3_table(size_type bucket_count, const ArgumentHash & hash = ArgumentHash(), const ArgumentEqual & equal = ArgumentEqual(), const ArgumentAlloc & alloc = ArgumentAlloc())
-        : EntryAlloc(alloc), Hasher(hash), Equal(equal)
+        : EntryAlloc(alloc), ArgumentHash(hash), ArgumentEqual(equal)
     {
         rehash(bucket_count);
     }
@@ -322,7 +303,7 @@ public:
     {
     }
     sherwood_v3_table(const sherwood_v3_table & other, const ArgumentAlloc & alloc)
-        : EntryAlloc(alloc), Hasher(other), Equal(other), _max_load_factor(other._max_load_factor)
+        : EntryAlloc(alloc), ArgumentHash(other), ArgumentEqual(other), _max_load_factor(other._max_load_factor)
     {
         rehash_for_other_container(other);
         try
@@ -337,12 +318,12 @@ public:
         }
     }
     sherwood_v3_table(sherwood_v3_table && other) noexcept
-        : EntryAlloc(std::move(other)), Hasher(std::move(other)), Equal(std::move(other))
+        : EntryAlloc(std::move(other)), ArgumentHash(std::move(other)), ArgumentEqual(std::move(other))
     {
         swap_pointers(other);
     }
     sherwood_v3_table(sherwood_v3_table && other, const ArgumentAlloc & alloc) noexcept
-        : EntryAlloc(alloc), Hasher(std::move(other)), Equal(std::move(other))
+        : EntryAlloc(alloc), ArgumentHash(std::move(other)), ArgumentEqual(std::move(other))
     {
         swap_pointers(other);
     }
@@ -361,8 +342,8 @@ public:
             AssignIfTrue<EntryAlloc, AllocatorTraits::propagate_on_container_copy_assignment::value>()(*this, other);
         }
         _max_load_factor = other._max_load_factor;
-        static_cast<Hasher &>(*this) = other;
-        static_cast<Equal &>(*this) = other;
+        static_cast<ArgumentHash &>(*this) = other;
+        static_cast<ArgumentEqual &>(*this) = other;
         rehash_for_other_container(other);
         insert(other.begin(), other.end());
         return *this;
@@ -391,8 +372,8 @@ public:
                 emplace(std::move(elem));
             other.clear();
         }
-        static_cast<Hasher &>(*this) = std::move(other);
-        static_cast<Equal &>(*this) = std::move(other);
+        static_cast<ArgumentHash &>(*this) = std::move(other);
+        static_cast<ArgumentEqual &>(*this) = std::move(other);
         return *this;
     }
     ~sherwood_v3_table()
@@ -857,20 +838,15 @@ private:
         max_lookups_ = detailv3::min_lookups - 1;
     }
 
-    /*template<typename U>
-    size_t hash_object(const U & key)
-    {
-        return static_cast<Hasher &>(*this)(key);
-    }*/
     template<typename U>
     size_t hash_object(const U & key) const
     {
-        return static_cast<const Hasher &>(*this)(key);
+        return static_cast<const ArgumentHash &>(*this)(key);
     }
     template<typename L, typename R>
     bool compares_equal(L && lhs, R && rhs) 
     {
-        return static_cast<Equal &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
+        return static_cast<ArgumentEqual &>(*this)(std::forward<L>(lhs), std::forward<R>(rhs));
     }
 
     struct convertible_to_iterator
@@ -1269,9 +1245,7 @@ class flat_hash_map
         <
             key_value<K,V>,
             K,
-            H,
             detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
-            E,
             detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
             A,
             typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
@@ -1281,9 +1255,7 @@ class flat_hash_map
     <
         key_value<K,V>,
         K,
-        H,
         detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
-        E,
         detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
         A,
         typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
@@ -1380,9 +1352,7 @@ class flat_hash_set
             T,
             T,
             H,
-            detailv3::functor_storage<size_t, H>,
             E,
-            detailv3::functor_storage<bool, E>,
             A,
             typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<T>>
         >
@@ -1392,9 +1362,7 @@ class flat_hash_set
         T,
         T,
         H,
-        detailv3::functor_storage<size_t, H>,
         E,
-        detailv3::functor_storage<bool, E>,
         A,
         typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<T>>
     >;
