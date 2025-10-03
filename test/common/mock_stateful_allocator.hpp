@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <utility>
 
-template <typename T>
+template <typename T,typename PropagateOnCCA=std::false_type,typename PropagateOnCMA=std::true_type,typename PropagateOnCS=std::true_type>
 class mock_stateful_allocator
 {
     std::allocator<T> impl_;
@@ -23,9 +23,9 @@ public:
     using reference = T&;
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
-    using propagate_on_container_copy_assignment = std::false_type;
-    using propagate_on_container_move_assignment = std::true_type;
-    using propagate_on_container_swap = std::true_type;
+    using propagate_on_container_copy_assignment = PropagateOnCCA;
+    using propagate_on_container_move_assignment = PropagateOnCMA;
+    using propagate_on_container_swap = PropagateOnCS;
     using is_always_equal = std::false_type;
 
     mock_stateful_allocator() = delete;
@@ -40,11 +40,11 @@ public:
     {
     }
 
-    template <typename U>
+    template <typename U,typename V, typename W, typename X>
     friend class mock_stateful_allocator;
 
-    template <typename U>
-    mock_stateful_allocator(const mock_stateful_allocator<U>& other) noexcept
+    template <typename U, typename V, typename W, typename X>
+    mock_stateful_allocator(const mock_stateful_allocator<U,V,W,X>& other) noexcept
         : impl_(), id_(other.id_)
     {
     }
@@ -71,5 +71,11 @@ public:
         return lhs.id_ != rhs.id_;
     }
 };
+
+template <typename T>
+using non_propagating_allocator = mock_stateful_allocator<T,std::false_type,std::false_type,std::false_type>;
+
+template <typename T>
+using propagating_allocator = mock_stateful_allocator<T,std::true_type,std::true_type,std::true_type>;
 
 #endif

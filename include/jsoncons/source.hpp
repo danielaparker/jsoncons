@@ -217,7 +217,7 @@ namespace jsoncons {
         }
 
         void move_assignment(std::false_type, // not propagate_on_container_move_assignment
-            stream_source&& other, const Allocator&) noexcept
+            stream_source&& other) noexcept
         {
             buffer_size_ = other.buffer_size_;
             buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
@@ -243,6 +243,26 @@ namespace jsoncons {
             move_assignment(typename std::allocator_traits<char_allocator_type>::propagate_on_container_move_assignment(),
                 std::move(other));
             return *this;
+        }
+
+        const value_type* buffer() const
+        {
+            return buffer_;
+        }
+
+        std::size_t buffer_size() const
+        {
+            return buffer_size_;
+        }
+
+        const value_type* data() const
+        {
+            return data_;
+        }
+
+        std::size_t length() const
+        {
+            return length_;
         }
 
         bool eof() const

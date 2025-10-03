@@ -8,6 +8,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include "common/mock_stateful_allocator.hpp"
 #include <catch/catch.hpp>
 
 TEST_CASE("basic_null_istream tests")
@@ -238,6 +239,92 @@ TEST_CASE("stream_source tests")
         CHECK(9 == source.position());
         CHECK(0 == source.read(&b,1));
         CHECK(source.eof());
+    }
+}
+
+TEST_CASE("stream_source with non-propagating allocator tests")
+{
+    using source_type = jsoncons::stream_source<char,non_propagating_allocator<char>>;
+
+    std::string data = "012345678";
+    std::istringstream is(data);
+
+    non_propagating_allocator<char> alloc(1);
+
+    SECTION("move constructor")
+    {
+        char b{};
+
+        source_type source(is, alloc);
+        CHECK(source_type::default_max_buffer_size == source.buffer_size());
+        CHECK(0 == source.length());
+        CHECK(1 == source.read(&b, 1));
+
+        source_type source2(std::move(source));
+        CHECK(nullptr == source.buffer());
+        CHECK(0 == source.buffer_size());
+
+        CHECK(1 == source2.position());
+    }
+
+    SECTION("move assignment")
+    {
+        char b{};
+
+        source_type source(is, alloc);
+        CHECK(source_type::default_max_buffer_size == source.buffer_size());
+        CHECK(0 == source.length());
+        CHECK(1 == source.read(&b, 1));
+
+        source_type source2(alloc);
+        source2 = std::move(source);
+        CHECK_FALSE(nullptr == source.buffer());
+        CHECK_FALSE(0 == source.buffer_size());
+
+        CHECK(1 == source2.position());
+    }
+}
+
+TEST_CASE("stream_source with propagating allocator tests")
+{
+    using source_type = jsoncons::stream_source<char, propagating_allocator<char>>;
+
+    std::string data = "012345678";
+    std::istringstream is(data);
+
+    propagating_allocator<char> alloc(1);
+
+    SECTION("move constructor test")
+    {
+        char b{};
+
+        source_type source(is, alloc);
+        CHECK(source_type::default_max_buffer_size == source.buffer_size());
+        CHECK(0 == source.length());
+        CHECK(1 == source.read(&b, 1));
+
+        source_type source2(std::move(source));
+        CHECK(nullptr == source.buffer());
+        CHECK(0 == source.buffer_size());
+
+        CHECK(1 == source2.position());
+    }
+
+    SECTION("move assignment")
+    {
+        char b{};
+
+        source_type source(is, alloc);
+        CHECK(source_type::default_max_buffer_size == source.buffer_size());
+        CHECK(0 == source.length());
+        CHECK(1 == source.read(&b, 1));
+
+        source_type source2(alloc);
+        source2 = std::move(source);
+        CHECK(nullptr == source.buffer());
+        CHECK(0 == source.buffer_size());
+
+        CHECK(1 == source2.position());
     }
 }
 
