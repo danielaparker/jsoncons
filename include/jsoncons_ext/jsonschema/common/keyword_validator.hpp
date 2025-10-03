@@ -1224,14 +1224,16 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
+            Json local_patch1(json_array_arg);
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
+                Json local_patch2{json_array_arg};
                 eval_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
-                walk_result result = validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
+                walk_result result = validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, local_patch2);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1239,6 +1241,10 @@ namespace jsonschema {
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
+                    for (auto& item : local_patch2.array_range())
+                    {
+                        local_patch1.push_back(std::move(item));
+                    }
                     ++count;
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1247,6 +1253,10 @@ namespace jsonschema {
             if (count > 0)
             {
                 results.merge(local_results1);
+                for (auto& item : local_patch1.array_range())
+                {
+                    patch.push_back(std::move(item));
+                }
             }
             else 
             {
@@ -1320,14 +1330,16 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
+            Json local_patch1(json_array_arg);
             std::vector<std::size_t> indices;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
+                Json local_patch2{json_array_arg};
                 eval_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
-                walk_result result = validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
+                walk_result result = validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, local_patch2);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1336,14 +1348,21 @@ namespace jsonschema {
                 {
                     local_results1.merge(local_results2);
                     indices.push_back(i);
+                    for (auto& item : local_patch2.array_range())
+                    {
+                        local_patch1.push_back(std::move(item));
+                    }
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
             }
-
-            
+           
             if (indices.size() == 1)
             {
                 results.merge(local_results1);
+                for (auto& item : local_patch1.array_range())
+                {
+                    patch.push_back(std::move(item));
+                }
             }
             else 
             {
