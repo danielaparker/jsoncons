@@ -149,7 +149,7 @@ namespace jsoncons {
             else if (other.buffer_ != nullptr)
             {
                 buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-                data_ = buffer_;
+                data_ = buffer_ + (other.data_ - other.buffer_);
                 std::memcpy(data_, other.data_, sizeof(value_type)*other.length_);
             }
             if (other.stream_ptr_ != &other.null_is_)
@@ -221,7 +221,7 @@ namespace jsoncons {
         {
             buffer_size_ = other.buffer_size_;
             buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-            data_ = buffer_;
+            data_ = buffer_ + (other.data_ - other.buffer_);
             length_ = other.length_;
             std::memcpy(buffer_, other.buffer_, sizeof(value_type)*other.length_);
             if (other.stream_ptr_ != &other.null_is_)
