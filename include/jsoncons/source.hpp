@@ -420,6 +420,9 @@ namespace jsoncons {
         }
     };
 
+    template <typename CharT,typename Allocator>
+    constexpr std::size_t stream_source<CharT,Allocator>::default_max_buffer_size;
+
     // string_source
 
     template <typename CharT>

@@ -35,10 +35,7 @@ public:
     {
     }
 
-    mock_stateful_allocator(const mock_stateful_allocator<T>& other) noexcept
-        : impl_(), id_(other.id_)
-    {
-    }
+    mock_stateful_allocator(const mock_stateful_allocator& other) noexcept = default;
 
     template <typename U,typename V, typename W, typename X>
     friend class mock_stateful_allocator;
