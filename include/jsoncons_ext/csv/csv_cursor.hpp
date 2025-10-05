@@ -141,6 +141,36 @@ public:
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
         Sourceable&& source, 
         const basic_csv_decode_options<CharT>& options,
+        std::error_code& ec,
+        typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+       : source_(std::forward<Sourceable>(source)),
+         parser_(options,alloc)
+    {
+        parser_.cursor_mode(true);
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
+    template <typename Sourceable>
+    basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,
+        std::error_code& ec,
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+       : source_(),
+         parser_(options,alloc)
+    {
+        parser_.cursor_mode(true);
+        jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
+        initialize_with_string_view(sv, ec);
+    }
+
+    template <typename Sourceable>
+    basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,
         std::function<bool(csv_errc,const ser_context&)> err_handler,
         std::error_code& ec,
         typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
