@@ -212,11 +212,14 @@ try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using value_type = T;
     using result_type = read_result<value_type>;
+    using byte_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<uint8_t>;
+    using stream_source_type = stream_source<uint8_t,byte_allocator_type>;
 
     std::error_code ec;   
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-    basic_bson_reader<jsoncons::binary_stream_source,TempAlloc> reader(is, adaptor, options, aset.get_temp_allocator());
+    basic_bson_reader<stream_source_type,TempAlloc> reader(stream_source_type(is,aset.get_temp_allocator()), 
+        adaptor, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {

@@ -25,6 +25,9 @@
 
 namespace jsoncons { 
 
+    // The source data must be padded by at least `buffer_padding_size` bytes.
+    JSONCONS_INLINE_CONSTEXPR uint8_t buffer_padding_size = 4;
+
     template <typename CharT>
     class basic_null_istream : public std::basic_istream<CharT>
     {
@@ -73,26 +76,34 @@ namespace jsoncons {
 
     // text sources
 
-    template <typename CharT>
-    class stream_source 
+    template <typename CharT,typename Allocator = std::allocator<CharT>>
+    class stream_source
     {
     public:
         using value_type = CharT;
         static constexpr std::size_t default_max_buffer_size = 16384;
     private:
         using char_type = typename std::conditional<sizeof(CharT) == sizeof(char),char,CharT>::type;
+        using char_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type>;
+
+        Allocator alloc_;
         basic_null_istream<char_type> null_is_;
         std::basic_istream<char_type>* stream_ptr_;
         std::basic_streambuf<char_type>* sbuf_;
         std::size_t position_{0};
-        std::vector<value_type> buffer_;
-        const value_type* buffer_data_;
-        std::size_t buffer_length_{0};
+        value_type* buffer_{nullptr};
+        std::size_t buffer_size_{0};
+        value_type* data_{nullptr};
+        std::size_t length_{0};
     public:
 
-        stream_source()
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
-              buffer_(1), buffer_data_(buffer_.data())
+        const Allocator& get_allocator() const
+        {
+            return alloc_;
+        }
+
+        stream_source(const Allocator& alloc = Allocator())
+            : alloc_(alloc), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf())
         {
         }
 
@@ -100,57 +111,163 @@ namespace jsoncons {
         stream_source(const stream_source&) = delete;
 
         stream_source(stream_source&& other) noexcept
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
-              buffer_(), buffer_data_(buffer_.data())
+            : alloc_(other.alloc_), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf())
         {
+            buffer_ = other.buffer_;
+            data_ = other.data_;
+            buffer_size_ = other.buffer_size_;
+            length_ = other.length_;
+            other.buffer_ = nullptr;
+            other.data_ = nullptr;
+            other.buffer_size_ = 0;
+            other.length_ = 0;
+
             if (other.stream_ptr_ != &other.null_is_)
             {
                 stream_ptr_ = other.stream_ptr_;
                 sbuf_ = other.sbuf_;
                 position_ = other.position_;
-                buffer_ = std::move(other.buffer_);
-                buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
-                buffer_length_ =  other.buffer_length_;
-                other = stream_source();
+                other.stream_ptr_ = &other.null_is_;
+                other.sbuf_ = other.null_is_.rdbuf();
+                other.position_ = 0;
             }
         }
 
-        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_size)
-            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
-              buffer_(buf_size), buffer_data_(buffer_.data())
+        stream_source(stream_source&& other, const Allocator& alloc) noexcept
+            : alloc_(alloc), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
+              buffer_size_(other.buffer_size_), length_(other.length_)
         {
-        }
-
-        ~stream_source() = default;
-
-        stream_source& operator=(const stream_source&) = delete;
-
-        stream_source& operator=(stream_source&& other) noexcept
-        {
+            if (alloc == other.get_allocator())
+            {
+                buffer_ = other.buffer_;
+                data_ = other.data_;
+                length_ = other.length_;
+                other.buffer_ = nullptr;
+                other.data_ = nullptr;
+                other.length_ = 0;
+            }
+            else if (other.buffer_ != nullptr)
+            {
+                buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
+                data_ = buffer_ + (other.data_ - other.buffer_);
+                std::memcpy(data_, other.data_, sizeof(value_type)*other.length_);
+            }
             if (other.stream_ptr_ != &other.null_is_)
             {
                 stream_ptr_ = other.stream_ptr_;
                 sbuf_ = other.sbuf_;
                 position_ = other.position_;
-                buffer_ = std::move(other.buffer_);
-                buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
-                buffer_length_ =  other.buffer_length_;
-                other = stream_source();
             }
             else
             {
                 stream_ptr_ = &null_is_;
                 sbuf_ = null_is_.rdbuf();
                 position_ = 0;
-                buffer_data_ = buffer_.data();
-                buffer_length_ =  0;
             }
+        }
+
+        stream_source(std::basic_istream<char_type>& is,
+            const Allocator& alloc = Allocator())
+            : alloc_(alloc), stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
+              buffer_size_(default_max_buffer_size)
+        {
+            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
+            data_ = buffer_;
+        }
+
+        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size,
+            const Allocator& alloc = Allocator())
+            : alloc_(alloc), stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
+              buffer_size_(buf_size)
+        {
+            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
+            data_ = buffer_;
+        }
+
+        ~stream_source() noexcept
+        {
+            if (buffer_)
+            {
+                std::allocator_traits<char_allocator_type>::deallocate(alloc_, buffer_, buffer_size_);
+            }
+        }
+
+        stream_source& operator=(const stream_source&) = delete;
+      
+        void move_assignment(std::true_type, // propagate_on_container_move_assignment
+            stream_source&& other) noexcept
+        {
+            alloc_ = other.alloc_;
+            std::swap(buffer_, other.buffer_);
+            std::swap(buffer_size_, other.buffer_size_);
+            std::swap(data_, other.data_);
+            std::swap(length_, other.length_);
+            if (other.stream_ptr_ != &other.null_is_)
+            {
+                stream_ptr_ = other.stream_ptr_;
+                sbuf_ = other.sbuf_;
+                position_ = other.position_;
+            }
+            else
+            {
+                stream_ptr_ = &null_is_;
+                sbuf_ = null_is_.rdbuf();
+                position_ = 0;
+            }
+        }
+
+        void move_assignment(std::false_type, // not propagate_on_container_move_assignment
+            stream_source&& other) noexcept
+        {
+            buffer_size_ = other.buffer_size_;
+            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
+            data_ = buffer_ + (other.data_ - other.buffer_);
+            length_ = other.length_;
+            std::memcpy(buffer_, other.buffer_, sizeof(value_type)*other.length_);
+            if (other.stream_ptr_ != &other.null_is_)
+            {
+                stream_ptr_ = other.stream_ptr_;
+                sbuf_ = other.sbuf_;
+                position_ = other.position_;
+            }
+            else
+            {
+                stream_ptr_ = &null_is_;
+                sbuf_ = null_is_.rdbuf();
+                position_ = 0;
+            }
+        }
+
+        stream_source& operator=(stream_source&& other) noexcept
+        {
+            move_assignment(typename std::allocator_traits<char_allocator_type>::propagate_on_container_move_assignment(),
+                std::move(other));
             return *this;
+        }
+
+        const value_type* buffer() const
+        {
+            return buffer_;
+        }
+
+        std::size_t buffer_size() const
+        {
+            return buffer_size_;
+        }
+
+        const value_type* data() const
+        {
+            return data_;
+        }
+
+        std::size_t length() const
+        {
+            return length_;
         }
 
         bool eof() const
         {
-            return buffer_length_ == 0 && stream_ptr_->eof();
+            return length_ == 0 && stream_ptr_->eof();
         }
 
         bool is_error() const
@@ -166,37 +283,37 @@ namespace jsoncons {
         void ignore(std::size_t length)
         {
             std::size_t len = 0;
-            if (buffer_length_ > 0)
+            if (length_ > 0)
             {
-                len = (std::min)(buffer_length_, length);
+                len = (std::min)(length_, length);
                 position_ += len;
-                buffer_data_ += len;
-                buffer_length_ -= len;
+                data_ += len;
+                length_ -= len;
             }
             while (len < length)
             {
                 fill_buffer();
-                if (buffer_length_ == 0)
+                if (length_ == 0)
                 {
                     break;
                 }
-                std::size_t len2 = (std::min)(buffer_length_, length-len);
+                std::size_t len2 = (std::min)(length_, length-len);
                 position_ += len2;
-                buffer_data_ += len2;
-                buffer_length_ -= len2;
+                data_ += len2;
+                length_ -= len2;
                 len += len2;
             }
         }
 
         char_result<value_type> peek() 
         {
-            if (buffer_length_ == 0)
+            if (length_ == 0)
             {
                 fill_buffer();
             }
-            if (buffer_length_ > 0)
+            if (length_ > 0)
             {
-                value_type c = *buffer_data_;
+                value_type c = *data_;
                 return char_result<value_type>{c, false};
             }
             else
@@ -207,15 +324,15 @@ namespace jsoncons {
 
         span<const value_type> read_buffer() 
         {
-            if (buffer_length_ == 0)
+            if (length_ == 0)
             {
                 fill_buffer();
             }
-            const value_type* data = buffer_data_;
-            std::size_t length = buffer_length_;
-            buffer_data_ += buffer_length_;
-            position_ += buffer_length_;
-            buffer_length_ = 0;
+            const value_type* data = data_;
+            std::size_t length = length_;
+            data_ += length_;
+            position_ += length_;
+            length_ = 0;
 
             return span<const value_type>(data, length);
         }
@@ -223,27 +340,27 @@ namespace jsoncons {
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len = 0;
-            if (buffer_length_ > 0)
+            if (length_ > 0)
             {
-                len = (std::min)(buffer_length_, length);
-                std::memcpy(p, buffer_data_, len*sizeof(value_type));
-                buffer_data_ += len;
-                buffer_length_ -= len;
+                len = (std::min)(length_, length);
+                std::memcpy(p, data_, len*sizeof(value_type));
+                data_ += len;
+                length_ -= len;
                 position_ += len;
             }
             if (length - len == 0)
             {
                 return len;
             }
-            else if (length - len < buffer_.size())
+            else if (length - len < buffer_size_)
             {
                 fill_buffer();
-                if (buffer_length_ > 0)
+                if (length_ > 0)
                 {
-                    std::size_t len2 = (std::min)(buffer_length_, length-len);
-                    std::memcpy(p+len, buffer_data_, len2*sizeof(value_type));
-                    buffer_data_ += len2;
-                    buffer_length_ -= len2;
+                    std::size_t len2 = (std::min)(length_, length-len);
+                    std::memcpy(p+len, data_, len2*sizeof(value_type));
+                    data_ += len2;
+                    length_ -= len2;
                     position_ += len2;
                     len += len2;
                 }
@@ -253,7 +370,7 @@ namespace jsoncons {
             {
                 if (stream_ptr_->eof())
                 {
-                    buffer_length_ = 0;
+                    length_ = 0;
                     return 0;
                 }
                 JSONCONS_TRY
@@ -280,17 +397,17 @@ namespace jsoncons {
         {
             if (stream_ptr_->eof())
             {
-                buffer_length_ = 0;
+                length_ = 0;
                 return;
             }
 
-            buffer_data_ = buffer_.data();
+            data_ = buffer_;
             JSONCONS_TRY
             {
-                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_.data()), buffer_.size());
-                buffer_length_ = static_cast<std::size_t>(count);
+                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_), buffer_size_);
+                length_ = static_cast<std::size_t>(count);
 
-                if (buffer_length_ < buffer_.size())
+                if (length_ < buffer_size_)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
@@ -298,10 +415,13 @@ namespace jsoncons {
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                buffer_length_ = 0;
+                length_ = 0;
             }
         }
     };
+
+    template <typename CharT,typename Allocator>
+    constexpr std::size_t stream_source<CharT,Allocator>::default_max_buffer_size;
 
     // string_source
 
@@ -412,7 +532,7 @@ namespace jsoncons {
         IteratorT end_;
         std::size_t position_{0};
         std::vector<value_type> buffer_;
-        std::size_t buffer_length_{0};
+        std::size_t buffer_len_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -464,12 +584,12 @@ namespace jsoncons {
 
         span<const value_type> read_buffer() 
         {
-            if (buffer_length_ == 0)
+            if (buffer_len_ == 0)
             {
-                buffer_length_ = read(buffer_.data(), buffer_.size());
+                buffer_len_ = read(buffer_.data(), buffer_.size());
             }
-            std::size_t length = buffer_length_;
-            buffer_length_ = 0;
+            std::size_t length = buffer_len_;
+            buffer_len_ = 0;
 
             return span<const value_type>(buffer_.data(), length);
         }
@@ -621,7 +741,7 @@ namespace jsoncons {
         IteratorT end_;
         std::size_t position_{0};
         std::vector<value_type> buffer_;
-        std::size_t buffer_length_{0};
+        std::size_t buffer_len_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -671,12 +791,12 @@ namespace jsoncons {
 
         span<const value_type> read_buffer() 
         {
-            if (buffer_length_ == 0)
+            if (buffer_len_ == 0)
             {
-                buffer_length_ = read(buffer_.data(), buffer_.size());
+                buffer_len_ = read(buffer_.data(), buffer_.size());
             }
-            std::size_t length = buffer_length_;
-            buffer_length_ = 0;
+            std::size_t length = buffer_len_;
+            buffer_len_ = 0;
 
             return span<const value_type>(buffer_.data(), length);
         }

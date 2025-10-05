@@ -204,7 +204,7 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 
     std::error_code ec;   
 
-    basic_csv_cursor<char_type,stream_source<char_type>,TempAlloc> cursor(
+    basic_csv_cursor<char_type,string_source<char_type>,TempAlloc> cursor(
         std::allocator_arg, aset.get_temp_allocator(), s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -217,18 +217,21 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
-           std::basic_istream<CharT>& is, 
-           const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
+    std::basic_istream<CharT>& is, 
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     using char_type = CharT;
     using value_type = T;
     using result_type = read_result<value_type>;
+    using char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+    using stream_source_type = stream_source<char_type,char_allocator_type>;
 
     std::error_code ec;   
 
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
 
-    basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAlloc> reader(is,decoder,options,aset.get_temp_allocator());
+    basic_csv_reader<char_type,stream_source_type,TempAlloc> reader(stream_source_type(is,aset.get_temp_allocator()),
+        decoder, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
