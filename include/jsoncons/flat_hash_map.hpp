@@ -29,132 +29,89 @@ struct fibonacci_hash_policy;
 
 namespace detailv3
 {
-template<typename Result, typename Functor>
-struct functor_storage : Functor
-{
-    functor_storage() = default;
-    functor_storage(const Functor & functor)
-        : Functor(functor)
-    {
-    }
-    template<typename... Args>
-    Result operator()(Args &&... args)
-    {
-        return static_cast<Functor &>(*this)(std::forward<Args>(args)...);
-    }
-    template<typename... Args>
-    Result operator()(Args &&... args) const
-    {
-        return static_cast<const Functor &>(*this)(std::forward<Args>(args)...);
-    }
-};
-template<typename Result, typename... Args>
-struct functor_storage<Result, Result (*)(Args...)>
-{
-    typedef Result (*function_ptr)(Args...);
-    function_ptr function;
-    functor_storage(function_ptr function)
-        : function(function)
-    {
-    }
-    Result operator()(Args... args) const
-    {
-        return function(std::forward<Args>(args)...);
-    }
-    operator function_ptr &()
-    {
-        return function;
-    }
-    operator const function_ptr &()
-    {
-        return function;
-    }
-};
 template<typename KeyT, typename ValueT, typename hasher>
-struct KeyOrValueHasher : functor_storage<size_t, hasher>
+struct KeyOrValueHasher : hasher
 {
-    typedef functor_storage<size_t, hasher> hasher_storage;
     KeyOrValueHasher() = default;
     KeyOrValueHasher(const hasher & hash)
-        : hasher_storage(hash)
+        : hasher(hash)
     {
     }
     size_t operator()(const KeyT & key)
     {
-        return static_cast<hasher_storage &>(*this)(key);
+        return static_cast<hasher&>(*this)(key);
     }
     size_t operator()(const KeyT & key) const
     {
-        return static_cast<const hasher_storage &>(*this)(key);
+        return static_cast<const hasher&>(*this)(key);
     }
     size_t operator()(const ValueT & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.key());
+        return static_cast<hasher&>(*this)(value.key());
     }
     size_t operator()(const ValueT & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.key());
+        return static_cast<const hasher&>(*this)(value.key());
     }
     template<typename F, typename S>
     size_t operator()(const key_value<F, S> & value)
     {
-        return static_cast<hasher_storage &>(*this)(value.key());
+        return static_cast<hasher&>(*this)(value.key());
     }
     template<typename F, typename S>
     size_t operator()(const key_value<F, S> & value) const
     {
-        return static_cast<const hasher_storage &>(*this)(value.key());
+        return static_cast<const hasher&>(*this)(value.key());
     }
 };
 template<typename KeyT, typename ValueT, typename KeyEqual>
-struct KeyOrValueEquality : functor_storage<bool, KeyEqual>
+struct KeyOrValueEquality : KeyEqual
 {
-    typedef functor_storage<bool, KeyEqual> equality_storage;
     KeyOrValueEquality() = default;
     KeyOrValueEquality(const KeyEqual & equality)
-        : equality_storage(equality)
+        : KeyEqual(equality)
     {
     }
     bool operator()(const KeyT & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs);
+        return static_cast<KeyEqual&>(*this)(lhs, rhs);
     }
     bool operator()(const KeyT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs, rhs.key());
     }
     bool operator()(const ValueT & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs);
+        return static_cast<KeyEqual&>(*this)(lhs.key(), rhs);
     }
     bool operator()(const ValueT & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const KeyT & lhs, const key_value<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs, rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs, rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const key_value<F,S> & lhs, const KeyT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.first, rhs);
+        return static_cast<KeyEqual&>(*this)(lhs.first, rhs);
     }
     template<typename F, typename S>
     bool operator()(const ValueT & lhs, const key_value<F,S> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs.key(), rhs.key());
     }
     template<typename F, typename S>
     bool operator()(const key_value<F,S> & lhs, const ValueT & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs.key(), rhs.key());
     }
     template<typename FL, typename SL, typename FR, typename SR>
     bool operator()(const key_value<FL, SL> & lhs, const key_value<FR, SR> & rhs)
     {
-        return static_cast<equality_storage &>(*this)(lhs.key(), rhs.key());
+        return static_cast<KeyEqual&>(*this)(lhs.key(), rhs.key());
     }
 };
 static constexpr int8_t min_lookups = 4;
@@ -278,7 +235,7 @@ struct HashPolicySelector<T, void_t<typename T::hash_policy>>
     typedef typename T::hash_policy type;
 };
 
-template<typename T, typename FindKey, typename ArgumentHash, typename Hasher, typename ArgumentEqual, typename Equal, typename ArgumentAlloc, typename EntryAlloc>
+template<typename T, typename FindKey, typename Hasher, typename Equal, typename ArgumentAlloc, typename EntryAlloc>
 class sherwood_v3_table : private EntryAlloc, private Hasher, private Equal
 {
     using Entry = detailv3::sherwood_v3_entry<T>;
@@ -291,8 +248,8 @@ public:
     using value_type = T;
     using size_type = size_t;
     using difference_type = std::ptrdiff_t;
-    using hasher = ArgumentHash;
-    using key_equal = ArgumentEqual;
+    using hasher = Hasher;
+    using key_equal = Equal;
     using allocator_type = EntryAlloc;
     using reference = value_type &;
     using const_reference = const value_type &;
@@ -302,17 +259,17 @@ public:
     sherwood_v3_table()
     {
     }
-    explicit sherwood_v3_table(size_type bucket_count, const ArgumentHash & hash = ArgumentHash(), const ArgumentEqual & equal = ArgumentEqual(), const ArgumentAlloc & alloc = ArgumentAlloc())
+    explicit sherwood_v3_table(size_type bucket_count, const Hasher & hash = Hasher(), const Equal & equal = Equal(), const ArgumentAlloc & alloc = ArgumentAlloc())
         : EntryAlloc(alloc), Hasher(hash), Equal(equal)
     {
         rehash(bucket_count);
     }
     sherwood_v3_table(size_type bucket_count, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(bucket_count, ArgumentHash(), ArgumentEqual(), alloc)
+        : sherwood_v3_table(bucket_count, Hasher(), Equal(), alloc)
     {
     }
-    sherwood_v3_table(size_type bucket_count, const ArgumentHash & hash, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(bucket_count, hash, ArgumentEqual(), alloc)
+    sherwood_v3_table(size_type bucket_count, const Hasher & hash, const ArgumentAlloc & alloc)
+        : sherwood_v3_table(bucket_count, hash, Equal(), alloc)
     {
     }
     explicit sherwood_v3_table(const ArgumentAlloc & alloc)
@@ -320,22 +277,22 @@ public:
     {
     }
     template<typename It>
-    sherwood_v3_table(It first, It last, size_type bucket_count = 0, const ArgumentHash & hash = ArgumentHash(), const ArgumentEqual & equal = ArgumentEqual(), const ArgumentAlloc & alloc = ArgumentAlloc())
+    sherwood_v3_table(It first, It last, size_type bucket_count = 0, const Hasher & hash = Hasher(), const Equal & equal = Equal(), const ArgumentAlloc & alloc = ArgumentAlloc())
         : sherwood_v3_table(bucket_count, hash, equal, alloc)
     {
         insert(first, last);
     }
     template<typename It>
     sherwood_v3_table(It first, It last, size_type bucket_count, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(first, last, bucket_count, ArgumentHash(), ArgumentEqual(), alloc)
+        : sherwood_v3_table(first, last, bucket_count, Hasher(), Equal(), alloc)
     {
     }
     template<typename It>
-    sherwood_v3_table(It first, It last, size_type bucket_count, const ArgumentHash & hash, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(first, last, bucket_count, hash, ArgumentEqual(), alloc)
+    sherwood_v3_table(It first, It last, size_type bucket_count, const Hasher & hash, const ArgumentAlloc & alloc)
+        : sherwood_v3_table(first, last, bucket_count, hash, Equal(), alloc)
     {
     }
-    sherwood_v3_table(std::initializer_list<T> il, size_type bucket_count = 0, const ArgumentHash & hash = ArgumentHash(), const ArgumentEqual & equal = ArgumentEqual(), const ArgumentAlloc & alloc = ArgumentAlloc())
+    sherwood_v3_table(std::initializer_list<T> il, size_type bucket_count = 0, const Hasher & hash = Hasher(), const Equal & equal = Equal(), const ArgumentAlloc & alloc = ArgumentAlloc())
         : sherwood_v3_table(bucket_count, hash, equal, alloc)
     {
         if (bucket_count == 0)
@@ -343,11 +300,11 @@ public:
         insert(il.begin(), il.end());
     }
     sherwood_v3_table(std::initializer_list<T> il, size_type bucket_count, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(il, bucket_count, ArgumentHash(), ArgumentEqual(), alloc)
+        : sherwood_v3_table(il, bucket_count, Hasher(), Equal(), alloc)
     {
     }
-    sherwood_v3_table(std::initializer_list<T> il, size_type bucket_count, const ArgumentHash & hash, const ArgumentAlloc & alloc)
-        : sherwood_v3_table(il, bucket_count, hash, ArgumentEqual(), alloc)
+    sherwood_v3_table(std::initializer_list<T> il, size_type bucket_count, const Hasher & hash, const ArgumentAlloc & alloc)
+        : sherwood_v3_table(il, bucket_count, hash, Equal(), alloc)
     {
     }
     sherwood_v3_table(const sherwood_v3_table & other)
@@ -438,13 +395,13 @@ public:
     {
         return static_cast<const allocator_type &>(*this);
     }
-    const ArgumentEqual & key_eq() const
+    const Equal & key_eq() const
     {
-        return static_cast<const ArgumentEqual &>(*this);
+        return static_cast<const Equal &>(*this);
     }
-    const ArgumentHash & hash_function() const
+    const Hasher & hash_function() const
     {
-        return static_cast<const ArgumentHash &>(*this);
+        return static_cast<const Hasher &>(*this);
     }
 
     template<typename ValueType>
@@ -740,8 +697,8 @@ public:
     {
         using std::swap;
         swap_pointers(other);
-        swap(static_cast<ArgumentHash &>(*this), static_cast<ArgumentHash &>(other));
-        swap(static_cast<ArgumentEqual &>(*this), static_cast<ArgumentEqual &>(other));
+        swap(static_cast<Hasher &>(*this), static_cast<Hasher &>(other));
+        swap(static_cast<Equal &>(*this), static_cast<Equal &>(other));
         if (AllocatorTraits::propagate_on_container_swap::value)
             swap(static_cast<EntryAlloc &>(*this), static_cast<EntryAlloc &>(other));
     }
@@ -791,7 +748,7 @@ public:
 private:
     EntryPointer entries = Entry::empty_default_table();
     size_t num_slots_minus_one_ = 0;
-    typename HashPolicySelector<ArgumentHash>::type hash_policy;
+    typename HashPolicySelector<Hasher>::type hash_policy;
     int8_t max_lookups_ = detailv3::min_lookups - 1;
     float _max_load_factor = 0.5f;
     size_t num_elements = 0;
@@ -1302,9 +1259,7 @@ class flat_hash_map
         <
             key_value<K,V>,
             K,
-            H,
             detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
-            E,
             detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
             A,
             typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
@@ -1314,9 +1269,7 @@ class flat_hash_map
     <
         key_value<K,V>,
         K,
-        H,
         detailv3::KeyOrValueHasher<K, key_value<K,V>, H>,
-        E,
         detailv3::KeyOrValueEquality<K, key_value<K,V>, E>,
         A,
         typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<key_value<K,V>>>
@@ -1413,9 +1366,7 @@ class flat_hash_set
             T,
             T,
             H,
-            detailv3::functor_storage<size_t, H>,
             E,
-            detailv3::functor_storage<bool, E>,
             A,
             typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<T>>
         >
@@ -1425,9 +1376,7 @@ class flat_hash_set
         T,
         T,
         H,
-        detailv3::functor_storage<size_t, H>,
         E,
-        detailv3::functor_storage<bool, E>,
         A,
         typename std::allocator_traits<A>::template rebind_alloc<detailv3::sherwood_v3_entry<T>>
     >;
