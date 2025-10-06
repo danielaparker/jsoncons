@@ -31,7 +31,7 @@ template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const BytesLike& v, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -56,7 +56,7 @@ template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const BytesLike& v, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -74,7 +74,7 @@ try_decode_cbor(const BytesLike& v,
 template <typename T>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(std::istream& is, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -98,7 +98,7 @@ try_decode_cbor(std::istream& is,
 template <typename T>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(std::istream& is, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -116,7 +116,7 @@ try_decode_cbor(std::istream& is,
 template <typename T,typename InputIt>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(InputIt first, InputIt last,
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -140,7 +140,7 @@ try_decode_cbor(InputIt first, InputIt last,
 template <typename T,typename InputIt>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(InputIt first, InputIt last,
-            const cbor_decode_options& options = cbor_decode_options())
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -161,8 +161,8 @@ template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const BytesLike& v, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const BytesLike& v, 
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -187,8 +187,8 @@ template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            const BytesLike& v, 
-            const cbor_decode_options& options = cbor_decode_options())
+    const BytesLike& v, 
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -206,16 +206,19 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 template <typename T,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-            std::istream& is, 
-            const cbor_decode_options& options = cbor_decode_options())
+    std::istream& is, 
+    const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
+    using byte_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<uint8_t>;
+    using stream_source_type = stream_source<uint8_t,byte_allocator_type>;
 
     std::error_code ec;
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-    basic_cbor_reader<jsoncons::binary_stream_source,TempAlloc> reader(is, adaptor, options, aset.get_temp_allocator());
+    basic_cbor_reader<stream_source_type,TempAlloc> reader(stream_source_type(is,aset.get_temp_allocator()), 
+        adaptor, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {

@@ -211,11 +211,14 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using value_type = T;
     using result_type = read_result<value_type>;
+    using char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
+    using stream_source_type = stream_source<CharT,char_allocator_type>;
 
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
 
     std::error_code ec;   
-    basic_json_reader<CharT, stream_source<CharT>,TempAlloc> reader(is, decoder, options, aset.get_temp_allocator());
+    basic_json_reader<CharT,stream_source_type,TempAlloc> reader(stream_source_type(is,aset.get_temp_allocator()), 
+        decoder, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -237,10 +240,13 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     using value_type = T;
     using result_type = read_result<value_type>;
     using char_type = CharT;
+    using char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
+    using stream_source_type = stream_source<CharT,char_allocator_type>;
 
     std::error_code ec;   
-    basic_json_cursor<char_type,stream_source<char_type>,TempAlloc> cursor(
-        std::allocator_arg, aset.get_temp_allocator(), is, options, ec);
+    basic_json_cursor<char_type,stream_source_type,TempAlloc> cursor(
+        std::allocator_arg, aset.get_temp_allocator(), 
+        stream_source_type(is,aset.get_temp_allocator()), options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};

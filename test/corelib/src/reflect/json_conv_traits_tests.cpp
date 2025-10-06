@@ -25,11 +25,18 @@ namespace ns {
         std::string title;
         double price{0};
     };
-    
+    struct A {
+        A() = default;
+        A(double a, double b) : a(a), b(b) {}
+        double a;
+        double b;
+    };
+
 } // namespace ns
 } // namespace
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::A, a, b)    
 
 using namespace jsoncons;
 
@@ -342,5 +349,18 @@ TEST_CASE("json_conv_traits as jsoncons::byte_string")
         REQUIRE(!result);
         CHECK(jsoncons::conv_errc::not_byte_string == result.error().code());
         //std::cout << result.error() .message() << "\n\n";
+    }
+}
+
+TEST_CASE("json_conv_traits shared_ptr")
+{
+    SECTION("test1")
+    {
+        auto a = std::make_shared<ns::A>(42.0, 32.0);
+        ojson j{a}; // Fails in compilation here
+        //std::cout << jsoncons::pretty_print(j) << "\n";
+        auto serializedA = j.as<std::shared_ptr<ns::A>>();
+        CHECK(serializedA->a == 42.0);
+        CHECK(serializedA->b == 32.0);
     }
 }
