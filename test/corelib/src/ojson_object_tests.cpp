@@ -345,7 +345,7 @@ using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<
 
 using cust_json = jsoncons::basic_json<char, jsoncons::order_preserving_policy, MyScopedAllocator<char>>;
 
-TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
+TEST_CASE("cust_json.merge test with order_preserving_policy and stateful allocator")
 {
     MyScopedAllocator<char> alloc(1);
 

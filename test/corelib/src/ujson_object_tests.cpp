@@ -57,7 +57,7 @@ struct MyHash
 
 using my_flat_hash_map = jsoncons::flat_hash_map<my_string,json,MyHash<my_string>,std::equal_to<my_string>,MyScopedAllocator<key_value<my_string,json>>>;
 
-TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
+TEST_CASE("cust_json.merge test with unordered_policy and stateful allocator")
 {
     MyScopedAllocator<char> alloc(1);
 
