@@ -3445,7 +3445,7 @@ namespace detail {
         std::size_t line_{1};
         std::size_t column_{1};
         const char_type* begin_input_{nullptr};
-        const char_type* end_input_{nullptr};
+        const char_type* input_end_{nullptr};
         const char_type* p_{nullptr};
         std::vector<token<Json>> operator_stack_;
 
@@ -3483,13 +3483,13 @@ namespace detail {
             uint32_t cp2 = 0;
      
             begin_input_ = path;
-            end_input_ = path + length;
+            input_end_ = path + length;
             p_ = begin_input_;
 
             slice slic{};
 
             bool done = false;
-            while (p_ < end_input_ && !done)
+            while (p_ < input_end_ && !done)
             {
                 switch (state_stack.back())
                 {
@@ -3829,7 +3829,7 @@ namespace detail {
                             ++p_;
                             ++column_;
                         }
-                        else if (*p_ == 'i' && (p_ + 1) < end_input_ && *(p_ + 1) == 'n')
+                        else if (*p_ == 'i' && (p_ + 1) < input_end_ && *(p_ + 1) == 'n')
                         {
                             p_ += 2;
                             column_ += 2;
@@ -3935,7 +3935,7 @@ namespace detail {
                                 // check no-args function
                                 bool is_no_args_func = true;
                                 bool isEnd = false;
-                                for (const char_type *p2_ = p_ + 1; p2_ < end_input_ && !isEnd; ++p2_)
+                                for (const char_type *p2_ = p_ + 1; p2_ < input_end_ && !isEnd; ++p2_)
                                 {
                                     
                                     switch (*p2_)
@@ -4317,7 +4317,7 @@ namespace detail {
                                 break;
                             }
                             case '\\':
-                                if (p_+1 < end_input_)
+                                if (p_+1 < input_end_)
                                 {
                                     ++p_;
                                     ++column_;
@@ -4417,7 +4417,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '*':
-                                if (p_+1 >= end_input_)
+                                if (p_+1 >= input_end_)
                                 {
                                     ec = jmespath_errc::unexpected_end_of_input;
                                     return jmespath_expression{};
@@ -5035,7 +5035,7 @@ namespace detail {
                     ++column_;
                     break;
                 case '\r':
-                    if (p_+1 < end_input_)
+                    if (p_+1 < input_end_)
                     {
                         if (*(p_ + 1) == '\n')
                             ++p_;

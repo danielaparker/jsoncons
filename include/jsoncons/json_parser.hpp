@@ -141,8 +141,7 @@ private:
     std::size_t position_{0};
     std::size_t mark_position_{0};
     std::size_t begin_position_{0};
-    const char_type* begin_input_{nullptr};
-    const char_type* end_input_{nullptr};
+    const char_type* input_end_{nullptr};
     const char_type* input_ptr_{nullptr};
     parse_state state_{parse_state::start};
     parse_string_state string_state_{};
@@ -234,7 +233,7 @@ public:
 
     bool source_exhausted() const
     {
-        return input_ptr_ == end_input_;
+        return input_ptr_ == input_end_;
     }
 
     ~basic_json_parser() noexcept
@@ -277,24 +276,9 @@ public:
         return !more_ && state_ != parse_state::accept;
     }
 
-    const char_type* first() const
-    {
-        return begin_input_;
-    }
-
-    const char_type* current() const
-    {
-        return input_ptr_;
-    }
-
-    const char_type* last() const
-    {
-        return end_input_;
-    }
-
     void skip_whitespace()
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         while (input_ptr_ != local_input_end) 
         {
@@ -466,8 +450,7 @@ public:
         cp_ = 0;
         cp2_ = 0;
         begin_position_ = 0;
-        begin_input_ = nullptr;
-        end_input_ = nullptr;
+        input_end_ = nullptr;
         input_ptr_ = nullptr;
         buffer_.clear();
     }
@@ -502,7 +485,7 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        for (; input_ptr_ != end_input_; ++input_ptr_)
+        for (; input_ptr_ != input_end_; ++input_ptr_)
         {
             char_type curr_char_ = *input_ptr_;
             switch (curr_char_)
@@ -531,9 +514,8 @@ public:
 
     void update(const char_type* data, std::size_t length)
     {
-        begin_input_ = data;
-        end_input_ = data + length;
-        input_ptr_ = begin_input_;
+        input_end_ = data + length;
+        input_ptr_ = data;
     }
 
     void parse_some(basic_json_visitor<char_type>& visitor)
@@ -579,7 +561,7 @@ public:
             more_ = false;
             return;
         }
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && more_)
         {
@@ -1587,7 +1569,7 @@ public:
     const char_type* parse_true(const char_type* cur, basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         begin_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - cur >= 4))
+        if (JSONCONS_LIKELY(input_end_ - cur >= 4))
         {
             if (*(cur+1) == 'r' && *(cur+2) == 'u' && *(cur+3) == 'e')
             {
@@ -1624,7 +1606,7 @@ public:
     void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         begin_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 4))
+        if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
@@ -1660,7 +1642,7 @@ public:
     const char_type* parse_false(const char_type* cur, basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         begin_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - cur >= 5))
+        if (JSONCONS_LIKELY(input_end_ - cur >= 5))
         {
             if (*(cur+1) == 'a' && *(cur+2) == 'l' && *(cur+3) == 's' && *(cur+4) == 'e')
             {
@@ -1697,7 +1679,7 @@ public:
     const char_type* parse_number(const char_type* hdr, basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         const char_type* cur = hdr;
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         switch (number_state_)
         {
@@ -1920,7 +1902,7 @@ exp3:
 
     const char_type* parse_string(const char_type* cur, basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
         const char_type* sb = cur;
 
         switch (string_state_)
@@ -2369,15 +2351,11 @@ escape_u8:
         return position_;
     }
 
-    std::size_t offset() const 
-    {
-        return input_ptr_ - begin_input_;
-    }
 private:
 
     void skip_space(char_type const ** ptr)
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
         const char_type* cur = *ptr;
 
         while (cur < local_input_end) 
