@@ -236,6 +236,11 @@ public:
         return input_ptr_ == input_end_;
     }
 
+    const char_type* current() const
+    {
+        return input_ptr_;
+    }
+
     ~basic_json_parser() noexcept
     {
     }
