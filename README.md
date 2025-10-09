@@ -73,6 +73,18 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 [RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://mtmorgan.github.io/rjsoncons/)&nbsp;&nbsp;&nbsp;[CoppeliaSim](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)&nbsp;&nbsp;&nbsp;[reflect-cpp](https://github.com/getml/reflect-cpp?tab=readme-ov-file#serialization-formats)
 
+## Benchmarks
+
+- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
+
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
+
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
+
+The benchmark code is available [here](https://github.com/danielaparker/json_benchmarks).
+
+[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
+
 ## Get jsoncons
 
 You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library manager to install the [jsoncons package](https://github.com/microsoft/vcpkg/tree/master/ports/jsoncons).
@@ -95,18 +107,6 @@ their standard library equivalents if detected. Otherwise they will be typedefed
 The library uses exceptions and in some cases [std::error_code](https://en.cppreference.com/w/cpp/error/error_code)'s to report errors. Apart from `jsoncons::assertion_error`,
 all jsoncons exception classes implement the [jsoncons::json_error](doc/ref/corelib/json_error.md) interface.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
-
-## Benchmarks
-
-[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
-
-- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
-
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
-
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
-
-[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
 
 ## Examples
 
