@@ -7,6 +7,9 @@
 
 TEST_CASE("configuration")
 {
+    char* p = new char [10];
+    p[0] = 0;
+
     #if defined(__clang__) 
         std::cout << "clang" << "\n";
     #elif defined(__GNUC__)
