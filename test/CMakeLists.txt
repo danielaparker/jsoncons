@@ -14,7 +14,7 @@ include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
-OPTION(JSONCONS_SANITIZE "sanitize" OFF)
+OPTION(JSONCONS_SANITIZE "sanitize" ON)
 option(JSONCONS_VALGRIND "Execute tests with valgrind" OFF)
 
 if(JSONCONS_VALGRIND)

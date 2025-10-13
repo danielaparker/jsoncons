@@ -7,6 +7,7 @@
 
 TEST_CASE("configuration")
 {
+    //memory test
     char* p = new char [10];
     p[0] = 0;
 
