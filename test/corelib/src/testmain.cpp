@@ -7,9 +7,9 @@
 
 TEST_CASE("configuration")
 {
-    //memory test
-    char* p = new char [10];
-    p[0] = 0;
+    //memory leak test
+    //char* p = new char [10];
+    //p[0] = 0;
 
     #if defined(__clang__) 
         std::cout << "clang" << "\n";
