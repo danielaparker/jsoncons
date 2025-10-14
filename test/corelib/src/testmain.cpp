@@ -7,6 +7,10 @@
 
 TEST_CASE("configuration")
 {
+    //memory leak test
+    //char* p = new char [10];
+    //p[0] = 0;
+
     #if defined(__clang__) 
         std::cout << "clang" << "\n";
     #elif defined(__GNUC__)
