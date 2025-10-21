@@ -302,7 +302,7 @@ private:
                 before_value(jsoncons::bson::bson_type::decimal128_type);
                 decimal128_t dec;
                 auto rc = decimal128_from_chars(sv.data(), sv.data()+sv.size(), dec);
-                if (rc.ec != std::errc())
+                if (rc.ec != std::errc{})
                 {
                     ec = bson_errc::invalid_decimal128_string;
                     JSONCONS_VISITOR_RETURN;

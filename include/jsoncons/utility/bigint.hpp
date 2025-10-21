@@ -33,7 +33,7 @@ struct to_bigint_result
     const CharT* ptr;
     std::errc ec;
     constexpr to_bigint_result(const CharT* ptr_)
-        : ptr(ptr_), ec(std::errc())
+        : ptr(ptr_), ec(std::errc{})
     {
     }
     constexpr to_bigint_result(const CharT* ptr_, std::errc ec_)
@@ -47,7 +47,7 @@ struct to_bigint_result
 
     constexpr explicit operator bool() const noexcept
     {
-        return ec == std::errc();
+        return ec == std::errc{};
     }
     std::error_code error_code() const
     {

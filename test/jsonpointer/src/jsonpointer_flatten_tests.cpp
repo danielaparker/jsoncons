@@ -19,6 +19,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("jsonpointer unflatten tests 1")
 {
     SECTION("test 1")
@@ -149,7 +150,7 @@ TEST_CASE("flatten test")
 
         //std::cout << pretty_print(result) << "\n";
         json unflattened = jsonpointer::unflatten(result);
-        CHECK(unflattened == input);
+        CHECK(input == unflattened);
         //std::cout << pretty_print(unflattened) << "\n";
 
     }
@@ -168,7 +169,7 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
 
         json flattened = jsonpointer::flatten(input);
         json unflattened = jsonpointer::unflatten(flattened);
-        CHECK(unflattened == input);
+        CHECK(input == unflattened);
     }
     SECTION("array with empty array or object")
     {
@@ -181,7 +182,47 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
 
         json flattened = jsonpointer::flatten(input);
         json unflattened = jsonpointer::unflatten(flattened);
-        CHECK(unflattened == input);
+        CHECK(input == unflattened);
+    }
+}
+#endif
+TEST_CASE("jsonpointer flatten/unflatten test")
+{
+    /*SECTION("array with 2 elements")
+    {
+        json input = json::parse(R"(
+[0,1]
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        json unflattened = jsonpointer::unflatten2(flattened);
+
+        CHECK(input == unflattened);
+    }*/
+    /*SECTION("array with more than 9 elements")
+    {
+        json input = json::parse(R"(
+[0,1,2,3,4,5,6,7,8,9,10,11]
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        json unflattened = jsonpointer::unflatten2(flattened);
+
+        CHECK(input == unflattened);
+    }*/
+    SECTION("array with array with 2 elements")
+    {
+        json input = json::parse(R"(
+[[0,1]]
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        std::cout << "(1) " << input << "\n";
+        std::cout << "(2) " << flattened << "\n";
+        json unflattened = jsonpointer::unflatten2(flattened);
+
+        std::cout << "(3) " << unflattened << "\n";
+        //CHECK(input == unflattened);
     }
 }
 

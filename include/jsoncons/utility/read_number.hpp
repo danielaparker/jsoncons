@@ -135,7 +135,7 @@ struct to_number_result
     const CharT* ptr;
     std::errc ec;
     constexpr to_number_result(const CharT* ptr_)
-        : ptr(ptr_), ec(std::errc())
+        : ptr(ptr_), ec(std::errc{})
     {
     }
     constexpr to_number_result(const CharT* ptr_, std::errc ec_)
@@ -149,7 +149,7 @@ struct to_number_result
 
     constexpr explicit operator bool() const noexcept
     {
-        return ec == std::errc();
+        return ec == std::errc{};
     }
     std::error_code error_code() const
     {
@@ -339,7 +339,7 @@ dec_to_integer(const CharT* s, std::size_t length, T& value)
 
     U num;
     auto ru = dec_to_integer(s, length, num);
-    if (ru.ec != std::errc())
+    if (ru.ec != std::errc{})
     {
         return to_number_result<CharT>(ru.ptr, ru.ec);
     }
@@ -549,7 +549,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
                 break;
         }
     }
-    return (state == integer_chars_state::initial) ? to_number_result<CharT>(s, std::errc::invalid_argument) : to_number_result<CharT>(s, std::errc());
+    return (state == integer_chars_state::initial) ? to_number_result<CharT>(s, std::errc::invalid_argument) : to_number_result<CharT>(s, std::errc{});
 }
 
 template <typename T,typename CharT>
@@ -574,7 +574,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
 
     U u;
     auto ru = to_integer(s, length, u);
-    if (ru.ec != std::errc())
+    if (ru.ec != std::errc{})
     {
         return to_number_result<CharT>(ru.ptr, ru.ec);
     }
@@ -587,7 +587,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
         else
         {
             n = static_cast<T>(U(0) - u);
-            return to_number_result<CharT>(ru.ptr, std::errc());
+            return to_number_result<CharT>(ru.ptr, std::errc{});
         }
     }
     else
@@ -599,7 +599,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
         else
         {
             n = static_cast<T>(u);
-            return to_number_result<CharT>(ru.ptr, std::errc());
+            return to_number_result<CharT>(ru.ptr, std::errc{});
         }
     }
 }
@@ -694,7 +694,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
         }
     }
 
-    return to_number_result<CharT>(s, std::errc());
+    return to_number_result<CharT>(s, std::errc{});
 }
 
 template <typename T,typename CharT>
@@ -740,7 +740,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
         n += x;
     }
 
-    return to_number_result<CharT>(s, std::errc());
+    return to_number_result<CharT>(s, std::errc{});
 }
 
 // decstr_to_double

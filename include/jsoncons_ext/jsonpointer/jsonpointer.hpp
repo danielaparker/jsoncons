@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 #define JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <ostream>
@@ -15,6 +16,7 @@
 #include <type_traits> // std::enable_if, std::true_type
 #include <utility> // std::move
 #include <vector>
+#include <set>
 
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_type.hpp>
@@ -221,6 +223,21 @@ namespace jsonpointer {
                 tokens.push_back(buffer);
             }
             return basic_json_pointer(tokens);
+        }
+
+        const std::vector<string_type>& tokens() const
+        {
+            return tokens_;
+        }
+
+        std::vector<string_type>& tokens() 
+        {
+            return tokens_;
+        }
+
+        const string_type& back() const
+        {
+            return tokens_.back();
         }
 
         // operator=
@@ -1297,12 +1314,13 @@ namespace jsonpointer {
 
     // unflatten
 
-    enum class unflatten_options {none,assume_object = 1
-};
+    enum class unflatten_options {none,assume_object = 1};
 
     template <typename Json>
     Json safe_unflatten (Json& value)
     {
+        using char_type = typename Json::char_type;
+
         if (!value.is_object() || value.empty())
         {
             return value;
@@ -1322,12 +1340,19 @@ namespace jsonpointer {
 
         if (safe)
         {
+            using value_type = std::pair<std::basic_string<char_type>,Json*>;
+            std::vector<value_type> temp;
             Json j(json_array_arg);
             j.reserve(value.size());
             for (auto& item : value.object_range())
             {
+                basic_json_pointer<char_type> jptr(item.key());
+                temp.push_back(std::make_pair(jptr.back(), &item.value()));
                 j.emplace_back(std::move(item.value()));
             }
+            std::sort(temp.begin(), temp.end(), [](const value_type& a, const value_type& b) 
+                {if (a.first.size() < b.first.size()) return true; if (a.first.size() > b.first.size()) return false; return a.first < b.first;}
+            );
             Json a(json_array_arg);
             for (auto& item : j.array_range())
             {
@@ -1350,12 +1375,37 @@ namespace jsonpointer {
     jsoncons::optional<Json> try_unflatten_array(const Json& value)
     {
         using char_type = typename Json::char_type;
+        using string_type = typename basic_json_pointer<char_type>::string_type;
+
+        std::size_t max_depth{0};
+        std::vector<basic_json_pointer<char_type>> tokens;
+        for (const auto& item : value.object_range())
+        {
+            tokens.push_back(basic_json_pointer<char_type>{item.key()});
+            if (tokens.back().tokens().size() > max_depth)
+            {
+                max_depth = tokens.back().tokens().size();
+            }
+        }
+
+        auto tokens_ptr = tokens.begin();
+        for (const auto& item : value.object_range())
+        {
+            auto first = tokens_ptr->begin()->begin();
+            auto penultimate = first + (tokens_ptr->begin()->size() - 1);
+            auto last = tokens_ptr->begin()->end();
+
+
+
+            ++tokens_ptr;
+        }
 
         if (JSONCONS_UNLIKELY(!value.is_object()))
         {
             JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
         }
-        Json result;
+
+        Json result;  // why not array
 
         for (const auto& item: value.object_range())
         {
@@ -1364,10 +1414,10 @@ namespace jsonpointer {
             std::size_t index = 0;
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
-                auto s = *it;
+                const auto& s = *it;
                 std::size_t n{0};
                 auto r = jsoncons::utility::dec_to_integer(s.data(), s.size(), n);
-                if (r.ec == std::errc() && (index++ == n))
+                if (r.ec == std::errc{} && (index++ == n))
                 {
                     if (!part->is_array())
                     {
@@ -1460,6 +1510,93 @@ namespace jsonpointer {
         {
             return unflatten_to_object(value,options);
         }
+    }
+
+    template <typename A,typename B>
+    struct pair_less
+    {
+        static bool operator()(const std::pair<A,B>& l, const std::pair<A,B>& r)
+        {
+            return l.first < r.first;
+        }
+    };
+
+    template <typename Json>
+    jsoncons::optional<Json> try_unflatten_array2(const std::vector<basic_json_pointer<typename Json::char_type>>& jptrs, 
+        std::size_t offset, const Json& value)
+    {
+        using char_type = typename Json::char_type;
+
+        auto it = jptrs.begin();
+        auto last = jptrs.end();
+
+        using element_type = std::pair<std::size_t,Json>;
+
+        std::set<element_type,pair_less<std::size_t,Json>> v;
+        for (const auto& item : value.object_range())
+        {
+            if (it->tokens().size() <= offset)
+            {
+                return jsoncons::optional<Json>{};
+            }
+            auto jt = it->tokens().begin() + offset;
+            const auto& s = *jt;
+            std::size_t n;
+            auto r = jsoncons::utility::dec_to_integer(s.data(), s.size(), n);
+            if (r.ec != std::errc{})
+            {
+                return jsoncons::optional<Json>{};
+            }
+            if (offset + 1 == it->tokens().size())
+            {
+                v.emplace(std::make_pair(n,item.value()));
+            }
+            else
+            {
+                auto res = try_unflatten_array2(jptrs, offset+1, value);
+                if (!res)
+                {
+                    return jsoncons::optional<Json>{};
+                }
+                auto x = v.emplace(std::make_pair(n,std::move(*res)));
+            }
+            ++it;
+        }
+
+        Json ja{json_array_arg};
+        ja.reserve(value.size());
+        for (const auto& item : v)
+        {
+            ja.push_back(std::move(item.second));
+        }
+
+        return jsoncons::optional<Json>{std::move(ja)};
+    }
+
+    template <typename Json>
+    Json unflatten2(const Json& value, unflatten_options options = unflatten_options::none)
+    {
+        using char_type = typename Json::char_type;
+        using string_type = typename basic_json_pointer<char_type>::string_type;
+
+        if (JSONCONS_UNLIKELY(!value.is_object()))
+        {
+            JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
+        }
+
+        std::size_t max_tokens{0};
+        std::vector<basic_json_pointer<char_type>> jptrs;
+        for (const auto& item : value.object_range())
+        {
+            jptrs.push_back(basic_json_pointer<char_type>{item.key()});
+            if (jptrs.back().tokens().size() > max_tokens)
+            {
+                max_tokens = jptrs.back().tokens().size();
+            }
+        }
+
+        auto result = try_unflatten_array2(jptrs, 0, value);
+        return result ? *result : Json::null();
     }
 
 } // namespace jsonpointer

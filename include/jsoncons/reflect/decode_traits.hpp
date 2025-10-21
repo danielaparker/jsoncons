@@ -692,7 +692,7 @@ struct decode_traits<T,
             }
             key_type n{0};
             auto r = jsoncons::utility::to_integer(s.data(), s.size(), n); 
-            if (r.ec != std::errc())
+            if (r.ec != std::errc{})
             {
                 return result_type{jsoncons::unexpect, json_errc::invalid_number, cursor.line(), cursor.column()}; 
             }
