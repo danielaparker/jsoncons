@@ -1551,7 +1551,7 @@ namespace jsonpointer {
             {
                 v.emplace(std::make_pair(n,item.value()));
             }
-            else
+            else if (v.count(std::make_pair(offset,Json{})) == 0)
             {
                 auto res = try_unflatten_array2(jptrs, offset+1, value);
                 if (!res)

@@ -188,7 +188,7 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
 #endif
 TEST_CASE("jsonpointer flatten/unflatten test")
 {
-    /*SECTION("array with 2 elements")
+    SECTION("array with 2 elements")
     {
         json input = json::parse(R"(
 [0,1]
@@ -198,8 +198,8 @@ TEST_CASE("jsonpointer flatten/unflatten test")
         json unflattened = jsonpointer::unflatten2(flattened);
 
         CHECK(input == unflattened);
-    }*/
-    /*SECTION("array with more than 9 elements")
+    }
+    SECTION("array with more than 9 elements")
     {
         json input = json::parse(R"(
 [0,1,2,3,4,5,6,7,8,9,10,11]
@@ -209,7 +209,7 @@ TEST_CASE("jsonpointer flatten/unflatten test")
         json unflattened = jsonpointer::unflatten2(flattened);
 
         CHECK(input == unflattened);
-    }*/
+    }
     SECTION("array with array with 2 elements")
     {
         json input = json::parse(R"(
@@ -221,8 +221,8 @@ TEST_CASE("jsonpointer flatten/unflatten test")
         std::cout << "(2) " << flattened << "\n";
         json unflattened = jsonpointer::unflatten2(flattened);
 
-        std::cout << "(3) " << unflattened << "\n";
-        //CHECK(input == unflattened);
+        //std::cout << "(3) " << unflattened << "\n";
+        CHECK(input == unflattened);
     }
 }
 
