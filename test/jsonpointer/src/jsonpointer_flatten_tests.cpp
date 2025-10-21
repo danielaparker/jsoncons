@@ -189,7 +189,7 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
     }
 }
 #endif
-//#if 0
+#if 0
 TEST_CASE("jsonpointer flatten/unflatten test")
 {
     SECTION("array with 2 elements")
@@ -255,4 +255,4 @@ TEST_CASE("jsonpointer flatten/unflatten test")
         CHECK(input == unflattened);
     }
 }
-//#endif
+#endif

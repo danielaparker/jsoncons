@@ -1523,8 +1523,6 @@ namespace jsonpointer {
         auto it = jptrs.begin();
         auto last = jptrs.end();
 
-        using element_type = std::pair<std::size_t,Json>;
-
         Json jo{json_object_arg};
         for (const auto& item : value.object_range())
         {
@@ -1573,9 +1571,9 @@ namespace jsonpointer {
         std::map<std::size_t,Json> m;
         for (const auto& item : value.object_range())
         {
-            if (it->tokens().size() <= offset)
+            if (offset >= it->tokens().size())
             {
-                return jsoncons::optional<Json>{};
+                return unflatten_object(jptrs, offset, value, unflatten_options{});
             }
             auto jt = it->tokens().begin() + offset;
             const auto& s = *jt;
@@ -1583,7 +1581,7 @@ namespace jsonpointer {
             auto r = jsoncons::utility::dec_to_integer(s.data(), s.size(), n);
             if (r.ec != std::errc{})
             {
-                return jsoncons::optional<Json>{};
+                return unflatten_object(jptrs, offset, value, unflatten_options{});
             }
             if (offset + 1 == it->tokens().size())
             {
