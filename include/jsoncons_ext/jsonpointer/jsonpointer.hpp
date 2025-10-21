@@ -1565,12 +1565,25 @@ namespace jsonpointer {
 
         Json ja{json_array_arg};
         ja.reserve(value.size());
+        std::size_t index = 0;
         for (const auto& item : v)
         {
+            if (item.first != index)
+            {
+                break;
+            }
             ja.push_back(std::move(item.second));
+            ++index;
         }
 
-        return jsoncons::optional<Json>{std::move(ja)};
+        if (index == v.size())
+        {
+            return jsoncons::optional<Json>{std::move(ja)};
+        }
+        else
+        {
+            return jsoncons::optional<Json>{};
+        }
     }
 
     template <typename Json>
