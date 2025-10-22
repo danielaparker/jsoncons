@@ -1534,16 +1534,16 @@ namespace jsonpointer {
     }
 #endif
 
-    template <typename Json>
-    Json unflatten_object(const std::map<basic_json_pointer<typename Json::char_type>,const Json*>& jptrs, 
-        std::size_t offset, unflatten_options options)
+    template <typename Json, typename Iterator>
+    jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset);
+
+    template <typename Json, typename Iterator>
+    Json unflatten_object(Iterator first, Iterator last, std::size_t offset, unflatten_options options)
     {
         using char_type = typename Json::char_type;
 
-        const auto last = jptrs.end();
-
         Json jo{json_object_arg};
-        for (auto it = jptrs.begin(); it != last; ++it)
+        for (auto it = first; it != last; ++it)
         {
             if (it->first.tokens().size() <= offset)
             {
@@ -1558,10 +1558,10 @@ namespace jsonpointer {
             {
                 if (options == unflatten_options{})
                 {
-                    auto res = try_unflatten_array(jptrs, offset+1);
+                    auto res = try_unflatten_array<Json,Iterator>(first, last, offset+1);
                     if (!res)
                     {
-                        jo.try_emplace(*jt, unflatten_object(jptrs, offset+1, options));
+                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(first, last, offset+1, options));
                     }
                     else
                     {
@@ -1570,27 +1570,24 @@ namespace jsonpointer {
                 }
                 else
                 {
-                    jo.try_emplace(*jt, unflatten_object(jptrs, offset+1, options));
+                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(first, last, offset+1, options));
                 }
             }
         }
         return jsoncons::optional<Json>{std::move(jo)};
     }
 
-    template <typename Json>
-    jsoncons::optional<Json> try_unflatten_array(const std::map<basic_json_pointer<typename Json::char_type>,const Json*>& jptrs, 
-        std::size_t offset)
+    template <typename Json, typename Iterator>
+    jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset)
     {
         using char_type = typename Json::char_type;
 
-        const auto last = jptrs.end();
-
         std::map<std::size_t,Json> m;
-        for (auto it = jptrs.begin(); it != last; ++it)
+        for (auto it = first; it != last; ++it)
         {
             if (offset >= it->first.tokens().size())
             {
-                return unflatten_object(jptrs, offset, unflatten_options{});
+                return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
             }
             auto jt = it->first.tokens().begin() + offset;
             const auto& s = *jt;
@@ -1598,7 +1595,7 @@ namespace jsonpointer {
             auto r = jsoncons::utility::dec_to_integer(s.data(), s.size(), n);
             if (r.ec != std::errc{})
             {
-                return unflatten_object(jptrs, offset, unflatten_options{});
+                return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
             }
             if (offset + 1 == it->first.tokens().size())
             {
@@ -1606,10 +1603,10 @@ namespace jsonpointer {
             }
             else if (m.find(n) == m.end())
             {
-                auto res = try_unflatten_array(jptrs, offset+1);
+                auto res = try_unflatten_array<Json,Iterator>(first, last, offset+1);
                 if (!res)
                 {
-                    m.emplace(std::make_pair(n,unflatten_object(jptrs, offset+1, unflatten_options{})));
+                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(first, last, offset+1, unflatten_options{})));
                 }
                 else
                 {
@@ -1637,7 +1634,7 @@ namespace jsonpointer {
         }
         else
         {
-            return jsoncons::optional<Json>{unflatten_object(jptrs, offset, unflatten_options{})};
+            return jsoncons::optional<Json>{unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{})};
         }
     }
 
@@ -1645,14 +1642,14 @@ namespace jsonpointer {
     Json unflatten(const Json& value, unflatten_options options = unflatten_options::none)
     {
         using char_type = typename Json::char_type;
-        using string_type = typename basic_json_pointer<char_type>::string_type;
+        using map_type = std::map<basic_json_pointer<char_type>, const Json*>;
 
         if (JSONCONS_UNLIKELY(!value.is_object()))
         {
             JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
         }
 
-        std::map<basic_json_pointer<char_type>,const Json*> jptrs;
+        map_type jptrs;
         for (const auto& item : value.object_range())
         {
             jptrs.emplace(std::make_pair(item.key(), std::addressof(item.value())));
@@ -1660,12 +1657,12 @@ namespace jsonpointer {
 
         if (options == unflatten_options{})
         {
-            auto result = try_unflatten_array(jptrs, 0);
-            return result ? *result : unflatten_object(jptrs, 0, options);
+            auto result = try_unflatten_array<Json,typename map_type::iterator>(jptrs.begin(), jptrs.end(), 0);
+            return result ? *result : unflatten_object<Json,typename map_type::iterator>(jptrs.begin(), jptrs.end(), 0, options);
         }
         else
         {
-            return unflatten_object(jptrs, 0, options);
+            return unflatten_object<Json,typename map_type::iterator>(jptrs.begin(), jptrs.end(), 0, options);
         }
     }
 
