@@ -1558,10 +1558,10 @@ namespace jsonpointer {
             {
                 if (options == unflatten_options{})
                 {
-                    auto res = try_unflatten_array<Json,Iterator>(first, last, offset+1);
+                    auto res = try_unflatten_array<Json,Iterator>(it, last, offset+1);
                     if (!res)
                     {
-                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(first, last, offset+1, options));
+                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last, offset+1, options));
                     }
                     else
                     {
@@ -1570,7 +1570,7 @@ namespace jsonpointer {
                 }
                 else
                 {
-                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(first, last, offset+1, options));
+                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last, offset+1, options));
                 }
             }
         }
@@ -1603,10 +1603,10 @@ namespace jsonpointer {
             }
             else if (m.find(n) == m.end())
             {
-                auto res = try_unflatten_array<Json,Iterator>(first, last, offset+1);
+                auto res = try_unflatten_array<Json,Iterator>(it, last, offset+1);
                 if (!res)
                 {
-                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(first, last, offset+1, unflatten_options{})));
+                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(it, last, offset+1, unflatten_options{})));
                 }
                 else
                 {
