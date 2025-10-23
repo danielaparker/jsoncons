@@ -1591,8 +1591,6 @@ namespace jsonpointer {
     template <typename Json, typename Iterator>
     jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset)
     {
-        using char_type = typename Json::char_type;
-
         std::map<std::size_t,Json> m;
         for (auto it = first; it != last; ++it)
         {
