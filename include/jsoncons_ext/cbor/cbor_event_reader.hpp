@@ -51,9 +51,9 @@ namespace cbor {
             : parser_(std::forward<Sourceable>(source), options, alloc)
         {
             parser_.cursor_mode(true);
-            if (!done())
+            if (!parser_.done())
             {
-                next();
+                read_next();
             }
         }
 
@@ -88,9 +88,9 @@ namespace cbor {
              eof_(false)
         {
             parser_.cursor_mode(true);
-            if (!done())
+            if (!parser_.done())
             {
-                next(ec);
+                read_next(ec);
             }
         }
         
@@ -104,9 +104,9 @@ namespace cbor {
             parser_.reset();
             cursor_visitor_.reset();
             eof_ = false;
-            if (!done())
+            if (!read_done())
             {
-                next();
+                read_next();
             }
         }
 
@@ -116,9 +116,9 @@ namespace cbor {
             parser_.reset(std::forward<Sourceable>(source));
             cursor_visitor_.reset();
             eof_ = false;
-            if (!done())
+            if (!read_done())
             {
-                next();
+                read_next();
             }
         }
 
@@ -127,9 +127,9 @@ namespace cbor {
             parser_.reset();
             cursor_visitor_.reset();
             eof_ = false;
-            if (!done())
+            if (!read_done())
             {
-                next(ec);
+                read_next(ec);
             }
         }
 
@@ -139,15 +139,15 @@ namespace cbor {
             parser_.reset(std::forward<Sourceable>(source));
             cursor_visitor_.reset();
             eof_ = false;
-            if (!done())
+            if (!read_done())
             {
-                next(ec);
+                read_next(ec);
             }
         }
 
         bool done() const override
         {
-            return parser_.done();
+            return read_done();
         }
 
         bool is_typed_array() const
@@ -206,12 +206,7 @@ namespace cbor {
 
         void next() override
         {
-            std::error_code ec;
-            next(ec);
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
-            }
+            read_next();
         }
 
         void next(std::error_code& ec) override
@@ -247,6 +242,22 @@ namespace cbor {
         }
 
     private:
+
+        bool read_done() const
+        {
+            return parser_.done();
+        }
+
+        void read_next()
+        {
+            std::error_code ec;
+            read_next(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+            }
+        }
+
         void read_next(std::error_code& ec)
         {
             if (cursor_visitor_.in_available())

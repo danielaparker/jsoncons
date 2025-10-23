@@ -7,8 +7,10 @@
 
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
+#include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 #include <sstream>
 #include <vector>

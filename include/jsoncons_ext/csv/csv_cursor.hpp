@@ -63,9 +63,9 @@ public:
          parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -131,9 +131,9 @@ public:
          parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -147,9 +147,9 @@ public:
          parser_(options,alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -194,9 +194,9 @@ public:
         source_ = std::forward<Sourceable>(source);
         parser_.reinitialize();
         cursor_visitor_.reset();
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -217,9 +217,9 @@ public:
         source_ = std::forward<Sourceable>(source);
         parser_.reinitialize();
         cursor_visitor_.reset();
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -283,12 +283,7 @@ public:
 
     void next() override
     {
-        std::error_code ec;
-        next(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
-        }
+        read_next();
     }
 
     void next(std::error_code& ec) override
@@ -325,6 +320,11 @@ public:
 
 private:
 
+    bool read_done() const
+    {
+        return parser_.done();
+    }
+
     void initialize_with_string_view(string_view_type sv)
     {
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
@@ -334,9 +334,9 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -350,9 +350,19 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
+        }
+    }
+
+    void read_next()
+    {
+        std::error_code ec;
+        read_next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 

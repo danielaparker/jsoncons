@@ -54,9 +54,9 @@ public:
         : parser_(std::forward<Sourceable>(source), options, alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -91,9 +91,9 @@ public:
        : parser_(std::forward<Sourceable>(source), options, alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -107,9 +107,9 @@ public:
         parser_.reset();
         cursor_visitor_.reset();
         eof_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -119,9 +119,9 @@ public:
         parser_.reset(std::forward<Sourceable>(source));
         cursor_visitor_.reset();
         eof_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -130,9 +130,9 @@ public:
         parser_.reset();
         cursor_visitor_.reset();
         eof_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -142,9 +142,9 @@ public:
         parser_.reset(std::forward<Sourceable>(source));
         cursor_visitor_.reset();
         eof_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -212,12 +212,7 @@ public:
 
     void next() override
     {
-        std::error_code ec;
-        next(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
-        }
+        read_next();
     }
 
     void next(std::error_code& ec) override
@@ -253,6 +248,22 @@ public:
     }
 
 private:
+
+    bool read_done() const
+    {
+        return parser_.done();
+    }
+
+    void read_next()
+    {
+        std::error_code ec;
+        read_next(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+        }
+    }
+
     void read_next(std::error_code& ec)
     {
         parser_.restart();

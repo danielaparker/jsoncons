@@ -59,7 +59,7 @@ public:
          parser_(options,err_handler,alloc)
     {
         parser_.cursor_mode(true);
-        if (!done())
+        if (!read_done())
         {
             std::error_code local_ec;
             read_next(local_ec);
@@ -139,7 +139,7 @@ public:
     {
         parser_.cursor_mode(true);
 
-        if (!done())
+        if (!read_done())
         {
             std::error_code local_ec;
             read_next(local_ec);
@@ -168,7 +168,7 @@ public:
     {
         parser_.cursor_mode(true);
 
-        if (!done())
+        if (!read_done())
         {
             std::error_code local_ec;
             read_next(local_ec);
@@ -215,9 +215,9 @@ public:
         parser_.reset();
         cursor_visitor_.reset();
         done_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -229,9 +229,9 @@ public:
         parser_.reinitialize();
         cursor_visitor_.reset();
         done_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next();
+            read_next();
         }
     }
 
@@ -251,9 +251,9 @@ public:
         parser_.reset();
         cursor_visitor_.reset();
         done_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -265,9 +265,9 @@ public:
         parser_.reinitialize();
         cursor_visitor_.reset();
         done_ = false;
-        if (!done())
+        if (!read_done())
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
@@ -333,12 +333,7 @@ public:
 
     void next() override
     {
-        std::error_code ec;
-        next(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
-        }
+        read_next();
     }
 
     void next(std::error_code& ec) override
@@ -420,6 +415,11 @@ public:
 
 private:
 
+    bool read_done() const 
+    {
+        return parser_.done() || done_;
+    }
+
     void initialize_with_string_view(string_view_type sv)
     {
         std::error_code local_ec;
@@ -440,8 +440,8 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
-        bool is_done = parser_.done() || done_;
-        if (!is_done)
+        bool read_done = parser_.done() || done_;
+        if (!read_done)
         {
             std::error_code local_ec;
             read_next(local_ec);
