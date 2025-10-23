@@ -1552,7 +1552,9 @@ namespace jsonpointer {
     Json unflatten_object(Iterator first, Iterator last, std::size_t offset, unflatten_options options)
     {
         Json jo{json_object_arg};
-        for (auto it = first; it != last; ++it)
+
+        auto it = first;
+        while (it != last)
         {
             if (it->first.tokens().size() <= offset)
             {
@@ -1562,16 +1564,17 @@ namespace jsonpointer {
             if (offset + 1 == it->first.tokens().size())
             {
                 jo.try_emplace(*jt, *(it->second));
+                ++it;
             }
-            else if (!jo.contains(*jt))
+            else 
             {
+                auto last2 = find_last(it, last, offset, *jt);
                 if (options == unflatten_options{})
                 {
-                    auto res = try_unflatten_array<Json,Iterator>(it, last, offset+1);
+                    auto res = try_unflatten_array<Json,Iterator>(it, last2, offset+1);
                     if (!res)
                     {
-                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, 
-                            find_last(it, last, offset, *jt), offset+1, options));
+                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last2, offset+1, options));
                     }
                     else
                     {
@@ -1580,9 +1583,9 @@ namespace jsonpointer {
                 }
                 else
                 {
-                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, 
-                        find_last(it, last, offset, *jt), offset+1, options));
+                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last2, offset+1, options));
                 }
+                it = last2;
             }
         }
         return jsoncons::optional<Json>{std::move(jo)};
@@ -1592,7 +1595,9 @@ namespace jsonpointer {
     jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset)
     {
         std::map<std::size_t,Json> m;
-        for (auto it = first; it != last; ++it)
+
+        auto it = first;
+        while (it != last)
         {
             if (offset >= it->first.tokens().size())
             {
@@ -1609,20 +1614,21 @@ namespace jsonpointer {
             if (offset + 1 == it->first.tokens().size())
             {
                 m.emplace(std::make_pair(n,*(it->second)));
+                ++it;
             }
-            else if (m.find(n) == m.end())
+            else 
             {
-                auto res = try_unflatten_array<Json,Iterator>(it, find_last(it, last, offset, *jt), 
-                    offset+1);
+                auto last2 = find_last(it, last, offset, *jt);
+                auto res = try_unflatten_array<Json,Iterator>(it, last2, offset+1);
                 if (!res)
                 {
-                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(it, find_last(it, last, offset, *jt), 
-                        offset+1, unflatten_options{})));
+                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(it, last2, offset+1, unflatten_options{})));
                 }
                 else
                 {
                     m.emplace(std::make_pair(n,std::move(*res)));
                 }
+                it = last2;
             }
         }
 
