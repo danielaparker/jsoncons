@@ -1534,6 +1534,17 @@ namespace jsonpointer {
     }
 #endif
 
+    template <typename Iterator,typename StringT>
+    Iterator find_last(Iterator first, Iterator last, std::size_t offset, const StringT& token)
+    {
+        Iterator it = first;
+        while (it != last && *(it->first.tokens().begin() + offset) == token)
+        {
+            ++it;
+        }
+        return it;
+    }
+
     template <typename Json, typename Iterator>
     jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset);
 
@@ -1561,7 +1572,8 @@ namespace jsonpointer {
                     auto res = try_unflatten_array<Json,Iterator>(it, last, offset+1);
                     if (!res)
                     {
-                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last, offset+1, options));
+                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, 
+                            find_last(it, last, offset, *jt), offset+1, options));
                     }
                     else
                     {
@@ -1570,7 +1582,8 @@ namespace jsonpointer {
                 }
                 else
                 {
-                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, last, offset+1, options));
+                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, 
+                        find_last(it, last, offset, *jt), offset+1, options));
                 }
             }
         }
@@ -1603,10 +1616,12 @@ namespace jsonpointer {
             }
             else if (m.find(n) == m.end())
             {
-                auto res = try_unflatten_array<Json,Iterator>(it, last, offset+1);
+                auto res = try_unflatten_array<Json,Iterator>(it, find_last(it, last, offset, *jt), 
+                    offset+1);
                 if (!res)
                 {
-                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(it, last, offset+1, unflatten_options{})));
+                    m.emplace(std::make_pair(n,unflatten_object<Json,Iterator>(it, find_last(it, last, offset, *jt), 
+                        offset+1, unflatten_options{})));
                 }
                 else
                 {

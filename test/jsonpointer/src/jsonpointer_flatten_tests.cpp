@@ -19,7 +19,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("jsonpointer unflatten tests 1")
 {
     SECTION("test 1")
@@ -107,9 +106,7 @@ TEST_CASE("jsonpointer unflatten tests 2")
         //std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
     }
 }
-#endif
 
-#if 0
 TEST_CASE("flatten test")
 {
     json input = json::parse(R"(
@@ -186,7 +183,6 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
         CHECK(input == unflattened);
     }
 }
-#endif
 
 TEST_CASE("jsonpointer flatten/unflatten test")
 {
@@ -254,7 +250,7 @@ TEST_CASE("jsonpointer flatten/unflatten test")
     }
 }
 
-TEST_CASE("jsonpointer unflatten tests 2")
+TEST_CASE("jsonpointer unflatten tests 3")
 {
 
     SECTION("default test")
@@ -284,11 +280,11 @@ TEST_CASE("jsonpointer unflatten tests 2")
         std::cout << "(2) " << flattened << "\n"; 
 
         json unflattened = jsonpointer::unflatten(flattened);
-        //CHECK(expected == unflattened);
+        CHECK(expected == unflattened);
         std::cout << "(3) " << unflattened << "\n"; 
         std::cout << "(4) " << expected << "\n";
     }
-    /*SECTION("default test 2")
+    SECTION("default test 2")
     {
         json input = json::parse(R"(
         {
@@ -309,9 +305,9 @@ TEST_CASE("jsonpointer unflatten tests 2")
         std::cout << "(2) " << flattened << "\n";
 
         json unflattened = jsonpointer::unflatten(flattened);
-        //CHECK(expected == unflattened);
+        CHECK(expected == unflattened);
         std::cout << "(3) " << unflattened << "\n";
         std::cout << "(4) " << expected << "\n";
-    }*/
+    }
 }
 
