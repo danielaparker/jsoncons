@@ -248,6 +248,20 @@ TEST_CASE("jsonpointer flatten/unflatten test")
         //std::cout << unflattened << "\n";
         CHECK(input == unflattened);
     }
+    SECTION("test2")
+    {
+        json input = json::parse(R"(
+{
+    "arr": ["0", "1", "2", "3", "4", "5", "6","7","8", "9", "10", "11"]
+}
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        json unflattened = jsonpointer::unflatten(flattened);
+
+        //std::cout << unflattened << "\n";
+        CHECK(input == unflattened);
+    }
 }
 
 TEST_CASE("jsonpointer unflatten tests 3")
@@ -276,13 +290,13 @@ TEST_CASE("jsonpointer unflatten tests 3")
         ]        
         )");
 
-        std::cout << "(1) " << input << "\n"; 
-        std::cout << "(2) " << flattened << "\n"; 
+        //std::cout << "(1) " << input << "\n"; 
+        //std::cout << "(2) " << flattened << "\n"; 
 
         json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
-        std::cout << "(3) " << unflattened << "\n"; 
-        std::cout << "(4) " << expected << "\n";
+        //std::cout << "(3) " << unflattened << "\n"; 
+        //std::cout << "(4) " << expected << "\n";
     }
     SECTION("default test 2")
     {
@@ -301,13 +315,13 @@ TEST_CASE("jsonpointer unflatten tests 3")
         ]        
         )");
 
-        std::cout << "(1) " << input << "\n";
-        std::cout << "(2) " << flattened << "\n";
+        //std::cout << "(1) " << input << "\n";
+        //std::cout << "(2) " << flattened << "\n";
 
         json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
-        std::cout << "(3) " << unflattened << "\n";
-        std::cout << "(4) " << expected << "\n";
+        //std::cout << "(3) " << unflattened << "\n";
+        //std::cout << "(4) " << expected << "\n";
     }
 }
 
