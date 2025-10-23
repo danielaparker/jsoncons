@@ -1551,8 +1551,6 @@ namespace jsonpointer {
     template <typename Json, typename Iterator>
     Json unflatten_object(Iterator first, Iterator last, std::size_t offset, unflatten_options options)
     {
-        using char_type = typename Json::char_type;
-
         Json jo{json_object_arg};
         for (auto it = first; it != last; ++it)
         {
