@@ -1,3 +1,10 @@
+master
+------
+
+- Fixed bug:
+
+    - Git Issue #644: flatten/unflatten does not preserve arrays with more than 10 elements
+
 1.4.3
 -----
 
