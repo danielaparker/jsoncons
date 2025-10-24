@@ -27,6 +27,24 @@
 
 namespace jsoncons {
 
+template <typename Allocator>
+class bigint_storage : private std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>
+{
+public:
+    using basic_type_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
+public:
+
+    explicit bigint_storage(const Allocator& alloc = Allocator{})
+        : basic_type_allocator_type(alloc)
+    {
+    }
+
+    const basic_type_allocator_type& get_allocator() const
+    {
+        return static_cast<const basic_type_allocator_type&>(*this);
+    }
+};
+
 template <typename CharT>
 struct to_bigint_result
 {
@@ -64,51 +82,24 @@ Chichester: John Wiley.
 
 namespace detail {
 
-    template <typename Allocator>
-    class basic_bigint_base
-    {
-    public:
-        using allocator_type = Allocator;
-        using basic_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;
-
-    private:
-        basic_type_allocator_type alloc_;
-    public:
-       using allocator_traits_type = std::allocator_traits<basic_type_allocator_type>;
-       using stored_allocator_type = allocator_type;
-       using pointer = typename allocator_traits_type::pointer;
-       using value_type = typename allocator_traits_type::value_type;
-       using size_type = std::size_t;
-       using pointer_traits = std::pointer_traits<pointer>;
-
-        basic_bigint_base()
-            : alloc_()
-        {
-        }
-        explicit basic_bigint_base(const allocator_type& alloc)
-            : alloc_(basic_type_allocator_type(alloc))
-        {
-        }
-
-        basic_type_allocator_type get_allocator() const
-        {
-            return alloc_;
-        }
-    };
-
 } // namespace detail
 
 template <typename Allocator = std::allocator<uint64_t>>
-class basic_bigint : protected detail::basic_bigint_base<Allocator>
+class basic_bigint 
 {
-    using base_t = detail::basic_bigint_base<Allocator>;
-
     static constexpr uint64_t max_short_storage_size = 2;
+
+    bigint_storage<Allocator> storage_; 
 public:
 
-    using size_type = typename base_t::size_type;
-    using value_type = typename base_t::value_type;
-    using base_t::get_allocator;
+    using allocator_type = Allocator;
+    using basic_type_allocator_type = typename bigint_storage<Allocator>::basic_type_allocator_type;
+    using allocator_traits_type = std::allocator_traits<basic_type_allocator_type>;
+    using stored_allocator_type = allocator_type;
+    using pointer = typename allocator_traits_type::pointer;
+    using value_type = typename allocator_traits_type::value_type;
+    using size_type = std::size_t;
+    using pointer_traits = std::pointer_traits<pointer>;
     using bigint_type = basic_bigint<Allocator>;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
@@ -315,14 +306,14 @@ public:
     }
 
     explicit basic_bigint(const Allocator& alloc)
-        : base_t(alloc)
+        : storage_(alloc)
     {
         ::new (&short_stor_) short_storage();
     }
 
 
     basic_bigint(const basic_bigint& n)
-        : base_t(n.get_allocator())
+        : storage_(n.get_allocator())
     {
         if (!n.is_dynamic())
         {
@@ -335,7 +326,7 @@ public:
     }
 
     basic_bigint(basic_bigint&& other) noexcept
-        : base_t(other.get_allocator())
+        : storage_(other.get_allocator())
     {
         if (!other.is_dynamic())
         {
@@ -357,6 +348,11 @@ public:
     ~basic_bigint() noexcept
     {
         destroy();
+    }
+
+    basic_type_allocator_type get_allocator() const
+    {
+        return storage_.get_allocator();
     }
 
     constexpr bool is_dynamic() const
