@@ -36,9 +36,9 @@ public:
     using uint64_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<uint64_allocator_type>::size_type;
     using value_type = typename std::allocator_traits<uint64_allocator_type>::value_type;
-    static constexpr value_type max_basic_type = (std::numeric_limits<value_type>::max)();
-    static constexpr value_type basic_type_bits = sizeof(value_type) * 8;  // Number of bits
-    static constexpr value_type basic_type_halfBits = basic_type_bits/2;
+    static constexpr value_type max_value_type = (std::numeric_limits<value_type>::max)();
+    static constexpr value_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
+    static constexpr value_type value_type_half_bits = value_type_bits/2;
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
     static constexpr value_type inlined_capacity = 2;
 public:
@@ -142,9 +142,9 @@ public:
             using unsigned_type = typename std::make_unsigned<T>::type;
 
             auto u = n < 0 ? (unsigned_type(0) - static_cast<unsigned_type>(n)) : static_cast<unsigned_type>(n);
-            values_[0] = value_type(u & max_basic_type);;
-            u >>= basic_type_bits;
-            values_[1] = value_type(u & max_basic_type);;
+            values_[0] = value_type(u & max_value_type);;
+            u >>= value_type_bits;
+            values_[1] = value_type(u & max_value_type);;
         }
 
         template <typename T>
@@ -156,9 +156,9 @@ public:
             is_negative_(false),
             size_(n == 0 ? 0 : inlined_capacity)
         {
-            values_[0] = value_type(n & max_basic_type);;
-            n >>= basic_type_bits;
-            values_[1] = value_type(n & max_basic_type);;
+            values_[0] = value_type(n & max_value_type);;
+            n >>= value_type_bits;
+            values_[1] = value_type(n & max_value_type);;
         }
 
         inlined_storage(const inlined_storage& stor)
@@ -532,7 +532,7 @@ Chichester: John Wiley.
 
 */
 
-template <typename Allocator = std::allocator<value_type>>
+template <typename Allocator = std::allocator<uint64_t>>
 class basic_bigint 
 {
     detail::bigint_storage<Allocator> storage_; 
@@ -548,14 +548,14 @@ public:
 
     static constexpr size_type inlined_capacity = 2;
 
-    static constexpr value_type max_basic_type = (std::numeric_limits<value_type>::max)();
-    static constexpr value_type basic_type_bits = sizeof(value_type) * 8;  // Number of bits
-    static constexpr value_type basic_type_halfBits = basic_type_bits/2;
+    static constexpr value_type max_value_type = (std::numeric_limits<value_type>::max)();
+    static constexpr value_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
+    static constexpr value_type value_type_half_bits = value_type_bits/2;
 
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
-    static constexpr value_type r_mask = (value_type(1) << basic_type_halfBits) - 1;
-    static constexpr value_type l_mask = max_basic_type - r_mask;
-    static constexpr value_type l_bit = max_basic_type - (max_basic_type >> 1);
+    static constexpr value_type r_mask = (value_type(1) << value_type_half_bits) - 1;
+    static constexpr value_type l_mask = max_value_type - r_mask;
+    static constexpr value_type l_bit = max_value_type - (max_value_type >> 1);
     static constexpr value_type max_uint64_div_10 = (std::numeric_limits<value_type>::max)()/10u ;
     static constexpr value_type max_uint64_div_16 = (std::numeric_limits<value_type>::max)()/16u ;
 
@@ -1017,18 +1017,18 @@ public:
 
     basic_bigint& operator<<=( value_type k )
     {
-        size_type q = size_type(k / basic_type_bits);
+        size_type q = size_type(k / value_type_bits);
         if ( q ) // Increase storage_.size() by q:
         {
             resize(size() + q);
             value_type* this_data = data();
             for (size_type i = size(); i-- > 0; )
                 this_data[i] = ( i < q ? 0 : this_data[i - q]);
-            k %= basic_type_bits;
+            k %= value_type_bits;
         }
-        if ( k )  // 0 < k < basic_type_bits:
+        if ( k )  // 0 < k < value_type_bits:
         {
-            value_type k1 = basic_type_bits - k;
+            value_type k1 = value_type_bits - k;
             value_type mask = (value_type(1) << k) - value_type(1);
             resize( size() + 1 );
             value_type* this_data = data();
@@ -1045,7 +1045,7 @@ public:
 
     basic_bigint& operator>>=(value_type k)
     {
-        size_type q = size_type(k / basic_type_bits);
+        size_type q = size_type(k / value_type_bits);
         if ( q >= size())
         {
             resize( 0 );
@@ -1055,7 +1055,7 @@ public:
         {
             memmove( data(), data()+q, size_type((size() - q)*sizeof(value_type)) );
             resize( size_type(size() - q) );
-            k %= basic_type_bits;
+            k %= value_type_bits;
             if ( k == 0 )
             {
                 reduce();
@@ -1065,7 +1065,7 @@ public:
 
         value_type* this_data = data();
         size_type n = size_type(size() - 1);
-        int64_t k1 = basic_type_bits - k;
+        int64_t k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
@@ -1183,7 +1183,7 @@ public:
     {
         double x = 0.0;
         double factor = 1.0;
-        double values = (double)max_basic_type + 1.0;
+        double values = (double)max_value_type + 1.0;
 
         const value_type* p = begin();
         const value_type* pEnd = end();
@@ -1201,7 +1201,7 @@ public:
     {
         long double x = 0.0;
         long double factor = 1.0;
-        long double values = (long double)max_basic_type + 1.0;
+        long double values = (long double)max_value_type + 1.0;
 
         const value_type* p = begin();
         const value_type* pEnd = end();
@@ -1250,7 +1250,7 @@ public:
     {
         basic_bigint<Allocator> v(*this);
 
-        size_type len = (v.size() * basic_type_bits / 3) + 2;
+        size_type len = (v.size() * value_type_bits / 3) + 2;
         data.reserve(len);
 
         static value_type p10 = 1;
@@ -1308,7 +1308,7 @@ public:
     {
         basic_bigint<Allocator> v(*this);
 
-        size_type len = (v.size() * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
+        size_type len = (v.size() * basic_bigint<Allocator>::value_type_bits / 3) + 2;
         data.reserve(len);
         // 1/3 > ln(2)/ln(10)
         static value_type p10 = 1;
@@ -1621,7 +1621,7 @@ public:
 
     void divide(basic_bigint<Allocator> denom, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
-        if ( denom.size() == 0 )
+        if (denom.size() == 0)
         {
             JSONCONS_THROW(std::runtime_error( "Zero divide." ));
         }
@@ -1653,13 +1653,13 @@ public:
             quot.resize(size());
             for (size_type i=size(); i-- > 0; )
             {
-                dividend = (dHi << basic_type_halfBits) | (data()[i] >> basic_type_halfBits);
+                dividend = (dHi << value_type_half_bits) | (data()[i] >> value_type_half_bits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << basic_type_halfBits) | (data()[i] & r_mask);
+                dividend = (r << value_type_half_bits) | (data()[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
-                quot.data()[i] = (q1 << basic_type_halfBits) | q2;
+                quot.data()[i] = (q1 << value_type_half_bits) | q2;
             }
             quot.reduce();
             rem = dHi;
@@ -1690,7 +1690,7 @@ public:
         }
         quot.reduce();
         quot.set_negative(quot_neg);
-        if ( remDesired )
+        if (remDesired)
         {
             unnormalize(rem, x, second_done);
             rem.set_negative(rem_neg);
@@ -1705,34 +1705,34 @@ private:
                     value_type& hi, value_type& lo ) const
     // Multiplying two digits: (hi, lo) = A * B
     {
-        value_type hiA = A >> basic_type_halfBits, loA = A & r_mask,
-                   hiB = B >> basic_type_halfBits, loB = B & r_mask;
+        value_type hiA = A >> value_type_half_bits, loA = A & r_mask,
+                   hiB = B >> value_type_half_bits, loB = B & r_mask;
 
         lo = loA * loB;
         hi = hiA * hiB;
         value_type mid1 = loA * hiB;
         value_type mid2 = hiA * loB;
         value_type old = lo;
-        lo += mid1 << basic_type_halfBits;
-            hi += (lo < old) + (mid1 >> basic_type_halfBits);
+        lo += mid1 << value_type_half_bits;
+            hi += (lo < old) + (mid1 >> value_type_half_bits);
         old = lo;
-        lo += mid2 << basic_type_halfBits;
-            hi += (lo < old) + (mid2 >> basic_type_halfBits);
+        lo += mid2 << value_type_half_bits;
+            hi += (lo < old) + (mid2 >> value_type_half_bits);
     }
 
     value_type DDquotient( value_type A, value_type B, value_type d ) const
     // Divide double word (A, B) by d. Quotient = (qHi, qLo)
     {
         value_type left, middle, right, qHi, qLo, x, dLo1,
-                   dHi = d >> basic_type_halfBits, dLo = d & r_mask;
+                   dHi = d >> value_type_half_bits, dLo = d & r_mask;
         qHi = A/(dHi + 1);
         // This initial guess of qHi may be too small.
         middle = qHi * dLo;
         left = qHi * dHi;
-        x = B - (middle << basic_type_halfBits);
-        A -= (middle >> basic_type_halfBits) + left + (x > B);
+        x = B - (middle << value_type_half_bits);
+        A -= (middle >> value_type_half_bits) + left + (x > B);
         B = x;
-        dLo1 = dLo << basic_type_halfBits;
+        dLo1 = dLo << value_type_half_bits;
         // Increase qHi if necessary:
         while ( A > dHi || (A == dHi && B >= dLo1) )
         {
@@ -1741,15 +1741,15 @@ private:
             B = x;
             qHi++;
         }
-        qLo = ((A << basic_type_halfBits) | (B >> basic_type_halfBits))/(dHi + 1);
+        qLo = ((A << value_type_half_bits) | (B >> value_type_half_bits))/(dHi + 1);
         // This initial guess of qLo may be too small.
         right = qLo * dLo;
         middle = qLo * dHi;
         x = B - right;
         A -= (x > B);
         B = x;
-        x = B - (middle << basic_type_halfBits);
-            A -= (middle >> basic_type_halfBits) + (x > B);
+        x = B - (middle << value_type_half_bits);
+            A -= (middle >> value_type_half_bits) + (x > B);
         B = x;
         // Increase qLo if necessary:
         while ( A || B >= d )
@@ -1759,7 +1759,7 @@ private:
             B = x;
             qLo++;
         }
-        return (qHi << basic_type_halfBits) + qLo;
+        return (qHi << value_type_half_bits) + qLo;
     }
 
     void subtractmul( value_type* a, value_type* b, size_type n, value_type& q ) const
@@ -1809,8 +1809,8 @@ private:
         num <<= x;
         if ( r > 0 && denom.data()[r] < denom.data()[r-1] )
         {
-            denom *= max_basic_type;
-            num *= max_basic_type;
+            denom *= max_value_type;
+            num *= max_value_type;
             return true;
         }
         return false;
@@ -1820,7 +1820,7 @@ private:
     {
         if (secondDone)
         {
-            rem /= max_basic_type;
+            rem /= max_value_type;
         }
         if ( x > 0 )
         {
