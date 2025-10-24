@@ -42,24 +42,20 @@ public:
     static constexpr uint64_t inlined_capacity = 2;
 public:
 
+    template <class ValueType>
     class storage_view
     {
-        uint64_t* data_;
+        ValueType* data_;
         size_type size_;
         size_type capacity_;
 
     public:
-        storage_view(uint64_t* data, size_type size, size_type capacity)
+        storage_view(ValueType* data, size_type size, size_type capacity)
             : data_(data), size_(size), capacity_(capacity)
         {
         }
 
-        uint64_t* data()
-        {
-            return data_;
-        }
-
-        const uint64_t* data() const
+        ValueType* data()
         {
             return data_;
         }
@@ -297,15 +293,17 @@ public:
         ::new (&inlined_) inlined_storage(n);
     }
 
-    bigint_storage& operator=( const bigint_storage& y )
+    bigint_storage& operator=(const bigint_storage& other)
     {
-        if ( this != &y )
+        if (this != &other)
         {
-            resize( y.length());
-            common_.is_negative_ = y.common_.is_negative_;
-            if ( y.length() > 0 )
+            resize(other.length());
+            auto storage_view = get_storage_view();
+            auto other_storage_view = other.get_storage_view();
+            common_.is_negative_ = other.common_.is_negative_;
+            if (other_storage_view.size() > 0)
             {
-                std::memcpy( data(), y.data(), size_type(y.length()*sizeof(uint64_t)) );
+                std::memcpy(storage_view.data(), other_storage_view.data(), size_type(other_storage_view.size()*sizeof(uint64_t)));
             }
         }
         return *this;
@@ -429,11 +427,18 @@ public:
         common_.is_negative_ = value;
     }
 
-    storage_view get_storage_view()
+    storage_view<uint64_t> get_storage_view()
     {
         return common_.is_allocated_ ? 
-            storage_view{allocated_.data_, allocated_.length_, allocated_.capacity_} :
-            storage_view{inlined_.values_, inlined_.length_, inlined_capacity};
+            storage_view<uint64_t>{allocated_.data_, allocated_.length_, allocated_.capacity_} :
+            storage_view<uint64_t>{inlined_.values_, inlined_.length_, inlined_capacity};
+    }
+
+    storage_view<const uint64_t> get_storage_view() const
+    {
+        return common_.is_allocated_ ? 
+            storage_view<const uint64_t>{allocated_.data_, allocated_.length_, allocated_.capacity_} :
+            storage_view<const uint64_t>{inlined_.values_, inlined_.length_, inlined_capacity};
     }
 
     const uint64_t* data() const
