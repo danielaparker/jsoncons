@@ -875,7 +875,7 @@ public:
         return *this;
     }
 
-    basic_bigint& operator*=(const basic_bigint& y)
+    basic_bigint& operator*=(const basic_bigint& y) // review
     {
         const uint64_t* y_data = y.data();
 
@@ -922,7 +922,7 @@ public:
                     for ( jA=0; jA < x.length(); jA++ )
                     {
                         jB = i - jA;
-                        if ( jB >= 0 && jB < y.length())
+                        if ( /*jB >= 0 &&*/ jB < y.length())
                         {
                             DDproduct( x_data[jA], y_data[jB], hi, lo );
                             sumLo_old = sumLo;
