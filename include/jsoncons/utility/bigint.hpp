@@ -422,7 +422,7 @@ public:
         return common_.is_negative_;
     }
 
-    void is_negative(bool value) 
+    void set_negative(bool value) 
     {
         common_.is_negative_ = value;
     }
@@ -600,9 +600,9 @@ public:
         return storage_.is_negative();
     }
 
-    void is_negative(bool value) 
+    void set_negative(bool value) 
     {
-        storage_.is_negative() = value;
+        storage_.set_negative(value);
     }
 
     const uint64_t* data() const
@@ -664,7 +664,7 @@ public:
 
         if (neg)
         {
-            v.storage_.is_negative(true);
+            v.set_negative(true);
         }
 
         return v;
@@ -703,7 +703,7 @@ public:
 
         if (neg)
         {
-            v.storage_.is_negative(true);
+            v.set_negative(true);
         }
 
         return v;
@@ -757,7 +757,7 @@ public:
 
         if ( neg )
         {
-            v.storage_.is_negative(true);
+            v.set_negative(true);
         }
         return v;
     }
@@ -784,7 +784,7 @@ public:
 
         if (signum < 0)
         {
-            v.storage_.is_negative(true);
+            v.set_negative(true);
         }
 
         return v;
@@ -815,7 +815,7 @@ public:
     basic_bigint operator-() const
     {
         basic_bigint<Allocator> v(*this);
-        v.storage_.is_negative(!v.is_negative());
+        v.set_negative(!v.is_negative());
         return v;
     }
 
@@ -889,7 +889,7 @@ public:
     {
         *this *= uint64_t(y < 0 ? -y : y);
         if ( y < 0 )
-            storage_.is_negative(!is_negative());
+            set_negative(!is_negative());
         return *this;
     }
 
@@ -933,7 +933,7 @@ public:
                 resize( inlined_capacity );
                 DDproduct( a, b, data()[1], data()[0] );
             }
-            storage_.is_negative(difSigns);
+            set_negative(difSigns);
             return *this;
         }
         if ( length() == 1 )  //  && y.length() > 1
@@ -986,7 +986,7 @@ public:
             }
         }
        reduce();
-       storage_.is_negative(difSigns);
+       set_negative(difSigns);
        return *this;
     }
 
@@ -1618,21 +1618,21 @@ public:
         bool rem_neg = is_negative();
         int x = 0;
         basic_bigint<Allocator> num = *this;
-        num.storage_.is_negative(false);
-        denom.storage_.is_negative(false);
+        num.set_negative(false);
+        denom.set_negative(false);
         if ( num < denom )
         {
             quot = uint64_t(0);
             rem = num;
-            rem.storage_.is_negative(rem_neg);
+            rem.set_negative(rem_neg);
             return;
         }
         if ( denom.length() == 1 && num.length() == 1 )
         {
             quot = uint64_t( num.data()[0]/denom.data()[0] );
             rem = uint64_t( num.data()[0]%denom.data()[0] );
-            quot.storage_.is_negative(quot_neg);
-            rem.storage_.is_negative(rem_neg);
+            quot.set_negative(quot_neg);
+            rem.set_negative(rem_neg);
             return;
         }
         else if (denom.length() == 1 && (denom.data()[0] & l_mask) == 0 )
@@ -1652,8 +1652,8 @@ public:
             }
             quot.reduce();
             rem = dHi;
-            quot.storage_.is_negative(quot_neg);
-            rem.storage_.is_negative(rem_neg);
+            quot.set_negative(quot_neg);
+            rem.set_negative(rem_neg);
             return;
         }
         basic_bigint<Allocator> num0 = num, denom0 = denom;
@@ -1678,11 +1678,11 @@ public:
             quot.data()[k - l - 1] = q;
         }
         quot.reduce();
-        quot.storage_.is_negative(quot_neg);
+        quot.set_negative(quot_neg);
         if ( remDesired )
         {
             unnormalize(rem, x, second_done);
-            rem.storage_.is_negative(rem_neg);
+            rem.set_negative(rem_neg);
         }
     }
 private:
@@ -1898,7 +1898,7 @@ private:
 
         if ( neg )
         {
-            val.storage_.is_negative(true);
+            val.set_negative(true);
         }
         return to_bigint_result<CharT>(cur, std::errc{});
     }
