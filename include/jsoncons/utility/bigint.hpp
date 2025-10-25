@@ -56,6 +56,16 @@ public:
         {
         }
 
+        ValueType& operator[](size_type i) 
+        {
+            return data_[i];
+        }
+
+        ValueType operator[](size_type i) const
+        {
+            return data_[i];
+        }
+
         ValueType* data()
         {
             return data_;
@@ -309,12 +319,12 @@ public:
         if (this != &other)
         {
             resize(other.size());
-            auto storage_view = get_storage_view();
-            auto other_storage_view = other.get_storage_view();
+            auto stor_view = get_storage_view();
+            auto other_stor_view = other.get_storage_view();
             common_.is_negative_ = other.common_.is_negative_;
-            if (other_storage_view.size() > 0)
+            if (other_stor_view.size() > 0)
             {
-                std::memcpy(storage_view.data(), other_storage_view.data(), size_type(other_storage_view.size()*sizeof(value_type)));
+                std::memcpy(stor_view.data(), other_stor_view.data(), size_type(other_stor_view.size()*sizeof(value_type)));
             }
         }
         return *this;
@@ -838,7 +848,7 @@ public:
 
     basic_bigint& operator+=( const basic_bigint& y )
     {
-        const value_type* y_data = y.data();
+        auto y_stor_view = y.storage_.get_storage_view();
         
         if ( is_negative() != y.is_negative())
             return *this -= -y;
@@ -846,22 +856,24 @@ public:
         value_type carry = 0;
 
         resize( (std::max)(y.size(), size()) + 1 );
-        value_type* this_data = data();
+        auto stor_view = storage_.get_storage_view();
 
         for (size_type i = 0; i < size(); i++ )
         {
-            if ( i >= y.size() && carry == 0 )
+            if ( i >= y_stor_view.size() && carry == 0 )
                 break;
-            d = this_data[i] + carry;
+            d = stor_view[i] + carry;
             carry = d < carry;
-            if ( i < y.size())
+            if ( i < y_stor_view.size())
             {
-                this_data[i] = d + y_data[i];
-                if ( this_data[i] < d )
+                stor_view[i] = d + y_stor_view[i];
+                if (stor_view[i] < d)
                     carry = 1;
             }
             else
-                this_data[i] = d;
+            {
+                stor_view[i] = d;
+            }
         }
         reduce();
         return *this;
@@ -877,20 +889,23 @@ public:
             return *this = -(y - *this);
         value_type borrow = 0;
         value_type d;
-        for (size_type i = 0; i < size(); i++ )
+        auto stor_view = storage_.get_storage_view();
+        for (size_type i = 0; i < stor_view.size(); i++ )
         {
             if ( i >= y.size() && borrow == 0 )
                 break;
-            d = data()[i] - borrow;
-            borrow = d > data()[i];
+            d = stor_view[i] - borrow;
+            borrow = d > stor_view[i];
             if ( i < y.size())
             {
-                data()[i] = d - y_data[i];
-                if ( data()[i] > d )
+                stor_view[i] = d - y_data[i];
+                if ( stor_view[i] > d )
                     borrow = 1;
             }
             else 
-                data()[i] = d;
+            {
+                stor_view[i] = d;
+            }
         }
         reduce();
         return *this;
@@ -1602,14 +1617,15 @@ public:
             code = +1;
         else
         {
-            for (size_type i = size(); i-- > 0; )
+            auto stor_view = storage_.get_storage_view();
+            for (size_type i = stor_view.size(); i-- > 0; )
             {
-                if (data()[i] > y_data[i])
+                if (stor_view[i] > y_data[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (data()[i] < y_data[i])
+                else if (stor_view[i] < y_data[i])
                 {
                     code = -1;
                     break;
@@ -1651,12 +1667,13 @@ public:
             // Denominator fits into a half word
             value_type divisor = denom.data()[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
-            for (size_type i=size(); i-- > 0; )
+            auto stor_view = storage_.get_storage_view();
+            for (size_type i=stor_view.size(); i-- > 0; )
             {
-                dividend = (dHi << value_type_half_bits) | (data()[i] >> value_type_half_bits);
+                dividend = (dHi << value_type_half_bits) | (stor_view[i] >> value_type_half_bits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << value_type_half_bits) | (data()[i] & r_mask);
+                dividend = (r << value_type_half_bits) | (stor_view[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
                 quot.data()[i] = (q1 << value_type_half_bits) | q2;
@@ -1793,11 +1810,12 @@ private:
             a[n] = 0;
         }
     }
-
+public:
     bool normalize(basic_bigint& denom, basic_bigint& num, int& x) const
     {
-        size_type r = denom.size() - 1;
-        value_type y = denom.data()[r];
+        auto denom_stor_view = denom.storage_.get_storage_view();
+        size_type r = denom_stor_view.size() - 1;
+        value_type y = denom_stor_view.data()[r];
 
         x = 0;
         while ( (y & l_bit) == 0 )
@@ -1807,7 +1825,9 @@ private:
         }
         denom <<= x;
         num <<= x;
-        if ( r > 0 && denom.data()[r] < denom.data()[r-1] )
+
+        denom_stor_view = denom.storage_.get_storage_view();
+        if ( r > 0 && denom_stor_view.data()[r] < denom_stor_view.data()[r-1] )
         {
             denom *= max_value_type;
             num *= max_value_type;
@@ -1831,7 +1851,7 @@ private:
             rem.reduce();
         }
     }
-
+private:
     size_type round_up(size_type i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
