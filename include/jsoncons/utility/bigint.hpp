@@ -1432,22 +1432,22 @@ public:
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend basic_bigint<Allocator> operator+( basic_bigint<Allocator> x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator+( basic_bigint x, const basic_bigint& y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator+( basic_bigint<Allocator> x, int64_t y )
+    friend basic_bigint<Allocator> operator+( basic_bigint x, int64_t y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator-( basic_bigint<Allocator> x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator-( basic_bigint x, const basic_bigint& y )
     {
         return x -= y;
     }
 
-    friend basic_bigint<Allocator> operator-( basic_bigint<Allocator> x, int64_t y )
+    friend basic_bigint<Allocator> operator-( basic_bigint x, int64_t y )
     {
         return x -= y;
     }
@@ -1635,7 +1635,7 @@ public:
         return is_negative() ? -code : code;
     }
 
-    void divide(basic_bigint<Allocator> denom, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
+    void divide(basic_bigint denom, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
         if (denom.size() == 0)
         {
@@ -1654,20 +1654,26 @@ public:
             rem.set_negative(rem_neg);
             return;
         }
+
+        auto num_stor_view = num.storage_.get_storage_view();
+        auto denom_stor_view = denom.storage_.get_storage_view();
+        auto quot_stor_view = quot.storage_.get_storage_view();
+
         if ( denom.size() == 1 && num.size() == 1 )
         {
-            quot = value_type( num.data()[0]/denom.data()[0] );
-            rem = value_type( num.data()[0]%denom.data()[0] );
+            quot = value_type( num_stor_view[0]/denom_stor_view[0] );
+            rem = value_type( num_stor_view[0]%denom_stor_view[0] );
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
         }
-        else if (denom.size() == 1 && (denom.data()[0] & l_mask) == 0 )
+        else if (denom.size() == 1 && (denom_stor_view[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
-            value_type divisor = denom.data()[0], dHi = 0, q1, r, q2, dividend;
+            value_type divisor = denom_stor_view[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
             auto stor_view = storage_.get_storage_view();
+            quot_stor_view = quot.storage_.get_storage_view();
             for (size_type i=stor_view.size(); i-- > 0; )
             {
                 dividend = (dHi << value_type_half_bits) | (stor_view[i] >> value_type_half_bits);
@@ -1676,7 +1682,7 @@ public:
                 dividend = (r << value_type_half_bits) | (stor_view[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
-                quot.data()[i] = (q1 << value_type_half_bits) | q2;
+                quot_stor_view[i] = (q1 << value_type_half_bits) | q2;
             }
             quot.reduce();
             rem = dHi;
@@ -1686,23 +1692,29 @@ public:
         }
         basic_bigint<Allocator> num0 = num, denom0 = denom;
         bool second_done = normalize(denom, num, x);
+        denom_stor_view = denom.storage_.get_storage_view();
+
         size_type l = denom.size() - 1;
         size_type n = num.size() - 1;
         quot.resize(n - l);
+        quot_stor_view = quot.storage_.get_storage_view();
         for (size_type i=quot.size(); i-- > 0; )
-            quot.data()[i] = 0;
+        {
+            quot_stor_view[i] = 0;
+        }
         rem = num;
-        if ( rem.data()[n] >= denom.data()[l] )
+        auto rem_stor_view = rem.storage_.get_storage_view();
+        if ( rem_stor_view[n] >= denom_stor_view[l] )
         {
             rem.resize(rem.size() + 1);
             n++;
             quot.resize(quot.size() + 1);
         }
-        value_type d = denom.data()[l];
+        value_type d = denom_stor_view[l];
         for ( size_type k = n; k > l; k-- )
         {
             value_type q = DDquotient(rem.data()[k], rem.data()[k-1], d);
-            subtractmul( rem.data() + k - l - 1, denom.data(), l + 1, q );
+            subtractmul( rem.data() + k - l - 1, denom_stor_view.data(), l + 1, q );
             quot.data()[k - l - 1] = q;
         }
         quot.reduce();
