@@ -745,7 +745,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
 
 // decstr_to_double
 
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
 
     inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val) 
     {
