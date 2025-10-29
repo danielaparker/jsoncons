@@ -340,9 +340,9 @@ public:
         resize( (std::min)( this_storage.size(), a_storage.size()) );
         this_storage = get_storage_view();
 
-        const value_type* pBegin = begin();
-        value_type* p = end() - 1;
-        const value_type* q = a.begin() + this_storage.size() - 1;
+        const value_type* pBegin = this_storage.begin();
+        value_type* p = this_storage.end() - 1;
+        const value_type* q = a_storage.begin() + this_storage.size() - 1;
 
         while ( p >= pBegin )
         {
@@ -373,8 +373,9 @@ public:
 
     void reduce()
     {
-        value_type* p = end() - 1;
-        value_type* pBegin = begin();
+        auto this_storage = get_storage_view();
+        value_type* p = this_storage.end() - 1;
+        value_type* pBegin = this_storage.begin();
         while ( p >= pBegin )
         {
             if ( *p )
@@ -432,11 +433,6 @@ public:
         return common_.is_allocated_;
     }
 
-    constexpr size_type size() const
-    {
-        return common_.size_;
-    }
-
     constexpr size_type capacity() const
     {
         return is_allocated() ? allocated_.capacity_ : inlined_capacity;
@@ -465,25 +461,6 @@ public:
             storage_view<const value_type>{allocated_.data_, allocated_.size_, allocated_.capacity_} :
             storage_view<const value_type>{inlined_.values_, inlined_.size_, inlined_capacity};
     }
-
-    const value_type* data() const
-    {
-        const value_type* p = is_allocated() ? allocated_.data_ : inlined_.values_;
-        JSONCONS_ASSERT(p != nullptr);
-        return p;
-    }
-
-    value_type* data() 
-    {
-        value_type* p = is_allocated() ? allocated_.data_ : inlined_.values_;
-        JSONCONS_ASSERT(p != nullptr);
-        return p;
-    }
-
-    value_type* begin() { return is_allocated() ? allocated_.data_ : inlined_.values_; }
-    const value_type* begin() const { return is_allocated() ? allocated_.data_ : inlined_.values_; }
-    value_type* end() { return begin() + size(); }
-    const value_type* end() const { return begin() + size(); }
 
     void resize(size_type new_length)
     {
@@ -806,11 +783,6 @@ public:
 
         return v;
     }
-
-    value_type* begin() { return storage_.begin(); }
-    const value_type* begin() const { return storage_.begin(); }
-    value_type* end() { return storage_.end(); }
-    const value_type* end() const { return storage_.end(); }
 
     void resize(size_type new_length)
     {
@@ -1135,9 +1107,9 @@ public:
             this_storage = get_storage_view();
         }
 
-        const value_type* qBegin = a.begin();
-        const value_type* q =      a.end() - 1;
-        value_type*       p =      begin() + a_storage.size() - 1;
+        const value_type* qBegin = a_storage.begin();
+        const value_type* q =      a_storage.end() - 1;
+        value_type*       p =      this_storage.begin() + a_storage.size() - 1;
 
         while ( q >= qBegin )
         {
@@ -1160,9 +1132,9 @@ public:
             this_storage = a.get_storage_view();
         }
 
-        const value_type* qBegin = a.begin();
-        const value_type* q = a.end() - 1;
-        value_type* p = begin() + a_storage.size() - 1;
+        const value_type* qBegin = a_storage.begin();
+        const value_type* q = a_storage.end() - 1;
+        value_type* p = this_storage.begin() + a_storage.size() - 1;
 
         while ( q >= qBegin )
         {
@@ -1216,8 +1188,10 @@ public:
         double factor = 1.0;
         double values = (double)max_value_type + 1.0;
 
-        const value_type* p = begin();
-        const value_type* pEnd = end();
+        auto this_storage = get_storage_view();
+
+        const value_type* p = this_storage.begin();
+        const value_type* pEnd = this_storage.end();
         while ( p < pEnd )
         {
             x += *p*factor;
@@ -1234,8 +1208,10 @@ public:
         long double factor = 1.0;
         long double values = (long double)max_value_type + 1.0;
 
-        const value_type* p = begin();
-        const value_type* pEnd = end();
+        auto this_storage = get_storage_view();
+
+        const value_type* p = this_storage.begin();
+        const value_type* pEnd = this_storage.end();
         while ( p < pEnd )
         {
             x += *p*factor;
@@ -1266,6 +1242,7 @@ public:
         {
             data.push_back((uint8_t)(value_type)n);
         }
+
         std::reverse(data.begin(),data.end());
     }
 
