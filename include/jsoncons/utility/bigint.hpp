@@ -1148,7 +1148,7 @@ public:
         if ( this_storage.size() < a_storage.size())
         {
             resize( a.size());
-            a_storage = a.get_storage_view();
+            this_storage = get_storage_view();
         }
 
         const value_type* qBegin = a.begin();
@@ -1167,14 +1167,18 @@ public:
 
     basic_bigint& operator^=( const basic_bigint& a )
     {
-        if ( size() < a.size())
+        auto this_storage = get_storage_view();
+        auto a_storage = a.get_storage_view();
+
+        if ( this_storage.size() < a_storage.size())
         {
-            resize( a.size());
+            resize(a.size());
+            this_storage = a.get_storage_view();
         }
 
         const value_type* qBegin = a.begin();
         const value_type* q = a.end() - 1;
-        value_type* p = begin() + a.size() - 1;
+        value_type* p = begin() + a_storage.size() - 1;
 
         while ( q >= qBegin )
         {
@@ -1195,7 +1199,7 @@ public:
 
     explicit operator bool() const
     {
-       return size() != 0 ? true : false;
+       return get_storage_view().size() != 0 ? true : false;
     }
 
     explicit operator int64_t() const
@@ -1292,14 +1296,15 @@ public:
     void write_string(std::basic_string<Ch,Traits,Alloc>& data) const
     {
         basic_bigint<Allocator> v(*this);
+        auto v_storage = v.get_storage_view();
 
-        size_type len = (v.size() * value_type_bits / 3) + 2;
+        size_type len = (v_storage.size() * value_type_bits / 3) + 2;
         data.reserve(len);
 
         static value_type p10 = 1;
         static value_type ip10 = 0;
 
-        if ( v.size() == 0 )
+        if ( v_storage.size() == 0 )
         {
             data.push_back('0');
         }
@@ -1321,6 +1326,7 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
+                v_storage = v.get_storage_view();
 
                 auto R_stor_view = R.get_storage_view();
                 r = (R_stor_view.size() ? R_stor_view[0] : 0);
@@ -1328,11 +1334,12 @@ public:
                 {
                     data.push_back(char(r % 10u + '0'));
                     r /= 10u;
-                    if ( r + v.size() == 0 )
+                    if ( r + v_storage.size() == 0 )
                         break;
                 }
             } 
-            while ( v.size());
+            while ( v_storage.size() > 0);
+
             if (is_negative())
             {
                 data.push_back('-');
