@@ -284,7 +284,7 @@ public:
     bigint_storage(const bigint_storage& other)
         : uint64_allocator_type(other.get_allocator())
     {
-        if (!other.is_dynamic())
+        if (!other.is_allocated())
         {
             ::new (&inlined_) inlined_storage(other.inlined_);
         }
@@ -297,7 +297,7 @@ public:
     bigint_storage(bigint_storage&& other)
         : uint64_allocator_type(other.get_allocator())
     {
-        if (!other.is_dynamic())
+        if (!other.is_allocated())
         {
             ::new (&inlined_) inlined_storage(other.inlined_);
         }
@@ -348,7 +348,7 @@ public:
         const size_type new_length = size();
         if ( old_length > new_length )
         {
-            if (is_dynamic())
+            if (is_allocated())
             {
                 std::memset( allocated_.data_ + new_length, 0, size_type(old_length - new_length*sizeof(value_type)) );
             }
@@ -390,7 +390,7 @@ public:
     {
        if (capacity() < n)
        {
-           if (!is_dynamic())
+           if (!is_allocated())
            {
                size_type size = inlined_.size_;
                size_type is_neg = inlined_.is_negative_;
@@ -417,13 +417,13 @@ public:
 
     void destroy() noexcept
     {
-        if (is_dynamic())
+        if (is_allocated())
         {
             allocated_.destroy(get_allocator());
         }
     }
 
-    constexpr bool is_dynamic() const
+    constexpr bool is_allocated() const
     {
         return common_.is_allocated_;
     }
@@ -435,7 +435,7 @@ public:
 
     constexpr size_type capacity() const
     {
-        return is_dynamic() ? allocated_.capacity_ : inlined_capacity;
+        return is_allocated() ? allocated_.capacity_ : inlined_capacity;
     }
 
     bool is_negative() const
@@ -464,20 +464,20 @@ public:
 
     const value_type* data() const
     {
-        const value_type* p = is_dynamic() ? allocated_.data_ : inlined_.values_;
+        const value_type* p = is_allocated() ? allocated_.data_ : inlined_.values_;
         JSONCONS_ASSERT(p != nullptr);
         return p;
     }
 
     value_type* data() 
     {
-        value_type* p = is_dynamic() ? allocated_.data_ : inlined_.values_;
+        value_type* p = is_allocated() ? allocated_.data_ : inlined_.values_;
         JSONCONS_ASSERT(p != nullptr);
         return p;
     }
 
-    value_type* begin() { return is_dynamic() ? allocated_.data_ : inlined_.values_; }
-    const value_type* begin() const { return is_dynamic() ? allocated_.data_ : inlined_.values_; }
+    value_type* begin() { return is_allocated() ? allocated_.data_ : inlined_.values_; }
+    const value_type* begin() const { return is_allocated() ? allocated_.data_ : inlined_.values_; }
     value_type* end() { return begin() + size(); }
     const value_type* end() const { return begin() + size(); }
 
@@ -489,7 +489,7 @@ public:
 
         if (old_length < new_length)
         {
-            if (is_dynamic())
+            if (is_allocated())
             {
                 std::memset(allocated_.data_+old_length, 0, size_type((new_length-old_length)*sizeof(value_type)));
             }
