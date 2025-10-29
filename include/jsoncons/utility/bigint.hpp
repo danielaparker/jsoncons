@@ -842,7 +842,7 @@ public:
 
     bool operator!() const
     {
-        return size() == 0 ? true : false;
+        return get_storage_view().size() == 0 ? true : false;
     }
 
     basic_bigint operator-() const
@@ -867,10 +867,11 @@ public:
         value_type d;
         value_type carry = 0;
 
-        resize( (std::max)(y.size(), size()) + 1 );
         auto this_storage = get_storage_view();
+        resize( (std::max)(y_storage.size(), this_storage.size()) + 1 );
+        this_storage = get_storage_view();
 
-        for (size_type i = 0; i < size(); i++ )
+        for (size_type i = 0; i < this_storage.size(); i++ )
         {
             if ( i >= y_storage.size() && carry == 0 )
                 break;
@@ -908,7 +909,7 @@ public:
                 break;
             d = this_storage[i] - borrow;
             borrow = d > this_storage[i];
-            if ( i < y.size())
+            if ( i < y_storage.size())
             {
                 this_storage[i] = d - y_storage[i];
                 if ( this_storage[i] > d )
@@ -958,15 +959,16 @@ public:
 
     basic_bigint& operator*=(const basic_bigint& y) 
     {
-        if (size() == 0 || y.size() == 0)
-        {
-            return *this = 0;
-        }
         auto this_storage = get_storage_view();
         auto y_storage = y.get_storage_view();
 
+        if (this_storage.size() == 0 || y_storage.size() == 0)
+        {
+            return *this = 0;
+        }
+
         bool difSigns = is_negative() != y.is_negative();
-        if ( size() + y.size() == inlined_capacity ) // size() = y.size() = 1
+        if ( this_storage.size() + y_storage.size() == inlined_capacity ) // size() = y.size() = 1
         {
             value_type a = this_storage[0], b = y_storage[0];
             this_storage[0] = a * b;
@@ -979,7 +981,8 @@ public:
             set_negative(difSigns);
             return *this;
         }
-        if ( size() == 1 )  //  && y.size() > 1
+
+        if ( this_storage.size() == 1 )  //  && y.size() > 1
         {
             value_type digit = this_storage[0];
             *this = y;
@@ -987,13 +990,13 @@ public:
         }
         else
         {
-            if (y.size() == 1)
+            if (y_storage.size() == 1)
             {
                 *this *= y_storage[0];
             }
             else
             {
-                size_type lenProd = size() + y.size();
+                size_type lenProd = this_storage.size() + y_storage.size();
                 value_type sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bigint<Allocator> x = *this;
@@ -1006,7 +1009,7 @@ public:
                     sumLo = sumHi;
                     sumHi = carry;
                     carry = 0;
-                    for (size_type jA=0; jA < x.size(); jA++)
+                    for (size_type jA=0; jA < x_storage.size(); jA++)
                     {
                         if (JSONCONS_LIKELY(i >= jA))
                         {
