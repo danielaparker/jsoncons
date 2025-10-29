@@ -319,12 +319,12 @@ public:
         if (this != &other)
         {
             resize(other.size());
-            auto storage = get_storage_view();
-            auto other_stor_view = other.get_storage_view();
+            auto this_storage = get_storage_view();
+            auto other_storage = other.get_storage_view();
             common_.is_negative_ = other.common_.is_negative_;
-            if (other_stor_view.size() > 0)
+            if (other_storage.size() > 0)
             {
-                std::memcpy(storage.data(), other_stor_view.data(), size_type(other_stor_view.size()*sizeof(value_type)));
+                std::memcpy(this_storage.data(), other_storage.data(), size_type(other_storage.size()*sizeof(value_type)));
             }
         }
         return *this;
@@ -868,23 +868,23 @@ public:
         value_type carry = 0;
 
         resize( (std::max)(y.size(), size()) + 1 );
-        auto storage = get_storage_view();
+        auto this_storage = get_storage_view();
 
         for (size_type i = 0; i < size(); i++ )
         {
             if ( i >= y_storage.size() && carry == 0 )
                 break;
-            d = storage[i] + carry;
+            d = this_storage[i] + carry;
             carry = d < carry;
             if ( i < y_storage.size())
             {
-                storage[i] = d + y_storage[i];
-                if (storage[i] < d)
+                this_storage[i] = d + y_storage[i];
+                if (this_storage[i] < d)
                     carry = 1;
             }
             else
             {
-                storage[i] = d;
+                this_storage[i] = d;
             }
         }
         reduce();
@@ -901,22 +901,22 @@ public:
             return *this = -(y - *this);
         value_type borrow = 0;
         value_type d;
-        auto storage = get_storage_view();
-        for (size_type i = 0; i < storage.size(); i++ )
+        auto this_storage = get_storage_view();
+        for (size_type i = 0; i < this_storage.size(); i++ )
         {
             if ( i >= y_storage.size() && borrow == 0 )
                 break;
-            d = storage[i] - borrow;
-            borrow = d > storage[i];
+            d = this_storage[i] - borrow;
+            borrow = d > this_storage[i];
             if ( i < y.size())
             {
-                storage[i] = d - y_storage[i];
-                if ( storage[i] > d )
+                this_storage[i] = d - y_storage[i];
+                if ( this_storage[i] > d )
                     borrow = 1;
             }
             else 
             {
-                storage[i] = d;
+                this_storage[i] = d;
             }
         }
         reduce();
@@ -933,13 +933,13 @@ public:
 
     basic_bigint& operator*=( value_type y )
     {
-        auto storage = get_storage_view();
-        size_type len0 = storage.size();
-        value_type dig = storage[0];
+        auto this_storage = get_storage_view();
+        size_type len0 = this_storage.size();
+        value_type dig = this_storage[0];
         value_type carry = 0;
 
-        resize(storage.size() + 1);
-        storage = get_storage_view();
+        resize(this_storage.size() + 1);
+        this_storage = get_storage_view();
 
         size_type i = 0;
         for (; i < len0; i++ )
@@ -947,37 +947,41 @@ public:
             value_type hi;
             value_type lo;
             DDproduct( dig, y, hi, lo );
-            storage[i] = lo + carry;
-            dig = storage[i+1];
-            carry = hi + (storage[i] < lo);
+            this_storage[i] = lo + carry;
+            dig = this_storage[i+1];
+            carry = hi + (this_storage[i] < lo);
         }
-        storage[i] = carry;
+        this_storage[i] = carry;
         reduce();
         return *this;
     }
 
     basic_bigint& operator*=(const basic_bigint& y) 
     {
+        if (size() == 0 || y.size() == 0)
+        {
+            return *this = 0;
+        }
+        auto this_storage = get_storage_view();
         auto y_storage = y.get_storage_view();
 
-        if ( size() == 0 || y.size() == 0 )
-                    return *this = 0;
         bool difSigns = is_negative() != y.is_negative();
         if ( size() + y.size() == inlined_capacity ) // size() = y.size() = 1
         {
-            value_type a = data()[0], b = y_storage[0];
-            data()[0] = a * b;
-            if ( data()[0] / a != b )
+            value_type a = this_storage[0], b = y_storage[0];
+            this_storage[0] = a * b;
+            if ( this_storage[0] / a != b )
             {
+                this_storage = get_storage_view();
                 resize( inlined_capacity );
-                DDproduct( a, b, data()[1], data()[0] );
+                DDproduct( a, b, this_storage[1], this_storage[0] );
             }
             set_negative(difSigns);
             return *this;
         }
         if ( size() == 1 )  //  && y.size() > 1
         {
-            value_type digit = data()[0];
+            value_type digit = this_storage[0];
             *this = y;
             *this *= digit;
         }
@@ -995,7 +999,7 @@ public:
                 basic_bigint<Allocator> x = *this;
                 auto x_storage = x.get_storage_view();
                 resize( lenProd ); // Give *this length lenProd
-                auto storage = get_storage_view();
+                this_storage = get_storage_view();
 
                 for (size_type i = 0; i < lenProd; i++ )
                 {
@@ -1020,7 +1024,7 @@ public:
                             }
                         }
                     }
-                    storage[i] = sumLo;
+                    this_storage[i] = sumLo;
                 }
             }
         }
@@ -1049,9 +1053,9 @@ public:
         if ( q ) // Increase storage_.size() by q:
         {
             resize(size() + q);
-            auto storage = get_storage_view();
+            auto this_storage = get_storage_view();
             for (size_type i = size(); i-- > 0; )
-                storage[i] = ( i < q ? 0 : storage[i - q]);
+                this_storage[i] = ( i < q ? 0 : this_storage[i - q]);
             k %= value_type_bits;
         }
         if ( k )  // 0 < k < value_type_bits:
@@ -1059,12 +1063,12 @@ public:
             value_type k1 = value_type_bits - k;
             value_type mask = (value_type(1) << k) - value_type(1);
             resize( size() + 1 );
-            auto storage = get_storage_view();
+            auto this_storage = get_storage_view();
             for (size_type i = size(); i-- > 0; )
             {
-                storage[i] <<= k;
+                this_storage[i] <<= k;
                 if ( i > 0 )
-                    storage[i] |= (storage[i-1] >> k1) & mask;
+                    this_storage[i] |= (this_storage[i-1] >> k1) & mask;
             }
         }
         reduce();
@@ -1091,15 +1095,15 @@ public:
             }
         }
 
-        auto storage = get_storage_view();
+        auto this_storage = get_storage_view();
         size_type n = size_type(size() - 1);
         int64_t k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
-            storage[i] >>= k;
+            this_storage[i] >>= k;
             if ( i < n )
-                storage[i] |= ((storage[i+1] & mask) << k1);
+                this_storage[i] |= ((this_storage[i+1] & mask) << k1);
         }
         reduce();
         return *this;
@@ -1633,15 +1637,15 @@ public:
             code = +1;
         else
         {
-            auto storage = get_storage_view();
-            for (size_type i = storage.size(); i-- > 0; )
+            auto this_storage = get_storage_view();
+            for (size_type i = this_storage.size(); i-- > 0; )
             {
-                if (storage[i] > y_storage[i])
+                if (this_storage[i] > y_storage[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (storage[i] < y_storage[i])
+                else if (this_storage[i] < y_storage[i])
                 {
                     code = -1;
                     break;
@@ -1687,14 +1691,14 @@ public:
             // Denominator fits into a half word
             value_type divisor = denom_stor_view[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
-            auto storage = get_storage_view();
+            auto this_storage = get_storage_view();
             quot_stor_view = quot.get_storage_view();
-            for (size_type i=storage.size(); i-- > 0; )
+            for (size_type i=this_storage.size(); i-- > 0; )
             {
-                dividend = (dHi << value_type_half_bits) | (storage[i] >> value_type_half_bits);
+                dividend = (dHi << value_type_half_bits) | (this_storage[i] >> value_type_half_bits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << value_type_half_bits) | (storage[i] & r_mask);
+                dividend = (r << value_type_half_bits) | (this_storage[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
                 quot_stor_view[i] = (q1 << value_type_half_bits) | q2;
