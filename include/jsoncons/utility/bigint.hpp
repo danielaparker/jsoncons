@@ -1192,24 +1192,26 @@ public:
 
     explicit operator int64_t() const
     {
-       int64_t x = 0;
-       if ( size() > 0 )
-       {
-           x = static_cast<int64_t>(data()[0]);
-       }
+        auto this_storage = get_storage_view();
+        int64_t x = 0;
+        if (this_storage.size() > 0)
+        {
+            x = static_cast<int64_t>(this_storage[0]);
+        }
 
-       return is_negative() ? -x : x;
+        return is_negative() ? -x : x;
     }
 
     explicit operator value_type() const
     {
-       value_type u = 0;
-       if ( size() > 0 )
-       {
-           u = data() [0];
-       }
+        auto this_storage = get_storage_view();
+        value_type u = 0;
+        if ( this_storage.size() > 0 )
+        {
+            u = this_storage[0];
+        }
 
-       return u;
+        return u;
     }
 
     explicit operator double() const
@@ -1676,21 +1678,21 @@ public:
         }
 
         auto num_stor_view = num.get_storage_view();
-        auto denom_stor_view = denom.get_storage_view();
+        auto denom_storage = denom.get_storage_view();
         auto quot_stor_view = quot.get_storage_view();
 
         if ( denom.size() == 1 && num.size() == 1 )
         {
-            quot = value_type( num_stor_view[0]/denom_stor_view[0] );
-            rem = value_type( num_stor_view[0]%denom_stor_view[0] );
+            quot = value_type( num_stor_view[0]/denom_storage[0] );
+            rem = value_type( num_stor_view[0]%denom_storage[0] );
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
         }
-        else if (denom.size() == 1 && (denom_stor_view[0] & l_mask) == 0 )
+        else if (denom.size() == 1 && (denom_storage[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
-            value_type divisor = denom_stor_view[0], dHi = 0, q1, r, q2, dividend;
+            value_type divisor = denom_storage[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
             auto this_storage = get_storage_view();
             quot_stor_view = quot.get_storage_view();
@@ -1713,7 +1715,7 @@ public:
         basic_bigint<Allocator> num0 = num, denom0 = denom;
         int x = 0;
         bool second_done = normalize(denom, num, x);
-        denom_stor_view = denom.get_storage_view();
+        denom_storage = denom.get_storage_view();
 
         size_type l = denom.size() - 1;
         size_type n = num.size() - 1;
@@ -1725,18 +1727,21 @@ public:
         }
         rem = num;
         auto rem_stor_view = rem.get_storage_view();
-        if ( rem_stor_view[n] >= denom_stor_view[l] )
+        if ( rem_stor_view[n] >= denom_storage[l] )
         {
             rem.resize(rem.size() + 1);
             n++;
             quot.resize(quot.size() + 1);
         }
-        value_type d = denom_stor_view[l];
+        value_type d = denom_storage[l];
+
+        auto rem_storage = rem.get_storage_view();
+        auto quot_storage = quot.get_storage_view();
         for ( size_type k = n; k > l; k-- )
         {
-            value_type q = DDquotient(rem.data()[k], rem.data()[k-1], d);
-            subtractmul( rem.data() + k - l - 1, denom_stor_view.data(), l + 1, q );
-            quot.data()[k - l - 1] = q;
+            value_type q = DDquotient(rem_storage[k], rem_storage[k-1], d);
+            subtractmul( rem_storage.data() + (k - l - 1), denom_storage.data(), l + 1, q );
+            quot_storage[k - l - 1] = q;
         }
         quot.reduce();
         quot.set_negative(quot_neg);
@@ -1846,9 +1851,9 @@ private:
 public:
     bool normalize(basic_bigint& denom, basic_bigint& num, int& x) const
     {
-        auto denom_stor_view = denom.get_storage_view();
-        size_type r = denom_stor_view.size() - 1;
-        value_type y = denom_stor_view.data()[r];
+        auto denom_storage = denom.get_storage_view();
+        size_type r = denom_storage.size() - 1;
+        value_type y = denom_storage.data()[r];
 
         x = 0;
         while ( (y & l_bit) == 0 )
@@ -1859,8 +1864,8 @@ public:
         denom <<= x;
         num <<= x;
 
-        denom_stor_view = denom.get_storage_view();
-        if ( r > 0 && denom_stor_view.data()[r] < denom_stor_view.data()[r-1] )
+        denom_storage = denom.get_storage_view();
+        if ( r > 0 && denom_storage.data()[r] < denom_storage.data()[r-1] )
         {
             denom *= max_value_type;
             num *= max_value_type;
