@@ -891,9 +891,9 @@ public:
         return *this;
     }
 
-    basic_bigint& operator-=( const basic_bigint& y )
+    basic_bigint& operator-=(const basic_bigint& y)
     {
-        const value_type* y_data = y.data();
+        auto y_stor_view = y.get_storage_view();
 
         if ( is_negative() != y.is_negative())
             return *this += -y;
@@ -904,13 +904,13 @@ public:
         auto stor_view = get_storage_view();
         for (size_type i = 0; i < stor_view.size(); i++ )
         {
-            if ( i >= y.size() && borrow == 0 )
+            if ( i >= y_stor_view.size() && borrow == 0 )
                 break;
             d = stor_view[i] - borrow;
             borrow = d > stor_view[i];
             if ( i < y.size())
             {
-                stor_view[i] = d - y_data[i];
+                stor_view[i] = d - y_stor_view[i];
                 if ( stor_view[i] > d )
                     borrow = 1;
             }
@@ -933,12 +933,13 @@ public:
 
     basic_bigint& operator*=( value_type y )
     {
-        size_type len0 = size();
-        value_type dig = data()[0];
+        auto stor_view = get_storage_view();
+        size_type len0 = stor_view.size();
+        value_type dig = stor_view[0];
         value_type carry = 0;
 
-        resize( size() + 1 );
-        value_type* this_data = data();
+        resize(stor_view.size() + 1);
+        stor_view = get_storage_view();
 
         size_type i = 0;
         for (; i < len0; i++ )
@@ -946,11 +947,11 @@ public:
             value_type hi;
             value_type lo;
             DDproduct( dig, y, hi, lo );
-            this_data[i] = lo + carry;
-            dig = this_data[i+1];
-            carry = hi + (this_data[i] < lo);
+            stor_view[i] = lo + carry;
+            dig = stor_view[i+1];
+            carry = hi + (stor_view[i] < lo);
         }
-        this_data[i] = carry;
+        stor_view[i] = carry;
         reduce();
         return *this;
     }
