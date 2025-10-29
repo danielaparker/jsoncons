@@ -14,6 +14,42 @@
 
 using namespace jsoncons;
 
+TEST_CASE("basic_bigint tests")
+{
+    SECTION("0")
+    {
+        bigint a{0};
+        bigint b{};
+        CHECK(0 == a.size());
+        CHECK(a.size() == b.size());
+        CHECK(a == b);
+        CHECK(0 == a);
+    }
+    SECTION("0 denom")
+    {
+        bigint denom{0};
+        bigint num{1000};
+        REQUIRE_THROWS(num / denom);
+    }
+    SECTION("0 num")
+    {
+        bigint denom{1000};
+        bigint num{0};
+        auto quot = num / denom;
+        CHECK(0 == quot);
+    }
+    SECTION("Dividend less than divisor")
+    {
+        bigint num{10};
+        bigint denom{1000};
+        bigint quot{};
+        bigint rem{};
+        num.divide(denom, quot, rem, true);
+        CHECK(0 == quot);
+        CHECK(num == rem);
+    }
+}
+
 TEST_CASE("test_positive_bignum")
 {
     std::string expected = "18446744073709551616";
