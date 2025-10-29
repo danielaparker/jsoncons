@@ -555,6 +555,8 @@ public:
     using pointer = typename allocator_traits_type::pointer;
     using size_type = typename detail::bigint_storage<Allocator>::size_type;
     using value_type = typename detail::bigint_storage<Allocator>::value_type;
+    using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<value_type>;
+    using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const value_type>;
 
     static constexpr size_type inlined_capacity = 2;
 
@@ -604,6 +606,16 @@ public:
     uint64_allocator_type get_allocator() const
     {
         return storage_.get_allocator();
+    }
+
+    storage_view_type get_storage_view()
+    {
+        return storage_.get_storage_view();
+    }
+
+    const_storage_view_type get_storage_view() const
+    {
+        return storage_.get_storage_view();
     }
 
     constexpr size_type size() const
@@ -848,7 +860,7 @@ public:
 
     basic_bigint& operator+=( const basic_bigint& y )
     {
-        auto y_stor_view = y.storage_.get_storage_view();
+        auto y_stor_view = y.get_storage_view();
         
         if ( is_negative() != y.is_negative())
             return *this -= -y;
@@ -856,7 +868,7 @@ public:
         value_type carry = 0;
 
         resize( (std::max)(y.size(), size()) + 1 );
-        auto stor_view = storage_.get_storage_view();
+        auto stor_view = get_storage_view();
 
         for (size_type i = 0; i < size(); i++ )
         {
@@ -889,7 +901,7 @@ public:
             return *this = -(y - *this);
         value_type borrow = 0;
         value_type d;
-        auto stor_view = storage_.get_storage_view();
+        auto stor_view = get_storage_view();
         for (size_type i = 0; i < stor_view.size(); i++ )
         {
             if ( i >= y.size() && borrow == 0 )
@@ -1293,7 +1305,9 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                r = (R.size() ? R.data()[0] : 0);
+
+                auto R_stor_view = R.get_storage_view();
+                r = (R_stor_view.size() ? R_stor_view[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
                     data.push_back(char(r % 10u + '0'));
@@ -1350,7 +1364,8 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                r = (R.size() ? R.data()[0] : 0);
+                auto R_stor_view = R.get_storage_view();
+                r = (R_stor_view.size() ? R_stor_view[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
                     uint8_t c = r % 16u;
@@ -1617,7 +1632,7 @@ public:
             code = +1;
         else
         {
-            auto stor_view = storage_.get_storage_view();
+            auto stor_view = get_storage_view();
             for (size_type i = stor_view.size(); i-- > 0; )
             {
                 if (stor_view[i] > y_data[i])
@@ -1643,7 +1658,6 @@ public:
         }
         bool quot_neg = is_negative() ^ denom.is_negative();
         bool rem_neg = is_negative();
-        int x = 0;
         basic_bigint<Allocator> num = *this;
         num.set_negative(false);
         denom.set_negative(false);
@@ -1655,9 +1669,9 @@ public:
             return;
         }
 
-        auto num_stor_view = num.storage_.get_storage_view();
-        auto denom_stor_view = denom.storage_.get_storage_view();
-        auto quot_stor_view = quot.storage_.get_storage_view();
+        auto num_stor_view = num.get_storage_view();
+        auto denom_stor_view = denom.get_storage_view();
+        auto quot_stor_view = quot.get_storage_view();
 
         if ( denom.size() == 1 && num.size() == 1 )
         {
@@ -1672,8 +1686,8 @@ public:
             // Denominator fits into a half word
             value_type divisor = denom_stor_view[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
-            auto stor_view = storage_.get_storage_view();
-            quot_stor_view = quot.storage_.get_storage_view();
+            auto stor_view = get_storage_view();
+            quot_stor_view = quot.get_storage_view();
             for (size_type i=stor_view.size(); i-- > 0; )
             {
                 dividend = (dHi << value_type_half_bits) | (stor_view[i] >> value_type_half_bits);
@@ -1691,19 +1705,20 @@ public:
             return;
         }
         basic_bigint<Allocator> num0 = num, denom0 = denom;
+        int x = 0;
         bool second_done = normalize(denom, num, x);
-        denom_stor_view = denom.storage_.get_storage_view();
+        denom_stor_view = denom.get_storage_view();
 
         size_type l = denom.size() - 1;
         size_type n = num.size() - 1;
         quot.resize(n - l);
-        quot_stor_view = quot.storage_.get_storage_view();
+        quot_stor_view = quot.get_storage_view();
         for (size_type i=quot.size(); i-- > 0; )
         {
             quot_stor_view[i] = 0;
         }
         rem = num;
-        auto rem_stor_view = rem.storage_.get_storage_view();
+        auto rem_stor_view = rem.get_storage_view();
         if ( rem_stor_view[n] >= denom_stor_view[l] )
         {
             rem.resize(rem.size() + 1);
@@ -1825,7 +1840,7 @@ private:
 public:
     bool normalize(basic_bigint& denom, basic_bigint& num, int& x) const
     {
-        auto denom_stor_view = denom.storage_.get_storage_view();
+        auto denom_stor_view = denom.get_storage_view();
         size_type r = denom_stor_view.size() - 1;
         value_type y = denom_stor_view.data()[r];
 
@@ -1838,7 +1853,7 @@ public:
         denom <<= x;
         num <<= x;
 
-        denom_stor_view = denom.storage_.get_storage_view();
+        denom_stor_view = denom.get_storage_view();
         if ( r > 0 && denom_stor_view.data()[r] < denom_stor_view.data()[r-1] )
         {
             denom *= max_value_type;
