@@ -958,14 +958,14 @@ public:
 
     basic_bigint& operator*=(const basic_bigint& y) 
     {
-        const value_type* y_data = y.data();
+        auto y_stor_view = y.get_storage_view();
 
         if ( size() == 0 || y.size() == 0 )
                     return *this = 0;
         bool difSigns = is_negative() != y.is_negative();
         if ( size() + y.size() == inlined_capacity ) // size() = y.size() = 1
         {
-            value_type a = data()[0], b = y_data[0];
+            value_type a = data()[0], b = y_stor_view[0];
             data()[0] = a * b;
             if ( data()[0] / a != b )
             {
@@ -985,7 +985,7 @@ public:
         {
             if (y.size() == 1)
             {
-                *this *= y_data[0];
+                *this *= y_stor_view[0];
             }
             else
             {
@@ -1009,7 +1009,7 @@ public:
                             size_type jB = i - jA;
                             if (jB < y.size())
                             {
-                                DDproduct( x_data[jA], y_data[jB], hi, lo );
+                                DDproduct( x_data[jA], y_stor_view[jB], hi, lo );
                                 sumLo_old = sumLo;
                                 sumHi_old = sumHi;
                                 sumLo += lo;
@@ -1620,7 +1620,7 @@ public:
 
     int compare( const basic_bigint& y ) const noexcept
     {
-        const value_type* y_data = y.data();
+        auto y_stor_view = y.get_storage_view();
 
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
@@ -1636,12 +1636,12 @@ public:
             auto stor_view = get_storage_view();
             for (size_type i = stor_view.size(); i-- > 0; )
             {
-                if (stor_view[i] > y_data[i])
+                if (stor_view[i] > y_stor_view[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (stor_view[i] < y_data[i])
+                else if (stor_view[i] < y_stor_view[i])
                 {
                     code = -1;
                     break;
