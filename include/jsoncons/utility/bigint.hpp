@@ -995,7 +995,7 @@ public:
                 basic_bigint<Allocator> x = *this;
                 auto x_storage = x.get_storage_view();
                 resize( lenProd ); // Give *this length lenProd
-                value_type* this_data = data();
+                auto storage = get_storage_view();
 
                 for (size_type i = 0; i < lenProd; i++ )
                 {
@@ -1020,7 +1020,7 @@ public:
                             }
                         }
                     }
-                    this_data[i] = sumLo;
+                    storage[i] = sumLo;
                 }
             }
         }
@@ -1049,9 +1049,9 @@ public:
         if ( q ) // Increase storage_.size() by q:
         {
             resize(size() + q);
-            value_type* this_data = data();
+            auto storage = get_storage_view();
             for (size_type i = size(); i-- > 0; )
-                this_data[i] = ( i < q ? 0 : this_data[i - q]);
+                storage[i] = ( i < q ? 0 : storage[i - q]);
             k %= value_type_bits;
         }
         if ( k )  // 0 < k < value_type_bits:
@@ -1059,12 +1059,12 @@ public:
             value_type k1 = value_type_bits - k;
             value_type mask = (value_type(1) << k) - value_type(1);
             resize( size() + 1 );
-            value_type* this_data = data();
+            auto storage = get_storage_view();
             for (size_type i = size(); i-- > 0; )
             {
-                this_data[i] <<= k;
+                storage[i] <<= k;
                 if ( i > 0 )
-                    this_data[i] |= (this_data[i-1] >> k1) & mask;
+                    storage[i] |= (storage[i-1] >> k1) & mask;
             }
         }
         reduce();
@@ -1091,15 +1091,15 @@ public:
             }
         }
 
-        value_type* this_data = data();
+        auto storage = get_storage_view();
         size_type n = size_type(size() - 1);
         int64_t k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
-            this_data[i] >>= k;
+            storage[i] >>= k;
             if ( i < n )
-                this_data[i] |= ((this_data[i+1] & mask) << k1);
+                storage[i] |= ((storage[i+1] & mask) << k1);
         }
         reduce();
         return *this;
