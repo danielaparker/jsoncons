@@ -332,20 +332,24 @@ public:
 
     bigint_storage& operator&=( const bigint_storage& a )
     {
-        size_type old_length = size();
+        auto this_storage = get_storage_view();
+        auto a_storage = a.get_storage_view();
 
-        resize( (std::min)( size(), a.size()) );
+        size_type old_length = this_storage.size();
+
+        resize( (std::min)( this_storage.size(), a_storage.size()) );
+        this_storage = get_storage_view();
 
         const value_type* pBegin = begin();
         value_type* p = end() - 1;
-        const value_type* q = a.begin() + size() - 1;
+        const value_type* q = a.begin() + this_storage.size() - 1;
 
         while ( p >= pBegin )
         {
             *p-- &= *q--;
         }
 
-        const size_type new_length = size();
+        const size_type new_length = this_storage.size();
         if ( old_length > new_length )
         {
             if (is_allocated())
@@ -1152,7 +1156,7 @@ public:
 
         if ( this_storage.size() < a_storage.size())
         {
-            resize(a.size());
+            resize(a_storage.size());
             this_storage = a.get_storage_view();
         }
 
