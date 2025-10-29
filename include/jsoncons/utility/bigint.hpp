@@ -1,4 +1,4 @@
-// Copyright 2018 vDaniel Parker
+// Copyright 2018 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -319,12 +319,12 @@ public:
         if (this != &other)
         {
             resize(other.size());
-            auto stor_view = get_storage_view();
+            auto storage = get_storage_view();
             auto other_stor_view = other.get_storage_view();
             common_.is_negative_ = other.common_.is_negative_;
             if (other_stor_view.size() > 0)
             {
-                std::memcpy(stor_view.data(), other_stor_view.data(), size_type(other_stor_view.size()*sizeof(value_type)));
+                std::memcpy(storage.data(), other_stor_view.data(), size_type(other_stor_view.size()*sizeof(value_type)));
             }
         }
         return *this;
@@ -860,7 +860,7 @@ public:
 
     basic_bigint& operator+=( const basic_bigint& y )
     {
-        auto y_stor_view = y.get_storage_view();
+        auto y_storage = y.get_storage_view();
         
         if ( is_negative() != y.is_negative())
             return *this -= -y;
@@ -868,23 +868,23 @@ public:
         value_type carry = 0;
 
         resize( (std::max)(y.size(), size()) + 1 );
-        auto stor_view = get_storage_view();
+        auto storage = get_storage_view();
 
         for (size_type i = 0; i < size(); i++ )
         {
-            if ( i >= y_stor_view.size() && carry == 0 )
+            if ( i >= y_storage.size() && carry == 0 )
                 break;
-            d = stor_view[i] + carry;
+            d = storage[i] + carry;
             carry = d < carry;
-            if ( i < y_stor_view.size())
+            if ( i < y_storage.size())
             {
-                stor_view[i] = d + y_stor_view[i];
-                if (stor_view[i] < d)
+                storage[i] = d + y_storage[i];
+                if (storage[i] < d)
                     carry = 1;
             }
             else
             {
-                stor_view[i] = d;
+                storage[i] = d;
             }
         }
         reduce();
@@ -893,7 +893,7 @@ public:
 
     basic_bigint& operator-=(const basic_bigint& y)
     {
-        auto y_stor_view = y.get_storage_view();
+        auto y_storage = y.get_storage_view();
 
         if ( is_negative() != y.is_negative())
             return *this += -y;
@@ -901,22 +901,22 @@ public:
             return *this = -(y - *this);
         value_type borrow = 0;
         value_type d;
-        auto stor_view = get_storage_view();
-        for (size_type i = 0; i < stor_view.size(); i++ )
+        auto storage = get_storage_view();
+        for (size_type i = 0; i < storage.size(); i++ )
         {
-            if ( i >= y_stor_view.size() && borrow == 0 )
+            if ( i >= y_storage.size() && borrow == 0 )
                 break;
-            d = stor_view[i] - borrow;
-            borrow = d > stor_view[i];
+            d = storage[i] - borrow;
+            borrow = d > storage[i];
             if ( i < y.size())
             {
-                stor_view[i] = d - y_stor_view[i];
-                if ( stor_view[i] > d )
+                storage[i] = d - y_storage[i];
+                if ( storage[i] > d )
                     borrow = 1;
             }
             else 
             {
-                stor_view[i] = d;
+                storage[i] = d;
             }
         }
         reduce();
@@ -933,13 +933,13 @@ public:
 
     basic_bigint& operator*=( value_type y )
     {
-        auto stor_view = get_storage_view();
-        size_type len0 = stor_view.size();
-        value_type dig = stor_view[0];
+        auto storage = get_storage_view();
+        size_type len0 = storage.size();
+        value_type dig = storage[0];
         value_type carry = 0;
 
-        resize(stor_view.size() + 1);
-        stor_view = get_storage_view();
+        resize(storage.size() + 1);
+        storage = get_storage_view();
 
         size_type i = 0;
         for (; i < len0; i++ )
@@ -947,25 +947,25 @@ public:
             value_type hi;
             value_type lo;
             DDproduct( dig, y, hi, lo );
-            stor_view[i] = lo + carry;
-            dig = stor_view[i+1];
-            carry = hi + (stor_view[i] < lo);
+            storage[i] = lo + carry;
+            dig = storage[i+1];
+            carry = hi + (storage[i] < lo);
         }
-        stor_view[i] = carry;
+        storage[i] = carry;
         reduce();
         return *this;
     }
 
     basic_bigint& operator*=(const basic_bigint& y) 
     {
-        auto y_stor_view = y.get_storage_view();
+        auto y_storage = y.get_storage_view();
 
         if ( size() == 0 || y.size() == 0 )
                     return *this = 0;
         bool difSigns = is_negative() != y.is_negative();
         if ( size() + y.size() == inlined_capacity ) // size() = y.size() = 1
         {
-            value_type a = data()[0], b = y_stor_view[0];
+            value_type a = data()[0], b = y_storage[0];
             data()[0] = a * b;
             if ( data()[0] / a != b )
             {
@@ -985,7 +985,7 @@ public:
         {
             if (y.size() == 1)
             {
-                *this *= y_stor_view[0];
+                *this *= y_storage[0];
             }
             else
             {
@@ -993,7 +993,7 @@ public:
                 value_type sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bigint<Allocator> x = *this;
-                const value_type* x_data = x.data();
+                auto x_storage = x.get_storage_view();
                 resize( lenProd ); // Give *this length lenProd
                 value_type* this_data = data();
 
@@ -1009,7 +1009,7 @@ public:
                             size_type jB = i - jA;
                             if (jB < y.size())
                             {
-                                DDproduct( x_data[jA], y_stor_view[jB], hi, lo );
+                                DDproduct( x_storage[jA], y_storage[jB], hi, lo );
                                 sumLo_old = sumLo;
                                 sumHi_old = sumHi;
                                 sumLo += lo;
@@ -1620,7 +1620,7 @@ public:
 
     int compare( const basic_bigint& y ) const noexcept
     {
-        auto y_stor_view = y.get_storage_view();
+        auto y_storage = y.get_storage_view();
 
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
@@ -1633,15 +1633,15 @@ public:
             code = +1;
         else
         {
-            auto stor_view = get_storage_view();
-            for (size_type i = stor_view.size(); i-- > 0; )
+            auto storage = get_storage_view();
+            for (size_type i = storage.size(); i-- > 0; )
             {
-                if (stor_view[i] > y_stor_view[i])
+                if (storage[i] > y_storage[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (stor_view[i] < y_stor_view[i])
+                else if (storage[i] < y_storage[i])
                 {
                     code = -1;
                     break;
@@ -1687,14 +1687,14 @@ public:
             // Denominator fits into a half word
             value_type divisor = denom_stor_view[0], dHi = 0, q1, r, q2, dividend;
             quot.resize(size());
-            auto stor_view = get_storage_view();
+            auto storage = get_storage_view();
             quot_stor_view = quot.get_storage_view();
-            for (size_type i=stor_view.size(); i-- > 0; )
+            for (size_type i=storage.size(); i-- > 0; )
             {
-                dividend = (dHi << value_type_half_bits) | (stor_view[i] >> value_type_half_bits);
+                dividend = (dHi << value_type_half_bits) | (storage[i] >> value_type_half_bits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << value_type_half_bits) | (stor_view[i] & r_mask);
+                dividend = (r << value_type_half_bits) | (storage[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
                 quot_stor_view[i] = (q1 << value_type_half_bits) | q2;
