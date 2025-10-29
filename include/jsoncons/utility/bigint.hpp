@@ -1014,7 +1014,7 @@ public:
                         if (JSONCONS_LIKELY(i >= jA))
                         {
                             size_type jB = i - jA;
-                            if (jB < y.size())
+                            if (jB < y_storage.size())
                             {
                                 DDproduct( x_storage[jA], y_storage[jB], hi, lo );
                                 sumLo_old = sumLo;
@@ -1052,12 +1052,13 @@ public:
 
     basic_bigint& operator<<=( value_type k )
     {
+        auto this_storage = get_storage_view();
         size_type q = size_type(k / value_type_bits);
         if ( q ) // Increase storage_.size() by q:
         {
-            resize(size() + q);
-            auto this_storage = get_storage_view();
-            for (size_type i = size(); i-- > 0; )
+            resize(this_storage.size() + q);
+            this_storage = get_storage_view();
+            for (size_type i = this_storage.size(); i-- > 0; )
                 this_storage[i] = ( i < q ? 0 : this_storage[i - q]);
             k %= value_type_bits;
         }
@@ -1065,9 +1066,9 @@ public:
         {
             value_type k1 = value_type_bits - k;
             value_type mask = (value_type(1) << k) - value_type(1);
-            resize( size() + 1 );
-            auto this_storage = get_storage_view();
-            for (size_type i = size(); i-- > 0; )
+            resize( this_storage.size() + 1 );
+            this_storage = get_storage_view();
+            for (size_type i = this_storage.size(); i-- > 0; )
             {
                 this_storage[i] <<= k;
                 if ( i > 0 )
@@ -1082,15 +1083,15 @@ public:
     {
         auto this_storage = get_storage_view();
         size_type q = size_type(k / value_type_bits);
-        if ( q >= size())
+        if ( q >= this_storage.size())
         {
             resize( 0 );
             return *this;
         }
         if (q > 0)
         {
-            memmove( this_storage.data(), this_storage.data()+q, size_type((size() - q)*sizeof(value_type)) );
-            resize( size_type(size() - q) );
+            memmove( this_storage.data(), this_storage.data()+q, size_type((this_storage.size() - q)*sizeof(value_type)) );
+            resize( size_type(this_storage.size() - q) );
             k %= value_type_bits;
             if ( k == 0 )
             {
@@ -1100,7 +1101,7 @@ public:
         }
 
         this_storage = get_storage_view();
-        size_type n = size_type(size() - 1);
+        size_type n = size_type(this_storage.size() - 1);
         int64_t k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
@@ -1141,14 +1142,18 @@ public:
 
     basic_bigint& operator|=( const basic_bigint& a )
     {
-        if ( size() < a.size())
+        auto this_storage = get_storage_view();
+        auto a_storage = a.get_storage_view();
+
+        if ( this_storage.size() < a_storage.size())
         {
             resize( a.size());
+            a_storage = a.get_storage_view();
         }
 
         const value_type* qBegin = a.begin();
         const value_type* q =      a.end() - 1;
-        value_type*       p =      begin() + a.size() - 1;
+        value_type*       p =      begin() + a_storage.size() - 1;
 
         while ( q >= qBegin )
         {
