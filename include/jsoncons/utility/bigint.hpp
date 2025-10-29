@@ -1077,6 +1077,7 @@ public:
 
     basic_bigint& operator>>=(value_type k)
     {
+        auto this_storage = get_storage_view();
         size_type q = size_type(k / value_type_bits);
         if ( q >= size())
         {
@@ -1085,7 +1086,7 @@ public:
         }
         if (q > 0)
         {
-            memmove( data(), data()+q, size_type((size() - q)*sizeof(value_type)) );
+            memmove( this_storage.data(), this_storage.data()+q, size_type((size() - q)*sizeof(value_type)) );
             resize( size_type(size() - q) );
             k %= value_type_bits;
             if ( k == 0 )
@@ -1095,7 +1096,7 @@ public:
             }
         }
 
-        auto this_storage = get_storage_view();
+        this_storage = get_storage_view();
         size_type n = size_type(size() - 1);
         int64_t k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
