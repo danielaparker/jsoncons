@@ -318,9 +318,9 @@ public:
     {
         if (this != &other)
         {
-            resize(other.size());
-            auto this_storage = get_storage_view();
             auto other_storage = other.get_storage_view();
+            resize(other_storage.size());
+            auto this_storage = get_storage_view();
             common_.is_negative_ = other.common_.is_negative_;
             if (other_storage.size() > 0)
             {
@@ -618,16 +618,6 @@ public:
         return storage_.get_storage_view();
     }
 
-    constexpr size_type size() const
-    {
-        return storage_.size();
-    }
-
-    constexpr size_type capacity() const
-    {
-        return storage_.capacity();
-    }
-
     bool is_negative() const
     {
         return storage_.is_negative();
@@ -636,16 +626,6 @@ public:
     void set_negative(bool value) 
     {
         storage_.set_negative(value);
-    }
-
-    const value_type* data() const
-    {
-        return storage_.data();
-    }
-
-    value_type* data() 
-    {
-        return storage_.data();
     }
 
     template <typename CharT>
@@ -1147,7 +1127,7 @@ public:
 
         if ( this_storage.size() < a_storage.size())
         {
-            resize( a.size());
+            resize( a_storage.size());
             this_storage = get_storage_view();
         }
 
@@ -1328,8 +1308,8 @@ public:
                 v.divide( LP10, v, R, true );
                 v_storage = v.get_storage_view();
 
-                auto R_stor_view = R.get_storage_view();
-                r = (R_stor_view.size() ? R_stor_view[0] : 0);
+                auto R_storage = R.get_storage_view();
+                r = (R_storage.size() ? R_storage[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
                     data.push_back(char(r % 10u + '0'));
@@ -1358,15 +1338,18 @@ public:
     template <typename Ch,typename Traits,typename Alloc>
     void write_string_hex(std::basic_string<Ch,Traits,Alloc>& data) const
     {
-        basic_bigint<Allocator> v(*this);
 
-        size_type len = (v.size() * basic_bigint<Allocator>::value_type_bits / 3) + 2;
+
+        basic_bigint<Allocator> v(*this);
+        auto v_storage = v.get_storage_view();
+
+        size_type len = (v_storage.size() * basic_bigint<Allocator>::value_type_bits / 3) + 2;
         data.reserve(len);
         // 1/3 > ln(2)/ln(10)
         static value_type p10 = 1;
         static value_type ip10 = 0;
 
-        if ( v.size() == 0 )
+        if ( v_storage.size() == 0 )
         {
             data.push_back('0');
         }
@@ -1387,18 +1370,19 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                auto R_stor_view = R.get_storage_view();
-                r = (R_stor_view.size() ? R_stor_view[0] : 0);
+                v_storage = v.get_storage_view();
+                auto R_storage = R.get_storage_view();
+                r = (R_storage.size() ? R_storage[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
                     uint8_t c = r % 16u;
                     data.push_back((c < 10u) ? ('0' + c) : ('A' - 10u + c));
                     r /= 16u;
-                    if ( r + v.size() == 0 )
+                    if ( r + v_storage.size() == 0 )
                         break;
                 }
             } 
-            while (v.size());
+            while (v_storage.size() > 0);
 
             if (is_negative())
             {
@@ -1642,20 +1626,20 @@ public:
 
     int compare( const basic_bigint& y ) const noexcept
     {
+        auto this_storage = get_storage_view();
         auto y_storage = y.get_storage_view();
 
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
         int code = 0;
-        if ( size() == 0 && y.size() == 0 )
+        if ( this_storage.size() == 0 && y_storage.size() == 0 )
             code = 0;
-        else if ( size() < y.size())
+        else if ( this_storage.size() < y_storage.size())
             code = -1;
-        else if ( size() > y.size())
+        else if ( this_storage.size() > y_storage.size())
             code = +1;
         else
         {
-            auto this_storage = get_storage_view();
             for (size_type i = this_storage.size(); i-- > 0; )
             {
                 if (this_storage[i] > y_storage[i])
@@ -1675,7 +1659,9 @@ public:
 
     void divide(basic_bigint denom, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
-        if (denom.size() == 0)
+        auto denom_storage = denom.get_storage_view();
+
+        if (denom_storage.size() == 0)
         {
             JSONCONS_THROW(std::runtime_error( "Zero divide." ));
         }
@@ -1692,25 +1678,24 @@ public:
             return;
         }
 
-        auto num_stor_view = num.get_storage_view();
-        auto denom_storage = denom.get_storage_view();
-        auto quot_stor_view = quot.get_storage_view();
+        auto num_storage = num.get_storage_view();
+        auto quot_storage = quot.get_storage_view();
+        auto this_storage = get_storage_view();
 
-        if ( denom.size() == 1 && num.size() == 1 )
+        if ( denom_storage.size() == 1 && num_storage.size() == 1 )
         {
-            quot = value_type( num_stor_view[0]/denom_storage[0] );
-            rem = value_type( num_stor_view[0]%denom_storage[0] );
+            quot = value_type( num_storage[0]/denom_storage[0] );
+            rem = value_type( num_storage[0]%denom_storage[0] );
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
         }
-        else if (denom.size() == 1 && (denom_storage[0] & l_mask) == 0 )
+        else if (denom_storage.size() == 1 && (denom_storage[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
             value_type divisor = denom_storage[0], dHi = 0, q1, r, q2, dividend;
-            quot.resize(size());
-            auto this_storage = get_storage_view();
-            quot_stor_view = quot.get_storage_view();
+            quot.resize(this_storage.size());
+            quot_storage = quot.get_storage_view();
             for (size_type i=this_storage.size(); i-- > 0; )
             {
                 dividend = (dHi << value_type_half_bits) | (this_storage[i] >> value_type_half_bits);
@@ -1719,7 +1704,7 @@ public:
                 dividend = (r << value_type_half_bits) | (this_storage[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
-                quot_stor_view[i] = (q1 << value_type_half_bits) | q2;
+                quot_storage[i] = (q1 << value_type_half_bits) | q2;
             }
             quot.reduce();
             rem = dHi;
@@ -1731,27 +1716,28 @@ public:
         int x = 0;
         bool second_done = normalize(denom, num, x);
         denom_storage = denom.get_storage_view();
+        num_storage = num.get_storage_view();
 
-        size_type l = denom.size() - 1;
-        size_type n = num.size() - 1;
+        size_type l = denom_storage.size() - 1;
+        size_type n = num_storage.size() - 1;
         quot.resize(n - l);
-        quot_stor_view = quot.get_storage_view();
-        for (size_type i=quot.size(); i-- > 0; )
+        quot_storage = quot.get_storage_view();
+        for (size_type i = quot_storage.size(); i-- > 0; )
         {
-            quot_stor_view[i] = 0;
+            quot_storage[i] = 0;
         }
         rem = num;
-        auto rem_stor_view = rem.get_storage_view();
-        if ( rem_stor_view[n] >= denom_storage[l] )
+        auto rem_storage = rem.get_storage_view();
+        if ( rem_storage[n] >= denom_storage[l] )
         {
-            rem.resize(rem.size() + 1);
+            rem.resize(rem_storage.size() + 1);
+            rem_storage = rem.get_storage_view();
             n++;
-            quot.resize(quot.size() + 1);
+            quot.resize(quot_storage.size() + 1);
+            quot_storage = quot.get_storage_view();
         }
         value_type d = denom_storage[l];
 
-        auto rem_storage = rem.get_storage_view();
-        auto quot_storage = quot.get_storage_view();
         for ( size_type k = n; k > l; k-- )
         {
             value_type q = DDquotient(rem_storage[k], rem_storage[k-1], d);
@@ -1868,7 +1854,7 @@ public:
     {
         auto denom_storage = denom.get_storage_view();
         size_type r = denom_storage.size() - 1;
-        value_type y = denom_storage.data()[r];
+        value_type y = denom_storage[r];
 
         x = 0;
         while ( (y & l_bit) == 0 )

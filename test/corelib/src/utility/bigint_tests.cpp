@@ -20,8 +20,8 @@ TEST_CASE("basic_bigint tests")
     {
         bigint a{0};
         bigint b{};
-        CHECK(0 == a.size());
-        CHECK(a.size() == b.size());
+        CHECK(0 == a.get_storage_view().size());
+        CHECK(a.get_storage_view().size() == b.get_storage_view().size());
         CHECK(a == b);
         CHECK(0 == a);
     }
