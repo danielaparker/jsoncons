@@ -1262,8 +1262,8 @@ public:
         size_type len = (v_storage.size() * value_type_bits / 3) + 2;
         data.reserve(len);
 
-        static value_type p10 = 1;
-        static value_type ip10 = 0;
+        static size_type p10 = 1;
+        static size_type ip10 = 0;
 
         if ( v_storage.size() == 0 )
         {
@@ -1327,8 +1327,8 @@ public:
         size_type len = (v_storage.size() * basic_bigint<Allocator>::value_type_bits / 3) + 2;
         data.reserve(len);
         // 1/3 > ln(2)/ln(10)
-        static value_type p10 = 1;
-        static value_type ip10 = 0;
+        static size_type p10 = 1;
+        static size_type ip10 = 0;
 
         if ( v_storage.size() == 0 )
         {
