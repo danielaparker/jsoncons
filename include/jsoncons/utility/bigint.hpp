@@ -24,6 +24,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conversion_result.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
 
@@ -880,7 +881,9 @@ public:
         return *this;
     }
 
-    basic_bigint& operator*=( int64_t y )
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    operator*=(IntegerType y)
     {
         *this *= value_type(y < 0 ? -y : y);
         if ( y < 0 )
@@ -888,7 +891,9 @@ public:
         return *this;
     }
 
-    basic_bigint& operator*=( value_type y )
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    operator*=(IntegerType y)
     {
         auto this_storage = get_storage_view();
         size_type len0 = this_storage.size();
@@ -1006,7 +1011,7 @@ public:
         return *this;
     }
 
-    basic_bigint& operator<<=( value_type k )
+    basic_bigint& operator<<=(value_type k)
     {
         auto this_storage = get_storage_view();
         size_type q = size_type(k / value_type_bits);
