@@ -1358,7 +1358,11 @@ namespace jsonpointer {
         auto it = first;
         while (it != last)
         {
-            if (it->first.tokens().size() <= offset)
+            if (it->first.tokens().size() == offset)
+            {
+                return jsoncons::optional<Json>{Json{}};
+            }
+            else if (it->first.tokens().size() < offset)
             {
                 return jsoncons::optional<Json>{};
             }
