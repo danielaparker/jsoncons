@@ -320,7 +320,7 @@ TEST_CASE("times 10")
 
 TEST_CASE("bigint div")
 {
-#if defined(_MSC_VER) && _MSC_VER >= 1910
+#if (defined(_MSC_VER) && _MSC_VER >= 1910) || !defined(_MSC_VER) 
     SECTION("bigint")
     {
         bigint big_pos = bigint::parse("18364494661702398480");
@@ -419,16 +419,6 @@ TEST_CASE("bigint operations")
 
         CHECK(expected == b);
     }
-
-    /*SECTION("unnormalize")
-    {
-        bigint a{0};
-        auto r = to_bigint("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377", a);
-        bigint rem;
-
-        a.unnormalize(rem, 1, true);
-        std::cout << rem << "\n";
-    }*/
 }
 
 TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
@@ -513,41 +503,38 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
     }
 
-    SECTION("Modulus")
+    SECTION("divide with remainder")
     {
-        bigint c = bigint(10000) % bigint(7);
-        //std::cout << c << "\n";
-        //std::cout << (10000 % 7) << "\n";
-        //std::cout << (10000 - ((10000 / 7))*7)  << "\n";
-
-        /*bigint c;
+        bigint c;
         bigint r;
-        a.divide( b, c, r, true );
 
-        bigint expected_c = bigint::parse("1007329941397107773827949833426167");
-        std::cout << expected_c << "\n";
-        bigint expected = bigint::parse("56654250564056135415631554531554513813");
-        std::cout << expected << "\n";
-        std::cout << c << "\n";
-        std::cout << r << "\n";
+        a.divide(b, c, r, true);
 
-
-        //bigint r = a - 91;
+        bigint c_expected = 931;
+        bigint r_expected = bigint::parse("30304836119413479098656090851801005");
+        //std::cout << expected << "\n";
         //std::cout << r << "\n";
+        CHECK(c_expected == c);
+        CHECK(r_expected == r);
+    }
 
-        //bigint c = a % b;
-        //CHECK(expected == c);
+    SECTION("modulus")
+    {
+        bigint c = a % b;
 
-        c = a / 56242;
-        expected = bigint::parse("1007329941397107773827949833426167");
+        bigint expected = bigint::parse("30304836119413479098656090851801005");
         CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
 
-        c = 98 / 56;
-        expected = 1;
-        CHECK(expected == c);
+    SECTION("modulus with second_done")
+    {
+        b = bigint::parse("4253529586511730793019062996110615940069384017080242667520");
+        bigint c = a % b;
 
-        c = a / b /c; 
-        expected = 931;
-        CHECK(expected == c);*/
+        CHECK(a == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
     }
 }

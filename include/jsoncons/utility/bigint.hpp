@@ -1852,7 +1852,7 @@ public:
         num <<= x;
 
         denom_storage = denom.get_storage_view();
-        if ( r > 0 && denom_storage.data()[r] < denom_storage.data()[r-1] )
+        if ( r > 0 && denom_storage[r] < denom_storage[r-1] )
         {
             denom *= max_value_type;
             num *= max_value_type;
