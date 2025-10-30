@@ -320,7 +320,7 @@ TEST_CASE("times 10")
 
 TEST_CASE("bigint div")
 {
-#if defined(_MSC_VER) && _MSC_VER >= 1910
+#if (defined(_MSC_VER) && _MSC_VER >= 1910) || !defined(_MSC_VER) 
     SECTION("bigint")
     {
         bigint big_pos = bigint::parse("18364494661702398480");
@@ -419,16 +419,6 @@ TEST_CASE("bigint operations")
 
         CHECK(expected == b);
     }
-
-    /*SECTION("unnormalize")
-    {
-        bigint a{0};
-        auto r = to_bigint("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377", a);
-        bigint rem;
-
-        a.unnormalize(rem, 1, true);
-        std::cout << rem << "\n";
-    }*/
 }
 
 TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
@@ -534,6 +524,16 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 
         bigint expected = bigint::parse("30304836119413479098656090851801005");
         CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+
+    SECTION("modulus with second_done")
+    {
+        b = bigint::parse("4253529586511730793019062996110615940069384017080242667520");
+        bigint c = a % b;
+
+        CHECK(a == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }
