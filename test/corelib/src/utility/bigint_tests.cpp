@@ -513,23 +513,27 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
     }
 
-    SECTION("divide")
+    SECTION("divide with remainder")
     {
         bigint c;
         bigint r;
 
         a.divide(b, c, r, true);
 
-        bigint expected = bigint::parse("56654250564056135415631554531554513813");
-        std::cout << expected << "\n";
-        std::cout << r << "\n";
+        bigint c_expected = 931;
+        bigint r_expected = bigint::parse("30304836119413479098656090851801005");
+        //std::cout << expected << "\n";
+        //std::cout << r << "\n";
+        CHECK(c_expected == c);
+        CHECK(r_expected == r);
     }
 
-    SECTION("Modulus")
+    SECTION("modulus")
     {
         bigint c = a % b;
 
-        bigint expected = bigint::parse("56654250564056135415631554531554513813");
+        bigint expected = bigint::parse("30304836119413479098656090851801005");
+        CHECK(expected == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }
