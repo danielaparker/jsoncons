@@ -336,33 +336,39 @@ public:
         auto this_storage = get_storage_view();
         auto a_storage = a.get_storage_view();
 
-        size_type old_length = this_storage.size();
+        const size_type old_length = this_storage.size();
+        const size_type new_length = (std::min)(old_length, a_storage.size());
 
-        resize( (std::min)( this_storage.size(), a_storage.size()) );
-        this_storage = get_storage_view();
-
-        const value_type* pBegin = this_storage.begin();
-        value_type* p = this_storage.end() - 1;
-        const value_type* q = a_storage.begin() + this_storage.size() - 1;
-
-        while ( p >= pBegin )
+        if (new_length != old_length)
         {
-            *p-- &= *q--;
+            resize(new_length);
+            this_storage = get_storage_view();
         }
 
-        const size_type new_length = this_storage.size();
-        if ( old_length > new_length )
+        if (new_length > 0)
         {
-            if (is_allocated())
+            const value_type* first = this_storage.begin();
+            value_type* p = this_storage.end() - 1;
+            const value_type* q = a_storage.begin() + this_storage.size() - 1;
+
+            while ( p >= first )
             {
-                std::memset( allocated_.data_ + new_length, 0, size_type(old_length - new_length*sizeof(value_type)) );
+                *p-- &= *q--;
             }
-            else
+
+            if (old_length > new_length)
             {
-                JSONCONS_ASSERT(new_length <= inlined_capacity);
-                for (size_type i = new_length; i < inlined_capacity; ++i)
+                if (is_allocated())
                 {
-                    inlined_.values_[i] = 0;
+                    std::memset(allocated_.data_ + new_length, 0, size_type(old_length - new_length*sizeof(value_type)));
+                }
+                else
+                {
+                    JSONCONS_ASSERT(new_length <= inlined_capacity);
+                    for (size_type i = new_length; i < inlined_capacity; ++i)
+                    {
+                        inlined_.values_[i] = 0;
+                    }
                 }
             }
         }
@@ -374,19 +380,22 @@ public:
 
     void reduce()
     {
-        auto this_storage = get_storage_view();
-        value_type* p = this_storage.end() - 1;
-        value_type* pBegin = this_storage.begin();
-        while ( p >= pBegin )
+        if (common_.size_ > 0)
         {
-            if ( *p )
+            auto this_storage = get_storage_view();
+            value_type* p = this_storage.end() - 1;
+            value_type* first = this_storage.begin();
+            while ( p >= first )
             {
-                break;
+                if ( *p )
+                {
+                    break;
+                }
+                --common_.size_;
+                --p;
             }
-            --common_.size_;
-            --p;
         }
-        if ( common_.size_ == 0 )
+        if (common_.size_ == 0)
         {
             common_.is_negative_ = false;
         }
