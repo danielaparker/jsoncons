@@ -114,7 +114,7 @@ namespace jsonschema {
             if (has_plain_name_fragment())
                 return *this;
 
-            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= field;
 
             jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
