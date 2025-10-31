@@ -524,6 +524,7 @@ Chichester: John Wiley.
 
 */
 
+
 template <typename Allocator = std::allocator<uint64_t>>
 class basic_bigint 
 {
@@ -550,8 +551,12 @@ public:
     static constexpr value_type r_mask = (value_type(1) << value_type_half_bits) - 1;
     static constexpr value_type l_mask = max_value_type - r_mask;
     static constexpr value_type l_bit = max_value_type - (max_value_type >> 1);
-    static constexpr value_type max_uint64_div_10 = (std::numeric_limits<value_type>::max)()/10u ;
-    static constexpr value_type max_uint64_div_16 = (std::numeric_limits<value_type>::max)()/16u ;
+    static constexpr value_type max_value_type_div_10 = (std::numeric_limits<value_type>::max)()/10u ;
+    static constexpr value_type max_value_type_div_16 = (std::numeric_limits<value_type>::max)()/16u ;
+    static constexpr value_type max_unsigned_power_10 = 10000000000000000000u; // max_unsigned_power_10 = ::pow(10, imax_unsigned_power_10)
+    static constexpr size_type imax_unsigned_power_10 = 19u;
+    static constexpr value_type max_unsigned_power_16 = 1152921504606846976u; // max_unsigned_power_16 = ::pow(16, imax_unsigned_power_16)
+    static constexpr size_type imax_unsigned_power_16 = 15;
 
 public:
     basic_bigint()
@@ -1267,9 +1272,6 @@ public:
         size_type len = (v_storage.size() * value_type_bits / 3) + 2;
         data.reserve(len);
 
-        static size_type p10 = 1;
-        static size_type ip10 = 0;
-
         if ( v_storage.size() == 0 )
         {
             data.push_back('0');
@@ -1277,17 +1279,8 @@ public:
         else
         {
             value_type r;
-            if ( p10 == 1 )
-            {
-                while ( p10 <= max_uint64_div_10)
-                {
-                    p10 *= 10u;
-                    ip10++;
-                }
-            }                     
-            // p10 is max unsigned power of 10
             basic_bigint<Allocator> R;
-            basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
+            basic_bigint<Allocator> LP10 = max_unsigned_power_10; 
 
             do
             {
@@ -1296,7 +1289,7 @@ public:
 
                 auto R_storage = R.get_storage_view();
                 r = (R_storage.size() ? R_storage[0] : 0);
-                for ( size_type j=0; j < ip10; j++ )
+                for ( size_type j=0; j < imax_unsigned_power_10; j++ )
                 {
                     data.push_back(char(r % 10u + '0'));
                     r /= 10u;
@@ -1331,9 +1324,6 @@ public:
 
         size_type len = (v_storage.size() * basic_bigint<Allocator>::value_type_bits / 3) + 2;
         data.reserve(len);
-        // 1/3 > ln(2)/ln(10)
-        static size_type p10 = 1;
-        static size_type ip10 = 0;
 
         if ( v_storage.size() == 0 )
         {
@@ -1342,24 +1332,15 @@ public:
         else
         {
             value_type r;
-            if ( p10 == 1 )
-            {
-                while ( p10 <= max_uint64_div_16)
-                {
-                    p10 *= 16u;
-                    ip10++;
-                }
-            }                     
-            // p10 is max unsigned power of 16
             basic_bigint<Allocator> R;
-            basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
+            basic_bigint<Allocator> LP10 = max_unsigned_power_16; // LP10 = max_unsigned_power_16 = ::pow(16, imax_unsigned_power_16)
             do
             {
                 v.divide( LP10, v, R, true );
                 v_storage = v.get_storage_view();
                 auto R_storage = R.get_storage_view();
                 r = (R_storage.size() ? R_storage[0] : 0);
-                for ( size_type j=0; j < ip10; j++ )
+                for ( size_type j=0; j < imax_unsigned_power_16; j++ )
                 {
                     uint8_t c = r % 16u;
                     data.push_back((c < 10u) ? ('0' + c) : ('A' - 10u + c));
