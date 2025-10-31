@@ -1127,11 +1127,11 @@ public:
                 this_view = get_storage_view();
             }
 
-            const value_type* q_first = a_view.begin();
+            const value_type* qfirst = a_view.begin();
             const value_type* q = a_view.end() - 1;
             value_type* p = this_view.begin() + a_view.size() - 1;
 
-            while (q >= q_first)
+            while (q >= qfirst)
             {
                 *p-- |= *q--;
             }
@@ -1154,11 +1154,11 @@ public:
                 this_view = get_storage_view();
             }
 
-            const value_type* q_first = a_view.begin();
+            const value_type* qfirst = a_view.begin();
             const value_type* q = a_view.end() - 1;
             value_type* p = this_view.begin() + a_view.size() - 1;
 
-            while (q >= q_first)
+            while (q >= qfirst)
             {
                 *p-- ^= *q--;
             }
