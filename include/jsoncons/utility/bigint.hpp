@@ -559,17 +559,15 @@ public:
     static constexpr size_type imax_unsigned_power_16 = 15;
 
 public:
-    basic_bigint()
-    {
-    }
+    basic_bigint() = default;
 
     explicit basic_bigint(const Allocator& alloc)
         : storage_(alloc)
     {
     }
 
-    basic_bigint(const basic_bigint& n)
-        : storage_(n.storage_)
+    basic_bigint(const basic_bigint& other)
+        : storage_(other.storage_)
     {
     }
 
