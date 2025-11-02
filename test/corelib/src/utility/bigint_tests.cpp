@@ -425,7 +425,7 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 {
     bigint a = bigint::parse("56654250564056135415631554531554513813"); 
     bigint b = bigint::parse("60820564691661355463515465564664568");
-    bigint d(956486133);
+    //bigint d(956486133);
 
     SECTION("Addition")
     {
@@ -518,7 +518,7 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(r_expected == r);
     }
 
-    SECTION("modulus")
+    SECTION("bigint % bigint")
     {
         bigint c = a % b;
 
@@ -526,6 +526,31 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
+    }
+
+    SECTION("bigint % integer")
+    {
+        bigint c = a % 56242;
+
+        bigint expected(29399);
+        CHECK(expected == c);
+    }
+
+    SECTION("integer % integer")
+    {
+        bigint c = 98 % 56;
+
+        bigint expected(42);
+        CHECK(expected == c);
+    }
+
+    SECTION("a % b % c")
+    {
+        bigint c = 98 % 56;
+        bigint d = a % b % c;
+
+        bigint expected(41);
+        CHECK(expected == d);
     }
 
     SECTION("modulus with second_done")
@@ -536,5 +561,23 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(a == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
+    }
+    SECTION("compare")
+    {
+        CHECK((a > b));
+        CHECK_FALSE((b > a));
+        CHECK((a >= b));
+        CHECK_FALSE((b >= a));
+        CHECK((b < a));
+        CHECK_FALSE((a < b));
+        CHECK((b <= a));
+        CHECK_FALSE((a <= b));
+        CHECK((a != b));
+        CHECK_FALSE((a == b));
+    }
+    SECTION("abs")
+    {
+        bigint c = abs(b);
+        CHECK(bigint::parse("60820564691661355463515465564664568") == c);
     }
 }
