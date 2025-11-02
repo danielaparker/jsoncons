@@ -320,12 +320,24 @@ TEST_CASE("jsonpointer unflatten tests 3")
 
         json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
-        //std::cout << "(3) " << unflattened << "\n";
-        //std::cout << "(4) " << expected << "\n";
     }
-    SECTION("empty objects")
+    SECTION("empty object")
     {
         jsoncons::json original{};
+        auto flattened = jsoncons::jsonpointer::flatten(original);
+        auto unflattened = jsoncons::jsonpointer::unflatten(flattened);
+        CHECK(original == unflattened);    
+    }
+    SECTION("empty array")
+    {
+        jsoncons::json original{jsoncons::json_array_arg};
+        auto flattened = jsoncons::jsonpointer::flatten(original);
+        auto unflattened = jsoncons::jsonpointer::unflatten(flattened);
+        CHECK(original == unflattened);    
+    }
+    SECTION("number")
+    {
+        jsoncons::json original{123};
         auto flattened = jsoncons::jsonpointer::flatten(original);
         auto unflattened = jsoncons::jsonpointer::unflatten(flattened);
         CHECK(original == unflattened);    
