@@ -577,7 +577,8 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
     SECTION("abs")
     {
-        bigint c = abs(b);
+        bigint c = jsoncons::abs(b);
         CHECK(bigint::parse("60820564691661355463515465564664568") == c);
     }
 }
+

@@ -1569,51 +1569,6 @@ public:
         return x &= y;
     }
 
-    friend basic_bigint<Allocator> abs( const basic_bigint& a )
-    {
-        if ( a.is_negative())
-        {
-            return -a;
-        }
-        return a;
-    }
-
-    friend basic_bigint<Allocator> power( basic_bigint<Allocator> x, unsigned n )
-    {
-        basic_bigint<Allocator> y = 1;
-
-        while ( n )
-        {
-            if ( n & 1 )
-            {
-                y *= x;
-            }
-            x *= x;
-            n >>= 1;
-        }
-
-        return y;
-    }
-
-    friend basic_bigint<Allocator> sqrt( const basic_bigint& a )
-    {
-        basic_bigint<Allocator> x = a;
-        basic_bigint<Allocator> b = a;
-        basic_bigint<Allocator> q;
-
-        b <<= 1;
-        while ( (void)(b >>= 2), b > 0 )
-        {
-            x >>= 1;
-        }
-        while ( x > (q = a/x) + 1 || x < q - 1 )
-        {
-            x += q;
-            x >>= 1;
-        }
-        return x < q ? x : q;
-    }
-
     template <typename CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigint& v)
     {
@@ -1629,12 +1584,12 @@ public:
         auto this_view = get_storage_view();
         auto y_view = y.get_storage_view();
 
+        if ( this_view.size() == 0 && y_view.size() == 0 )
+            return 0;
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
         int code = 0;
-        if ( this_view.size() == 0 && y_view.size() == 0 )
-            code = 0;
-        else if ( this_view.size() < y_view.size())
+        if ( this_view.size() < y_view.size())
             code = -1;
         else if ( this_view.size() > y_view.size())
             code = +1;
@@ -1673,6 +1628,7 @@ public:
         if ( num < denom )
         {
             quot = value_type(0);
+            quot.set_negative(quot_neg);
             rem = num;
             rem.set_negative(rem_neg);
             return;
@@ -1849,7 +1805,7 @@ private:
             a[n] = 0;
         }
     }
-public:
+
     bool normalize(basic_bigint& denom, basic_bigint& num, int& x) const
     {
         auto denom_view = denom.get_storage_view();
@@ -1894,7 +1850,7 @@ public:
             rem.reduce();
         }
     }
-private:
+
     size_type round_up(size_type i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
@@ -1977,6 +1933,54 @@ private:
         return to_bigint_result<CharT>(cur, std::errc{});
     }
 };
+
+template <typename Allocator>
+basic_bigint<Allocator> abs( const basic_bigint<Allocator>& a )
+{
+    if ( a.is_negative())
+    {
+        return -a;
+    }
+    return a;
+}
+
+template <typename Allocator>
+basic_bigint<Allocator> pow(const basic_bigint<Allocator>& x, unsigned n)
+{
+    basic_bigint<Allocator> y = 1;
+
+    while ( n )
+    {
+        if ( n & 1 )
+        {
+            y *= x;
+        }
+        x *= x;
+        n >>= 1;
+    }
+
+    return y;
+}
+
+template <typename Allocator>
+basic_bigint<Allocator> sqrt(const basic_bigint<Allocator>& a)
+{
+    basic_bigint<Allocator> x = a;
+    basic_bigint<Allocator> b = a;
+    basic_bigint<Allocator> q;
+
+    b <<= 1;
+    while ( (void)(b >>= 2), b > 0 )
+    {
+        x >>= 1;
+    }
+    while ( x > (q = a/x) + 1 || x < q - 1 )
+    {
+        x += q;
+        x >>= 1;
+    }
+    return x < q ? x : q;
+}
 
 using bigint = basic_bigint<std::allocator<uint8_t>>;
 
