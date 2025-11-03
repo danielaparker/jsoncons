@@ -129,7 +129,7 @@ TEST_CASE("test_negative_bignum")
 
 TEST_CASE("test_longlong")
 {
-    long long n = (std::numeric_limits<long long>::max)();
+    constexpr auto n = (std::numeric_limits<long long>::max)();
 
     bigint val(n);
 
@@ -577,7 +577,8 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
     SECTION("abs")
     {
-        bigint c = abs(b);
+        bigint c = jsoncons::abs(b);
         CHECK(bigint::parse("60820564691661355463515465564664568") == c);
     }
 }
+
