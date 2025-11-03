@@ -202,20 +202,23 @@ public:
         {
         }
 
-        allocated_storage(const allocated_storage& stor, real_allocator_type alloc)
+        allocated_storage(const allocated_storage& stor, const real_allocator_type& a)
             : is_allocated_(true),
-            is_negative_(stor.is_negative_),
-            size_(stor.size_),
-            capacity_(round_up(stor.size_))
+              is_negative_(stor.is_negative_),
+              size_(stor.size_),
+              capacity_(round_up(stor.size_))
         {
+            real_allocator_type alloc(a);
+
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
             JSONCONS_TRY
             {
                 std::allocator_traits<real_allocator_type>::construct(alloc, ext_traits::to_plain_pointer(data_));
             }
-                JSONCONS_CATCH(...)
+            JSONCONS_CATCH(...)
             {
                 std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
+                data_ = nullptr;
                 JSONCONS_RETHROW;
             }
             JSONCONS_ASSERT(stor.data_ != nullptr);
@@ -223,12 +226,14 @@ public:
         }
 
         allocated_storage(allocated_storage&& stor) noexcept
-            : is_allocated_(true),
+            : is_allocated_(stor.is_allocated_),
             is_negative_(stor.is_negative_),
             size_(stor.size_),
             capacity_(stor.capacity_),
             data_(stor.data_)
         {
+            stor.is_allocated_ = false;
+            stor.is_negative_ = false;
             stor.size_ = 0;
             stor.capacity_ = 0;
             stor.data_ = nullptr;
@@ -239,27 +244,26 @@ public:
             if (data_ != nullptr)
             {
                 real_allocator_type alloc(a);
-
                 std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
             }
         }
 
         void reserve(size_type n, const real_allocator_type& a)
         {
-            real_allocator_type alloc(a);
-
             size_type capacity_new = round_up(n);
-            value_type* data_old = data_;
-            data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_new);
+
+            real_allocator_type alloc(a);
+            value_type* data_new = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_new);
             if (size_ > 0)
             {
-                std::memcpy(data_, data_old, size_type(size_ * sizeof(value_type)));
+                std::memcpy(data_new, data_, size_type(size_ * sizeof(value_type)));
             }
-            if (capacity_ > 0 && data_ != nullptr)
+            if (data_ != nullptr)
             {
-                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_old, capacity_);
+                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
             }
             capacity_ = capacity_new;
+            data_ = data_new;
         }
 
         // Find suitable new block size
@@ -295,7 +299,7 @@ public:
         }
     }
 
-    bigint_storage(bigint_storage&& other)
+    bigint_storage(bigint_storage&& other) noexcept
         : uint64_allocator_type(other.get_allocator())
     {
         if (!other.is_allocated())
@@ -322,9 +326,9 @@ public:
             auto other_view = other.get_storage_view();
             resize(other_view.size());
             auto this_view = get_storage_view();
-            common_.is_negative_ = other.common_.is_negative_;
             if (other_view.size() > 0)
             {
+                common_.is_negative_ = other.common_.is_negative_;
                 std::memcpy(this_view.data(), other_view.data(), size_type(other_view.size()*sizeof(value_type)));
             }
         }
@@ -415,8 +419,14 @@ public:
                allocated_.reserve(n, get_allocator());
                allocated_.size_ = size;
                allocated_.is_negative_ = is_neg;
-               allocated_.data_[0] = values[0];
-               allocated_.data_[1] = values[1];
+               if (n >= 1)
+               {
+                   allocated_.data_[0] = values[0];
+               }
+               if (n >= 2)
+               {
+                   allocated_.data_[1] = values[1];
+               }
            }
            else
            {
@@ -435,6 +445,11 @@ public:
         if (is_allocated())
         {
             allocated_.destroy(get_allocator());
+            allocated_.~allocated_storage();
+        }
+        else
+        {
+            inlined_.~inlined_storage();
         }
     }
 
@@ -590,6 +605,12 @@ public:
                  typename std::enable_if<std::is_integral<Integer>::value>::type* = 0)
         : storage_(n)
     {
+    }
+
+    template <typename CharT>
+    basic_bigint(jsoncons::basic_string_view<CharT> sv)
+    {
+        *this = parse(sv.data(), sv.size());
     }
 
     ~basic_bigint() noexcept
@@ -1669,7 +1690,7 @@ public:
             rem.set_negative(rem_neg);
             return;
         }
-        else if (denom_view.size() == 1 && (denom_view[0] & l_mask) == 0 )
+        if (denom_view.size() == 1 && (denom_view[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
             value_type divisor = denom_view[0], dHi = 0, q1, r, q2, dividend;

@@ -129,7 +129,7 @@ TEST_CASE("test_negative_bignum")
 
 TEST_CASE("test_longlong")
 {
-    long long n = (std::numeric_limits<long long>::max)();
+    constexpr auto n = (std::numeric_limits<long long>::max)();
 
     bigint val(n);
 
