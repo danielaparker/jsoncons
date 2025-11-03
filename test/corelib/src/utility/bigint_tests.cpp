@@ -5,10 +5,12 @@
 #include "windows.h"
 #endif
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
+#include <jsoncons/json.hpp>
 #include <ctime>
 #include <catch/catch.hpp>
 
@@ -577,8 +579,13 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
     SECTION("abs")
     {
-        bigint c = jsoncons::abs(b);
+        bigint c = jsoncons::babs(b);
         CHECK(bigint::parse("60820564691661355463515465564664568") == c);
+    }
+    SECTION("pow")
+    {
+        //bigint c = jsoncons::bpow(a, 2u);
+        //CHECK(bigint::parse("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
     }
 }
 

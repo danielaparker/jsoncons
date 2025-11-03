@@ -664,12 +664,21 @@ public:
     template <typename CharT>
     static basic_bigint<Allocator> parse(const CharT* data, size_type length)
     {
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
+        }
+
         bool neg;
         if (*data == '-')
         {
             neg = true;
             data++;
             --length;
+            if (JSONCONS_UNLIKELY(length == 0))
+            {
+                JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
+            }
         }
         else
         {
@@ -1935,7 +1944,7 @@ private:
 };
 
 template <typename Allocator>
-basic_bigint<Allocator> abs( const basic_bigint<Allocator>& a )
+basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
 {
     if ( a.is_negative())
     {
@@ -1945,7 +1954,7 @@ basic_bigint<Allocator> abs( const basic_bigint<Allocator>& a )
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> pow(const basic_bigint<Allocator>& x, unsigned n)
+basic_bigint<Allocator> bpow(basic_bigint<Allocator> x, unsigned n)
 {
     basic_bigint<Allocator> y = 1;
 
@@ -1963,7 +1972,7 @@ basic_bigint<Allocator> pow(const basic_bigint<Allocator>& x, unsigned n)
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> sqrt(const basic_bigint<Allocator>& a)
+basic_bigint<Allocator> bsqrt(const basic_bigint<Allocator>& a)
 {
     basic_bigint<Allocator> x = a;
     basic_bigint<Allocator> b = a;
