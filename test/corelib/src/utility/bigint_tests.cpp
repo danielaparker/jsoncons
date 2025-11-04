@@ -584,7 +584,8 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
     SECTION("pow")
     {
-        //bigint c = jsoncons::bpow(a, 2u);
+        bigint c = jsoncons::bpow(a, 2u);
+        std::cout << c << "\n";
         //CHECK(bigint::parse("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
     }
 }

@@ -38,8 +38,8 @@ public:
     using size_type = typename std::allocator_traits<uint64_allocator_type>::size_type;
     using value_type = typename std::allocator_traits<uint64_allocator_type>::value_type;
     static constexpr value_type max_value_type = (std::numeric_limits<value_type>::max)();
-    static constexpr value_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
-    static constexpr value_type value_type_half_bits = value_type_bits/2;
+    static constexpr size_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
+    static constexpr size_type value_type_half_bits = value_type_bits/2;
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
     static constexpr value_type inlined_capacity = 2;
 public:
@@ -568,8 +568,8 @@ public:
     static constexpr size_type inlined_capacity = 2;
 
     static constexpr value_type max_value_type = (std::numeric_limits<value_type>::max)();
-    static constexpr value_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
-    static constexpr value_type value_type_half_bits = value_type_bits/2;
+    static constexpr size_type value_type_bits = sizeof(value_type) * 8;  // Number of bits
+    static constexpr size_type value_type_half_bits = value_type_bits/2;
 
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
     static constexpr value_type r_mask = (value_type(1) << value_type_half_bits) - 1;
@@ -971,14 +971,14 @@ public:
         }
 
         bool difSigns = is_negative() != y.is_negative();
-        if ( this_view.size() + y_view.size() == inlined_capacity ) // size() = y.size() = 1
+        if ( this_view.size() + y_view.size() == 2 ) // size() = y.size() = 1
         {
             value_type a = this_view[0], b = y_view[0];
             this_view[0] = a * b;
             if ( this_view[0] / a != b )
             {
+                resize(2);
                 this_view = get_storage_view();
-                resize( inlined_capacity );
                 DDproduct( a, b, this_view[1], this_view[0] );
             }
             set_negative(difSigns);
@@ -1053,10 +1053,10 @@ public:
         return *this;
     }
 
-    basic_bigint& operator<<=(value_type k)
+    basic_bigint& operator<<=(size_type k)
     {
         auto this_view = get_storage_view();
-        size_type q = size_type(k / value_type_bits);
+        size_type q = k / value_type_bits;
         if ( q ) // Increase storage_.size() by q:
         {
             resize(this_view.size() + q);
@@ -1067,7 +1067,7 @@ public:
         }
         if ( k )  // 0 < k < value_type_bits:
         {
-            value_type k1 = value_type_bits - k;
+            size_type k1 = value_type_bits - k;
             value_type mask = (value_type(1) << k) - value_type(1);
             resize( this_view.size() + 1 );
             this_view = get_storage_view();
@@ -1082,10 +1082,10 @@ public:
         return *this;
     }
 
-    basic_bigint& operator>>=(value_type k)
+    basic_bigint& operator>>=(size_type k)
     {
         auto this_view = get_storage_view();
-        size_type q = size_type(k / value_type_bits);
+        size_type q = k / value_type_bits;
         if ( q >= this_view.size())
         {
             resize( 0 );
