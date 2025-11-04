@@ -264,7 +264,7 @@ template <typename T,typename CharT>
 typename std::enable_if<ext_traits::integer_limits<T>::is_specialized && !ext_traits::integer_limits<T>::is_signed,to_number_result<CharT>>::type
 dec_to_integer(const CharT* s, std::size_t length, T& value)
 {
-    if (length == 0)
+    if (JSONCONS_UNLIKELY(length == 0))
     {
         return to_number_result<CharT>(s, std::errc::invalid_argument);
     }
