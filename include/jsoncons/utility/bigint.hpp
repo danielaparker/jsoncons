@@ -561,6 +561,7 @@ public:
     using stored_allocator_type = allocator_type;
     using pointer = typename allocator_traits_type::pointer;
     using size_type = typename detail::bigint_storage<Allocator>::size_type;
+    using ssize_type = std::make_signed<size_type>::type;
     using value_type = typename detail::bigint_storage<Allocator>::value_type;
     using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<value_type>;
     using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const value_type>;
@@ -1105,7 +1106,7 @@ public:
 
         this_view = get_storage_view();
         size_type n = size_type(this_view.size() - 1);
-        int64_t k1 = value_type_bits - k;
+        ssize_type k1 = value_type_bits - k;
         value_type mask = (value_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
