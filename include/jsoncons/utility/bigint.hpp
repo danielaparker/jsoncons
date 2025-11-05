@@ -34,10 +34,10 @@ template <typename Allocator>
 class bigint_storage : private std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>
 {
 public:
-    using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
+    using word_type = uint64_t;
+    using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<word_type>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
-    using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
-    static constexpr word_type max_word_type = (std::numeric_limits<word_type>::max)();
+    static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
@@ -153,9 +153,9 @@ public:
             using unsigned_type = typename std::make_unsigned<T>::type;
 
             auto u = n < 0 ? (unsigned_type(0) - static_cast<unsigned_type>(n)) : static_cast<unsigned_type>(n);
-            values_[0] = word_type(u & max_word_type);;
+            values_[0] = word_type(u & max_word);;
             u >>= word_type_bits;
-            values_[1] = word_type(u & max_word_type);;
+            values_[1] = word_type(u & max_word);;
         }
 
         template <typename T>
@@ -167,9 +167,9 @@ public:
             is_negative_(false),
             size_(n == 0 ? 0 : inlined_capacity)
         {
-            values_[0] = word_type(n & max_word_type);;
+            values_[0] = word_type(n & max_word);;
             n >>= word_type_bits;
-            values_[1] = word_type(n & max_word_type);;
+            values_[1] = word_type(n & max_word);;
         }
 
         inlined_storage(const inlined_storage& stor)
@@ -280,6 +280,31 @@ public:
         allocated_storage allocated_;
     };
 
+    void move_assignment(std::true_type, bigint_storage&& other)
+    {
+        static_cast<word_allocator_type&>(*this) = other.get_allocator();
+        auto other_view = other.get_storage_view();
+        resize(other_view.size());
+        auto this_view = get_storage_view();
+        if (other_view.size() > 0)
+        {
+            common_.is_negative_ = other.common_.is_negative_;
+            std::memcpy(this_view.data(), other_view.data(), size_type(other_view.size()*sizeof(word_type)));
+        }
+    }
+
+    void move_assignment(std::false_type, bigint_storage&& other)
+    {
+        auto other_view = other.get_storage_view();
+        resize(other_view.size());
+        auto this_view = get_storage_view();
+        if (other_view.size() > 0)
+        {
+            common_.is_negative_ = other.common_.is_negative_;
+            std::memcpy(this_view.data(), other_view.data(), size_type(other_view.size()*sizeof(word_type)));
+        }
+    }
+
     explicit bigint_storage(const Allocator& alloc = Allocator{})
         : word_allocator_type(alloc)
     {
@@ -287,7 +312,7 @@ public:
     }
 
     bigint_storage(const bigint_storage& other)
-        : word_allocator_type(other.get_allocator())
+        : word_allocator_type(std::allocator_traits<word_allocator_type>::select_on_container_copy_construction(other.get_allocator()))
     {
         if (!other.is_allocated())
         {
@@ -358,6 +383,16 @@ public:
                 common_.is_negative_ = other.common_.is_negative_;
                 std::memcpy(this_view.data(), other_view.data(), size_type(other_view.size()*sizeof(word_type)));
             }
+        }
+        return *this;
+    }
+
+    bigint_storage& operator=(bigint_storage&& other)
+    {
+        if (this != &other)
+        {
+            move_assignment(typename std::allocator_traits<word_allocator_type>::propogate_on_container_move_assignment(), 
+                std::move(other));
         }
         return *this;
     }
@@ -595,14 +630,14 @@ public:
 
     static constexpr size_type inlined_capacity = 2;
 
-    static constexpr word_type max_word_type = (std::numeric_limits<word_type>::max)();
+    static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
 
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
     static constexpr word_type r_mask = (word_type(1) << word_type_half_bits) - 1;
-    static constexpr word_type l_mask = max_word_type - r_mask;
-    static constexpr word_type l_bit = max_word_type - (max_word_type >> 1);
+    static constexpr word_type l_mask = max_word - r_mask;
+    static constexpr word_type l_bit = max_word - (max_word >> 1);
     static constexpr word_type max_word_type_div_10 = (std::numeric_limits<word_type>::max)()/10u ;
     static constexpr word_type max_word_type_div_16 = (std::numeric_limits<word_type>::max)()/16u ;
     static constexpr word_type max_unsigned_power_10 = 10000000000000000000u; // max_unsigned_power_10 = ::pow(10, imax_unsigned_power_10)
@@ -619,7 +654,7 @@ public:
     }
 
     template <typename CharT>
-    basic_bigint(const CharT* str, const Allocator& alloc)
+    basic_bigint(const CharT* str, const Allocator& alloc = Allocator())
         : storage_(alloc)
     {
         *this = parse(str, std::char_traits<CharT>::length(str), alloc);
@@ -894,6 +929,44 @@ public:
         basic_bigint<Allocator> v(*this);
         v.set_negative(!v.is_negative());
         return v;
+    }
+
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    operator=(IntegerType n)
+    {
+        auto this_view = get_storage_view();
+        if (n != 0)
+        {
+            resize(1);
+            set_negative(n < 0);
+            this_view[0] = static_cast<word_type>(n);
+        }
+        else
+        {
+            resize(0);
+            set_negative(false);
+        }
+        return *this;
+    }
+
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    operator=(IntegerType n)
+    {
+        auto this_view = get_storage_view();
+        if (n != 0)
+        {
+            resize(1);
+            set_negative(false);
+            this_view[0] = static_cast<word_type>(n);
+        }
+        else
+        {
+            resize(0);
+            set_negative(false);
+        }
+        return *this;
     }
 
     basic_bigint& operator=( const basic_bigint& y )
@@ -1283,7 +1356,7 @@ public:
     {
         double x = 0.0;
         double factor = 1.0;
-        double values = (double)max_word_type + 1.0;
+        double values = (double)max_word + 1.0;
 
         auto this_view = get_storage_view();
 
@@ -1303,7 +1376,7 @@ public:
     {
         long double x = 0.0;
         long double factor = 1.0;
-        long double values = (long double)max_word_type + 1.0;
+        long double values = (long double)max_word + 1.0;
 
         auto this_view = get_storage_view();
 
@@ -1884,8 +1957,8 @@ private:
         denom_view = denom.get_storage_view();
         if ( r > 0 && denom_view[r] < denom_view[r-1] )
         {
-            denom *= max_word_type;
-            num *= max_word_type;
+            denom *= max_word;
+            num *= max_word;
             return true;
         }
         return false;
@@ -1895,7 +1968,7 @@ private:
     {
         if (secondDone)
         {
-            rem /= max_word_type;
+            rem /= max_word;
         }
         if ( x > 0 )
         {

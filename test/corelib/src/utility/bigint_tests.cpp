@@ -604,11 +604,10 @@ TEST_CASE("bigint with stateful allocator")
 {
     SECTION("test1")
     {
-        /*
-        mock_stateful_allocator<char> alloc(1);
-        cust_bigint a(alloc);
-        cust_bigint b(10, alloc);
-        */
+        //mock_stateful_allocator<char> alloc(1);
+        //cust_bigint a(alloc);
+        //cust_bigint b(10, alloc);
+        
         //std::cout << "a: " << a << "\n";
         //std::cout << "b: " << b << "\n";
         //cust_bigint a("56654250564056135415631554531554513813", alloc); 

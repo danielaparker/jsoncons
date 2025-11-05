@@ -197,7 +197,9 @@ namespace jsoncons {
         void move_assignment(std::true_type, // propagate_on_container_move_assignment
             stream_source&& other) noexcept
         {
-            alloc_ = other.alloc_;
+            auto alloc = other.alloc_;
+            other.alloc_ = alloc_;
+            alloc_ = alloc;
             std::swap(buffer_, other.buffer_);
             std::swap(buffer_size_, other.buffer_size_);
             std::swap(data_, other.data_);
