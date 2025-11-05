@@ -299,6 +299,19 @@ public:
         }
     }
 
+    bigint_storage(const bigint_storage& other, const Allocator& alloc)
+        : uint64_allocator_type(alloc)
+    {
+        if (!other.is_allocated())
+        {
+            ::new (&inlined_) inlined_storage(other.inlined_);
+        }
+        else
+        {
+            ::new (&allocated_) allocated_storage(other.allocated_, get_allocator());
+        }
+    }
+
     bigint_storage(bigint_storage&& other) noexcept
         : uint64_allocator_type(other.get_allocator())
     {
@@ -312,9 +325,23 @@ public:
         }
     }
 
+    bigint_storage(bigint_storage&& other, const Allocator& alloc) noexcept
+        : uint64_allocator_type(alloc)
+    {
+        if (!other.is_allocated())
+        {
+            ::new (&inlined_) inlined_storage(other.inlined_);
+        }
+        else
+        {
+            ::new (&allocated_) allocated_storage(std::move(other.allocated_));
+        }
+    }
+
     template <typename Integer>
-    bigint_storage(Integer n, 
+    bigint_storage(Integer n, const Allocator& alloc = Allocator(), 
         typename std::enable_if<std::is_integral<Integer>::value>::type* = 0)
+        : uint64_allocator_type(alloc)
     {
         ::new (&inlined_) inlined_storage(n);
     }
@@ -591,8 +618,20 @@ public:
     {
     }
 
+    template <typename CharT>
+    basic_bigint(const CharT* str, const Allocator& alloc)
+        : storage_(alloc)
+    {
+        *this = parse(str, std::char_traits<CharT>::length(str), alloc);
+    }
+
     basic_bigint(const basic_bigint& other)
         : storage_(other.storage_)
+    {
+    }
+
+    basic_bigint(const basic_bigint& other, const Allocator& alloc)
+        : storage_(other.storage_, alloc)
     {
     }
 
@@ -601,10 +640,15 @@ public:
     {
     }
 
+    basic_bigint(basic_bigint&& other, const Allocator& alloc) noexcept
+        : storage_(std::move(other.storage_), alloc)
+    {
+    }
+
     template <typename Integer>
-    basic_bigint(Integer n, 
+    basic_bigint(Integer n, const Allocator& alloc = Allocator(), 
                  typename std::enable_if<std::is_integral<Integer>::value>::type* = 0)
-        : storage_(n)
+        : storage_(n, alloc)
     {
     }
 
@@ -663,7 +707,7 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* data, size_type length)
+    static basic_bigint<Allocator> parse(const CharT* data, size_type length, const Allocator& alloc = Allocator())
     {
         if (JSONCONS_UNLIKELY(length == 0))
         {
@@ -686,7 +730,7 @@ public:
             neg = false;
         }
 
-        basic_bigint<Allocator> v = 0;
+        basic_bigint<Allocator> v(0, alloc);
         for (size_type i = 0; i < length; i++)
         {
             CharT c = data[i];
@@ -1322,8 +1366,8 @@ public:
         else
         {
             value_type r;
-            basic_bigint<Allocator> R;
-            basic_bigint<Allocator> LP10 = max_unsigned_power_10; 
+            basic_bigint<Allocator> R(get_allocator());
+            basic_bigint<Allocator> LP10(max_unsigned_power_10, get_allocator()); 
 
             do
             {
@@ -1622,8 +1666,9 @@ public:
         return is_negative() ? -code : code;
     }
 
-    void divide(basic_bigint denom, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
+    void divide(const basic_bigint& denom_, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
+        basic_bigint<Allocator> denom(denom_, get_allocator());
         auto denom_view = denom.get_storage_view();
 
         if (denom_view.size() == 0)
@@ -1632,7 +1677,7 @@ public:
         }
         bool quot_neg = is_negative() ^ denom.is_negative();
         bool rem_neg = is_negative();
-        basic_bigint<Allocator> num = *this;
+        basic_bigint<Allocator> num(*this, get_allocator());
         num.set_negative(false);
         denom.set_negative(false);
         if ( num < denom )
@@ -1678,7 +1723,8 @@ public:
             rem.set_negative(rem_neg);
             return;
         }
-        basic_bigint<Allocator> num0 = num, denom0 = denom;
+        basic_bigint<Allocator> num0(num, get_allocator());
+        basic_bigint<Allocator> denom0(denom, get_allocator());
         int x = 0;
         bool second_done = normalize(denom, num, x);
         denom_view = denom.get_storage_view();

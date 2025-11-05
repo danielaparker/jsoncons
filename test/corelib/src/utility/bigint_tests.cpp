@@ -592,3 +592,27 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(bigint::parse("7526901790514881921") == c);
     }
 }
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <common/mock_stateful_allocator.hpp>
+#include <scoped_allocator>
+
+using cust_bigint = jsoncons::basic_bigint<mock_stateful_allocator<char>>;
+
+TEST_CASE("bigint with stateful allocator")
+{
+    SECTION("test1")
+    {
+        /*
+        mock_stateful_allocator<char> alloc(1);
+        cust_bigint a(alloc);
+        cust_bigint b(10, alloc);
+        */
+        //std::cout << "a: " << a << "\n";
+        //std::cout << "b: " << b << "\n";
+        //cust_bigint a("56654250564056135415631554531554513813", alloc); 
+    }
+}
+
+#endif
