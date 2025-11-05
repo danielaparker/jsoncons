@@ -356,5 +356,15 @@ TEST_CASE("jsonpointer unflatten tests 3")
         auto unflattened = jsoncons::jsonpointer::unflatten(flattened);
         CHECK(original == unflattened);    
     }
+    SECTION("unflatten empty object")
+    {
+        jsoncons::json original{};
+        REQUIRE_THROWS(jsoncons::jsonpointer::unflatten(original));
+    }
+    SECTION("unflatten array")
+    {
+        jsoncons::json original{jsoncons::json_array_arg};
+        REQUIRE_THROWS(jsoncons::jsonpointer::unflatten(original));
+    }
 }
 

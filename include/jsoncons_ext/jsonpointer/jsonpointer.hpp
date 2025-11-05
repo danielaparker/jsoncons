@@ -1471,7 +1471,7 @@ namespace jsonpointer {
         using char_type = typename Json::char_type;
         using map_type = std::map<basic_json_pointer<char_type>, const Json*>;
 
-        if (JSONCONS_UNLIKELY(!value.is_object()))
+        if (JSONCONS_UNLIKELY(!value.is_object() || value.empty()))
         {
             JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
         }

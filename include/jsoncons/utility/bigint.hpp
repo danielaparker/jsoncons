@@ -561,7 +561,7 @@ public:
     using stored_allocator_type = allocator_type;
     using pointer = typename allocator_traits_type::pointer;
     using size_type = typename detail::bigint_storage<Allocator>::size_type;
-    using ssize_type = std::make_signed<size_type>::type;
+    using ssize_type = typename std::make_signed<size_type>::type;
     using value_type = typename detail::bigint_storage<Allocator>::value_type;
     using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<value_type>;
     using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const value_type>;
