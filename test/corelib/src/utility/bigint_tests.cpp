@@ -422,7 +422,6 @@ TEST_CASE("bigint operations")
         CHECK(expected == b);
     }
 }
-
 TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 {
     bigint a = bigint::parse("56654250564056135415631554531554513813"); 
@@ -577,16 +576,19 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK((a != b));
         CHECK_FALSE((a == b));
     }
-    SECTION("abs")
+    SECTION("babs")
     {
         bigint c = jsoncons::babs(b);
         CHECK(bigint::parse("60820564691661355463515465564664568") == c);
     }
-    SECTION("pow")
+    SECTION("bpow")
     {
         bigint c = jsoncons::bpow(a, 2u);
-        //std::cout << c << "\n";
-        //CHECK(bigint::parse("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
+        CHECK(bigint::parse("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
+    }
+    SECTION("bsqrt")
+    {
+        bigint c = jsoncons::bsqrt(a);
+        CHECK(bigint::parse("7526901790514881921") == c);
     }
 }
-

@@ -961,7 +961,7 @@ public:
         return *this;
     }
 
-    basic_bigint& operator*=(const basic_bigint& y) 
+    basic_bigint& operator*=(basic_bigint y) 
     {
         auto this_view = get_storage_view();
         auto y_view = y.get_storage_view();
