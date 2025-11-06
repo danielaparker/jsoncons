@@ -1084,20 +1084,11 @@ public:
        return *this;
     }
 
-    template <typename IntegerType>
-    typename std::enable_if<std::is_integral<IntegerType>::value, basic_bigint<Allocator>&>::type
-    operator/=(IntegerType divisor)
+    template <typename Divisor>
+    basic_bigint& operator/=(Divisor&& divisor)
     {
-        basic_bigint<Allocator> denom{divisor, get_allocator()};
         basic_bigint<Allocator> r{get_allocator()};
-        divide(denom, *this, r, false);
-        return *this;
-    }
-
-    basic_bigint& operator/=( const basic_bigint& divisor )
-    {
-        basic_bigint<Allocator> r;
-        divide( divisor, *this, r, false );
+        divide(std::forward<Divisor>(divisor), *this, r, false );
         return *this;
     }
 
@@ -1676,9 +1667,10 @@ public:
         return is_negative() ? -code : code;
     }
 
-    void divide(const basic_bigint& denom_, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
+    template <typename Divisor>
+    void divide(Divisor&& divis, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
-        basic_bigint<Allocator> denom(denom_, get_allocator());
+        basic_bigint<Allocator> denom(std::forward<Divisor>(divis), get_allocator());
         auto denom_view = denom.get_storage_view();
 
         if (denom_view.size() == 0)
