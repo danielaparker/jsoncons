@@ -602,11 +602,15 @@ using cust_bigint = jsoncons::basic_bigint<mock_stateful_allocator<char>>;
 
 TEST_CASE("bigint with stateful allocator")
 {
+    mock_stateful_allocator<char> alloc(1);
+    cust_bigint a(100, alloc);
+    //cust_bigint a("56654250564056135415631554531554513813", alloc); 
+    cust_bigint b(10, alloc);
+
     SECTION("test1")
     {
-        //mock_stateful_allocator<char> alloc(1);
-        //cust_bigint a(alloc);
-        //cust_bigint b(10, alloc);
+        a /= 5;
+        CHECK(cust_bigint(20,alloc) == a);
         
         //std::cout << "a: " << a << "\n";
         //std::cout << "b: " << b << "\n";

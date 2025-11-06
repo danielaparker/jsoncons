@@ -1084,6 +1084,16 @@ public:
        return *this;
     }
 
+    template <typename IntegerType>
+    typename std::enable_if<std::is_integral<IntegerType>::value, basic_bigint<Allocator>&>::type
+    operator/=(IntegerType divisor)
+    {
+        basic_bigint<Allocator> denom{divisor, get_allocator()};
+        basic_bigint<Allocator> r{get_allocator()};
+        divide(denom, *this, r, false);
+        return *this;
+    }
+
     basic_bigint& operator/=( const basic_bigint& divisor )
     {
         basic_bigint<Allocator> r;
@@ -1682,7 +1692,7 @@ public:
         denom.set_negative(false);
         if ( num < denom )
         {
-            quot = word_type(0);
+            quot = basic_bigint<Allocator>{word_type(0), get_allocator()};
             quot.set_negative(quot_neg);
             rem = num;
             rem.set_negative(rem_neg);
@@ -1695,8 +1705,8 @@ public:
 
         if ( denom_view.size() == 1 && num_view.size() == 1 )
         {
-            quot = word_type( num_view[0]/denom_view[0] );
-            rem = word_type( num_view[0]%denom_view[0] );
+            quot = basic_bigint<Allocator>{word_type(num_view[0] / denom_view[0]), get_allocator()};
+            rem = basic_bigint<Allocator>{word_type(num_view[0] % denom_view[0]), get_allocator()};
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
@@ -1718,7 +1728,7 @@ public:
                 quot_view[i] = (q1 << word_type_half_bits) | q2;
             }
             quot.reduce();
-            rem = dHi;
+            rem = basic_bigint<Allocator>(dHi, get_allocator());
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
