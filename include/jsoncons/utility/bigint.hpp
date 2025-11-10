@@ -695,9 +695,9 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* s)
+    static basic_bigint<Allocator> parse(const CharT* s, const Allocator& alloc = Allocator())
     {
-        return parse(s, std::char_traits<CharT>::length(s));
+        return parse(s, std::char_traits<CharT>::length(s), alloc);
     }
 
     template <typename CharT>
@@ -768,7 +768,7 @@ public:
             neg = false;
         }
 
-        basic_bigint<Allocator> v = 0;
+        basic_bigint<Allocator> v(0);
         for (size_type i = 0; i < length; i++)
         {
             CharT c = data[i];
@@ -1509,22 +1509,22 @@ public:
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend basic_bigint<Allocator> operator+( basic_bigint x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator+( const basic_bigint& x, const basic_bigint& y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator+( basic_bigint x, int64_t y )
+    friend basic_bigint<Allocator> operator+( const basic_bigint& x, int64_t y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator-( basic_bigint x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator-( const basic_bigint& x, const basic_bigint& y )
     {
         return x -= y;
     }
 
-    friend basic_bigint<Allocator> operator-( basic_bigint x, int64_t y )
+    friend basic_bigint<Allocator> operator-( const basic_bigint x, int64_t y )
     {
         return x -= y;
     }
