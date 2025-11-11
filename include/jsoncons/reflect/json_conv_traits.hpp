@@ -1243,15 +1243,15 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     };
 
     template <typename Json,typename T>
-    struct json_conv_traits<Json, jsoncons::optional<T>,
-                            typename std::enable_if<!is_json_conv_traits_declared<jsoncons::optional<T>>::value>::type>
+    struct json_conv_traits<Json, T,
+        typename std::enable_if<jsoncons::ext_traits::is_optional<T>::value && !is_json_conv_traits_declared<T>::value>::type>
     {
     public:
-        using result_type = conversion_result<jsoncons::optional<T>>;
+        using result_type = conversion_result<T>;
 
         static bool is(const Json& j) noexcept
         {
-            return j.is_null() || j.template is<T>();
+            return j.is_null() || j.template is<typename T::value_type>();
         }
         
         template <typename Alloc, typename TempAlloc>
@@ -1259,18 +1259,18 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         { 
             if (j.is_null())
             {
-                return result_type(jsoncons::optional<T>());
+                return result_type(T());
             }
-            auto r = j.template try_as<T>(aset);
+            auto r = j.template try_as<typename T::value_type>(aset);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
             }
-            return result_type(jsoncons::optional<T>(std::move(r.value())));
+            return result_type(T(std::move(r.value())));
         }
         
         template <typename Alloc, typename TempAlloc>
-        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const jsoncons::optional<T>& val)
+        static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val)
         {
             return val.has_value() ? jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), *val) : Json::null();
         }

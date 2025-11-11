@@ -463,6 +463,10 @@ namespace ext_traits {
     using
     optional_has_value_t = decltype(std::declval<Optional>().has_value());
 
+    template <typename T>
+    using
+    value_type_t = typename T::value_type;
+
     template <typename Optional>
     using
     optional_value_t = decltype(std::declval<Optional>().value());
@@ -589,6 +593,10 @@ namespace ext_traits {
 
     template <typename T>
     using
+    has_value_type = is_detected<value_type_t, T>;
+
+    template <typename T>
+    using
     has_value = is_detected<optional_value_t, T>;
 
     template <typename T>
@@ -602,7 +610,7 @@ namespace ext_traits {
     template <typename T>
     struct is_optional
     {
-        static constexpr bool value = has_has_value<T>::value && has_value<T>::value && has_operator_bool<T>::value && has_operator_star<T>::value;
+        static constexpr bool value = has_value_type<T>::value && has_has_value<T>::value && has_value<T>::value && has_operator_bool<T>::value && has_operator_star<T>::value;
     };
 
     // is_front_insertable
