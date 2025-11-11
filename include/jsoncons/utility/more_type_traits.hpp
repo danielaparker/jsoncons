@@ -465,7 +465,15 @@ namespace ext_traits {
 
     template <typename Optional>
     using
+    optional_value_t = decltype(std::declval<Optional>().value());
+
+    template <typename Optional>
+    using
     optional_operator_star_t = decltype(std::declval<Optional>().operator *());
+
+    template <typename Optional>
+    using
+    optional_operator_bool_t = decltype(std::declval<Optional>().operator bool());
 
     template <typename Container>
     using
@@ -581,12 +589,20 @@ namespace ext_traits {
 
     template <typename T>
     using
+    has_value = is_detected<optional_value_t, T>;
+
+    template <typename T>
+    using
     has_operator_star = is_detected<optional_operator_star_t, T>;
+
+    template <typename T>
+    using
+    has_operator_bool = is_detected_exact<bool, optional_operator_bool_t, T>;
 
     template <typename T>
     struct is_optional
     {
-        static constexpr bool value = has_has_value<T>::value && has_operator_star<T>::value;
+        static constexpr bool value = has_has_value<T>::value && has_value<T>::value && has_operator_bool<T>::value && has_operator_star<T>::value;
     };
 
     // is_front_insertable
