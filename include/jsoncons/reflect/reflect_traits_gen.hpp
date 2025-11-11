@@ -143,7 +143,7 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
 }
  
 template <typename CharT, typename T> 
-std::enable_if<ext_traits::is_optional<T>::value, write_result>::type
+typename std::enable_if<ext_traits::is_optional<T>::value, write_result>::type
 try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val.has_value())
@@ -155,7 +155,7 @@ try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, ba
 } 
 
 template <typename CharT, typename T> 
-std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
+typename std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
 try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder)
 { 
     encoder.key(key);
@@ -173,13 +173,13 @@ bool is_optional_value_set(const std::unique_ptr<T,Deleter>& val)
     return val ? true : false;
 } 
 template <typename T> 
-std::enable_if<ext_traits::is_optional<T>::value, bool>::type
+typename std::enable_if<ext_traits::is_optional<T>::value, bool>::type
 is_optional_value_set(const T& val) 
 { 
     return val.has_value();
 } 
 template <typename T> 
-std::enable_if<!ext_traits::is_optional<T>::value, bool>::type
+typename std::enable_if<!ext_traits::is_optional<T>::value, bool>::type
 is_optional_value_set(const T&) 
 {
     return true; 
