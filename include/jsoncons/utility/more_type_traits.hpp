@@ -459,6 +459,10 @@ namespace ext_traits {
     using
     container_push_back_t = decltype(std::declval<Container>().push_back(std::declval<typename Container::value_type>()));
 
+    template <typename Optional>
+    using
+    optional_has_value_t = decltype(std::declval<Optional>().has_value());
+
     template <typename Container>
     using
     container_push_front_t = decltype(std::declval<Container>().push_front(std::declval<typename Container::value_type>()));
@@ -566,6 +570,10 @@ namespace ext_traits {
     template <typename Container>
     using
     is_back_insertable = is_detected<container_push_back_t, Container>;
+
+    template <typename T>
+    using
+    is_optional = is_detected_exact<bool, optional_has_value_t, T>;
 
     // is_front_insertable
 

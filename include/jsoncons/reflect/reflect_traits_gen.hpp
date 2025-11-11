@@ -98,12 +98,16 @@ struct json_traits_helper
         if (val) j.try_emplace(key, val); 
     } 
     template <typename U> 
-    static void set_optional_json_member(string_view_type key, const jsoncons::optional<U>& val, Json& j) 
+    static 
+    typename std::enable_if<ext_traits::is_optional<U>::value, void>::type
+    set_optional_json_member(string_view_type key, const U& val, Json& j) 
     { 
-        if (val) j.try_emplace(key, val); 
+        if (val.has_value()) j.try_emplace(key, val); 
     } 
     template <typename U> 
-    static void set_optional_json_member(string_view_type key, const U& val, Json& j) 
+    static         
+    typename std::enable_if<!ext_traits::is_optional<U>::value, void>::type
+    set_optional_json_member(string_view_type key, const U& val, Json& j) 
     { 
         j.try_emplace(key, val); 
     } 
@@ -139,9 +143,10 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
 }
  
 template <typename CharT, typename T> 
-write_result try_encode_optional_member(const basic_string_view<CharT>& key, const jsoncons::optional<T>& val, basic_json_visitor<CharT>& encoder) 
+std::enable_if<ext_traits::is_optional<T>::value, write_result>::type
+try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
-    if (val)
+    if (val.has_value())
     {
         encoder.key(key);
         return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
@@ -150,7 +155,8 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
 } 
 
 template <typename CharT, typename T> 
-write_result try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
+std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
+try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder)
 { 
     encoder.key(key);
     return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
@@ -167,12 +173,14 @@ bool is_optional_value_set(const std::unique_ptr<T,Deleter>& val)
     return val ? true : false;
 } 
 template <typename T> 
-bool is_optional_value_set(const jsoncons::optional<T>& val) 
+std::enable_if<ext_traits::is_optional<T>::value, bool>::type
+is_optional_value_set(const T& val) 
 { 
-    return val ? true : false;
+    return val.has_value();
 } 
 template <typename T> 
-bool is_optional_value_set(const T&) 
+std::enable_if<!ext_traits::is_optional<T>::value, bool>::type
+is_optional_value_set(const T&) 
 {
     return true; 
 } 
