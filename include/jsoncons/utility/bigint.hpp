@@ -36,8 +36,8 @@ class bigint_storage : private std::allocator_traits<Allocator>:: template rebin
 public:
     using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
-    using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
-    static const word_type max_word = (std::numeric_limits<word_type>::max)();
+    using word_type = uint64_t/*typename std::allocator_traits<word_allocator_type>::value_type*/;
+    static const word_type max_word;
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
@@ -2009,7 +2009,7 @@ private:
 };
 
 template <typename Allocator>
-const typename basic_bigint<Allocator>::word_type max_word;
+const typename basic_bigint<Allocator>::word_type max_word = (std::numeric_limits<word_type>::max)();
 
 template <typename Allocator>
 basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
@@ -2059,7 +2059,7 @@ basic_bigint<Allocator> bsqrt(const basic_bigint<Allocator>& a)
     return x < q ? x : q;
 }
 
-using bigint = basic_bigint<std::allocator<uint8_t>>;
+using bigint = basic_bigint<std::allocator<char>>;
 
 } // namespace jsoncons
 
