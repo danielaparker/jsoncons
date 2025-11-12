@@ -944,6 +944,14 @@ public:
         return *this;
     }
 
+    template <typename IntegerType>
+    typename std::enable_if<std::is_integral<IntegerType>::value,basic_bigint&>::type
+    operator-=(IntegerType n)
+    {
+        basic_bigint y(n, get_allocator());
+        return *this -= y;
+    }
+
     basic_bigint& operator-=(const basic_bigint& y)
     {
         auto y_view = y.get_storage_view();
