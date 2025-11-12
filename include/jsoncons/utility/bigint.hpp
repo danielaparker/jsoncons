@@ -37,7 +37,7 @@ public:
     using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
     using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
-    static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
+    static const word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
     static constexpr uint16_t word_length = 4; // Use multiples of word_length words
@@ -2009,7 +2009,7 @@ private:
 };
 
 template <typename Allocator>
-constexpr typename basic_bigint<Allocator>::word_type max_word;
+const typename basic_bigint<Allocator>::word_type max_word;
 
 template <typename Allocator>
 basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
