@@ -459,6 +459,26 @@ namespace ext_traits {
     using
     container_push_back_t = decltype(std::declval<Container>().push_back(std::declval<typename Container::value_type>()));
 
+    template <typename Optional>
+    using
+    optional_has_value_t = decltype(std::declval<Optional>().has_value());
+
+    template <typename T>
+    using
+    value_type_t = typename T::value_type;
+
+    template <typename Optional>
+    using
+    optional_value_t = decltype(std::declval<Optional>().value());
+
+    template <typename Optional>
+    using
+    optional_operator_star_t = decltype(std::declval<Optional>().operator *());
+
+    template <typename Optional>
+    using
+    optional_operator_bool_t = decltype(std::declval<Optional>().operator bool());
+
     template <typename Container>
     using
     container_push_front_t = decltype(std::declval<Container>().push_front(std::declval<typename Container::value_type>()));
@@ -566,6 +586,32 @@ namespace ext_traits {
     template <typename Container>
     using
     is_back_insertable = is_detected<container_push_back_t, Container>;
+
+    template <typename T>
+    using
+    has_has_value = is_detected_exact<bool, optional_has_value_t, T>;
+
+    template <typename T>
+    using
+    has_value_type = is_detected<value_type_t, T>;
+
+    template <typename T>
+    using
+    has_value = is_detected<optional_value_t, T>;
+
+    template <typename T>
+    using
+    has_operator_star = is_detected<optional_operator_star_t, T>;
+
+    template <typename T>
+    using
+    has_operator_bool = is_detected_exact<bool, optional_operator_bool_t, T>;
+
+    template <typename T>
+    struct is_optional
+    {
+        static constexpr bool value = has_value_type<T>::value && has_has_value<T>::value && has_value<T>::value && has_operator_bool<T>::value && has_operator_star<T>::value;
+    };
 
     // is_front_insertable
 
