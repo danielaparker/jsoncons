@@ -2009,6 +2009,9 @@ private:
 };
 
 template <typename Allocator>
+constexpr typename basic_bigint<Allocator>::word_type max_word;
+
+template <typename Allocator>
 basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
 {
     if ( a.is_negative())
