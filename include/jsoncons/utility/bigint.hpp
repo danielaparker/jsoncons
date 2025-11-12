@@ -902,6 +902,14 @@ public:
         return *this;
     }
 
+    template <typename IntegerType>
+    typename std::enable_if<std::is_integral<IntegerType>::value,basic_bigint&>::type
+    operator+=(IntegerType n)
+    {
+        basic_bigint y(n, get_allocator());
+        return *this += y;
+    }
+
     basic_bigint& operator+=( const basic_bigint& y )
     {
         auto y_view = y.get_storage_view();
@@ -1509,29 +1517,29 @@ public:
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend basic_bigint<Allocator> operator+( const basic_bigint& x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator+( basic_bigint x, const basic_bigint& y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator+( const basic_bigint& x, int64_t y )
+    friend basic_bigint<Allocator> operator+( basic_bigint x, int64_t y )
     {
         return x += y;
     }
 
-    friend basic_bigint<Allocator> operator-( const basic_bigint& x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator-( basic_bigint x, const basic_bigint& y )
     {
         return x -= y;
     }
 
-    friend basic_bigint<Allocator> operator-( const basic_bigint x, int64_t y )
+    friend basic_bigint<Allocator> operator-( basic_bigint x, int64_t y )
     {
-        return x -= y;
+        return basic_bigint(x) -= y;
     }
 
-    friend basic_bigint<Allocator> operator*( int64_t x, const basic_bigint& y )
+    friend basic_bigint<Allocator> operator*( int64_t x, basic_bigint y )
     {
-        return basic_bigint<Allocator>(y) *= x;
+        return y *= x;
     }
 
     friend basic_bigint<Allocator> operator*( basic_bigint<Allocator> x, const basic_bigint& y )
