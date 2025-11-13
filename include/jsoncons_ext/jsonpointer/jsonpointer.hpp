@@ -1364,38 +1364,41 @@ namespace jsonpointer {
             }
             if (it->first.tokens().size() == offset)
             {
-                return jsoncons::optional<Json>{Json{}};
+                ++it;
             }
             else if (it->first.tokens().size() < offset)
             {
                 return jsoncons::optional<Json>{};
             }
-            auto jt = it->first.tokens().begin() + offset;
-            if (offset + 1 == it->first.tokens().size())
+            else
             {
-                jo.try_emplace(*jt, *(it->second));
-                ++it;
-            }
-            else 
-            {
-                auto inner_last = find_inner_last(it, last, offset, *jt);
-                if (options == unflatten_options{})
+                auto jt = it->first.tokens().begin() + offset;
+                if (offset + 1 == it->first.tokens().size())
                 {
-                    auto res = try_unflatten_array<Json,Iterator>(it, inner_last, offset+1);
-                    if (!res)
+                    jo.try_emplace(*jt, *(it->second));
+                    ++it;
+                }
+                else 
+                {
+                    auto inner_last = find_inner_last(it, last, offset, *jt);
+                    if (options == unflatten_options{})
                     {
-                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
+                        auto res = try_unflatten_array<Json,Iterator>(it, inner_last, offset+1);
+                        if (!res)
+                        {
+                            jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
+                        }
+                        else
+                        {
+                            jo.try_emplace(*jt, std::move(*res));
+                        }
                     }
                     else
                     {
-                        jo.try_emplace(*jt, std::move(*res));
+                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
                     }
+                    it = inner_last;
                 }
-                else
-                {
-                    jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
-                }
-                it = inner_last;
             }
         }
         return jsoncons::optional<Json>{std::move(jo)};
