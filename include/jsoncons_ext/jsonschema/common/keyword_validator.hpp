@@ -2936,7 +2936,6 @@ namespace jsonschema {
                             {
                                 return result;
                             }
-                            break;
                         }
                     }
                 }

@@ -209,4 +209,59 @@ std::string json_str = R"(
         auto compiled = jsoncons::jsonschema::make_json_schema(main_schema, resolver);
         CHECK(compiled.is_valid(jsoncons::ojson::parse(json_str)));
     }
+
+    SECTION("additionalProperties")
+    {
+        std::vector<jsoncons::jsonschema::validation_message> result;
+
+        auto reporter =
+        [&result](const jsoncons::jsonschema::validation_message& message) -> jsoncons::jsonschema::walk_result
+            {
+                /*std::cout << "+++++++++++++++++" << std::endl;
+                std::cout << "message: " << message.message() << std::endl;
+                std::cout << "instance location: " << message.instance_location().string() << std::endl;
+                std::cout << "schema location: " << message.schema_location().string() << std::endl;
+                std::cout << "keyword: " << message.keyword() << std::endl;
+                std::cout << "evaluation path: " << message.eval_path().string() << std::endl;
+                std::cout << "+++++++++++++++++" << std::endl;
+                std::cout << std::endl;*/
+
+                result.push_back(message);
+                return jsoncons::jsonschema::walk_result::advance;
+            };
+
+        std::string schemaString = R"(
+            {
+                "$schema" : "https://json-schema.org/draft/2020-12/schema",
+                "type" : "object",
+                "additionalProperties" : false,
+                "required" : [ "s1" ],
+                "properties" : {
+                    "s1" : {"type" : "string"},
+                    "n2" : {"type" : "integer"}
+                }
+            }
+          )";
+
+        std::string dataString = R"(
+            {
+                "s1": "1",
+                "n2": 2,
+                "x4": 4,
+                "x5": 5
+            }
+          )";
+
+        auto schema = jsoncons::jsonschema::make_json_schema(jsoncons::json::parse(schemaString));
+        auto parsed = jsoncons::json::parse(dataString);
+
+        schema.validate(parsed, reporter);
+        REQUIRE(2U == result.size());
+        CHECK(std::string("additionalProperties") == result[0].keyword());
+        CHECK(std::string("/additionalProperties/x4") == result[0].eval_path().string());
+        CHECK(std::string("/x4") == result[0].instance_location().string());
+        CHECK(std::string("additionalProperties") == result[1].keyword());
+        CHECK(std::string("/additionalProperties/x5") == result[1].eval_path().string());
+        CHECK(std::string("/x5") == result[1].instance_location().string());
+    }
 }
