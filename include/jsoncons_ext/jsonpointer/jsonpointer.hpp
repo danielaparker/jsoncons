@@ -1355,10 +1355,12 @@ namespace jsonpointer {
     {
         Json jo{json_object_arg};
 
+        std::size_t length = std::distance(first, last);
+
         auto it = first;
         while (it != last)
         {
-            if (it->first.tokens().size() == offset && !it->second->is_object())
+            if (it->first.tokens().size() == offset && length == 1)
             {
                 return *(it->second);
             }

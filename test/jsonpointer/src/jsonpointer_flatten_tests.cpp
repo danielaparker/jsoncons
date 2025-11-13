@@ -377,5 +377,16 @@ TEST_CASE("jsonpointer unflatten tests 3")
 
         CHECK(expected == jsoncons::jsonpointer::unflatten(flattened));
     }
+    SECTION("unflatten flattened merged with flattened null value")
+    {
+        auto flattened = jsoncons::json::parse(R"(
+{"":null,"/r1":"v1","/r2":"v2"}
+        )");
+        auto expected = jsoncons::json::parse(R"(
+{"r1":"v1","r2":"v2"}
+        )");
+
+        CHECK(expected == jsoncons::jsonpointer::unflatten(flattened));
+    }
 }
 
