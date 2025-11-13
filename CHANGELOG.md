@@ -1,9 +1,17 @@
 master
 ------
 
+- Enhancements
+
+    - Supports `boost::optional` with built-in reflection traits
+
 - Fixed bug:
 
     - Git Issue #644: flatten/unflatten does not preserve arrays with more than 10 elements
+
+- Security issues detected by Flawfinder:
+
+    - Replaced `snprintf` with `sprintf_s` 
 
 1.4.3
 -----
@@ -3086,7 +3094,7 @@ Changes
 - If a fractional number is read in in fixed format, serialization now preserves
   that fixed format, e.g. if 0.000071 is read in, serialization gives 0.000071
   and not 7.1e-05. In previous versions, the floating point format, whether
-  fixed or scientific, was determined by the behavior of snprintf using the g
+  fixed or scientific, was determined by the behavior of sprintf using the g
   conversion specifier.
 
 Bug fix:
@@ -4121,7 +4129,7 @@ For consistency the json::make_array notation is now favored in the documentatio
 0.70
 -------------
 
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (Ã¢â¬Ë.Ã¢â¬â¢) is now always used as the decimal point, non English locales are ignored.
+- Since 0.50, jsoncons has used sprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (Ã¢â¬Ë.Ã¢â¬â¢) is now always used as the decimal point, non English locales are ignored.
 
 - The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.
 
