@@ -1,6 +1,10 @@
 master
 ------
 
+- Changes
+
+    - `jsonpointer::unflatten` now throws an exception if passed an empty object
+
 - Enhancements
 
     - Supports `boost::optional` with built-in reflection traits

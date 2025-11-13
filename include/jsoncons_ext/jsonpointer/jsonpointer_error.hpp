@@ -53,7 +53,7 @@ enum class jsonpointer_errc
     expected_object_or_array,
     end_of_input,
     unexpected_end_of_input,
-    argument_to_unflatten_invalid,
+    invalid_argument_to_unflatten,
     invalid_flattened_key,
     invalid_uri_escaped_data,
     cannot_remove_root
@@ -89,8 +89,8 @@ public:
                 return "Unexpected end of input";
             case jsonpointer_errc::unexpected_end_of_input:
                 return "Unexpected end of jsonpointer input";
-            case jsonpointer_errc::argument_to_unflatten_invalid:
-                return "Argument to unflatten must be an object";
+            case jsonpointer_errc::invalid_argument_to_unflatten:
+                return "Argument to unflatten must be a non-empty object";
             case jsonpointer_errc::invalid_flattened_key:
                 return "Flattened key is invalid";
             case jsonpointer_errc::cannot_remove_root:

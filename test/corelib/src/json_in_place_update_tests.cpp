@@ -55,10 +55,10 @@ TEST_CASE("json in-place update tests")
         std::string format = "{\"items\": [{\"id\":1, \"name\" : \"abc\", \"expiry\" : \"0420\"}, { \"id\":2,\"name\" : \"%s\",\"expiry\" : \"0720\" }] }";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         //std::cout << "(1)\n" << input << "\n";
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -70,10 +70,10 @@ TEST_CASE("json in-place update tests")
         std::string format = "{\"items\"\n:\n \n[\n{\"id\"\n:\n1\n,\n \"name\" \n:\n \"abc\"\n,\n \"expiry\" \n:\n \"0420\"\n}\n\n,\n { \"id\"\n:\n2\n,\n\"name\" \n:\n \"%s\"\n,\n\"expiry\" \n:\n \"0720\" \n}\n\n]\n \n}";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         //std::cout << "(1)\n" << input << "\n";
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -85,9 +85,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "{\"items\"\r\n:\r\n \r\n[\r\n{\"id\"\r\n:\r\n1\r\n,\r\n \"name\" \r\n:\r\n \"abc\"\r\n,\r\n \"foo\" \r\n:\r\n 1000.0e-50\r\n,\r\n \"expiry\" \r\n:\r\n \"0420\"\r\n}\r\n\r\n,\r\n { \"id\"\r\n:\r\n2\r\n,\r\n\"name\" \r\n:\r\n \"%s\"\r\n,\r\n\"expiry\" \r\n:\r\n \"0720\" \r\n}\r\n\r\n]\r\n \r\n}";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -99,10 +99,10 @@ TEST_CASE("json in-place update tests")
         std::string format = "{\"items\"\r:\r \r[\r{\"id\"\r:\r1\r,\r \"name\" \r:\r \"abc\"\r,\r \"expiry\" \r:\r \"0420\"\r}\r\r,\r { \"id\"\r:\r2\r,\r\"name\" \r:\r \"%s\"\r,\r\"expiry\" \r:\r \"0720\" \r}\r\r]\r \r}";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
 
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -114,9 +114,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "/*\n       \n        \n*/\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -128,9 +128,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "/*\r       \r        \r*/\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -142,9 +142,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "/*\r\n       \r\n        \r\n*/\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -156,9 +156,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "//               \n\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -170,9 +170,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "//               \r\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);
@@ -184,9 +184,9 @@ TEST_CASE("json in-place update tests")
         std::string format = "//               \r\n\"%s\"";
 
         char input[500];
-        int length = sprintf_s(input, 500, format.c_str(), "id");
+        int length = snprintf(input, 500, format.c_str(), "id");
         char expected[500];
-        sprintf_s(expected, 500, format.c_str(), "ab");
+        snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
         jsoncons::json_string_reader reader(input, updater);

@@ -1478,7 +1478,7 @@ namespace jsonpointer {
 
         if (JSONCONS_UNLIKELY(!value.is_object() || value.empty()))
         {
-            JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
+            JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::invalid_argument_to_unflatten));
         }
 
         map_type jptrs;

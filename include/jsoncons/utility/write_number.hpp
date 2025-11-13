@@ -14,7 +14,7 @@
 #include <limits> // std::numeric_limits
 #include <locale>
 #include <stdexcept>
-#include <stdio.h> // sprintf_s
+#include <stdio.h> // snprintf
 #include <string>
 #include <type_traits>
 
@@ -301,7 +301,7 @@ namespace utility {
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
-        int length = sprintf_s(buffer, sizeof(buffer), "%1.*e", precision, val);
+        int length = snprintf(buffer, sizeof(buffer), "%1.*e", precision, val);
         if (length < 0)
         {
             return false;
@@ -315,7 +315,7 @@ namespace utility {
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
-            length = sprintf_s(buffer, sizeof(buffer), "%1.*e", precision2, val);
+            length = snprintf(buffer, sizeof(buffer), "%1.*e", precision2, val);
             if (length < 0)
             {
                 return false;
@@ -338,7 +338,7 @@ namespace utility {
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
-        int length = sprintf_s(buffer, sizeof(buffer), "%1.*g", precision, val);
+        int length = snprintf(buffer, sizeof(buffer), "%1.*g", precision, val);
         if (length < 0)
         {
             return false;
@@ -352,7 +352,7 @@ namespace utility {
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
-            length = sprintf_s(buffer, sizeof(buffer), "%1.*g", precision2, val);
+            length = snprintf(buffer, sizeof(buffer), "%1.*g", precision2, val);
             if (length < 0)
             {
                 return false;
@@ -409,7 +409,7 @@ namespace utility {
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
-        int length = sprintf_s(buffer, sizeof(buffer), "%1.*f", precision, val);
+        int length = snprintf(buffer, sizeof(buffer), "%1.*f", precision, val);
         if (length < 0)
         {
             return false;
@@ -423,7 +423,7 @@ namespace utility {
         if (x != val)
         {
             const int precision2 = std::numeric_limits<double>::max_digits10;
-            length = sprintf_s(buffer, sizeof(buffer), "%1.*f", precision2, val);
+            length = snprintf(buffer, sizeof(buffer), "%1.*f", precision2, val);
             if (length < 0)
             {
                 return false;
@@ -513,7 +513,7 @@ namespace utility {
                 {
                     if (precision_ > 0)
                     {
-                        length = sprintf_s(number_buffer, sizeof(number_buffer), "%1.*f", precision_, val);
+                        length = snprintf(number_buffer, sizeof(number_buffer), "%1.*f", precision_, val);
                         if (length < 0)
                         {
                             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
@@ -533,7 +533,7 @@ namespace utility {
                 {
                     if (precision_ > 0)
                     {
-                        length = sprintf_s(number_buffer, sizeof(number_buffer), "%1.*e", precision_, val);
+                        length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", precision_, val);
                         if (length < 0)
                         {
                             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
@@ -553,7 +553,7 @@ namespace utility {
                 {
                     if (precision_ > 0)
                     {
-                        length = sprintf_s(number_buffer, sizeof(number_buffer), "%1.*g", precision_, val);
+                        length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision_, val);
                         if (length < 0)
                         {
                             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
