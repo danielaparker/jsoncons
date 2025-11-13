@@ -639,7 +639,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_all_m: price" == result.error().message_arg());
+        CHECK("ns::book_all_m::price" == result.error().message_arg());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("invalid JSON value")
@@ -861,7 +861,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_all_cg: price" == result.error().message_arg());
+        CHECK("ns::book_all_cg::price" == result.error().message_arg());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("invalid JSON value")
@@ -1252,7 +1252,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
         REQUIRE_FALSE(result);
         CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_all_gs: Price" == result.error().message_arg());
+        CHECK("ns::book_all_gs::Price" == result.error().message_arg());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("invalid JSON value")

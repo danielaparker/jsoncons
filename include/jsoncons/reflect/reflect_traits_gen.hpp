@@ -369,7 +369,7 @@ using identity = reflect::identity;
 #define JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) \
     static inline const string_view& Member(char) {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
     static inline const wstring_view& Member(wchar_t) {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
-    static inline const string_view& Member(unexpect_t) {static const string_view sv = # Prefix ": " # Member; return sv;} \
+    static inline const string_view& Member(unexpect_t) {static const string_view sv = # Prefix "::" # Member; return sv;} \
     /**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Count) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Count)
@@ -1494,7 +1494,7 @@ namespace reflect { \
 #define JSONCONS_ALL_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) { \
   auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, json_object_name_members<value_type>::Property(char_type{})); \
-  if (!result) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix ": " # Property);} \
+  if (!result) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix "::" # Property);} \
   class_instance.Setter(std::move(* result)); \
 }
 

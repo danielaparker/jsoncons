@@ -241,9 +241,9 @@ Output:
 
 (2) ns::book: Expected source object at line 1 and column 2
 
-(3) ns::book: price: Missing required JSON object member at line 2 and column 2
+(3) ns::book::price: Missing required JSON object member at line 2 and column 2
 
-(4) ns::book: price: Unable to convert into the provided type at line 2 and column 2
+(4) ns::book::price: Unable to convert into the provided type at line 2 and column 2
 
 (5) Haruki Murakami, Kafka on the Shore, 25.17
 ```

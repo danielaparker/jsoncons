@@ -126,7 +126,7 @@ TEST_CASE("json_conv_traits as std::vector<T> tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::vector<ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_double == result.error().code());
-        CHECK("ns::book: price" == result.error().message_arg());
+        CHECK("ns::book::price" == result.error().message_arg());
     }
 }
 
@@ -168,7 +168,7 @@ TEST_CASE("json_conv_traits as std::map<string,T> tests")
         auto result = jsoncons::reflect::json_conv_traits<jsoncons::json,std::map<std::string,ns::book>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::not_double == result.error().code());
-        CHECK("ns::book: price" == result.error().message_arg());
+        CHECK("ns::book::price" == result.error().message_arg());
     }
 }
 
