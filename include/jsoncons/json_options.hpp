@@ -374,11 +374,11 @@ public:
           array_object_line_splits_(other.array_object_line_splits_),
           spaces_around_colon_(other.spaces_around_colon_),
           spaces_around_comma_(other.spaces_around_comma_),
-          indent_char_(other.indent_char_),
           precision_(other.precision_),
           indent_size_(other.indent_size_),
           line_length_limit_(other.line_length_limit_),
-          new_line_chars_(std::move(other.new_line_chars_))
+          new_line_chars_(std::move(other.new_line_chars_)),
+          indent_char_(other.indent_char_)
     {
     }
     

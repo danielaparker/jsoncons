@@ -488,7 +488,7 @@ TEST_CASE("json_options escape_solidus")
         std::string expected = R"(["1","\/2",3,4])";
         std::string buffer;
         jsoncons::encode_json(j_arr, buffer, options);
-        std::cout << buffer << "\n";
+        //std::cout << buffer << "\n";
 
         CHECK(expected == buffer);
     }
