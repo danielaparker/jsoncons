@@ -217,15 +217,6 @@ std::string json_str = R"(
         auto reporter =
         [&result](const jsoncons::jsonschema::validation_message& message) -> jsoncons::jsonschema::walk_result
             {
-                /*std::cout << "+++++++++++++++++" << std::endl;
-                std::cout << "message: " << message.message() << std::endl;
-                std::cout << "instance location: " << message.instance_location().string() << std::endl;
-                std::cout << "schema location: " << message.schema_location().string() << std::endl;
-                std::cout << "keyword: " << message.keyword() << std::endl;
-                std::cout << "evaluation path: " << message.eval_path().string() << std::endl;
-                std::cout << "+++++++++++++++++" << std::endl;
-                std::cout << std::endl;*/
-
                 result.push_back(message);
                 return jsoncons::jsonschema::walk_result::advance;
             };

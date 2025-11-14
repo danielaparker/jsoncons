@@ -7,15 +7,18 @@ master
 
 - Enhancements
 
-    - Supports `boost::optional` with built-in reflection traits
+    - Git Discussion #594: Supports `boost::optional` with built-in reflection traits
+
+    - Git Discussion #651: Improve `decode_json` error messages 
+
+    - Git PR #647: Allow user configuration of **JSONCONS_HAS_STD_FROM_CHARS**
 
 - Fixed bug:
 
     - Git Issue #644: flatten/unflatten does not preserve arrays with more than 10 elements
 
-- Security issues detected by Flawfinder:
+    - Git Issue #652: Fixed issue with JSON Schema **AdditionalProperties** validator
 
-    - Replaced `snprintf` with `sprintf_s` 
 
 1.4.3
 -----
