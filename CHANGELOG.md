@@ -5,6 +5,15 @@ master
 
     - `jsonpointer::unflatten` now throws an exception if passed an empty object
 
+    - The `err_handler` property of `basic_json_options` has been deprecated and will
+      be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
+      options instead.
+
+    - Constructor overloads for `basic_json_cursor`, `basic_json_parser`, `basic_json_reader`, 
+      `basic_csv_parser` and `basic_csv_reader` that take an `err_handler` argument have been deprecated
+      and will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
+      options instead.
+
 - Enhancements
 
     - Git Discussion #594: Supports `boost::optional` with built-in reflection traits
