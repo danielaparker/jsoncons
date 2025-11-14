@@ -667,5 +667,19 @@ TEST_CASE("json_options tests")
         j.dump_pretty(os, options);
         CHECK(os.str() == s);
     }
+    SECTION("indent with tabs")
+    {
+        std::string s = "[\n\t{\n\t\t\"foo\": 1\n\t}\n]";
+
+        json j = json::parse(s);
+
+        auto options = json_options{}
+            .indent_char('\t')
+            .indent_size(1);
+
+        std::string buffer;
+        j.dump_pretty(buffer, options);
+        CHECK(s == buffer);
+    }
 }
 

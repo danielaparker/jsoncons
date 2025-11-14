@@ -334,6 +334,7 @@ private:
     uint8_t indent_size_{indent_size_default};
     std::size_t line_length_limit_{line_length_limit_default};
     string_type new_line_chars_;
+    char_type indent_char_;
 public:
     basic_json_encode_options()
         : escape_all_non_ascii_(false),
@@ -349,7 +350,8 @@ public:
           array_array_line_splits_(line_split_kind{}),
           array_object_line_splits_(line_split_kind{}),
           spaces_around_colon_(spaces_option::space_after),
-          spaces_around_comma_(spaces_option::space_after)
+          spaces_around_comma_(spaces_option::space_after),
+          indent_char_(' ')
     {
         new_line_chars_.push_back('\n');
     }
@@ -372,6 +374,7 @@ public:
           array_object_line_splits_(other.array_object_line_splits_),
           spaces_around_colon_(other.spaces_around_colon_),
           spaces_around_comma_(other.spaces_around_comma_),
+          indent_char_(other.indent_char_),
           precision_(other.precision_),
           indent_size_(other.indent_size_),
           line_length_limit_(other.line_length_limit_),
@@ -417,6 +420,11 @@ public:
     spaces_option spaces_around_comma() const 
     {
         return spaces_around_comma_;
+    }
+
+    char_type indent_char() const 
+    {
+        return indent_char_;
     }
 
     bool pad_inside_object_braces() const 
@@ -601,6 +609,12 @@ public:
     basic_json_options& spaces_around_comma(spaces_option value)
     {
         this->spaces_around_comma_ = value;
+        return *this;
+    }
+
+    basic_json_options& indent_char(char_type value)
+    {
+        this->indent_char_ = value;
         return *this;
     }
 

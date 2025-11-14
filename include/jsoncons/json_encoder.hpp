@@ -317,6 +317,7 @@ namespace detail {
 
         Sink sink_;
         basic_json_encode_options<CharT> options_;
+        char_type indent_char_{' '};
         jsoncons::utility::write_double fp_;
 
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
@@ -346,6 +347,7 @@ namespace detail {
                            const Allocator& alloc = Allocator())
            : sink_(std::forward<Sink>(sink)), 
              options_(options),
+             indent_char_(options.indent_char()),
              fp_(options.float_format(), options.precision()),
              stack_(alloc)
         {
@@ -1059,7 +1061,7 @@ namespace detail {
             sink_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
             for (int i = 0; i < indent_amount_; ++i)
             {
-                sink_.push_back(' ');
+                sink_.push_back(indent_char_);
             }
             column_ = indent_amount_;
         }

@@ -14,38 +14,39 @@ template<
 
 Specifies options for reading and writing JSON text. 
 
-Option|Reading|Writing|Default
-------|-------|-------|-------
-nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON|Unenabled
-inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON|Unenabled
-neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON|Unenabled
-nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled
-inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled
-neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled
-max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024
-lossless_bignum (since 1.4.0)|If `true`, reads out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise as negative or positive infinity.| |`true`
-lossless_number|If `true`, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |`false`
-allow_comments (since 1.3.0)|If 'true', allow (and ignore) comments when parsing JSON| |`true`
-allow_trailing_comma (since 1.3.0)|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |false
-err_handler (since 0.171.0)|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`
-indent_size| |The indent size|4
-spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`).|space after
-spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after
-pad_inside_object_braces| |Pad inside object braces|`false`
-pad_inside_array_brackets| |Pad inside array brackets|`false`
-bigint_format| |Specifies which [bigint format](bigint_chars_format.md) to use when serializing json.|`bignum_format_kind::raw` (since 1.0.0)
-bignum_format| |Specifies which [bignum format](bignum_format_kind.md) to use when serializing json. |`bignum_format_kind::raw`
-byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. |[byte_string_chars_format::base64url](byte_string_chars_format.md)
-float_format| |Overrides [floating point format](float_chars_format.md) when serializing to JSON. |[float_chars_format::general](float_chars_format.md)
-precision| |Overrides floating point precision when serializing json.|shortest representation
-escape_all_non_ascii| |Escape all non-ascii characters. |`false`
-escape_solidus| |Escape the solidus ('/') character. |`false`
-new_line_chars| |New line characters|"\n"
-line_length_limit| |Line length limit|120
-object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)
-array_object_line_splits| |For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)
-object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::same_line](line_split_kind.md)
-array_array_line_splits| |For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::new_line](line_split_kind.md)
+Option|Reading|Writing|Default|comment
+------|-------|-------|-------|------
+nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON|Unenabled|
+inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON|Unenabled|
+neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON|Unenabled|
+nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled|
+inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled|
+neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
+max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024|
+lossless_bignum|If `true`, reads out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise as negative or positive infinity.| |`true`|(since 1.4.0)
+lossless_number|If `true`, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |`false`|
+allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |`true`|(since 1.3.0)
+allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |false|(since 1.3.0)
+err_handler|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`|(since 0.171.0, deprecated in 1.5.0)
+indent_size| |The indent size|4|
+indent_char| |The indent character, e.g. '\t'|' '| (since 1.5)
+spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`).|space after|
+spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after|
+pad_inside_object_braces| |Pad inside object braces|`false`|
+pad_inside_array_brackets| |Pad inside array brackets|`false`|
+bigint_format| |Specifies which [bigint format](bigint_chars_format.md) to use when serializing json.|`bignum_format_kind::raw`| (since 1.0.0)
+bignum_format| |Specifies which [bignum format](bignum_format_kind.md) to use when serializing json. |`bignum_format_kind::raw`|
+byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. |[byte_string_chars_format::base64url](byte_string_chars_format.md)|
+float_format| |Overrides [floating point format](float_chars_format.md) when serializing to JSON. |[float_chars_format::general](float_chars_format.md)|
+precision| |Overrides floating point precision when serializing json.|shortest representation|
+escape_all_non_ascii| |Escape all non-ascii characters. |`false`|
+escape_solidus| |Escape the solidus ('/') character. |`false`|
+new_line_chars| |New line characters|"\n"|
+line_length_limit| |Line length limit|120|
+object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
+array_object_line_splits| |For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
+object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::same_line](line_split_kind.md)|
+array_array_line_splits| |For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::new_line](line_split_kind.md)|
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
