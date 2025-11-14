@@ -2652,7 +2652,7 @@ namespace jsonschema {
                         // If default value is available, update patch
                         jsonpointer::json_pointer prop_location = instance_location / prop.first;
 
-                        update_patch(patch, prop_location, std::move(*default_value));
+                        update_patch(patch, prop_location, *default_value);
                     }
                 }
             }
@@ -2718,12 +2718,12 @@ namespace jsonschema {
             return walk(context, instance, instance_location, reporter, allowed_properties);
         }
 
-        void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
+        void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, const Json& default_value) const
         {
             Json j;
             j.try_emplace("op", "add"); 
             j.try_emplace("path", instance_location.string()); 
-            j.try_emplace("value", std::forward<Json>(default_value)); 
+            j.try_emplace("value", default_value); 
             patch.push_back(std::move(j));
         }
     };

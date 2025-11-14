@@ -236,7 +236,7 @@ namespace jsonschema {
         std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val_;
         std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val_;
         std::map<std::string,schema_validator_ptr_type> defs_;
-        Json default_value_;
+        jsoncons::optional<Json> default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
         anchor_schema_map_type anchor_dict_;
@@ -252,7 +252,7 @@ namespace jsonschema {
             const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_ptr_type>&& validators, 
             std::map<std::string,schema_validator_ptr_type>&& defs,
-            Json&& default_value)
+            jsoncons::optional<Json>&& default_value)
             : schema_location_(schema_location),
               id_(id),
               validators_(std::move(validators)),
@@ -269,7 +269,7 @@ namespace jsonschema {
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
             std::map<std::string,schema_validator_ptr_type>&& defs,
-            Json&& default_value, bool recursive_anchor)
+            jsoncons::optional<Json>&& default_value, bool recursive_anchor)
             : schema_location_(schema_location),
               id_(id),
               validators_(std::move(validators)),
@@ -288,7 +288,7 @@ namespace jsonschema {
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
             std::map<std::string,schema_validator_ptr_type>&& defs,
-            Json&& default_value,
+            jsoncons::optional<Json>&& default_value,
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
             anchor_schema_map_type&& anchor_dict)
             : schema_location_(schema_location),

@@ -244,7 +244,7 @@ namespace draft202012 {
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
-            Json default_value{jsoncons::null_type()};
+            jsoncons::optional<Json> default_value;
             std::vector<keyword_validator_ptr_type> validators;
             std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
             std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;

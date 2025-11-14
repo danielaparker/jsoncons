@@ -47,8 +47,6 @@ TEST_CASE("jsonschema defaults tests")
             json patch;
             compiled.validate(data, patch); 
 
-            std::cout << "patch:\n" << pretty_print(patch) << "\n";
-
             jsonpatch::apply_patch(data, patch);
 
             json expected = json::parse(R"(

@@ -19,6 +19,8 @@ master
 
     - Git Issue #652: Fixed issue with JSON Schema **AdditionalProperties** validator
 
+    - Git Issue #653: Fixed issue with non existing default values being added in JSON Schema patch
+
 
 1.4.3
 -----

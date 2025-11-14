@@ -166,7 +166,7 @@ namespace draft6 {
                             }
                         }
 
-                        Json default_value{ jsoncons::null_type() };
+                        jsoncons::optional<Json> default_value;
                         uri relative((*it).value().template as<std::string>()); 
                         auto id = context.get_base_uri().resolve(relative)                   ;
                         validators.push_back(this->get_or_create_reference(sch, uri_wrapper{id}));
@@ -204,7 +204,7 @@ namespace draft6 {
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
-            Json default_value{ jsoncons::null_type() };
+            jsoncons::optional<Json> default_value;
             std::vector<keyword_validator_ptr_type> validators;
             std::map<std::string,schema_validator_ptr_type> defs;
 

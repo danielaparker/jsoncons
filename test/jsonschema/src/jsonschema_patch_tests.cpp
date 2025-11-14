@@ -108,5 +108,23 @@ TEST_CASE("jsonschema patch tests")
 
         CHECK(expectedPatch == resultPatch);
     }
+
+    SECTION("patch empty object with no default")
+    {
+        std::string schemaString = R"(
+{ 
+  "$schema": "https://json-schema.org/draft/2020-12/schema", 
+  "$id": "https://example.com/main-schema", "type": "object", 
+  "properties": { "objectType": { "type": "string", "enum": [ "Table", "Chair", "Planner", "Apple", "Water" ] } }, "required": [ "objectType" ] 
+}         
+        )";
+
+        jsoncons::ojson data, patch;
+        auto schema = jsoncons::jsonschema::make_json_schema(jsoncons::ojson::parse(schemaString));
+
+        schema.validate(data, patch);
+        CHECK(patch.is_array());
+        CHECK(patch.empty());
+    }
 }
 
