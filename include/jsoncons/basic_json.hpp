@@ -1797,9 +1797,13 @@ namespace jsoncons {
                             case json_storage_kind::json_ref:
                                 return compare(rhs.cast<json_reference_storage>().value());
                             default:
-                                if (is_string_storage(rhs.storage_kind()))
+                                if (is_string_storage(rhs.storage_kind()) && is_number_tag(rhs.tag()))
                                 {
                                     double val2 = rhs.as_double();
+                                    if (val1 == val2)
+                                    {
+                                        return 0;
+                                    }
                                     auto r = val1 - val2; 
                                     return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                                 }
