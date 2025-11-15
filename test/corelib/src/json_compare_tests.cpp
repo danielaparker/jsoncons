@@ -596,3 +596,44 @@ TEST_CASE("basic_json bool comparator")
     }
 }
 
+TEST_CASE("basic_json big number compare")
+{
+    SECTION("test1")
+    {
+        json j1 = json::parse("[1e999]");
+        json j2 = j1;
+        json j3 = j1;
+
+        CHECK(j1 == j1);
+        CHECK(j2 == j1);
+        CHECK(j1 == j2);
+        CHECK(j2 == j3);
+        CHECK_FALSE(j1 < j2);
+        CHECK_FALSE(j2 < j3);
+        CHECK_FALSE(j2 < j1);
+        CHECK_FALSE(j3 < j2);
+    }
+    SECTION("test2")
+    {
+        json j1 = json::parse("[1e999]");
+        json j2 = json::parse("[-1e999]");
+
+        CHECK_FALSE(j1 == j2);
+        CHECK(j1 > j2);
+        CHECK_FALSE(j2 > j1);
+        CHECK_FALSE(j1 < j2);
+        CHECK(j2 < j1);
+    }
+    SECTION("test3")
+    {
+        json j1 = json::parse("[1e999]");
+        json j2 = json::parse("1000");
+
+        CHECK_FALSE(j1 == j2);
+        CHECK(j1 > j2);
+        CHECK_FALSE(j2 > j1);
+        CHECK_FALSE(j1 < j2);
+        CHECK(j2 < j1);
+    }
+}
+

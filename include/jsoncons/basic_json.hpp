@@ -1761,8 +1761,7 @@ namespace jsoncons {
                             {
                                 double val1 = as_double();
                                 double val2 = rhs.as_double();
-                                auto r = val1 - val2;
-                                return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                                return val1 == val2 ? 0 : (val1 < val2 ? -1 : 1);
                             }
                             else
                             {
