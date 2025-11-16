@@ -14,6 +14,10 @@ master
       and will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
       options instead.
 
+    - The functors `default_json_parsing`, `strict_json_parsing`, and `allow_trailing_commas`
+      have been deprecated and will be removed in a future release. Use the `allow_trailing_comma` 
+      and `allow_comments` (set to **false** for strict) options instead.
+
 - Enhancements
 
     - Git Discussion #594: Supports `boost::optional` with built-in reflection traits
@@ -21,6 +25,8 @@ master
     - Git Discussion #651: Improve `decode_json` error messages 
 
     - Git PR #647: Allow user configuration of **JSONCONS_HAS_STD_FROM_CHARS**
+
+    - Added an `indent_char` property to `basic_json_options` that supports tab indents
 
 - Fixed bug:
 
