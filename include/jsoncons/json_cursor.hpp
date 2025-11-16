@@ -186,6 +186,7 @@ public:
         }
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
         Sourceable&& source, 

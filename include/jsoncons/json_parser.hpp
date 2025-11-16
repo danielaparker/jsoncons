@@ -163,7 +163,7 @@ private:
 
 public:
     basic_json_parser(const TempAlloc& temp_alloc = TempAlloc())
-        : basic_json_parser(basic_json_decode_options<char_type>(), default_json_parsing(), temp_alloc)
+        : basic_json_parser(basic_json_decode_options<char_type>(), temp_alloc)
     {
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -211,7 +211,11 @@ public:
          allow_comments_(options.allow_comments()),
          lossless_number_(options.lossless_number()),
          lossless_bignum_(options.lossless_bignum()),
+#if !defined(JSONCONS_NO_DEPRECATED)
+         err_handler_(options.err_handler()),
+#else
          err_handler_(default_json_parsing()),
+#endif
          buffer_(temp_alloc),
          state_stack_(temp_alloc)
     {

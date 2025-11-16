@@ -3,18 +3,14 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
 
 TEST_CASE("test_array_extra_comma")
 {
+
+#if !defined(JSONCONS_NO_DEPRECATED)
     SECTION("using err_handler")
     {
         allow_trailing_commas err_handler;
@@ -27,6 +23,7 @@ TEST_CASE("test_array_extra_comma")
 
         CHECK(expected == val);
     }
+#endif
     SECTION("with option")
     {
         auto options = json_options{}
@@ -34,14 +31,15 @@ TEST_CASE("test_array_extra_comma")
 
         json expected = json::parse("[1,2,3]");
 
-        json val = json::parse("[1,2,3,]", options);
+        json val1 = json::parse("[1,2,3,]", options);
 
-        CHECK(expected == val);
+        CHECK(expected == val1);
     }
 }
 
 TEST_CASE("test_object_extra_comma")
 {
+#if !defined(JSONCONS_NO_DEPRECATED)
     SECTION("using err_handler")
     {
         allow_trailing_commas err_handler;
@@ -64,7 +62,7 @@ TEST_CASE("test_object_extra_comma")
 
         CHECK(expected == val);
     }
-
+#endif
     SECTION("with option")
     {
         auto options = json_options{}
@@ -90,6 +88,7 @@ TEST_CASE("test_object_extra_comma")
 
 TEST_CASE("test json_parser error recovery")
 {
+#if !defined(JSONCONS_NO_DEPRECATED)
     SECTION("illegal control character")
     {
         auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
@@ -108,7 +107,6 @@ TEST_CASE("test json_parser error recovery")
         REQUIRE(j.is_string());
         CHECK(j.as_string() == "Cat");
     }
-
     SECTION("\r")
     {
         auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
@@ -151,6 +149,7 @@ TEST_CASE("test json_parser error recovery")
         REQUIRE(j.is_string());
         CHECK(j.as_string() == "Cat");
     }
+#endif
 }
 
 

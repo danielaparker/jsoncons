@@ -54,37 +54,41 @@ namespace csv {
         basic_csv_parser<CharT,Allocator> parser_;
 
     public:
-        // Structural characters
-        static constexpr size_t default_max_buffer_size = 16384;
-        //!  Parse an input stream of CSV text into a json object
-        /*!
-          \param is The input stream to read from
-        */
-
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor, 
+                         basic_json_visitor<CharT>& visitor,
+                         const basic_csv_decode_options<CharT>& options,
                          const Allocator& alloc = Allocator())
+           : source_(std::forward<Sourceable>(source)),
+             visitor_(visitor),
+             parser_(options, alloc)
 
-           : basic_csv_reader(std::forward<Sourceable>(source), 
-                              visitor, 
-                              basic_csv_decode_options<CharT>(), 
-                              default_csv_parsing(), 
-                              alloc)
         {
         }
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
-                         const basic_csv_decode_options<CharT>& options, 
                          const Allocator& alloc = Allocator())
-
             : basic_csv_reader(std::forward<Sourceable>(source), 
                                visitor, 
-                               options, 
-                               default_csv_parsing(),
+                               basic_csv_decode_options<CharT>(), 
                                alloc)
+        {
+        }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+        template <typename Sourceable>
+        basic_csv_reader(Sourceable&& source,
+                         basic_json_visitor<CharT>& visitor,
+                         const basic_csv_decode_options<CharT>& options,
+                         std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                         const Allocator& alloc = Allocator())
+           : source_(std::forward<Sourceable>(source)),
+             visitor_(visitor),
+             parser_(options, err_handler, alloc)
+             
         {
         }
 
@@ -100,19 +104,7 @@ namespace csv {
                                alloc)
         {
         }
-
-        template <typename Sourceable>
-        basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor,
-                         const basic_csv_decode_options<CharT>& options,
-                         std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                         const Allocator& alloc = Allocator())
-           : source_(std::forward<Sourceable>(source)),
-             visitor_(visitor),
-             parser_(options, err_handler, alloc)
-             
-        {
-        }
+#endif
 
         ~basic_csv_reader() noexcept = default;
 
