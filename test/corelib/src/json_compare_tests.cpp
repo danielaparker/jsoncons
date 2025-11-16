@@ -613,7 +613,7 @@ TEST_CASE("basic_json big number compare")
         CHECK_FALSE(j2 < j1);
         CHECK_FALSE(j3 < j2);
     }
-    /*SECTION("test2")
+    SECTION("test2")
     {
         json j1 = json::parse("[1e999]");
         json j2 = json::parse("[-1e999]");
@@ -623,7 +623,7 @@ TEST_CASE("basic_json big number compare")
         CHECK_FALSE(j2 > j1);
         CHECK_FALSE(j1 < j2);
         CHECK(j2 < j1);
-    }*/
+    }
     SECTION("test3")
     {
         json j1 = json::parse("[1e999]");
