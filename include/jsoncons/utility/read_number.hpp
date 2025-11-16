@@ -762,7 +762,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
         if (res.ec == std::errc::result_out_of_range)
         {
             bool negative = (s < last && *s == '-') ? true : false;
-            val = negative ? -std::infinity() : std::infinity();
+            val = negative ? -HUGE_VAL : HUGE_VAL;
         }
 
         return to_number_result<char>{res.ptr,res.ec};
