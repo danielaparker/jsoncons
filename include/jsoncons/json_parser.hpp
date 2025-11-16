@@ -167,6 +167,7 @@ public:
     {
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAlloc& temp_alloc = TempAlloc())
         : basic_json_parser(basic_json_decode_options<char_type>(), err_handler, temp_alloc)

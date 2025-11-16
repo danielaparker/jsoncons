@@ -39,35 +39,44 @@ Type                |Definition
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator()); (1)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),  (2) (deprecated in 1.5.0)
+        const Allocator& alloc = Allocator());   
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      std::error_code& ec); (2)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
+        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),  (2) (deprecated in 1.5.0)
+        const Allocator& alloc = Allocator());
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec); (3)
+        const basic_json_decode_options<CharT>& options,                                         (3)
+        std::error_code& ec); 
+
+    template <typename Sourceable>
+    basic_json_cursor(Sourceable&& source, std::error_code& ec);                                     (4)
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec); (4)
+        const basic_json_decode_options<CharT>& options,                                         (5)
+        std::error_code& ec);   
+
+    template <typename Sourceable>
+    basic_json_cursor(Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler,                           (6) (deprecated in 1.5.0)
+        std::error_code& ec); 
 
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Sourceable&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec); (5)
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,                                         (7) (deprecated in 1.5.0)
+        std::function<bool(json_errc,const ser_context&)> err_handler,
+        std::error_code& ec);
 
-Constructor (1) reads from a character sequence or stream and throws a 
+Constructors (1)=(2) read from a character sequence or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
-Constructors (2)-(5) read from a character sequence or stream and set `ec`
+Constructors (3)-(7) read from a character sequence or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive the source, 
@@ -92,8 +101,7 @@ Feeds the current and succeeding [staj events](basic_staj_event.md) through the 
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read_to(basic_json_visitor<char_type>& visitor,
-                std::error_code& ec) override
+    void read_to(basic_json_visitor<char_type>& visitor, std::error_code& ec) override
 Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
@@ -119,7 +127,7 @@ Reset cursor to read new value from a new source
 
    template <typename CharT,typename Source,typename Allocator>
    basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Source,Allocator>& cursor, 
-                                    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
+       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples
 
