@@ -751,7 +751,7 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
     {
         const char* last = s+length;
         const auto res = std::from_chars(s, last, val);
-        if (JSONCONS_LIKELY(res))
+        if (JSONCONS_LIKELY(res.ec == std::errc()))
         {
             return to_number_result<char>{res.ptr,res.ec};
         }
