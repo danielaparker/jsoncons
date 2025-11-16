@@ -13,10 +13,9 @@ master
       `basic_csv_parser` and `basic_csv_reader` that take an `err_handler` argument have been deprecated
       and will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
       options instead.
-
-    - The functors `default_json_parsing`, `strict_json_parsing`, and `allow_trailing_commas`
-      have been deprecated and will be removed in a future release. Use the `allow_trailing_comma` 
-      and `allow_comments` (set to **false** for strict) options instead.
+    - The functors `strict_json_parsing` and `allow_trailing_commas have been deprecated and 
+      will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments` 
+      options instead.
 
 - Enhancements
 

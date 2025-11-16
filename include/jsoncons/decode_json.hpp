@@ -60,7 +60,7 @@ try_decode_json(const CharsLike& s,
     using char_type = typename CharsLike::value_type;
 
     std::error_code ec;
-    basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, default_json_parsing(), ec);
+    basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
@@ -100,7 +100,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     using result_type = read_result<value_type>;
 
     std::error_code ec;
-    basic_json_cursor<CharT> cursor(is, options, default_json_parsing(), ec);
+    basic_json_cursor<CharT> cursor(is, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
@@ -145,7 +145,7 @@ try_decode_json(InputIt first, InputIt last,
 
     std::error_code ec;
     basic_json_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), 
-        options, default_json_parsing(), ec);
+        options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
@@ -184,7 +184,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 
 template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
+     ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const CharsLike& s,
     const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
@@ -195,7 +195,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>,TempAlloc> cursor(
-        std::allocator_arg, aset.get_temp_allocator(), s, options, default_json_parsing(), ec);
+        std::allocator_arg, aset.get_temp_allocator(), s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};

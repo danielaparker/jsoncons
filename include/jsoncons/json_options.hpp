@@ -50,6 +50,8 @@ struct default_json_parsing
     }
 };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 struct strict_json_parsing
 {
     bool operator()(json_errc, const ser_context&) noexcept
@@ -65,6 +67,8 @@ struct allow_trailing_commas
         return ec == json_errc::illegal_comment || ec == jsoncons::json_errc::extra_comma;
     }
 };
+
+#endif
 
 template <typename CharT>
 class basic_json_options;
@@ -297,11 +301,12 @@ public:
         return allow_trailing_comma_;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     const std::function<bool(json_errc,const ser_context&)>& err_handler() const 
     {
         return err_handler_;
     }
-
+#endif
 };
 
 template <typename CharT>
@@ -493,8 +498,9 @@ public:
     using basic_json_decode_options<CharT>::lossless_bignum;
     using basic_json_decode_options<CharT>::allow_comments;
     using basic_json_decode_options<CharT>::allow_trailing_comma;
+#if !defined(JSONCONS_NO_DEPRECATED)
     using basic_json_decode_options<CharT>::err_handler;
-
+#endif
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bignum_format;
     using basic_json_encode_options<CharT>::line_splits;
@@ -660,12 +666,13 @@ public:
         return *this;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_options& err_handler(const std::function<bool(json_errc,const ser_context&)>& value) 
     {
         this->err_handler_ = value;
         return *this;
     }
-
+#endif
     basic_json_options& line_length_limit(std::size_t value)
     {
         this->line_length_limit_ = value;

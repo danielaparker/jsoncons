@@ -49,6 +49,7 @@ public:
 
     // Constructors that throw parse exceptions
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
         const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
@@ -76,7 +77,6 @@ public:
             }
         }
     }
-
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
         const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
@@ -89,7 +89,7 @@ public:
         parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
-
+#endif
 
     // Constructors that set parse error codes
     template <typename Sourceable>
@@ -97,7 +97,6 @@ public:
         : basic_json_cursor(std::allocator_arg, Allocator(), 
               std::forward<Sourceable>(source),
               basic_json_decode_options<CharT>(),
-              default_json_parsing(),
               ec)
     {
     }
@@ -109,11 +108,11 @@ public:
         : basic_json_cursor(std::allocator_arg, Allocator(), 
               std::forward<Sourceable>(source),
               options,
-              default_json_parsing(),
               ec)
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
         const basic_json_decode_options<CharT>& options,
@@ -156,6 +155,7 @@ public:
             }
         }
     }
+#endif
 
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
@@ -164,7 +164,7 @@ public:
         std::error_code& ec,
         typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options,default_json_parsing(),alloc)
+         parser_(options, alloc)
     {
         parser_.cursor_mode(true);
 
@@ -185,7 +185,7 @@ public:
             }
         }
     }
-
+#if !defined(JSONCONS_NO_DEPRECATED)
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
         Sourceable&& source, 
@@ -195,6 +195,19 @@ public:
         typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc)
+    {
+        parser_.cursor_mode(true);
+        initialize_with_string_view(std::forward<Sourceable>(source), ec);
+    }
+#endif
+    template <typename Sourceable>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,
+        std::error_code& ec,
+        typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
+       : source_(),
+         parser_(options, alloc)
     {
         parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
