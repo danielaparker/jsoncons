@@ -225,7 +225,7 @@ namespace jsoncons {
 #if !defined(JSONCONS_NO_DEPRECATED)
         template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
-            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>{},
+            const basic_json_decode_options<CharT>& options,
             std::function<bool(json_errc,const ser_context&)> err_handler, 
             const TempAlloc& temp_alloc = TempAlloc())
             : basic_json_reader(std::forward<Sourceable>(source),
