@@ -197,7 +197,7 @@ public:
         }
     }
 
-    basic_json_parser(const TempAlloc& temp_alloc = TempAlloc())
+    basic_json_parser(const TempAlloc& temp_alloc)
         : basic_json_parser(basic_json_decode_options<char_type>(), temp_alloc)
     {
     }
