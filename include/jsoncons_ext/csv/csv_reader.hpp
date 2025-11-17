@@ -56,9 +56,9 @@ namespace csv {
     public:
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor,
-                         const basic_csv_decode_options<CharT>& options,
-                         const Allocator& alloc = Allocator())
+            basic_json_visitor<CharT>& visitor,
+            const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>{},
+            const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
              parser_(options, alloc)
@@ -68,8 +68,8 @@ namespace csv {
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor,
-                         const Allocator& alloc = Allocator())
+            basic_json_visitor<CharT>& visitor,
+            const Allocator& alloc = Allocator())
             : basic_csv_reader(std::forward<Sourceable>(source), 
                                visitor, 
                                basic_csv_decode_options<CharT>(), 
@@ -81,10 +81,10 @@ namespace csv {
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor,
-                         const basic_csv_decode_options<CharT>& options,
-                         std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                         const Allocator& alloc = Allocator())
+            basic_json_visitor<CharT>& visitor,
+            const basic_csv_decode_options<CharT>& options,
+            std::function<bool(csv_errc,const ser_context&)> err_handler, 
+            const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
              parser_(options, err_handler, alloc)
@@ -94,9 +94,9 @@ namespace csv {
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
-                         basic_json_visitor<CharT>& visitor,
-                         std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                         const Allocator& alloc = Allocator())
+            basic_json_visitor<CharT>& visitor,
+            std::function<bool(csv_errc,const ser_context&)> err_handler, 
+            const Allocator& alloc = Allocator())
             : basic_csv_reader(std::forward<Sourceable>(source), 
                                visitor, 
                                basic_csv_decode_options<CharT>(), 

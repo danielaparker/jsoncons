@@ -36,43 +36,42 @@ source_type                |Source
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
-                     basic_json_visitor<CharT>& visitor, 
-                     const TempAlloc& alloc = TempAlloc()); (1)
-
-
-    template <typename Sourceable>
-    basic_csv_reader(Sourceable&& source,
-                     basic_json_visitor<CharT>& visitor,
-                     const basic_csv_options<CharT>& options, 
-                     const TempAlloc& alloc = TempAlloc()); (2)
+        basic_json_visitor<CharT>& visitor,
+        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>{},   (1)
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
-                     basic_json_visitor<CharT>& visitor,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const TempAlloc& alloc = TempAlloc()); (3)
+        basic_json_visitor<CharT>& visitor,                                                   (2)
+        const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
-                     basic_json_visitor<CharT>& visitor,
-                     const basic_csv_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const TempAlloc& alloc = TempAlloc()); (4)
+        basic_json_visitor<CharT>& visitor,
+        const basic_csv_decode_options<CharT>& options,                                       (3) (deprecated since 1.5.0)
+        std::function<bool(csv_errc,const ser_context&)> err_handler, 
+        const TempAlloc& alloc = TempAlloc()); 
+
+    template <typename Sourceable>
+    basic_csv_reader(Sourceable&& source,
+        basic_json_visitor<CharT>& visitor,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,                         (4) (deprecated since 1.5.0)
+        const TempAlloc& alloc = TempAlloc()); 
 
 (1) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
-and a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
-JSON events. Uses default [basic_csv_options](basic_csv_options.md).
+and writes JSON events to a [basic_json_visitor](../corelib/basic_json_visitor.md) using provided 
+[options](basic_csv_options.md).
 
-(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
-JSON events, and [basic_csv_options](basic_csv_options.md).
+(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source` 
+and writes JSON events to a [basic_json_visitor](../corelib/basic_json_visitor.md) using default options.
 
-(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
-JSON events and the specified [JSON parsing error handling](../corelib/err_handler.md).
-Uses default [basic_csv_options](basic_csv_options.md).
+(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
+and writes JSON eventa to a [basic_json_visitor](../corelib/basic_json_visitor.md) using
+provided [JSON parsing error handling](../corelib/err_handler.md) and [options](basic_csv_options.md).
 
-(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../corelib/basic_json_visitor.md) that receives
-JSON events, [basic_csv_options](basic_csv_options.md),
-and the specified [JSON parsing error handling](../corelib/err_handler.md).
+(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source` 
+and writes JSON events to a [basic_json_visitor](../corelib/basic_json_visitor.md) 
+using provided [JSON parsing error handling](../corelib/err_handler.md) and default options.
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source or 
 visitor passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.

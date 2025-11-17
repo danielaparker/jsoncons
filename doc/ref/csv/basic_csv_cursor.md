@@ -39,35 +39,46 @@ Type                |Definition
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),  (1)
-        std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+        const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),   (1)
         const Allocator& alloc = Allocator()); 
 
     template <typename Sourceable>
-    basic_csv_cursor(Sourceable&& source, std::error_code& ec);                              (2)
+    basic_csv_cursor(Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,                                       (2) (deprecated in 1.5.0)
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        const Allocator& alloc = Allocator()); 
+
+    template <typename Sourceable>
+    basic_csv_cursor(Sourceable&& source, std::error_code& ec);                               (3)
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-        const basic_csv_decode_options<CharT>& options,                                      (3)
+        const basic_csv_decode_options<CharT>& options,                                       (4)
         std::error_code& ec); 
 
     template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
-        const basic_csv_decode_options<CharT>& options,                                      (4)
+        const basic_csv_decode_options<CharT>& options,                                       (5) (deprecated in 1.5.0)
         std::function<bool(csv_errc,const ser_context&)> err_handler,
         std::error_code& ec); 
 
     template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
         Sourceable&& source, 
-        const basic_csv_decode_options<CharT>& options,                                      (5)  
+        const basic_csv_decode_options<CharT>& options,                                       (6) (deprecated in 1.5.0)
         std::function<bool(csv_errc,const ser_context&)> err_handler,
         std::error_code& ec);                                                
 
-Constructors (1) reads from a character sequence or stream and throws a 
+    template <typename Sourceable>
+    basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
+        Sourceable&& source, 
+        const basic_csv_decode_options<CharT>& options,                                       (7) (deprecated in 1.5.0)
+        std::error_code& ec);                                                
+
+Constructors (1)-(2) read from a character sequence or stream source and throw a 
 [ser_error](../corelib/ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructors (2)-(5) read from a character sequence or stream and set `ec`
+Constructors (3)-(7) read from a character sequence or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_cursor` does not outlive the source  

@@ -39,42 +39,43 @@ Type                |Definition
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),  (2) (deprecated in 1.5.0)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),  (1) 
         const Allocator& alloc = Allocator());   
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),  (2) (deprecated in 1.5.0)
+        const basic_json_decode_options<CharT>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler,                         (2) (deprecated in 1.5.0)
         const Allocator& alloc = Allocator());
 
     template <typename Sourceable>
+    basic_json_cursor(Sourceable&& source, std::error_code& ec);                               (3)
+
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
-        const basic_json_decode_options<CharT>& options,                                         (3)
+        const basic_json_decode_options<CharT>& options,                                       (4)
         std::error_code& ec); 
-
-    template <typename Sourceable>
-    basic_json_cursor(Sourceable&& source, std::error_code& ec);                                     (4)
-
-    template <typename Sourceable>
-    basic_json_cursor(Sourceable&& source, 
-        const basic_json_decode_options<CharT>& options,                                         (5)
-        std::error_code& ec);   
 
     template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
         const basic_json_decode_options<CharT>& options,
-        std::function<bool(json_errc,const ser_context&)> err_handler,                           (6) (deprecated in 1.5.0)
+        std::function<bool(json_errc,const ser_context&)> err_handler,                         (5) (deprecated in 1.5.0)
         std::error_code& ec); 
 
     template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
         Sourceable&& source, 
-        const basic_json_decode_options<CharT>& options,                                         (7) (deprecated in 1.5.0)
+        const basic_json_decode_options<CharT>& options,                                       (6) 
+        std::error_code& ec);
+
+    template <typename Sourceable>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
+        Sourceable&& source, 
+        const basic_json_decode_options<CharT>& options,                                       (7) (deprecated in 1.5.0)
         std::function<bool(json_errc,const ser_context&)> err_handler,
         std::error_code& ec);
 
-Constructors (1)=(2) read from a character sequence or stream source and throws a 
+Constructors (1)=(2) read from a character sequence or stream source and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 Constructors (3)-(7) read from a character sequence or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.

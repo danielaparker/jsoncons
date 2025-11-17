@@ -188,18 +188,10 @@ namespace jsoncons {
         basic_json_reader& operator=(const basic_json_reader&) = delete;
 
     public:
-        template <typename Sourceable>
-        explicit basic_json_reader(Sourceable&& source, const TempAlloc& temp_alloc = TempAlloc())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                default_visitor_,
-                                basic_json_decode_options<CharT>(),
-                                temp_alloc)
-        {
-        }
 
         template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
-            const basic_json_decode_options<CharT>& options, 
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>{}, 
             const TempAlloc& temp_alloc = TempAlloc())
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
@@ -208,35 +200,10 @@ namespace jsoncons {
         {
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        template <typename Sourceable>
-        basic_json_reader(Sourceable&& source,
-                          std::function<bool(json_errc,const ser_context&)> err_handler, 
-                          const TempAlloc& temp_alloc = TempAlloc())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                default_visitor_,
-                                basic_json_decode_options<CharT>(),
-                                err_handler,
-                                temp_alloc)
-        {
-        }
         template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
-                          const basic_json_decode_options<CharT>& options,
-                          std::function<bool(json_errc,const ser_context&)> err_handler, 
-                          const TempAlloc& temp_alloc = TempAlloc())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                default_visitor_,
-                                options,
-                                err_handler,
-                                temp_alloc)
-        {
-        }
-#endif
-        template <typename Sourceable>
-        basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor, 
-                          const TempAlloc& temp_alloc = TempAlloc())
+            basic_json_visitor<CharT>& visitor, 
+            const TempAlloc& temp_alloc = TempAlloc())
             : basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 basic_json_decode_options<CharT>(),
@@ -246,9 +213,9 @@ namespace jsoncons {
 
         template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor,
-                          const basic_json_decode_options<CharT>& options, 
-                          const TempAlloc& temp_alloc = TempAlloc())
+            basic_json_visitor<CharT>& visitor,
+            const basic_json_decode_options<CharT>& options, 
+            const TempAlloc& temp_alloc = TempAlloc())
         : source_(std::forward<Sourceable>(source)),
           visitor_(visitor),
           parser_(options, temp_alloc)
@@ -256,6 +223,19 @@ namespace jsoncons {
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+        template <typename Sourceable>
+        basic_json_reader(Sourceable&& source, 
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>{},
+            std::function<bool(json_errc,const ser_context&)> err_handler, 
+            const TempAlloc& temp_alloc = TempAlloc())
+            : basic_json_reader(std::forward<Sourceable>(source),
+                                default_visitor_,
+                                options,
+                                err_handler,
+                                temp_alloc)
+        {
+        }
+
         template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,

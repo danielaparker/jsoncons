@@ -43,20 +43,20 @@ temp_allocator_type        |TempAlloc
         const TempAlloc& temp_alloc = TempAlloc());                                    (3)   (deprecated since 0.171.0)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        std::function<bool(json_errc,const ser_context&)> err_handler,                         (4)   (deprecated since 0.171.0) 
+        std::function<bool(json_errc,const ser_context&)> err_handler,                 (4)   (deprecated since 0.171.0) 
         const TempAlloc& temp_alloc = TempAlloc());                       
 
 
-(1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
+(1) Constructs a `json_parser` that uses default [options](basic_json_options.md)
 and a default [err_handler](err_handler.md).
 
-(2) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
+(2) Constructs a `json_parser` that uses the specified [options](basic_json_options.md)
 and a default [err_handler](err_handler.md).
 
-(3) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
+(3) Constructs a `json_parser` that uses default [options](basic_json_options.md)
 and a specified [err_handler](err_handler.md).
 
-(4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
+(4) Constructs a `json_parser` that uses the specified [options](basic_json_options.md)
 and a specified [err_handler](err_handler.md).
 
 #### Member functions

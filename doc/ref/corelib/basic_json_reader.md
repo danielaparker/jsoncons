@@ -39,83 +39,74 @@ string_view_type           |
 #### Constructors
 
     template <typename Sourceable>
-    explicit basic_json_reader(Sourceable&& source,                      (1)
-        const TempAlloc& alloc = TempAlloc());         
-
-    template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
-        const basic_json_options<CharT>& options, 
-        const TempAlloc& alloc = TempAlloc());                   (2)
+        const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>{},   (1)
+        const TempAlloc& alloc = TempAlloc());                   
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
-        std::function<bool(json_errc,const ser_context&)> err_handler,   (3)   (deprecated in 0.171.0) 
+        std::function<bool(json_errc,const ser_context&)> err_handler,                          (2)   (deprecated in 0.171.0) 
         const TempAlloc& alloc = TempAlloc());                    
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
-        const basic_json_options<CharT>& options,                        (4)   (deprecated in 0.171.0) 
+        const basic_json_options<CharT>& options,                                               (3)   (deprecated in 0.171.0) 
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
-    basic_json_reader(Sourceable&& source,                               (5)
+    basic_json_reader(Sourceable&& source,                                                      (4)
         basic_json_visitor<CharT>& visitor, 
         const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source, 
-        basic_json_visitor<CharT>& visitor,                              (6)
+        basic_json_visitor<CharT>& visitor,                                                     (5)
         const basic_json_options<CharT>& options, 
         const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
-        basic_json_visitor<CharT>& visitor,                              (7)   (deprecated in 0.171.0) 
+        basic_json_visitor<CharT>& visitor,                                                     (6)   (deprecated in 0.171.0) 
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAlloc& alloc = TempAlloc()); 
 
     template <typename Sourceable>
     basic_json_reader(Sourceable&& source,
-        basic_json_visitor<CharT>& visitor,                              (8)   (deprecated in 0.171.0)
+        basic_json_visitor<CharT>& visitor,                                                     (7)   (deprecated in 0.171.0)
         const basic_json_options<CharT>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAlloc& alloc = TempAlloc()); 
 
-Constructors (1)-(4) use a default [basic_json_visitor](basic_json_visitor.md) that discards the JSON parse events, and are for validation only.
+Constructors (1)-(3) use a default [basic_json_visitor](basic_json_visitor.md) that discards the JSON parse events, and are for validation only.
 
-(1) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, uses default [options](basic_json_options.md) and a default [JSON parsing error handling](err_handler.md).
+(1) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
+uses the specified [options](basic_json_options.md) and a default [JSON parsing error handling](err_handler.md).
 
 (2) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
-uses the specified [options](basic_json_options.md)
-and a default [JSON parsing error handling](err_handler.md).
-
-(3) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
 uses default [options](basic_json_options.md)
 and a specified [JSON parsing error handling](err_handler.md).
 
-(4) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
+(3) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
 uses the specified [options](basic_json_options.md)
 and a specified [JSON parsing error handling](err_handler.md).
 
-Constructors (5)-(8) take a user supplied [basic_json_visitor](basic_json_visitor.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
+Constructors (4)-(7) take a user supplied [basic_json_visitor](basic_json_visitor.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
-(5) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
+(3) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified 
-[basic_json_visitor](basic_json_visitor.md), and uses default [options](basic_json_options.md)
-and a default [JSON parsing error handling](err_handler.md).
+[basic_json_visitor](basic_json_visitor.md), and uses default [options](basic_json_options.md).
+
+(4) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
+emits JSON parse events to the specified 
+[basic_json_visitor](basic_json_visitor.md), and uses specified [options](basic_json_options.md).
 
 (6) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
-emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) 
-and uses the specified [options](basic_json_options.md)
-and a default [JSON parsing error handling](err_handler.md).
-
-(7) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) 
 and uses default [options](basic_json_options.md)
 and a specified [JSON parsing error handling](err_handler.md).
 
-(8) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
+(7) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) and
 uses the specified [options](basic_json_options.md)
 and a specified [JSON parsing error handling](err_handler.md).
