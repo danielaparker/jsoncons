@@ -609,11 +609,72 @@ private:
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
 public:
-    basic_csv_parser(const TempAlloc& alloc = TempAlloc())
+    basic_csv_parser()
+       : basic_csv_parser(basic_csv_decode_options<CharT>())
+    {
+    }
+
+    explicit basic_csv_parser(const TempAlloc& alloc)
        : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(),
                           alloc)
     {
+    }
+
+    explicit basic_csv_parser(const basic_csv_decode_options<CharT>& options)
+        : basic_csv_parser(options, TempAlloc{})
+    {
+    }
+
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
+        const TempAlloc& alloc)
+       : alloc_(alloc),
+         state_(csv_parse_state::start),
+         err_handler_(default_csv_parsing()),
+         assume_header_(options.assume_header()),                  
+         comment_starter_(options.comment_starter()),
+         field_delimiter_(options.field_delimiter()),
+         header_lines_(options.header_lines()),
+         ignore_empty_values_(options.ignore_empty_values()),
+         ignore_empty_lines_(options.ignore_empty_lines()),
+         infer_types_(options.infer_types()),
+         lossless_number_(options.lossless_number()), 
+         mapping_kind_(options.mapping_kind()),
+         max_lines_(options.max_lines()),
+         quote_char_(options.quote_char()),
+         quote_escape_char_(options.quote_escape_char()),
+         subfield_delimiter_(options.subfield_delimiter()),
+         trim_leading_(options.trim_leading()),
+         trim_leading_inside_quotes_(options.trim_leading_inside_quotes()),
+         trim_trailing_(options.trim_trailing()),
+         trim_trailing_inside_quotes_(options.trim_trailing_inside_quotes()),
+         unquoted_empty_value_is_null_(options.unquoted_empty_value_is_null()),
+         m_columns_filter_(alloc),
+         stack_(alloc),
+         column_names_(alloc),
+         column_types_(alloc),
+         column_defaults_(alloc),
+         state_stack_(alloc),
+         buffer_(alloc)
+    {
+        if (options.enable_str_to_nan())
+        {
+            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
+        }
+        if (options.enable_str_to_inf())
+        {
+            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
+        }
+        if (options.enable_str_to_neginf())
+        {
+            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
+        }
+
+        jsoncons::csv::detail::parse_column_types(options.column_types(), column_types_);
+        jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
+        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
+        min_column_names_ = column_names_.size();
+        initialize();
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -677,56 +738,6 @@ public:
         initialize();
     }
 #endif
-    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
-        const TempAlloc& alloc = TempAlloc())
-       : alloc_(alloc),
-         state_(csv_parse_state::start),
-         err_handler_(default_csv_parsing()),
-         assume_header_(options.assume_header()),                  
-         comment_starter_(options.comment_starter()),
-         field_delimiter_(options.field_delimiter()),
-         header_lines_(options.header_lines()),
-         ignore_empty_values_(options.ignore_empty_values()),
-         ignore_empty_lines_(options.ignore_empty_lines()),
-         infer_types_(options.infer_types()),
-         lossless_number_(options.lossless_number()), 
-         mapping_kind_(options.mapping_kind()),
-         max_lines_(options.max_lines()),
-         quote_char_(options.quote_char()),
-         quote_escape_char_(options.quote_escape_char()),
-         subfield_delimiter_(options.subfield_delimiter()),
-         trim_leading_(options.trim_leading()),
-         trim_leading_inside_quotes_(options.trim_leading_inside_quotes()),
-         trim_trailing_(options.trim_trailing()),
-         trim_trailing_inside_quotes_(options.trim_trailing_inside_quotes()),
-         unquoted_empty_value_is_null_(options.unquoted_empty_value_is_null()),
-         m_columns_filter_(alloc),
-         stack_(alloc),
-         column_names_(alloc),
-         column_types_(alloc),
-         column_defaults_(alloc),
-         state_stack_(alloc),
-         buffer_(alloc)
-    {
-        if (options.enable_str_to_nan())
-        {
-            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
-        }
-        if (options.enable_str_to_inf())
-        {
-            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
-        }
-        if (options.enable_str_to_neginf())
-        {
-            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
-        }
-
-        jsoncons::csv::detail::parse_column_types(options.column_types(), column_types_);
-        jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
-        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
-        min_column_names_ = column_names_.size();
-        initialize();
-    }
 
     ~basic_csv_parser() noexcept
     {

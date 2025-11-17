@@ -34,30 +34,37 @@ temp_allocator_type        |TempAlloc
 
 #### Constructors
 
-    basic_json_parser(const TempAlloc& temp_alloc = TempAlloc());                      (1)
+    basic_json_parser();                                                               (1)
+
+    explicit basic_json_parser(const TempAlloc& temp_alloc);                           (2)
+
+    explicit basic_json_parser(const basic_json_decode_options<CharT>& options);       (3)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        const TempAlloc& temp_alloc = TempAlloc());                                    (2)
+        const TempAlloc& temp_alloc);                                                  (4)
 
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAlloc& temp_alloc = TempAlloc());                                    (3)   (deprecated since 0.171.0)
+        const TempAlloc& temp_alloc = TempAlloc());                                    (5)   (deprecated since 0.171.0)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        std::function<bool(json_errc,const ser_context&)> err_handler,                 (4)   (deprecated since 0.171.0) 
+        std::function<bool(json_errc,const ser_context&)> err_handler,                 (6)   (deprecated since 0.171.0) 
         const TempAlloc& temp_alloc = TempAlloc());                       
 
 
-(1) Constructs a `json_parser` that uses default [options](basic_json_options.md)
-and a default [err_handler](err_handler.md).
+(1) Default constructor using default options.
 
-(2) Constructs a `json_parser` that uses the specified [options](basic_json_options.md)
-and a default [err_handler](err_handler.md).
+(2) Constructs a `basic_json_parser` using a provided allocator for temporary allocations.
 
-(3) Constructs a `json_parser` that uses default [options](basic_json_options.md)
-and a specified [err_handler](err_handler.md).
+(3) Constructs a `basic_json_parser` using  the specified [options](basic_json_options.md).
 
-(4) Constructs a `json_parser` that uses the specified [options](basic_json_options.md)
-and a specified [err_handler](err_handler.md).
+(4) Constructs a `basic_json_parser` using the provided [options](basic_json_options.md)
+and allocator for temporary allocations.
+
+(5) Constructs a `basic_json_parser` using the provided [error handler](err_handler.md)
+and allocator for temporary allocations.
+
+(6) Constructs a `basic_json_parser` using the provided [options](basic_json_options.md),
+[error handler](err_handler.md) and allocator for temporary allocations.
 
 #### Member functions
 

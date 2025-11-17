@@ -162,7 +162,18 @@ private:
     basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
-    basic_json_parser(const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>{},
+
+    basic_json_parser()
+        : basic_json_parser(basic_json_decode_options<char_type>())
+    {
+    }
+
+    explicit basic_json_parser(const TempAlloc& temp_alloc)
+        : basic_json_parser(basic_json_decode_options<char_type>(), temp_alloc)
+    {
+    }
+
+    basic_json_parser(const basic_json_decode_options<char_type>& options,
         const TempAlloc& temp_alloc = TempAlloc())
        : max_nesting_depth_(options.max_nesting_depth()),
          allow_trailing_comma_(options.allow_trailing_comma()),
@@ -195,11 +206,6 @@ public:
         {
             string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
-    }
-
-    basic_json_parser(const TempAlloc& temp_alloc)
-        : basic_json_parser(basic_json_decode_options<char_type>(), temp_alloc)
-    {
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
