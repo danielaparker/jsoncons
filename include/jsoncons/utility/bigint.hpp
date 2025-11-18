@@ -619,10 +619,10 @@ public:
     }
 
     template <typename CharT>
-    basic_bigint(const CharT* str, const Allocator& alloc)
+    basic_bigint(const CharT* s, const Allocator& alloc = Allocator())
         : storage_(alloc)
     {
-        *this = parse(str, std::char_traits<CharT>::length(str), alloc);
+        *this = parse(s, std::char_traits<CharT>::length(s), alloc);
     }
 
     basic_bigint(const basic_bigint& other)
@@ -652,8 +652,8 @@ public:
     {
     }
 
-    template <typename CharT>
-    basic_bigint(jsoncons::basic_string_view<CharT> sv)
+    template <typename StringViewLike,typename=typename std::enable_if<ext_traits::is_string_or_string_view<StringViewLike>::value>::type>
+    basic_bigint(const StringViewLike& sv)
     {
         *this = parse(sv.data(), sv.size());
     }

@@ -4,6 +4,8 @@ oss_fuzz_compile_all()
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
     cd ${DIR}/..
 
+    $CXX ./fuzzers/fuzz_bigint.cpp -I./include $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_bigint
+
     $CXX ./fuzzers/fuzz_parse.cpp -I./include $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_parse
     $CXX ./fuzzers/fuzz_csv.cpp -I./include $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_csv
 
