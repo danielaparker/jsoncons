@@ -28,7 +28,7 @@ jsoncons is distributed under the [Boost Software License](http://www.boost.org/
 jsoncons is free but welcomes support to sustain its development. If you find this library helpful, please consider making a [one time donation](https://paypal.me/jsoncons?locale.x=en_US)
 or becoming a [:heart: sponsor](https://github.com/sponsors/danielaparker). 
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the 
+As the `jsoncons` library has evolved, names have sometimes changed, see [deprecated](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/deprecated.md). To ease transition, jsoncons deprecates the 
 old names but continues to support many of them. The deprecated names can be suppressed by defining the macro 
 `JSONCONS_NO_DEPRECATED`, and doing so is recommended for new code.
 

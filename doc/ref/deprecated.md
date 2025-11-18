@@ -4,7 +4,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 Category/class|Old name|Replacement
 --------|-----------|--------------
-`encode_json`|&nbsp;|&nbsp;
+`pretty json`|&nbsp;|&nbsp;
 &nbsp;|`encode_json` overloads that take a `jsoncons::indenting` argument|Use `_pretty` overloads instead
 &nbsp;|`basic_json::dump`overloads that take a `jsoncons::indenting` argument|Use `_pretty` overloads instead
 `allocator_set`|&nbsp;|&nbsp;
