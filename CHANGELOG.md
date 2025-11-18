@@ -9,8 +9,8 @@ master
       be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
       options instead.
 
-    - Constructor overloads for `basic_json_cursor`, `basic_json_parser`, `basic_json_reader`, 
-      `basic_csv_parser` and `basic_csv_reader` that take an `err_handler` argument have been deprecated
+    - Constructor overloads for `basic_json_parser`, `basic_json_reader`, `basic_json_cursor`,  
+      `basic_csv_parser` `basic_csv_reader`, `basic_csv_cursor` that take an `err_handler` argument have been deprecated
       and will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
       options instead.
     - The functors `strict_json_parsing` and `allow_trailing_commas have been deprecated and 
