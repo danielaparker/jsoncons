@@ -1,4 +1,3 @@
-
 #
 # jsoncons examples CMake file
 #
