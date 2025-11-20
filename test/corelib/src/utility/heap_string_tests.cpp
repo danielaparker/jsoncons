@@ -39,7 +39,7 @@ public:
    {
    }
 
-   ssize_t allocated = 0;
+   std::make_signed<size_t>::type allocated = 0;
 
 protected:
    void* do_allocate(std::size_t bytes, std::size_t alignment) override
