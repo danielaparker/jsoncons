@@ -7,7 +7,6 @@ cmake_minimum_required(VERSION 3.5...3.14)
 # load global config
 include (../../build/cmake/Config.cmake)
 
-
 project (Examples CXX)
 
 # load per-platform configuration
