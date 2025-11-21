@@ -31,6 +31,36 @@ TEST_CASE("heap_string test")
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 
+class checked_resource : public std::pmr::memory_resource
+{
+public:
+   explicit checked_resource(std::pmr::memory_resource* upstream = std::pmr::get_default_resource())
+      : upstream_(upstream)
+   {
+   }
+
+   std::make_signed<size_t>::type allocated = 0;
+
+protected:
+   void* do_allocate(std::size_t bytes, std::size_t alignment) override
+   {
+      allocated += bytes;
+      return upstream_->allocate(bytes, alignment);
+   }
+
+   void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) override
+   {
+      allocated -= bytes;
+      upstream_->deallocate(p, bytes, alignment);
+   }
+
+   bool do_is_equal(const memory_resource& other) const noexcept override { return this == &other; }
+
+private:
+   std::pmr::memory_resource* upstream_;
+};
+
+
 TEST_CASE("heap_string with polymorphic allocator test")
 {
     using heap_string_factory_type = jsoncons::utility::heap_string_factory<char, null_type, std::pmr::polymorphic_allocator<char>>;
@@ -38,7 +68,8 @@ TEST_CASE("heap_string with polymorphic allocator test")
 
     char buffer[1024] = {}; // a small buffer on the stack
     std::pmr::monotonic_buffer_resource pool1{ std::data(buffer), std::size(buffer) };
-    std::pmr::polymorphic_allocator<char> alloc(&pool1);
+    checked_resource checked(&pool1);
+    std::pmr::polymorphic_allocator<char> alloc(&checked);
 
     std::string s1("Hello World 1");
     pointer ptr1 = heap_string_factory_type::create(s1.data(), s1.length(), null_type(), alloc);
@@ -52,6 +83,8 @@ TEST_CASE("heap_string with polymorphic allocator test")
 
     heap_string_factory_type::destroy(ptr1);
     heap_string_factory_type::destroy(ptr2);
+
+    CHECK(checked.allocated == 0);
 }
 
 
