@@ -817,7 +817,6 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         REQUIRE_NOTHROW(reader.read(ec));
     }
-#endif
 
     // Fuzz target: fuzz_json_parser_max
     // Issue: Timeout (exceeds 60 secs)
@@ -836,6 +835,27 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         reader.read(ec);
         //std::cout << ec.message() << "\n";
     }
+    // Fuzz target: fuzz_bigint
+    // Issue: Timeout (exceeds 60 secs)
+    SECTION("issue 416794751")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_bigint-5516555002904576";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::istreambuf_iterator<char> eos;
+        std::string s(std::istreambuf_iterator<char>(is), eos);
+
+        try {
+            bigint a("56654250564056135415631554531554513813");
+            bigint b(s);
+            bigint c = a % b;
+            bigint d = b % a;
+        }
+        catch (const std::runtime_error&) {}
+    }
+#endif
 }
 
 
