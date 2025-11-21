@@ -847,6 +847,8 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::istreambuf_iterator<char> eos;
         std::string s(std::istreambuf_iterator<char>(is), eos);
 
+        std::cout << s.length() << "\n";
+
         try {
             bigint a("56654250564056135415631554531554513813");
             bigint b(s);
