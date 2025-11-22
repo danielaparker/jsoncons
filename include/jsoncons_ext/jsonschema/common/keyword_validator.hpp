@@ -2509,7 +2509,7 @@ namespace jsonschema {
                         message.append(to_string(expected_types_[i]));
                 }
                 message.append(", found ");
-                message.append(to_schema_type(instance.type()));
+                message.append(to_schema_type(instance.type(), instance.tag()));
 
                 return reporter.error(this->make_validation_message(
                     this_context.eval_path(),
@@ -2519,7 +2519,7 @@ namespace jsonschema {
             return walk_result::advance;
         }
         
-        std::string to_schema_type(json_type type) const
+        std::string to_schema_type(json_type type, semantic_tag tag) const
         {
             switch (type)
             {
@@ -2543,7 +2543,7 @@ namespace jsonschema {
                 }
                 case json_type::string_value:
                 {
-                    return "string";
+                    return is_number_tag(tag) ? "number" : "string";
                 }
                 case json_type::array_value:
                 {

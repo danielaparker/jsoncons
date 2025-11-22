@@ -3242,7 +3242,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
-                    return tag() == semantic_tag::bigint || tag() == semantic_tag::bigdec || tag() == semantic_tag::bigfloat || tag() == semantic_tag::float128;
+                    return is_number_tag(tag());
                 case json_storage_kind::json_const_ref:
                     return cast<json_const_reference_storage>().value().is_bignum();
                 case json_storage_kind::json_ref:
@@ -3373,9 +3373,7 @@ namespace jsoncons {
                     return true;
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
-                    return tag() == semantic_tag::bigint ||
-                           tag() == semantic_tag::bigdec ||
-                           tag() == semantic_tag::bigfloat;
+                    return is_number_tag(tag());
                 case json_storage_kind::json_const_ref:
                     return cast<json_const_reference_storage>().value().is_number();
                 case json_storage_kind::json_ref:
