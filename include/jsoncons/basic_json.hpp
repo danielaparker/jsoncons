@@ -3242,10 +3242,9 @@ namespace jsoncons {
             {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
-                    return jsoncons::utility::is_base10(as_string_view().data(), as_string_view().length());
-                case json_storage_kind::int64:
-                case json_storage_kind::uint64:
-                    return true;
+                    return tag() == semantic_tag::bigint || tag() == semantic_tag::bigdec || tag() == semantic_tag::bigfloat || tag() == semantic_tag::float128;
+                case json_storage_kind::json_const_ref:
+                    return cast<json_const_reference_storage>().value().is_bignum();
                 case json_storage_kind::json_ref:
                     return cast<json_reference_storage>().value().is_bignum();
                 default:
