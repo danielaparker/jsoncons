@@ -2462,13 +2462,35 @@ private:
         if (result)
         {
             visitor.int64_value(val, semantic_tag::none, *this, ec);
-            more_ = !cursor_mode_;
         }
         else // Must be overflow
         {
-            visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
-            more_ = !cursor_mode_;
+            if (lossless_bignum_)
+            {
+                visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
+            }
+            else
+            {
+                double d{0};
+                result = jsoncons::utility::decstr_to_double(&buffer_[0], buffer_.length(), d);
+                if (JSONCONS_LIKELY(result))
+                {
+                    visitor.double_value(d, semantic_tag::none, *this, ec);
+                }
+                else if (result.ec == std::errc::result_out_of_range)
+                {
+                    visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
+                }
+                else
+                {
+                    ec = json_errc::invalid_number;
+                    more_ = false;
+                    return;
+                }
+            }
+
         }
+        more_ = !cursor_mode_;
         after_value(ec);
     }
 
@@ -2479,13 +2501,34 @@ private:
         if (result)
         {
             visitor.uint64_value(val, semantic_tag::none, *this, ec);
-            more_ = !cursor_mode_;
         }
         else // Must be overflow
         {
-            visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
-            more_ = !cursor_mode_;
+            if (lossless_bignum_)
+            {
+                visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
+            }
+            else
+            {
+                double d{0};
+                result = jsoncons::utility::decstr_to_double(&buffer_[0], buffer_.length(), d);
+                if (JSONCONS_LIKELY(result))
+                {
+                    visitor.double_value(d, semantic_tag::none, *this, ec);
+                }
+                else if (result.ec == std::errc::result_out_of_range)
+                {
+                    visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
+                }
+                else
+                {
+                    ec = json_errc::invalid_number;
+                    more_ = false;
+                    return;
+                }
+            }
         }
+        more_ = !cursor_mode_;
         after_value(ec);
     }
 
@@ -2494,7 +2537,6 @@ private:
         if (lossless_number_)
         {
             visitor.string_value(buffer_, semantic_tag::bigdec, *this, ec);
-            more_ = !cursor_mode_;
         }
         else
         {
@@ -2504,29 +2546,26 @@ private:
             {
                 visitor.double_value(d, semantic_tag::none, *this, ec);
             }
-            else
+            else if (result.ec == std::errc::result_out_of_range)
             {
-                if (result.ec == std::errc::result_out_of_range)
+                if (lossless_bignum_)
                 {
-                    if (lossless_bignum_)
-                    {
-                        visitor.string_value(buffer_, semantic_tag::bigdec, *this, ec);
-                    }
-                    else
-                    {
-                        visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
-                    }
+                    visitor.string_value(buffer_, semantic_tag::bigdec, *this, ec);
                 }
                 else
                 {
-                    ec = json_errc::invalid_number;
-                    more_ = false;
-                    return;
+                    visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
                 }
             }
-            more_ = !cursor_mode_;
+            else
+            {
+                ec = json_errc::invalid_number;
+                more_ = false;
+                return;
+            }
         }
 
+        more_ = !cursor_mode_;
         after_value(ec);
     }
 

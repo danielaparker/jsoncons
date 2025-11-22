@@ -683,3 +683,29 @@ TEST_CASE("json_options tests")
     }
 }
 
+TEST_CASE("json_options lossless_bignum")
+{
+    SECTION("positive bignum")
+    {
+        std::string str = R"({"a":123456789012345678901234567890})";
+        std::string expected = R"({"a":1.2345678901234568e+29})";
+		auto options = jsoncons::json_options{}
+		    .lossless_bignum(false);
+		auto j = jsoncons::json::parse(str, options);
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(expected == buffer);
+    }
+    SECTION("positive bignum")
+    {
+        std::string str = R"({"a":-123456789012345678901234567890})";
+        std::string expected = R"({"a":-1.2345678901234568e+29})";
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(false);
+        auto j = jsoncons::json::parse(str, options);
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(expected == buffer);
+    }
+}
+
