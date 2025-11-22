@@ -23,7 +23,8 @@ nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled|
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled|
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024|
-lossless_bignum|If `true`, reads out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise as negative or positive infinity.| |`true`|(since 1.4.0)
+lossless_bignum|If `true`, reads out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise parses as double.| |`true`|(since 1.4.0)</br>(until 1.5.0)
+lossless_bignum|If `true`, reads out-of-range integer numbers as strings with tag `semantic_tag::bigint`, otherwise parses as double, and out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise parses as double.| |`true`|(since 1.5.0)
 lossless_number|If `true`, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |`false`|
 allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |`true`|(since 1.3.0)
 allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |false|(since 1.3.0)
