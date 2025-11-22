@@ -187,6 +187,37 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
+    // enum
+
+    template <typename Json,typename T>
+    struct json_conv_traits<Json, T,
+        typename std::enable_if<!is_json_conv_traits_declared<T>::value && std::is_enum<T>::value 
+    >::type>
+    {
+        using result_type = conversion_result<T>;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.template is_integer<T>();
+        }
+        template<typename Alloc,typename TempAlloc>
+        static result_type try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j)
+        {
+            auto r = j.template try_as_integer<int64_t>();
+            if (r)
+            {
+                return result_type{static_cast<T>(*r)};
+            }
+            return result_type{unexpect, r.error()};
+        }
+
+        template <typename Alloc, typename TempAlloc>
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, T val)
+        {
+            return Json(static_cast<int64_t>(val), semantic_tag::none);
+        }
+    };
+
     // integer
 
     template <typename Json,typename T>

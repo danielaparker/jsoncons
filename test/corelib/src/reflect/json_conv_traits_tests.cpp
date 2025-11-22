@@ -19,24 +19,48 @@
 namespace {
 namespace ns {
 
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price{0};
-    };
-    struct A {
-        A() = default;
-        A(double a, double b) : a(a), b(b) {}
-        double a;
-        double b;
-    };
+struct book
+{
+    std::string author;
+    std::string title;
+    double price{0};
+};
+
+struct A {
+    A() = default;
+    A(double a, double b) : a(a), b(b) {}
+    double a;
+    double b;
+};
+
+enum class PacketCompression : uint32_t {
+    NONE = 199,
+    TEXTURE,
+    GENERAL,
+    ALL
+};
+
+enum class PacketCompression2 : uint32_t {
+    NONE = 199,
+    TEXTURE,
+    GENERAL,
+    ALL
+};
+
+struct Foo
+{
+    PacketCompression value;
+    PacketCompression2 value2;
+};
 
 } // namespace ns
 } // namespace
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 JSONCONS_ALL_MEMBER_TRAITS(ns::A, a, b)    
+
+JSONCONS_ENUM_TRAITS(ns::PacketCompression2, NONE, TEXTURE, GENERAL, ALL)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Foo,value, value2)
 
 using namespace jsoncons;
 
@@ -362,5 +386,23 @@ TEST_CASE("json_conv_traits shared_ptr")
         auto serializedA = j.as<std::shared_ptr<ns::A>>();
         CHECK(serializedA->a == 42.0);
         CHECK(serializedA->b == 32.0);
+    }
+}
+
+TEST_CASE("json_conv_traits enum")
+{
+    SECTION("test1")
+    {
+        std::string data = R"({"value":199,"value2":"NONE"})";
+        auto j = jsoncons::json::parse(data);
+
+        auto foo = j.as<ns::Foo>();
+
+        CHECK(foo.value == ns::PacketCompression::NONE);
+        CHECK(foo.value2 == ns::PacketCompression2::NONE);
+
+        std::string buffer;
+        jsoncons::encode_json(foo, buffer);
+        CHECK(data == buffer);
     }
 }
