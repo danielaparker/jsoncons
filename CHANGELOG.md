@@ -13,19 +13,28 @@
       `basic_csv_parser` `basic_csv_reader` and `basic_csv_cursor` that take an `err_handler` argument have been deprecated
       and will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments`
       options instead.
+
     - The functors `strict_json_parsing` and `allow_trailing_commas have been deprecated and 
       will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments` 
       options instead.
 
+    - The json_parser option `lossless_bignum`, when **false**, now applies to integer values as well as floating point values. 
+
+    - `basic_json::is_bignum` function has been changed to return `true` if the value 
+      is any string value tagged as `bigint`, `bigdec`, `float128`, or `bigfloat`
+      (previously only `bigint`.)
+
 - Enhancements
 
-    - Git Discussion #594: Supports `boost::optional` with built-in reflection traits
+    - Git Discussions #594: Updated reflection traits to supports `boost::optional` 
 
-    - Git Discussion #651: Improve `decode_json` error messages 
+    - Git Discussions #651: Improved `decode_json` error messages 
 
     - Git PR #647: Allow user configuration of **JSONCONS_HAS_STD_FROM_CHARS**
 
-    - Added an `indent_char` property to `basic_json_options` that supports tab indents
+    - Git Discussions #654: Added an `indent_char` property to `basic_json_options` that supports tab indents
+
+    - Git Discussions #660: Added reflection traits for read/write of enum values as integers.
 
 - Fixed bug:
 

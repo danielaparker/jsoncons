@@ -22,12 +22,12 @@ neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a stri
 nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled|
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled|
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
-max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024|
+max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|**1024**|
 lossless_bignum|When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- infinity.| |**true**|(since 1.4.0)</br>(until 1.5.0)
-lossless_bignum|When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- **infinity**.| |**true**|(since 1.5.0)
+lossless_bignum|When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces `+- infinity`.| |**true**|(since 1.5.0)
 lossless_number|If **true**, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |**false**|
 allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |**true**|(since 1.3.0)
-allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |false|(since 1.3.0)
+allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |**false**|(since 1.3.0)
 err_handler|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`|(since 0.171.0, deprecated in 1.5.0)
 indent_size| |The indent size|4|
 indent_char| |The indent character, e.g. '\t'|' '| (since 1.5)

@@ -696,13 +696,37 @@ TEST_CASE("json_options lossless_bignum")
         j.dump(buffer);
         CHECK(expected == buffer);
     }
-    SECTION("positive bignum")
+    SECTION("negative bignum")
     {
         std::string str = R"({"a":-123456789012345678901234567890})";
         std::string expected = R"({"a":-1.2345678901234568e+29})";
         auto options = jsoncons::json_options{}
             .lossless_bignum(false);
         auto j = jsoncons::json::parse(str, options);
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(expected == buffer);
+    }
+    SECTION("+inf")
+    {
+        std::string str = R"({"a":1e999})";
+        std::string expected = R"({"a":null})";
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(false);
+        auto j = jsoncons::json::parse(str, options);
+        CHECK(HUGE_VAL == j["a"].as<double>());
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(expected == buffer);
+    }
+    SECTION("-inf")
+    {
+        std::string str = R"({"a":-1e999})";
+        std::string expected = R"({"a":null})";
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(false);
+        auto j = jsoncons::json::parse(str, options);
+        CHECK(-HUGE_VAL == j["a"].as<double>());
         std::string buffer;
         j.dump(buffer);
         CHECK(expected == buffer);
