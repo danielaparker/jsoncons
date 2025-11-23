@@ -533,3 +533,45 @@ Output:
 (1) {"a":123456789012345678901234567890}
 (2) {"a":1.2345678901234568e+29}
 ```
+
+### Parse floating point with lossless_bignum 
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    try
+    {
+        std::string str = R"({"a":1.5e999})";
+
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(true);  // default
+
+        auto j1 = jsoncons::json::parse(str, options);
+        std::string buffer1;
+        j1.dump(buffer1);
+        std::cout << "(1) " << buffer1 << "\n";
+
+        options.lossless_bignum(false);
+        auto j2 = jsoncons::json::parse(str, options);
+        std::cout << "(2) " << j2.at("a").as<double>() << "\n";
+        std::string buffer2;
+        j2.dump(buffer2);
+        // By default, an inf value is serialzed to null
+        std::cout << "(3) " << buffer2 << "\n"; 
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+
+Output:
+```
+(1) {"a":1.5e999}
+(2) inf
+(3) {"a":null}
+```
