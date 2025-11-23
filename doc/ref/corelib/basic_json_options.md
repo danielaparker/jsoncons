@@ -23,25 +23,25 @@ nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled|
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled|
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|1024|
-lossless_bignum|If `true`, reads out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise parses as double.| |`true`|(since 1.4.0)</br>(until 1.5.0)
-lossless_bignum|If `true`, reads out-of-range integer numbers as strings with tag `semantic_tag::bigint`, otherwise parses as double, and out-of-range floating point numbers as strings with tag `semantic_tag::bigdec`, otherwise parses as double.| |`true`|(since 1.5.0)
-lossless_number|If `true`, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |`false`|
-allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |`true`|(since 1.3.0)
+lossless_bignum|When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- infinity.| |**true**|(since 1.4.0)</br>(until 1.5.0)
+lossless_bignum|When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- **infinity**.| |**true**|(since 1.5.0)
+lossless_number|If **true**, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |**false**|
+allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |**true**|(since 1.3.0)
 allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |false|(since 1.3.0)
 err_handler|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`|(since 0.171.0, deprecated in 1.5.0)
 indent_size| |The indent size|4|
 indent_char| |The indent character, e.g. '\t'|' '| (since 1.5)
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`).|space after|
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after|
-pad_inside_object_braces| |Pad inside object braces|`false`|
-pad_inside_array_brackets| |Pad inside array brackets|`false`|
+pad_inside_object_braces| |Pad inside object braces|**false**|
+pad_inside_array_brackets| |Pad inside array brackets|**false**|
 bigint_format| |Specifies which [bigint format](bigint_chars_format.md) to use when serializing json.|`bignum_format_kind::raw`| (since 1.0.0)
 bignum_format| |Specifies which [bignum format](bignum_format_kind.md) to use when serializing json. |`bignum_format_kind::raw`|
 byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. |[byte_string_chars_format::base64url](byte_string_chars_format.md)|
 float_format| |Overrides [floating point format](float_chars_format.md) when serializing to JSON. |[float_chars_format::general](float_chars_format.md)|
 precision| |Overrides floating point precision when serializing json.|shortest representation|
-escape_all_non_ascii| |Escape all non-ascii characters. |`false`|
-escape_solidus| |Escape the solidus ('/') character. |`false`|
+escape_all_non_ascii| |Escape all non-ascii characters. |**false**|
+escape_solidus| |Escape the solidus ('/') character. |**false**|
 new_line_chars| |New line characters|"\n"|
 line_length_limit| |Line length limit|120|
 object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
@@ -117,16 +117,16 @@ Sets a number replacement for `Infinity` when writing JSON
 Sets a number replacement for `Negative Infinity` when writing JSON
 
     basic_json_options& lossless_number(bool value); 
-If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
-Defaults to `false`.
+If set to **true**, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
+Defaults to **false**.
 
     basic_json_options& allow_comments(bool value); 
-If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
-Defaults to `true`.
+If set to **true**, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
+Defaults to **true**.
 
     basic_json_options& allow_trailing_comma(bool value); 
-If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
-Defaults to `false`.
+If set to **true**, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
+Defaults to **false**.
 
     basic_json_options& indent_size(uint8_t value)
 The indent size, the default is 4.
@@ -140,10 +140,10 @@ Indicates [space option](spaces_option.md) for array value and object name/value
 is space after.
 
     basic_json_options& pad_inside_object_braces(bool value)
-Default is `false`
+Default is **false**
 
     basic_json_options& pad_inside_array_brackets(bool value)
-Default is `false`
+Default is **false**
 
     basic_json_options& bignum_format(bignum_format_kind value)
 Overrides [bignum format](bignum_format_kind.md) when serializing json.
@@ -161,10 +161,10 @@ Overrides floating point precision when serializing json.
 The default is shortest representation.
 
     basic_json_options& escape_all_non_ascii(bool value)
-Escape all non-ascii characters. The default is `false`.
+Escape all non-ascii characters. The default is **false**.
 
     basic_json_options& escape_solidus(bool value)
-Escape the solidus ('/') character. The default is `false`.
+Escape the solidus ('/') character. The default is **false**.
 
     basic_json_options& new_line_chars(const string_type& value)
 Defaults to "\n"
