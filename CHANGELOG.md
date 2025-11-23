@@ -44,6 +44,8 @@
 
     - Git Issue #653: Fixed issue with non existing default values being added in JSON Schema patch
 
+    - Git Issue #659: Fixed jsonschema validation message 
+
 
 1.4.3
 -----
