@@ -191,6 +191,10 @@ for their storage, otherwise attempts to return a default constructed allocator.
     <td>Returns <code>true</code> if an object has a member with the given <code>key</code> , otherwise <code>false</code></td> 
   </tr>
   <tr>
+    <td><a href="json/is_bignum.md">is</a></td>
+    <td>Checks if a basic_json value is a string tagged as bigint, bigdec, float128 or bigfloat.</td> 
+  </tr>
+  <tr>
     <td><a href="json/is.md">is</a></td>
     <td>Checks if a basic_json value matches a type.</td> 
   </tr>

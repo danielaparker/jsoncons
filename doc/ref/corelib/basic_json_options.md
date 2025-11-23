@@ -495,4 +495,41 @@ Output:
 (2) {"first":1,"second":2}
 ```
 
+### Parse integer with lossless_bignum 
 
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    try
+    {
+        std::string str = R"({"a":123456789012345678901234567890})";
+
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(true);  // default
+
+        auto j1 = jsoncons::json::parse(str, options);
+        std::string buffer1;
+        j1.dump(buffer1);
+        std::cout << "(1) " << buffer1 << "\n";
+
+        options.lossless_bignum(false);
+        auto j2 = jsoncons::json::parse(str, options);
+        std::string buffer2;
+        j2.dump(buffer2);
+        std::cout << "(2) " << buffer2 << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+
+Output:
+```
+(1) {"a":123456789012345678901234567890}
+(2) {"a":1.2345678901234568e+29}
+```
