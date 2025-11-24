@@ -48,7 +48,7 @@ public:
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
-    static constexpr uint16_t word_length = 4; // Use multiples of word_length words
+    static constexpr uint16_t word_length = 8; // Use multiples of word_length words
     static constexpr size_type inlined_capacity = 2;
 public:
 
@@ -607,7 +607,7 @@ public:
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
 
-    static constexpr uint16_t word_length = 4; // Use multiples of word_length words
+    static constexpr uint16_t word_length = 8; // Use multiples of word_length words
     static constexpr word_type r_mask = (word_type(1) << word_type_half_bits) - 1;
     static constexpr word_type l_mask = max_word - r_mask;
     static constexpr word_type l_bit = max_word - (max_word >> 1);
@@ -722,19 +722,14 @@ public:
             JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
         }
 
-        bool neg;
         if (*data == '-')
         {
-            neg = true;
-            ++data;
-            --length;
+            return parse(data+1, length-1, true, alloc); 
         }
         else
         {
-            neg = false;
+            return parse(data, length, false, alloc); 
         }
-
-        return parse(data, length, neg, alloc); 
     }
 
     template <typename CharT>
@@ -757,8 +752,20 @@ public:
         {
             return basic_bigint{0, alloc};
         }
+        size_type num_digits = last - data;
+        size_type num_words;
+        if (length < 10)
+        {
+            num_words = 1;
+        }
+        else
+        {
+            size_type num_bits = (size_type)(((num_digits*detail::bits_per_digit[10]) >> 10) + 1);
+            num_words = (num_bits+63) >> 6;
+        }
 
         basic_bigint<Allocator> v(0, alloc);
+        v.reserve(num_words);
         for (size_type i = 0; i < length; i++)
         {
             CharT c = data[i];
@@ -771,6 +778,13 @@ public:
                     JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
             }
         }
+
+        auto view = v.get_storage_view();
+
+        //if (num_words != view.size())
+        //{
+        //    std::cout << "Unexpected num_words! num_words: " << num_words << ", " << num_words << ", size: " << view.size() << "\n";
+        //}
 
         if (neg)
         {
