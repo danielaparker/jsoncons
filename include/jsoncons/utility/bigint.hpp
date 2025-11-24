@@ -30,6 +30,14 @@ namespace jsoncons {
 
 namespace detail {
 
+// bits per digit in the given radix times 1024
+// Rounded up to avoid underallocation.
+JSONCONS_INLINE_CONSTEXPR uint64_t bits_per_digit[] = { 0, 0,
+    1024, 1624, 2048, 2378, 2648, 2875, 3072, 3247, 3402, 3543, 3672,
+    3790, 3899, 4001, 4096, 4186, 4271, 4350, 4426, 4498, 4567, 4633,
+    4696, 4756, 4814, 4870, 4923, 4975, 5025, 5074, 5120, 5166, 5210,
+    5253, 5295};
+
 template <typename Allocator>
 class bigint_storage : private std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>
 {
@@ -730,11 +738,24 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* data, size_type length, bool neg, const Allocator& alloc = Allocator())
+    static basic_bigint<Allocator> parse(const CharT* data, size_type length, 
+        bool neg, const Allocator& alloc = Allocator())
     {
         if (JSONCONS_UNLIKELY(length == 0))
         {
             JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
+        }
+
+        const CharT* last = data + length;
+        const CharT* p = data;
+
+        while (p < last && *p == '0')
+        {
+            ++p;
+        }
+        if (p == last)
+        {
+            return basic_bigint{0, alloc};
         }
 
         basic_bigint<Allocator> v(0, alloc);
@@ -1772,6 +1793,7 @@ public:
         }
     }
 private:
+
     void destroy() noexcept
     {
         storage_.destroy();
