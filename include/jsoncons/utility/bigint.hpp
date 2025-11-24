@@ -779,7 +779,7 @@ public:
             }
         }
 
-        auto view = v.get_storage_view();
+       // auto view = v.get_storage_view();
 
         //if (num_words != view.size())
         //{
