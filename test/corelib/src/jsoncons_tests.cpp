@@ -76,7 +76,7 @@ TEST_CASE("test_for_each_value")
     ++it;
     CHECK(it->value().is_string());
     ++it;
-    CHECK(it->value().type() == jsoncons::json_type::uint64);
+    CHECK(it->value().type() == jsoncons::json_type::uint64_value);
     ++it;
     CHECK((it == val.object_range().end()));
 }

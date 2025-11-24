@@ -27,16 +27,5 @@ Category/class|Old name|Replacement
 &nbsp;|`csv::basic_csv_cursor` constructor overloads that take an `err_handler` argument|
 `csv::result_options`|&nbsp;|&nbsp;
 &nbsp;|**csv::result_options::value**|Use `csv::result_options{}` instead
-`json_type`|&nbsp;|&nbsp;
-&nbsp;|**json_type::null_value**|Use `json_type::null` instead
-&nbsp;|**json_type::bool_value**|Use `json_type::boolean` instead
-&nbsp;|**json_type::int64_value**|Use `json_type::int64` instead
-&nbsp;|**json_type::uint64_value**|Use `json_type::uint64` instead
-&nbsp;|**json_type::half_value**|Use `json_type::float16` instead
-&nbsp;|**json_type::double_value**|Use `json_type::float64` instead
-&nbsp;|**json_type::string_value**|Use `json_type::string` instead
-&nbsp;|**json_type::byte_string_value**|Use `json_type::byte_string` instead
-&nbsp;|**json_type::array_value**|Use `json_type::array` instead
-&nbsp;|**json_type::object_value**|Use `json_type::object` instead
 
 

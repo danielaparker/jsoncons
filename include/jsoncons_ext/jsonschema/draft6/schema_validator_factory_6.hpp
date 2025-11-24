@@ -138,7 +138,7 @@ namespace draft6 {
 
             switch (sch.type())
             {
-                case json_type::boolean:
+                case json_type::bool_value:
                 {
                     schema_validator_ptr = this->make_boolean_schema(new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -148,7 +148,7 @@ namespace draft6 {
                     }          
                     break;
                 }
-                case json_type::object:
+                case json_type::object_value:
                 {
                     auto it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
@@ -277,12 +277,12 @@ namespace draft6 {
             if (it != sch.object_range().end()) 
             {
 
-                if ((*it).value().type() == json_type::array) 
+                if ((*it).value().type() == json_type::array_value) 
                 {
                     validators.emplace_back(factory_.make_prefix_items_validator_07(context, (*it).value(), sch, anchor_dict));
                 } 
-                else if ((*it).value().type() == json_type::object ||
-                           (*it).value().type() == json_type::boolean)
+                else if ((*it).value().type() == json_type::object_value ||
+                           (*it).value().type() == json_type::bool_value)
                 {
                     validators.emplace_back(factory_.make_items_validator("items", context, (*it).value(), sch, anchor_dict));
                 }

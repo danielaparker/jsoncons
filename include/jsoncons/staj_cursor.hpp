@@ -945,7 +945,7 @@ begin_object:
                 {
                     return result_type(std::move(cont));
                 }
-                if (stack.back()->type() == json_type::object)
+                if (stack.back()->type() == json_type::object_value)
                 {
                     goto begin_object;
                 }
@@ -1042,7 +1042,7 @@ begin_array:
                 {
                     return cont;
                 }
-                if (stack.back()->type() == json_type::object)
+                if (stack.back()->type() == json_type::object_value)
                 {
                     goto begin_object;
                 }

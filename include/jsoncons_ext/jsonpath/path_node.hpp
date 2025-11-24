@@ -242,7 +242,7 @@ namespace jsonpath {
         {
             if (node->node_kind() == path_node_kind::index)
             {
-                if (current->type() != json_type::array || node->index() >= current->size())
+                if (current->type() != json_type::array_value || node->index() >= current->size())
                 {
                     return nullptr; 
                 }
@@ -250,7 +250,7 @@ namespace jsonpath {
             }
             else if (node->node_kind() == path_node_kind::name)
             {
-                if (current->type() != json_type::object)
+                if (current->type() != json_type::object_value)
                 {
                     return nullptr;
                 }

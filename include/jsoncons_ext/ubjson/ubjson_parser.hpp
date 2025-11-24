@@ -366,7 +366,7 @@ private:
     {
         switch (type)
         {
-            case jsoncons::ubjson::ubjson_type::null: 
+            case jsoncons::ubjson::ubjson_type::null_type: 
             {
                 visitor.null_value(semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;

@@ -16,28 +16,16 @@ namespace jsoncons {
 
     enum class json_type : uint8_t 
     {
-        null,
-        boolean,
-        int64,
-        uint64,
-        float16,
-        float64,
-        string,
-        byte_string,
-        array,
-        object
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        , null_value = null,
-        bool_value = boolean,
-        int64_value = int64,
-        uint64_value = uint64,
-        half_value = float16,
-        double_value = float64,
-        string_value = string,
-        byte_string_value = byte_string,
-        array_value = array,
-        object_value = object
-    #endif
+        null_value,
+        bool_value,
+        int64_value,
+        uint64_value,
+        half_value,
+        double_value,
+        string_value,
+        byte_string_value,
+        array_value,
+        object_value
     };
 
     template <typename CharT>
@@ -61,47 +49,47 @@ namespace jsoncons {
                 os << null_value;
                 break;
             }
-            case json_type::boolean:
+            case json_type::bool_value:
             {
                 os << bool_value;
                 break;
             }
-            case json_type::int64:
+            case json_type::int64_value:
             {
                 os << int64_value;
                 break;
             }
-            case json_type::uint64:
+            case json_type::uint64_value:
             {
                 os << uint64_value;
                 break;
             }
-            case json_type::float16:
+            case json_type::half_value:
             {
                 os << half_value;
                 break;
             }
-            case json_type::float64:
+            case json_type::double_value:
             {
                 os << double_value;
                 break;
             }
-            case json_type::string:
+            case json_type::string_value:
             {
                 os << string_value;
                 break;
             }
-            case json_type::byte_string:
+            case json_type::byte_string_value:
             {
                 os << byte_string_value;
                 break;
             }
-            case json_type::array:
+            case json_type::array_value:
             {
                 os << array_value;
                 break;
             }
-            case json_type::object:
+            case json_type::object_value:
             {
                 os << object_value;
                 break;

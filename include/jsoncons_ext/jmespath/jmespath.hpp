@@ -1300,13 +1300,13 @@ namespace detail {
                 reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
-                    case json_type::uint64:
+                    case json_type::uint64_value:
                         return arg0;
-                    case json_type::int64:
+                    case json_type::int64_value:
                     {
                         return arg0.template as<int64_t>() >= 0 ? arg0 : *context.create_json(std::abs(arg0.template as<int64_t>()));
                     }
-                    case json_type::float64:
+                    case json_type::double_value:
                     {
                         return arg0.template as<double>() >= 0 ? arg0 : *context.create_json(std::abs(arg0.template as<double>()));
                     }
@@ -1384,12 +1384,12 @@ namespace detail {
                 reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
-                    case json_type::uint64:
-                    case json_type::int64:
+                    case json_type::uint64_value:
+                    case json_type::int64_value:
                     {
                         return *context.create_json(arg0.template as<double>());
                     }
-                    case json_type::float64:
+                    case json_type::double_value:
                     {
                         return *context.create_json(std::ceil(arg0.template as<double>()));
                     }
@@ -1424,7 +1424,7 @@ namespace detail {
 
                 switch (arg0.type())
                 {
-                    case json_type::array:
+                    case json_type::array_value:
                         for (auto& j : arg0.array_range())
                         {
                             if (j == arg1)
@@ -1433,7 +1433,7 @@ namespace detail {
                             }
                         }
                         return context.false_value();
-                    case json_type::string:
+                    case json_type::string_value:
                     {
                         if (!arg1.is_string())
                         {
@@ -1520,12 +1520,12 @@ namespace detail {
                 reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
-                    case json_type::uint64:
-                    case json_type::int64:
+                    case json_type::uint64_value:
+                    case json_type::int64_value:
                     {
                         return *context.create_json(arg0.template as<double>());
                     }
-                    case json_type::float64:
+                    case json_type::double_value:
                     {
                         return *context.create_json(std::floor(arg0.template as<double>()));
                     }
@@ -1617,10 +1617,10 @@ namespace detail {
 
                 switch (arg0.type())
                 {
-                    case json_type::object:
-                    case json_type::array:
+                    case json_type::object_value:
+                    case json_type::array_value:
                         return *context.create_json(arg0.size());
-                    case json_type::string:
+                    case json_type::string_value:
                     {
                         auto sv0 = arg0.template as<string_view_type>();
                         auto length = unicode_traits::count_codepoints(sv0.data(), sv0.size());
@@ -1989,17 +1989,17 @@ namespace detail {
 
                 switch (arg0.type())
                 {
-                    case json_type::int64:
-                    case json_type::uint64:
-                    case json_type::float64:
+                    case json_type::int64_value:
+                    case json_type::uint64_value:
+                    case json_type::double_value:
                         return context.number_type_name();
-                    case json_type::boolean:
+                    case json_type::bool_value:
                         return context.boolean_type_name();
-                    case json_type::string:
+                    case json_type::string_value:
                         return context.string_type_name();
-                    case json_type::object:
+                    case json_type::object_value:
                         return context.object_type_name();
-                    case json_type::array:
+                    case json_type::array_value:
                         return context.array_type_name();
                     default:
                         return context.null_type_name();
@@ -2210,7 +2210,7 @@ namespace detail {
                 reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
-                    case json_type::string:
+                    case json_type::string_value:
                     {
                         string_view_type sv = arg0.as_string_view();
                         std::basic_string<char32_t> buf;
@@ -2220,7 +2220,7 @@ namespace detail {
                         unicode_traits::convert(buf.data(), buf.size(), s);
                         return *context.create_json(s);
                     }
-                    case json_type::array:
+                    case json_type::array_value:
                     {
                         auto result = context.create_json(arg0);
                         std::reverse(result->array_range().begin(),result->array_range().end());
@@ -2371,11 +2371,11 @@ namespace detail {
                 reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
-                    case json_type::int64:
-                    case json_type::uint64:
-                    case json_type::float64:
+                    case json_type::int64_value:
+                    case json_type::uint64_value:
+                    case json_type::double_value:
                         return arg0;
-                    case json_type::string:
+                    case json_type::string_value:
                     {
                         auto sv = arg0.as_string_view();
                         uint64_t uval{ 0 };

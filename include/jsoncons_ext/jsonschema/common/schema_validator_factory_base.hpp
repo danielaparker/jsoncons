@@ -214,7 +214,7 @@ namespace jsonschema {
                 }
 
                 // recursively add possible subschemas of unknown keywords
-                if (value.type() == json_type::object)
+                if (value.type() == json_type::object_value)
                 {
                     for (const auto& subsch : value.object_range())
                     {
@@ -304,7 +304,7 @@ namespace jsonschema {
             schema_validator_ptr_type schema_val = schema_validator_ptr_type{};
             switch (sch.type())
             {
-                case json_type::object:
+                case json_type::object_value:
                 {
                     auto it = sch.find("$schema");
                     if (it != sch.object_range().end())
@@ -326,7 +326,7 @@ namespace jsonschema {
                     }
                     break;
                 }
-                case json_type::boolean:
+                case json_type::bool_value:
                 {
                     return make_schema_validator(context, std::move(sch), keys, anchor_dict);
                 }

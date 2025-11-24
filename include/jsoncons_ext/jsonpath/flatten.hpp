@@ -33,7 +33,7 @@ namespace jsonpath {
 
         switch (parent_value.type())
         {
-            case json_type::array:
+            case json_type::array_value:
             {
                 if (parent_value.empty())
                 {
@@ -53,7 +53,7 @@ namespace jsonpath {
                 break;
             }
 
-            case json_type::object:
+            case json_type::object_value:
             {
                 if (parent_value.empty())
                 {
