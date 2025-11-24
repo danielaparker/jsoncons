@@ -718,16 +718,23 @@ public:
         if (*data == '-')
         {
             neg = true;
-            data++;
+            ++data;
             --length;
-            if (JSONCONS_UNLIKELY(length == 0))
-            {
-                JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
-            }
         }
         else
         {
             neg = false;
+        }
+
+        return parse(data, length, neg, alloc); 
+    }
+
+    template <typename CharT>
+    static basic_bigint<Allocator> parse(const CharT* data, size_type length, bool neg, const Allocator& alloc = Allocator())
+    {
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
         }
 
         basic_bigint<Allocator> v(0, alloc);
