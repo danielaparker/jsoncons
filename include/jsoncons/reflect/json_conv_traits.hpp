@@ -1344,10 +1344,10 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             switch (j.type())
             {
-                case json_type::string_value:
+                case json_type::string:
                     return jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length());
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                case json_type::int64:
+                case json_type::uint64:
                     return true;
                 default:
                     return false;
@@ -1359,7 +1359,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             switch (j.type())
             {
-                case json_type::string_value:
+                case json_type::string:
                 {
                     auto sv = j.as_string_view();
                     std::error_code ec;
@@ -1371,18 +1371,18 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                     }
                     return result_type(std::move(val));
                 }
-                case json_type::half_value:
-                case json_type::double_value:
+                case json_type::float16:
+                case json_type::float64:
                 {
                     auto res = j.template try_as<int64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
-                case json_type::int64_value:
+                case json_type::int64:
                 {
                     auto res = j.template try_as<int64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);
                 }
-                case json_type::uint64_value:
+                case json_type::uint64:
                 {
                     auto res = j.template try_as<uint64_t>(aset);
                     return res ? result_type(jsoncons::in_place, *res) : result_type(jsoncons::unexpect, conv_errc::not_bigint);

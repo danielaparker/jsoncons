@@ -2527,29 +2527,29 @@ namespace jsonschema {
                 {
                     return "null";
                 }
-                case json_type::bool_value:
+                case json_type::boolean:
                 {
                     return "boolean";
                 }
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                case json_type::int64:
+                case json_type::uint64:
                 {
                     return "integer";
                 }
-                case json_type::half_value:
-                case json_type::double_value:
+                case json_type::float16:
+                case json_type::float64:
                 {
                     return "number";
                 }
-                case json_type::string_value:
+                case json_type::string:
                 {
                     return is_number_tag(tag) ? "number" : "string";
                 }
-                case json_type::array_value:
+                case json_type::array:
                 {
                     return "array";
                 }
-                case json_type::object_value:
+                case json_type::object:
                 {
                     return "object";
                 }

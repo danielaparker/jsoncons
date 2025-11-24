@@ -204,7 +204,7 @@ namespace draft202012 {
 
             switch (sch.type())
             {
-                case json_type::bool_value:
+                case json_type::boolean:
                 {
                     schema_validator_ptr = this->make_boolean_schema(new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -214,7 +214,7 @@ namespace draft202012 {
                     }          
                     break;
                 }
-                case json_type::object_value:
+                case json_type::object:
                 {
                     schema_validator_ptr = make_object_schema_validator(new_context, sch, anchor_dict);
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -395,7 +395,7 @@ namespace draft202012 {
                 if (it != sch.object_range().end()) 
                 {
 
-                    if ((*it).value().type() == json_type::array_value) 
+                    if ((*it).value().type() == json_type::array) 
                     {
                         validators.emplace_back(factory_.make_prefix_items_validator(context, (*it).value(), sch, local_anchor_dict));
                     } 
@@ -405,7 +405,7 @@ namespace draft202012 {
                     it = sch.find("items");
                     if (it != sch.object_range().end()) 
                     {
-                        if ((*it).value().type() == json_type::object_value || (*it).value().type() == json_type::bool_value)
+                        if ((*it).value().type() == json_type::object || (*it).value().type() == json_type::boolean)
                         {
                             validators.emplace_back(factory_.make_items_validator("items", context, (*it).value(), sch, local_anchor_dict));
                         }

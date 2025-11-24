@@ -25,6 +25,16 @@
       is any string value tagged as `bigint`, `bigdec`, `float128`, or `bigfloat`
       (previously only `bigint`.)
 
+    - `basic_json` has a function `type()` that returns a `json_type` enumeration,
+      and the names of its enumerators have been changed. `null_value`, `bool_value`, 
+      `int64_value`, `uint64_value`, `half_value`, `double_value`, `string_value`, 
+      `byte_string_value`, `array_value` and `object_value` have been changed to 
+      `null`, `boolean`, `int64`, `uint64`, `float16`, `float64`, `string`, 
+      `byte_string`, `array` and `object` respectively. It's unlikely that we have
+      many users of `json_type`, it isn't used in any of our examples, but for 
+      backwards compatability the old names, now deprecated, have been typedefed to 
+      the new names. 
+
 - Enhancements
 
     - Git Discussions #594: Updated reflection traits to supports `boost::optional` 

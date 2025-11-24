@@ -274,7 +274,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
-        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::null_type), std::back_inserter(sink_));
+        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::null), std::back_inserter(sink_));
         end_value();
         JSONCONS_VISITOR_RETURN;
     }
