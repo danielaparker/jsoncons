@@ -22,6 +22,45 @@
 
 using namespace jsoncons;
 
+TEST_CASE("cbor_options tests")
+{
+    auto options = cbor::cbor_options{}
+        .max_nesting_depth(2000)
+        .pack_strings(true)
+        .use_typed_arrays(true);
+
+    SECTION("copy constructor")
+    {
+        cbor::cbor_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.pack_strings() == other.pack_strings());
+        CHECK(options.use_typed_arrays() == other.use_typed_arrays());
+    }
+
+    SECTION("assignment")
+    {
+        cbor::cbor_options other;
+        other = options;
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.pack_strings() == other.pack_strings());
+        CHECK(options.use_typed_arrays() == other.use_typed_arrays());
+    }
+
+    SECTION("cbor_decode_options copy constructor")
+    {
+        cbor::cbor_decode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("cbor_encode_options copy constructor")
+    {
+        cbor::cbor_encode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.pack_strings() == other.pack_strings());
+        CHECK(options.use_typed_arrays() == other.use_typed_arrays());
+    }
+}
+
 TEST_CASE("cbor encode multi dim array test")
 {
     std::vector<uint8_t> v;

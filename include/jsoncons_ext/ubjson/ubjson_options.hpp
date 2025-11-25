@@ -18,19 +18,11 @@ class ubjson_options_common
 {
     friend class ubjson_options;
 
-    int max_nesting_depth_;
+    int max_nesting_depth_{1024};
 protected:
-    virtual ~ubjson_options_common() = default;
-
-    ubjson_options_common()
-        : max_nesting_depth_(1024)
-    {
-    }
-
+    ubjson_options_common() = default;
     ubjson_options_common(const ubjson_options_common&) = default;
-    ubjson_options_common& operator=(const ubjson_options_common&) = default;
-    ubjson_options_common(ubjson_options_common&&) = default;
-    ubjson_options_common& operator=(ubjson_options_common&&) = default;
+    virtual ~ubjson_options_common() = default;
 public:
     int max_nesting_depth() const 
     {
@@ -43,12 +35,11 @@ class ubjson_decode_options : public virtual ubjson_options_common
     friend class ubjson_options;
     std::size_t max_items_{1 << 24};
 public:
-    ubjson_decode_options()
-    {
-    }
-    
-    ~ubjson_decode_options() = default;
-
+    ubjson_decode_options() = default;
+    ubjson_decode_options(const ubjson_decode_options& other) = default;
+protected:
+    ubjson_decode_options& operator=(const ubjson_decode_options& other) = default;
+public:
     std::size_t max_items() const
     {
         return max_items_;
@@ -59,15 +50,22 @@ class ubjson_encode_options : public virtual ubjson_options_common
 {
     friend class ubjson_options;
 public:
-    ubjson_encode_options()
-    {
-    }
+    ubjson_encode_options() = default;
+    ubjson_encode_options(const ubjson_encode_options& other) = default;
+protected:
+    ubjson_encode_options& operator=(const ubjson_encode_options& other) = default;
 };
 
 class ubjson_options final : public ubjson_decode_options, public ubjson_encode_options
 {
 public:
     using ubjson_options_common::max_nesting_depth;
+    using ubjson_decode_options::max_items;
+
+    ubjson_options() = default;
+    ubjson_options(const ubjson_options& other) = default;
+
+    ubjson_options& operator=(const ubjson_options& other) = default;
 
     ubjson_options& max_nesting_depth(int value)
     {

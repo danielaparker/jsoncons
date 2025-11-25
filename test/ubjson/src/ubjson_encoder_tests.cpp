@@ -44,6 +44,53 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputon, x)
 
+TEST_CASE("ubjson_options tests")
+{
+    SECTION("copy constructor")
+    {
+        auto options = ubjson::ubjson_options{}
+            .max_nesting_depth(2000)
+            .max_items(10000);
+
+        ubjson::ubjson_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.max_items() == other.max_items());
+    }
+
+    SECTION("assignment")
+    {
+        auto options = ubjson::ubjson_options{}
+            .max_nesting_depth(2000)
+            .max_items(10000);
+
+        ubjson::ubjson_options other;
+        other = options;
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.max_items() == other.max_items());
+    }
+
+    SECTION("ubjson_decode_options copy constructor")
+    {
+        auto options = ubjson::ubjson_options{}
+            .max_nesting_depth(2000)
+            .max_items(10000);
+
+        ubjson::ubjson_decode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+        CHECK(options.max_items() == other.max_items());
+    }
+
+    SECTION("ubjson_encode_options copy constructor")
+    {
+        auto options = ubjson::ubjson_options{}
+            .max_nesting_depth(2000)
+            .max_items(10000);
+
+        ubjson::ubjson_encode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+}
+
 TEST_CASE("serialize array to ubjson")
 {
     std::vector<uint8_t> v;

@@ -20,19 +20,14 @@ class cbor_options_common
 {
     friend class cbor_options;
 
-    int max_nesting_depth_;
+    int max_nesting_depth_{1024};
 protected:
+    cbor_options_common() = default;
+    cbor_options_common(const cbor_options_common&) = default;
     virtual ~cbor_options_common() = default;
 
-    cbor_options_common()
-        : max_nesting_depth_(1024)
-    {
-    }
-
-    cbor_options_common(const cbor_options_common&) = default;
     cbor_options_common& operator=(const cbor_options_common&) = default;
-    cbor_options_common(cbor_options_common&&) = default;
-    cbor_options_common& operator=(cbor_options_common&&) = default;
+
 public:
     int max_nesting_depth() const 
     {
@@ -44,24 +39,24 @@ class cbor_decode_options : public virtual cbor_options_common
 {
     friend class cbor_options;
 public:
-    cbor_decode_options()
-    {
-    }
+    cbor_decode_options() = default;
+    cbor_decode_options(const cbor_decode_options& other) = default;
+protected:
+    cbor_decode_options& operator=(const cbor_decode_options& other) = default;
 };
 
 class cbor_encode_options : public virtual cbor_options_common
 {
     friend class cbor_options;
 
-    bool use_stringref_;
-    bool use_typed_arrays_;
+    bool use_stringref_{false};
+    bool use_typed_arrays_{false};
 public:
-    cbor_encode_options()
-        : use_stringref_(false),
-          use_typed_arrays_(false)
-    {
-    }
-
+    cbor_encode_options() = default;
+    cbor_encode_options(const cbor_encode_options& other) = default;
+protected:
+    cbor_encode_options& operator=(const cbor_encode_options& other) = default;
+public:
     bool pack_strings() const 
     {
         return use_stringref_;
@@ -79,6 +74,10 @@ public:
     using cbor_options_common::max_nesting_depth;
     using cbor_encode_options::pack_strings;
     using cbor_encode_options::use_typed_arrays;
+
+    cbor_options() = default;
+    cbor_options(const cbor_options& other) = default;
+    cbor_options& operator=(const cbor_options& other) = default;
 
     cbor_options& max_nesting_depth(int value)
     {

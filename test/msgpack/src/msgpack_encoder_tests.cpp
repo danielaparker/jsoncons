@@ -18,6 +18,37 @@
 
 using namespace jsoncons;
 
+TEST_CASE("msgpack_options tests")
+{
+    auto options = msgpack::msgpack_options{}
+        .max_nesting_depth(2000);
+
+    SECTION("copy constructor")
+    {
+        msgpack::msgpack_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("assignment")
+    {
+        msgpack::msgpack_options other;
+        other = options;
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("msgpack_decode_options copy constructor")
+    {
+        msgpack::msgpack_decode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("msgpack_encode_options copy constructor")
+    {
+        msgpack::msgpack_encode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+}
+
 TEST_CASE("serialize array to msgpack")
 {
     std::vector<uint8_t> v;

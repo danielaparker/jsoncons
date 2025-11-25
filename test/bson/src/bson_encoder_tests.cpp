@@ -38,6 +38,37 @@ namespace {
     }
 }
 
+TEST_CASE("bson_options tests")
+{
+    auto options = bson::bson_options{}
+        .max_nesting_depth(2000);
+
+    SECTION("copy constructor")
+    {
+        bson::bson_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("assignment")
+    {
+        bson::bson_options other;
+        other = options;
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("bson_decode_options copy constructor")
+    {
+        bson::bson_decode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+
+    SECTION("bson_encode_options copy constructor")
+    {
+        bson::bson_encode_options other(options);
+        CHECK(options.max_nesting_depth() == other.max_nesting_depth());
+    }
+}
+
 TEST_CASE("serialize to bson")
 {
     SECTION("array")
