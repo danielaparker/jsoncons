@@ -983,7 +983,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64:
                 {
-                    bigint n = bigint::parse(sv.data(), sv.length());
+                    bigint n(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1006,7 +1006,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64url:
                 {
-                    bigint n = bigint::parse(sv.data(), sv.length());
+                    bigint n(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1303,7 +1303,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64:
                 {
-                    bigint n = bigint::parse(sv.data(), sv.length());
+                    bigint n(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
@@ -1324,7 +1324,7 @@ namespace detail {
                 }
                 case bignum_format_kind::base64url:
                 {
-                    bigint n = bigint::parse(sv.data(), sv.length());
+                    bigint n(sv.data(), sv.length());
                     bool is_neg = n < 0;
                     if (is_neg)
                     {
