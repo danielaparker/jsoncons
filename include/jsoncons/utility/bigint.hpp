@@ -25,6 +25,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conversion_result.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/utility/read_number.hpp>
 
 namespace jsoncons {
 
@@ -576,6 +577,17 @@ struct to_bigint_result
     }
 };
 
+template <typename Allocator>
+class basic_bigint;
+
+template <typename CharT, typename Allocator>
+utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+    basic_bigint<Allocator>& value, const Allocator& alloc);
+
+template <typename CharT>
+utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+    basic_bigint<std::allocator<uint64_t>>& value);
+
 /*
 This implementation is based on Chapter 2 and Appendix A of
 Ammeraal, L. (1996) Algorithms and Data Structures in C++,
@@ -630,7 +642,22 @@ public:
     basic_bigint(const CharT* s, const Allocator& alloc = Allocator())
         : storage_(alloc)
     {
-        *this = parse(s, std::char_traits<CharT>::length(s), alloc);
+        auto r = jsoncons::to_bigint(s, std::char_traits<CharT>::length(s), *this, alloc);
+        if (r.ec != std::errc{})
+        {
+            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+        }
+    }
+
+    template <typename CharT>
+    basic_bigint(const CharT* s, size_type length, const Allocator& alloc = Allocator())
+        : storage_(alloc)
+    {
+        auto r = jsoncons::to_bigint(s, length, *this, alloc);
+        if (r.ec != std::errc{})
+        {
+            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+        }
     }
 
     basic_bigint(const basic_bigint& other)
@@ -661,9 +688,13 @@ public:
     }
 
     template <typename StringViewLike,typename=typename std::enable_if<ext_traits::is_string_or_string_view<StringViewLike>::value>::type>
-    basic_bigint(const StringViewLike& sv)
+    basic_bigint(const StringViewLike& s)
     {
-        *this = parse(sv.data(), sv.size());
+        auto r = jsoncons::to_bigint(s.data(), s.size(), *this);
+        if (r.ec != std::errc{})
+        {
+            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+        }
     }
 
     ~basic_bigint() noexcept
@@ -697,48 +728,47 @@ public:
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const std::basic_string<CharT>& s)
+    static utility::to_number_result<CharT> parse(const std::basic_string<CharT>& s, basic_bigint<Allocator>& value)
     {
-        return parse(s.data(), s.size());
+        return parse<CharT>(s.data(), s.size(), value);
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* s)
+    static utility::to_number_result<CharT> parse(const CharT* s, basic_bigint<Allocator>& value)
     {
-        return parse(s, std::char_traits<CharT>::length(s));
+        auto r = parse(s, std::char_traits<CharT>::length(s), value);
+        if (r.ec != std::errc{})
+        {
+            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+        }
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* s, std::error_code& ec)
-    {
-        return parse(s, std::char_traits<CharT>::length(s), ec);
-    }
-
-    template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* data, size_type length, const Allocator& alloc = Allocator())
+    static utility::to_number_result<CharT> parse(const CharT* data, size_type length, 
+        basic_bigint<Allocator>& value, const Allocator& alloc = Allocator())
     {
         if (JSONCONS_UNLIKELY(length == 0))
         {
-            JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
+            return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
         }
 
         if (*data == '-')
         {
-            return parse(data+1, length-1, true, alloc); 
+            return parse(data+1, length-1, true, value, alloc); 
         }
         else
         {
-            return parse(data, length, false, alloc); 
+            return parse(data, length, false, value, alloc); 
         }
     }
 
     template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* data, size_type length, 
-        bool neg, const Allocator& alloc = Allocator())
+    static utility::to_number_result<CharT> parse(const CharT* data, size_type length, 
+        bool neg, basic_bigint<Allocator>& value, const Allocator& alloc = Allocator())
     {
         if (JSONCONS_UNLIKELY(length == 0))
         {
-            JSONCONS_THROW(std::runtime_error(std::string("Invalid argument")));
+            return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
         }
 
         const CharT* last = data + length;
@@ -750,7 +780,8 @@ public:
         }
         if (p == last)
         {
-            return basic_bigint{0, alloc};
+            value = std::move(basic_bigint{0, alloc});
+            return utility::to_number_result<CharT>(last, std::errc{});
         }
         size_type num_digits = last - data;
         size_type num_words;
@@ -775,7 +806,7 @@ public:
                     v = (v * 10u) + (word_type)(c - '0');
                     break;
                 default:
-                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
+                    return utility::to_number_result<CharT>(data+i, std::errc::invalid_argument);
             }
         }
 
@@ -790,46 +821,8 @@ public:
             v.set_negative(true);
         }
 
-        return v;
-    }
-
-    template <typename CharT>
-    static basic_bigint<Allocator> parse(const CharT* data, size_type length, std::error_code& ec)
-    {
-        ec.clear();
-        bool neg;
-        if (*data == '-')
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-        else
-        {
-            neg = false;
-        }
-
-        basic_bigint<Allocator> v = 0;
-        for (size_type i = 0; i < length; i++)
-        {
-            CharT c = data[i];
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    v = (v * 10u) + (word_type)(c - '0');
-                    break;
-                default:
-                    ec = std::make_error_code(std::errc::invalid_argument);
-                    return basic_bigint<Allocator>{};
-            }
-        }
-
-        if (neg)
-        {
-            v.set_negative(true);
-        }
-
-        return v;
+        value = std::move(v);
+        return utility::to_number_result<CharT>(last, std::errc{});
     }
 
     template <typename CharT>
@@ -1966,13 +1959,13 @@ private:
     }
 
     template <typename CharT>
-    friend to_bigint_result<CharT> to_bigint(const CharT* s, basic_bigint& val, int radix = 10)
+    friend to_bigint_result<CharT> to_bigint(const CharT* s, basic_bigint& val, int radix)
     {
         return to_bigint(s, std::char_traits<CharT>::length(s), val, radix);
     }
 
     template <typename CharT>
-    friend to_bigint_result<CharT> to_bigint(const CharT* s, size_type length, basic_bigint& val, int radix = 10)
+    friend to_bigint_result<CharT> to_bigint(const CharT* s, size_type length, basic_bigint& val, int radix)
     {
         if (!(radix >= 2 && radix <= 16))
         {
@@ -2075,7 +2068,116 @@ basic_bigint<Allocator> bsqrt(const basic_bigint<Allocator>& a)
     return x < q ? x : q;
 }
 
-using bigint = basic_bigint<std::allocator<uint8_t>>;
+template <typename CharT, typename Allocator>
+utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length, 
+    basic_bigint<Allocator>& value, const Allocator& alloc)
+{
+    if (JSONCONS_UNLIKELY(length == 0))
+    {
+        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+    }
+
+    if (*data == '-')
+    {
+        return to_bigint(data+1, length-1, true, value, alloc); 
+    }
+    else
+    {
+        return to_bigint(data, length, false, value, alloc); 
+    }
+}
+
+template <typename CharT>
+utility::to_number_result<CharT> to_bigint(const CharT* s, basic_bigint<std::allocator<uint64_t>>& value)
+{
+    return to_bigint(s, std::char_traits<CharT>::length(s), value);
+}
+
+template <typename CharT>
+utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+    basic_bigint<std::allocator<uint64_t>>& value)
+{
+    if (JSONCONS_UNLIKELY(length == 0))
+    {
+        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+    }
+
+    if (*data == '-')
+    {
+        return to_bigint(data+1, length-1, true, value, std::allocator<uint64_t>{}); 
+    }
+    else
+    {
+        return to_bigint(data, length, false, value, std::allocator<uint64_t>{}); 
+    }
+}
+
+template <typename CharT, typename Allocator>
+utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+    bool neg, basic_bigint<Allocator>& value, const Allocator& alloc)
+{
+    if (JSONCONS_UNLIKELY(length == 0))
+    {
+        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+    }
+
+    using word_type = typename basic_bigint<Allocator>::word_type;
+
+    const CharT* last = data + length;
+    const CharT* p = data;
+
+    while (p < last && *p == '0')
+    {
+        ++p;
+    }
+    if (p == last)
+    {
+        value = std::move(basic_bigint<Allocator>{0, alloc});
+        return utility::to_number_result<CharT>(last, std::errc{});
+    }
+    std::size_t num_digits = last - data;
+    std::size_t num_words;
+    if (length < 10)
+    {
+        num_words = 1;
+    }
+    else
+    {
+        std::size_t num_bits = (std::size_t)(((num_digits*detail::bits_per_digit[10]) >> 10) + 1);
+        num_words = (num_bits+63) >> 6;
+    }
+
+    basic_bigint<Allocator> v(0, alloc);
+    v.reserve(num_words);
+    for (std::size_t i = 0; i < length; i++)
+    {
+        CharT c = data[i];
+        switch (c)
+        {
+            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                v = (v * 10u) + (word_type)(c - '0');
+                break;
+            default:
+                return utility::to_number_result<CharT>(data+i, std::errc::invalid_argument);
+        }
+    }
+
+    //auto view = v.get_storage_view();
+    //if (num_words != view.size())
+    //{
+    //    std::cout << "Unexpected num_words! num_words: " << num_words << ", " << num_words << ", size: " << view.size() << "\n";
+    //}
+
+    if (neg)
+    {
+        v.set_negative(true);
+    }
+
+    value = std::move(v);
+    return utility::to_number_result<CharT>(last, std::errc{});
+}
+
+using bigint = basic_bigint<std::allocator<uint64_t>>;
 
 } // namespace jsoncons
 

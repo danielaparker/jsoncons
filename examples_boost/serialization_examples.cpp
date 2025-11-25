@@ -343,7 +343,7 @@ void bignum_serialization_examples1()
 {
     std::string s = "-18446744073709551617";
 
-    json j(bigint::parse(s.c_str()));
+    json j(bigint(s.c_str()));
 
     std::cout << "(default) ";
     j.dump(std::cout);

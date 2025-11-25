@@ -568,7 +568,7 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(it2->as<std::vector<uint8_t>>() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
-    CHECK(bool(it2->as<bigint>() == bigint::parse("-18446744073709551617")));
+    CHECK(bool(it2->as<bigint>() == bigint("-18446744073709551617")));
     it2++;
     CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
@@ -652,7 +652,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[0].as<std::string>() == std::string("foo"));
         CHECK(j[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
         CHECK(j[2].as<std::string>() == std::string("-18446744073709551617"));
-        CHECK(bool(j[2].as<jsoncons::bigint>() == jsoncons::bigint::parse("-18446744073709551617")));
+        CHECK(bool(j[2].as<jsoncons::bigint>() == jsoncons::bigint("-18446744073709551617")));
         CHECK(j[3].as<std::string>() == std::string("273.15"));
         CHECK(j[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
         CHECK(j[5].as<int64_t>() == 1431027667);
