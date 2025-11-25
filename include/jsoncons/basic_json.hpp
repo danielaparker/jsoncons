@@ -1440,27 +1440,27 @@ namespace jsoncons {
             switch(storage_kind())
             {
                 case json_storage_kind::null:
-                    return json_type::null_value;
+                    return json_type::null;
                 case json_storage_kind::boolean:
-                    return json_type::bool_value;
+                    return json_type::boolean;
                 case json_storage_kind::int64:
-                    return json_type::int64_value;
+                    return json_type::int64;
                 case json_storage_kind::uint64:
-                    return json_type::uint64_value;
+                    return json_type::uint64;
                 case json_storage_kind::half_float:
-                    return json_type::half_value;
+                    return json_type::float16;
                 case json_storage_kind::float64:
-                    return json_type::double_value;
+                    return json_type::float64;
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
-                    return json_type::string_value;
+                    return json_type::string;
                 case json_storage_kind::byte_str:
-                    return json_type::byte_string_value;
+                    return json_type::byte_string;
                 case json_storage_kind::array:
-                    return json_type::array_value;
+                    return json_type::array;
                 case json_storage_kind::empty_object:
                 case json_storage_kind::object:
-                    return json_type::object_value;
+                    return json_type::object;
                 case json_storage_kind::json_const_ref:
                     return cast<json_const_reference_storage>().value().type();
                 case json_storage_kind::json_ref:
