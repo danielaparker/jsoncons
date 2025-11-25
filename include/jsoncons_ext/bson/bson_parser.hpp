@@ -72,7 +72,7 @@ class basic_bson_parser : public ser_context
     int mark_level_{0};
     
     Source source_;
-    bson_decode_options options_;
+    int max_nesting_depth_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     string_type name_buffer_;
     string_type text_buffer_;
@@ -83,7 +83,7 @@ public:
                       const bson_decode_options& options = bson_decode_options(),
                       const TempAlloc& temp_alloc = TempAlloc())
        : source_(std::forward<Sourceable>(source)), 
-         options_(options),
+         max_nesting_depth_(options.max_nesting_depth()),
          bytes_buffer_(temp_alloc),
          name_buffer_(temp_alloc),
          text_buffer_(temp_alloc),
@@ -248,7 +248,7 @@ private:
 
     void begin_document(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             more_ = false;
@@ -294,7 +294,7 @@ private:
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             more_ = false;

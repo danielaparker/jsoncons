@@ -136,7 +136,7 @@ class basic_cbor_parser : public ser_context
     std::bitset<num_of_tags> other_tags_;
     allocator_type alloc_;
     Source source_;
-    cbor_decode_options options_;
+    int max_nesting_depth_;
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -186,7 +186,7 @@ public:
                       const Allocator& alloc = Allocator())
        : alloc_(alloc),
          source_(std::forward<Sourceable>(source)),
-         options_(options),
+         max_nesting_depth_(options.max_nesting_depth()),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
@@ -657,7 +657,7 @@ private:
 
     void begin_array(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             more_ = false;
@@ -715,7 +715,7 @@ private:
 
     void begin_object(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             more_ = false;

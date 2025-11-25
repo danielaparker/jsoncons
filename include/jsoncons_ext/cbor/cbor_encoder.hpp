@@ -103,7 +103,9 @@ private:
     using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item>;
 
     Sink sink_;
-    const cbor_encode_options options_;
+    int max_nesting_depth_;
+    bool pack_strings_;
+    bool use_typed_arrays_;
     allocator_type alloc_;
 
     std::vector<stack_item,stack_item_allocator_type> stack_;
@@ -126,7 +128,9 @@ public:
                        const cbor_encode_options& options, 
                        const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
-         options_(options), 
+         max_nesting_depth_(options.max_nesting_depth()), 
+         pack_strings_(options.pack_strings()),
+         use_typed_arrays_(options.use_typed_arrays()),
          alloc_(alloc),
          stack_(alloc),
          stringref_map_(alloc),
@@ -259,7 +263,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -272,7 +276,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -347,7 +351,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -359,7 +363,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -459,7 +463,7 @@ private:
             JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));
         }
 
-        if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (pack_strings_ && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             string_type s(sv.data(), sv.size(), alloc_);
             auto it = stringref_map_.find(s);
@@ -998,7 +1002,7 @@ private:
             default:
                 break;
         }
-        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (pack_strings_ && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             byte_string_type bs(b.data(), b.size(), alloc_);
             auto it = bytestringref_map_.find(bs);
@@ -1027,7 +1031,7 @@ private:
                            const ser_context&,
                            std::error_code&) override
     {
-        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (pack_strings_ && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             byte_string_type bs(b.data(), b.size(), alloc_);
             auto it = bytestringref_map_.find(bs);
@@ -1347,7 +1351,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             switch (tag)
             {
@@ -1380,7 +1384,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint16_t(), 
@@ -1409,7 +1413,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint32_t(), 
@@ -1438,7 +1442,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint64_t(), 
@@ -1467,7 +1471,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
@@ -1494,7 +1498,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int16_t(), 
@@ -1523,7 +1527,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int32_t(), 
@@ -1552,7 +1556,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int64_t(), 
@@ -1582,7 +1586,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   half_arg, 
@@ -1611,7 +1615,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   float(), 
@@ -1640,7 +1644,7 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
-        if (options_.use_typed_arrays())
+        if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   double(), 

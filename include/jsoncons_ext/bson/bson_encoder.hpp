@@ -92,7 +92,7 @@ private:
     };
 
     sink_type sink_;
-    const bson_encode_options options_;
+    int max_nesting_depth_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -116,7 +116,7 @@ public:
                                 const bson_encode_options& options, 
                                 const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
-         options_(options),
+         max_nesting_depth_(options.max_nesting_depth()),
          alloc_(alloc)
     {
     }
@@ -152,7 +152,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -196,7 +196,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;

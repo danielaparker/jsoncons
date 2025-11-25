@@ -67,7 +67,8 @@ class basic_ubjson_parser : public ser_context
     int mark_level_{0};
 
     Source source_;
-    ubjson_decode_options options_;
+    int max_nesting_depth_;
+    std::size_t max_items_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
 public:
@@ -76,7 +77,8 @@ public:
                           const ubjson_decode_options& options = ubjson_decode_options(),
                           const Allocator& alloc = Allocator())
        : source_(std::forward<Sourceable>(source)), 
-         options_(options),
+         max_nesting_depth_(options.max_nesting_depth()),
+         max_items_(options.max_items()),
          text_buffer_(alloc),
          state_stack_(alloc)
     {
@@ -205,7 +207,7 @@ public:
                     }
                     else
                     {
-                        if (++state_stack_.back().index > options_.max_items())
+                        if (++state_stack_.back().index > max_items_)
                         {
                             ec = ubjson_errc::max_items_exceeded;
                             more_ = false;
@@ -295,7 +297,7 @@ public:
                     }
                     else
                     {
-                        if (++state_stack_.back().index > options_.max_items())
+                        if (++state_stack_.back().index > max_items_)
                         {
                             ec = ubjson_errc::max_items_exceeded;
                             more_ = false;
@@ -580,7 +582,7 @@ private:
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             more_ = false;
@@ -619,7 +621,7 @@ private:
                 {
                     return;
                 }
-                if (length > options_.max_items())
+                if (length > max_items_)
                 {
                     ec = ubjson_errc::max_items_exceeded;
                     more_ = false;
@@ -644,7 +646,7 @@ private:
             {
                 return;
             }
-            if (length > options_.max_items())
+            if (length > max_items_)
             {
                 ec = ubjson_errc::max_items_exceeded;
                 more_ = false;
@@ -677,7 +679,7 @@ private:
 
     void begin_object(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             more_ = false;
@@ -716,7 +718,7 @@ private:
                 {
                     return;
                 }
-                if (length > options_.max_items())
+                if (length > max_items_)
                 {
                     ec = ubjson_errc::max_items_exceeded;
                     more_ = false;
@@ -750,7 +752,7 @@ private:
                 {
                     return;
                 }
-                if (length > options_.max_items())
+                if (length > max_items_)
                 {
                     ec = ubjson_errc::max_items_exceeded;
                     more_ = false;
