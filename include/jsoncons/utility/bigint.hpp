@@ -57,11 +57,10 @@ public:
     {
         ValueType* data_;
         size_type size_;
-        size_type capacity_;
 
     public:
-        storage_view(ValueType* data, size_type size, size_type capacity)
-            : data_(data), size_(size), capacity_(capacity)
+        storage_view(ValueType* data, size_type size)
+            : data_(data), size_(size)
         {
         }
 
@@ -84,12 +83,6 @@ public:
         {
             return size_;
         }
-
-        size_type capacity() const
-        {
-            return capacity_;
-        }
-
         ValueType* begin()
         {
             return data_;
@@ -511,15 +504,15 @@ public:
     storage_view<word_type> get_storage_view()
     {
         return common_.is_allocated_ ? 
-            storage_view<word_type>{allocated_.data_, allocated_.size_, allocated_.capacity_} :
-            storage_view<word_type>{inlined_.values_, inlined_.size_, inlined_capacity};
+            storage_view<word_type>{allocated_.data_, allocated_.size_} :
+            storage_view<word_type>{inlined_.values_, inlined_.size_};
     }
 
     storage_view<const word_type> get_storage_view() const
     {
         return common_.is_allocated_ ? 
-            storage_view<const word_type>{allocated_.data_, allocated_.size_, allocated_.capacity_} :
-            storage_view<const word_type>{inlined_.values_, inlined_.size_, inlined_capacity};
+            storage_view<const word_type>{allocated_.data_, allocated_.size_} :
+            storage_view<const word_type>{inlined_.values_, inlined_.size_};
     }
 
     void resize(size_type new_length)
