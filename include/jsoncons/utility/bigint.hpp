@@ -23,9 +23,8 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/conversion_result.hpp>
+//#include <jsoncons/conversion_result.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
-#include <jsoncons/utility/read_number.hpp>
 
 namespace jsoncons {
 
@@ -581,11 +580,11 @@ template <typename Allocator>
 class basic_bigint;
 
 template <typename CharT, typename Allocator>
-utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     basic_bigint<Allocator>& value, const Allocator& alloc);
 
 template <typename CharT>
-utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     basic_bigint<std::allocator<uint64_t>>& value);
 
 /*
@@ -728,13 +727,13 @@ public:
     }
 
     template <typename CharT>
-    static utility::to_number_result<CharT> parse(const std::basic_string<CharT>& s, basic_bigint<Allocator>& value)
+    static to_bigint_result<CharT> parse(const std::basic_string<CharT>& s, basic_bigint<Allocator>& value)
     {
         return parse<CharT>(s.data(), s.size(), value);
     }
 
     template <typename CharT>
-    static utility::to_number_result<CharT> parse(const CharT* s, basic_bigint<Allocator>& value)
+    static to_bigint_result<CharT> parse(const CharT* s, basic_bigint<Allocator>& value)
     {
         auto r = parse(s, std::char_traits<CharT>::length(s), value);
         if (r.ec != std::errc{})
@@ -1987,12 +1986,12 @@ basic_bigint<Allocator> bsqrt(const basic_bigint<Allocator>& a)
 }
 
 template <typename CharT, typename Allocator>
-utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length, 
+to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length, 
     basic_bigint<Allocator>& value, const Allocator& alloc)
 {
     if (JSONCONS_UNLIKELY(length == 0))
     {
-        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+        return to_bigint_result<CharT>(data, std::errc::invalid_argument);
     }
 
     if (*data == '-')
@@ -2006,18 +2005,18 @@ utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length
 }
 
 template <typename CharT>
-utility::to_number_result<CharT> to_bigint(const CharT* s, basic_bigint<std::allocator<uint64_t>>& value)
+to_bigint_result<CharT> to_bigint(const CharT* s, basic_bigint<std::allocator<uint64_t>>& value)
 {
     return to_bigint(s, std::char_traits<CharT>::length(s), value);
 }
 
 template <typename CharT>
-utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     basic_bigint<std::allocator<uint64_t>>& value)
 {
     if (JSONCONS_UNLIKELY(length == 0))
     {
-        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+        return to_bigint_result<CharT>(data, std::errc::invalid_argument);
     }
 
     if (*data == '-')
@@ -2031,12 +2030,12 @@ utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length
 }
 
 template <typename CharT, typename Allocator>
-utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length,
+to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     bool neg, basic_bigint<Allocator>& value, const Allocator& alloc)
 {
     if (JSONCONS_UNLIKELY(length == 0))
     {
-        return utility::to_number_result<CharT>(data, std::errc::invalid_argument);
+        return to_bigint_result<CharT>(data, std::errc::invalid_argument);
     }
 
     using word_type = typename basic_bigint<Allocator>::word_type;
@@ -2051,7 +2050,7 @@ utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length
     if (p == last)
     {
         value = std::move(basic_bigint<Allocator>{0, alloc});
-        return utility::to_number_result<CharT>(last, std::errc{});
+        return to_bigint_result<CharT>(last, std::errc{});
     }
     std::size_t num_digits = last - data;
     std::size_t num_words;
@@ -2076,7 +2075,7 @@ utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length
                 v = (v * 10u) + (word_type)(c - '0');
                 break;
             default:
-                return utility::to_number_result<CharT>(data+i, std::errc::invalid_argument);
+                return to_bigint_result<CharT>(data+i, std::errc::invalid_argument);
         }
     }
 
@@ -2092,7 +2091,7 @@ utility::to_number_result<CharT> to_bigint(const CharT* data, std::size_t length
     }
 
     value = std::move(v);
-    return utility::to_number_result<CharT>(last, std::errc{});
+    return to_bigint_result<CharT>(last, std::errc{});
 }
 
 using bigint = basic_bigint<std::allocator<uint64_t>>;
