@@ -46,9 +46,9 @@ public:
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
     using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
+    static constexpr size_type mem_unit = sizeof(word_type);
     static constexpr size_type word_type_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_type_half_bits = word_type_bits/2;
-    static constexpr uint16_t word_length = 8; // Use multiples of word_length words
     static constexpr size_type inlined_capacity = 2;
 public:
 
@@ -277,7 +277,7 @@ public:
         // Find suitable new block size
         constexpr size_type round_up(size_type i) const noexcept
         {
-            return (i / word_length + 1) * word_length;
+            return ((i + 1/3) / mem_unit + 1) * mem_unit;
         }
     };
 
@@ -779,8 +779,7 @@ public:
             }
         }
 
-       // auto view = v.get_storage_view();
-
+        //auto view = v.get_storage_view();
         //if (num_words != view.size())
         //{
         //    std::cout << "Unexpected num_words! num_words: " << num_words << ", " << num_words << ", size: " << view.size() << "\n";
@@ -1948,11 +1947,6 @@ private:
         {
             rem.reduce();
         }
-    }
-
-    size_type round_up(size_type i) const // Find suitable new block size
-    {
-        return (i/word_length + 1) * word_length;
     }
 
     void reduce()
