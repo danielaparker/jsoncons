@@ -495,7 +495,7 @@ Output:
 (2) {"first":1,"second":2}
 ```
 
-### Parse integer with lossless_bignum 
+#### Parse integer with lossless_bignum 
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -534,7 +534,7 @@ Output:
 (2) {"a":1.2345678901234568e+29}
 ```
 
-### Parse floating point with lossless_bignum 
+#### Parse floating point with lossless_bignum 
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -575,3 +575,28 @@ Output:
 (2) inf
 (3) {"a":null}
 ```
+
+#### Indent with tabs
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <cassert>
+
+int main()
+{
+    jsoncons::json j{jsoncons::json_array_arg};
+    j.push_back(jsoncons::json{jsoncons::json_object_arg});
+    j[0]["foo"] = 1;
+
+    auto options = jsoncons::json_options{}
+        .indent_char('\t')
+        .indent_size(1);
+
+    std::string buffer;
+    j.dump_pretty(buffer, options);
+
+    std::string expected = "[\n\t{\n\t\t\"foo\": 1\n\t}\n]";
+    assert(expected == buffer);
+}
+```
+
