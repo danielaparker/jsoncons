@@ -18,7 +18,7 @@ using namespace jsoncons;
 template <typename CharT>
 std::basic_string<CharT> float_to_string(double val, int precision)
 {
-    jsoncons::utility::write_double print(float_chars_format::general,precision);
+    jsoncons::write_double print(float_chars_format::general,precision);
 
     std::basic_string<CharT> s;
     jsoncons::string_sink<std::basic_string<CharT>> writer(s);

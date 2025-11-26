@@ -387,7 +387,7 @@ struct encode_traits<T,
         {
             using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
             std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
-            jsoncons::utility::from_integer((*it).first,s);
+            jsoncons::from_integer((*it).first,s);
             encoder.key(basic_string_view<CharT>(s.data(), s.size()));
             auto r = encode_traits<mapped_type>::try_encode(aset, (*it).second, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}

@@ -15,7 +15,7 @@ using namespace jsoncons;
 
 TEST_CASE("heap_string test")
 {
-    using heap_string_factory_type = jsoncons::utility::heap_string_factory<char, null_type, std::allocator<char>>;
+    using heap_string_factory_type = jsoncons::heap_string_factory<char, null_type, std::allocator<char>>;
     using pointer = typename heap_string_factory_type::pointer;
 
     std::string s("Hello World");
@@ -63,7 +63,7 @@ private:
 
 TEST_CASE("heap_string with polymorphic allocator test")
 {
-    using heap_string_factory_type = jsoncons::utility::heap_string_factory<char, null_type, std::pmr::polymorphic_allocator<char>>;
+    using heap_string_factory_type = jsoncons::heap_string_factory<char, null_type, std::pmr::polymorphic_allocator<char>>;
     using pointer = typename heap_string_factory_type::pointer;
 
     char buffer[1024] = {}; // a small buffer on the stack

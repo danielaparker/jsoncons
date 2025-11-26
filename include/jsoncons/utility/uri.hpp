@@ -710,7 +710,7 @@ namespace jsoncons {
                     auto hex = encoded.substr(i + 1, 2);
 
                     uint8_t n;
-                    jsoncons::utility::hex_to_integer<uint8_t>(hex.data(), hex.size(), n);
+                    jsoncons::hex_to_integer<uint8_t>(hex.data(), hex.size(), n);
                     decoded.push_back((char)n);
                     i += 3;
                 }
@@ -1419,7 +1419,7 @@ namespace jsoncons {
                             {
                                 encoded.push_back('0');
                             }
-                            jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                            jsoncons::integer_to_hex((uint8_t)ch, encoded);
                         }
                         else if (escaped)
                         {
@@ -1452,7 +1452,7 @@ namespace jsoncons {
                         if (!is_unreserved(ch) && !is_punct(ch))
                         {
                             encoded.push_back('%');
-                            jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                            jsoncons::integer_to_hex((uint8_t)ch, encoded);
                         }
                         else
                         {
@@ -1484,7 +1484,7 @@ namespace jsoncons {
                     {
                         encoded.push_back('0');
                     }
-                    jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                    jsoncons::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else if (escaped)
                 {
@@ -1506,7 +1506,7 @@ namespace jsoncons {
                 if (!is_unreserved(ch) && !is_punct(ch))
                 {
                     encoded.push_back('%');
-                    jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                    jsoncons::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else
                 {
@@ -1534,7 +1534,7 @@ namespace jsoncons {
                     {
                         encoded.push_back('0');
                     }
-                    jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                    jsoncons::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else if (escaped)
                 {
@@ -1556,7 +1556,7 @@ namespace jsoncons {
                 if (!is_unreserved(ch) && !is_reserved(ch))
                 {
                     encoded.push_back('%');
-                    jsoncons::utility::integer_to_hex((uint8_t)ch, encoded);
+                    jsoncons::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else
                 {
@@ -1667,7 +1667,7 @@ namespace jsoncons {
         static bool validate_port(string_view port)
         {
             uint16_t p;
-            auto result = jsoncons::utility::to_integer<uint16_t>(port.data(), port.length(), p);
+            auto result = jsoncons::to_integer<uint16_t>(port.data(), port.length(), p);
             return static_cast<bool>(result);
         }
         

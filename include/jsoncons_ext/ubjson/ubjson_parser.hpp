@@ -546,7 +546,7 @@ private:
                     more_ = false;
                     return;
                 }
-                if (jsoncons::utility::is_base10(text_buffer_.data(),text_buffer_.length()))
+                if (jsoncons::is_base10(text_buffer_.data(),text_buffer_.length()))
                 {
                     visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;

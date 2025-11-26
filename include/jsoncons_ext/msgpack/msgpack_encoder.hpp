@@ -302,7 +302,7 @@ namespace msgpack {
                 case semantic_tag::epoch_second:
                 {
                     int64_t seconds;
-                    auto result = jsoncons::utility::to_integer(sv.data(), sv.length(), seconds);
+                    auto result = jsoncons::to_integer(sv.data(), sv.length(), seconds);
                     if (!result)
                     {
                         ec = msgpack_errc::invalid_timestamp;

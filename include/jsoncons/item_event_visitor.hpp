@@ -1237,7 +1237,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
-                jsoncons::utility::from_integer(value,key_);
+                jsoncons::from_integer(value,key_);
             }
 
             if (level_stack_.back().is_key())
@@ -1283,7 +1283,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
-                jsoncons::utility::from_integer(value,key_);
+                jsoncons::from_integer(value,key_);
             }
 
             if (level_stack_.back().is_key())
@@ -1330,7 +1330,7 @@ namespace jsoncons {
             {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
-                jsoncons::utility::write_double f{float_chars_format::general,0};
+                jsoncons::write_double f{float_chars_format::general,0};
                 double x = binary::decode_half(value);
                 f(x, sink);
             }
@@ -1379,7 +1379,7 @@ namespace jsoncons {
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
-                jsoncons::utility::write_double f{float_chars_format::general,0};
+                jsoncons::write_double f{float_chars_format::general,0};
                 f(value, sink);
             }
 

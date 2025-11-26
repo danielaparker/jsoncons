@@ -1426,7 +1426,7 @@ namespace detail {
                                     return path_expression_type(alloc_);
                                 }
                                 int64_t n{0};
-                                auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                 if (!r)
                                 {
                                     ec = jsonpath_errc::invalid_number;
@@ -1451,7 +1451,7 @@ namespace detail {
                                 }
 
                                 int64_t n{0};
-                                auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                 if (!r)
                                 {
                                     ec = jsonpath_errc::invalid_number;
@@ -1476,7 +1476,7 @@ namespace detail {
                                 if (!buffer.empty())
                                 {
                                     int64_t n{0};
-                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
@@ -1504,7 +1504,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t n{0};
-                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                            auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
@@ -1542,7 +1542,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t n{0};
-                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                            auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
@@ -1728,7 +1728,7 @@ namespace detail {
                                 }
                                 
                                 int64_t n{0};
-                                auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                 if (!r)
                                 {
                                     ec = jsonpath_errc::invalid_number;
@@ -1747,7 +1747,7 @@ namespace detail {
                                 if (!buffer.empty())
                                 {
                                     int64_t n{0};
-                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;

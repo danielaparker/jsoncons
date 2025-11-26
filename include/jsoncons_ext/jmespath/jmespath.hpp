@@ -2379,20 +2379,20 @@ namespace detail {
                     {
                         auto sv = arg0.as_string_view();
                         uint64_t uval{ 0 };
-                        auto result1 = jsoncons::utility::to_integer(sv.data(), sv.length(), uval);
+                        auto result1 = jsoncons::to_integer(sv.data(), sv.length(), uval);
                         if (result1)
                         {
                             return *context.create_json(uval);
                         }
                         int64_t sval{ 0 };
-                        auto result2 = jsoncons::utility::to_integer(sv.data(), sv.length(), sval);
+                        auto result2 = jsoncons::to_integer(sv.data(), sv.length(), sval);
                         if (result2)
                         {
                             return *context.create_json(sval);
                         }
                         auto s = arg0.as_string();
                         double d{0};
-                        auto result3 = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), d);
+                        auto result3 = jsoncons::decstr_to_double(s.c_str(), s.length(), d);
                         if (result3)
                         {
                             return *context.create_json(d);
@@ -4508,7 +4508,7 @@ namespace detail {
                                 else
                                 {
                                     int64_t val{ 0 };
-                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
+                                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
@@ -4529,7 +4529,7 @@ namespace detail {
                                 if (!buffer.empty())
                                 {
                                     int64_t val{};
-                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
+                                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
@@ -4554,7 +4554,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t val{ 0 };
-                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
+                            auto r = jsoncons::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
@@ -4590,7 +4590,7 @@ namespace detail {
                         if (!buffer.empty())
                         {
                             int64_t val{ 0 };
-                            auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), val);
+                            auto r = jsoncons::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;

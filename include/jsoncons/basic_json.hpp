@@ -613,7 +613,7 @@ namespace jsoncons {
         // long_string_storage
         struct long_string_storage
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,Allocator>;
+            using heap_string_factory_type = jsoncons::heap_string_factory<char_type,null_type,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -662,7 +662,7 @@ namespace jsoncons {
         // byte_string_storage
         struct byte_string_storage 
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,Allocator>;
+            using heap_string_factory_type = jsoncons::heap_string_factory<uint8_t,uint64_t,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -927,14 +927,14 @@ namespace jsoncons {
 
         typename long_string_storage::pointer create_long_string(const allocator_type& alloc, const char_type* data, std::size_t length)
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,Allocator>;
+            using heap_string_factory_type = jsoncons::heap_string_factory<char_type,null_type,Allocator>;
             return heap_string_factory_type::create(data, length, null_type(), alloc); 
         }
 
         typename byte_string_storage::pointer create_byte_string(const allocator_type& alloc, const uint8_t* data, std::size_t length,
             uint64_t ext_tag)
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,Allocator>;
+            using heap_string_factory_type = jsoncons::heap_string_factory<uint8_t,uint64_t,Allocator>;
             return heap_string_factory_type::create(data, length, ext_tag, alloc); 
         }
         
@@ -2596,7 +2596,7 @@ namespace jsoncons {
                    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::utility::from_integer(val, s);
+            jsoncons::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -2627,7 +2627,7 @@ namespace jsoncons {
                    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::utility::from_integer(val, s);
+            jsoncons::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -2644,7 +2644,7 @@ namespace jsoncons {
                    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::utility::from_integer(val, s);
+            jsoncons::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -3619,7 +3619,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     T val;
-                    auto result = jsoncons::utility::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
                         return result_type(jsoncons::unexpect, conv_errc::not_integer);
@@ -3685,7 +3685,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     T val;
-                    auto result = jsoncons::utility::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::to_integer<T>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3730,7 +3730,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                 {
                     IntegerType val;
-                    auto result = jsoncons::utility::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
+                    auto result = jsoncons::to_integer<IntegerType>(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case json_storage_kind::int64:
@@ -3760,7 +3760,7 @@ namespace jsoncons {
                     std::size_t len = as_string_view().length();
                     if (JSONCONS_UNLIKELY(len > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')))
                     {
-                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        auto result = jsoncons::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_double);
@@ -3768,7 +3768,7 @@ namespace jsoncons {
                     }
                     else if (JSONCONS_UNLIKELY(len > 3 && s[0] == '-' && s[1] == '0' && (s[2] == 'x' || s[2] == 'X')))
                     {
-                        auto result = jsoncons::utility::hexstr_to_double(s, len, x);
+                        auto result = jsoncons::hexstr_to_double(s, len, x);
                         if (result.ec == std::errc::invalid_argument)
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_double);
@@ -3776,7 +3776,7 @@ namespace jsoncons {
                     }
                     else
                     {
-                        auto result = jsoncons::utility::decstr_to_double(as_cstring(), as_string_view().length(), x);
+                        auto result = jsoncons::decstr_to_double(as_cstring(), as_string_view().length(), x);
                         if (result.ec == std::errc::invalid_argument)
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_double);

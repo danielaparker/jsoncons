@@ -292,19 +292,19 @@ public:
             case staj_event_type::uint64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::utility::from_integer(value_.uint64_value_, s);
+                jsoncons::from_integer(value_.uint64_value_, s);
                 return s;
             }
             case staj_event_type::int64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::utility::from_integer(value_.int64_value_, s);
+                jsoncons::from_integer(value_.int64_value_, s);
                 return s;
             }
             case staj_event_type::half_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::utility::write_double f{float_chars_format::general,0};
+                jsoncons::write_double f{float_chars_format::general,0};
                 double x = binary::decode_half(value_.half_value_);
                 f(x, s);
                 return s;
@@ -312,7 +312,7 @@ public:
             case staj_event_type::double_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::utility::write_double f{float_chars_format::general,0};
+                jsoncons::write_double f{float_chars_format::general,0};
                 f(value_.double_value_, s);
                 return s;
             }
@@ -406,7 +406,7 @@ public:
             case staj_event_type::string_value:
             {
                 IntegerType val;
-                auto result = jsoncons::utility::to_integer(value_.string_data_, length_, val);
+                auto result = jsoncons::to_integer(value_.string_data_, length_, val);
                 if (!result)
                 {
                     ec = conv_errc::not_integer;
@@ -460,7 +460,7 @@ private:
             case staj_event_type::string_value:
             {
                 double val{0};
-                jsoncons::utility::decstr_to_double(value_.string_data_, length_, val);
+                jsoncons::decstr_to_double(value_.string_data_, length_, val);
                 return val;
             }
             case staj_event_type::double_value:

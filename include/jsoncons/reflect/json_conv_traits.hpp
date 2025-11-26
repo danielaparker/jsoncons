@@ -1345,7 +1345,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
             switch (j.type())
             {
                 case json_type::string:
-                    return jsoncons::utility::is_base10(j.as_string_view().data(), j.as_string_view().length());
+                    return jsoncons::is_base10(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::int64:
                 case json_type::uint64:
                     return true;
@@ -1728,7 +1728,7 @@ namespace variant_detail
                             return result_type(jsoncons::unexpect, conv_errc::not_epoch);
                         }
                         Rep n{0};
-                        auto result = jsoncons::utility::dec_to_integer((*res).data(), (*res).size(), n);
+                        auto result = jsoncons::dec_to_integer((*res).data(), (*res).size(), n);
                         if (!result)
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_epoch);

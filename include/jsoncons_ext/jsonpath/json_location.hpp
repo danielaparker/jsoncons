@@ -411,7 +411,7 @@ namespace jsonpath {
                                     break;
                                 default:
                                     std::size_t n{0};
-                                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
@@ -510,7 +510,7 @@ namespace jsonpath {
                 else if (state == json_location_state::digit)
                 {
                     std::size_t n{ 0 };
-                    auto r = jsoncons::utility::to_integer(buffer.data(), buffer.size(), n);
+                    auto r = jsoncons::to_integer(buffer.data(), buffer.size(), n);
                     if (!r)
                     {
                         ec = jsonpath_errc::invalid_number;
@@ -879,7 +879,7 @@ namespace jsonpath {
             else
             {
                 buffer.push_back('[');
-                jsoncons::utility::from_integer(element.index(), buffer);
+                jsoncons::from_integer(element.index(), buffer);
                 buffer.push_back(']');
             }
         }

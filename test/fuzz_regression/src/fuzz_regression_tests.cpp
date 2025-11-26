@@ -111,7 +111,7 @@ TEST_CASE("oss-fuzz issues")
     {
         std::string s = "-6.6E6";
         int64_t n{ 0 };
-        auto result = jsoncons::utility::to_integer(s.data(),s.size(), n);
+        auto result = jsoncons::to_integer(s.data(),s.size(), n);
         CHECK_FALSE(result); //-V521
     }
 

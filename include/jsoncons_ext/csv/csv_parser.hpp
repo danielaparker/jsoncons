@@ -2316,7 +2316,7 @@ private:
                 if (is_negative)
                 {
                     int64_t val{ 0 };
-                    auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2331,7 +2331,7 @@ private:
                 else
                 {
                     uint64_t val{ 0 };
-                    auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         visitor.uint64_value(val, semantic_tag::none, *this, ec);
@@ -2362,7 +2362,7 @@ private:
                 else
                 {
                     double d{0};
-                    auto result = jsoncons::utility::decstr_to_double(buffer.c_str(), buffer.length(), d);
+                    auto result = jsoncons::decstr_to_double(buffer.c_str(), buffer.length(), d);
                     if (result.ec == std::errc::result_out_of_range)
                     {
                         d = buffer.front() == '-' ? -HUGE_VAL : HUGE_VAL;

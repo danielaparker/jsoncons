@@ -122,26 +122,26 @@ namespace detail {
 
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(jsoncons::utility::to_hex_character(first >> 12 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(first >> 8 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(first >> 4 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(first & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first & 0x000F));
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(jsoncons::utility::to_hex_character(second >> 12 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(second >> 8 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(second >> 4 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(second & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second & 0x000F));
                                 count += 12;
                             }
                             else
                             {
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(jsoncons::utility::to_hex_character(cp >> 12 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(cp >> 8 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(cp >> 4 & 0x000F));
-                                sink.push_back(jsoncons::utility::to_hex_character(cp & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp & 0x000F));
                                 count += 6;
                             }
                         }
@@ -318,7 +318,7 @@ namespace detail {
         Sink sink_;
         basic_json_encode_options<CharT> options_;
         char_type indent_char_{' '};
-        jsoncons::utility::write_double fp_;
+        jsoncons::write_double fp_;
 
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
         int indent_amount_{0};
@@ -897,7 +897,7 @@ namespace detail {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::utility::from_integer(value, sink_);
+            std::size_t length = jsoncons::from_integer(value, sink_);
             column_ += length;
             end_value();
             JSONCONS_VISITOR_RETURN;
@@ -919,7 +919,7 @@ namespace detail {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::utility::from_integer(value, sink_);
+            std::size_t length = jsoncons::from_integer(value, sink_);
             column_ += length;
             end_value();
             JSONCONS_VISITOR_RETURN;
@@ -1140,7 +1140,7 @@ namespace detail {
 
         Sink sink_;
         basic_json_encode_options<CharT> options_;
-        jsoncons::utility::write_double fp_;
+        jsoncons::write_double fp_;
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
         int nesting_depth_;
     public:
@@ -1546,7 +1546,7 @@ namespace detail {
             {
                 sink_.push_back(',');
             }
-            jsoncons::utility::from_integer(value, sink_);
+            jsoncons::from_integer(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();
@@ -1563,7 +1563,7 @@ namespace detail {
             {
                 sink_.push_back(',');
             }
-            jsoncons::utility::from_integer(value, sink_);
+            jsoncons::from_integer(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();

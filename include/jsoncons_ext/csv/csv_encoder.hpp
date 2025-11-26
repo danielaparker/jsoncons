@@ -127,7 +127,7 @@ private:
     allocator_type alloc_;
 
     std::vector<stack_item, stack_item_allocator_type> stack_;
-    jsoncons::utility::write_double fp_;
+    jsoncons::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_paths_;
@@ -516,7 +516,7 @@ private:
                 {
                     string_type str{alloc_};
                     str.push_back('/');
-                    jsoncons::utility::from_integer(index, str);
+                    jsoncons::from_integer(index, str);
                     column_paths_.emplace_back(str);
                     column_path_value_map_.emplace(str, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(str), item);
@@ -802,7 +802,7 @@ private:
     {
         stack_.back().column_path_ = parent(stack_).column_path_;
         stack_.back().column_path_.push_back('/');
-        jsoncons::utility::from_integer(stack_.back().count_, stack_.back().column_path_);
+        jsoncons::from_integer(stack_.back().count_, stack_.back().column_path_);
         if (stack_[0].count_ == 0)
         {
             if (!has_column_mapping_)
@@ -1385,12 +1385,12 @@ private:
 
     void write_int64_value(int64_t val, string_type& str)
     {
-        jsoncons::utility::from_integer(val,str);
+        jsoncons::from_integer(val,str);
     }
 
     void write_uint64_value(uint64_t val, string_type& str)
     {
-        jsoncons::utility::from_integer(val,str);
+        jsoncons::from_integer(val,str);
     }
 
     void write_bool_value(bool val, string_type& str) 

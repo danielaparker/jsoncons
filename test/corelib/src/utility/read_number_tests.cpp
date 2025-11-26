@@ -8,13 +8,13 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jsoncons::utility::to_integer tests")
+TEST_CASE("jsoncons::to_integer tests")
 {
     SECTION("")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::invalid_argument);
     }
@@ -22,7 +22,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::invalid_argument);
     }
@@ -30,7 +30,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "-9223372036854775808";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::min)());
     }
@@ -38,7 +38,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "9223372036854775807";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::max)());
     }
@@ -46,7 +46,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "18446744073709551615";
         uint64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<uint64_t>::max)());
     }
@@ -54,7 +54,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "-9223372036854775809";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::result_out_of_range);
     }
@@ -62,7 +62,7 @@ TEST_CASE("jsoncons::utility::to_integer tests")
     {
         std::string s = "9223372036854775808";
         int64_t val;
-        auto result = jsoncons::utility::to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::result_out_of_range);
     }
@@ -74,7 +74,7 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::invalid_argument);
     }
@@ -82,7 +82,7 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::invalid_argument);
     }
@@ -90,18 +90,18 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = std::to_string((std::numeric_limits<uint64_t>::max)());
         uint64_t value{ 0 };
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), value);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), value);
         REQUIRE(result);
         CHECK(value == (std::numeric_limits<uint64_t>::max)());
         s.push_back('0');
-        auto result2 = jsoncons::utility::dec_to_integer(s.data(), s.length(), value);
+        auto result2 = jsoncons::dec_to_integer(s.data(), s.length(), value);
         REQUIRE_FALSE(result2);
     }
     SECTION("min int64_t")
     {
         std::string s = "-9223372036854775808";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::min)());
     }
@@ -109,7 +109,7 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = "9223372036854775807";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::max)());
     }
@@ -117,7 +117,7 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = "-9223372036854775809";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::result_out_of_range);
     }
@@ -125,30 +125,30 @@ TEST_CASE("utility::dec_to_integer tests")
     {
         std::string s = "9223372036854775808";
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(s.data(), s.length(), val);
+        auto result = jsoncons::dec_to_integer(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == std::errc::result_out_of_range);
     }
 }
 
-TEST_CASE("jsoncons::utility::decstr_to_double tests")
+TEST_CASE("jsoncons::decstr_to_double tests")
 {
     SECTION("minus overflow")
     {
         std::string s = "-50011731000E95978";
         double val;
-        auto result = jsoncons::utility::decstr_to_double(s.data(), s.length(), val);
+        auto result = jsoncons::decstr_to_double(s.data(), s.length(), val);
         REQUIRE(result.ec == std::errc::result_out_of_range);
-        auto result2 = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), val);
+        auto result2 = jsoncons::decstr_to_double(s.c_str(), s.length(), val);
         REQUIRE(result2.ec == std::errc::result_out_of_range);
     }
     SECTION("overflow")
     {
         std::wstring s = L"50011731000E95978";
         double val;
-        auto result = jsoncons::utility::decstr_to_double(s.data(), s.length(), val);
+        auto result = jsoncons::decstr_to_double(s.data(), s.length(), val);
         REQUIRE(result.ec == std::errc::result_out_of_range);
-        auto result2 = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), val);
+        auto result2 = jsoncons::decstr_to_double(s.c_str(), s.length(), val);
         REQUIRE(result2.ec == std::errc::result_out_of_range);
     }
     SECTION("locale")
@@ -160,22 +160,22 @@ TEST_CASE("jsoncons::utility::decstr_to_double tests")
             std::wstring ws = L"1234.5678";
             
             double val1{0};
-            auto result1 = jsoncons::utility::decstr_to_double(&s[0], s.length(), val1);
+            auto result1 = jsoncons::decstr_to_double(&s[0], s.length(), val1);
             CHECK(result1);
             CHECK(1234.5678 == val1);
 
             double val2{ 0 };
-            auto result2 = jsoncons::utility::decstr_to_double(&ws[0], ws.length(), val2);
+            auto result2 = jsoncons::decstr_to_double(&ws[0], ws.length(), val2);
             CHECK(result2);
             CHECK(1234.5678 == val2);
             
             double val3{0};
-            auto result3 = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), val3);
+            auto result3 = jsoncons::decstr_to_double(s.c_str(), s.length(), val3);
             CHECK(result3);
             CHECK(1234.5678 == val3);
 
             double val4{ 0 };
-            auto result4 = jsoncons::utility::decstr_to_double(ws.c_str(), ws.length(), val4);
+            auto result4 = jsoncons::decstr_to_double(ws.c_str(), ws.length(), val4);
             CHECK(result4);
             CHECK(1234.5678 == val4);
         }

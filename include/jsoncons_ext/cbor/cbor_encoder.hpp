@@ -700,7 +700,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{};
-            auto r = jsoncons::utility::to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -712,7 +712,7 @@ private:
         if (JSONCONS_UNLIKELY(ec)) {return;}
 
         int64_t val{ 0 };
-        auto r = jsoncons::utility::to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);
@@ -875,7 +875,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{ 0 };
-            auto r = jsoncons::utility::hex_to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::hex_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -887,7 +887,7 @@ private:
         if (JSONCONS_UNLIKELY(ec)) return;
 
         int64_t val{ 0 };
-        auto r = jsoncons::utility::hex_to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::hex_to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);

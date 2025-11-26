@@ -23,7 +23,6 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons { 
-namespace utility {
 
 // Inspired by yyjson https://github.com/ibireme/yyjson
 
@@ -747,293 +746,292 @@ hex_to_integer(const CharT* s, std::size_t length, T& n)
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
 
-    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val) 
+inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val) 
+{
+    const char* last = s+length;
+    const auto res = std::from_chars(s, last, val);
+    if (JSONCONS_LIKELY(res.ec == std::errc()))
     {
-        const char* last = s+length;
-        const auto res = std::from_chars(s, last, val);
-        if (JSONCONS_LIKELY(res.ec == std::errc()))
-        {
-            return to_number_result<char>{res.ptr,res.ec};
-        }
-        if (JSONCONS_UNLIKELY(res.ptr != last))
-        {
-            return to_number_result<char>{res.ptr,std::errc::invalid_argument};
-        }
-        if (res.ec == std::errc::result_out_of_range)
-        {
-            bool negative = (s < last && *s == '-') ? true : false;
-            val = negative ? -HUGE_VAL : HUGE_VAL;
-        }
-
         return to_number_result<char>{res.ptr,res.ec};
     }
-
-    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+    if (JSONCONS_UNLIKELY(res.ptr != last))
     {
-        std::string buf(length,'0');
-        for (size_t i = 0; i < length; ++i)
-        {
-            buf[i] = static_cast<char>(s[i]);
-        }
-        
-        const auto res = std::from_chars(buf.data(), buf.data()+length, val);
-        if (JSONCONS_UNLIKELY(res.ptr != (buf.data()+length)))
-        {
-            return to_number_result<wchar_t>{s+(res.ptr-buf.data()),std::errc::invalid_argument};
-        }
-        return to_number_result<wchar_t>{s+length,res.ec};
+        return to_number_result<char>{res.ptr,std::errc::invalid_argument};
     }
+    if (res.ec == std::errc::result_out_of_range)
+    {
+        bool negative = (s < last && *s == '-') ? true : false;
+        val = negative ? -HUGE_VAL : HUGE_VAL;
+    }
+
+    return to_number_result<char>{res.ptr,res.ec};
+}
+
+inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+{
+    std::string buf(length,'0');
+    for (size_t i = 0; i < length; ++i)
+    {
+        buf[i] = static_cast<char>(s[i]);
+    }
+    
+    const auto res = std::from_chars(buf.data(), buf.data()+length, val);
+    if (JSONCONS_UNLIKELY(res.ptr != (buf.data()+length)))
+    {
+        return to_number_result<wchar_t>{s+(res.ptr-buf.data()),std::errc::invalid_argument};
+    }
+    return to_number_result<wchar_t>{s+length,res.ec};
+}
 
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
-    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
+inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
+{
+    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+    const char* cur = s+length;
+    char *end = nullptr;
+    val = _strtod_l(s, &end, locale);
+    if (JSONCONS_UNLIKELY(end != cur))
     {
-        static _locale_t locale = _create_locale(LC_NUMERIC, "C");
-
-        const char* cur = s+length;
-        char *end = nullptr;
-        val = _strtod_l(s, &end, locale);
-        if (JSONCONS_UNLIKELY(end != cur))
-        {
-            return to_number_result<char>{end,std::errc::invalid_argument};
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<char>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<char>{end};
+        return to_number_result<char>{end,std::errc::invalid_argument};
     }
-
-    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
     {
-        static _locale_t locale = _create_locale(LC_NUMERIC, "C");
-
-        const wchar_t* cur = s+length;
-        wchar_t* end = nullptr;
-        val = _wcstod_l(s, &end, locale);
-        if (JSONCONS_UNLIKELY(end != cur))
-        {
-            return to_number_result<wchar_t>{end,std::errc::invalid_argument};
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<wchar_t>{end};
+        return to_number_result<char>{end, std::errc::result_out_of_range};
     }
+    return to_number_result<char>{end};
+}
+
+inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+{
+    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+    const wchar_t* cur = s+length;
+    wchar_t* end = nullptr;
+    val = _wcstod_l(s, &end, locale);
+    if (JSONCONS_UNLIKELY(end != cur))
+    {
+        return to_number_result<wchar_t>{end,std::errc::invalid_argument};
+    }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
+    }
+    return to_number_result<wchar_t>{end};
+}
 
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
-    {
-        locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
+{
+    locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
 
-        const char* cur = s+length;
-        char *end = nullptr;
-        val = strtod_l(s, &end, locale);
+    const char* cur = s+length;
+    char *end = nullptr;
+    val = strtod_l(s, &end, locale);
+    if (JSONCONS_UNLIKELY(end != cur))
+    {
+        return to_number_result<char>{end,std::errc::invalid_argument};
+    }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<char>{end, std::errc::result_out_of_range};
+    }
+    return to_number_result<char>{end};
+}
+
+inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+{
+    locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+
+    const wchar_t* cur = s+length;
+    wchar_t *end = nullptr;
+    val = wcstod_l(s, &end, locale);
+    if (JSONCONS_UNLIKELY(end != cur))
+    {
+        return to_number_result<wchar_t>{end,std::errc::invalid_argument};
+    }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
+    }
+    return to_number_result<wchar_t>{end};
+}
+
+#else
+
+inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
+{
+    const char* cur = s+length;
+    char *end = nullptr;
+    val = strtod(s, &end);
+    const char* str_end = end;
+    if (JSONCONS_UNLIKELY(end < cur))
+    {
+        if (*end == '.')
+        {
+            std::string buf{s, length};
+            char* dot_ptr = &buf[0] + (cur - end - 1);
+            *dot_ptr = ',';
+            end = nullptr;
+            val = strtod(buf.c_str(), &end);
+            str_end = s + (end - &buf[0]);
+        }
+        if (JSONCONS_UNLIKELY(str_end != cur))
+        {
+            return to_number_result<char>{str_end,std::errc::invalid_argument};
+        }
+    }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<char>{str_end, std::errc::result_out_of_range};
+    }
+    return to_number_result<char>{str_end};
+}
+
+inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+{
+    const wchar_t* cur = s+length;
+    wchar_t *end = nullptr;
+    val = wcstod(s, &end);
+    const wchar_t* str_end = end;
+    if (JSONCONS_UNLIKELY(end < cur))
+    {
+        if (*end == '.')
+        {
+            std::wstring buf{s, length};
+            wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
+            *dot_ptr = ',';
+            end = nullptr;
+            val = wcstod(buf.c_str(), &end);
+            str_end = s + (end-&buf[0]);
+        }
+        if (JSONCONS_UNLIKELY(str_end != cur))
+        {
+            return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
+        }
+    }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
+    }
+    return to_number_result<wchar_t>{str_end};
+}
+
+inline to_number_result<char> decstr_to_double(char* s, std::size_t length)
+{
+    char* cur = s+length;
+    char *end = nullptr;
+    double val = strtod(s, &end);
+    if (JSONCONS_UNLIKELY(end < cur))
+    {
+        if (*end == '.')
+        {
+            char* dot_ptr = end;
+            *end = ',';
+            val = strtod(s, &end);
+            *dot_ptr = '.';
+        }
         if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<char>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<char>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<char>{end};
     }
-
-    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
     {
-        locale_t locale = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+        return to_number_result<char>{end, std::errc::result_out_of_range};
+    }
+    return to_number_result<char>{end};
+}
 
-        const wchar_t* cur = s+length;
-        wchar_t *end = nullptr;
-        val = wcstod_l(s, &end, locale);
+inline to_number_result<wchar_t> decstr_to_double(wchar_t* s, std::size_t length)
+{
+    wchar_t* cur = s+length;
+    wchar_t *end = nullptr;
+    double val = wcstod(s, &end);
+    if (JSONCONS_UNLIKELY(end < cur))
+    {
+        if (*end == '.')
+        {
+            wchar_t* dot_ptr = end;
+            *end = ',';
+            val = wcstod(s, &end);
+            *dot_ptr = '.';
+        }
         if (JSONCONS_UNLIKELY(end != cur))
         {
             return to_number_result<wchar_t>{end,std::errc::invalid_argument};
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<wchar_t>{end};
     }
-
-#else
-
-    inline to_number_result<char> decstr_to_double(const char* s, std::size_t length, double& val)
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
     {
-        const char* cur = s+length;
-        char *end = nullptr;
-        val = strtod(s, &end);
-        const char* str_end = end;
-        if (JSONCONS_UNLIKELY(end < cur))
-        {
-            if (*end == '.')
-            {
-                std::string buf{s, length};
-                char* dot_ptr = &buf[0] + (cur - end - 1);
-                *dot_ptr = ',';
-                end = nullptr;
-                val = strtod(buf.c_str(), &end);
-                str_end = s + (end - &buf[0]);
-            }
-            if (JSONCONS_UNLIKELY(str_end != cur))
-            {
-                return to_number_result<char>{str_end,std::errc::invalid_argument};
-            }
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<char>{str_end, std::errc::result_out_of_range};
-        }
-        return to_number_result<char>{str_end};
+        return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
     }
-
-    inline to_number_result<wchar_t> decstr_to_double(const wchar_t* s, std::size_t length, double& val)
-    {
-        const wchar_t* cur = s+length;
-        wchar_t *end = nullptr;
-        val = wcstod(s, &end);
-        const wchar_t* str_end = end;
-        if (JSONCONS_UNLIKELY(end < cur))
-        {
-            if (*end == '.')
-            {
-                std::wstring buf{s, length};
-                wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
-                *dot_ptr = ',';
-                end = nullptr;
-                val = wcstod(buf.c_str(), &end);
-                str_end = s + (end-&buf[0]);
-            }
-            if (JSONCONS_UNLIKELY(str_end != cur))
-            {
-                return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
-            }
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
-        }
-        return to_number_result<wchar_t>{str_end};
-    }
-    
-    inline to_number_result<char> decstr_to_double(char* s, std::size_t length)
-    {
-        char* cur = s+length;
-        char *end = nullptr;
-        double val = strtod(s, &end);
-        if (JSONCONS_UNLIKELY(end < cur))
-        {
-            if (*end == '.')
-            {
-                char* dot_ptr = end;
-                *end = ',';
-                val = strtod(s, &end);
-                *dot_ptr = '.';
-            }
-            if (JSONCONS_UNLIKELY(end != cur))
-            {
-                return to_number_result<char>{end,std::errc::invalid_argument};
-            }
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<char>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<char>{end};
-    }
-
-    inline to_number_result<wchar_t> decstr_to_double(wchar_t* s, std::size_t length)
-    {
-        wchar_t* cur = s+length;
-        wchar_t *end = nullptr;
-        double val = wcstod(s, &end);
-        if (JSONCONS_UNLIKELY(end < cur))
-        {
-            if (*end == '.')
-            {
-                wchar_t* dot_ptr = end;
-                *end = ',';
-                val = wcstod(s, &end);
-                *dot_ptr = '.';
-            }
-            if (JSONCONS_UNLIKELY(end != cur))
-            {
-                return to_number_result<wchar_t>{end,std::errc::invalid_argument};
-            }
-        }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
-        {
-            return to_number_result<wchar_t>{end, std::errc::result_out_of_range};
-        }
-        return to_number_result<wchar_t>{end};
-    }
+    return to_number_result<wchar_t>{end};
+}
 
 #endif
 
-    inline to_number_result<char> hexstr_to_double(const char* s, std::size_t length, double& val)
+inline to_number_result<char> hexstr_to_double(const char* s, std::size_t length, double& val)
+{
+    const char* cur = s+length;
+    char *end = nullptr;
+    val = strtod(s, &end);
+    const char* str_end = end;
+    if (JSONCONS_UNLIKELY(end < cur))
     {
-        const char* cur = s+length;
-        char *end = nullptr;
-        val = strtod(s, &end);
-        const char* str_end = end;
-        if (JSONCONS_UNLIKELY(end < cur))
+        if (*end == '.')
         {
-            if (*end == '.')
-            {
-                std::string buf{s, length};
-                char* dot_ptr = &buf[0] + (cur - end - 1);
-                *dot_ptr = ',';
-                end = nullptr;
-                val = strtod(buf.c_str(), &end);
-                str_end = s + (end - &buf[0]);
-            }
-            if (JSONCONS_UNLIKELY(str_end != cur))
-            {
-                return to_number_result<char>{str_end,std::errc::invalid_argument};
-            }
+            std::string buf{s, length};
+            char* dot_ptr = &buf[0] + (cur - end - 1);
+            *dot_ptr = ',';
+            end = nullptr;
+            val = strtod(buf.c_str(), &end);
+            str_end = s + (end - &buf[0]);
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+        if (JSONCONS_UNLIKELY(str_end != cur))
         {
-            return to_number_result<char>{str_end, std::errc::result_out_of_range};
+            return to_number_result<char>{str_end,std::errc::invalid_argument};
         }
-        return to_number_result<char>{str_end};
     }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<char>{str_end, std::errc::result_out_of_range};
+    }
+    return to_number_result<char>{str_end};
+}
 
-    inline to_number_result<wchar_t> hexstr_to_double(const wchar_t* s, std::size_t length, double& val)
+inline to_number_result<wchar_t> hexstr_to_double(const wchar_t* s, std::size_t length, double& val)
+{
+    const wchar_t* cur = s+length;
+    wchar_t *end = nullptr;
+    val = wcstod(s, &end);
+    const wchar_t* str_end = end;
+    if (JSONCONS_UNLIKELY(end < cur))
     {
-        const wchar_t* cur = s+length;
-        wchar_t *end = nullptr;
-        val = wcstod(s, &end);
-        const wchar_t* str_end = end;
-        if (JSONCONS_UNLIKELY(end < cur))
+        if (*end == '.')
         {
-            if (*end == '.')
-            {
-                std::wstring buf{s, length};
-                wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
-                *dot_ptr = ',';
-                end = nullptr;
-                val = wcstod(buf.c_str(), &end);
-                str_end = s + (end-&buf[0]);
-            }
-            if (JSONCONS_UNLIKELY(str_end != cur))
-            {
-                return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
-            }
+            std::wstring buf{s, length};
+            wchar_t* dot_ptr = &buf[0] + (cur - end - 1);
+            *dot_ptr = ',';
+            end = nullptr;
+            val = wcstod(buf.c_str(), &end);
+            str_end = s + (end-&buf[0]);
         }
-        if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+        if (JSONCONS_UNLIKELY(str_end != cur))
         {
-            return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
+            return to_number_result<wchar_t>{str_end,std::errc::invalid_argument};
         }
-        return to_number_result<wchar_t>{str_end};
     }
+    if (JSONCONS_UNLIKELY(val <= -HUGE_VAL || val >= HUGE_VAL))
+    {
+        return to_number_result<wchar_t>{str_end, std::errc::result_out_of_range};
+    }
+    return to_number_result<wchar_t>{str_end};
+}
         
-} // namespace utility
 } // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_READ_NUMBER_HPP

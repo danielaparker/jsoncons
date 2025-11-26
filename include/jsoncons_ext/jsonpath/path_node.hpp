@@ -297,7 +297,7 @@ namespace jsonpath {
                     break;
                 case path_node_kind::index:
                     buffer.push_back('[');
-                    jsoncons::utility::from_integer(node->index(), buffer);
+                    jsoncons::from_integer(node->index(), buffer);
                     buffer.push_back(']');
                     break;
             }

@@ -691,7 +691,7 @@ struct decode_traits<T,
                 return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
             }
             key_type n{0};
-            auto r = jsoncons::utility::to_integer(s.data(), s.size(), n); 
+            auto r = jsoncons::to_integer(s.data(), s.size(), n); 
             if (r.ec != std::errc{})
             {
                 return result_type{jsoncons::unexpect, json_errc::invalid_number, cursor.line(), cursor.column()}; 

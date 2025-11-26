@@ -1567,20 +1567,20 @@ namespace detail {
                 {
                     auto sv = arg0.as_string_view();
                     uint64_t un{0};
-                    auto result1 = jsoncons::utility::to_integer(sv.data(), sv.length(), un);
+                    auto result1 = jsoncons::to_integer(sv.data(), sv.length(), un);
                     if (result1)
                     {
                         return value_type(un, semantic_tag::none);
                     }
                     int64_t sn{0};
-                    auto result2 = jsoncons::utility::to_integer(sv.data(), sv.length(), sn);
+                    auto result2 = jsoncons::to_integer(sv.data(), sv.length(), sn);
                     if (result2)
                     {
                         return value_type(sn, semantic_tag::none);
                     }
                     auto s = arg0.as_string();
                     double d;
-                    auto result = jsoncons::utility::decstr_to_double(s.c_str(), s.length(), d);
+                    auto result = jsoncons::decstr_to_double(s.c_str(), s.length(), d);
                     if (result.ec == std::errc::invalid_argument)
                     {
                         return value_type::null();

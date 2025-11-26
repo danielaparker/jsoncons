@@ -263,7 +263,7 @@ namespace jsonpointer {
         append(IntegerType val)
         {
             string_type s;
-            jsoncons::utility::from_integer(val, s);
+            jsoncons::from_integer(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -280,7 +280,7 @@ namespace jsonpointer {
         operator/=(IntegerType val)
         {
             string_type s;
-            jsoncons::utility::from_integer(val, s);
+            jsoncons::from_integer(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -442,7 +442,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
             if (!result)
             {
                 ec = jsonpointer_errc::invalid_index;
@@ -483,7 +483,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
             if (!result)
             {
                 ec = jsonpointer_errc::invalid_index;
@@ -733,7 +733,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -874,7 +874,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1019,7 +1019,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1128,7 +1128,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{};
-                auto result = jsoncons::utility::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1283,7 +1283,7 @@ namespace jsonpointer {
                     {
                         string_type key(parent_key);
                         key.push_back('/');
-                        jsoncons::utility::from_integer(i,key);
+                        jsoncons::from_integer(i,key);
                         flatten_(key, parent_value.at(i), result);
                     }
                 }
@@ -1421,7 +1421,7 @@ namespace jsonpointer {
             auto jt = it->first.tokens().begin() + offset;
             const auto& s = *jt;
             std::size_t n;
-            auto r = jsoncons::utility::dec_to_integer(s.data(), s.size(), n);
+            auto r = jsoncons::dec_to_integer(s.data(), s.size(), n);
             if (r.ec != std::errc{})
             {
                 return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});

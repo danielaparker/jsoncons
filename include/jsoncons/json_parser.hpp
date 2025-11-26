@@ -1751,7 +1751,7 @@ minus_sign:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::utility::is_nonzero_digit(*cur))
+        if (jsoncons::is_nonzero_digit(*cur))
         {
             ++cur;
             goto integer;
@@ -1779,12 +1779,12 @@ zero:
             ++cur;
             goto fraction1;
         }
-        if (jsoncons::utility::is_exp(*cur))
+        if (jsoncons::is_exp(*cur))
         {
             ++cur;
             goto exp1;
         }
-        if (jsoncons::utility::is_digit(*cur))
+        if (jsoncons::is_digit(*cur))
         {
             err_handler_(json_errc::leading_zero, *this);
             ec = json_errc::leading_zero;
@@ -1808,7 +1808,7 @@ integer:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::utility::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
             {
                 break;
             }
@@ -1819,7 +1819,7 @@ integer:
             ++cur;
             goto fraction1;
         }
-        if (jsoncons::utility::is_exp(*cur))
+        if (jsoncons::is_exp(*cur))
         {
             ++cur;
             goto exp1;
@@ -1836,7 +1836,7 @@ fraction1:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::utility::is_digit(*cur))
+        if (jsoncons::is_digit(*cur))
         {
             ++cur;
             goto fraction2;
@@ -1857,13 +1857,13 @@ fraction2:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::utility::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
             {
                 break;
             }
             ++cur;
         }
-        if (jsoncons::utility::is_exp(*cur))
+        if (jsoncons::is_exp(*cur))
         {
             ++cur;
             goto exp1;
@@ -1885,7 +1885,7 @@ exp1:
             ++cur;
             goto exp2;
         }
-        if (jsoncons::utility::is_digit(*cur))
+        if (jsoncons::is_digit(*cur))
         {
             ++cur;
             goto exp3;
@@ -1908,7 +1908,7 @@ exp2:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::utility::is_digit(*cur))
+        if (jsoncons::is_digit(*cur))
         {
             ++cur;
             goto exp3;
@@ -1929,7 +1929,7 @@ exp3:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::utility::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
             {
                 break;
             }
@@ -2458,7 +2458,7 @@ private:
     void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         int64_t val;
-        auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
+        auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
             visitor.int64_value(val, semantic_tag::none, *this, ec);
@@ -2472,7 +2472,7 @@ private:
             else
             {
                 double d{0};
-                result = jsoncons::utility::decstr_to_double(&buffer_[0], buffer_.length(), d);
+                result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
                 if (JSONCONS_LIKELY(result))
                 {
                     visitor.double_value(d, semantic_tag::none, *this, ec);
@@ -2497,7 +2497,7 @@ private:
     void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         uint64_t val;
-        auto result = jsoncons::utility::dec_to_integer(buffer_.data(), buffer_.length(), val);
+        auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
             visitor.uint64_value(val, semantic_tag::none, *this, ec);
@@ -2511,7 +2511,7 @@ private:
             else
             {
                 double d{0};
-                result = jsoncons::utility::decstr_to_double(&buffer_[0], buffer_.length(), d);
+                result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
                 if (JSONCONS_LIKELY(result))
                 {
                     visitor.double_value(d, semantic_tag::none, *this, ec);
@@ -2541,7 +2541,7 @@ private:
         else
         {
             double d{0};
-            auto result = jsoncons::utility::decstr_to_double(&buffer_[0], buffer_.length(), d);
+            auto result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
             if (JSONCONS_LIKELY(result))
             {
                 visitor.double_value(d, semantic_tag::none, *this, ec);

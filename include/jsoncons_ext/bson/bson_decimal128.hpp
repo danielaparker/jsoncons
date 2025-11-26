@@ -494,7 +494,7 @@ namespace bson {
            if (scientific_exponent >= 0) {
                s.push_back('+');
            }
-           jsoncons::utility::from_integer(scientific_exponent, s);
+           jsoncons::from_integer(scientific_exponent, s);
            if (str_out + s.size() < last) 
            {
                std::memcpy(str_out, s.data(), s.size());
@@ -677,7 +677,7 @@ namespace bson {
            if (*str_read == '+') {
                ++str_read;
            }
-           auto result = jsoncons::utility::to_integer(str_read, last - str_read, exponent);
+           auto result = jsoncons::to_integer(str_read, last - str_read, exponent);
            if (result.ec != std::errc{}) 
            {
                dec = decimal128_limits::nan();
