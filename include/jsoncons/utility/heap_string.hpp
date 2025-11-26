@@ -16,6 +16,7 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
+namespace heap {
 
 inline char*
 align_up(char* ptr, std::size_t alignment) noexcept
@@ -181,6 +182,7 @@ public:
     }
 };
 
+} // namespace heap
 } // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_HEAP_STRING_HPP

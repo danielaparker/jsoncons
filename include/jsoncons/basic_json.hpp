@@ -613,7 +613,7 @@ namespace jsoncons {
         // long_string_storage
         struct long_string_storage
         {
-            using heap_string_factory_type = jsoncons::heap_string_factory<char_type,null_type,Allocator>;
+            using heap_string_factory_type = jsoncons::heap::heap_string_factory<char_type,null_type,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -662,7 +662,7 @@ namespace jsoncons {
         // byte_string_storage
         struct byte_string_storage 
         {
-            using heap_string_factory_type = jsoncons::heap_string_factory<uint8_t,uint64_t,Allocator>;
+            using heap_string_factory_type = jsoncons::heap::heap_string_factory<uint8_t,uint64_t,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -927,14 +927,14 @@ namespace jsoncons {
 
         typename long_string_storage::pointer create_long_string(const allocator_type& alloc, const char_type* data, std::size_t length)
         {
-            using heap_string_factory_type = jsoncons::heap_string_factory<char_type,null_type,Allocator>;
+            using heap_string_factory_type = jsoncons::heap::heap_string_factory<char_type,null_type,Allocator>;
             return heap_string_factory_type::create(data, length, null_type(), alloc); 
         }
 
         typename byte_string_storage::pointer create_byte_string(const allocator_type& alloc, const uint8_t* data, std::size_t length,
             uint64_t ext_tag)
         {
-            using heap_string_factory_type = jsoncons::heap_string_factory<uint8_t,uint64_t,Allocator>;
+            using heap_string_factory_type = jsoncons::heap::heap_string_factory<uint8_t,uint64_t,Allocator>;
             return heap_string_factory_type::create(data, length, ext_tag, alloc); 
         }
         
