@@ -774,8 +774,8 @@ namespace impl {
                                  std::is_same<typename std::decay<typename T::value_type>::type,int16_t>::value ||
                                  std::is_same<typename std::decay<typename T::value_type>::type,int32_t>::value ||
                                  std::is_same<typename std::decay<typename T::value_type>::type,int64_t>::value ||
-                                 std::is_same<typename std::decay<typename T::value_type>::type,float_t>::value ||
-                                 std::is_same<typename std::decay<typename T::value_type>::type,double_t>::value)>::type
+                                 std::is_same<typename std::decay<typename T::value_type>::type,float>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,double>::value)>::type
     > : std::true_type{};
 
 } // namespace impl
