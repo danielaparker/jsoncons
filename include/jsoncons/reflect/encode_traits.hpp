@@ -301,6 +301,7 @@ struct encode_traits<T,
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
+        std::cout << "encode_traits::try_encode is_array_like: " << ext_traits::is_array_like<T>::value << ", is_typed_array: " << ext_traits::is_typed_array<T>::value << "\n";
         std::error_code ec;
         encoder.typed_array(jsoncons::span<const value_type>(val), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}

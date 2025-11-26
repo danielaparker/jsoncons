@@ -41,8 +41,13 @@ template <typename T,typename ByteContainer>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
     ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
 try_encode_cbor(const T& val, ByteContainer& cont, 
-            const cbor_encode_options& options = cbor_encode_options())
+    const cbor_encode_options& options = cbor_encode_options())
 {
+    std::cout << "try_encode_cbor cbor_encode_options::use_typed_arrays: " 
+        << options.use_typed_arrays() 
+        << ", is_array_like: " << ext_traits::is_array_like<T>::value
+        << ", is_typed_array: " << ext_traits::is_typed_array<T>::value
+        << "\n";
     basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
     return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
 }

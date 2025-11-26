@@ -119,14 +119,11 @@ public:
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
     basic_cbor_encoder(basic_cbor_encoder&&) = delete;
 
-    explicit basic_cbor_encoder(Sink&& sink, 
-                                const Allocator& alloc = Allocator())
+    explicit basic_cbor_encoder(Sink&& sink, const Allocator& alloc = Allocator())
        : basic_cbor_encoder(std::forward<Sink>(sink), cbor_encode_options(), alloc)
     {
     }
-    basic_cbor_encoder(Sink&& sink, 
-                       const cbor_encode_options& options, 
-                       const Allocator& alloc = Allocator())
+    basic_cbor_encoder(Sink&& sink, const cbor_encode_options& options, const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
          max_nesting_depth_(options.max_nesting_depth()), 
          pack_strings_(options.pack_strings()),
@@ -136,6 +133,7 @@ public:
          stringref_map_(alloc),
          bytestringref_map_(alloc)
     {
+        std::cout << "basic_cbor_encoder::use_typed_arrays: " << use_typed_arrays_ << "\n";
         if (options.pack_strings())
         {
             write_tag(256);
@@ -1644,17 +1642,18 @@ private:
         const ser_context& context, 
         std::error_code& ec) override
     {
+        std::cout << "visit_typed_array use_typed_arrays: " << use_typed_arrays_ << "\n";
         if (use_typed_arrays_)
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
-                                  double(), 
-                                  tag);
+                double(), tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(double));
             write_byte_string(byte_string_view(v));
             JSONCONS_VISITOR_RETURN;
         }
-        
+        std::cout << "visit_typed_array: don't use_typed_arrays\n";
+
         this->begin_array(data.size(), semantic_tag::none,context, ec);
         if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN;}
         for (auto p = data.begin(); p != data.end(); ++p)
@@ -1812,16 +1811,14 @@ private:
         write_tag(0x55);  // little endian
     }
 
-    void write_typed_array_tag(std::true_type, 
-                               double,
-                               semantic_tag)
+    void write_typed_array_tag(std::true_type, double, semantic_tag)
     {
+        std::cout << "write_typed_array_tag 0x52\n"; 
         write_tag(0x52); // big endian
     }
-    void write_typed_array_tag(std::false_type,
-                               double,
-                               semantic_tag)
+    void write_typed_array_tag(std::false_type, double, semantic_tag)
     {
+        std::cout << "write_typed_array_tag 0x56\n"; 
         write_tag(0x56);  // little endian
     }
 
