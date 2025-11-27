@@ -30,7 +30,7 @@ allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |**true
 allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |**false**|(since 1.3.0)
 err_handler|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`|(since 0.171.0, deprecated in 1.5.0)
 indent_size| |The indent size|**4**|
-indent_char| |The indent character, e.g. '\t'|' '| (since 1.5)
+indent_char| |The indent character, e.g. '\t'|**' '**| (since 1.5)
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`).|space after|
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after|
 pad_inside_object_braces| |Pad inside object braces|**false**|
@@ -46,8 +46,8 @@ new_line_chars| |New line characters|"\n"|
 line_length_limit| |Line length limit|120|
 object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 array_object_line_splits| |For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
-object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::same_line](line_split_kind.md)|
-array_array_line_splits| |For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::new_line](line_split_kind.md)|
+object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
+array_array_line_splits| |For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
