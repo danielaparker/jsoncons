@@ -76,7 +76,7 @@ Member type                         |Definition
 #### Constructors
 
     basic_json_options()
-Constructs a `basic_json_options` with default values. 
+Default constructor. 
 
     basic_json_options(const basic_json_options& other)
 Copy constructor. 
@@ -84,106 +84,50 @@ Copy constructor.
     basic_json_options(basic_json_options&& other)
 Move constructor. 
 
-#### Modifiers
+#### Setters
 
-    void max_nesting_depth(int depth)
-The maximum nesting depth allowed when decoding and encoding JSON. 
-Default is 1024. Parsing can have an arbitrarily large depth
-limited only by available memory. Serializing a [basic_json](basic_json.md) to
-JSON is limited by stack size.
-
+    basic_json_options& max_nesting_depth(int depth)
     basic_json_options& decode_escaped_unicode(bool value); 
-Indicates whether to interpret escaped unicode in JSON strings. Defaults to true. 
-
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
-Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
-to be used when reading JSON.
-
     basic_json_options& inf_to_str(const string_type& value, bool enable_inverse = true); 
-Sets a string replacement for infinity when writing JSON, and indicate whether it is also
-to be used when reading JSON.
-
     basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); 
-Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
-to be used when reading JSON.
-
     basic_json_options& nan_to_num(const string_type& value); 
-Sets a number replacement for `NaN` when writing JSON
-
     basic_json_options& inf_to_num(const string_type& value); 
-Sets a number replacement for `Infinity` when writing JSON
-
     basic_json_options& neginf_to_num(const string_type& value); 
-Sets a number replacement for `Negative Infinity` when writing JSON
-
     basic_json_options& lossless_number(bool value); 
-If set to **true**, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
-Defaults to **false**.
-
     basic_json_options& allow_comments(bool value); 
-If set to **true**, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
-Defaults to **true**.
-
     basic_json_options& allow_trailing_comma(bool value); 
-If set to **true**, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
-Defaults to **false**.
-
     basic_json_options& indent_size(uint8_t value)
-The indent size, the default is 4.
-
     basic_json_options& spaces_around_colon(spaces_option value)
-Indicates [space option](spaces_option.md) for name separator (`:`). Default
-is space after.
-
     basic_json_options& spaces_around_comma(spaces_option value)
-Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default
-is space after.
-
     basic_json_options& pad_inside_object_braces(bool value)
-Default is **false**
-
     basic_json_options& pad_inside_array_brackets(bool value)
-Default is **false**
-
     basic_json_options& bignum_format(bignum_format_kind value)
-Overrides [bignum format](bignum_format_kind.md) when serializing json.
-The default is [bignum_format_kind::base10](bignum_format_kind.md). 
-
     basic_json_options& byte_string_format(byte_string_chars_format value)
-Overrides [byte string format](byte_string_chars_format.md) when serializing json.
-The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
-
     basic_json_options& float_format(float_chars_format value);
-Overrides [floating point format](float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
-
     basic_json_options& precision(int8_t value)
-Overrides floating point precision when serializing json. 
-The default is shortest representation.
-
     basic_json_options& escape_all_non_ascii(bool value)
-Escape all non-ascii characters. The default is **false**.
-
     basic_json_options& escape_solidus(bool value)
-Escape the solidus ('/') character. The default is **false**.
-
     basic_json_options& new_line_chars(const string_type& value)
-Defaults to "\n"
-
     basic_json_options& line_length_limit(std::size_t value)
-
     basic_json_options& object_object_line_splits(line_split_kind value)
-For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
-
     basic_json_options& array_object_line_splits(line_split_kind value)
-For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
-
     basic_json_options& object_array_line_splits(line_split_kind value)
-For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
-
     basic_json_options& array_array_line_splits(line_split_kind value)
-For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
 ### Examples
+
+[Default NaN and inf replacement](#E1)
+[User specified `Nan` and `Inf` replacement](#E2)
+[Decimal precision](#E3)
+[Parse integer with lossless_bignum](#E4) 
+[Parse floating point with lossless_bignum](#E5) 
+[Object-array block formatting](#E6)
+[Array-array block formatting](#E7)
+[Indent with tabs](#E8)
+[Allow trailing commas](#E9)
+
+<div id="E1"/> 
 
 #### Default NaN and inf replacement
 ```cpp
@@ -197,6 +141,9 @@ Output:
 ```json
 {"field1":null,"field2":null,"field3":null}
 ```
+
+<div id="E2"/> 
+
 #### User specified `Nan` and `Inf` replacement
 
 ```cpp
@@ -220,6 +167,55 @@ Output:
         "field3":-1e9999
     }
 ```
+
+Multi line
+
+```json
+{
+    "data": {
+        "id": [
+            0,1,2,3,4,5,6,7
+        ],
+        "item": [
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                4
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                3
+            ]
+        ]
+    }
+}
+```
+
+<div id="E3"/> 
 
 #### Decimal precision
 
@@ -268,6 +264,93 @@ Output:
 (3) a: 12.00, b: 1.23456789012345678901234567890
 (4) a: 12, b: 1.23456789012346
 ```
+
+<div id="E4"/> 
+
+#### Parse integer with lossless_bignum 
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    try
+    {
+        std::string str = R"({"a":123456789012345678901234567890})";
+
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(true);  // default
+
+        auto j1 = jsoncons::json::parse(str, options);
+        std::string buffer1;
+        j1.dump(buffer1);
+        std::cout << "(1) " << buffer1 << "\n";
+
+        options.lossless_bignum(false);
+        auto j2 = jsoncons::json::parse(str, options);
+        std::string buffer2;
+        j2.dump(buffer2);
+        std::cout << "(2) " << buffer2 << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+
+Output:
+```
+(1) {"a":123456789012345678901234567890}
+(2) {"a":1.2345678901234568e+29}
+```
+
+<div id="E5"/> 
+
+#### Parse floating point with lossless_bignum 
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    try
+    {
+        std::string str = R"({"a":1.5e999})";
+
+        auto options = jsoncons::json_options{}
+            .lossless_bignum(true);  // default
+
+        auto j1 = jsoncons::json::parse(str, options);
+        std::string buffer1;
+        j1.dump(buffer1);
+        std::cout << "(1) " << buffer1 << "\n";
+
+        options.lossless_bignum(false);
+        auto j2 = jsoncons::json::parse(str, options);
+        std::cout << "(2) " << j2.at("a").as<double>() << "\n";
+        std::string buffer2;
+        j2.dump(buffer2);
+        // By default, an inf value is serialzed to null
+        std::cout << "(3) " << buffer2 << "\n"; 
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+
+Output:
+```
+(1) {"a":1.5e999}
+(2) inf
+(3) {"a":null}
+```
+
+<div id="E6"/> 
 
 #### Object-array block formatting
 
@@ -341,6 +424,8 @@ Multi line
 }
 ```
 
+<div id="E7"/> 
+
 #### Array-array block formatting
 
 ```cpp
@@ -401,52 +486,33 @@ Same line
 }
 ```
 
-Multi line
+<div id="E8"/> 
 
-```json
+#### Indent with tabs
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <cassert>
+
+int main()
 {
-    "data": {
-        "id": [
-            0,1,2,3,4,5,6,7
-        ],
-        "item": [
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                4
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                3
-            ]
-        ]
-    }
+    jsoncons::json j{jsoncons::json_array_arg};
+    j.push_back(jsoncons::json{jsoncons::json_object_arg});
+    j[0]["foo"] = 1;
+
+    auto options = jsoncons::json_options{}
+        .indent_char('\t')
+        .indent_size(1);
+
+    std::string buffer;
+    j.dump_pretty(buffer, options);
+
+    std::string expected = "[\n\t{\n\t\t\"foo\": 1\n\t}\n]";
+    assert(expected == buffer);
 }
 ```
+
+<div id="E9"/> 
 
 #### Allow trailing commas
 
@@ -475,11 +541,6 @@ int main()
     // until 0.170.0
     // auto j = json::parse(s, allow_trailing_commas());
 
-    // since 0.171.0
-    // auto options = json_options{}
-    //     .err_handler(allow_trailing_commas());
-    // auto j = json::parse(s, options);
-
     // since 1.3.0
     auto options = json_options{}
         .allow_trailing_comma(true));
@@ -493,110 +554,5 @@ Output:
 (1) Extra comma at line 5 and column 5
 
 (2) {"first":1,"second":2}
-```
-
-#### Parse integer with lossless_bignum 
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <iostream>
-
-int main()
-{
-    try
-    {
-        std::string str = R"({"a":123456789012345678901234567890})";
-
-        auto options = jsoncons::json_options{}
-            .lossless_bignum(true);  // default
-
-        auto j1 = jsoncons::json::parse(str, options);
-        std::string buffer1;
-        j1.dump(buffer1);
-        std::cout << "(1) " << buffer1 << "\n";
-
-        options.lossless_bignum(false);
-        auto j2 = jsoncons::json::parse(str, options);
-        std::string buffer2;
-        j2.dump(buffer2);
-        std::cout << "(2) " << buffer2 << "\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "\n";
-    }
-}
-```
-
-Output:
-```
-(1) {"a":123456789012345678901234567890}
-(2) {"a":1.2345678901234568e+29}
-```
-
-#### Parse floating point with lossless_bignum 
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <iostream>
-
-int main()
-{
-    try
-    {
-        std::string str = R"({"a":1.5e999})";
-
-        auto options = jsoncons::json_options{}
-            .lossless_bignum(true);  // default
-
-        auto j1 = jsoncons::json::parse(str, options);
-        std::string buffer1;
-        j1.dump(buffer1);
-        std::cout << "(1) " << buffer1 << "\n";
-
-        options.lossless_bignum(false);
-        auto j2 = jsoncons::json::parse(str, options);
-        std::cout << "(2) " << j2.at("a").as<double>() << "\n";
-        std::string buffer2;
-        j2.dump(buffer2);
-        // By default, an inf value is serialzed to null
-        std::cout << "(3) " << buffer2 << "\n"; 
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "\n";
-    }
-}
-```
-
-Output:
-```
-(1) {"a":1.5e999}
-(2) inf
-(3) {"a":null}
-```
-
-#### Indent with tabs
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <cassert>
-
-int main()
-{
-    jsoncons::json j{jsoncons::json_array_arg};
-    j.push_back(jsoncons::json{jsoncons::json_object_arg});
-    j[0]["foo"] = 1;
-
-    auto options = jsoncons::json_options{}
-        .indent_char('\t')
-        .indent_size(1);
-
-    std::string buffer;
-    j.dump_pretty(buffer, options);
-
-    std::string expected = "[\n\t{\n\t\t\"foo\": 1\n\t}\n]";
-    assert(expected == buffer);
-}
 ```
 
