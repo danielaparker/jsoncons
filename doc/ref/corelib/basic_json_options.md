@@ -29,7 +29,7 @@ lossless_number|If **true**, reads numbers with exponents and fractional parts a
 allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |**true**|(since 1.3.0)
 allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |**false**|(since 1.3.0)
 err_handler|Defines an [error handler](err_handler.md) for parsing JSON.| |`default_json_parsing`|(since 0.171.0, deprecated in 1.5.0)
-indent_size| |The indent size|4|
+indent_size| |The indent size|**4**|
 indent_char| |The indent character, e.g. '\t'|' '| (since 1.5)
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`).|space after|
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after|
@@ -117,15 +117,15 @@ Move constructor.
 
 ### Examples
 
-[Default NaN and inf replacement](#E1)
-[User specified `Nan` and `Inf` replacement](#E2)
-[Decimal precision](#E3)
-[Parse integer with lossless_bignum](#E4) 
-[Parse floating point with lossless_bignum](#E5) 
-[Object-array block formatting](#E6)
-[Array-array block formatting](#E7)
-[Indent with tabs](#E8)
-[Allow trailing commas](#E9)
+[Default NaN and inf replacement](#E1)  
+[User specified `Nan` and `Inf` replacement](#E2)  
+[Decimal precision](#E3)  
+[Parse integer with lossless_bignum](#E4)  
+[Parse floating point with lossless_bignum](#E5)  
+[Object-array block formatting](#E6)  
+[Array-array block formatting](#E7)  
+[Indent with tabs](#E8)  
+[Allow trailing commas](#E9)  
 
 <div id="E1"/> 
 
@@ -355,55 +355,39 @@ Output:
 #### Object-array block formatting
 
 ```cpp
-json j;
+#include <jsoncons/json.hpp>
+#include <iostream>
 
-j["verts"] = json(json_array_arg, {1, 2, 3});
-j["normals"] = json(json_array_arg, {1, 0, 1});
-j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
+using namespace jsoncons;
 
-std::cout << "Default (same line)" << '\n';
-std::cout << pretty_print(j) << '\n';
+int main()
+{
+    json j;
 
-std::cout << "New line" << '\n';
-auto options1 = json_options{}
-    .object_array_line_splits(line_split_kind::new_line);
-std::cout << pretty_print(j,options1) << '\n';
+    j["verts"] = json(json_array_arg, {1, 2, 3});
+    j["normals"] = json(json_array_arg, {1, 0, 1});
+    j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-std::cout << "Multi line" << '\n';
-auto options2 = json_options{}
-    .object_array_line_splits(line_split_kind::multi_line);
-std::cout << pretty_print(j,options2) << '\n';
+    std::cout << "multi_line: (default)" << '\n';
+    auto options1 = json_options{}
+        .object_array_line_splits(line_split_kind::multi_line);
+    std::cout << pretty_print(j, options1) << '\n';
+
+    std::cout << "same_line: " << '\n';
+    auto options2 = json_options{}
+        .object_array_line_splits(line_split_kind::same_line);
+    std::cout << pretty_print(j, options2) << '\n';
+
+    std::cout << "new_ine:" << '\n';
+    auto options3 = json_options{}
+        .object_array_line_splits(line_split_kind::new_line);
+    std::cout << pretty_print(j, options3) << '\n';
+}
 ```
 
 Output:
-
-Default (same line)
-
-```json
-{
-    "normals": [1,0,1],
-    "uvs": [0,0,1,1],
-    "verts": [1,2,3]
-}
 ```
-
-New line
-
-```json
-{
-    "normals": [
-        1,0,1
-    ],
-    "uvs": [
-        0,0,1,1
-    ],
-    "verts": [
-        1,2,3
-    ]
-}
-```
-Multi line
-```json
+multi_line: (default)
 {
     "normals": [
         1,
@@ -422,6 +406,24 @@ Multi line
         3
     ]
 }
+same_line:
+{
+    "normals": [1, 0, 1],
+    "uvs": [0, 0, 1, 1],
+    "verts": [1, 2, 3]
+}
+new_ine:
+{
+    "normals": [
+        1, 0, 1
+    ],
+    "uvs": [
+        0, 0, 1, 1
+    ],
+    "verts": [
+        1, 2, 3
+    ]
+}
 ```
 
 <div id="E7"/> 
@@ -429,59 +431,141 @@ Multi line
 #### Array-array block formatting
 
 ```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+using namespace jsoncons;
+
+int main()
+{
     json j;
-    j["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
+    j["data"]["id"] = json(json_array_arg, {0, 1, 2, 3, 4, 5, 6, 7});
     j["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,5,2,3}),
-                                      json(json_array_arg, {4}),
-                                      json(json_array_arg, {4,5,2,3}),
-                                      json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,5,3}),
-                                      json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,3})});
+        json(json_array_arg, {4, 5, 2, 3}),
+        json(json_array_arg, {4}),
+        json(json_array_arg, {4, 5, 2, 3}),
+        json(json_array_arg, {2}),
+        json(json_array_arg, {4, 5, 3}),
+        json(json_array_arg, {2}),
+        json(json_array_arg, {4, 3})});
 
-    std::cout << "Default (new line)" << '\n';
-    std::cout << pretty_print(j) << '\n';
-
-    std::cout << "Same line" << '\n';
+    std::cout << "multi_line (default):" << '\n';
     auto options1 = json_options{}
-        .array_array_line_splits(line_split_kind::same_line);
+        .array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(j, options1) << '\n';
 
-    std::cout << "Multi line" << '\n';
+    std::cout << "same_line:" << '\n';
     auto options2 = json_options{}
-        .array_array_line_splits(line_split_kind::multi_line);
+        .array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(j, options2) << '\n';
+
+    std::cout << "new_line" << '\n';
+    auto options3 = json_options{}
+        .array_array_line_splits(line_split_kind::new_line);
+    std::cout << pretty_print(j, options3) << '\n';
+}
 ```
 
 Output:
-
-Default (new line)
-
-```json
+```
+multi_line (default):
 {
     "data": {
-        "id": [0,1,2,3,4,5,6,7],
+        "id": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ],
         "item": [
-            [2],
-            [4,5,2,3],
-            [4],
-            [4,5,2,3],
-            [2],
-            [4,5,3],
-            [2],
-            [4,3]
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                4
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                3
+            ]
         ]
     }
 }
-```
-Same line
-
-```json
+same_line:
 {
     "data": {
-        "id": [0,1,2,3,4,5,6,7],
-        "item": [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
+        "id": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ],
+        "item": [
+            [2],
+            [4, 5, 2, 3],
+            [4],
+            [4, 5, 2, 3],
+            [2],
+            [4, 5, 3],
+            [2],
+            [4, 3]
+        ]
+    }
+}
+new_line
+{
+    "data": {
+        "id": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ],
+        "item": [
+            [2],
+            [4, 5, 2, 3],
+            [4],
+            [4, 5, 2, 3],
+            [2],
+            [4, 5, 3],
+            [2],
+            [4, 3]
+        ]
     }
 }
 ```
