@@ -370,18 +370,18 @@ int main()
 
     std::cout << "multi_line: (default)" << '\n';
     auto options1 = json_options{}
-        .object_array_line_splits(line_split_kind::multi_line);
-    std::cout << pretty_print(j, options1) << '\n';
+    .object_array_line_splits(line_split_kind::multi_line);
+    std::cout << pretty_print(j, options1) << "\n\n";
 
     std::cout << "same_line: " << '\n';
     auto options2 = json_options{}
-        .object_array_line_splits(line_split_kind::same_line);
-    std::cout << pretty_print(j, options2) << '\n';
+    .object_array_line_splits(line_split_kind::same_line);
+    std::cout << pretty_print(j, options2) << "\n\n";
 
     std::cout << "new_ine:" << '\n';
     auto options3 = json_options{}
-        .object_array_line_splits(line_split_kind::new_line);
-    std::cout << pretty_print(j, options3) << '\n';
+    .object_array_line_splits(line_split_kind::new_line);
+    std::cout << pretty_print(j, options3) << "\n\n";
 }
 ```
 
@@ -406,12 +406,14 @@ multi_line: (default)
         3
     ]
 }
+
 same_line:
 {
     "normals": [1, 0, 1],
     "uvs": [0, 0, 1, 1],
     "verts": [1, 2, 3]
 }
+
 new_ine:
 {
     "normals": [
@@ -439,30 +441,25 @@ using namespace jsoncons;
 int main()
 {
     json j;
-    j["data"]["id"] = json(json_array_arg, {0, 1, 2, 3, 4, 5, 6, 7});
+    j["data"]["id"] = json(json_array_arg, {0, 1, 2});
     j["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
         json(json_array_arg, {4, 5, 2, 3}),
-        json(json_array_arg, {4}),
-        json(json_array_arg, {4, 5, 2, 3}),
-        json(json_array_arg, {2}),
-        json(json_array_arg, {4, 5, 3}),
-        json(json_array_arg, {2}),
-        json(json_array_arg, {4, 3})});
+        json(json_array_arg, {4})});
 
-    std::cout << "multi_line (default):" << '\n';
+    std::cout << "multi_line (default):" << "\n";
     auto options1 = json_options{}
         .array_array_line_splits(line_split_kind::multi_line);
-    std::cout << pretty_print(j, options1) << '\n';
+    std::cout << pretty_print(j, options1) << "\n\n";
 
     std::cout << "same_line:" << '\n';
     auto options2 = json_options{}
         .array_array_line_splits(line_split_kind::same_line);
-    std::cout << pretty_print(j, options2) << '\n';
+    std::cout << pretty_print(j, options2) << "\n\n";
 
     std::cout << "new_line" << '\n';
     auto options3 = json_options{}
         .array_array_line_splits(line_split_kind::new_line);
-    std::cout << pretty_print(j, options3) << '\n';
+    std::cout << pretty_print(j, options3) << "\n\n";
 }
 ```
 
@@ -474,12 +471,7 @@ multi_line (default):
         "id": [
             0,
             1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            2
         ],
         "item": [
             [
@@ -493,78 +485,39 @@ multi_line (default):
             ],
             [
                 4
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                3
             ]
         ]
     }
 }
+
 same_line:
 {
     "data": {
         "id": [
             0,
             1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            2
         ],
         "item": [
             [2],
             [4, 5, 2, 3],
-            [4],
-            [4, 5, 2, 3],
-            [2],
-            [4, 5, 3],
-            [2],
-            [4, 3]
+            [4]
         ]
     }
 }
+
 new_line
 {
     "data": {
         "id": [
             0,
             1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            2
         ],
         "item": [
             [2],
             [4, 5, 2, 3],
-            [4],
-            [4, 5, 2, 3],
-            [2],
-            [4, 5, 3],
-            [2],
-            [4, 3]
+            [4]
         ]
     }
 }

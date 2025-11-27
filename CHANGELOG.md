@@ -1,6 +1,16 @@
 1.5.0
 -----
 
+- Fixed bugs:
+
+    - Git Issue #644: flatten/unflatten does not preserve arrays with more than 10 elements
+
+    - Git Issue #652: Fixed issue with JSON Schema **AdditionalProperties** validator
+
+    - Git Issue #653: Fixed issue with non existing default values being added in JSON Schema patch
+
+    - Git Issue #659: Fixed jsonschema validation message 
+
 - Changes
 
     - `jsonpointer::unflatten` now throws an exception if passed an empty object
@@ -14,7 +24,7 @@
       argument have been deprecated and will be removed in a future release. Use the 
       `allow_trailing_comma` and `allow_comments` options instead.
 
-    - The functors `strict_json_parsing` and `allow_trailing_commas have been deprecated and 
+    - The functors `strict_json_parsing` and `allow_trailing_commas` have been deprecated and 
       will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments` 
       options instead.
 
@@ -46,17 +56,6 @@
     - Git Discussions #654: Added an `indent_char` property to `basic_json_options` that supports tab indents
 
     - Git Discussions #660: Added reflection traits for read/write of enum values as integers.
-
-- Fixed bug:
-
-    - Git Issue #644: flatten/unflatten does not preserve arrays with more than 10 elements
-
-    - Git Issue #652: Fixed issue with JSON Schema **AdditionalProperties** validator
-
-    - Git Issue #653: Fixed issue with non existing default values being added in JSON Schema patch
-
-    - Git Issue #659: Fixed jsonschema validation message 
-
 
 1.4.3
 -----
