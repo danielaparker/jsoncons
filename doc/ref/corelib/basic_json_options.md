@@ -124,8 +124,9 @@ Move constructor.
 [Parse floating point with lossless_bignum](#E5)  
 [Object-array block formatting](#E6)  
 [Array-array block formatting](#E7)  
-[Indent with tabs](#E8)  
-[Allow trailing commas](#E9)  
+[Prettify single line output](#E8)  
+[Indent with tabs](#E9)  
+[Allow trailing commas](#E10)  
 
 <div id="E1"/> 
 
@@ -166,53 +167,6 @@ Output:
         "field2":1e9999,
         "field3":-1e9999
     }
-```
-
-Multi line
-
-```json
-{
-    "data": {
-        "id": [
-            0,1,2,3,4,5,6,7
-        ],
-        "item": [
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                4
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                3
-            ],
-            [
-                2
-            ],
-            [
-                4,
-                3
-            ]
-        ]
-    }
-}
 ```
 
 <div id="E3"/> 
@@ -440,90 +394,93 @@ using namespace jsoncons;
 
 int main()
 {
-    json j;
-    j["data"]["id"] = json(json_array_arg, {0, 1, 2});
-    j["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
-        json(json_array_arg, {4, 5, 2, 3}),
-        json(json_array_arg, {4})});
+    auto j = json::parse(R"(
+        [[0,1]]
+    )");
 
     std::cout << "multi_line (default):" << "\n";
     auto options1 = json_options{}
         .array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(j, options1) << "\n\n";
 
-    std::cout << "same_line:" << '\n';
+    std::cout << "new_line:" << "\n";
     auto options2 = json_options{}
-        .array_array_line_splits(line_split_kind::same_line);
-    std::cout << pretty_print(j, options2) << "\n\n";
-
-    std::cout << "new_line" << '\n';
-    auto options3 = json_options{}
         .array_array_line_splits(line_split_kind::new_line);
-    std::cout << pretty_print(j, options3) << "\n\n";
+    std::cout << pretty_print(j, options2) << "\n\n";
+    
+    std::cout << "same_line:" << "\n";
+    auto options3 = json_options{}
+        .array_array_line_splits(line_split_kind::same_line);
+    std::string buffer;
+    j.dump_pretty(buffer, options3);
+    std::cout << buffer << "\n";
 }
 ```
 
 Output:
 ```
 multi_line (default):
-{
-    "data": {
-        "id": [
-            0,
-            1,
-            2
-        ],
-        "item": [
-            [
-                2
-            ],
-            [
-                4,
-                5,
-                2,
-                3
-            ],
-            [
-                4
-            ]
-        ]
-    }
-}
+[
+    [
+        0,
+        1
+    ]
+]
+
+new_line:
+[
+    [
+        0, 1
+    ]
+]
 
 same_line:
-{
-    "data": {
-        "id": [
-            0,
-            1,
-            2
-        ],
-        "item": [
-            [2],
-            [4, 5, 2, 3],
-            [4]
-        ]
-    }
-}
-
-new_line
-{
-    "data": {
-        "id": [
-            0,
-            1,
-            2
-        ],
-        "item": [
-            [2],
-            [4, 5, 2, 3],
-            [4]
-        ]
-    }
-}
+[
+    [0, 1]
+]
 ```
 
 <div id="E8"/> 
+
+#### Prettify single line output
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+using namespace jsoncons;
+
+int main()
+{
+    auto j = json::parse(R"(
+        [[1,2,3,4]]
+    )");
+
+    jsoncons::json_options options;
+    options.spaces_around_comma(jsoncons::spaces_option::space_after) // default when using pretty printing 
+        .line_splits(jsoncons::line_split_kind::same_line);           // default is multi_line 
+    
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+    std::cout << "(2)\n" << pretty_print(j, options) << "\n\n";
+}
+```
+Output:
+```
+(1)
+[
+    [
+        1,
+        2,
+        3,
+        4
+    ]
+]
+
+(2)
+[[1, 2, 3, 4]]
+```
+
+<div id="E9"/> 
 
 #### Indent with tabs
 
@@ -549,7 +506,7 @@ int main()
 }
 ```
 
-<div id="E9"/> 
+<div id="E10"/> 
 
 #### Allow trailing commas
 

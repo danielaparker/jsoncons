@@ -60,7 +60,9 @@ std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
-            [1,2,3]
+            [
+                1,2,3
+            ]
         ],
         "tags": []
     },
@@ -110,7 +112,9 @@ std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
-            [1,2,3]
+            [
+                1,2,3
+            ]
         ],
         "tags": []
     },
@@ -163,7 +167,9 @@ std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
-            [1,2,3]
+            [
+                1,2,3
+            ]
         ],
         "tags": []
     },
@@ -189,7 +195,9 @@ std::string expected = R"({
             1,2,3
         ],
         "item": [
-            [1,2,3]
+            [
+                1,2,3
+            ]
         ],
         "tags": []
     },

@@ -11,6 +11,8 @@
 
     - Git Issue #659: Fixed jsonschema validation message 
 
+    - Fixed issue with JSON write option `array_array_split_lines::new_line`
+
 - Changes
 
     - `jsonpointer::unflatten` now throws an exception if passed an empty object
