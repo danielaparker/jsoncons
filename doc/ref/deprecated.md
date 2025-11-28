@@ -16,7 +16,8 @@ Category/class|Old name|Replacement
 `basic_json_options`|&nbsp;|&nbsp;
 &nbsp;|`bigint_chars_format`|`bignum_chars_format`
 &nbsp;|`bigint_chars_format::number`|`bignum_chars_format::raw`
-&nbsp;|`err_handler`|Use the `allow_trailing_comma` and `allow_comments` options instead
+&nbsp;|`line_splits`|Use the `root_line_splits` option instead (since 1.5.0)
+&nbsp;|**json_type::object_value**|Use `json_type::object` instead
 `basic_json_parser`|&nbsp;|&nbsp;
 &nbsp;|`basic_json_parser` constructor overloads that take an `err_handler` argument|Use the `allow_trailing_comma` and `allow_comments` options instead
 &nbsp;|`basic_json_reader` constructor overloads that take an `err_handler` argument|Use the `allow_trailing_comma` and `allow_comments` options instead
@@ -28,15 +29,15 @@ Category/class|Old name|Replacement
 `csv::result_options`|&nbsp;|&nbsp;
 &nbsp;|**csv::result_options::value**|Use `csv::result_options{}` instead
 `json_type`|&nbsp;|&nbsp;
-&nbsp;|**json_type::null_value**|Use `json_type::null` instead
-&nbsp;|**json_type::bool_value**|Use `json_type::boolean` instead
-&nbsp;|**json_type::int64_value**|Use `json_type::int64` instead
-&nbsp;|**json_type::uint64_value**|Use `json_type::uint64` instead
-&nbsp;|**json_type::half_value**|Use `json_type::float16` instead
-&nbsp;|**json_type::double_value**|Use `json_type::float64` instead
-&nbsp;|**json_type::string_value**|Use `json_type::string` instead
-&nbsp;|**json_type::byte_string_value**|Use `json_type::byte_string` instead
-&nbsp;|**json_type::array_value**|Use `json_type::array` instead
-&nbsp;|**json_type::object_value**|Use `json_type::object` instead
+&nbsp;|**json_type::null_value**|Use `json_type::null` instead (since 1.5.0)
+&nbsp;|**json_type::bool_value**|Use `json_type::boolean` instead (since 1.5.0)
+&nbsp;|**json_type::int64_value**|Use `json_type::int64` instead (since 1.5.0)
+&nbsp;|**json_type::uint64_value**|Use `json_type::uint64` instead (since 1.5.0)
+&nbsp;|**json_type::half_value**|Use `json_type::float16` instead (since 1.5.0)
+&nbsp;|**json_type::double_value**|Use `json_type::float64` instead (since 1.5.0)
+&nbsp;|**json_type::string_value**|Use `json_type::string` instead (since 1.5.0)
+&nbsp;|**json_type::byte_string_value**|Use `json_type::byte_string` instead (since 1.5.0)
+&nbsp;|**json_type::array_value**|Use `json_type::array` instead (since 1.5.0)
+&nbsp;|**json_type::object_value**|Use `json_type::object` instead (since 1.5.0)
 
 

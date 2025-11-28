@@ -49,6 +49,10 @@
       backwards compatability the old names, now deprecated, have been typedefed to 
       the new names. 
 
+    - The `json_options` member name `line_splits` has been renamed to `root_line_spits`.
+      For backwards compatibility, the old name, now deprecated, behaves the same as the
+      new name.
+
 - Enhancements
 
     - Git Discussions #594: Updated reflection traits to supports `boost::optional` 

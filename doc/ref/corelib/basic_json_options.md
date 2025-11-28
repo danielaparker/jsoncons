@@ -44,6 +44,7 @@ escape_all_non_ascii| |Escape all non-ascii characters. |**false**|
 escape_solidus| |Escape the solidus ('/') character. |**false**|
 new_line_chars| |New line characters|"\n"|
 line_length_limit| |Line length limit|120|
+root_line_splits| |Sets whether the root of a JSON value is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 array_object_line_splits| |For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
@@ -110,6 +111,7 @@ Move constructor.
     basic_json_options& escape_solidus(bool value)
     basic_json_options& new_line_chars(const string_type& value)
     basic_json_options& line_length_limit(std::size_t value)
+    basic_json_options& root_line_splits(line_split_kind value)
     basic_json_options& object_object_line_splits(line_split_kind value)
     basic_json_options& array_object_line_splits(line_split_kind value)
     basic_json_options& object_array_line_splits(line_split_kind value)
@@ -322,7 +324,7 @@ int main()
 
     jsoncons::json_options options;
     options.spaces_around_comma(jsoncons::spaces_option::space_after) // default when using pretty printing 
-        .line_splits(jsoncons::line_split_kind::same_line);           // default is multi_line 
+        .root_line_splits(jsoncons::line_split_kind::same_line);      // default is multi_line 
     
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
     std::cout << "(2)\n" << pretty_print(j, options) << "\n\n";

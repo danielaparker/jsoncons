@@ -510,7 +510,7 @@ namespace detail {
             }
             else 
             {
-                stack_.emplace_back(container_type::object, options_.line_splits(), false,
+                stack_.emplace_back(container_type::object, options_.root_line_splits(), false,
                                     column_, column_+open_object_brace_str_.length());
             }
             indent();
@@ -608,7 +608,7 @@ namespace detail {
             }
             else 
             {
-                stack_.emplace_back(container_type::array, options_.line_splits(), false,
+                stack_.emplace_back(container_type::array, options_.root_line_splits(), false,
                                     column_, column_+open_array_bracket_str_.length());
             }
             indent();

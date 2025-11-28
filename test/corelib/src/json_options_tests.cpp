@@ -144,7 +144,7 @@ TEST_CASE("object: nan_to_str, inf_to_str, neginf_to_str test")
             .nan_to_str("NaN")
             .inf_to_str("Inf")
             .neginf_to_str("NegInf")
-            .line_splits(line_split_kind::same_line);
+            .root_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -183,7 +183,7 @@ TEST_CASE("array: nan_to_str, inf_to_str, neginf_to_str test")
             .nan_to_str("NaN")
             .inf_to_str("Inf")
             .neginf_to_str("NegInf")
-            .line_splits(line_split_kind::same_line);
+            .root_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -458,7 +458,7 @@ TEST_CASE("json_options line_indent")
         jsoncons::json j_arr = jsoncons::json::parse(j_str);
         auto options = json_options{}
             .spaces_around_comma(jsoncons::spaces_option::space_after)
-            .line_splits(jsoncons::line_split_kind::same_line);
+            .root_line_splits(jsoncons::line_split_kind::same_line);
         std::string buffer;
         jsoncons::encode_json_pretty(j_arr, buffer, options);
 
@@ -470,7 +470,7 @@ TEST_CASE("json_options line_indent")
         jsoncons::json j_arr = jsoncons::json::parse(j_str);
         auto options = json_options{}
             .spaces_around_comma(jsoncons::spaces_option::space_after)
-            .line_splits(jsoncons::line_split_kind::same_line);
+            .root_line_splits(jsoncons::line_split_kind::same_line);
         std::string buffer;
         jsoncons::encode_json_pretty(j_arr, buffer, options);
 
