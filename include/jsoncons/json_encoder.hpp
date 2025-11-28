@@ -227,7 +227,7 @@ namespace detail {
         class encoding_context
         {
             container_type type_;
-            line_split_kind line_splits_;
+            line_split_kind split_kind_;
             bool indent_before_;
             bool new_line_after_;
             std::size_t begin_pos_{0};
@@ -236,7 +236,7 @@ namespace detail {
         public:
             encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
                              std::size_t begin_pos, std::size_t data_pos) noexcept
-               : type_(type), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
+               : type_(type), split_kind_(split_lines), indent_before_(indent_once), new_line_after_(false),
                  begin_pos_(begin_pos), data_pos_(data_pos)
             {
             }
@@ -292,19 +292,24 @@ namespace detail {
                 return type_ == container_type::array;
             }
 
+            line_split_kind split_kind() const
+            {
+                return split_kind_;
+            }
+
             bool is_same_line() const
             {
-                return line_splits_ == line_split_kind::same_line;
+                return split_kind_ == line_split_kind::same_line;
             }
 
             bool is_new_line() const
             {
-                return line_splits_ == line_split_kind::new_line;
+                return split_kind_ == line_split_kind::new_line;
             }
 
             bool is_multi_line() const
             {
-                return line_splits_ == line_split_kind::multi_line;
+                return split_kind_ == line_split_kind::multi_line;
             }
 
             bool is_indent_once() const
@@ -455,7 +460,9 @@ namespace detail {
             {
                 if (stack_.back().is_object())
                 {
-                    switch (options_.object_object_line_splits())
+                    line_split_kind split_kind = static_cast<uint8_t>(options_.object_object_line_splits()) >= static_cast<uint8_t>(stack_.back().split_kind()) ? 
+                        options_.object_object_line_splits() : stack_.back().split_kind();
+                    switch (split_kind)
                     {
                         case line_split_kind::same_line:
                         case line_split_kind::new_line:
@@ -467,12 +474,14 @@ namespace detail {
                         default: // multi_line
                             break;
                     }
-                    stack_.emplace_back(container_type::object,options_.object_object_line_splits(), false,
+                    stack_.emplace_back(container_type::object,split_kind, false,
                                         column_, column_+open_object_brace_str_.length());
                 }
                 else // array
                 {
-                    switch (options_.array_object_line_splits())
+                    line_split_kind split_kind = static_cast<uint8_t>(options_.array_object_line_splits()) >= static_cast<uint8_t>(stack_.back().split_kind()) ? 
+                        options_.array_object_line_splits() : stack_.back().split_kind();
+                    switch (split_kind)
                     {
                         case line_split_kind::same_line:
                             if (column_ >= options_.line_length_limit())
@@ -495,7 +504,7 @@ namespace detail {
                             new_line();
                             break;
                     }
-                    stack_.emplace_back(container_type::object,options_.array_object_line_splits(), false,
+                    stack_.emplace_back(container_type::object,split_kind, false,
                                         column_, column_+open_object_brace_str_.length());
                 }
             }
@@ -545,27 +554,32 @@ namespace detail {
             {
                 if (stack_.back().is_object())
                 {
-                    switch (options_.object_array_line_splits())
+                    line_split_kind split_kind = static_cast<uint8_t>(options_.object_array_line_splits()) >= static_cast<uint8_t>(stack_.back().split_kind()) ? 
+                        options_.object_array_line_splits() : 
+                        stack_.back().split_kind();
+                    switch (split_kind)
                     {
                         case line_split_kind::same_line:
-                            stack_.emplace_back(container_type::array,options_.object_array_line_splits(),false,
+                            stack_.emplace_back(container_type::array,split_kind,false,
                                                 column_, column_ + open_array_bracket_str_.length());
                             break;
                         case line_split_kind::new_line:
                         {
-                            stack_.emplace_back(container_type::array,options_.object_array_line_splits(),true,
+                            stack_.emplace_back(container_type::array,split_kind,true,
                                                 column_, column_+open_array_bracket_str_.length());
                             break;
                         }
                         default: // multi_line
-                            stack_.emplace_back(container_type::array,options_.object_array_line_splits(),true,
+                            stack_.emplace_back(container_type::array,split_kind,true,
                                                 column_, column_+open_array_bracket_str_.length());
                             break;
                     }
                 }
                 else // array
                 {
-                    switch (options_.array_array_line_splits())
+                    line_split_kind split_kind = static_cast<uint8_t>(options_.array_array_line_splits()) >= static_cast<uint8_t>(stack_.back().split_kind()) ? 
+                        options_.array_array_line_splits() : stack_.back().split_kind();
+                    switch (split_kind)
                     {
                         case line_split_kind::same_line:
                             if (stack_.back().is_multi_line())
@@ -573,19 +587,19 @@ namespace detail {
                                 stack_.back().new_line_after(true);
                                 new_line();
                             }
-                            stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                            stack_.emplace_back(container_type::array,split_kind, false,
                                                 column_, column_+open_array_bracket_str_.length());
                             break;
                         case line_split_kind::new_line:
                             stack_.back().new_line_after(true);
                             new_line();
-                            stack_.emplace_back(container_type::array,options_.array_array_line_splits(), true,
+                            stack_.emplace_back(container_type::array,split_kind, true,
                                                 column_, column_+open_array_bracket_str_.length());
                             break;
                         default: // multi_line
                             stack_.back().new_line_after(true);
                             new_line();
-                            stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                            stack_.emplace_back(container_type::array,split_kind, false,
                                                 column_, column_+open_array_bracket_str_.length());
                             //new_line();
                             break;
@@ -1048,12 +1062,12 @@ namespace detail {
 
         void indent()
         {
-            indent_amount_ += static_cast<int>(options_.indent_size());
+            indent_amount_ += static_cast<uint8_t>(options_.indent_size());
         }
 
         void unindent()
         {
-            indent_amount_ -= static_cast<int>(options_.indent_size());
+            indent_amount_ -= static_cast<uint8_t>(options_.indent_size());
         }
 
         void new_line()

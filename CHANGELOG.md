@@ -11,7 +11,9 @@
 
     - Git Issue #659: Fixed jsonschema validation message 
 
-    - Fixed issue with JSON write option `array_array_split_lines::new_line`
+    - Fixed issue with JSON write option `array_array_split_lines` value `line_split_kind::new_line` not creating a new line
+
+    - Fixed issue with inconsistent JSON write option output
 
 - Changes
 

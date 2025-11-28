@@ -122,9 +122,9 @@ Move constructor.
 [Decimal precision](#E3)  
 [Parse integer with lossless_bignum](#E4)  
 [Parse floating point with lossless_bignum](#E5)  
-[Object-array block formatting](#E6)  
-[Array-array block formatting](#E7)  
-[Prettify single line output](#E8)  
+[Root line splits](#E6)  
+[Object-array line splits](#E7)  
+[Array-array line splits](#E8)  
 [Indent with tabs](#E9)  
 [Allow trailing commas](#E10)  
 
@@ -306,7 +306,47 @@ Output:
 
 <div id="E6"/> 
 
-#### Object-array block formatting
+#### Root line splits
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+using namespace jsoncons;
+
+int main()
+{
+    auto j = json::parse(R"(
+        [[1,2,3,4]]
+    )");
+
+    jsoncons::json_options options;
+    options.spaces_around_comma(jsoncons::spaces_option::space_after) // default when using pretty printing 
+        .line_splits(jsoncons::line_split_kind::same_line);           // default is multi_line 
+    
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+    std::cout << "(2)\n" << pretty_print(j, options) << "\n\n";
+}
+```
+Output:
+```
+(1)
+[
+    [
+        1,
+        2,
+        3,
+        4
+    ]
+]
+
+(2)
+[[1, 2, 3, 4]]
+```
+
+<div id="E7"/> 
+
+#### Object-array line splits
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -384,9 +424,9 @@ new_ine:
 }
 ```
 
-<div id="E7"/> 
+<div id="E8"/> 
 
-#### Array-array block formatting
+#### Array-array line splits
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -440,46 +480,6 @@ same_line:
 [
     [0, 1]
 ]
-```
-
-<div id="E8"/> 
-
-#### Prettify single line output
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <iostream>
-
-using namespace jsoncons;
-
-int main()
-{
-    auto j = json::parse(R"(
-        [[1,2,3,4]]
-    )");
-
-    jsoncons::json_options options;
-    options.spaces_around_comma(jsoncons::spaces_option::space_after) // default when using pretty printing 
-        .line_splits(jsoncons::line_split_kind::same_line);           // default is multi_line 
-    
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-    std::cout << "(2)\n" << pretty_print(j, options) << "\n\n";
-}
-```
-Output:
-```
-(1)
-[
-    [
-        1,
-        2,
-        3,
-        4
-    ]
-]
-
-(2)
-[[1, 2, 3, 4]]
 ```
 
 <div id="E9"/> 

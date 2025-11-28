@@ -312,11 +312,7 @@ TEST_CASE("object_array with/without line_length_limit")
     SECTION("same_line")
     {
     std::string expected = R"({
-    "foo": ["bar","baz",
-        [
-            1,2,3
-        ]
-    ],
+    "foo": ["bar","baz",[1,2,3]],
     "qux": [1,2,3,null,123,45.3,342334,234]
 })";
 
@@ -399,11 +395,9 @@ TEST_CASE("object_array with/without line_length_limit")
     SECTION("same_line with line length limit")
     {
     std::string expected = R"({
-    "foo": ["bar","baz",
-        [
+    "foo": ["bar","baz",[
             1,2,3
-        ]
-    ],
+        ]],
     "qux": [1,2,3,null,
         123,45.3,342334,
         234

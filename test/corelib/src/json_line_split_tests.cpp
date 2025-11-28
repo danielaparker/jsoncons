@@ -59,11 +59,7 @@ TEST_CASE("json_encoder line split tests")
 std::string expected = R"({
     "data": {
         "id": [1,2,3],
-        "item": [
-            [
-                1,2,3
-            ]
-        ],
+        "item": [[1,2,3]],
         "tags": []
     },
     "header": {
@@ -111,11 +107,7 @@ std::string expected = R"({
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
-        "item": [
-            [
-                1,2,3
-            ]
-        ],
+        "item": [[1,2,3]],
         "tags": []
     },
     "header": {
@@ -138,13 +130,7 @@ std::string expected = R"({
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
-        "item": [
-            [
-                1,
-                2,
-                3
-            ]
-        ],
+        "item": [[1,2,3]],
         "tags": []
     },
     "header": {
@@ -166,11 +152,7 @@ std::string expected = R"({
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
-        "item": [
-            [
-                1,2,3
-            ]
-        ],
+        "item": [[1,2,3]],
         "tags": []
     },
     "header": {
