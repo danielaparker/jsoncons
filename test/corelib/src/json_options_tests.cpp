@@ -313,7 +313,9 @@ TEST_CASE("object_array with/without line_length_limit")
     {
     std::string expected = R"({
     "foo": ["bar","baz",
-        [1,2,3]
+        [
+            1,2,3
+        ]
     ],
     "qux": [1,2,3,null,123,45.3,342334,234]
 })";
@@ -337,7 +339,9 @@ TEST_CASE("object_array with/without line_length_limit")
     std::string expected = R"({
     "foo": [
         "bar","baz",
-        [1,2,3]
+        [
+            1,2,3
+        ]
     ],
     "qux": [
         1,2,3,null,123,45.3,342334,234
@@ -396,7 +400,9 @@ TEST_CASE("object_array with/without line_length_limit")
     {
     std::string expected = R"({
     "foo": ["bar","baz",
-        [1,2,3]
+        [
+            1,2,3
+        ]
     ],
     "qux": [1,2,3,null,
         123,45.3,342334,
@@ -424,7 +430,9 @@ TEST_CASE("object_array with/without line_length_limit")
     std::string expected = R"({
     "foo": [
         "bar","baz",
-        [1,2,3]
+        [
+            1,2,3
+        ]
     ],
     "qux": [
         1,2,3,null,123,
@@ -649,7 +657,7 @@ TEST_CASE("json_options tests")
 
         std::ostringstream os;
         j.dump_pretty(os, options);
-        CHECK(os.str() == s);
+        CHECK(s == os.str());
     }
     SECTION("pad_inside_object_braces")
     {
