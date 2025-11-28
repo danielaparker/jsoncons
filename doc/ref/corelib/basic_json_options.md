@@ -316,26 +316,28 @@ using namespace jsoncons;
 
 int main()
 {
-    json j;
-
-    j["verts"] = json(json_array_arg, {1, 2, 3});
-    j["normals"] = json(json_array_arg, {1, 0, 1});
-    j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
+    json j = json::parse(R"(
+{
+    "normals": [1, 0, 1],
+    "uvs": [0, 0, 1, 1],
+    "verts": [1, 2, 3]
+}
+    )");
 
     std::cout << "multi_line: (default)" << '\n';
     auto options1 = json_options{}
-    .object_array_line_splits(line_split_kind::multi_line);
+        .object_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(j, options1) << "\n\n";
+
+    std::cout << "new_iine:" << '\n';
+    auto options3 = json_options{}
+        .object_array_line_splits(line_split_kind::new_line);
+    std::cout << pretty_print(j, options3) << "\n\n";
 
     std::cout << "same_line: " << '\n';
     auto options2 = json_options{}
-    .object_array_line_splits(line_split_kind::same_line);
+        .object_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(j, options2) << "\n\n";
-
-    std::cout << "new_ine:" << '\n';
-    auto options3 = json_options{}
-    .object_array_line_splits(line_split_kind::new_line);
-    std::cout << pretty_print(j, options3) << "\n\n";
 }
 ```
 
