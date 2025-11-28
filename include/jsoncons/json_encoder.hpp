@@ -579,7 +579,7 @@ namespace detail {
                         case line_split_kind::new_line:
                             stack_.back().new_line_after(true);
                             new_line();
-                            stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                            stack_.emplace_back(container_type::array,options_.array_array_line_splits(), true,
                                                 column_, column_+open_array_bracket_str_.length());
                             break;
                         default: // multi_line
