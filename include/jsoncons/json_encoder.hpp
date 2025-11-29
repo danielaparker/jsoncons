@@ -215,22 +215,22 @@ namespace detail {
             return k;
         }
 
-        static std::array<CharT,1> colon;
-        static std::array<CharT,2> colon_space; 
-        static std::array<CharT,2> space_colon; 
-        static std::array<CharT,3> space_colon_space; 
-        static std::array<CharT,1> comma;
-        static std::array<CharT,2> comma_space; 
-        static std::array<CharT,2> space_comma; 
-        static std::array<CharT,3> space_comma_space; 
-        static std::array<CharT,1> left_brace; 
-        static std::array<CharT,1> right_brace; 
-        static std::array<CharT,2> left_brace_space;
-        static std::array<CharT,2> space_right_brace; 
-        static std::array<CharT,1> left_bracket; 
-        static std::array<CharT,1> right_bracket; 
-        static std::array<CharT,2> left_bracket_space;
-        static std::array<CharT,2> space_right_bracket; 
+        static const std::array<CharT,1> colon;
+        static const std::array<CharT,2> colon_space; 
+        static const std::array<CharT,2> space_colon; 
+        static const std::array<CharT,3> space_colon_space; 
+        static const std::array<CharT,1> comma;
+        static const std::array<CharT,2> comma_space; 
+        static const std::array<CharT,2> space_comma; 
+        static const std::array<CharT,3> space_comma_space; 
+        static const std::array<CharT,1> left_brace; 
+        static const std::array<CharT,1> right_brace; 
+        static const std::array<CharT,2> left_brace_space;
+        static const std::array<CharT,2> space_right_brace; 
+        static const std::array<CharT,1> left_bracket; 
+        static const std::array<CharT,1> right_bracket; 
+        static const std::array<CharT,2> left_bracket_space;
+        static const std::array<CharT,2> space_right_bracket; 
     public:
         using allocator_type = Allocator;
         using char_type = CharT;
@@ -1104,40 +1104,40 @@ namespace detail {
     };
 
     template <typename CharT, typename Sink, typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::colon = {':'};
+    const std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::colon = {':'};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::colon_space = {':', ' '};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::colon_space = {':', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_colon = {' ', ':'};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_colon = {' ', ':'};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_colon_space = {' ', ':', ' '};
+    const std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_colon_space = {' ', ':', ' '};
 
     template <typename CharT, typename Sink, typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::comma = {','};
+    const std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::comma = {','};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::comma_space = {',', ' '};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::comma_space = {',', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_comma = {' ', ','};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_comma = {' ', ','};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_comma_space = {' ', ',', ' '};
+    const std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_comma_space = {' ', ',', ' '};
 
     template <typename CharT, typename Sink, typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_brace = {'{'};
+    const std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_brace = {'{'};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_brace = {'}'};
+    const std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_brace = {'}'};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_brace_space = {'{', ' '};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_brace_space = {'{', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_brace = {' ', '}'};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_brace = {' ', '}'};
 
     template <typename CharT, typename Sink, typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_bracket = {'['};
+    const std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_bracket = {'['};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_bracket = {']'};
+    const std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_bracket = {']'};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_bracket_space = {'[', ' '};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_bracket_space = {'[', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_bracket = {' ', ']'};
+    const std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_bracket = {' ', ']'};
 
     template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_compact_json_encoder final : public basic_json_visitor<CharT>
