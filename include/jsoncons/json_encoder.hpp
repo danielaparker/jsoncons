@@ -214,6 +214,23 @@ namespace detail {
             static const jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT, "false");
             return k;
         }
+
+        static const CharT colon[1];
+        static const CharT colon_space[2]; 
+        static const CharT space_colon[2]; 
+        static const CharT space_colon_space[3]; 
+        static const CharT comma[1];
+        static const CharT comma_space[2]; 
+        static const CharT space_comma[2]; 
+        static const CharT space_comma_space[3]; 
+        static const CharT left_brace[1]; 
+        static const CharT right_brace[1]; 
+        static const CharT left_brace_space[2];
+        static const CharT space_right_brace[2]; 
+        static const CharT left_bracket[1]; 
+        static const CharT right_bracket[1]; 
+        static const CharT left_bracket_space[2];
+        static const CharT space_right_bracket[2]; 
     public:
         using allocator_type = Allocator;
         using char_type = CharT;
@@ -297,16 +314,6 @@ namespace detail {
                 return split_kind_;
             }
 
-            bool is_same_line() const
-            {
-                return split_kind_ == line_split_kind::same_line;
-            }
-
-            bool is_new_line() const
-            {
-                return split_kind_ == line_split_kind::new_line;
-            }
-
             bool is_multi_line() const
             {
                 return split_kind_ == line_split_kind::multi_line;
@@ -328,12 +335,12 @@ namespace detail {
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
         int indent_amount_{0};
         std::size_t column_{0};
-        std::basic_string<CharT> colon_str_;
-        std::basic_string<CharT> comma_str_;
-        std::basic_string<CharT> open_object_brace_str_;
-        std::basic_string<CharT> close_object_brace_str_;
-        std::basic_string<CharT> open_array_bracket_str_;
-        std::basic_string<CharT> close_array_bracket_str_;
+        jsoncons::basic_string_view<CharT> colon_str_;
+        jsoncons::basic_string_view<CharT> comma_str_;
+        jsoncons::basic_string_view<CharT> open_brace_str_;
+        jsoncons::basic_string_view<CharT> close_brace_str_;
+        jsoncons::basic_string_view<CharT> open_bracket_str_;
+        jsoncons::basic_string_view<CharT> close_bracket_str_;
         int nesting_depth_{0};
     public:
 
@@ -359,52 +366,52 @@ namespace detail {
             switch (options.spaces_around_colon())
             {
                 case spaces_option::space_after:
-                    colon_str_ = std::basic_string<CharT>({':',' '});
+                    colon_str_ = jsoncons::basic_string_view<CharT>(colon_space, sizeof(colon_space));
                     break;
                 case spaces_option::space_before:
-                    colon_str_ = std::basic_string<CharT>({' ',':'});
+                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon, sizeof(space_colon));
                     break;
                 case spaces_option::space_before_and_after:
-                    colon_str_ = std::basic_string<CharT>({' ',':',' '});
+                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon_space, sizeof(space_colon_space));
                     break;
                 default:
-                    colon_str_.push_back(':');
+                    colon_str_ = jsoncons::basic_string_view<CharT>(colon, sizeof(colon));
                     break;
             }
             switch (options.spaces_around_comma())
             {
                 case spaces_option::space_after:
-                    comma_str_ = std::basic_string<CharT>({',',' '});
+                    comma_str_ = jsoncons::basic_string_view<CharT>(comma_space, sizeof(comma_space));
                     break;
                 case spaces_option::space_before:
-                    comma_str_ = std::basic_string<CharT>({' ',','});
+                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma, sizeof(space_comma));
                     break;
                 case spaces_option::space_before_and_after:
-                    comma_str_ = std::basic_string<CharT>({' ',',',' '});
+                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma_space, sizeof(space_comma_space));
                     break;
                 default:
-                    comma_str_.push_back(',');
+                    comma_str_ = jsoncons::basic_string_view<CharT>(comma, sizeof(comma));
                     break;
             }
             if (options.pad_inside_object_braces())
             {
-                open_object_brace_str_ = std::basic_string<CharT>({'{', ' '});
-                close_object_brace_str_ = std::basic_string<CharT>({' ', '}'});
+                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace_space, sizeof(left_brace_space));
+                close_brace_str_ = jsoncons::basic_string_view<CharT>(space_right_brace, sizeof(space_right_brace));
             }
             else
             {
-                open_object_brace_str_.push_back('{');
-                close_object_brace_str_.push_back('}');
+                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace, sizeof(left_brace));
+                close_brace_str_ = jsoncons::basic_string_view<CharT>(right_brace, sizeof(right_brace));
             }
             if (options.pad_inside_array_brackets())
             {
-                open_array_bracket_str_ = std::basic_string<CharT>({'[', ' '});
-                close_array_bracket_str_ = std::basic_string<CharT>({' ', ']'});
+                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket_space, sizeof(left_bracket_space));
+                close_bracket_str_ = jsoncons::basic_string_view<CharT>(space_right_bracket, sizeof(space_right_bracket));
             }
             else
             {
-                open_array_bracket_str_.push_back('[');
-                close_array_bracket_str_.push_back(']');
+                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket, sizeof(left_bracket));
+                close_bracket_str_ = jsoncons::basic_string_view<CharT>(right_bracket, sizeof(right_bracket));
             }
         }
 
@@ -475,7 +482,7 @@ namespace detail {
                             break;
                     }
                     stack_.emplace_back(container_type::object,split_kind, false,
-                                        column_, column_+open_object_brace_str_.length());
+                                        column_, column_+open_brace_str_.length());
                 }
                 else // array
                 {
@@ -505,18 +512,18 @@ namespace detail {
                             break;
                     }
                     stack_.emplace_back(container_type::object,split_kind, false,
-                                        column_, column_+open_object_brace_str_.length());
+                                        column_, column_+open_brace_str_.length());
                 }
             }
             else 
             {
                 stack_.emplace_back(container_type::object, options_.root_line_splits(), false,
-                                    column_, column_+open_object_brace_str_.length());
+                                    column_, column_+open_brace_str_.length());
             }
             indent();
             
-            sink_.append(open_object_brace_str_.data(), open_object_brace_str_.length());
-            column_ += open_object_brace_str_.length();
+            sink_.append(open_brace_str_.data(), open_brace_str_.length());
+            column_ += open_brace_str_.length();
             JSONCONS_VISITOR_RETURN;
         }
 
@@ -531,8 +538,8 @@ namespace detail {
                 new_line();
             }
             stack_.pop_back();
-            sink_.append(close_object_brace_str_.data(), close_object_brace_str_.length());
-            column_ += close_object_brace_str_.length();
+            sink_.append(close_brace_str_.data(), close_brace_str_.length());
+            column_ += close_brace_str_.length();
 
             end_value();
             JSONCONS_VISITOR_RETURN;
@@ -561,17 +568,17 @@ namespace detail {
                     {
                         case line_split_kind::same_line:
                             stack_.emplace_back(container_type::array,split_kind,false,
-                                                column_, column_ + open_array_bracket_str_.length());
+                                                column_, column_ + open_bracket_str_.length());
                             break;
                         case line_split_kind::new_line:
                         {
                             stack_.emplace_back(container_type::array,split_kind,true,
-                                                column_, column_+open_array_bracket_str_.length());
+                                                column_, column_+open_bracket_str_.length());
                             break;
                         }
                         default: // multi_line
                             stack_.emplace_back(container_type::array,split_kind,true,
-                                                column_, column_+open_array_bracket_str_.length());
+                                                column_, column_+open_bracket_str_.length());
                             break;
                     }
                 }
@@ -588,20 +595,19 @@ namespace detail {
                                 new_line();
                             }
                             stack_.emplace_back(container_type::array,split_kind, false,
-                                                column_, column_+open_array_bracket_str_.length());
+                                                column_, column_+open_bracket_str_.length());
                             break;
                         case line_split_kind::new_line:
                             stack_.back().new_line_after(true);
                             new_line();
                             stack_.emplace_back(container_type::array,split_kind, true,
-                                                column_, column_+open_array_bracket_str_.length());
+                                                column_, column_+open_bracket_str_.length());
                             break;
                         default: // multi_line
                             stack_.back().new_line_after(true);
                             new_line();
                             stack_.emplace_back(container_type::array,split_kind, false,
-                                                column_, column_+open_array_bracket_str_.length());
-                            //new_line();
+                                                column_, column_+open_bracket_str_.length());
                             break;
                     }
                 }
@@ -609,11 +615,11 @@ namespace detail {
             else 
             {
                 stack_.emplace_back(container_type::array, options_.root_line_splits(), false,
-                                    column_, column_+open_array_bracket_str_.length());
+                                    column_, column_+open_bracket_str_.length());
             }
             indent();
-            sink_.append(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-            column_ += open_array_bracket_str_.length();
+            sink_.append(open_bracket_str_.data(), open_bracket_str_.length());
+            column_ += open_bracket_str_.length();
             JSONCONS_VISITOR_RETURN;
         }
 
@@ -628,8 +634,8 @@ namespace detail {
                 new_line();
             }
             stack_.pop_back();
-            sink_.append(close_array_bracket_str_.data(), close_array_bracket_str_.length());
-            column_ += close_array_bracket_str_.length();
+            sink_.append(close_bracket_str_.data(), close_bracket_str_.length());
+            column_ += close_bracket_str_.length();
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1096,6 +1102,42 @@ namespace detail {
             new_line();
         }
     };
+
+    template <typename CharT, typename Sink, typename Allocator>
+    const CharT basic_json_encoder<CharT, Sink, Allocator>::colon[1] = {':'};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::colon_space[2] = {':', ' '};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_colon[2] = {' ', ':'};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_colon_space[3] = {' ', ':', ' '};
+
+    template <typename CharT, typename Sink, typename Allocator>
+    const CharT basic_json_encoder<CharT, Sink, Allocator>::comma[1] = {','};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::comma_space[2] = {',', ' '};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_comma[2] = {' ', ','};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_comma_space[3] = {' ', ',', ' '};
+
+    template <typename CharT, typename Sink, typename Allocator>
+    const CharT basic_json_encoder<CharT, Sink, Allocator>::left_brace[1] = {'{'};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::right_brace[1] = {'}'};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::left_brace_space[2] = {'{', ' '};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_right_brace[2] = {' ', '}'};
+
+    template <typename CharT, typename Sink, typename Allocator>
+    const CharT basic_json_encoder<CharT, Sink, Allocator>::left_bracket[1] = {'['};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::right_bracket[1] = {']'};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::left_bracket_space[2] = {'[', ' '};
+    template <typename CharT,typename Sink,typename Allocator>
+    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_right_bracket[2] = {' ', ']'};
 
     template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_compact_json_encoder final : public basic_json_visitor<CharT>
