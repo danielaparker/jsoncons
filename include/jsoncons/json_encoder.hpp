@@ -215,22 +215,22 @@ namespace detail {
             return k;
         }
 
-        static const CharT colon[1];
-        static const CharT colon_space[2]; 
-        static const CharT space_colon[2]; 
-        static const CharT space_colon_space[3]; 
-        static const CharT comma[1];
-        static const CharT comma_space[2]; 
-        static const CharT space_comma[2]; 
-        static const CharT space_comma_space[3]; 
-        static const CharT left_brace[1]; 
-        static const CharT right_brace[1]; 
-        static const CharT left_brace_space[2];
-        static const CharT space_right_brace[2]; 
-        static const CharT left_bracket[1]; 
-        static const CharT right_bracket[1]; 
-        static const CharT left_bracket_space[2];
-        static const CharT space_right_bracket[2]; 
+        static std::array<CharT,1> colon;
+        static std::array<CharT,2> colon_space; 
+        static std::array<CharT,2> space_colon; 
+        static std::array<CharT,3> space_colon_space; 
+        static std::array<CharT,1> comma;
+        static std::array<CharT,2> comma_space; 
+        static std::array<CharT,2> space_comma; 
+        static std::array<CharT,3> space_comma_space; 
+        static std::array<CharT,1> left_brace; 
+        static std::array<CharT,1> right_brace; 
+        static std::array<CharT,2> left_brace_space;
+        static std::array<CharT,2> space_right_brace; 
+        static std::array<CharT,1> left_bracket; 
+        static std::array<CharT,1> right_bracket; 
+        static std::array<CharT,2> left_bracket_space;
+        static std::array<CharT,2> space_right_bracket; 
     public:
         using allocator_type = Allocator;
         using char_type = CharT;
@@ -366,52 +366,52 @@ namespace detail {
             switch (options.spaces_around_colon())
             {
                 case spaces_option::space_after:
-                    colon_str_ = jsoncons::basic_string_view<CharT>(colon_space, sizeof(colon_space));
+                    colon_str_ = jsoncons::basic_string_view<CharT>(colon_space.data(), colon_space.size());
                     break;
                 case spaces_option::space_before:
-                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon, sizeof(space_colon));
+                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon.data(), space_colon.size());
                     break;
                 case spaces_option::space_before_and_after:
-                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon_space, sizeof(space_colon_space));
+                    colon_str_ = jsoncons::basic_string_view<CharT>(space_colon_space.data(), space_colon_space.size());
                     break;
                 default:
-                    colon_str_ = jsoncons::basic_string_view<CharT>(colon, sizeof(colon));
+                    colon_str_ = jsoncons::basic_string_view<CharT>(colon.data(), colon.size());
                     break;
             }
             switch (options.spaces_around_comma())
             {
                 case spaces_option::space_after:
-                    comma_str_ = jsoncons::basic_string_view<CharT>(comma_space, sizeof(comma_space));
+                    comma_str_ = jsoncons::basic_string_view<CharT>(comma_space.data(), colon_space.size());
                     break;
                 case spaces_option::space_before:
-                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma, sizeof(space_comma));
+                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma.data(), space_comma.size());
                     break;
                 case spaces_option::space_before_and_after:
-                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma_space, sizeof(space_comma_space));
+                    comma_str_ = jsoncons::basic_string_view<CharT>(space_comma_space.data(), space_comma_space.size());
                     break;
                 default:
-                    comma_str_ = jsoncons::basic_string_view<CharT>(comma, sizeof(comma));
+                    comma_str_ = jsoncons::basic_string_view<CharT>(comma.data(), comma.size());
                     break;
             }
             if (options.pad_inside_object_braces())
             {
-                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace_space, sizeof(left_brace_space));
-                close_brace_str_ = jsoncons::basic_string_view<CharT>(space_right_brace, sizeof(space_right_brace));
+                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace_space.data(), left_brace_space.size());
+                close_brace_str_ = jsoncons::basic_string_view<CharT>(space_right_brace.data(), space_right_brace.size());
             }
             else
             {
-                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace, sizeof(left_brace));
-                close_brace_str_ = jsoncons::basic_string_view<CharT>(right_brace, sizeof(right_brace));
+                open_brace_str_ = jsoncons::basic_string_view<CharT>(left_brace.data(), left_brace.size());
+                close_brace_str_ = jsoncons::basic_string_view<CharT>(right_brace.data(), right_brace.size());
             }
             if (options.pad_inside_array_brackets())
             {
-                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket_space, sizeof(left_bracket_space));
-                close_bracket_str_ = jsoncons::basic_string_view<CharT>(space_right_bracket, sizeof(space_right_bracket));
+                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket_space.data(), left_bracket_space.size());
+                close_bracket_str_ = jsoncons::basic_string_view<CharT>(space_right_bracket.data(), space_right_bracket.size());
             }
             else
             {
-                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket, sizeof(left_bracket));
-                close_bracket_str_ = jsoncons::basic_string_view<CharT>(right_bracket, sizeof(right_bracket));
+                open_bracket_str_ = jsoncons::basic_string_view<CharT>(left_bracket.data(), left_bracket.size());
+                close_bracket_str_ = jsoncons::basic_string_view<CharT>(right_bracket.data(), right_bracket.size());
             }
         }
 
@@ -1104,40 +1104,40 @@ namespace detail {
     };
 
     template <typename CharT, typename Sink, typename Allocator>
-    const CharT basic_json_encoder<CharT, Sink, Allocator>::colon[1] = {':'};
+    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::colon = {':'};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::colon_space[2] = {':', ' '};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::colon_space = {':', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_colon[2] = {' ', ':'};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_colon = {' ', ':'};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_colon_space[3] = {' ', ':', ' '};
+    std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_colon_space = {' ', ':', ' '};
 
     template <typename CharT, typename Sink, typename Allocator>
-    const CharT basic_json_encoder<CharT, Sink, Allocator>::comma[1] = {','};
+    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::comma = {','};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::comma_space[2] = {',', ' '};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::comma_space = {',', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_comma[2] = {' ', ','};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_comma = {' ', ','};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_comma_space[3] = {' ', ',', ' '};
+    std::array<CharT,3> basic_json_encoder<CharT,Sink,Allocator>::space_comma_space = {' ', ',', ' '};
 
     template <typename CharT, typename Sink, typename Allocator>
-    const CharT basic_json_encoder<CharT, Sink, Allocator>::left_brace[1] = {'{'};
+    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_brace = {'{'};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::right_brace[1] = {'}'};
+    std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_brace = {'}'};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::left_brace_space[2] = {'{', ' '};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_brace_space = {'{', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_right_brace[2] = {' ', '}'};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_brace = {' ', '}'};
 
     template <typename CharT, typename Sink, typename Allocator>
-    const CharT basic_json_encoder<CharT, Sink, Allocator>::left_bracket[1] = {'['};
+    std::array<CharT,1> basic_json_encoder<CharT, Sink, Allocator>::left_bracket = {'['};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::right_bracket[1] = {']'};
+    std::array<CharT,1> basic_json_encoder<CharT,Sink,Allocator>::right_bracket = {']'};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::left_bracket_space[2] = {'[', ' '};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::left_bracket_space = {'[', ' '};
     template <typename CharT,typename Sink,typename Allocator>
-    const CharT basic_json_encoder<CharT,Sink,Allocator>::space_right_bracket[2] = {' ', ']'};
+    std::array<CharT,2> basic_json_encoder<CharT,Sink,Allocator>::space_right_bracket = {' ', ']'};
 
     template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_compact_json_encoder final : public basic_json_visitor<CharT>
