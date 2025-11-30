@@ -73,19 +73,19 @@ and allocator for temporary allocations.
 Update the parser with a chunk of JSON
 
     bool done() const
-Returns `true` when the parser has consumed a complete JSON text, `false` otherwise
+Returns **true** when the parser has consumed a complete JSON text, **false** otherwise
 
     bool stopped() const
-Returns `true` if the parser is stopped, `false` otherwise.
+Returns **true** if the parser is stopped, **false** otherwise.
 The parser may enter a stopped state as a result of a visitor
-function returning `false`, an error occurred,
+function returning **false**, an error occurred,
 or after having consumed a complete JSON text.
 
     bool finished() const
-Returns `true` if the parser is finished parsing, `false` otherwise.
+Returns **true** if the parser is finished parsing, **false** otherwise.
 
     bool source_exhausted() const
-Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
+Returns **true** if the input in the source buffer has been exhausted, **false** otherwise
 
     void parse_some(json_visitor& visitor)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
@@ -99,14 +99,14 @@ Parse events are sent to the supplied `visitor`.
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void finish_parse(json_visitor<CharT>& visitor)
-Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some(visitor)` until `finished()` returns `true`
+Called after `source_exhausted()` is **true** and there is no more input. 
+Repeatedly calls `parse_some(visitor)` until `finished()` returns **true**
 Throws a [ser_error](ser_error.md) if parsing fails.
 
     void finish_parse(json_visitor<CharT>& visitor,
                    std::error_code& ec)
-Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some(visitor)` until `finished()` returns `true`
+Called after `source_exhausted()` is **true** and there is no more input. 
+Repeatedly calls `parse_some(visitor)` until `finished()` returns **true**
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
@@ -122,10 +122,10 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void reset() const
 Resets the state of the parser to its initial state. In this state
-`stopped()` returns `false` and `done()` returns `false`.
+`stopped()` returns **false** and `done()` returns **false**.
 
     void restart() const
-Resets the `stopped` state of the parser to `false`, allowing parsing
+Resets the `stopped` state of the parser to **false**, allowing parsing
 to continue.
 
 ### Examples

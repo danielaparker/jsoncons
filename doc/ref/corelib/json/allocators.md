@@ -109,7 +109,7 @@ Json j1(std::move(j));
 ```
 
 constructs `j1` by taking the contents of `j`, which has either a pointer or a trivially copyable value,
-and replaces it with `null`. For example: 
+and replaces it with **null**. For example: 
 
 ```
 char buffer[1024];

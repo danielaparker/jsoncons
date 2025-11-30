@@ -42,7 +42,7 @@ Returns the allocator associated with the json value.
 
     bool is_valid() const
 Checks if the decoder contains a valid `basic_json` value. 
-Initially `is_valid()` is false, becomes `true` when a `basic_json`
+Initially `is_valid()` is false, becomes **true** when a `basic_json`
 value has been received, and becomes false when `get_result()` is called.
 
     Json get_result()

@@ -315,7 +315,7 @@ int main()
           }        
     )";
   
-    auto expr = jmespath::make_expression<json>("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
+    auto expr = jmespath::make_expression<json>("generate_array(devices, 16, &[?position==add(current_index(), 1)] | [0], &{id: '', state: 0, position: add(current_index(), 1)})",
         myspace::my_custom_functions<json>{});
   
     auto doc = json::parse(jtext);

@@ -97,7 +97,7 @@ basic_json(json_pointer_arg, basic_json* ptr);                     (26) (since 1
 
 (3) Copy with allocator
 
-(4) Acquires the contents of val, leaving val a `null` value
+(4) Acquires the contents of val, leaving val a **null** value
 
 (5) Move with allocator
 
@@ -159,11 +159,11 @@ Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambigu
 
 (25) Constructs a `basic_json` value that provides a non-owning view of
 another `basic_json` value. If second argument `ptr` is null,
-constructs a `null` value.
+constructs a **null** value.
 
 (26) Constructs a `basic_json` value that provides a non-owning view of
 another `basic_json` value. If second argument `ptr` is null,
-constructs a `null` value. 
+constructs a **null** value. 
 
 ### Helpers
 

@@ -293,10 +293,10 @@ Throws `std::domain_error` if not an object.
 #### Non member functions
 
     bool operator==(const basic_json& lhs, const basic_json& rhs)
-Returns `true` if two basic_json objects compare equal, `false` otherwise. 
+Returns **true** if two basic_json objects compare equal, **false** otherwise. 
 
     bool operator!=(const basic_json& lhs, const basic_json& rhs)
-Returns `true` if two basic_json objects do not compare equal, `false` otherwise. 
+Returns **true** if two basic_json objects do not compare equal, **false** otherwise. 
 
     bool operator<(const basic_json& lhs, const basic_json& rhs)
 Compares the contents of lhs and rhs lexicographically. 

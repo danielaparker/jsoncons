@@ -121,7 +121,7 @@ visitor passed in the constuctor, as `basic_json_reader` holds pointers to but d
 #### Member functions
 
     bool eof() const
-Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
+Returns **true** when there are no more JSON texts to be read from the stream, **false** otherwise
 
     void read(); (1)
     void read(std::error_code& ec); (2)

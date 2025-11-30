@@ -44,8 +44,8 @@ void replace(Json& target,
 
 Replaces the value at the location specified by `location` with a new value. 
 
-If `create_if_missing` is `false`, the target location must exist 
-for the replacement to succeed. If `create_if_missing` is `true`, 
+If `create_if_missing` is **false**, the target location must exist 
+for the replacement to succeed. If `create_if_missing` is **true**, 
 and if the target location specifies object members that do not
 already exist, the missing objects and members are added.  
 

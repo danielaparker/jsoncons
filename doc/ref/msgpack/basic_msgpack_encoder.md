@@ -227,74 +227,74 @@ Reset encoder to write a new value to a new sink
 (1) Flushes whatever is buffered to the destination.
 
 (2) Indicates the begining of an object of indefinite length.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (3) Indicates the begining of an object of known length. 
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (4) Indicates the end of an object.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (5) Indicates the beginning of an indefinite length array. 
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (6) Indicates the beginning of an array of known length. 
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (7) Indicates the end of an array.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (8) Writes the name part of an object name-value pair.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (9) Writes a null value. 
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (10) Writes a boolean value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (11) Writes a text string value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (12) Writes a byte string value `source` with a generic tag.
 Type `ByteStringLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (13) Writes a byte string value `source` with a format specific tag, `ext_tag`.
 Type `ByteStringLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (14) Writes a non-negative integer value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (15) Writes a signed integer value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (16) Writes a half precision floating point value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (17) Writes a double precision floating point value.
-Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(18)-(33) Same as (2)-(17), except sets `ec` and returns `false` on parse errors.
+(18)-(33) Same as (2)-(17), except sets `ec` and returns **false** on parse errors.
 
 ### Examples
 

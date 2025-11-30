@@ -8,7 +8,7 @@ typedef basic_staj_cursor<char> staj_cursor
 
 The `staj_cursor` interface supports forward, read-only, access to JSON and JSON-like data formats.
 
-The `staj_cursor` is designed to iterate over stream events until `done()` returns `true`.
+The `staj_cursor` is designed to iterate over stream events until `done()` returns **true**.
 The `next()` function causes the reader to advance to the next stream event. The `current()` function
 returns the current stream event. The data can be accessed using the [staj_event](basic_staj_event.md) 
 interface. When `next()` is called, copies of data previously accessed may be invalidated.

@@ -32,13 +32,13 @@ Defaults to `schema_version::draft202012()`.
 
     bool compatibility_mode() const;
     evaluation_options& compatibility_mode(bool value); 
-Get or set the compatibility mode. If set to `true`, the JSON Schema 2019-09
+Get or set the compatibility mode. If set to **true**, the JSON Schema 2019-09
 and 2020-12 implementations support the Draft 7 "definitions" and 
-"dependencies" keywords. The default is `false`. 
+"dependencies" keywords. The default is **false**. 
 
     bool require_format_validation() const;
     evaluation_options& require_format_validation(bool value); 
-Determines whether `format` is an assertion. The default is `false`. 
+Determines whether `format` is an assertion. The default is **false**. 
 
     const std::string& default_base_uri() const;
     evaluation_options& default_base_uri(const std::string& base_uri);         (since 1.0.0) 
@@ -48,7 +48,7 @@ relative references. It defaults to 'https://jsoncons.com'.
 
     bool enable_custom_error_message() const;
     evaluation_options& enable_custom_error_message(bool value); 
-Determines whether custom error messages in a schema are supported. The default is `false`. 
+Determines whether custom error messages in a schema are supported. The default is **false**. 
 
 #### Non-member functions
 

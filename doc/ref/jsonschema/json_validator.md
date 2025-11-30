@@ -47,7 +47,7 @@ which accepts an argument of type <a href="validation_output.md">validation_outp
 
 #### Return value
  
-(1) `true` if the instance is valid, otherwise `false` 
+(1) **true** if the instance is valid, otherwise **false** 
 
 (2) - (3) A JSONPatch document that may be applied to the input JSON
 to fill in missing properties that have "default" values in the

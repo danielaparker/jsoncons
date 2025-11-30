@@ -352,7 +352,7 @@ See [examples](doc/Examples.md#G0) for other ways of specializing reflection tra
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
-returns `true`.
+returns **true**.
 
 ```cpp
 int main()
@@ -614,7 +614,7 @@ that the variant like data structure preserved with a tag, so serializing back t
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
-returns `true`.
+returns **true**.
 
 ```cpp
 int main()

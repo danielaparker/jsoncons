@@ -10,7 +10,7 @@ template <typename T>
 struct is_json_type_traits_declared : public std::false_type {};
 ```
 which inherits from [std::false_type](http://www.cplusplus.com/reference/type_traits/false_type/).
-This traits class may be specialized for a user-defined type with member constant `value` equal `true`
+This traits class may be specialized for a user-defined type with member constant `value` equal **true**
 to inform the `jsoncons` library that the type is already specialized.  
 
 ### Examples

@@ -635,9 +635,9 @@ Output:
 ]
 ```
 There are a few things to note about the effect of the parameter settings.
-- `assume_header` `true` tells the csv parser to parse the first line of the file for column names, which become object member names.
-- `trim` `true` tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.
-- `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
+- `assume_header` **true** tells the csv parser to parse the first line of the file for column names, which become object member names.
+- `trim` **true** tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.
+- `ignore_empty_values` **true** causes the empty last value in the `task_finish` column to be omitted.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
 <div id="A6"/>

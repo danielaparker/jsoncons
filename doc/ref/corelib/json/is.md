@@ -27,41 +27,41 @@ bool is_array() const noexcept; (11)
 bool is_object() const noexcept; (12)
 ```
 
-(1) Generic `is` equivalent to type `T`. Returns `true` if the json value is the same as type `T` according to [json_type_traits](../corelib/json_type_traits/json_type_traits.md), `false` otherwise.  
+(1) Generic `is` equivalent to type `T`. Returns **true** if the json value is the same as type `T` according to [json_type_traits](../corelib/json_type_traits/json_type_traits.md), **false** otherwise.  
 
     bool is<X<T>> const noexcept
-If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits/json_type_traits.md), `false` otherwise.
+If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns **true** if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits/json_type_traits.md), **false** otherwise.
     bool is<X<std::string,T>> const noexcept
-If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits/json_type_traits.md), `false` otherwise.
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns **true** if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits/json_type_traits.md), **false** otherwise.
 
 (2) Same as `is<jsoncons::null_type>()`.  
-Returns `true` if the json value is null, `false` otherwise.  
+Returns **true** if the json value is null, **false** otherwise.  
 
 (3) Same as `is<std::string>()`.  
-Returns `true` if the json value is of string type, `false` otherwise.  
+Returns **true** if the json value is of string type, **false** otherwise.  
 
 (4) Same as `is<int64_t>()`.  
-Returns `true` if the json value is integral and within the range of `int64_t`, `false` otherwise.  
+Returns **true** if the json value is integral and within the range of `int64_t`, **false** otherwise.  
 
 (5) Same as `is<uint64_t>()`.  
-Returns `true` if the json value is integral and within the range of `uint64_t`, `false` otherwise.  
+Returns **true** if the json value is integral and within the range of `uint64_t`, **false** otherwise.  
 
 (6) Same as `is<double>()`.  
-Returns `true` if the json value is floating point and within the range of `double`, `false` otherwise.  
+Returns **true** if the json value is floating point and within the range of `double`, **false** otherwise.  
 
 (7) Same as `is<int64_t>() || is<uint64_t>() || is<double>()`.
 
 (8) Same as `is<bool>()`.  
-Returns `true` if the json value is of boolean type, `false` otherwise.  
+Returns **true** if the json value is of boolean type, **false** otherwise.  
 
 (10) Same as `is<jsoncons::bigint>()`.  
-Returns `true` if `is<int64_t>() || is<uint64_t>() is `true`, or if
-`is<std::string>()` is `true` and the string holds an integer value,
-otherwise `false`.
+Returns **true** if `is<int64_t>() || is<uint64_t>() is **true**, or if
+`is<std::string>()` is **true** and the string holds an integer value,
+otherwise **false**.
 
-(11) Returns `true` if the json value is an array, `false` otherwise.  
+(11) Returns **true** if the json value is an array, **false** otherwise.  
 
-(12) Returns `true` if the json value is an object, `false` otherwise.  
+(12) Returns **true** if the json value is an object, **false** otherwise.  
 
 ### Examples
 

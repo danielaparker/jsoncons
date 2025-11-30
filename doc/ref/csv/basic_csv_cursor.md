@@ -11,7 +11,7 @@ template<
 
 A pull parser for reporting CSV parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
-function to advance to the next event, until `done()` returns `true`.
+function to advance to the next event, until `done()` returns **true**.
 In addition, when positioned on a `begin_object` event, 
 the `read_to` function can pull a complete object representing
 the events from `begin_object` to `end_object`, 

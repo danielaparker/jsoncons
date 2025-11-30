@@ -18,7 +18,7 @@ first schema violation.
 
 #### Return value
  
-`true` if the instance is valid, otherwise `false`.
+**true** if the instance is valid, otherwise **false**.
 
 #### Exceptions
 

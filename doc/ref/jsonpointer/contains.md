@@ -27,7 +27,7 @@ bool contains(const Json& root, const StringSource& location_str);
 
 #### Return value
 
-Returns `true` if the json doc contains the given JSON Pointer, otherwise `false'
+Returns **true** if the json doc contains the given JSON Pointer, otherwise `false'
 
 ### Examples
 

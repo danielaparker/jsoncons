@@ -760,7 +760,7 @@ Output:
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
-returns `true`.
+returns **true**.
 
 ```cpp
 #include <jsoncons/json_cursor.hpp>
@@ -2700,7 +2700,7 @@ the type selection strategy is the same as for polymorphic types, and is based
 on the presence of mandatory members in the classes. More generally, 
 the type selection strategy is based on the `json_type_traits<Json,T>::is(const Json& j)` 
 function, checking each type in the variant from left to right, and stopping when 
-`json_type_traits<Json,T>::is(j)` returns `true`. 
+`json_type_traits<Json,T>::is(j)` returns **true**. 
 
 Now consider 
 

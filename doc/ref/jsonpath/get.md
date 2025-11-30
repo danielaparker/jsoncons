@@ -28,8 +28,8 @@ Gets a pointer to a JSON value in a JSON document at a specified location.
 
 Until 0.175.0, returns a pointer to the selected item, or null if not found. 
 
-Since 0.175.0, returns a `std::pair<Json*,bool>`. If the get operation succeeded, the bool component is `true`, and
-the `Json*` component points to the value in the `root`. If the get operation failed, the bool component is `false`.
+Since 0.175.0, returns a `std::pair<Json*,bool>`. If the get operation succeeded, the bool component is **true**, and
+the `Json*` component points to the value in the `root`. If the get operation failed, the bool component is **false**.
 
 
 ### Exceptions

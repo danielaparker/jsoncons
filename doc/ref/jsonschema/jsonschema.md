@@ -123,7 +123,7 @@ The implementation understands the following [formats](https://json-schema.org/u
 Any other format type is ignored.
 
 Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
-by setting the evaluation option `require_format_validation` to `true` 
+by setting the evaluation option `require_format_validation` to **true** 
 
 ### Schema dialect
 
@@ -328,7 +328,7 @@ Output:
 #### Format validation
 
 Since Draft 2019-09, format validation is disabled by default, but may be enabled by setting the 
-evaluation option `require_format_validation` to `true`. 
+evaluation option `require_format_validation` to **true**. 
 
 ```cpp
 #include <jsoncons/json.hpp>

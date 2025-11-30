@@ -45,7 +45,7 @@ trim_trailing_inside_quotes|Trim trailing whitespace inside quote characters.|&n
 trim_inside_quotes|Trim both leading and trailing whitespace inside quote characters.||&nbsp;**false**
 unquoted_empty_value_is_null|Replace empty field with json null value.|&nbsp;|**false**
 infer_types|Infer null, true, false, integers and floating point values in the CSV source.|&nbsp;|**true**
-lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.|&nbsp;|**false**
+lossless_number|If set to **true**, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.|&nbsp;|**false**
 comment_starter|Character to comment out a line, must be at column 1|&nbsp;|None
 mapping_kind|Indicates what [mapping kind](csv_mapping_kind.md) to use when parsing a CSV file into a `basic_json`.|&nbsp;|`csv_mapping_kind::n_objects` if assume_header is true or column_names is not empty, otherwise `csv_mapping_kind::n_rows`.|
 max_lines|Maximum number of lines to read.|&nbsp;|Unlimited

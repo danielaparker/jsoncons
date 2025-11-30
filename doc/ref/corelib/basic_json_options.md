@@ -24,7 +24,7 @@ inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenable
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|**1024**|
 lossless_bignum|When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- infinity.| |**true**|(since 1.4.0)</br>(until 1.5.0)
-lossless_bignum|When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces `+- infinity`.| |**true**|(since 1.5.0)
+ |When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces `+- infinity`.| |**true**|(since 1.5.0)
 lossless_number|If **true**, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |**false**|
 allow_comments|If 'true', allow (and ignore) comments when parsing JSON| |**true**|(since 1.3.0)
 allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored)| |**false**|(since 1.3.0)
@@ -35,7 +35,6 @@ spaces_around_colon| |Indicates [space option](spaces_option.md) for name separa
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`).|space after|
 pad_inside_object_braces| |Pad inside object braces|**false**|
 pad_inside_array_brackets| |Pad inside array brackets|**false**|
-bigint_format| |Specifies which [bigint format](bigint_chars_format.md) to use when serializing json.|`bignum_format_kind::raw`| (since 1.0.0)
 bignum_format| |Specifies which [bignum format](bignum_format_kind.md) to use when serializing json. |`bignum_format_kind::raw`|
 byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. |[byte_string_chars_format::base64url](byte_string_chars_format.md)|
 float_format| |Overrides [floating point format](float_chars_format.md) when serializing to JSON. |[float_chars_format::general](float_chars_format.md)|
@@ -51,7 +50,7 @@ object_array_line_splits| |For an array whose parent is an object, set whether t
 array_array_line_splits| |For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. |[line_split_kind::multi_line](line_split_kind.md)|
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
-The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
+The default precision is shortest representation, e.g. **1.1** read will remain **1.1** when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 Aliases for common character types are provided:
@@ -121,14 +120,13 @@ Move constructor.
 
 [Default NaN and inf replacement](#E1)  
 [User specified `Nan` and `Inf` replacement](#E2)  
-[Decimal precision](#E3)  
+[Parcing decimal numbers](#E3)  
 [Parse integer with lossless_bignum](#E4)  
-[Parse floating point with lossless_bignum](#E5)  
-[Root line splits](#E6)  
-[Object-array line splits](#E7)  
-[Array-array line splits](#E8)  
-[Indent with tabs](#E9)  
-[Allow trailing commas](#E10)  
+[Root line splits](#E5)  
+[Object-array line splits](#E6)  
+[Array-array line splits](#E7)  
+[Indent with tabs](#E8)  
+[Allow trailing commas](#E9)  
 
 <div id="E1"/> 
 
@@ -173,53 +171,86 @@ Output:
 
 <div id="E3"/> 
 
-#### Decimal precision
+#### Parcing decimal numbers
 
-By default, jsoncons parses a number with an exponent or fractional part
-into a double precision floating point number. If you wish, you can
-keep the number as a string with semantic tagging `bigdec`, 
-using the `lossless_number` option. You can then put it into a `float`, 
-`double`, a boost multiprecision number, or whatever type you want. 
+By default, if a parsed value with an exponent or decimal part 
+outside the range representable by a `double`, e.g. **1.5e999**, 
+the number is kept as a string and tagged with semantic tag `bigdec`, 
+otherwise it is parsed into a `double`. If you don't want this
+behavior, if you want values with an exponent or decimal part 
+outside the range representable by a `double` parsed as
+`inf` or `+inf`, you can set the option `lossless_bignum` to
+**false**.
+
+If the parsed value has a large number of decimal places but is within 
+the range representable by a double, it will be parsed as a double 
+and may loose precision. If you wish, you can keep all numbers as 
+strings with semantic tagging `bigint` or `bigdec`, by setting the 
+`lossless_number` option to **true**. You can then convert them into a 
+`float`, `double`, boost multiprecision  number, or whatever type you 
+wish. 
 
 ```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+using namespace jsoncons;
+
 int main()
 {
     std::string s = R"(
     {
         "a" : 12.00,
-        "b" : 1.23456789012345678901234567890
+        "b" : 1.23456789012345678901234567890,
+        "c" : 1.5e999
     }
     )";
 
-    // Default
-    json j = json::parse(s);
-
     std::cout.precision(15);
 
-    // Access as string
-    std::cout << "(1) a: " << j["a"].as<std::string>() << ", b: " << j["b"].as<std::string>() << "\n"; 
-    // Access as double
-    std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
+    std::cout << "default:\n";
+    json j1 = json::parse(s);
+    std::cout << "(1) " << j1["a"].as<std::string>() << ", " << j1["a"].as<double>() << "\n";
+    std::cout << "(2) " << j1["b"].as<std::string>() << ", " << j1["b"].as<double>() << "\n";
+    std::cout << "(3) " << j1["c"].as<std::string>() << ", " << j1["c"].as<double>() << "\n\n";
 
-    // Using lossless_number option
-    auto options = json_options{}
+    std::cout << "lossless_bignum is false:\n";
+    auto options2 = json_options{}
+        .lossless_bignum(false);
+    json j2 = json::parse(s, options2);
+    std::cout << "(1) " << j2["a"].as<std::string>() << ", " << j2["a"].as<double>() << "\n";
+    std::cout << "(2) " << j2["b"].as<std::string>() << ", " << j2["b"].as<double>() << "\n";
+    std::cout << "(3) " << j2["c"].as<std::string>() << ", " << j2["c"].as<double>() << "\n\n";
+
+    std::cout << "lossless_number is true:\n";
+    auto options3 = json_options{}
         .lossless_number(true);
-
-    json j2 = json::parse(s, options);
-    // Access as string
-    std::cout << "(3) a: " << j2["a"].as<std::string>() << ", b: " << j2["b"].as<std::string>() << "\n";
-    // Access as double
-    std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
+    json j3 = json::parse(s, options3);
+    std::cout << "(1) " << j3["a"].as<std::string>() << ", " << j3["a"].as<double>() << "\n";
+    std::cout << "(2) " << j3["b"].as<std::string>() << ", " << j3["b"].as<double>() << "\n";
+    std::cout << "(3) " << j3["c"].as<std::string>() << ", " << j3["c"].as<double>() << "\n\n";
 }
 ```
 Output:
 ```
-(1) a: 12.0, b: 1.2345678901234567
-(2) a: 12, b: 1.23456789012346
+default:
+(1) 12.0, 12
+(2) 1.2345678901234567, 1.23456789012346
+(3) 1.5e999, inf
 
-(3) a: 12.00, b: 1.23456789012345678901234567890
-(4) a: 12, b: 1.23456789012346
+lossless_bignum is false:
+(1) 12.0, 12
+(2) 1.2345678901234567, 1.23456789012346
+(3) null, inf
+
+lossless_number is true:
+(1) 12.00, 12
+(2) 1.23456789012345678901234567890, 1.23456789012346
+(3) 1.5e999, inf
 ```
+
+Note that `as<std::string>()` on an **inf** or **nan** value represented by a
+double will by default return **null**.
 
 <div id="E4"/> 
 
@@ -264,50 +295,6 @@ Output:
 
 <div id="E5"/> 
 
-#### Parse floating point with lossless_bignum 
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <iostream>
-
-int main()
-{
-    try
-    {
-        std::string str = R"({"a":1.5e999})";
-
-        auto options = jsoncons::json_options{}
-            .lossless_bignum(true);  // default
-
-        auto j1 = jsoncons::json::parse(str, options);
-        std::string buffer1;
-        j1.dump(buffer1);
-        std::cout << "(1) " << buffer1 << "\n";
-
-        options.lossless_bignum(false);
-        auto j2 = jsoncons::json::parse(str, options);
-        std::cout << "(2) " << j2.at("a").as<double>() << "\n";
-        std::string buffer2;
-        j2.dump(buffer2);
-        // By default, an inf value is serialzed to null
-        std::cout << "(3) " << buffer2 << "\n"; 
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "\n";
-    }
-}
-```
-
-Output:
-```
-(1) {"a":1.5e999}
-(2) inf
-(3) {"a":null}
-```
-
-<div id="E6"/> 
-
 #### Root line splits
 
 ```cpp
@@ -346,7 +333,7 @@ Output:
 [[1, 2, 3, 4]]
 ```
 
-<div id="E7"/> 
+<div id="E6"/> 
 
 #### Object-array line splits
 
@@ -426,7 +413,7 @@ new_ine:
 }
 ```
 
-<div id="E8"/> 
+<div id="E7"/> 
 
 #### Array-array line splits
 
@@ -484,7 +471,7 @@ same_line:
 ]
 ```
 
-<div id="E9"/> 
+<div id="E8"/> 
 
 #### Indent with tabs
 
@@ -510,7 +497,7 @@ int main()
 }
 ```
 
-<div id="E10"/> 
+<div id="E9"/> 
 
 #### Allow trailing commas
 

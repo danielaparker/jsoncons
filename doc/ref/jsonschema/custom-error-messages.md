@@ -1,7 +1,7 @@
 ### Custom Error Messages (since 1.2.0)
 
 jsoncons optionally allows schema authors to provide custom error messages via an `errorMessage` keyword. 
-To enable this feature, you need to provide an `expression_options` argument with `enable_custom_error_message` set to `true` when preparing a JSON Schema document with `make_json_schema`. 
+To enable this feature, you need to provide an `expression_options` argument with `enable_custom_error_message` set to **true** when preparing a JSON Schema document with `make_json_schema`. 
 
 The `errorMessage` keyword can be set to either
 
