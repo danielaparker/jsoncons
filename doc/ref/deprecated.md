@@ -16,6 +16,7 @@ Category/class|Old name|Replacement
 `basic_json_options`|&nbsp;|&nbsp;
 &nbsp;|`bigint_chars_format`|`bignum_chars_format`
 &nbsp;|`bigint_chars_format::number`|`bignum_chars_format::raw`
+&nbsp;|`lossless_bigint`|Use `lossless_bignum` instead
 &nbsp;|`line_splits`|Use the `root_line_splits` option instead (since 1.5.0)
 &nbsp;|**json_type::object_value**|Use `json_type::object` instead
 `basic_json_parser`|&nbsp;|&nbsp;
