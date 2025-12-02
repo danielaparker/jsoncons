@@ -507,7 +507,9 @@ public:
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bignum_format;
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     using basic_json_encode_options<CharT>::line_splits;
+#endif
     using basic_json_encode_options<CharT>::root_line_splits;
     using basic_json_encode_options<CharT>::object_object_line_splits;
     using basic_json_encode_options<CharT>::array_object_line_splits;
