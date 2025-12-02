@@ -53,7 +53,7 @@
       `null`, `boolean`, `int64`, `uint64`, `float16`, `float64`, `string`, 
       `byte_string`, `array` and `object` respectively. It's unlikely that we have
       many users of `json_type`, it isn't used in any of our examples, but for 
-      backwards compatability the old names, now deprecated, have been typedefed to 
+      backwards compatibility  the old names, now deprecated, have been typedef-ed to 
       the new names. 
 
     - The `json_options` member name `line_splits` has been renamed to `root_line_spits`.
@@ -1104,7 +1104,7 @@ the same node paths) to be excluded from results, and for results to be sorted i
 Changes to `json_query`
 
 - The parameter `result_type` has been replaced by a bitmask type `result_options`.
-For backwards compatability, `result_type` has been typedefed to `result_options`,
+For backwards compatability, `result_type` has been typedef-ed to `result_options`,
 and the `value` and `path` enumerators are still there. In addition, `result_options`
 provides options for excluding duplicates from results, and for results to be sorted in
 path order.
@@ -1252,7 +1252,7 @@ Change reverted:
 
 - The name change `ser_error` to `codec_error` introduced in
 0.157.0 has been reverted back to `ser_error`. Just in case
-anybody used it, the name `codec_error` has been typedefed 
+anybody used it, the name `codec_error` has been typedef-ed 
 to `ser_error`.
 
 0.157.0 
@@ -3834,7 +3834,7 @@ Changes to extensions:
 
 - Reversion of 0.96 change:
 
-The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_output_handler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedefed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
+The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_output_handler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedef-ed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
 
 The rationale for this reversion is that the change doesn't really help to make the software more flexible, and that it's better to leave out the typedefs. There will be future enhancements to support greater numeric precision, but these will not affect the current method signatures.
 
@@ -3999,7 +3999,7 @@ New extensions
 New features
 
 - Supports wide character strings and streams with wjson, wjson_reader etc. Assumes UTF16 encoding if sizeof(wchar_t)=2 and UTF32 encoding if sizeof(wchar_t)=4.
-- The empty class null_type  is added to the jsoncons namespace, it replaces the member type json::null_type (json::null_type is typedefed to jsoncons::null_type for backward compatibility.)
+- The empty class null_type  is added to the jsoncons namespace, it replaces the member type json::null_type (json::null_type is typedef-ed to jsoncons::null_type for backward compatibility.)
 
 Defect fixes:
 
@@ -4020,7 +4020,7 @@ Breaking change (but only if you have subclassed json_input_handler or json_outp
 
 Non breaking changes (previous features are deprecated but still work)
 
-- name_value_pair has been renamed to member_type (typedefed to previous name.)
+- name_value_pair has been renamed to member_type (typedef-ed to previous name.)
 
 - as_string(output_format format) has been deprecated, use the existing to_string(output_format format) instead
 
