@@ -38,8 +38,121 @@
 namespace jsoncons {
 namespace cursors {
 
-namespace detail {
+enum class json_event_kind : uint8_t
+{
+    key = 0,                // 0000
+    string_value = 1,       // 0001
+    byte_string_value = 2,  // 0010
+    null_value = 3,         // 0011
+    bool_value = 4,         // 0100
+    int64_value = 5,        // 0101
+    uint64_value = 6,       // 0110
+    half_value = 8,         // 1000
+    double_value = 9,       // 1001
+    begin_object = 13,      // 1101
+    end_object = 7,         // 0111    
+    begin_array = 14,       // 1110
+    end_array = 15          // 1111
+};
 
+inline bool is_begin_container(json_event_kind event_kind) noexcept
+{
+    static const uint8_t mask{ uint8_t(json_event_kind::begin_object) & uint8_t(json_event_kind::begin_array) };
+    return (uint8_t(event_kind) & mask) == mask;
+}
+
+inline bool is_end_container(json_event_kind event_kind) noexcept
+{
+    static const uint8_t mask{ uint8_t(json_event_kind::end_object) & uint8_t(json_event_kind::end_array) };
+    return (uint8_t(event_kind) & mask) == mask;
+}
+
+template <typename CharT>
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, json_event_kind tag)
+{
+    static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
+    static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
+    static constexpr const CharT* begin_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_object");
+    static constexpr const CharT* end_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_object");
+    static constexpr const CharT* key_name = JSONCONS_CSTRING_CONSTANT(CharT, "key");
+    static constexpr const CharT* string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "string_value");
+    static constexpr const CharT* byte_string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string_value");
+    static constexpr const CharT* null_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "null_value");
+    static constexpr const CharT* bool_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "bool_value");
+    static constexpr const CharT* uint64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "uint64_value");
+    static constexpr const CharT* int64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "int64_value");
+    static constexpr const CharT* half_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
+    static constexpr const CharT* double_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
+
+    switch (tag)
+    {
+        case json_event_kind::begin_array:
+        {
+            os << begin_array_name;
+            break;
+        }
+        case json_event_kind::end_array:
+        {
+            os << end_array_name;
+            break;
+        }
+        case json_event_kind::begin_object:
+        {
+            os << begin_object_name;
+            break;
+        }
+        case json_event_kind::end_object:
+        {
+            os << end_object_name;
+            break;
+        }
+        case json_event_kind::key:
+        {
+            os << key_name;
+            break;
+        }
+        case json_event_kind::string_value:
+        {
+            os << string_value_name;
+            break;
+        }
+        case json_event_kind::byte_string_value:
+        {
+            os << byte_string_value_name;
+            break;
+        }
+        case json_event_kind::null_value:
+        {
+            os << null_value_name;
+            break;
+        }
+        case json_event_kind::bool_value:
+        {
+            os << bool_value_name;
+            break;
+        }
+        case json_event_kind::int64_value:
+        {
+            os << int64_value_name;
+            break;
+        }
+        case json_event_kind::uint64_value:
+        {
+            os << uint64_value_name;
+            break;
+        }
+        case json_event_kind::half_value:
+        {
+            os << half_value_name;
+            break;
+        }
+        case json_event_kind::double_value:
+        {
+            os << double_value_name;
+            break;
+        }
+    }
+    return os;
 }
 
 enum class parse_state : uint8_t 
@@ -109,7 +222,7 @@ class basic_json_cursor : public ser_context
 {
 public:
     using char_type = CharT;
-    using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
+    using string_view_type = jsoncons::string_view_type<char_type>;
 private:
     struct string_maps_to_double
     {
