@@ -11,9 +11,15 @@
 
     - Git Issue #659: Fixed jsonschema validation message 
 
-    - Fixed issue with JSON write option `array_array_split_lines` value `line_split_kind::new_line` not creating a new line
+    - Git Issue #664: Fixed issue with detection of CBOR typed arrays that manifested itself on i386
 
-    - Fixed issue with inconsistent JSON write option output
+    - Fixed issue with JSON encode option `array_array_split_lines` value `line_split_kind::new_line` 
+      not creating a new line
+
+    - Fixed issue of JSON encode line split options applied to inner JSON structures 
+      conflicting with line split options applied to outer JSON structures, e.g. when
+      root line splits are **same_line** and array within array line splits are **multi_line**. 
+      With the new behaviour this will remain **same_line**. 
 
 - Changes
 
