@@ -19,7 +19,8 @@
     - Fixed issue of JSON encode line split options applied to inner JSON structures 
       conflicting with line split options applied to outer JSON structures, e.g. when
       root line splits are **same_line** and array within array line splits are **multi_line**. 
-      With the new behaviour the output will remain **same_line**. 
+      With the new behaviour the inner structure will remain **same_line** if the outer 
+      structure is **same_line**. 
 
 - Changes
 
