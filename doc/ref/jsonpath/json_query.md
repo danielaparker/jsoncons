@@ -75,7 +75,7 @@ void fun(const Json::string_view_type& path, const Json& val);
   </tr>
   <tr>
     <td><code>type</code> (until 0.161.0))</td>
-    <td>Since 0.161.0, typedefed to <code>jsonpath_options</code>.</td> 
+    <td>Since 0.161.0, typedef-ed to <code>jsonpath_options</code>.</td> 
   </tr>
   <tr>
     <td><code>options</code> (since 0.161.0)</td>
