@@ -4,16 +4,15 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons/cursors/json_cursor.hpp>
+#include <jsoncons_ext/msgpack/msgpack_tokenizer.hpp>
 #include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
 
-TEST_CASE("cursors::json_cursor constructor test")
+TEST_CASE("msgpack_tokenizer constructor test")
 {
-    SECTION("default constructor")
+    SECTION("constructor")
     {
-        cursors::json_cursor cursor{};
     }
 }

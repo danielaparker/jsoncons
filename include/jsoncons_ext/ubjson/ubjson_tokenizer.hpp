@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_UBJSON_CURSORS_UBJSON_CURSOR_HPP
-#define JSONCONS_EXT_UBJSON_CURSORS_UBJSON_CURSOR_HPP
+#ifndef JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
+#define JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -31,7 +31,6 @@
 
 namespace jsoncons { 
 namespace ubjson {
-namespace cursors {
 
 enum class parse_mode {root,accept,array,indefinite_array,strongly_typed_array,map_key,map_value,strongly_typed_map_key,strongly_typed_map_value,indefinite_map_key,indefinite_map_value};
 
@@ -941,7 +940,6 @@ private:
     }
 };
 
-} // namespace cursors
 } // namespace ubjson
 } // namespace jsoncons
 

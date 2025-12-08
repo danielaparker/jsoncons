@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CBOR_CURSORS_CBOR_CURSOR_HPP   
-#define JSONCONS_EXT_CBOR_CURSORS_CBOR_CURSOR_HPP   
+#ifndef JSONCONS_EXT_CBOR_CBOR_CURSOR_HPP   
+#define JSONCONS_EXT_CBOR_CBOR_CURSOR_HPP   
 
 #include <bitset> // std::bitset
 #include <cstddef>
@@ -32,7 +32,6 @@
 
 namespace jsoncons { 
 namespace cbor {
-namespace cursors {
 
 enum class parse_mode {root,accept,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
@@ -2040,7 +2039,6 @@ private:
     }
 };
 
-} // namespace cursors
 } // namespace cbor
 } // namespace jsoncons
 

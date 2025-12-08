@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_MSGPACK_CURSORS_MSGPACK_CURSOR_HPP
-#define JSONCONS_EXT_MSGPACK_CURSORS_MSGPACK_CURSOR_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -33,7 +33,6 @@
 
 namespace jsoncons { 
 namespace msgpack {
-namespace cursors {
 
 enum class parse_mode {root,accept,array,map_key,map_value};
 
@@ -803,8 +802,7 @@ private:
     }
 };
 
-} // namespace cursors
 } // namespace msgpack
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_MSGPACK_CURSORS_MSGPACK_CURSOR_HPP
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP

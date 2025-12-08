@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_BSON_CURSORS_BSON_CURSOR_HPP      
-#define JSONCONS_EXT_BSON_CURSORS_BSON_CURSOR_HPP      
+#ifndef JSONCONS_EXT_BSON_BSON_CURSOR_HPP      
+#define JSONCONS_EXT_BSON_BSON_CURSOR_HPP      
 
 #include <cstddef>
 #include <cstdint>
@@ -33,7 +33,6 @@
 
 namespace jsoncons { 
 namespace bson {
-namespace cursors {
 
 enum class parse_mode {root,accept,document,array,value};
 
@@ -706,8 +705,7 @@ private:
     }
 };
 
-} // namespace cursors
 } // namespace bson
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_BSON_CURSORS_BSON_CURSOR_HPP      
+#endif // JSONCONS_EXT_BSON_BSON_CURSOR_HPP      

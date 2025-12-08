@@ -4,13 +4,13 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons_ext/bson/cursors/bson_cursor.hpp>
+#include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 #include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
 
-TEST_CASE("cursors::bson_cursor constructor test")
+TEST_CASE("ubjson_tokenizer constructor test")
 {
     SECTION("constructor")
     {

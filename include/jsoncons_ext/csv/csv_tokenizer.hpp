@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CSV_CURSORS_CSV_CURSORS_HPP
-#define JSONCONS_EXT_CSV_CURSORS_CSV_CURSORS_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_HPP
+#define JSONCONS_EXT_CSV_CSV_HPP
 
 #include <cctype>
 #include <cstddef>
@@ -34,7 +34,6 @@
 
 namespace jsoncons { 
 namespace csv {
-namespace cursors {
 
 enum class csv_mode 
 {
@@ -2405,7 +2404,6 @@ private:
 using csv_cursor = basic_csv_cursor<char>;
 using wcsv_cursor = basic_csv_cursor<wchar_t>;
 
-} // namespace cursors
 } // namespace csv
 } // namespace jsoncons
 
