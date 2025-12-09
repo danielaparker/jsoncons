@@ -22,13 +22,13 @@ TEST_CASE("json_tokenizer constructor test")
 }
 )";
 
+        jsoncons::from_json_result r;
         tokenizer.update(str.data(), str.size());
         while (!tokenizer.done())
         {
-            std::error_code ec;
-            if (ec)
+            if (!r)
             {
-                std::cout << ec.message() << "\n";
+                std::cout << (int)r.ec << "\n";
                 //tokenizer.update("}", 1);
                 //break;
             }
@@ -36,7 +36,7 @@ TEST_CASE("json_tokenizer constructor test")
             {
                 std::cout << tokenizer.event_kind() << "\n";
             }
-            tokenizer.next(ec);
+            r = tokenizer.try_next();
         }
     }
 }

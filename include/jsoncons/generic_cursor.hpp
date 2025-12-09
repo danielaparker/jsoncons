@@ -142,7 +142,7 @@ public:
 
 struct from_json_result
 {
-    json_errc ec;
+    json_errc ec{};
 
     explicit operator bool() const noexcept
     {
