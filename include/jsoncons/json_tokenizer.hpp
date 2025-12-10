@@ -123,7 +123,7 @@ private:
     static constexpr std::size_t initial_buffer_capacity = 256;
     static constexpr int default_initial_stack_capacity = 66;
 
-    generic_event_kind event_kind_{};
+    generic_token_kind token_kind_{};
     semantic_tag tag_{};
     union
     {
@@ -154,7 +154,7 @@ private:
     parse_string_state string_state_{};
     parse_number_state number_state_{};
     bool more_{true};
-    bool done_{false};
+    bool done_{true};
     int mark_level_{0};
     
     semantic_tag escape_tag_;
@@ -209,9 +209,34 @@ public:
         }
     }
 
-    generic_event_kind event_kind()
+    generic_token_kind token_kind()
     {
-        return event_kind_;
+        return token_kind_;
+    }
+
+    bool get_bool() const
+    {
+        return value_.bool_value_;
+    }
+
+    int64_t get_int64() const
+    {
+        return value_.int64_value_;
+    }
+
+    uint64_t get_uint64() const
+    {
+        return value_.uint64_value_;
+    }
+
+    double get_double() const
+    {
+        return value_.double_value_;
+    }
+
+    string_view_type get_string_view() const
+    {
+        return string_view_type(value_.string_data_, length_);
     }
 
     int level() const
@@ -352,7 +377,7 @@ public:
 
         push_state(parse_state::object);
         state_ = parse_state::expect_member_name_or_end;
-        event_kind_ = generic_event_kind::begin_map;
+        token_kind_ = generic_token_kind::begin_map;
         tag_ = semantic_tag{};
         more_ = false;
     }
@@ -368,7 +393,7 @@ public:
         state_ = pop_state();
         if (state_ == parse_state::object)
         {
-            event_kind_ = generic_event_kind::end_map;
+            token_kind_ = generic_token_kind::end_map;
             tag_ = semantic_tag{};
         }
         else if (state_ == parse_state::array)
@@ -411,7 +436,7 @@ public:
 
         push_state(parse_state::array);
         state_ = parse_state::expect_value_or_end;
-        event_kind_ = generic_event_kind::begin_array;
+        token_kind_ = generic_token_kind::begin_array;
         tag_ = semantic_tag{};
 
         more_ = false;
@@ -428,7 +453,7 @@ public:
         state_ = pop_state();
         if (state_ == parse_state::array)
         {
-            event_kind_ = generic_event_kind::end_array;
+            token_kind_ = generic_token_kind::end_array;
             tag_ = semantic_tag{};
         }
         else if (state_ == parse_state::object)
@@ -478,7 +503,7 @@ public:
         push_state(parse_state::root);
         state_ = parse_state::start;
         more_ = true;
-        done_ = false;
+        done_ = true;
         line_ = 1;
         position_ = 0;
         mark_position_ = 0;
@@ -499,7 +524,7 @@ public:
         }
     }
 
-    from_json_result try_update(const string_view_type sv)
+    from_json_result try_update(string_view_type sv)
     {
         input_ptr_ = sv.data();
         input_end_ = input_ptr_ + sv.size();
@@ -537,11 +562,6 @@ public:
         return from_json_result{(json_errc)ec.value()};
     }
 
-    void parse_some(std::error_code& ec)
-    {
-        parse_some_(ec);
-    }
-
     void finish_parse()
     {
         std::error_code ec;
@@ -560,7 +580,7 @@ public:
         }
     }
 
-    void parse_some_(std::error_code& ec)
+    void parse_some(std::error_code& ec)
     {
         if (state_ == parse_state::accept)
         {
@@ -599,7 +619,6 @@ public:
                     break;
                 case parse_state::start:
                     more_ = false;
-                    ec = json_errc::unexpected_eof;
                     break;                
                 case parse_state::done:
                     more_ = false;
@@ -656,6 +675,7 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
+                            done_ = false;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -663,6 +683,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '[':
+                            done_ = false;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -670,6 +691,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
+                            done_ = false;
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
                             begin_position_ = position_;
@@ -681,6 +703,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '-':
+                            done_ = false;
                             buffer_.clear();
                             buffer_.push_back('-');
                             begin_position_ = position_;
@@ -692,6 +715,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case '0': 
+                            done_ = false;
                             buffer_.clear();
                             buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = parse_state::number;
@@ -703,6 +727,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            done_ = false;
                             buffer_.clear();
                             buffer_.push_back(static_cast<char>(*input_ptr_));
                             begin_position_ = position_;
@@ -714,14 +739,17 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 'n':
+                            done_ = false;
                             parse_null(ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 't':
+                            done_ = false;
                             input_ptr_ = parse_true(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 'f':
+                            done_ = false;
                             input_ptr_ = parse_false(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
@@ -1210,7 +1238,7 @@ public:
                         case 'e':
                             ++input_ptr_;
                             ++position_;
-                            event_kind_ = generic_event_kind::bool_value;
+                            token_kind_ = generic_token_kind::bool_value;
                             value_.bool_value_ = true;
                             tag_ = semantic_tag{};
                             if (level_ == 0)
@@ -1277,7 +1305,7 @@ public:
                         case 'e':
                             ++input_ptr_;
                             ++position_;
-                            event_kind_ = generic_event_kind::bool_value;
+                            token_kind_ = generic_token_kind::bool_value;
                             value_.bool_value_ = true;
                             tag_ = semantic_tag{};
                             if (level_ == 0)
@@ -1329,7 +1357,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'l':
-                            event_kind_ = generic_event_kind::null_value;
+                            token_kind_ = generic_token_kind::null_value;
                             tag_ = semantic_tag{};
                             if (level_ == 0)
                             {
@@ -1452,7 +1480,7 @@ public:
             {
                 cur += 4;
                 position_ += 4;
-                event_kind_ = generic_event_kind::bool_value;
+                token_kind_ = generic_token_kind::bool_value;
                 value_.bool_value_ = true;
                 tag_ = semantic_tag::none;
                 if (level_ == 0)
@@ -1490,7 +1518,7 @@ public:
             {
                 input_ptr_ += 4;
                 position_ += 4;
-                event_kind_ = generic_event_kind::null_value;
+                token_kind_ = generic_token_kind::null_value;
                 tag_ = semantic_tag::none;
                 more_ = false;
                 if (level_ == 0)
@@ -1526,7 +1554,7 @@ public:
             {
                 cur += 5;
                 position_ += 5;
-                event_kind_ = generic_event_kind::bool_value;
+                token_kind_ = generic_token_kind::bool_value;
                 value_.bool_value_ = false;
                 tag_ = semantic_tag{};
                 more_ = false;
@@ -1844,13 +1872,13 @@ text:
                     position_ += (cur - sb + 1);
                     if (buffer_.empty())
                     {
-                        ec = end_string_value(sb,cur-sb);
+                        ec = end_string_value(sb,cur-sb).ec;
                         if (JSONCONS_UNLIKELY(ec)) {return cur;}
                     }
                     else
                     {
                         buffer_.append(sb,cur-sb);
-                        ec = end_string_value(buffer_.data(), buffer_.length());
+                        ec = end_string_value(buffer_.data(), buffer_.length()).ec;
                         if (JSONCONS_UNLIKELY(ec)) {return cur;}
                     }
                     ++cur;
@@ -2264,7 +2292,7 @@ private:
         auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
-            event_kind_ = generic_event_kind::int64_value;
+            token_kind_ = generic_token_kind::int64_value;
             value_.int64_value_ = val;
             tag_ = semantic_tag::none;
         }
@@ -2272,7 +2300,7 @@ private:
         {
             if (lossless_bignum_)
             {
-                event_kind_ = generic_event_kind::string_value;
+                token_kind_ = generic_token_kind::string_value;
                 value_.string_data_ = buffer_.data();
                 length_ = buffer_.size();
                 tag_ = semantic_tag::bigint;
@@ -2283,13 +2311,13 @@ private:
                 result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
                 if (JSONCONS_LIKELY(result))
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = d;
                     tag_ = semantic_tag{};
                 }
                 else if (result.ec == std::errc::result_out_of_range)
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = d;
                     tag_ = semantic_tag{};
                 }
@@ -2316,7 +2344,7 @@ private:
         auto result = jsoncons::dec_to_integer(buffer_.data(), buffer_.length(), val);
         if (result)
         {
-            event_kind_ = generic_event_kind::uint64_value;
+            token_kind_ = generic_token_kind::uint64_value;
             value_.uint64_value_ = val;
             tag_ = semantic_tag::none;
         }
@@ -2324,7 +2352,7 @@ private:
         {
             if (lossless_bignum_)
             {
-                event_kind_ = generic_event_kind::string_value;
+                token_kind_ = generic_token_kind::string_value;
                 value_.string_data_ = buffer_.data();
                 length_ = buffer_.size();
                 tag_ = semantic_tag::bigint;
@@ -2335,13 +2363,13 @@ private:
                 result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
                 if (JSONCONS_LIKELY(result))
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = d;
                     tag_ = semantic_tag{};
                 }
                 else if (result.ec == std::errc::result_out_of_range)
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = d;
                     tag_ = semantic_tag{};
                 }
@@ -2365,7 +2393,7 @@ private:
     {
         if (lossless_number_)
         {
-            event_kind_ = generic_event_kind::string_value;
+            token_kind_ = generic_token_kind::string_value;
             value_.string_data_ = buffer_.data();
             length_ = buffer_.size();
             tag_ = semantic_tag::bigdec;
@@ -2376,7 +2404,7 @@ private:
             auto result = jsoncons::decstr_to_double(&buffer_[0], buffer_.length(), d);
             if (JSONCONS_LIKELY(result))
             {
-                event_kind_ = generic_event_kind::double_value;
+                token_kind_ = generic_token_kind::double_value;
                 value_.double_value_ = d;
                 tag_ = semantic_tag{};
             }
@@ -2384,14 +2412,14 @@ private:
             {
                 if (lossless_bignum_)
                 {
-                    event_kind_ = generic_event_kind::string_value;
+                    token_kind_ = generic_token_kind::string_value;
                     value_.string_data_ = buffer_.data();
                     length_ = buffer_.size();
                     tag_ = semantic_tag::bigdec;
                 }
                 else
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = d;
                     tag_ = semantic_tag{};
                 }
@@ -2407,7 +2435,7 @@ private:
         return try_after_value();
     }
 
-    json_errc end_string_value(const char_type* s, std::size_t length) 
+    from_json_result end_string_value(const char_type* s, std::size_t length) 
     {
         string_view_type sv(s, length);
         auto result = unicode_traits::validate(s, length);
@@ -2415,65 +2443,65 @@ private:
         {
             more_ = false;
             position_ += (result.ptr - s);
-            return translate_conv_errc(result.ec);
+            return from_json_result{translate_conv_errc(result.ec)};
         }
         switch (parent())
         {
             case parse_state::member_name:
-                event_kind_ = generic_event_kind::string_value;
+                token_kind_ = generic_token_kind::string_value;
                 value_.string_data_ = buffer_.data();
                 length_ = buffer_.size();
                 tag_ = semantic_tag{};
                 more_ = false;
                 pop_state();
                 state_ = parse_state::expect_colon;
-                return json_errc{};
+                return from_json_result{};
             case parse_state::object:
             case parse_state::array:
             {
                 auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
                 if (it != string_double_map_.end())
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = (*it).second;
                     tag_ = semantic_tag{};
                     more_ = false;
                 }
                 else
                 {
-                    event_kind_ = generic_event_kind::string_value;
+                    token_kind_ = generic_token_kind::string_value;
                     value_.string_data_ = sv.data();
                     length_ = sv.size();
                     tag_ = escape_tag_;
                     more_ = false;
                 }
                 state_ = parse_state::expect_comma_or_end;
-                return json_errc{};
+                return from_json_result{};
             }
             case parse_state::root:
             {
                 auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
                 if (it != string_double_map_.end())
                 {
-                    event_kind_ = generic_event_kind::double_value;
+                    token_kind_ = generic_token_kind::double_value;
                     value_.double_value_ = (*it).second;
                     tag_ = semantic_tag{};
                     more_ = false;
                 }
                 else
                 {
-                    event_kind_ = generic_event_kind::string_value;
+                    token_kind_ = generic_token_kind::string_value;
                     value_.string_data_ = sv.data();
                     length_ = sv.size();
                     tag_ = escape_tag_;
                     more_ = false;
                 }
                 state_ = parse_state::accept;
-                return json_errc{};
+                return from_json_result{};
             }
             default:
                 more_ = false;
-                return json_errc::syntax_error;
+                return from_json_result{json_errc::syntax_error};
         }
     }
 

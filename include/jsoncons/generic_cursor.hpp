@@ -14,8 +14,9 @@
 
 namespace jsoncons {
 
-enum class generic_event_kind : uint8_t
+enum class generic_token_kind : uint8_t
 {
+    unknown = 0,
     string_value = 1,       // 0001
     byte_string_value = 2,  // 0010
     null_value = 3,         // 0011
@@ -30,21 +31,22 @@ enum class generic_event_kind : uint8_t
     end_array = 15          // 1111
 };
 
-inline bool is_begin_container(generic_event_kind event_kind) noexcept
+inline bool is_begin_container(generic_token_kind event_kind) noexcept
 {
-    static const uint8_t mask{ uint8_t(generic_event_kind::begin_map) & uint8_t(generic_event_kind::begin_array) };
+    static const uint8_t mask{ uint8_t(generic_token_kind::begin_map) & uint8_t(generic_token_kind::begin_array) };
     return (uint8_t(event_kind) & mask) == mask;
 }
 
-inline bool is_end_container(generic_event_kind event_kind) noexcept
+inline bool is_end_container(generic_token_kind event_kind) noexcept
 {
-    static const uint8_t mask{ uint8_t(generic_event_kind::end_map) & uint8_t(generic_event_kind::end_array) };
+    static const uint8_t mask{ uint8_t(generic_token_kind::end_map) & uint8_t(generic_token_kind::end_array) };
     return (uint8_t(event_kind) & mask) == mask;
 }
 
 template <typename CharT>
-std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, generic_event_kind tag)
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, generic_token_kind tag)
 {
+    static constexpr const CharT* unknown_name = JSONCONS_CSTRING_CONSTANT(CharT, "unknown");
     static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
     static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
     static constexpr const CharT* begin_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_map");
@@ -61,84 +63,74 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, generic_eve
 
     switch (tag)
     {
-        case generic_event_kind::begin_array:
+        case generic_token_kind::begin_array:
         {
             os << begin_array_name;
             break;
         }
-        case generic_event_kind::end_array:
+        case generic_token_kind::end_array:
         {
             os << end_array_name;
             break;
         }
-        case generic_event_kind::begin_map:
+        case generic_token_kind::begin_map:
         {
             os << begin_object_name;
             break;
         }
-        case generic_event_kind::end_map:
+        case generic_token_kind::end_map:
         {
             os << end_object_name;
             break;
         }
-        case generic_event_kind::string_value:
+        case generic_token_kind::string_value:
         {
             os << string_value_name;
             break;
         }
-        case generic_event_kind::byte_string_value:
+        case generic_token_kind::byte_string_value:
         {
             os << byte_string_value_name;
             break;
         }
-        case generic_event_kind::null_value:
+        case generic_token_kind::null_value:
         {
             os << null_value_name;
             break;
         }
-        case generic_event_kind::bool_value:
+        case generic_token_kind::bool_value:
         {
             os << bool_value_name;
             break;
         }
-        case generic_event_kind::int64_value:
+        case generic_token_kind::int64_value:
         {
             os << int64_value_name;
             break;
         }
-        case generic_event_kind::uint64_value:
+        case generic_token_kind::uint64_value:
         {
             os << uint64_value_name;
             break;
         }
-        case generic_event_kind::half_value:
+        case generic_token_kind::half_value:
         {
             os << half_value_name;
             break;
         }
-        case generic_event_kind::double_value:
+        case generic_token_kind::double_value:
         {
             os << double_value_name;
+            break;
+        }
+        default:
+        {
+            os << unknown_name;
             break;
         }
     }
     return os;
 }
-
-template <typename CharT>
-class basic_generic_cursor
-{
-public:
-    virtual bool done() const = 0;
-
-    virtual void next() = 0;
-
-    virtual void next(std::error_code& ec) = 0;
-
-    virtual generic_event_kind event_kind() = 0;
-
-    //virtual void next(std::error_code& ec) = 0;
-};
 
 struct from_json_result
 {

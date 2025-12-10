@@ -17,9 +17,16 @@ using namespace jsoncons;
 
 TEST_CASE("json_cursor eof test")
 {
-    SECTION("string source eof 1")
+    SECTION("empty string 1")
     {
         std::string data = "";
+
+        json_string_cursor cursor(data);
+        CHECK(cursor.eof());
+    }
+    SECTION("string with ws 1")
+    {
+        std::string data = " ";
 
         json_string_cursor cursor(data);
         CHECK(cursor.eof());
