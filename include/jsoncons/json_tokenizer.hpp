@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include <jsoncons/generic_cursor.hpp>
+#include <jsoncons/generic_tokenizer.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/json_error.hpp>

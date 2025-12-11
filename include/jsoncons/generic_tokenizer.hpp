@@ -16,7 +16,7 @@ namespace jsoncons {
 
 enum class generic_token_kind : uint8_t
 {
-    unknown = 0,
+    parsing_incomplete = 0,
     string_value = 1,       // 0001
     byte_string_value = 2,  // 0010
     null_value = 3,         // 0011
