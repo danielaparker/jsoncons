@@ -100,7 +100,7 @@ enum class parse_number_state : uint8_t
 };
 
 template <typename CharT,typename TempAlloc  = std::allocator<char>>
-class basic_json_tokenizer 
+class basic_json_tokenizer : private ser_context
 {
 public:
     using char_type = CharT;
@@ -214,22 +214,27 @@ public:
         return token_kind_;
     }
 
-    bool get_bool() const
+    semantic_tag tag() const
+    {
+        return tag_;
+    }
+
+    bool get_bool_value() const
     {
         return value_.bool_value_;
     }
 
-    int64_t get_int64() const
+    int64_t get_int64_value() const
     {
         return value_.int64_value_;
     }
 
-    uint64_t get_uint64() const
+    uint64_t get_uint64_value() const
     {
         return value_.uint64_value_;
     }
 
-    double get_double() const
+    double get_double_value() const
     {
         return value_.double_value_;
     }
@@ -324,6 +329,25 @@ public:
     bool finished() const
     {
         return !more_ && state_ != parse_state::accept;
+    }
+
+    void check_done(std::error_code& ec)
+    {
+        for (; input_ptr_ != input_end_; ++input_ptr_)
+        {
+            char_type curr_char_ = *input_ptr_;
+            switch (curr_char_)
+            {
+                case '\n':
+                case '\r':
+                case '\t':
+                case ' ':
+                    break;
+                default:
+                    ec = json_errc::extra_character;
+                    break;
+            }
+        }
     }
 
     void skip_whitespace()
@@ -2198,14 +2222,19 @@ escape_u8:
         }
     }
 
-    std::size_t line() const
+    std::size_t line() const final
     {
         return line_;
     }
 
-    std::size_t column() const
+    std::size_t column() const final
     {
         return (position_ - mark_position_) + 1;
+    }
+
+    const ser_context& get_context() const
+    {
+        return *this;
     }
 
     std::size_t begin_position() const

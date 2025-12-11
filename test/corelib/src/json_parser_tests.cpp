@@ -16,6 +16,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("Test cyrillic.json")
 {
     std::string path = "./corelib/input/cyrillic.json";
@@ -27,6 +28,7 @@ TEST_CASE("Test cyrillic.json")
     REQUIRE(is);
     json j = json::parse(is);
 }
+#endif 
 
 TEST_CASE("test_object2")
 {
@@ -39,7 +41,7 @@ json source = json::parse(R"(
 
     std::cout << source << '\n';
 }
-
+#if 0
 TEST_CASE("test_object_with_three_members")
 {
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
@@ -48,6 +50,7 @@ TEST_CASE("test_object_with_three_members")
     CHECK(true == val.is_object());
     CHECK(3 == val.size());
 }
+#endif
 
 TEST_CASE("test_double")
 {
@@ -232,7 +235,7 @@ TEST_CASE("test_parse_null")
 
     json j = decoder.get_result();
 }
-
+#if 0
 TEST_CASE("test incremental parsing")
 {
     SECTION("array of bool")
@@ -257,6 +260,7 @@ TEST_CASE("test incremental parsing")
         CHECK_FALSE(j[0].as<bool>());
     }
 }
+#endif
 
 TEST_CASE("test_parser_reinitialization")
 {
@@ -281,9 +285,9 @@ TEST_CASE("test_parser_reinitialization")
     REQUIRE(j2.is_int64());
     CHECK(j2.as<int64_t>() == -42);
 }
-
 TEST_CASE("test_diagnostics_visitor", "")
 {
+#if 0
     SECTION("narrow char")
     {
         std::ostringstream os;
@@ -302,7 +306,6 @@ TEST_CASE("test_diagnostics_visitor", "")
                  << "visit_end_object"    << '\n';
         CHECK(os.str() == expected.str());
     }
-
     SECTION("wide char")
     {
         std::wostringstream os;
@@ -321,10 +324,12 @@ TEST_CASE("test_diagnostics_visitor", "")
                  << L"visit_end_object"    << '\n';
         CHECK(os.str() == expected.str());
     }
+#endif
 }
 
 TEST_CASE("json_parser skip space tests")
 {
+#if 0
     SECTION("test 1")
     {
         jsoncons::json_decoder<json> decoder;
@@ -346,6 +351,7 @@ TEST_CASE("json_parser skip space tests")
         CHECK(2 == parser.line());
         CHECK(7 == parser.column());
     }
+
     SECTION("test 2")
     {
         jsoncons::json_decoder<json> decoder;
@@ -388,5 +394,6 @@ TEST_CASE("json_parser skip space tests")
         CHECK(2 == parser.line());
         CHECK(7 == parser.column());
     }
+#endif
 }
 

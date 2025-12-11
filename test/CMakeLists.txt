@@ -115,6 +115,7 @@ add_executable(unit_tests
                corelib/src/json_reader_tests.cpp
                corelib/src/json_storage_tests.cpp
                corelib/src/json_swap_tests.cpp
+               corelib/src/json_tokenizer_tests.cpp
                corelib/src/json_uses_allocator_tests.cpp
                corelib/src/jsoncons_tests.cpp
                corelib/src/JSONTestSuite_tests.cpp
