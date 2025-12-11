@@ -293,7 +293,7 @@ TEST_CASE("ubjson_parser with json_diagnostics_visitor", "")
              << "    visit_null"      << '\n'
              << "  visit_end_array"   << '\n'
              << "visit_end_object"    << '\n';
-    CHECK(os.str() == expected.str());
+    CHECK(expected.str() == os.str())             ;
 }
 
 struct ubjson_bytes_cursor_reset_test_traits

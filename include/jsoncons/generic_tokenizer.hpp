@@ -141,14 +141,9 @@ struct from_json_result
         return ec == json_errc{};
     }
 
-    bool operator==(const from_json_result& other)
-    {
-        return ec == other.ec;
-    }
-
     friend bool operator==(const from_json_result& lhs, const from_json_result& rhs)
     {
-        return lhs == rhs;
+        return lhs.ec == rhs.ec;
     }
 };
 

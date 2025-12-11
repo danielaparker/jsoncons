@@ -28,7 +28,7 @@ TEST_CASE("Test cyrillic.json")
     REQUIRE(is);
     json j = json::parse(is);
 }
-#endif 
+#endif
 
 TEST_CASE("test_object2")
 {
@@ -41,16 +41,28 @@ json source = json::parse(R"(
 
     std::cout << source << '\n';
 }
-#if 0
+
 TEST_CASE("test_object_with_three_members")
 {
-    std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
-    json val = json::parse(input);
+    SECTION("json object with three members")
+    {
+        std::string input = R"({"A":"Jane","B":"Roe","C":10})";
+        auto j = json::parse(input);
 
-    CHECK(true == val.is_object());
-    CHECK(3 == val.size());
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(input == buffer);
+    }
+    SECTION("ojson object with three members")
+    {
+        std::string input = R"({"B":"Roe","A":"Jane","C":10})";
+        auto j = ojson::parse(input);
+
+        std::string buffer;
+        j.dump(buffer);
+        CHECK(input == buffer);
+    }
 }
-#endif
 
 TEST_CASE("test_double")
 {
@@ -304,7 +316,7 @@ TEST_CASE("test_diagnostics_visitor", "")
                  << "    visit_null"      << '\n'
                  << "  visit_end_array"   << '\n'
                  << "visit_end_object"    << '\n';
-        CHECK(os.str() == expected.str());
+        CHECK(expected.str() == os.str())             ;
     }
     SECTION("wide char")
     {
@@ -322,7 +334,7 @@ TEST_CASE("test_diagnostics_visitor", "")
                  << L"    visit_null"      << '\n'
                  << L"  visit_end_array"   << '\n'
                  << L"visit_end_object"    << '\n';
-        CHECK(os.str() == expected.str());
+        CHECK(expected.str() == os.str())             ;
     }
 #endif
 }

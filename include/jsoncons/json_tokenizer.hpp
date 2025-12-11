@@ -156,6 +156,7 @@ private:
     bool more_{true};
     bool done_{true};
     int mark_level_{0};
+    bool is_key_{false};
     
     semantic_tag escape_tag_;
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> buffer_;
@@ -217,6 +218,11 @@ public:
     semantic_tag tag() const
     {
         return tag_;
+    }
+
+    bool is_key() const
+    {
+        return is_key_;
     }
 
     bool get_bool_value() const
@@ -659,6 +665,7 @@ public:
 
         while ((input_ptr_ < local_input_end) && more_)
         {
+            is_key_ = false;
             switch (state_)
             {
                 case parse_state::accept:
@@ -900,6 +907,7 @@ public:
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
+                            is_key_ = true;
                             break;
                         case '\'':
                             more_ = false;
@@ -940,6 +948,7 @@ public:
                             buffer_.clear();
                             input_ptr_ = parse_string(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) return;
+                            is_key_ = true;
                             break;
                         case '}':
                             begin_position_ = position_;
@@ -2478,8 +2487,8 @@ private:
         {
             case parse_state::member_name:
                 token_kind_ = generic_token_kind::string_value;
-                value_.string_data_ = buffer_.data();
-                length_ = buffer_.size();
+                value_.string_data_ = s;
+                length_ = length;
                 tag_ = semantic_tag{};
                 more_ = false;
                 pop_state();

@@ -184,4 +184,19 @@ TEST_CASE("json_tokenizer update test")
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
     }
+    SECTION("object with three members")
+    {
+        std::string data = R"({"A":"Jane", "B":"Roe", "C":10})";
+
+        json_tokenizer tokenizer{};
+        CHECK(json_errc{} == tokenizer.try_update(data).ec);
+        while (!tokenizer.done())
+        {
+            std::cout << tokenizer.event_kind() << "\n";
+        }
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(tokenizer.done());
+    }
 }

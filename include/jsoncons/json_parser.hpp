@@ -185,8 +185,16 @@ public:
             switch (tokenizer_.token_kind())
             {
                 case generic_token_kind::string_value:
-                    visitor.string_value(tokenizer_.get_string_view(),
-                        tokenizer_.tag(), tokenizer_.get_context());
+                    if (tokenizer_.is_key())
+                    {
+                        visitor.key(tokenizer_.get_string_view(),
+                            tokenizer_.get_context());
+                    }
+                    else
+                    {
+                        visitor.string_value(tokenizer_.get_string_view(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                    }
                     break;
                 case generic_token_kind::null_value:
                     visitor.null_value(tokenizer_.tag(), tokenizer_.get_context());
@@ -229,6 +237,7 @@ public:
                 return;
             }
         }
+        visitor.flush();
         //parse_some_(visitor, ec);
     }
 
