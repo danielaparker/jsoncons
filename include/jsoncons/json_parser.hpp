@@ -174,7 +174,10 @@ public:
         parse_some(visitor, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec,tokenizer_.line(), tokenizer_.column()));
+            if (ec != json_errc::unexpected_eof)
+            {
+                JSONCONS_THROW(ser_error(ec,tokenizer_.line(), tokenizer_.column()));
+            }
         }
     }
 
@@ -234,29 +237,26 @@ public:
             if (!r)
             {
                 ec = r.ec;
+                if (ec == json_errc::unexpected_eof)
+                {
+                    ec.clear();
+                }
                 return;
             }
         }
         visitor.flush();
-        //parse_some_(visitor, ec);
-    }
-
-    void finish_parse(basic_json_visitor<char_type>& visitor)
-    {
-        std::error_code ec;
-        finish_parse(visitor, ec);
-        if (JSONCONS_UNLIKELY(ec))
+        if (ec == json_errc::unexpected_eof)
         {
-            JSONCONS_THROW(ser_error(ec,tokenizer_.line(), tokenizer_.column()));
+            ec.clear();
         }
     }
 
-    void finish_parse(basic_json_visitor<char_type>& visitor, std::error_code& ec)
+    void finish_parse(basic_json_visitor<char_type>&)
     {
-        while (!finished())
-        {
-            parse_some(visitor, ec);
-        }
+    }
+
+    void finish_parse(basic_json_visitor<char_type>&, std::error_code&)
+    {
     }
 };
 

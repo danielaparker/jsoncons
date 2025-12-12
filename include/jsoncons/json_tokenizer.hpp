@@ -303,12 +303,15 @@ public:
     void next(std::error_code& ec)
     {
         more_ = true;
+        token_kind_ = generic_token_kind{};
         parse_some(ec);
     }
 
     from_json_result try_next()
     {
+
         more_ = true;
+        token_kind_ = generic_token_kind{};
         return try_parse_some();
     }
 
@@ -592,24 +595,6 @@ public:
         return from_json_result{(json_errc)ec.value()};
     }
 
-    void finish_parse()
-    {
-        std::error_code ec;
-        finish_parse(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
-        }
-    }
-
-    void finish_parse(std::error_code& ec)
-    {
-        while (!finished())
-        {
-            parse_some(ec);
-        }
-    }
-
     void parse_some(std::error_code& ec)
     {
         if (state_ == parse_state::accept)
@@ -662,7 +647,7 @@ public:
                     return;
             }
         }
-
+ 
         while ((input_ptr_ < local_input_end) && more_)
         {
             is_key_ = false;
@@ -1339,7 +1324,7 @@ public:
                             ++input_ptr_;
                             ++position_;
                             token_kind_ = generic_token_kind::bool_value;
-                            value_.bool_value_ = true;
+                            value_.bool_value_ = false;
                             tag_ = semantic_tag{};
                             if (level_ == 0)
                             {

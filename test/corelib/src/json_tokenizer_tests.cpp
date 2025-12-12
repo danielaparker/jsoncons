@@ -184,19 +184,54 @@ TEST_CASE("json_tokenizer update test")
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
     }
+
     SECTION("object with three members")
     {
         std::string data = R"({"A":"Jane", "B":"Roe", "C":10})";
 
         json_tokenizer tokenizer{};
-        CHECK(json_errc{} == tokenizer.try_update(data).ec);
-        while (!tokenizer.done())
-        {
-            std::cout << tokenizer.event_kind() << "\n";
-        }
-        CHECK_FALSE(tokenizer.done());
-        CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
+        REQUIRE(json_errc{} == tokenizer.try_update(data).ec);
+        CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::end_map == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(tokenizer.done());
+    }
+
+    SECTION("test1")
+    {
+        std::string data(R"({"foo":[42,null]})");
+
+        json_tokenizer tokenizer{};
+        REQUIRE(json_errc{} == tokenizer.try_update(data).ec);
+        CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::begin_array == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::null_value == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::end_array == tokenizer.token_kind());
+        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(generic_token_kind::end_map == tokenizer.token_kind());
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
     }
 }
+
+

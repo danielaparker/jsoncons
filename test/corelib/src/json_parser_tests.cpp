@@ -15,7 +15,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-
 #if 0
 TEST_CASE("Test cyrillic.json")
 {
@@ -29,7 +28,7 @@ TEST_CASE("Test cyrillic.json")
     json j = json::parse(is);
 }
 #endif
-
+//#if 0
 TEST_CASE("test_object2")
 {
 json source = json::parse(R"(
@@ -247,7 +246,7 @@ TEST_CASE("test_parse_null")
 
     json j = decoder.get_result();
 }
-#if 0
+
 TEST_CASE("test incremental parsing")
 {
     SECTION("array of bool")
@@ -269,10 +268,10 @@ TEST_CASE("test incremental parsing")
 
         json j = decoder.get_result();
         REQUIRE(j.is_array());
+        REQUIRE(j[0].is<bool>());
         CHECK_FALSE(j[0].as<bool>());
     }
 }
-#endif
 
 TEST_CASE("test_parser_reinitialization")
 {
@@ -281,6 +280,7 @@ TEST_CASE("test_parser_reinitialization")
 
     parser.reset();
     parser.update("false true", 10);
+    parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK_FALSE(parser.source_exhausted());
@@ -290,6 +290,7 @@ TEST_CASE("test_parser_reinitialization")
 
     parser.reinitialize();
     parser.update("-42", 3);
+    parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK(parser.source_exhausted());
@@ -297,9 +298,9 @@ TEST_CASE("test_parser_reinitialization")
     REQUIRE(j2.is_int64());
     CHECK(j2.as<int64_t>() == -42);
 }
+
 TEST_CASE("test_diagnostics_visitor", "")
 {
-#if 0
     SECTION("narrow char")
     {
         std::ostringstream os;
@@ -307,6 +308,7 @@ TEST_CASE("test_diagnostics_visitor", "")
         json_parser parser;
         std::string input(R"({"foo":[42,null]})");
         parser.update(input.data(), input.size());
+        parser.parse_some(visitor);
         parser.finish_parse(visitor);
         std::ostringstream expected;
         expected << "visit_begin_object"  << '\n'
@@ -325,6 +327,7 @@ TEST_CASE("test_diagnostics_visitor", "")
         wjson_parser parser;
         std::wstring input(LR"({"foo":[42,null]})");
         parser.update(input.data(), input.size());
+        parser.parse_some(visitor);
         parser.finish_parse(visitor);
         std::wostringstream expected;
         expected << L"visit_begin_object"  << '\n'
@@ -336,7 +339,6 @@ TEST_CASE("test_diagnostics_visitor", "")
                  << L"visit_end_object"    << '\n';
         CHECK(expected.str() == os.str())             ;
     }
-#endif
 }
 
 TEST_CASE("json_parser skip space tests")
@@ -408,4 +410,4 @@ TEST_CASE("json_parser skip space tests")
     }
 #endif
 }
-
+//#endif
