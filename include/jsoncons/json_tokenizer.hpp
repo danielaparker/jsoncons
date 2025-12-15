@@ -290,28 +290,61 @@ public:
         return done_;
     }
 
-    void next()
-    {
-        std::error_code ec;
-        next(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
-        }
-    }
-
-    void next(std::error_code& ec)
-    {
-        more_ = true;
-        token_kind_ = generic_token_kind{};
-        parse_some(ec);
-    }
-
     from_json_result try_next()
     {
-
         more_ = true;
         token_kind_ = generic_token_kind{};
+        if (state_ == parse_state::accept)
+        {
+            done_ = true;
+            state_ = parse_state::done;
+            more_ = false;
+            return from_json_result{};
+        }
+        const char_type* local_input_end = input_end_;
+        std::error_code ec{};
+
+        if (input_ptr_ == local_input_end && more_)
+        {
+            switch (state_)
+            {
+                case parse_state::number:  
+                    if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
+                    {
+                        end_integer_value(ec);
+                        if (JSONCONS_UNLIKELY(ec)) return from_json_result{(json_errc)ec.value()};
+                    }
+                    else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
+                    {
+                        auto r = end_fraction_value();
+                        if (JSONCONS_UNLIKELY(!r)) return r;
+                    }
+                    else
+                    {
+                        more_ = false;
+                        return from_json_result{json_errc::unexpected_eof};
+                    }
+                    break;
+                case parse_state::accept:
+                    done_ = true;
+                    state_ = parse_state::done;
+                    more_ = false;
+                    break;
+                case parse_state::start:
+                    more_ = false;
+                    break;                
+                case parse_state::done:
+                    more_ = false;
+                    break;
+                case parse_state::cr:
+                    state_ = pop_state();
+                    break;
+                default:
+                    more_ = false;
+                    return from_json_result{json_errc::unexpected_eof};
+            }
+        }
+
         return try_parse_some();
     }
 
@@ -548,15 +581,6 @@ public:
         more_ = true;
     }
 
-    void update(string_view_type sv)
-    {
-        auto r = try_update(sv);
-        if (!r)
-        {
-            JSONCONS_THROW(ser_error(r.ec, line_, column()));
-        }
-    }
-
     from_json_result try_update(string_view_type sv)
     {
         input_ptr_ = sv.data();
@@ -569,13 +593,6 @@ public:
         input_ptr_ = data;
         input_end_ = data + length;
         return try_parse_some();
-    }
-
-    void update(const char_type* data, std::size_t length)
-    {
-        input_end_ = data + length;
-        input_ptr_ = data;
-        parse_some();
     }
 
     void parse_some()
@@ -605,48 +622,6 @@ public:
             return;
         }
         const char_type* local_input_end = input_end_;
-
-        if (input_ptr_ == local_input_end && more_)
-        {
-            switch (state_)
-            {
-                case parse_state::number:  
-                    if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
-                    {
-                        end_integer_value(ec);
-                        if (JSONCONS_UNLIKELY(ec)) return;
-                    }
-                    else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
-                    {
-                        ec = end_fraction_value().ec;
-                        if (JSONCONS_UNLIKELY(ec)) return;
-                    }
-                    else
-                    {
-                        ec = json_errc::unexpected_eof;
-                        more_ = false;
-                    }
-                    break;
-                case parse_state::accept:
-                    done_ = true;
-                    state_ = parse_state::done;
-                    more_ = false;
-                    break;
-                case parse_state::start:
-                    more_ = false;
-                    break;                
-                case parse_state::done:
-                    more_ = false;
-                    break;
-                case parse_state::cr:
-                    state_ = pop_state();
-                    break;
-                default:
-                    ec = json_errc::unexpected_eof;
-                    more_ = false;
-                    return;
-            }
-        }
  
         while ((input_ptr_ < local_input_end) && more_)
         {
