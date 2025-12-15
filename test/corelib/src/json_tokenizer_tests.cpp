@@ -41,7 +41,6 @@ using namespace jsoncons;
     }
 }*/
 
-#if 0
 TEST_CASE("json_tokenizer update test")
 {
     SECTION("empty input")
@@ -50,7 +49,6 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         CHECK(json_errc{} == tokenizer.try_update(data).ec);
-        CHECK_NOTHROW(tokenizer.update(data));
         CHECK(tokenizer.done());
     }
     SECTION("input with whitespace")
@@ -59,7 +57,6 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         CHECK(json_errc{} == tokenizer.try_update(data).ec);
-        CHECK_NOTHROW(tokenizer.update(data));
         CHECK(tokenizer.done());
     }
     SECTION("string")
@@ -234,11 +231,9 @@ TEST_CASE("json_tokenizer update test")
         CHECK(tokenizer.done());
     }
 }
-#endif
 
 TEST_CASE("json_tokenizer incremental update tests")
 {
-#if 0
     SECTION("test 1")
     {
         std::string data{"123456"};
@@ -260,44 +255,10 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(generic_token_kind{} == tokenizer.token_kind());
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
+        CHECK(12345678 == tokenizer.get_uint64_value());
         REQUIRE(!tokenizer.done());
-    }
-#endif
-
-    SECTION("test 2")
-    {
-        std::string data{"123456"};
-        std::string more_data{"78"};
-        std::string no_data{""};
-
-        json_tokenizer tokenizer{};
-        REQUIRE(json_errc{} == tokenizer.try_update(data).ec);
-        while (!tokenizer.done())
-        {
-            if (tokenizer.token_kind() == generic_token_kind::uint64_value)
-            {
-                std::cout << "(1) " << tokenizer.get_uint64_value() << "\n";
-            }
-            tokenizer.try_next();
-        }
-        REQUIRE(json_errc{} == tokenizer.try_update(more_data).ec);
-        /*while (!tokenizer.done())
-        {
-            if (tokenizer.token_kind() == generic_token_kind::uint64_value)
-            {
-                std::cout << "(2) " << tokenizer.get_uint64_value() << "\n";
-            }
-            tokenizer.try_next();
-        }
-        REQUIRE(json_errc{} == tokenizer.try_update(no_data).ec);*/
-        while (!tokenizer.done())
-        {
-            if (tokenizer.token_kind() == generic_token_kind::uint64_value)
-            {
-                std::cout << "(3) " << tokenizer.get_uint64_value() << "\n";
-            }
-            tokenizer.try_next();
-        }
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(tokenizer.done());
     }
 }
 

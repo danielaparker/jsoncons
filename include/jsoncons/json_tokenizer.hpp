@@ -343,9 +343,12 @@ public:
                     more_ = false;
                     return from_json_result{json_errc::unexpected_eof};
             }
+            return from_json_result{};
         }
-
-        return try_parse_some();
+        else
+        {
+            return try_parse_some();
+        }
     }
 
     bool enter() const
