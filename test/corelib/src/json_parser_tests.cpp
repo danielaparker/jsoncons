@@ -401,6 +401,7 @@ TEST_CASE("json_parser skip space tests")
         CHECK(parser.source_exhausted());
         parser.update(line2.data(), line2.size());
         parser.parse_some(decoder);
+        parser.finish_parse(decoder);
 
         //std::cout << "position:" << parser.position() << "line:" << parser.line() << "column:" << parser.column() << "\n";
 

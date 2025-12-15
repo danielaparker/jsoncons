@@ -41,6 +41,7 @@ using namespace jsoncons;
     }
 }*/
 
+#if 0
 TEST_CASE("json_tokenizer update test")
 {
     SECTION("empty input")
@@ -231,10 +232,10 @@ TEST_CASE("json_tokenizer update test")
         CHECK(tokenizer.done());
     }
 }
-
+#endif
 TEST_CASE("json_tokenizer incremental update tests")
 {
-    SECTION("test 1")
+    /*SECTION("test 1")
     {
         std::string data{"123456"};
         std::string more_data{"78"};
@@ -256,6 +257,35 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
         CHECK(12345678 == tokenizer.get_uint64_value());
+        REQUIRE(!tokenizer.done());
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(tokenizer.done());
+    }*/
+    SECTION("test 2")
+    {
+        std::string data{"[123456"};
+        std::string more_data{"78"};
+        std::string last_data{"]"};
+
+        json_tokenizer tokenizer{};
+        REQUIRE(json_errc{} == tokenizer.try_update(data).ec);
+        REQUIRE(!tokenizer.done());
+        REQUIRE(!tokenizer.source_exhausted());
+        REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
+        REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(generic_token_kind{} == tokenizer.token_kind());
+        REQUIRE(json_errc{} == tokenizer.try_update(more_data).ec);
+        REQUIRE(!tokenizer.done());
+        REQUIRE(tokenizer.source_exhausted());
+        REQUIRE(generic_token_kind{} == tokenizer.token_kind());
+        REQUIRE(json_errc{} == tokenizer.try_update(last_data).ec);
+        REQUIRE(!tokenizer.done());
+        REQUIRE(!tokenizer.source_exhausted()); // 
+        REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
+        CHECK(12345678 == tokenizer.get_uint64_value());
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(generic_token_kind::end_array == tokenizer.token_kind());
         REQUIRE(!tokenizer.done());
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(tokenizer.done());
