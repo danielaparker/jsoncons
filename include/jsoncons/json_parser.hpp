@@ -153,6 +153,21 @@ public:
         return tokenizer_.column();
     }
 
+    std::size_t begin_position() const 
+    {
+        return tokenizer_.begin_position();
+    }
+
+    std::size_t position() const 
+    {
+        return tokenizer_.begin_position();
+    }
+
+    std::size_t end_position() const 
+    {
+        return tokenizer_.end_position();
+    }
+
     void check_done()
     {
         std::error_code ec;

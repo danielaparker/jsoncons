@@ -367,7 +367,7 @@ namespace jsonschema {
                     }
                 }
                 always_succeeds_ = always_succeeds_count == validators_.size(); // empty schema always succeeds
-                always_fails_ = validators_.size() > 0 && (always_fails_count == validators_.size()); 
+                always_fails_ = !validators_.empty() && (always_fails_count == validators_.size()); 
             }
         }
 

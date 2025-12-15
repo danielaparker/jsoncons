@@ -427,7 +427,7 @@ public:
                 {
                     auto s = source_.read_buffer(ec);
                     if (JSONCONS_UNLIKELY(ec)) {return;}
-                    if (s.size() > 0)
+                    if (!s.empty())
                     {
                         parser_.update(s.data(),s.size());
                     }
@@ -534,7 +534,7 @@ private:
             {
                 auto s = source_.read_buffer(ec);
                 if (JSONCONS_UNLIKELY(ec)) {return;}
-                if (s.size() > 0)
+                if (!s.empty())
                 {
                     parser_.update(s.data(),s.size());
                     if (JSONCONS_UNLIKELY(ec)) {return;}

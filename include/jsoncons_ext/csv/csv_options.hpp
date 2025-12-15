@@ -602,7 +602,7 @@ public:
 
     csv_mapping_kind mapping_kind() const 
     {
-        return mapping_kind_ != csv_mapping_kind() ? mapping_kind_ : (assume_header() || this->column_names().size() > 0 ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
+        return mapping_kind_ != csv_mapping_kind() ? mapping_kind_ : (assume_header() || !this->column_names().empty() ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
     }
 
     std::size_t max_lines() const 

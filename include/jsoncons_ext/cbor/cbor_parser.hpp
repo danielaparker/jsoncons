@@ -1291,7 +1291,7 @@ private:
             more_ = false;
             return;
         }
-        else if (str.size() > 0)
+        else if (!str_.empty())
         {
             if (str[0] == '-')
             {

@@ -15,7 +15,7 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("Test cyrillic.json")
 {
     std::string path = "./corelib/input/cyrillic.json";
@@ -27,8 +27,7 @@ TEST_CASE("Test cyrillic.json")
     REQUIRE(is);
     json j = json::parse(is);
 }
-#endif
-//#if 0
+
 TEST_CASE("test_object2")
 {
 json source = json::parse(R"(
@@ -343,7 +342,6 @@ TEST_CASE("test_diagnostics_visitor", "")
 
 TEST_CASE("json_parser skip space tests")
 {
-#if 0
     SECTION("test 1")
     {
         jsoncons::json_decoder<json> decoder;
@@ -409,6 +407,5 @@ TEST_CASE("json_parser skip space tests")
         CHECK(2 == parser.line());
         CHECK(7 == parser.column());
     }
-#endif
 }
-//#endif
+

@@ -285,7 +285,7 @@ namespace jsoncons {
                 {
                     auto s = source_.read_buffer(ec);
                     if (JSONCONS_UNLIKELY(ec)) return;
-                    if (s.size() > 0)
+                    if (!s.empty())
                     {
                         parser_.update(s.data(),s.size());
                     }
@@ -315,7 +315,7 @@ namespace jsoncons {
                 {
                     auto s = source_.read_buffer(ec);
                     if (JSONCONS_UNLIKELY(ec)) return;
-                    if (s.size() > 0)
+                    if (!s.empty())
                     {
                         parser_.update(s.data(),s.size());
                     }
@@ -324,6 +324,11 @@ namespace jsoncons {
                 {
                     break;
                 }
+            }
+
+            if (parser_.source_exhausted())
+            {
+                parser_.finish_parse(visitor_);
             }
         }
 
@@ -367,7 +372,7 @@ namespace jsoncons {
                     {
                         auto s = source_.read_buffer(ec);
                         if (JSONCONS_UNLIKELY(ec)) return;
-                        if (s.size() > 0)
+                        if (!s.empty())
                         {
                             parser_.update(s.data(),s.size());
                         }

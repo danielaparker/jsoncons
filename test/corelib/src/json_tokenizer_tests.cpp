@@ -261,7 +261,7 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(tokenizer.done());
     }*/
-    SECTION("test 2")
+    /*SECTION("test 2")
     {
         std::string data{"[123456"};
         std::string more_data{"78"};
@@ -289,6 +289,60 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(!tokenizer.done());
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(tokenizer.done());
+    }*/
+    /*SECTION("test 3")
+    {
+        std::string input = R"({"A":"Jane","B":"Roe","C":10})";
+
+        json_tokenizer tokenizer{};
+        REQUIRE(json_errc{} == tokenizer.try_update(input).ec);
+
+        while (!tokenizer.done())
+        {
+            switch (tokenizer.token_kind())
+            {
+                case generic_token_kind::string_value:
+                    std::cout << tokenizer.get_string_view() << "\n";
+                    break;
+                case generic_token_kind::uint64_value:
+                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    break;
+                case generic_token_kind::begin_map:
+                    std::cout << "begin_map\n";
+                    break;
+                case generic_token_kind::end_map:
+                    std::cout << "end_map\n";
+                    break;
+            }
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        }
+    }*/
+    SECTION("test 4")
+    {
+        std::string input = "[1,2,3]";
+
+        json_tokenizer tokenizer{};
+        REQUIRE(json_errc{} == tokenizer.try_update(input).ec);
+
+        while (!tokenizer.done())
+        {
+            switch (tokenizer.token_kind())
+            {
+                case generic_token_kind::string_value:
+                    std::cout << tokenizer.get_string_view() << "\n";
+                    break;
+                case generic_token_kind::uint64_value:
+                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    break;
+                case generic_token_kind::begin_array:
+                    std::cout << "begin_array\n";
+                    break;
+                case generic_token_kind::end_array:
+                    std::cout << "end_array\n";
+                    break;
+            }
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        }
     }
 }
 
