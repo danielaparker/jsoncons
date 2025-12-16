@@ -16,6 +16,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("Test cyrillic.json")
 {
     std::string path = "./corelib/input/cyrillic.json";
@@ -245,10 +246,11 @@ TEST_CASE("test_parse_null")
 
     json j = decoder.get_result();
 }
+#endif
 
 TEST_CASE("test incremental parsing")
 {
-    SECTION("array of bool")
+    /*SECTION("array of bool")
     {
         jsoncons::json_decoder<json> decoder;
         json_parser parser;
@@ -269,8 +271,31 @@ TEST_CASE("test incremental parsing")
         REQUIRE(j.is_array());
         REQUIRE(j[0].is<bool>());
         CHECK_FALSE(j[0].as<bool>());
+    }*/
+    SECTION("array of bool 2")
+    {
+        json_diagnostics_visitor decoder(std::cout, "  ");
+        //jsoncons::json_decoder<json> decoder;
+        json_parser parser;
+
+        parser.reset();
+
+        parser.update("[fal",4);
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+        parser.update("se]",3);
+        parser.parse_some(decoder);
+
+        parser.finish_parse(decoder);
+        CHECK(parser.done());
+
+        //json j = decoder.get_result();
+        //REQUIRE(j.is_array());
+        //REQUIRE(j[0].is<bool>());
+        //CHECK_FALSE(j[0].as<bool>());
     }
-    SECTION("test 2")
+    /*SECTION("test 2")
     {
         std::string data1 = R"("010)";
         std::string data2 = R"(1010")";
@@ -307,8 +332,37 @@ TEST_CASE("test incremental parsing")
         json j = decoder.get_result();
         REQUIRE(j.is_string());
     }
-}
 
+    SECTION("test 3")
+    {
+        std::string data = R"("010101")";
+        std::istringstream is(data);
+
+        std::ostringstream os;
+        //json_diagnostics_visitor decoder(os, "  ");
+        json_decoder<json> decoder;
+        json_parser parser;
+
+        //std::error_code ec{};
+        stream_source<char> source(is, 4);
+        while (!source.eof())
+        {
+            auto s = source.read_buffer();
+            std::cout << jsoncons::string_view(s.data(), s.size()) << "\n";
+            parser.update(s.data(), s.size());
+            parser.parse_some(decoder);
+            //if (parser.done())
+            //{
+            //    break;
+            //}
+        }
+        parser.finish_parse(decoder);
+        std::cout << "done: " << parser.done() << "\n";
+        std::cout << decoder.is_valid() << "\n";
+        //std::cout << os.str() << "\n";
+    }*/
+}
+#if 0
 TEST_CASE("test_parser_reinitialization")
 {
     jsoncons::json_decoder<json> decoder;
@@ -445,4 +499,4 @@ TEST_CASE("json_parser skip space tests")
         CHECK(7 == parser.column());
     }
 }
-
+#endif

@@ -293,9 +293,9 @@ public:
         }
     }
 
-    void finish_parse(basic_json_visitor<char_type>& visitor, std::error_code& ec)
+    void finish_parse(basic_json_visitor<char_type>& visitor, std::error_code& /*ec*/)
     {
-        while (!tokenizer_.done())
+        //while (!tokenizer_.done())
         {
             switch (tokenizer_.token_kind())
             {
@@ -345,7 +345,7 @@ public:
                 default:
                     break;
             }
-            auto r = tokenizer_.try_next();
+            /*auto r = tokenizer_.try_next();
             if (!r)
             {
                 ec = r.ec;
@@ -354,7 +354,7 @@ public:
                     ec.clear();
                 }
                 return;
-            }
+            }*/
         }
     }
 };

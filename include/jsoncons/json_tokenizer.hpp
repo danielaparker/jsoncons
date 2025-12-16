@@ -2573,6 +2573,42 @@ private:
         }
         return from_json_result{json_errc::invalid_unicode_escape_sequence};
     }
+
+    void finish_parse(std::error_code& /*ec*/)
+    {
+        switch (token_kind_)
+        {
+            case generic_token_kind::string_value:
+                ec = end_string_value(buffer_.data(), buffer_.length()).ec;
+                break;
+            case generic_token_kind::null_value:
+                done_ = true;
+                break;
+            case generic_token_kind::bool_value:
+                break;
+            case generic_token_kind::int64_value:
+                end_integer_value(ec);
+                break;
+            case generic_token_kind::uint64_value:
+                end_integer_value(ec);
+                break;
+            case generic_token_kind::double_value:
+                end_double_value(ec);
+                break;
+            case generic_token_kind::begin_map:
+                break;
+            case generic_token_kind::end_map:
+                done_ = true;
+                break;
+            case generic_token_kind::begin_array:
+                break;
+            case generic_token_kind::end_array:
+                done_ = true;
+                break;
+            default:
+                break;
+        }
+    }
 };
 
 using json_tokenizer = basic_json_tokenizer<char>;
