@@ -351,7 +351,7 @@ public:
         }
     }
 
-    bool enter() const
+    bool parsing_started() const
     {
         return state_ == parse_state::start;
     }

@@ -98,9 +98,16 @@ public:
         return tokenizer_.done();
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     bool enter() const
     {
-        return tokenizer_.enter();
+        return tokenizer_.parsing_started();
+    }
+#endif
+
+    bool parsing_started() const
+    {
+        return tokenizer_.parsing_started();
     }
 
     bool accept() const

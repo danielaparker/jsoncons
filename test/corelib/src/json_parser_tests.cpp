@@ -270,6 +270,43 @@ TEST_CASE("test incremental parsing")
         REQUIRE(j[0].is<bool>());
         CHECK_FALSE(j[0].as<bool>());
     }
+    SECTION("test 2")
+    {
+        std::string data1 = R"("010)";
+        std::string data2 = R"(1010")";
+        std::string data3 = R"(1010)";
+        std::string data4 = R"(101")";
+        jsoncons::json_decoder<json> decoder;
+        json_parser parser;
+
+        parser.reset();
+
+        parser.update(data1);
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+
+        parser.update(data2);
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+
+        parser.update(data3);
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+
+        parser.update(data4);
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+
+        parser.finish_parse(decoder);
+        CHECK(parser.done());
+
+        json j = decoder.get_result();
+        REQUIRE(j.is_string());
+    }
 }
 
 TEST_CASE("test_parser_reinitialization")

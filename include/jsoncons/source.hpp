@@ -81,7 +81,7 @@ namespace jsoncons {
     {
     public:
         using value_type = CharT;
-        static constexpr std::size_t default_max_buffer_size = 16384;
+        static constexpr std::size_t default_max_buffer_size = 4/*16384*/;
     private:
         using char_type = typename std::conditional<sizeof(CharT) == sizeof(char),char,CharT>::type;
         using char_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type>;

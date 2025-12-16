@@ -295,7 +295,7 @@ namespace jsoncons {
                 if (JSONCONS_UNLIKELY(ec)) return;
                 if (eof)
                 {
-                    if (parser_.enter())
+                    if (parser_.parsing_started())
                     {
                         break;
                     }

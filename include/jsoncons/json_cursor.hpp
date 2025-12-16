@@ -545,7 +545,7 @@ private:
             if (JSONCONS_UNLIKELY(ec)) {return;}
             if (eof)
             {
-                if (parser_.enter())
+                if (parser_.parsing_started())
                 {
                     done_ = true;
                     break;
