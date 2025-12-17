@@ -62,7 +62,7 @@ void set_member(T&&, const U&)
 template <typename T, typename U> 
 void set_member(T&& val, U& result)
 { 
-    result = std::move(val); 
+    result = std::forward<T>(val); 
 } 
 
 template <typename Json>
