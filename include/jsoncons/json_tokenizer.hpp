@@ -584,18 +584,16 @@ public:
         more_ = true;
     }
 
-    from_json_result try_update(string_view_type sv)
+    void update(string_view_type sv)
     {
         input_ptr_ = sv.data();
         input_end_ = input_ptr_ + sv.size();
-        return try_parse_some();
     }
 
-    from_json_result try_update(const char_type* data, std::size_t length)
+    void update(const char_type* data, std::size_t length)
     {
         input_ptr_ = data;
         input_end_ = data + length;
-        return try_parse_some();
     }
 
     void parse_some()
