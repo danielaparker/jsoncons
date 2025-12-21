@@ -290,7 +290,7 @@ public:
         return done_;
     }
 
-    from_json_result try_next(bool expect_more = false)
+    from_json_result try_next()
     {
         if (JSONCONS_UNLIKELY(state_ == parse_state::done))
         {
@@ -298,61 +298,56 @@ public:
         }
         more_ = true;
         token_kind_ = generic_token_kind{};
-        if (!expect_more)
+        if (state_ == parse_state::accept)
         {
-            if (state_ == parse_state::accept)
-            {
-                done_ = true;
-                state_ = parse_state::done;
-                more_ = false;
-                return from_json_result{};
-            }
+            done_ = true;
+            state_ = parse_state::done;
+            more_ = false;
+            return from_json_result{};
         }
         const char_type* local_input_end = input_end_;
         std::error_code ec{};
 
         if (input_ptr_ == local_input_end && more_)
         {
-            if (!expect_more)
+            switch (state_)
             {
-                switch (state_)
-                {
-                    case parse_state::number:  
-                        if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
-                        {
-                            end_integer_value(ec);
-                            if (JSONCONS_UNLIKELY(ec)) return from_json_result{(json_errc)ec.value()};
-                        }
-                        else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
-                        {
-                            auto r = end_fraction_value();
-                            if (JSONCONS_UNLIKELY(!r)) return r;
-                        }
-                        else
-                        {
-                            more_ = false;
-                            return from_json_result{json_errc::unexpected_eof};
-                        }
-                        break;
-                    case parse_state::accept:
-                        done_ = true;
-                        state_ = parse_state::done;
-                        more_ = false;
-                        break;
-                    case parse_state::start:
-                        more_ = false;
-                        break;                
-                    case parse_state::done:
-                        more_ = false;
-                        break;
-                    case parse_state::cr:
-                        state_ = pop_state();
-                        break;
-                    default:
+                case parse_state::number:  
+                    if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
+                    {
+                        end_integer_value(ec);
+                        if (JSONCONS_UNLIKELY(ec)) return from_json_result{(json_errc)ec.value()};
+                    }
+                    else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
+                    {
+                        auto r = end_fraction_value();
+                        if (JSONCONS_UNLIKELY(!r)) return r;
+                    }
+                    else
+                    {
                         more_ = false;
                         return from_json_result{json_errc::unexpected_eof};
-                }
+                    }
+                    break;
+                case parse_state::accept:
+                    done_ = true;
+                    state_ = parse_state::done;
+                    more_ = false;
+                    break;
+                case parse_state::start:
+                    more_ = false;
+                    break;                
+                case parse_state::done:
+                    more_ = false;
+                    break;
+                case parse_state::cr:
+                    state_ = pop_state();
+                    break;
+                default:
+                    more_ = false;
+                    return from_json_result{json_errc::unexpected_eof};
             }
+            
             return from_json_result{};
         }
         else

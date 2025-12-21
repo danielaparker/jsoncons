@@ -502,7 +502,7 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data1);
-        REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
         std::cout << "(1) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -515,10 +515,10 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(1) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
         }
         tokenizer.update(data2);
-        REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
         std::cout << "(2) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -531,11 +531,11 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(2) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
             std::cout << "(2a) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n";
         }
         tokenizer.update(data3);
-        REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
         std::cout << "(3) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -548,10 +548,10 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
         }
         tokenizer.update(data4);
-        REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+        REQUIRE(json_errc{} == tokenizer.try_next().ec);
         std::cout << "(4) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -564,7 +564,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(4) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next(true).ec);
+            REQUIRE(json_errc{} == tokenizer.try_next().ec);
         }
         std::cout << "(5) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done())

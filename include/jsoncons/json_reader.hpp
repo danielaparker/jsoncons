@@ -328,7 +328,7 @@ namespace jsoncons {
 
             if (parser_.source_exhausted())
             {
-                parser_.finish_parse(visitor_);
+                parser_.finish_parse(visitor_, ec);
             }
         }
 

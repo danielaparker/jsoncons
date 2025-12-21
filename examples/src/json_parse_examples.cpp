@@ -30,9 +30,9 @@ void parse_with_comment()
         auto j1 = json::parse(s, strict_json_parsing());
 
         // since 0.171.0
-        auto options2 = json_options{}
-            .err_handler(strict_json_parsing());
-        auto j2 = json::parse(s, options2);
+        //auto options2 = json_options{}
+        //    .err_handler(strict_json_parsing());
+        //auto j2 = json::parse(s, options2);
 
         // since 1.3.0
         auto options3 = json_options{}

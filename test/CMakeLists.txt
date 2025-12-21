@@ -107,7 +107,6 @@ add_executable(unit_tests
                corelib/src/json_options_tests.cpp
                corelib/src/json_parser_error_tests.cpp
                corelib/src/json_parser_position_tests.cpp
-               corelib/src/json_parser_recovery_tests.cpp
                corelib/src/json_parser_tests.cpp
                corelib/src/json_pointer_arg_tests.cpp
                corelib/src/json_push_back_tests.cpp

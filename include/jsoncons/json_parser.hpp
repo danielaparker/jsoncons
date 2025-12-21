@@ -303,6 +303,11 @@ public:
 
     void finish_parse(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        if (tokenizer_.state() == parse_state::start)
+        {
+            ec = json_errc::unexpected_eof;
+            return;
+        }
         while (!tokenizer_.done())
         {
             switch (tokenizer_.token_kind())
@@ -356,7 +361,7 @@ public:
             auto r = tokenizer_.try_next();
             if (JSONCONS_UNLIKELY(!r))
             {
-                if (r.ec != json_errc::unexpected_eof)
+                if (!r)
                 {
                     ec = r.ec;
                 }

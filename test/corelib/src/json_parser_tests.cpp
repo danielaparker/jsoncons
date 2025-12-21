@@ -11,7 +11,6 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include <fstream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -31,21 +30,21 @@ TEST_CASE("test_object_with_three_members")
 {
     SECTION("json object with three members")
     {
-        std::string input = R"({"A":"Jane","B":"Roe","C":10})";
-        auto j = json::parse(input);
+        std::string text = R"({"A":"Jane","B":"Roe","C":10})";
+        auto j = json::parse(text);
 
         std::string buffer;
         j.dump(buffer);
-        CHECK(input == buffer);
+        CHECK(text == buffer);
     }
     SECTION("ojson object with three members")
     {
-        std::string input = R"({"B":"Roe","A":"Jane","C":10})";
-        auto j = ojson::parse(input);
+        std::string text = R"({"B":"Roe","A":"Jane","C":10})";
+        auto j = ojson::parse(text);
 
         std::string buffer;
         j.dump(buffer);
-        CHECK(input == buffer);
+        CHECK(text == buffer);
     }
 }
 
@@ -60,16 +59,16 @@ TEST_CASE("json::parse with string")
 
     SECTION("test array of integer")
     {
-        std::string s = "[1,2,3]";
-        auto j = json::parse(s);
+        std::string text = "[1,2,3]";
+        auto j = json::parse(text);
         CHECK(true == j.is_array());
         CHECK(3 == j.size());
     }
 
     SECTION("test skip bom")
     {
-        std::string s = "\xEF\xBB\xBF[1,2,3]";
-        auto j = json::parse(s);
+        std::string text = "\xEF\xBB\xBF[1,2,3]";
+        auto j = json::parse(text);
         CHECK(true == j.is_array());
         CHECK(3 == j.size());
     }
@@ -82,9 +81,9 @@ TEST_CASE("test_parse_empty_object")
 
     parser.reset();
 
-    static std::string s("{}");
+    static std::string text("{}");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -99,9 +98,9 @@ TEST_CASE("test_parse_array")
 
     parser.reset();
 
-    static std::string s("[]");
+    static std::string text("[]");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -116,9 +115,9 @@ TEST_CASE("test_parse_string")
 
     parser.reset();
 
-    static std::string s("\"\"");
+    static std::string text("\"\"");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -133,9 +132,9 @@ TEST_CASE("test_parse_integer")
 
     parser.reset();
 
-    static std::string s("10");
+    static std::string text("10");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -150,9 +149,9 @@ TEST_CASE("test_parse_integer_space")
 
     parser.reset();
 
-    static std::string s("10 ");
+    static std::string text("10 ");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -167,9 +166,9 @@ TEST_CASE("test_parse_double_space")
 
     parser.reset();
 
-    static std::string s("10.0 ");
+    static std::string text("10.0 ");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -184,9 +183,9 @@ TEST_CASE("test_parse_false")
 
     parser.reset();
 
-    static std::string s("false");
+    static std::string text("false");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -201,9 +200,9 @@ TEST_CASE("test_parse_true")
 
     parser.reset();
 
-    static std::string s("true");
+    static std::string text("true");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -218,9 +217,9 @@ TEST_CASE("test_parse_null")
 
     parser.reset();
 
-    static std::string s("null");
+    static std::string text("null");
 
-    parser.update(s.data(),s.length());
+    parser.update(text.data(),text.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -277,31 +276,31 @@ TEST_CASE("test incremental parsing")
     }
     SECTION("test 2")
     {
-        std::string data1 = R"("010)";
-        std::string data2 = R"(1010)";
-        std::string data3 = R"(1010)";
-        std::string data4 = R"(101")";
+        std::string text1 = R"("010)";
+        std::string text2 = R"(1010)";
+        std::string text3 = R"(1010)";
+        std::string text4 = R"(101")";
         jsoncons::json_decoder<json> decoder;
         json_parser parser;
 
         parser.reset();
 
-        parser.update(data1);
+        parser.update(text1);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
 
-        parser.update(data2);
+        parser.update(text2);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
 
-        parser.update(data3);
+        parser.update(text3);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
 
-        parser.update(data4);
+        parser.update(text4);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
@@ -315,8 +314,8 @@ TEST_CASE("test incremental parsing")
 
     SECTION("test 3")
     {
-        std::string data = R"("010101")";
-        std::istringstream is(data);
+        std::string text = R"("010101")";
+        std::istringstream is(text);
 
         std::ostringstream os;
         //json_diagnostics_visitor decoder(os, "  ");
@@ -327,9 +326,9 @@ TEST_CASE("test incremental parsing")
         stream_source<char> source(is, 4);
         while (!source.eof())
         {
-            auto s = source.read_buffer();
-            std::cout << jsoncons::string_view(s.data(), s.size()) << "\n";
-            parser.update(s.data(), s.size());
+            auto chunk = source.read_buffer();
+            //std::cout << jsoncons::string_view(chunk.data(), chunk.size()) << "\n";
+            parser.update(chunk.data(), chunk.size());
             parser.parse_some(decoder);
             //if (parser.done())
             //{
@@ -376,8 +375,8 @@ TEST_CASE("test_diagnostics_visitor", "")
         std::ostringstream os;
         json_diagnostics_visitor visitor(os, "  ");
         json_parser parser;
-        std::string input(R"({"foo":[42,null]})");
-        parser.update(input.data(), input.size());
+        std::string text(R"({"foo":[42,null]})");
+        parser.update(text.data(), text.size());
         parser.parse_some(visitor);
         parser.finish_parse(visitor);
         std::ostringstream expected;
@@ -395,8 +394,8 @@ TEST_CASE("test_diagnostics_visitor", "")
         std::wostringstream os;
         wjson_diagnostics_visitor visitor(os, L"  ");
         wjson_parser parser;
-        std::wstring input(LR"({"foo":[42,null]})");
-        parser.update(input.data(), input.size());
+        std::wstring text(LR"({"foo":[42,null]})");
+        parser.update(text.data(), text.size());
         parser.parse_some(visitor);
         parser.finish_parse(visitor);
         std::wostringstream expected;

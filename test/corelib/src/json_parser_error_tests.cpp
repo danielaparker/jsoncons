@@ -13,7 +13,7 @@
 
 using namespace jsoncons;
 
-void test_parse_error(const std::string& text, const std::error_code& ec)
+bool test_parse_error(const std::string& text, const std::error_code& ec)
 {
     REQUIRE_THROWS(json::parse(text));
     JSONCONS_TRY
@@ -28,7 +28,9 @@ void test_parse_error(const std::string& text, const std::error_code& ec)
             std::cout << e.code().value() << " " << e.what() << '\n'; 
         }
         CHECK(ec == e.code());
+        return ec == e.code();
     }
+    return false;
 }
 
 void test_parse_ec(const std::string& text, const std::error_code& expected)
@@ -51,35 +53,35 @@ void test_parse_ec(const std::string& text, const std::error_code& expected)
 
 TEST_CASE("test_parse_missing_separator")
 {
-    std::string jtext = R"({"field1"{}})";    
+    std::string text = R"({"field1"{}})";    
 
-    test_parse_error(jtext, jsoncons::json_errc::expected_colon);
-    test_parse_ec(jtext, jsoncons::json_errc::expected_colon);
+    CHECK(test_parse_error(text, jsoncons::json_errc::expected_colon));
+    test_parse_ec(text, jsoncons::json_errc::expected_colon);
 }
 
 TEST_CASE("test_invalid_value")
 {
-    std::string jtext = R"({"field1":ru})";    
+    std::string text = R"({"field1":ru})";    
 
-    test_parse_error(jtext,jsoncons::json_errc::expected_value);
-    test_parse_ec(jtext, jsoncons::json_errc::expected_value);
+    CHECK(test_parse_error(text,jsoncons::json_errc::expected_value));
+    test_parse_ec(text, jsoncons::json_errc::expected_value);
 }
 
 
 TEST_CASE("test_unexpected_end_of_file")
 {
-    std::string jtext = R"({"field1":{})";    
+    std::string text = R"({"field1":{})";    
 
-    test_parse_error(jtext, jsoncons::json_errc::unexpected_eof);
-    test_parse_ec(jtext, jsoncons::json_errc::unexpected_eof);
+    CHECK(test_parse_error(text, jsoncons::json_errc::unexpected_eof));
+    test_parse_ec(text, jsoncons::json_errc::unexpected_eof);
 }
 
 TEST_CASE("test_value_not_found")
 {
-    std::string jtext = R"({"name":})";    
+    std::string text = R"({"name":})";    
 
-    test_parse_error(jtext, jsoncons::json_errc::expected_value);
-    test_parse_ec(jtext, jsoncons::json_errc::expected_value);
+    CHECK(test_parse_error(text, jsoncons::json_errc::expected_value));
+    test_parse_ec(text, jsoncons::json_errc::expected_value);
 }
 
 TEST_CASE("test_escaped_characters")
@@ -94,30 +96,30 @@ TEST_CASE("test_escaped_characters")
 
 TEST_CASE("test_expected_colon")
 {
-    test_parse_error("{\"name\" 10}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" true}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" false}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" null}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" \"value\"}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" {}}", jsoncons::json_errc::expected_colon);
-    test_parse_error("{\"name\" []}", jsoncons::json_errc::expected_colon);
+    CHECK(test_parse_error("{\"name\" 10}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" true}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" false}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" null}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" \"value\"}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" {}}", jsoncons::json_errc::expected_colon));
+    CHECK(test_parse_error("{\"name\" []}", jsoncons::json_errc::expected_colon));
 }
 
 TEST_CASE("test_expected_key")
 {
-    test_parse_error("{10}", jsoncons::json_errc::expected_key);
-    test_parse_error("{true}", jsoncons::json_errc::expected_key);
-    test_parse_error("{false}", jsoncons::json_errc::expected_key);
-    test_parse_error("{null}", jsoncons::json_errc::expected_key);
-    test_parse_error("{{}}", jsoncons::json_errc::expected_key);
-    test_parse_error("{[]}", jsoncons::json_errc::expected_key);
+    CHECK(test_parse_error("{10}", jsoncons::json_errc::expected_key));
+    CHECK(test_parse_error("{true}", jsoncons::json_errc::expected_key));
+    CHECK(test_parse_error("{false}", jsoncons::json_errc::expected_key));
+    CHECK(test_parse_error("{null}", jsoncons::json_errc::expected_key));
+    CHECK(test_parse_error("{{}}", jsoncons::json_errc::expected_key));
+    CHECK(test_parse_error("{[]}", jsoncons::json_errc::expected_key));
 }
 
 TEST_CASE("test_expected_value")
 {
-    test_parse_error("[tru]", jsoncons::json_errc::invalid_value);
-    test_parse_error("[fa]", jsoncons::json_errc::invalid_value);
-    test_parse_error("[n]", jsoncons::json_errc::invalid_value);
+    CHECK(test_parse_error("[tru]", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("[fa]", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("[n]", jsoncons::json_errc::invalid_value));
 }
 
 TEST_CASE("test_parse_primitive_pass")
@@ -148,20 +150,20 @@ TEST_CASE("test_parse_empty_structures")
 
 TEST_CASE("test_parse_primitive_fail")
 {
-    test_parse_error("null {}", jsoncons::json_errc::extra_character);
-    test_parse_error("n ", jsoncons::json_errc::invalid_value);
-    test_parse_error("nu ", jsoncons::json_errc::invalid_value);
-    test_parse_error("nul ", jsoncons::json_errc::invalid_value);
-    test_parse_error("false {}", jsoncons::json_errc::extra_character);
-    test_parse_error("fals ", jsoncons::json_errc::invalid_value);
-    test_parse_error("true []", jsoncons::json_errc::extra_character);
-    test_parse_error("tru ", jsoncons::json_errc::invalid_value);
-    test_parse_error("10 {}", jsoncons::json_errc::extra_character);
-    test_parse_error("1a ", jsoncons::json_errc::extra_character);
-    test_parse_error("1.999 []", jsoncons::json_errc::extra_character);
-    test_parse_error("1e0-1", jsoncons::json_errc::extra_character);
-    test_parse_error("\"string\"{}", jsoncons::json_errc::extra_character);
-    test_parse_error("\"string\"[]", jsoncons::json_errc::extra_character);
+    CHECK(test_parse_error("null {}", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("n ", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("nu ", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("nul ", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("false {}", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("fals ", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("true []", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("tru ", jsoncons::json_errc::invalid_value));
+    CHECK(test_parse_error("10 {}", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("1a ", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("1.999 []", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("1e0-1", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("\"string\"{}", jsoncons::json_errc::extra_character));
+    CHECK(test_parse_error("\"string\"[]", jsoncons::json_errc::extra_character));
 }
 
 TEST_CASE("test_multiple")
@@ -246,7 +248,7 @@ TEST_CASE("test json_parser errors")
             std::error_code ec;
             reader.read(ec);
             reader.check_done();
-            CHECK(ec == json_errc::unexpected_eof);
+            CHECK(json_errc::unexpected_eof == ec);
         }
     }
 }

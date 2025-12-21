@@ -735,3 +735,43 @@ TEST_CASE("json_options lossless_bignum")
     }
 }
 
+TEST_CASE("test_array_extra_comma")
+{
+    SECTION("with option")
+    {
+        auto options = json_options{}
+            .allow_trailing_comma(true);
+
+        json expected = json::parse("[1,2,3]");
+
+        json val1 = json::parse("[1,2,3,]", options);
+
+        CHECK(expected == val1);
+    }
+}
+
+TEST_CASE("test_object_extra_comma")
+{
+    SECTION("with option")
+    {
+        auto options = json_options{}
+            .allow_trailing_comma(true);
+
+        json expected = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2
+    }
+    )", options);
+
+        json val = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2,
+    }
+    )", options);
+
+        CHECK(expected == val);
+    }
+}
+

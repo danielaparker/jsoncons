@@ -638,7 +638,7 @@ TEST_CASE("oss-fuzz issues")
                 reader.next(ec);
             }
         }
-        //CHECK(ec == json_errc::unexpected_eof); 
+        //CHECK(json_errc::unexpected_eof == ec); 
     }
 
     // Fuzz target: jsoncons:fuzz_json_cursor

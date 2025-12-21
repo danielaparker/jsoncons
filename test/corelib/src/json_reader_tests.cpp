@@ -9,6 +9,43 @@
 
 using namespace jsoncons; 
 
+bool test_json_reader_error(const std::string& text, const std::error_code& ec)
+{
+    REQUIRE_THROWS(json::parse(text));
+    JSONCONS_TRY
+    {
+        json::parse(text);
+    }
+    JSONCONS_CATCH (const ser_error& e)
+    {
+        if (e.code() != ec)
+        {
+            std::cout << text << '\n';
+            std::cout << e.code().value() << " " << e.what() << '\n'; 
+        }
+        return ec == e.code();
+    }
+    return true;
+}
+
+void test_json_reader_ec(const std::string& text, const std::error_code& expected)
+{
+    std::error_code ec;
+
+    std::istringstream is(text);
+    json_decoder<json> decoder;
+    json_stream_reader reader(is,decoder);
+
+    reader.read(ec);
+    //std::cerr << text << '\n';
+    //std::cerr << ec.message() 
+    //          << " at line " << reader.line() 
+    //          << " and column " << reader.column() << '\n';
+
+    CHECK(ec);
+    CHECK(expected == ec);
+}
+
 TEST_CASE("Test cyrillic.json")
 {
     std::string path = "./corelib/input/cyrillic.json";
@@ -143,74 +180,37 @@ TEST_CASE("test json_reader buffered read")
     }
 }
 
-bool test_json_reader_error(const std::string& text, const std::error_code& ec)
-{
-    REQUIRE_THROWS(json::parse(text));
-    JSONCONS_TRY
-    {
-        json::parse(text);
-    }
-    JSONCONS_CATCH (const ser_error& e)
-    {
-        if (e.code() != ec)
-        {
-            std::cout << text << '\n';
-            std::cout << e.code().value() << " " << e.what() << '\n'; 
-        }
-        return ec == e.code();
-    }
-    return true;
-}
-
-void test_json_reader_ec(const std::string& text, const std::error_code& expected)
-{
-    std::error_code ec;
-
-    std::istringstream is(text);
-    json_decoder<json> decoder;
-    json_stream_reader reader(is,decoder);
-
-    reader.read(ec);
-    //std::cerr << text << '\n';
-    //std::cerr << ec.message() 
-    //          << " at line " << reader.line() 
-    //          << " and column " << reader.column() << '\n';
-
-    CHECK(ec);
-    CHECK(expected == ec);
-}
-
 TEST_CASE("test_missing_separator")
 {
-    std::string jtext = R"({"field1"{}})";    
+    std::string text = R"({"field1"{}})";    
 
-    CHECK(test_json_reader_error(jtext, jsoncons::json_errc::expected_colon));
-    test_json_reader_ec(jtext, jsoncons::json_errc::expected_colon);
+    CHECK(test_json_reader_error(text, jsoncons::json_errc::expected_colon));
+    test_json_reader_ec(text, jsoncons::json_errc::expected_colon);
 }
 
 TEST_CASE("test_read_invalid_value")
 {
-    std::string jtext = R"({"field1":ru})";    
+    std::string text = R"({"field1":ru})";    
 
-    CHECK(test_json_reader_error(jtext,jsoncons::json_errc::expected_value));
-    test_json_reader_ec(jtext, jsoncons::json_errc::expected_value);
+    CHECK(test_json_reader_error(text,jsoncons::json_errc::expected_value));
+    test_json_reader_ec(text, jsoncons::json_errc::expected_value);
 }
 
 TEST_CASE("test_read_unexpected_end_of_file")
 {
-    std::string jtext = R"({"field1":{})";    
+    std::string text = R"({"field1":{})";    
 
-    CHECK(test_json_reader_error(jtext, jsoncons::json_errc::unexpected_eof));
-    test_json_reader_ec(jtext, jsoncons::json_errc::unexpected_eof);
+    CHECK(test_json_reader_error(text, jsoncons::json_errc::unexpected_eof));
+    test_json_reader_ec(text, jsoncons::json_errc::unexpected_eof);
 }
 
 
 TEST_CASE("test_read_value_not_found")
 {
-    std::string jtext = R"({"name":})";    
+    std::string text = R"({"name":})";    
 
-    CHECK(test_json_reader_error(jtext, jsoncons::json_errc::expected_value));
-    test_json_reader_ec(jtext, jsoncons::json_errc::expected_value);
+    CHECK(test_json_reader_error(text, jsoncons::json_errc::expected_value));
+    test_json_reader_ec(text, jsoncons::json_errc::expected_value);
 }
 
 TEST_CASE("test_read_escaped_characters")
