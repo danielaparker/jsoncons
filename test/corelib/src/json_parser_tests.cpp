@@ -16,27 +16,13 @@
 
 using namespace jsoncons;
 
-#if 0
-TEST_CASE("Test cyrillic.json")
-{
-    std::string path = "./corelib/input/cyrillic.json";
-    std::fstream is(path);
-    if (!is)
-    {
-        std::cout << "Cannot open " << path << '\n';
-    }
-    REQUIRE(is);
-    json j = json::parse(is);
-}
-
 TEST_CASE("test_object2")
 {
 json source = json::parse(R"(
 {
     "a" : "2",
     "c" : [4,5,6]
-}
-)");
+})");
 
     std::cout << source << '\n';
 }
@@ -63,35 +49,30 @@ TEST_CASE("test_object_with_three_members")
     }
 }
 
-TEST_CASE("test_double")
+TEST_CASE("json::parse with string")
 {
-    json val = json::parse("42.229999999999997");
-}
+    SECTION("test double")
+    {
+        double expected = 42.229999999999997;
+        auto val = json::parse(std::to_string(expected));
+        CHECK(expected == val);
+    }
 
-TEST_CASE("test_array_of_integer")
-{
-    std::string s = "[1,2,3]";
-    json j1 = json::parse(s);
-    CHECK(true == j1.is_array());
-    CHECK(3 == j1.size());
+    SECTION("test array of integer")
+    {
+        std::string s = "[1,2,3]";
+        auto j = json::parse(s);
+        CHECK(true == j.is_array());
+        CHECK(3 == j.size());
+    }
 
-    std::istringstream is(s);
-    json j2 = json::parse(is);
-    CHECK(true == j2.is_array());
-    CHECK(3 == j2.size());
-}
-
-TEST_CASE("test_skip_bom")
-{
-    std::string s = "\xEF\xBB\xBF[1,2,3]";
-    json j1 = json::parse(s);
-    CHECK(true == j1.is_array());
-    CHECK(3 == j1.size());
-
-    std::istringstream is(s);
-    json j2 = json::parse(is);
-    CHECK(true == j2.is_array());
-    CHECK(3 == j2.size());
+    SECTION("test skip bom")
+    {
+        std::string s = "\xEF\xBB\xBF[1,2,3]";
+        auto j = json::parse(s);
+        CHECK(true == j.is_array());
+        CHECK(3 == j.size());
+    }
 }
 
 TEST_CASE("test_parse_empty_object")
@@ -246,11 +227,10 @@ TEST_CASE("test_parse_null")
 
     json j = decoder.get_result();
 }
-#endif
 
 TEST_CASE("test incremental parsing")
 {
-    /*SECTION("array of bool")
+    SECTION("array of bool")
     {
         jsoncons::json_decoder<json> decoder;
         json_parser parser;
@@ -271,7 +251,7 @@ TEST_CASE("test incremental parsing")
         REQUIRE(j.is_array());
         REQUIRE(j[0].is<bool>());
         CHECK_FALSE(j[0].as<bool>());
-    }*/
+    }
     SECTION("array of bool 2")
     {
         json_diagnostics_visitor decoder(std::cout, "  ");
@@ -295,10 +275,10 @@ TEST_CASE("test incremental parsing")
         //REQUIRE(j[0].is<bool>());
         //CHECK_FALSE(j[0].as<bool>());
     }
-    /*SECTION("test 2")
+    SECTION("test 2")
     {
         std::string data1 = R"("010)";
-        std::string data2 = R"(1010")";
+        std::string data2 = R"(1010)";
         std::string data3 = R"(1010)";
         std::string data4 = R"(101")";
         jsoncons::json_decoder<json> decoder;
@@ -360,9 +340,9 @@ TEST_CASE("test incremental parsing")
         std::cout << "done: " << parser.done() << "\n";
         std::cout << decoder.is_valid() << "\n";
         //std::cout << os.str() << "\n";
-    }*/
+    }
 }
-#if 0
+
 TEST_CASE("test_parser_reinitialization")
 {
     jsoncons::json_decoder<json> decoder;
@@ -499,4 +479,4 @@ TEST_CASE("json_parser skip space tests")
         CHECK(7 == parser.column());
     }
 }
-#endif
+
