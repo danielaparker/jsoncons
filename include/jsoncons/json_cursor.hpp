@@ -57,7 +57,7 @@ public:
          tokenizer_(options, alloc),
          current_(staj_event_type::null_value)
     {
-        if (!read_done())
+        if (done_)
         {
             std::error_code local_ec;
             read_next(local_ec);
@@ -117,7 +117,7 @@ public:
          tokenizer_(options, alloc),
          current_(staj_event_type::null_value) 
     {
-        if (!read_done())
+        if (!done_)
         {
             std::error_code local_ec;
             read_next(local_ec);
@@ -162,7 +162,7 @@ public:
     {
         tokenizer_.reset();
         done_ = false;
-        if (!read_done())
+        if (!done_)
         {
             read_next();
         }
@@ -175,7 +175,7 @@ public:
         source_ = std::forward<Sourceable>(source);
         tokenizer_.reinitialize();
         done_ = false;
-        if (!read_done())
+        if (!done_)
         {
             read_next();
         }
@@ -195,7 +195,7 @@ public:
     {
         tokenizer_.reset();
         done_ = false;
-        if (!read_done())
+        if (!done_)
         {
             read_next(ec);
         }
@@ -208,7 +208,7 @@ public:
         source_ = std::forward<Sourceable>(source);
         tokenizer_.reinitialize();
         done_ = false;
-        if (!read_done())
+        if (!done_)
         {
             read_next(ec);
         }
@@ -344,11 +344,6 @@ public:
 
 private:
 
-    bool read_done() const 
-    {
-        return tokenizer_.done() || done_;
-    }
-
     void initialize_with_string_view(string_view_type sv)
     {
         std::error_code local_ec;
@@ -369,8 +364,7 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         tokenizer_.update(sv.data()+offset,sv.size()-offset);
-        bool read_done = tokenizer_.done() || done_;
-        if (!read_done)
+        if (!done_)
         {
             std::error_code local_ec;
             read_next(local_ec);
