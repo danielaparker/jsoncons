@@ -57,20 +57,17 @@ public:
          tokenizer_(options, alloc),
          current_(staj_event_type::null_value)
     {
-        if (done_)
+        std::error_code local_ec;
+        read_next(local_ec);
+        if (local_ec)
         {
-            std::error_code local_ec;
-            read_next(local_ec);
-            if (local_ec)
+            if (local_ec == json_errc::unexpected_eof)
             {
-                if (local_ec == json_errc::unexpected_eof)
-                {
-                    done_ = true;
-                }
-                else
-                {
-                    JSONCONS_THROW(ser_error(local_ec, 1, 1));
-                }
+                done_ = true;
+            }
+            else
+            {
+                JSONCONS_THROW(ser_error(local_ec, 1, 1));
             }
         }
     }
@@ -117,20 +114,17 @@ public:
          tokenizer_(options, alloc),
          current_(staj_event_type::null_value) 
     {
-        if (!done_)
+        std::error_code local_ec;
+        read_next(local_ec);
+        if (local_ec)
         {
-            std::error_code local_ec;
-            read_next(local_ec);
-            if (local_ec)
+            if (local_ec == json_errc::unexpected_eof)
             {
-                if (local_ec == json_errc::unexpected_eof)
-                {
-                    done_ = true;
-                }
-                else
-                {
-                    ec = local_ec;
-                }
+                done_ = true;
+            }
+            else
+            {
+                ec = local_ec;
             }
         }
     }

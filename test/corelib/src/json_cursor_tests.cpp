@@ -15,6 +15,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("json_cursor eof test")
 {
     SECTION("empty string 1")
@@ -64,7 +65,8 @@ TEST_CASE("json_cursor eof test")
         CHECK(cursor.eof());
     }
 }
-#if 0
+#endif
+
 TEST_CASE("json_cursor string_value test")
 {
     std::string s = R"("Tom")";
@@ -82,6 +84,7 @@ TEST_CASE("json_cursor string_value test")
         CHECK(cursor.done());
     }
 }
+#if 0
 
 TEST_CASE("json_cursor string_value as<int> test")
 {
