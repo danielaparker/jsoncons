@@ -210,7 +210,7 @@ public:
         }
     }
 
-    generic_token_kind token_kind()
+    generic_token_kind token_kind() const
     {
         return token_kind_;
     }

@@ -18,7 +18,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_tokenizer.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_util.hpp>
 #include <jsoncons/source.hpp>
@@ -41,9 +41,9 @@ private:
     static constexpr size_t default_max_buffer_size = 16384;
 
     json_source_adaptor<Source> source_;
-    basic_json_parser<CharT,Allocator> parser_;
-    basic_staj_visitor<CharT> cursor_visitor_;
+    basic_json_tokenizer<CharT,Allocator> tokenizer_;
     bool done_{false};
+    basic_staj_event<char_type> current_;
 
 public:
 
@@ -54,9 +54,9 @@ public:
         const Allocator& alloc = Allocator(),
         typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options, alloc)
+         tokenizer_(options, alloc),
+         current_(staj_event_type::null_value)
     {
-        parser_.cursor_mode(true);
         if (!read_done())
         {
             std::error_code local_ec;
@@ -80,9 +80,9 @@ public:
         const Allocator& alloc = Allocator(),
         typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options, alloc)
+         tokenizer_(options, alloc),
+         current_(staj_event_type::null_value)
     {
-        parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
 
@@ -114,10 +114,9 @@ public:
         std::error_code& ec,
         typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         parser_(options, alloc)
+         tokenizer_(options, alloc),
+         current_(staj_event_type::null_value) 
     {
-        parser_.cursor_mode(true);
-
         if (!read_done())
         {
             std::error_code local_ec;
@@ -143,9 +142,9 @@ public:
         std::error_code& ec,
         typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
-         parser_(options, alloc)
+         tokenizer_(options, alloc),
+         current_(staj_event_type::null_value)
     {
-        parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
     
@@ -161,8 +160,7 @@ public:
 
     void reset()
     {
-        parser_.reset();
-        cursor_visitor_.reset();
+        tokenizer_.reset();
         done_ = false;
         if (!read_done())
         {
@@ -175,8 +173,7 @@ public:
     reset(Sourceable&& source)
     {
         source_ = std::forward<Sourceable>(source);
-        parser_.reinitialize();
-        cursor_visitor_.reset();
+        tokenizer_.reinitialize();
         done_ = false;
         if (!read_done())
         {
@@ -189,16 +186,14 @@ public:
     reset(Sourceable&& source)
     {
         source_ = {};
-        parser_.reinitialize();
-        cursor_visitor_.reset();
+        tokenizer_.reinitialize();
         done_ = false;
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
 
     void reset(std::error_code& ec)
     {
-        parser_.reset();
-        cursor_visitor_.reset();
+        tokenizer_.reset();
         done_ = false;
         if (!read_done())
         {
@@ -211,8 +206,7 @@ public:
     reset(Sourceable&& source, std::error_code& ec)
     {
         source_ = std::forward<Sourceable>(source);
-        parser_.reinitialize();
-        cursor_visitor_.reset();
+        tokenizer_.reinitialize();
         done_ = false;
         if (!read_done())
         {
@@ -225,19 +219,24 @@ public:
     reset(Sourceable&& source, std::error_code& ec)
     {
         source_ = {};
-        parser_.reinitialize();
+        tokenizer_.reinitialize();
         done_ = false;
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
 
     bool done() const override
     {
-        return parser_.done() || done_;
+        return tokenizer_.done() || done_;
+    }
+
+    string_view_type get_string_view() const
+    {
+        return tokenizer_.get_string_view();
     }
 
     const basic_staj_event<CharT>& current() const override
     {
-        return cursor_visitor_.event();
+        return current_;
     }
 
     void read_to(basic_json_visitor<CharT>& visitor) override
@@ -246,37 +245,18 @@ public:
         read_to(visitor, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+            JSONCONS_THROW(ser_error(ec,tokenizer_.line(),tokenizer_.column()));
         }
     }
 
-    void read_to(basic_json_visitor<CharT>& visitor,
-        std::error_code& ec) override
+    void read_to(basic_json_visitor<CharT>& /*visitor*/,
+        std::error_code& /*ec*/) override
     {
         if (is_begin_container(current().event_type()))
         {
-            parser_.cursor_mode(false);
-            parser_.mark_level(parser_.level());
-            cursor_visitor_.event().send_json_event(visitor, *this, ec);
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                return;
-            }
-            read_next(visitor, ec);
-            parser_.cursor_mode(true);
-            parser_.mark_level(0);
-            if (current().event_type() == staj_event_type::begin_object)
-            {
-                cursor_visitor_.end_object(*this);
-            }
-            else
-            {
-                cursor_visitor_.end_array(*this);
-            }
         }
         else
         {
-            cursor_visitor_.event().send_json_event(visitor, *this, ec);
         }
     }
 
@@ -296,7 +276,7 @@ public:
         check_done(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+            JSONCONS_THROW(ser_error(ec,tokenizer_.line(),tokenizer_.column()));
         }
     }
 
@@ -314,25 +294,25 @@ public:
         }   
         if (source_.eof())
         {
-            parser_.check_done(ec);
+            tokenizer_.check_done(ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
         else
         {
             do
             {
-                if (parser_.source_exhausted())
+                if (tokenizer_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
                     if (JSONCONS_UNLIKELY(ec)) {return;}
                     if (!s.empty())
                     {
-                        parser_.update(s.data(),s.size());
+                        tokenizer_.update(s.data(),s.size());
                     }
                 }
-                if (!parser_.source_exhausted())
+                if (!tokenizer_.source_exhausted())
                 {
-                    parser_.check_done(ec);
+                    tokenizer_.check_done(ec);
                     if (JSONCONS_UNLIKELY(ec)) {return;}
                 }
             }
@@ -342,17 +322,17 @@ public:
 
     bool eof() const
     {
-        return parser_.source_exhausted() && source_.eof();
+        return tokenizer_.source_exhausted() && source_.eof();
     }
 
     std::size_t line() const override
     {
-        return parser_.line();
+        return tokenizer_.line();
     }
 
     std::size_t column() const override
     {
-        return parser_.column();
+        return tokenizer_.column();
     }
 
     friend
@@ -366,7 +346,7 @@ private:
 
     bool read_done() const 
     {
-        return parser_.done() || done_;
+        return tokenizer_.done() || done_;
     }
 
     void initialize_with_string_view(string_view_type sv)
@@ -388,8 +368,8 @@ private:
             return;
         }
         std::size_t offset = (r.ptr - sv.data());
-        parser_.update(sv.data()+offset,sv.size()-offset);
-        bool read_done = parser_.done() || done_;
+        tokenizer_.update(sv.data()+offset,sv.size()-offset);
+        bool read_done = tokenizer_.done() || done_;
         if (!read_done)
         {
             std::error_code local_ec;
@@ -411,49 +391,65 @@ private:
     void read_next()
     {
         std::error_code ec;
-        read_next(cursor_visitor_, ec);
+        read_next(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+            JSONCONS_THROW(ser_error(ec,tokenizer_.line(),tokenizer_.column()));
         }
     }
 
     void read_next(std::error_code& ec)
     {
-        read_next(cursor_visitor_, ec);
-    }
-
-    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
+        tokenizer_.restart();
+        while (!tokenizer_.stopped())
         {
-            if (parser_.source_exhausted())
+            if (tokenizer_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
                 if (JSONCONS_UNLIKELY(ec)) {return;}
                 if (!s.empty())
                 {
-                    parser_.update(s.data(),s.size());
+                    tokenizer_.update(s.data(),s.size());
                     if (JSONCONS_UNLIKELY(ec)) {return;}
                 }
             }
-            bool eof = parser_.source_exhausted() && source_.eof();
-            parser_.parse_some(visitor, ec);
+            bool eof = tokenizer_.source_exhausted() && source_.eof();
+            //tokenizer_.parse_some(visitor, ec);
+            tokenizer_.parse_next(ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
             if (eof)
             {
-                if (parser_.parsing_started())
+                if (tokenizer_.parsing_started())
                 {
                     done_ = true;
                     break;
                 }
-                else if (!parser_.accept())
+                else if (!tokenizer_.accept())
                 {
                     ec = json_errc::unexpected_eof;
                     return;
                 }
             }
+        }
+        update_current();
+    }
+
+    void update_current()
+    {
+        switch (tokenizer_.token_kind())
+        {
+            case generic_token_kind::string_value:
+                if (tokenizer_.is_key())
+                {
+                    current_ = basic_staj_event<CharT>(tokenizer_.get_string_view(),
+                        staj_event_type::key);
+                }
+                current_ = basic_staj_event<CharT>(tokenizer_.get_string_view(),
+                    staj_event_type::string_value, tokenizer_.tag());
+                break;
+            default:
+                current_ = basic_staj_event<CharT>(staj_event_type::null_value);
+                break;
         }
     }
 };

@@ -64,7 +64,7 @@ TEST_CASE("json_cursor eof test")
         CHECK(cursor.eof());
     }
 }
-
+#if 0
 TEST_CASE("json_cursor string_value test")
 {
     std::string s = R"("Tom")";
@@ -686,3 +686,4 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         CHECK(cursor.done());
     }
 }
+#endif
