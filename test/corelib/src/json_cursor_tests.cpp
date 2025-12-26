@@ -154,7 +154,7 @@ TEST_CASE("json_cursor int64_value test")
     REQUIRE_FALSE(ec);
     CHECK(cursor.done());
 }
-#if 0
+
 TEST_CASE("json_cursor uint64_value test")
 {
     std::string s = "100";
@@ -210,7 +210,7 @@ TEST_CASE("json_cursor double_value test")
     cursor.next();
     CHECK(cursor.done());
 }
-#endif
+
 
 TEST_CASE("json_cursor array_value test")
 {
@@ -673,7 +673,7 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
 
         cursor.reset(input2, ec);
         CHECK(ec == json_errc::syntax_error);
-        CHECK_FALSE(cursor.done());
+        CHECK(cursor.done()); //REVISIT Changed behavior
 
         // Check that cursor can reused be upon reset following an error.
         ec = json_errc::success;

@@ -413,7 +413,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = get_uint64_value(ec);
+                uint64_t val = get_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -479,7 +479,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = get_int64_value(ec);
+                int64_t val = get_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -561,7 +561,7 @@ private:
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     {
-                        uint64_t val = get_uint64_value(ec);
+                        uint64_t val = get_uint64(ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
@@ -804,7 +804,7 @@ private:
 
     std::size_t get_size(std::error_code& ec)
     {
-        uint64_t u = get_uint64_value(ec);
+        uint64_t u = get_uint64(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return 0;
@@ -936,7 +936,7 @@ private:
         } 
     }
 
-    uint64_t get_uint64_value(std::error_code& ec)
+    uint64_t get_uint64(std::error_code& ec)
     {
         uint64_t val = 0;
 
@@ -998,7 +998,7 @@ private:
         return val;
     }
 
-    int64_t get_int64_value(std::error_code& ec)
+    int64_t get_int64(std::error_code& ec)
     {
         int64_t val = 0;
 
@@ -1082,7 +1082,7 @@ private:
 
                 case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
                 {
-                    uint64_t x = get_uint64_value(ec);
+                    uint64_t x = get_uint64(ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return 0;
@@ -1178,7 +1178,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                exponent = get_uint64_value(ec);
+                exponent = get_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1187,7 +1187,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                exponent = get_int64_value(ec);
+                exponent = get_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1216,7 +1216,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = get_uint64_value(ec);
+                uint64_t val = get_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1226,7 +1226,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = get_int64_value(ec);
+                int64_t val = get_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1337,7 +1337,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                exponent = get_uint64_value(ec);
+                exponent = get_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1346,7 +1346,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                exponent = get_int64_value(ec);
+                exponent = get_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1372,7 +1372,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = get_uint64_value(ec);
+                uint64_t val = get_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1384,7 +1384,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = get_int64_value(ec);
+                int64_t val = get_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1489,7 +1489,7 @@ private:
 
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
-            uint64_t val = get_uint64_value(ec);
+            uint64_t val = get_uint64(ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;

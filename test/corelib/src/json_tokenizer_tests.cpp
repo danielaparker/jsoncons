@@ -86,7 +86,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
         CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
-        auto val = tokenizer.get_uint64_value();
+        auto val = tokenizer.get_uint64();
         CHECK(data == std::to_string(val));
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -100,7 +100,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
-        auto val = tokenizer.get_uint64_value();
+        auto val = tokenizer.get_uint64();
         CHECK(data.substr(0,data.size()-1) == std::to_string(val));
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -116,7 +116,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
         CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
         CHECK(generic_token_kind::int64_value == tokenizer.token_kind());
-        auto val = tokenizer.get_int64_value();
+        auto val = tokenizer.get_int64();
         CHECK(data == std::to_string(val));
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -132,7 +132,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
         CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
         CHECK(generic_token_kind::double_value == tokenizer.token_kind());
-        auto val = tokenizer.get_double_value();
+        auto val = tokenizer.get_double();
         CHECK(data == std::to_string(val));
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -148,7 +148,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
         CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
         CHECK(generic_token_kind::double_value == tokenizer.token_kind());
-        auto val = tokenizer.get_double_value();
+        auto val = tokenizer.get_double();
         CHECK(data == std::to_string(val));
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -162,7 +162,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
-        auto val = tokenizer.get_bool_value();
+        auto val = tokenizer.get_bool();
         CHECK(val);
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -176,7 +176,7 @@ TEST_CASE("json_tokenizer update test")
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
-        auto val = tokenizer.get_bool_value();
+        auto val = tokenizer.get_bool();
         CHECK_FALSE(val);
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -267,7 +267,7 @@ TEST_CASE("json_tokenizer update test")
             CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
             CHECK(generic_token_kind::double_value == tokenizer.token_kind());
         }
-        auto val = tokenizer.get_double_value();
+        auto val = tokenizer.get_double();
         CHECK(expected == val);
         CHECK(json_errc{} == tokenizer.try_next().ec);
         CHECK(tokenizer.done());
@@ -289,7 +289,7 @@ TEST_CASE("json_tokenizer update test")
                     std::cout << tokenizer.get_string_view() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
-                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    std::cout << tokenizer.get_uint64() << "\n";
                     break;
                 case generic_token_kind::begin_array:
                     std::cout << "begin_array\n";
@@ -314,7 +314,7 @@ TEST_CASE("json_tokenizer update test")
                     std::cout << tokenizer.get_string_view() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
-                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    std::cout << tokenizer.get_uint64() << "\n";
                     break;
                 case generic_token_kind::begin_array:
                     std::cout << "begin_array\n";
@@ -359,7 +359,7 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(!tokenizer.done());
         REQUIRE(tokenizer.source_exhausted());
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
-        CHECK(12345678 == tokenizer.get_uint64_value());
+        CHECK(12345678 == tokenizer.get_uint64());
         REQUIRE(!tokenizer.done());
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(tokenizer.done());
@@ -389,7 +389,7 @@ TEST_CASE("json_tokenizer incremental update tests")
         REQUIRE(!tokenizer.done());
         REQUIRE(!tokenizer.source_exhausted()); // 
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
-        CHECK(12345678 == tokenizer.get_uint64_value());
+        CHECK(12345678 == tokenizer.get_uint64());
         REQUIRE(json_errc{} == tokenizer.try_next().ec);
         REQUIRE(generic_token_kind::end_array == tokenizer.token_kind());
         REQUIRE(!tokenizer.done());
@@ -412,7 +412,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << tokenizer.get_string_view() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
-                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    std::cout << tokenizer.get_uint64() << "\n";
                     break;
                 case generic_token_kind::begin_map:
                     std::cout << "begin_map\n";
@@ -440,7 +440,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << tokenizer.get_string_view() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
-                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    std::cout << tokenizer.get_uint64() << "\n";
                     break;
                 case generic_token_kind::begin_array:
                     std::cout << "begin_array\n";
@@ -474,7 +474,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << tokenizer.get_string_view() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
-                    std::cout << tokenizer.get_uint64_value() << "\n";
+                    std::cout << tokenizer.get_uint64() << "\n";
                     break;
                 case generic_token_kind::begin_array:
                     std::cout << "begin_array\n";

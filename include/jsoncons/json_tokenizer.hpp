@@ -225,22 +225,22 @@ public:
         return is_key_;
     }
 
-    bool get_bool_value() const
+    bool get_bool() const
     {
         return value_.bool_value_;
     }
 
-    int64_t get_int64_value() const
+    int64_t get_int64() const
     {
         return value_.int64_value_;
     }
 
-    uint64_t get_uint64_value() const
+    uint64_t get_uint64() const
     {
         return value_.uint64_value_;
     }
 
-    double get_double_value() const
+    double get_double() const
     {
         return value_.double_value_;
     }
