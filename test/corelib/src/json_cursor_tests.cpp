@@ -15,7 +15,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("json_cursor eof test")
 {
     SECTION("empty string 1")
@@ -65,7 +64,6 @@ TEST_CASE("json_cursor eof test")
         CHECK(cursor.eof());
     }
 }
-#endif
 
 TEST_CASE("json_cursor string_value test")
 {
@@ -84,7 +82,6 @@ TEST_CASE("json_cursor string_value test")
         CHECK(cursor.done());
     }
 }
-#if 0
 
 TEST_CASE("json_cursor string_value as<int> test")
 {
@@ -157,7 +154,7 @@ TEST_CASE("json_cursor int64_value test")
     REQUIRE_FALSE(ec);
     CHECK(cursor.done());
 }
-
+#if 0
 TEST_CASE("json_cursor uint64_value test")
 {
     std::string s = "100";
@@ -213,6 +210,7 @@ TEST_CASE("json_cursor double_value test")
     cursor.next();
     CHECK(cursor.done());
 }
+#endif
 
 TEST_CASE("json_cursor array_value test")
 {
@@ -689,4 +687,4 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         CHECK(cursor.done());
     }
 }
-#endif
+

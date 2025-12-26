@@ -297,7 +297,6 @@ public:
             return from_json_result{};
         }
         more_ = true;
-        token_kind_ = generic_token_kind{};
         if (state_ == parse_state::accept)
         {
             done_ = true;
@@ -305,6 +304,7 @@ public:
             more_ = false;
             return from_json_result{};
         }
+        token_kind_ = generic_token_kind{};
         const char_type* local_input_end = input_end_;
         std::error_code ec{};
 

@@ -220,7 +220,7 @@ public:
 
     bool done() const override
     {
-        return tokenizer_.done() || done_;
+        return tokenizer_.done() /*|| done_*/;
     }
 
     string_view_type get_string_view() const
@@ -243,14 +243,141 @@ public:
         }
     }
 
-    void read_to(basic_json_visitor<CharT>& /*visitor*/,
-        std::error_code& /*ec*/) override
+    void read_to(basic_json_visitor<CharT>& visitor,
+        std::error_code& ec) override
     {
         if (is_begin_container(current().event_type()))
         {
+            int level = 1;
+            if (tokenizer_.token_kind() == generic_token_kind::begin_map)
+            {
+                visitor.begin_object(tokenizer_.tag(), tokenizer_.get_context());
+            }
+            else
+            {
+                visitor.begin_array(tokenizer_.tag(), tokenizer_.get_context());
+            }
+            while (!tokenizer_.done() && level != 0)
+            {
+                auto r = tokenizer_.try_next();
+                if (JSONCONS_UNLIKELY(!r))
+                {
+                    if (r.ec != json_errc::unexpected_eof)
+                    {
+                        ec = r.ec;
+                    }
+                    return;
+                }
+                switch (tokenizer_.token_kind())
+                {
+                    case generic_token_kind::string_value:
+                        if (tokenizer_.is_key())
+                        {
+                            visitor.key(tokenizer_.get_string_view(),
+                                tokenizer_.get_context());
+                        }
+                        else
+                        {
+                            visitor.string_value(tokenizer_.get_string_view(),
+                                tokenizer_.tag(), tokenizer_.get_context());
+                        }
+                        break;
+                    case generic_token_kind::null_value:
+                        visitor.null_value(tokenizer_.tag(), tokenizer_.get_context());
+                        break;
+                    case generic_token_kind::bool_value:
+                        visitor.bool_value(tokenizer_.get_bool_value(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                        break;
+                    case generic_token_kind::int64_value:
+                        visitor.int64_value(tokenizer_.get_int64_value(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                        break;
+                    case generic_token_kind::uint64_value:
+                        visitor.uint64_value(tokenizer_.get_uint64_value(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                        break;
+                    case generic_token_kind::double_value:
+                        visitor.double_value(tokenizer_.get_double_value(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                        break;
+                    case generic_token_kind::begin_map:
+                        visitor.begin_object(tokenizer_.tag(), tokenizer_.get_context());
+                        ++level;
+                        break;
+                    case generic_token_kind::end_map:
+                        visitor.end_object(tokenizer_.get_context());
+                        --level;
+                        break;
+                    case generic_token_kind::begin_array:
+                        visitor.begin_array(tokenizer_.tag(), tokenizer_.get_context());
+                        ++level;
+                        break;
+                    case generic_token_kind::end_array:
+                        visitor.end_array(tokenizer_.get_context());
+                        --level;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            update_current();
+            visitor.flush();
+            if (ec == json_errc::unexpected_eof)
+            {
+                ec.clear();
+            }
         }
         else
         {
+            switch (tokenizer_.token_kind())
+            {
+                case generic_token_kind::string_value:
+                    if (tokenizer_.is_key())
+                    {
+                        visitor.key(tokenizer_.get_string_view(),
+                            tokenizer_.get_context());
+                    }
+                    else
+                    {
+                        visitor.string_value(tokenizer_.get_string_view(),
+                            tokenizer_.tag(), tokenizer_.get_context());
+                    }
+                    break;
+                case generic_token_kind::null_value:
+                    visitor.null_value(tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::bool_value:
+                    visitor.bool_value(tokenizer_.get_bool_value(),
+                        tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::int64_value:
+                    visitor.int64_value(tokenizer_.get_int64_value(),
+                        tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::uint64_value:
+                    visitor.uint64_value(tokenizer_.get_uint64_value(),
+                        tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::double_value:
+                    visitor.double_value(tokenizer_.get_double_value(),
+                        tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::begin_map:
+                    visitor.begin_object(tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::end_map:
+                    visitor.end_object(tokenizer_.get_context());
+                    break;
+                case generic_token_kind::begin_array:
+                    visitor.begin_array(tokenizer_.tag(), tokenizer_.get_context());
+                    break;
+                case generic_token_kind::end_array:
+                    visitor.end_array(tokenizer_.get_context());
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -388,33 +515,75 @@ private:
 
     void read_next(std::error_code& ec)
     {
-        tokenizer_.restart();
-        while (!tokenizer_.stopped())
+        auto r = tokenizer_.try_next();
+        if (JSONCONS_UNLIKELY(!r))
+        {
+            if (r.ec != json_errc::unexpected_eof)
+            {
+                ec = r.ec;
+            }
+            return;
+        }
+        while (tokenizer_.token_kind() == generic_token_kind{})
         {
             if (tokenizer_.source_exhausted())
             {
-                auto s = source_.read_buffer(ec);
-                if (JSONCONS_UNLIKELY(ec)) {return;}
-                if (!s.empty())
+                if (!source_.eof())
                 {
-                    tokenizer_.update(s.data(),s.size());
+                    auto buf = source_.read_buffer(ec);
                     if (JSONCONS_UNLIKELY(ec)) {return;}
+                    if (!buf.empty())
+                    {
+                        tokenizer_.update(buf.data(), buf.size());
+                        r = tokenizer_.try_next();
+                        if (JSONCONS_UNLIKELY(!r))
+                        {
+                            if (r.ec != json_errc::unexpected_eof)
+                            {
+                                ec = r.ec;
+                            }
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        r = tokenizer_.try_next();
+                        if (JSONCONS_UNLIKELY(!r))
+                        {
+                            if (!r)
+                            {
+                                ec = r.ec;
+                            }
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    if (tokenizer_.state() == parse_state::start)
+                    {
+                        return;
+                    }
+                    r = tokenizer_.try_next();
+                    if (JSONCONS_UNLIKELY(!r))
+                    {
+                        if (!r)
+                        {
+                            ec = r.ec;
+                        }
+                        return;
+                    }
                 }
             }
-            bool eof = tokenizer_.source_exhausted() && source_.eof();
-            //tokenizer_.parse_some(visitor, ec);
-            tokenizer_.parse_next(ec);
-            if (JSONCONS_UNLIKELY(ec)) {return;}
-            if (eof)
+            else
             {
-                if (tokenizer_.parsing_started())
+                r = tokenizer_.try_next();
+                if (JSONCONS_UNLIKELY(!r))
                 {
-                    done_ = true;
-                    break;
-                }
-                else if (!tokenizer_.accept())
-                {
-                    ec = json_errc::unexpected_eof;
+                    if (!r)
+                    {
+                        ec = r.ec;
+                    }
                     return;
                 }
             }
@@ -426,14 +595,48 @@ private:
     {
         switch (tokenizer_.token_kind())
         {
+            case generic_token_kind::null_value:
+                current_ = basic_staj_event<CharT>(staj_event_type::null_value);
+                break;
             case generic_token_kind::string_value:
                 if (tokenizer_.is_key())
                 {
                     current_ = basic_staj_event<CharT>(tokenizer_.get_string_view(),
                         staj_event_type::key);
                 }
-                current_ = basic_staj_event<CharT>(tokenizer_.get_string_view(),
-                    staj_event_type::string_value, tokenizer_.tag());
+                else
+                {
+                    current_ = basic_staj_event<CharT>(tokenizer_.get_string_view(),
+                        staj_event_type::string_value, tokenizer_.tag());
+                }
+                break;
+            case generic_token_kind::bool_value:
+                current_ = basic_staj_event<CharT>(tokenizer_.get_bool_value(),
+                    tokenizer_.tag());
+                break;
+            case generic_token_kind::uint64_value:
+                current_ = basic_staj_event<CharT>(tokenizer_.get_uint64_value(),
+                    tokenizer_.tag());
+                break;
+            case generic_token_kind::int64_value:
+                current_ = basic_staj_event<CharT>(tokenizer_.get_int64_value(),
+                    tokenizer_.tag());
+                break;
+            case generic_token_kind::double_value:
+                current_ = basic_staj_event<CharT>(tokenizer_.get_double_value(),
+                    tokenizer_.tag());
+                break;
+            case generic_token_kind::begin_map:
+                current_ = basic_staj_event<CharT>(staj_event_type::begin_object);
+                break;
+            case generic_token_kind::end_map:
+                current_ = basic_staj_event<CharT>(staj_event_type::end_object);
+                break;
+            case generic_token_kind::begin_array:
+                current_ = basic_staj_event<CharT>(staj_event_type::begin_array);
+                break;
+            case generic_token_kind::end_array:
+                current_ = basic_staj_event<CharT>(staj_event_type::end_array);
                 break;
             default:
                 current_ = basic_staj_event<CharT>(staj_event_type::null_value);
