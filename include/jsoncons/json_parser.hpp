@@ -215,7 +215,7 @@ public:
 
     void parse_some(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        auto r = tokenizer_.try_next();
+        auto r = tokenizer_.try_next_token();
         if (JSONCONS_UNLIKELY(!r))
         {
             if (r.ec != json_errc::unexpected_eof)
@@ -274,7 +274,7 @@ public:
                 default:
                     break;
             }
-            r = tokenizer_.try_next();
+            r = tokenizer_.try_next_token();
             if (JSONCONS_UNLIKELY(!r))
             {
                 if (r.ec != json_errc::unexpected_eof)
@@ -358,7 +358,7 @@ public:
                 default:
                     break;
             }
-            auto r = tokenizer_.try_next();
+            auto r = tokenizer_.try_next_token();
             if (JSONCONS_UNLIKELY(!r))
             {
                 if (!r)

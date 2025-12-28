@@ -259,7 +259,7 @@ public:
             }
             while (!tokenizer_.done() && level != 0)
             {
-                auto r = tokenizer_.try_next();
+                auto r = tokenizer_.try_next_token();
                 if (JSONCONS_UNLIKELY(!r))
                 {
                     if (r.ec != json_errc::unexpected_eof)
@@ -515,7 +515,7 @@ private:
 
     void read_next(std::error_code& ec)
     {
-        auto r = tokenizer_.try_next();
+        auto r = tokenizer_.try_next_token();
         if (JSONCONS_UNLIKELY(!r))
         {
             if (r.ec != json_errc::unexpected_eof)
@@ -535,7 +535,7 @@ private:
                     if (!buf.empty())
                     {
                         tokenizer_.update(buf.data(), buf.size());
-                        r = tokenizer_.try_next();
+                        r = tokenizer_.try_next_token();
                         if (JSONCONS_UNLIKELY(!r))
                         {
                             if (r.ec != json_errc::unexpected_eof)
@@ -547,7 +547,7 @@ private:
                     }
                     else
                     {
-                        r = tokenizer_.try_next();
+                        r = tokenizer_.try_next_token();
                         if (JSONCONS_UNLIKELY(!r))
                         {
                             if (!r)
@@ -564,7 +564,7 @@ private:
                     {
                         return;
                     }
-                    r = tokenizer_.try_next();
+                    r = tokenizer_.try_next_token();
                     if (JSONCONS_UNLIKELY(!r))
                     {
                         if (!r)
@@ -577,7 +577,7 @@ private:
             }
             else
             {
-                r = tokenizer_.try_next();
+                r = tokenizer_.try_next_token();
                 if (JSONCONS_UNLIKELY(!r))
                 {
                     if (!r)

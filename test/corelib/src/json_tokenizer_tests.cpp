@@ -5,6 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <jsoncons/json_tokenizer.hpp>
+#include <jsoncons/source.hpp>
 #include <iostream>
 #include <catch/catch.hpp>
 
@@ -36,7 +37,7 @@ TEST_CASE("json_tokenizer constructor test")
             {
                 std::cout << tokenizer.token_kind() << "\n";
             }
-            r = tokenizer.try_next();
+            r = tokenizer.try_next_token();
         }
     }
 }
@@ -49,7 +50,7 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("input with whitespace")
@@ -58,7 +59,7 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("string")
@@ -67,12 +68,12 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
         auto sv = tokenizer.get_string_view();
         CHECK(data.substr(1,data.size()-2) == sv);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("uint64_t max")
@@ -81,14 +82,14 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
-        CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
         auto val = tokenizer.get_uint64();
         CHECK(data == std::to_string(val));
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("uint64_t max + space")
@@ -97,12 +98,12 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
         auto val = tokenizer.get_uint64();
         CHECK(data.substr(0,data.size()-1) == std::to_string(val));
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("int64_t min")
@@ -111,14 +112,14 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
-        CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
         CHECK(generic_token_kind::int64_value == tokenizer.token_kind());
         auto val = tokenizer.get_int64();
         CHECK(data == std::to_string(val));
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("double max")
@@ -127,14 +128,14 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
-        CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
         CHECK(generic_token_kind::double_value == tokenizer.token_kind());
         auto val = tokenizer.get_double();
         CHECK(data == std::to_string(val));
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("double min")
@@ -143,14 +144,14 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
-        CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
         CHECK(generic_token_kind::double_value == tokenizer.token_kind());
         auto val = tokenizer.get_double();
         CHECK(data == std::to_string(val));
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("bool true")
@@ -159,12 +160,12 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
         auto val = tokenizer.get_bool();
         CHECK(val);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("bool false")
@@ -173,12 +174,12 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
         auto val = tokenizer.get_bool();
         CHECK_FALSE(val);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
     SECTION("null")
@@ -187,10 +188,10 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind::bool_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
 
@@ -200,23 +201,23 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::end_map == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
 
@@ -226,21 +227,21 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::string_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::begin_array == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::uint64_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::null_value == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::end_array == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(generic_token_kind::end_map == tokenizer.token_kind());
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
 
@@ -251,12 +252,12 @@ TEST_CASE("json_tokenizer update test")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK_FALSE(tokenizer.done());
         CHECK(generic_token_kind{} == tokenizer.token_kind()); // still unknown, may be more data
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
-            CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+            CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
         }
         CHECK_FALSE(tokenizer.done());
         CHECK(tokenizer.source_exhausted());
@@ -264,12 +265,12 @@ TEST_CASE("json_tokenizer update test")
 
         if (!tokenizer.done())
         {
-            CHECK(json_errc{} == tokenizer.try_next().ec);  // now we know we have the number
+            CHECK(json_errc{} == tokenizer.try_next_token().ec);  // now we know we have the number
             CHECK(generic_token_kind::double_value == tokenizer.token_kind());
         }
         auto val = tokenizer.get_double();
         CHECK(expected == val);
-        CHECK(json_errc{} == tokenizer.try_next().ec);
+        CHECK(json_errc{} == tokenizer.try_next_token().ec);
         CHECK(tokenizer.done());
     }
 
@@ -279,7 +280,7 @@ TEST_CASE("json_tokenizer update test")
         json_tokenizer tokenizer;
 
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -304,7 +305,7 @@ TEST_CASE("json_tokenizer update test")
                     std::cout << "end_map\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
         while (!tokenizer.done())
         {
@@ -329,7 +330,7 @@ TEST_CASE("json_tokenizer update test")
                     std::cout << "end_map\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
     }
 }
@@ -345,23 +346,23 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(tokenizer.source_exhausted());
         REQUIRE(generic_token_kind{} == tokenizer.token_kind());
         tokenizer.update(more_data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(tokenizer.source_exhausted());
         REQUIRE(generic_token_kind{} == tokenizer.token_kind());
         tokenizer.update(no_data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(tokenizer.source_exhausted());
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
         CHECK(12345678 == tokenizer.get_uint64());
         REQUIRE(!tokenizer.done());
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(tokenizer.done());
     }
     SECTION("test 2")
@@ -372,28 +373,28 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(!tokenizer.source_exhausted());
         REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
         REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(generic_token_kind{} == tokenizer.token_kind());
         tokenizer.update(more_data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(tokenizer.source_exhausted());
         REQUIRE(generic_token_kind{} == tokenizer.token_kind());
         tokenizer.update(last_data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(!tokenizer.done());
         REQUIRE(!tokenizer.source_exhausted()); // 
         REQUIRE(generic_token_kind::uint64_value == tokenizer.token_kind());
         CHECK(12345678 == tokenizer.get_uint64());
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(generic_token_kind::end_array == tokenizer.token_kind());
         REQUIRE(!tokenizer.done());
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         REQUIRE(tokenizer.done());
     }
     SECTION("test 3")
@@ -402,7 +403,7 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(input);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
 
         while (!tokenizer.done())
         {
@@ -421,7 +422,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "end_map\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
     }
     SECTION("test 4")
@@ -430,7 +431,7 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(input);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
 
         while (!tokenizer.done())
         {
@@ -449,7 +450,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "end_array\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
     }
 
@@ -464,7 +465,7 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -489,10 +490,10 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "end_map\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
-        tokenizer.try_next();
-    }*/
+        tokenizer.try_next_token();
+    }
     SECTION("test 6")
     {
         std::string data1 = R"("010)";
@@ -502,7 +503,7 @@ TEST_CASE("json_tokenizer incremental update tests")
 
         json_tokenizer tokenizer{};
         tokenizer.update(data1);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         std::cout << "(1) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -515,10 +516,10 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(1) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
         tokenizer.update(data2);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         std::cout << "(2) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -531,11 +532,11 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(2) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
             std::cout << "(2a) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n";
         }
         tokenizer.update(data3);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         std::cout << "(3) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -548,10 +549,10 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
         tokenizer.update(data4);
-        REQUIRE(json_errc{} == tokenizer.try_next().ec);
+        REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         std::cout << "(4) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done() && !tokenizer.source_exhausted())
         {
@@ -564,7 +565,7 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(4) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
         std::cout << "(5) done: " << tokenizer.done() << ", source_exhausted: " << tokenizer.source_exhausted() << "\n"; 
         while (!tokenizer.done())
@@ -578,8 +579,65 @@ TEST_CASE("json_tokenizer incremental update tests")
                     std::cout << "(last) no token\n";
                     break;
             }
-            REQUIRE(json_errc{} == tokenizer.try_next().ec);
+            REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
+    }*/
+    SECTION("test 7")
+    {
+        std::string buf = R"([
+    {
+        "person": {
+            "A": 1
+        }
+    }
+        ])";
+
+        json_tokenizer tokenizer{};
+        std::istringstream is(buf);
+        stream_source<char> source{is, 4};
+
+        while (!tokenizer.started())
+        {
+            if (tokenizer.source_exhausted())
+            {
+                auto chunk = source.read_buffer();
+                tokenizer.update(chunk.data(), chunk.size());
+            }
+            tokenizer.try_next_token();
+        }
+        REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
+        do
+        {
+            switch (tokenizer.token_kind())
+            {
+                case generic_token_kind::string_value:
+                    std::cout << tokenizer.get_string_view() << "\n";
+                    break;
+                case generic_token_kind::uint64_value:
+                    std::cout << tokenizer.get_uint64() << "\n";
+                    break;
+                case generic_token_kind::begin_array:
+                    std::cout << "begin_array\n";
+                    break;
+                case generic_token_kind::end_array:
+                    std::cout << "end_array\n";
+                    break;
+                case generic_token_kind::begin_map:
+                    std::cout << "begin_map\n";
+                    break;
+                case generic_token_kind::end_map:
+                    std::cout << "end_map\n";
+                    break;
+            }
+            if (tokenizer.source_exhausted())
+            {
+                auto chunk = source.read_buffer();
+                tokenizer.update(chunk.data(), chunk.size());
+            }
+
+            tokenizer.try_next_token();
+        } while (!tokenizer.done());
+
     }
 }
 
