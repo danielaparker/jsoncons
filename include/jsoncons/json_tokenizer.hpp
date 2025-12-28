@@ -39,7 +39,7 @@ namespace jsoncons {
 
 enum class parse_state : uint8_t 
 {
-    start, 
+    initial, 
     root,
     accept, 
     slash,  
@@ -150,11 +150,10 @@ private:
     std::size_t begin_position_{0};
     const char_type* input_end_{nullptr};
     const char_type* input_ptr_{nullptr};
-    parse_state state_{parse_state::start};
+    parse_state state_{parse_state::initial};
     parse_string_state string_state_{};
     parse_number_state number_state_{};
     bool more_{true};
-    bool started_{false};
     int mark_level_{0};
     bool is_key_{false};
     
@@ -287,7 +286,7 @@ public:
 
     bool started() const
     {
-        return started_;
+        return state_ != parse_state::initial;
     }
 
     bool done() const
@@ -303,7 +302,6 @@ public:
         }
         if (state_ == parse_state::accept)
         {
-            started_ = false;
             state_ = parse_state::done;
             more_ = false;
             return from_json_result{};
@@ -341,7 +339,7 @@ public:
                     state_ = parse_state::done;
                     more_ = false;
                     break;
-                case parse_state::start:
+                case parse_state::initial:
                     more_ = false;
                     break;                
                 case parse_state::done:
@@ -365,7 +363,7 @@ public:
 
     bool parsing_started() const
     {
-        return state_ == parse_state::start;
+        return state_ == parse_state::initial;
     }
 
     bool accept() const
@@ -582,9 +580,8 @@ public:
     {
         state_stack_.clear();
         push_state(parse_state::root);
-        state_ = parse_state::start;
+        state_ = parse_state::initial;
         more_ = true;
-        started_ = false;
         line_ = 1;
         position_ = 0;
         mark_position_ = 0;
@@ -661,7 +658,7 @@ public:
                     }
                     mark_position_ = position_;
                     break;
-                case parse_state::start: 
+                case parse_state::initial: 
                 {
                     switch (*input_ptr_)
                     {
@@ -679,7 +676,6 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            started_ = true;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -687,7 +683,6 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '[':
-                            started_ = true;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -695,7 +690,6 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
-                            started_ = true;
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
                             begin_position_ = position_;
@@ -707,7 +701,6 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '-':
-                            started_ = true;
                             buffer_.clear();
                             buffer_.push_back('-');
                             begin_position_ = position_;
@@ -719,7 +712,6 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case '0': 
-                            started_ = true;
                             buffer_.clear();
                             buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = parse_state::number;
@@ -731,7 +723,6 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            started_ = true;
                             buffer_.clear();
                             buffer_.push_back(static_cast<char>(*input_ptr_));
                             begin_position_ = position_;
@@ -743,17 +734,14 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 'n':
-                            started_ = true;
                             parse_null(ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 't':
-                            started_ = true;
                             input_ptr_ = parse_true(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;
                         case 'f':
-                            started_ = true;
                             input_ptr_ = parse_false(input_ptr_, ec);
                             if (JSONCONS_UNLIKELY(ec)) {return;}
                             break;

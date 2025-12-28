@@ -279,7 +279,7 @@ namespace jsoncons {
                 return;
             }        
             parser_.reset();
-            while (!parser_.stopped())
+            while (!parser_.done())
             {
                 if (parser_.source_exhausted())
                 {

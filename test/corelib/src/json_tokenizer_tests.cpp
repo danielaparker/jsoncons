@@ -603,7 +603,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                 auto chunk = source.read_buffer();
                 tokenizer.update(chunk.data(), chunk.size());
             }
-            tokenizer.try_next_token();
+            auto rc = tokenizer.try_next_token();
+            std::cout << "ec: " << rc.ec << "\n";
         }
         REQUIRE(generic_token_kind::begin_array == tokenizer.token_kind());
         do
@@ -635,7 +636,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                 tokenizer.update(chunk.data(), chunk.size());
             }
 
-            tokenizer.try_next_token();
+            auto rc = tokenizer.try_next_token();
+            std::cout << "ec: " << rc.ec << "\n";
         } while (!tokenizer.done());
 
     }
