@@ -306,6 +306,8 @@ TEST_CASE("json_tokenizer update test")
                 case generic_token_kind::end_map:
                     std::cout << "end_map\n";
                     break;
+                default:
+                    break;
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
@@ -330,6 +332,8 @@ TEST_CASE("json_tokenizer update test")
                     break;
                 case generic_token_kind::end_map:
                     std::cout << "end_map\n";
+                    break;
+                default:
                     break;
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
@@ -422,6 +426,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                 case generic_token_kind::end_map:
                     std::cout << "end_map\n";
                     break;
+                default:
+                    break;
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
@@ -449,6 +455,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                     break;
                 case generic_token_kind::end_array:
                     std::cout << "end_array\n";
+                    break;
+                default:
                     break;
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
@@ -489,6 +497,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                     break;
                 case generic_token_kind::end_map:
                     std::cout << "end_map\n";
+                    break;
+                default:
                     break;
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
@@ -629,6 +639,8 @@ TEST_CASE("json_tokenizer incremental update tests")
                     break;
                 case generic_token_kind::end_map:
                     std::cout << "end_map\n";
+                    break;
+                default:
                     break;
             }
             if (tokenizer.source_exhausted())

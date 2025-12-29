@@ -49,9 +49,8 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, generic_tok
     static constexpr const CharT* unknown_name = JSONCONS_CSTRING_CONSTANT(CharT, "unknown");
     static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
     static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
-    static constexpr const CharT* begin_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_map");
-    static constexpr const CharT* end_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_map");
-    static constexpr const CharT* key_name = JSONCONS_CSTRING_CONSTANT(CharT, "key");
+    static constexpr const CharT* begin_map_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_map");
+    static constexpr const CharT* end_map_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_map");
     static constexpr const CharT* string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "string_value");
     static constexpr const CharT* byte_string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string_value");
     static constexpr const CharT* null_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "null_value");
@@ -75,12 +74,12 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, generic_tok
         }
         case generic_token_kind::begin_map:
         {
-            os << begin_object_name;
+            os << begin_map_name;
             break;
         }
         case generic_token_kind::end_map:
         {
-            os << end_object_name;
+            os << end_map_name;
             break;
         }
         case generic_token_kind::string_value:
