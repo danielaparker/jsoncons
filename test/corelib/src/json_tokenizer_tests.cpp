@@ -10,7 +10,7 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("json_tokenizer constructor test")
 {
     SECTION("default constructor")
@@ -51,7 +51,8 @@ TEST_CASE("json_tokenizer update test")
         json_tokenizer tokenizer{};
         tokenizer.update(data);
         CHECK(json_errc{} == tokenizer.try_next_token().ec);
-        CHECK(tokenizer.done());
+        CHECK(!tokenizer.started());
+        CHECK(!tokenizer.done());
     }
     SECTION("input with whitespace")
     {
@@ -60,7 +61,8 @@ TEST_CASE("json_tokenizer update test")
         json_tokenizer tokenizer{};
         tokenizer.update(data);
         CHECK(json_errc{} == tokenizer.try_next_token().ec);
-        CHECK(tokenizer.done());
+        CHECK(!tokenizer.started());
+        CHECK(!tokenizer.done());
     }
     SECTION("string")
     {
@@ -334,11 +336,10 @@ TEST_CASE("json_tokenizer update test")
         }
     }
 }
-#endif
 
 TEST_CASE("json_tokenizer incremental update tests")
 {
-    /*SECTION("test 1")
+    SECTION("test 1")
     {
         std::string data{"123456"};
         std::string more_data{"78"};
@@ -581,7 +582,7 @@ TEST_CASE("json_tokenizer incremental update tests")
             }
             REQUIRE(json_errc{} == tokenizer.try_next_token().ec);
         }
-    }*/
+    }
     SECTION("test 7")
     {
         std::string buf = R"([
@@ -612,7 +613,7 @@ TEST_CASE("json_tokenizer incremental update tests")
             switch (tokenizer.token_kind())
             {
                 case generic_token_kind::string_value:
-                    std::cout << tokenizer.get_string_view() << "\n";
+                    std::cout << tokenizer.get_string_view() << ", is_key: " << tokenizer.is_key() << "\n";
                     break;
                 case generic_token_kind::uint64_value:
                     std::cout << tokenizer.get_uint64() << "\n";

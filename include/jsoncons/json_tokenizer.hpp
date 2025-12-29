@@ -636,7 +636,6 @@ public:
  
         while ((input_ptr_ < local_input_end) && more_)
         {
-            is_key_ = false;
             switch (state_)
             {
                 case parse_state::accept:
@@ -690,6 +689,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
+                            is_key_ = false;
                             state_ = parse_state::string;
                             string_state_ = parse_string_state{};
                             begin_position_ = position_;
@@ -858,6 +858,7 @@ public:
                             if (JSONCONS_UNLIKELY(ec)) return;
                             break;
                         case '\"':
+                            is_key_ = true;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -899,6 +900,7 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '\"':
+                            is_key_ = true;
                             begin_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -954,6 +956,7 @@ public:
                             break;
                         case ':':
                             state_ = parse_state::expect_value;
+                            is_key_ = false;
                             ++input_ptr_;
                             ++position_;
                             break;
