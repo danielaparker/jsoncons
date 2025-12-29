@@ -560,7 +560,7 @@ private:
                 }
                 else
                 {
-                    if (tokenizer_.state() == parse_state::start)
+                    if (!tokenizer_.started())
                     {
                         return;
                     }

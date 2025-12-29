@@ -661,7 +661,7 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         cursor_type cursor(input0);
         std::error_code ec;
 
-        REQUIRE(cursor.done());
+        REQUIRE_FALSE(cursor.done());
         cursor.reset(input1);
         REQUIRE_FALSE(cursor.done());
         CHECK(staj_event_type::string_value == cursor.current().event_type());
@@ -673,7 +673,7 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
 
         cursor.reset(input2, ec);
         CHECK(ec == json_errc::syntax_error);
-        CHECK(cursor.done()); //REVISIT Changed behavior
+        CHECK(!cursor.done()); 
 
         // Check that cursor can reused be upon reset following an error.
         ec = json_errc::success;
