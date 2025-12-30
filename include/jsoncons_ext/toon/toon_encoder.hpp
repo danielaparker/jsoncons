@@ -53,8 +53,6 @@ namespace detail {
                          bool escape_all_non_ascii, bool escape_solidus,
                          Sink& sink)
     {
-        std::basic_string<CharT> buffer;
-        bool contains_quote{false};
         std::size_t count = 0;
         const CharT* begin = s;
         const CharT* end = s + length;
@@ -64,46 +62,45 @@ namespace detail {
             switch (c)
             {
                 case '\\':
-                    buffer.push_back('\\');
-                    buffer.push_back('\\');
+                    sink.push_back('\\');
+                    sink.push_back('\\');
                     count += 2;
                     break;
                 case '"':
-                    contains_quote = true;
-                    buffer.push_back('\\');
-                    buffer.push_back('\"');
+                    sink.push_back('\\');
+                    sink.push_back('\"');
                     count += 2;
                     break;
                 case '\b':
-                    buffer.push_back('\\');
-                    buffer.push_back('b');
+                    sink.push_back('\\');
+                    sink.push_back('b');
                     count += 2;
                     break;
                 case '\f':
-                    buffer.push_back('\\');
-                    buffer.push_back('f');
+                    sink.push_back('\\');
+                    sink.push_back('f');
                     count += 2;
                     break;
                 case '\n':
-                    buffer.push_back('\\');
-                    buffer.push_back('n');
+                    sink.push_back('\\');
+                    sink.push_back('n');
                     count += 2;
                     break;
                 case '\r':
-                    buffer.push_back('\\');
-                    buffer.push_back('r');
+                    sink.push_back('\\');
+                    sink.push_back('r');
                     count += 2;
                     break;
                 case '\t':
-                    buffer.push_back('\\');
-                    buffer.push_back('t');
+                    sink.push_back('\\');
+                    sink.push_back('t');
                     count += 2;
                     break;
                 default:
                     if (escape_solidus && c == '/')
                     {
-                        buffer.push_back('\\');
-                        buffer.push_back('/');
+                        sink.push_back('\\');
+                        sink.push_back('/');
                         count += 2;
                     }
                     else if (is_control_character(c) || escape_all_non_ascii)
@@ -124,54 +121,44 @@ namespace detail {
                                 uint32_t first = (cp >> 10) + 0xD800;
                                 uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                                buffer.push_back('\\');
-                                buffer.push_back('u');
-                                buffer.push_back(jsoncons::to_hex_character(first >> 12 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(first >> 8 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(first >> 4 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(first & 0x000F));
-                                buffer.push_back('\\');
-                                buffer.push_back('u');
-                                buffer.push_back(jsoncons::to_hex_character(second >> 12 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(second >> 8 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(second >> 4 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(second & 0x000F));
+                                sink.push_back('\\');
+                                sink.push_back('u');
+                                sink.push_back(jsoncons::to_hex_character(first >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(first & 0x000F));
+                                sink.push_back('\\');
+                                sink.push_back('u');
+                                sink.push_back(jsoncons::to_hex_character(second >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(second & 0x000F));
                                 count += 12;
                             }
                             else
                             {
-                                buffer.push_back('\\');
-                                buffer.push_back('u');
-                                buffer.push_back(jsoncons::to_hex_character(cp >> 12 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(cp >> 8 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(cp >> 4 & 0x000F));
-                                buffer.push_back(jsoncons::to_hex_character(cp & 0x000F));
+                                sink.push_back('\\');
+                                sink.push_back('u');
+                                sink.push_back(jsoncons::to_hex_character(cp >> 12 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp >> 8 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp >> 4 & 0x000F));
+                                sink.push_back(jsoncons::to_hex_character(cp & 0x000F));
                                 count += 6;
                             }
                         }
                         else
                         {
-                            buffer.push_back(c);
+                            sink.push_back(c);
                             ++count;
                         }
                     }
                     else
                     {
-                        buffer.push_back(c);
+                        sink.push_back(c);
                         ++count;
                     }
                     break;
             }
-        }
-        if (contains_quote)
-        {
-            sink.push_back('\"');
-            sink.append(buffer.data(), buffer.size());
-            sink.push_back('\"');
-        }
-        else
-        {
-            sink.append(buffer.data(), buffer.size());
         }
     }
 
@@ -212,20 +199,20 @@ namespace detail {
     template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_toon_encoder final : public basic_json_visitor<CharT>
     {
-        static const std::array<CharT, 4>& null_constant()
+        static jsoncons::basic_string_view<CharT> null_literal()
         {
-            static constexpr std::array<CharT,4> k{{'n','u','l','l'}};
-            return k;
+            static jsoncons::basic_string_view<CharT> lit = JSONCONS_STRING_VIEW_CONSTANT(CharT, "null");
+            return lit;
         }
-        static const std::array<CharT, 4>& true_constant()
+        static jsoncons::basic_string_view<CharT> true_literal()
         {
-            static constexpr std::array<CharT,4> k{{'t','r','u','e'}};
-            return k;
+            static jsoncons::basic_string_view<CharT> lit = JSONCONS_STRING_VIEW_CONSTANT(CharT, "true");
+            return lit;
         }
-        static const std::array<CharT, 5>& false_constant()
+        static jsoncons::basic_string_view<CharT> false_literal()
         {
-            static constexpr std::array<CharT,5> k{{'f','a','l','s','e'}};
-            return k;
+            static jsoncons::basic_string_view<CharT> lit = JSONCONS_STRING_VIEW_CONSTANT(CharT, "false");
+            return lit;
         }
     public:
         using allocator_type = Allocator;
@@ -433,7 +420,7 @@ namespace detail {
                 sink_.push_back(',');
             }
 
-            sink_.append(null_constant().data(), null_constant().size());
+            sink_.append(null_literal().data(), null_literal().size());
 
             if (!stack_.empty())
             {
@@ -517,7 +504,16 @@ namespace detail {
                 }
             }
 
-            write_string(sv, tag, context, ec);
+            if (!is_unquoted_safe(sv, ','))
+            {
+                sink_.push_back('\"');
+                write_string(sv, tag, context, ec);
+                sink_.push_back('\"');
+            }
+            else
+            {
+                write_string(sv, tag, context, ec);
+            }
 
             if (!stack_.empty())
             {
@@ -648,7 +644,7 @@ namespace detail {
                     }
                     else
                     {
-                        sink_.append(null_constant().data(), null_constant().size());
+                        sink_.append(null_literal().data(), null_literal().size());
                     }
                 }
                 else if (value == std::numeric_limits<double>::infinity())
@@ -663,7 +659,7 @@ namespace detail {
                     }
                     else
                     {
-                        sink_.append(null_constant().data(), null_constant().size());
+                        sink_.append(null_literal().data(), null_literal().size());
                     }
                 }
                 else 
@@ -678,7 +674,7 @@ namespace detail {
                     }
                     else
                     {
-                        sink_.append(null_constant().data(), null_constant().size());
+                        sink_.append(null_literal().data(), null_literal().size());
                     }
                 }
             }
@@ -737,11 +733,11 @@ namespace detail {
 
             if (value)
             {
-                sink_.append(true_constant().data(), true_constant().size());
+                sink_.append(true_literal().data(), true_literal().size());
             }
             else
             {
-                sink_.append(false_constant().data(), false_constant().size());
+                sink_.append(false_literal().data(), false_literal().size());
             }
 
             if (!stack_.empty())
@@ -749,6 +745,143 @@ namespace detail {
                 stack_.back().increment_count();
             }
             JSONCONS_VISITOR_RETURN;
+        }
+
+        static bool is_unquoted_safe(jsoncons::basic_string_view<CharT> str, CharT delimiter = ',')
+        {
+            if (str.empty())
+            {
+                return false;
+            }
+            if (is_number(str))
+            {
+                return false;
+            }
+            if (str == null_literal() || str == true_literal() || str == false_literal())
+            {
+                return false;
+            }
+            if (str.front() == '-')
+            {
+                return false;
+            }
+            for (auto c : str)
+            {
+                switch (c)
+                {
+                    case ':':
+                    case '[':
+                    case ']':
+                    case '{':
+                    case '}':
+                    case '\"':
+                    case '\\':
+                    case '\n':
+                    case '\r':
+                    case '\t':
+                        return false;
+                }
+                if (c == delimiter)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    public:
+        static bool is_number(jsoncons::basic_string_view<CharT> str) 
+        {
+            int state = 0;
+
+            for (auto c : str)
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (c == '-')
+                        {
+                            state = 1;
+                        }
+                        else if (c == '0')
+                        {
+                            state = 2;
+                        }
+                        else if (c >= '1' && c <= '9')
+                        {
+                            state = 3;
+                        }
+                        else
+                        {
+                            state = 9;
+                        }
+                        break;
+                    case 1: // leading minus
+                        if (c == '0')
+                        {
+                            state = 2;
+                        }
+                        else if (c >= '1' && c <= '9')
+                        {
+                            state = 3;
+                        }
+                        else
+                        {
+                            state = 9;
+                        }
+                        break;
+                    case 2: // after 0
+                        if (c == '0')
+                        {
+                            state = 9;
+                        }
+                        else if (c == '.')
+                        {
+                            state = 4;
+                        }
+                        else if (c >= '1' && c <= '9')
+                        {
+                            state = 3;
+                        }
+                        else
+                        {
+                            state = 9;
+                        }
+                        break;
+                    case 3: // expect digits or dot
+                        if (c == '.')
+                        {
+                            state = 4;
+                        }
+                        else if (!(c >= '0' && c <= '9'))
+                        {
+                            state = 9;
+                        }
+                        break;
+                    case 4: // expect digits
+                        if (c >= '0' && c <= '9')
+                        {
+                            state = 5;
+                        }
+                        else
+                        {
+                            state = 9;
+                        }
+                        break;
+                    case 5: // expect digits
+                        if (!(c >= '0' && c <= '9'))
+                        {
+                            state = 9;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (state == 2 || state == 3 || state == 5)
+            {
+                return true;
+            }
+            return false;
         }
     };
 

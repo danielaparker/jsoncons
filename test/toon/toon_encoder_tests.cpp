@@ -12,6 +12,30 @@
 
 using namespace jsoncons;
 
+TEST_CASE("toon is_number")
+{
+    SECTION("test1")
+    {
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("-"));
+        CHECK(toon::toon_stream_encoder::is_number("-0"));
+        CHECK(toon::toon_stream_encoder::is_number("-1"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("-0a"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("00"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("-00"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("0-0"));
+        CHECK(toon::toon_stream_encoder::is_number("-0.0"));
+        CHECK(toon::toon_stream_encoder::is_number("-1.1"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("-0.0a"));
+        CHECK(toon::toon_stream_encoder::is_number("0"));
+        CHECK(toon::toon_stream_encoder::is_number("1"));
+        CHECK(toon::toon_stream_encoder::is_number("123456789"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("123456789."));
+        CHECK(toon::toon_stream_encoder::is_number("123456789.0"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("foo"));
+        CHECK_FALSE(toon::toon_stream_encoder::is_number("-foo"));
+    }
+}
+
 TEST_CASE("toon test string encoding")
 {
     SECTION("array of one string")
