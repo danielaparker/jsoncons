@@ -36,7 +36,7 @@ TEST_CASE("toon is_number")
     }
 }
 
-TEST_CASE("toon test string encoding")
+TEST_CASE("toon array encode")
 {
     SECTION("array of one string")
     {
@@ -120,5 +120,42 @@ TEST_CASE("toon test string encoding")
 
         CHECK(expected == os.str());
     }
-}
+    SECTION("object")
+    {
+        std::string expected = R"(baz: qux
+foo: bar)";
 
+        std::ostringstream os;
+        toon::toon_stream_encoder encoder{os};
+
+        encoder.begin_object(1);
+        encoder.key("baz");
+        encoder.string_value("qux");
+        encoder.key("foo");
+        encoder.string_value("bar");
+        encoder.end_object();
+        encoder.flush();
+
+        CHECK(expected == os.str());
+    }
+    SECTION("array of object")
+    {
+        std::string expected = R"([1]{baz,foo}:
+  qux,bar)";
+
+        std::ostringstream os;
+        toon::toon_stream_encoder encoder{os};
+
+        encoder.begin_array(1);
+        encoder.begin_object();
+        encoder.key("baz");
+        encoder.string_value("qux");
+        encoder.key("foo");
+        encoder.string_value("bar");
+        encoder.end_object();
+        encoder.end_array();
+        encoder.flush();
+
+        CHECK(expected == os.str());
+    }
+}

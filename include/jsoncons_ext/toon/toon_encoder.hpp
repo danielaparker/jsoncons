@@ -53,7 +53,6 @@ namespace detail {
                          bool escape_all_non_ascii, bool escape_solidus,
                          Sink& sink)
     {
-        std::size_t count = 0;
         const CharT* begin = s;
         const CharT* end = s + length;
         for (const CharT* it = begin; it != end; ++it)
@@ -64,44 +63,36 @@ namespace detail {
                 case '\\':
                     sink.push_back('\\');
                     sink.push_back('\\');
-                    count += 2;
                     break;
                 case '"':
                     sink.push_back('\\');
                     sink.push_back('\"');
-                    count += 2;
                     break;
                 case '\b':
                     sink.push_back('\\');
                     sink.push_back('b');
-                    count += 2;
                     break;
                 case '\f':
                     sink.push_back('\\');
                     sink.push_back('f');
-                    count += 2;
                     break;
                 case '\n':
                     sink.push_back('\\');
                     sink.push_back('n');
-                    count += 2;
                     break;
                 case '\r':
                     sink.push_back('\\');
                     sink.push_back('r');
-                    count += 2;
                     break;
                 case '\t':
                     sink.push_back('\\');
                     sink.push_back('t');
-                    count += 2;
                     break;
                 default:
                     if (escape_solidus && c == '/')
                     {
                         sink.push_back('\\');
                         sink.push_back('/');
-                        count += 2;
                     }
                     else if (is_control_character(c) || escape_all_non_ascii)
                     {
@@ -133,7 +124,6 @@ namespace detail {
                                 sink.push_back(jsoncons::to_hex_character(second >> 8 & 0x000F));
                                 sink.push_back(jsoncons::to_hex_character(second >> 4 & 0x000F));
                                 sink.push_back(jsoncons::to_hex_character(second & 0x000F));
-                                count += 12;
                             }
                             else
                             {
@@ -143,19 +133,16 @@ namespace detail {
                                 sink.push_back(jsoncons::to_hex_character(cp >> 8 & 0x000F));
                                 sink.push_back(jsoncons::to_hex_character(cp >> 4 & 0x000F));
                                 sink.push_back(jsoncons::to_hex_character(cp & 0x000F));
-                                count += 6;
                             }
                         }
                         else
                         {
                             sink.push_back(c);
-                            ++count;
                         }
                     }
                     else
                     {
                         sink.push_back(c);
-                        ++count;
                     }
                     break;
             }
@@ -325,7 +312,6 @@ namespace detail {
             }
 
             stack_.emplace_back(container_type::object);
-            sink_.push_back('{');
             JSONCONS_VISITOR_RETURN;
         }
 
@@ -335,7 +321,6 @@ namespace detail {
             --nesting_depth_;
 
             stack_.pop_back();
-            sink_.push_back('}');
 
             if (!stack_.empty())
             {
@@ -403,13 +388,21 @@ namespace detail {
         {
             if (!stack_.empty() && stack_.back().count() > 0)
             {
-                sink_.push_back(',');
+                sink_.push_back('\n');
             }
 
-            sink_.push_back('\"');
-            jsoncons::toon::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
-            sink_.push_back('\"');
+            if (is_unquoted_safe(name))
+            {
+                jsoncons::toon::detail::escape_string(name.data(), name.length(), options_.escape_all_non_ascii(), options_.escape_solidus(), sink_);
+            }
+            else
+            {
+                sink_.push_back('\"');
+                jsoncons::toon::detail::escape_string(name.data(), name.length(), options_.escape_all_non_ascii(), options_.escape_solidus(), sink_);
+                sink_.push_back('\"');
+            }
             sink_.push_back(':');
+            sink_.push_back(' ');
             JSONCONS_VISITOR_RETURN;
         }
 
