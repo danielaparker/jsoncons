@@ -295,7 +295,7 @@ namespace jsoncons {
                 if (JSONCONS_UNLIKELY(ec)) return;
                 if (eof)
                 {
-                    if (parser_.parsing_started())
+                    if (!parser_.started())
                     {
                         break;
                     }
@@ -303,6 +303,10 @@ namespace jsoncons {
                     {
                         ec = json_errc::unexpected_eof;
                         return;
+                    }
+                    else
+                    {
+                        parser_.finish_parse(visitor_, ec); // bump accept to done
                     }
                 }
             }

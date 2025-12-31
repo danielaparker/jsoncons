@@ -105,9 +105,9 @@ public:
     }
 #endif
 
-    bool parsing_started() const
+    bool started() const
     {
-        return tokenizer_.parsing_started();
+        return tokenizer_.started();
     }
 
     bool accept() const
