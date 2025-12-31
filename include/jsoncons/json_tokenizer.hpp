@@ -302,6 +302,7 @@ public:
         }
         if (state_ == parse_state::accept)
         {
+            token_kind_ = generic_token_kind{};
             state_ = parse_state::done;
             more_ = false;
             return from_json_result{};
@@ -336,6 +337,7 @@ public:
                     }
                     break;
                 case parse_state::accept:
+                    token_kind_ = generic_token_kind{};
                     state_ = parse_state::done;
                     more_ = false;
                     break;
@@ -628,6 +630,7 @@ public:
         token_kind_ = generic_token_kind{};
         if (state_ == parse_state::accept)
         {
+            token_kind_ = generic_token_kind{};
             state_ = parse_state::done;
             more_ = false;
             return;
@@ -639,6 +642,7 @@ public:
             switch (state_)
             {
                 case parse_state::accept:
+                    token_kind_ = generic_token_kind{};
                     state_ = parse_state::done;
                     more_ = false;
                     break;

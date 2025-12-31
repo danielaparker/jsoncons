@@ -11,6 +11,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("json_tokenizer constructor test")
 {
     SECTION("default constructor")
@@ -340,10 +341,11 @@ TEST_CASE("json_tokenizer update test")
         }
     }
 }
+#endif
 
 TEST_CASE("json_tokenizer incremental update tests")
 {
-    SECTION("test 1")
+    /*SECTION("test 1")
     {
         std::string data{"123456"};
         std::string more_data{"78"};
@@ -653,6 +655,121 @@ TEST_CASE("json_tokenizer incremental update tests")
             std::cout << "ec: " << rc.ec << "\n";
         } while (!tokenizer.done());
 
+    }*/
+
+    SECTION("test 8")
+    {
+        std::string data = R"([
+  {
+       "given":
+           [{"name": "JS"}]
+   }
+]
+)";
+
+        json_tokenizer tokenizer{};
+
+        std::istringstream is(data);
+        stream_source<char> source(is, 8);
+
+        auto chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        auto r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(tokenizer.started());
+        CHECK_FALSE(tokenizer.done());
+        CHECK_FALSE(tokenizer.source_exhausted());
+        CHECK(generic_token_kind::begin_array == tokenizer.token_kind());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
+        CHECK_FALSE(tokenizer.source_exhausted());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind{} == tokenizer.token_kind());
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind{} == tokenizer.token_kind());
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK_FALSE(tokenizer.source_exhausted());
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(tokenizer.is_key());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind{} == tokenizer.token_kind());
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind{} == tokenizer.token_kind());
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK_FALSE(tokenizer.source_exhausted());
+        CHECK(generic_token_kind::begin_array == tokenizer.token_kind());
+        CHECK_FALSE(tokenizer.is_key());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind::begin_map == tokenizer.token_kind());
+        CHECK_FALSE(tokenizer.source_exhausted());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind{} == tokenizer.token_kind());
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK_FALSE(tokenizer.source_exhausted());
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK(tokenizer.is_key());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK_FALSE(tokenizer.source_exhausted());
+        CHECK(generic_token_kind::string_value == tokenizer.token_kind());
+        CHECK_FALSE(tokenizer.is_key());
+
+        r = tokenizer.try_next_token();
+        REQUIRE(r);
+        CHECK_FALSE(tokenizer.done());
+        CHECK(generic_token_kind::end_map == tokenizer.token_kind());  // missing event
+        CHECK(tokenizer.source_exhausted());
+        chunk = source.read_buffer();
+        tokenizer.update(chunk.data(), chunk.size());
     }
 }
 

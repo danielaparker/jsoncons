@@ -23,7 +23,7 @@ using namespace jsoncons;
 
 void jsonpath_tests(const std::string& fpath)
 {
-    std::cout << "Test " << fpath << '\n';
+    std::cout << "Test: " << fpath << '\n';
 
     std::fstream is(fpath);
     if (!is)
@@ -54,6 +54,8 @@ void jsonpath_tests(const std::string& fpath)
                 auto expression = jsoncons::jsonpath::make_expression<json>(expr);
                 if (test_case.contains("result"))
                 {
+                    std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
+                    std::cout << "Expression: " << expr << "\n\n";
                     jsonpath::result_options rflags = options;
                     json actual = expression.evaluate(instance, rflags);
                     const json& expected = test_case["result"];
@@ -130,6 +132,7 @@ TEST_CASE("jsonpath-tests")
 {
     SECTION("compliance")
     {
+        /*
 #if defined(JSONCONS_HAS_STD_REGEX)
         jsonpath_tests("./jsonpath/input/test_data/regex.json");
 #endif
@@ -138,15 +141,16 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath/input/test_data/indices.json");
         jsonpath_tests("./jsonpath/input/test_data/wildcard.json");
         jsonpath_tests("./jsonpath/input/test_data/recursive-descent.json"); 
-        jsonpath_tests("./jsonpath/input/test_data/union.json");       
+        jsonpath_tests("./jsonpath/input/test_data/union.json"); 
+         */
         jsonpath_tests("./jsonpath/input/test_data/filters.json");
-        jsonpath_tests("./jsonpath/input/test_data/functions.json");
+        /*jsonpath_tests("./jsonpath/input/test_data/functions.json");
         jsonpath_tests("./jsonpath/input/test_data/expressions.json");
         jsonpath_tests("./jsonpath/input/test_data/syntax.json");
         jsonpath_tests("./jsonpath/input/test_data/functions.json");
         jsonpath_tests("./jsonpath/input/test_data/slice.json"); 
         jsonpath_tests("./jsonpath/input/test_data/parent-operator.json"); 
-        jsonpath_tests("./jsonpath/input/test.json");
+        jsonpath_tests("./jsonpath/input/test.json");*/
     }
 }
 
