@@ -299,11 +299,11 @@ namespace jsoncons {
                     {
                         break;
                     }
-                    else if (!parser_.accept())
+                    /*else if (!parser_.accept())
                     {
                         ec = json_errc::unexpected_eof;
                         return;
-                    }
+                    }*/
                     else
                     {
                         parser_.finish_parse(visitor_, ec); // bump accept to done
