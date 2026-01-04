@@ -524,7 +524,7 @@ private:
             }
             return;
         }
-        while (tokenizer_.token_kind() == generic_token_kind{})
+        while (!tokenizer_.done() && tokenizer_.token_kind() == generic_token_kind{})
         {
             if (tokenizer_.source_exhausted())
             {
