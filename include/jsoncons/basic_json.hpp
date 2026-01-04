@@ -1765,7 +1765,7 @@ namespace jsoncons {
                                 {
                                     return -1;
                                 }
-                                if (val2 >= 0 && val2 < 0)
+                                if (val2 < 0 && val1 >= 0)
                                 {
                                     return 1;
                                 }
