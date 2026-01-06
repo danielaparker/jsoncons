@@ -71,16 +71,14 @@ struct allow_trailing_commas
 
 #endif
 
-template <typename CharT>
-class basic_toon_options;
+class toon_options;
 
-template <typename CharT>
-class basic_toon_options_common
+class toon_options_common
 {
-    friend class basic_toon_options<CharT>;
+    friend class toon_options;
 public:
-    using char_type = CharT;
-    using string_type = std::basic_string<CharT>;
+    using char_type = char;
+    using string_type = std::string;
 private:
 
     bool enable_nan_to_num_:1;
@@ -102,7 +100,7 @@ private:
     int max_nesting_depth_;
 
 protected:
-    basic_toon_options_common()
+    toon_options_common()
        :
         enable_nan_to_num_(false),
         enable_inf_to_num_(false),
@@ -116,12 +114,12 @@ protected:
         max_nesting_depth_(1024)
     {}
 
-    virtual ~basic_toon_options_common() = default;
+    virtual ~toon_options_common() = default;
 
-    basic_toon_options_common(const basic_toon_options_common&) = default;
-    basic_toon_options_common& operator=(const basic_toon_options_common&) = default;
-    basic_toon_options_common(basic_toon_options_common&&) = default;
-    //basic_toon_options_common& operator=(basic_toon_options_common&&) = default;
+    toon_options_common(const toon_options_common&) = default;
+    toon_options_common& operator=(const toon_options_common&) = default;
+    toon_options_common(toon_options_common&&) = default;
+    //toon_options_common& operator=(toon_options_common&&) = default;
 
 public:
 
@@ -248,11 +246,10 @@ public:
     }
 };
 
-template <typename CharT>
-class basic_toon_decode_options : public virtual basic_toon_options_common<CharT>
+class toon_decode_options : public virtual toon_options_common
 {
-    friend class basic_toon_options<CharT>;
-    using super_type = basic_toon_options_common<CharT>;
+    friend class toon_options;
+    using super_type = toon_options_common;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
@@ -263,14 +260,14 @@ private:
     bool allow_trailing_comma_{false};
     std::function<bool(json_errc,const ser_context&)> err_handler_;
 public:
-    basic_toon_decode_options()
+    toon_decode_options()
         : err_handler_(default_json_parsing())
     {
     }
 
-    basic_toon_decode_options(const basic_toon_decode_options&) = default;
+    toon_decode_options(const toon_decode_options&) = default;
 
-    basic_toon_decode_options(basic_toon_decode_options&& other) noexcept
+    toon_decode_options(toon_decode_options&& other) noexcept
         : super_type(std::move(other)), 
           lossless_number_(other.lossless_number_), 
           lossless_bignum_(other.lossless_bignum_), 
@@ -280,8 +277,8 @@ public:
     {
     }
 protected:
-    basic_toon_decode_options& operator=(const basic_toon_decode_options&) = default;
-    basic_toon_decode_options& operator=(basic_toon_decode_options&&) = default;
+    toon_decode_options& operator=(const toon_decode_options&) = default;
+    toon_decode_options& operator=(toon_decode_options&&) = default;
 public:
     bool lossless_number() const 
     {
@@ -310,11 +307,10 @@ public:
 #endif
 };
 
-template <typename CharT>
-class basic_toon_encode_options : public virtual basic_toon_options_common<CharT>
+class toon_encode_options : public virtual toon_options_common
 {
-    friend class basic_toon_options<CharT>;
-    using super_type = basic_toon_options_common<CharT>;
+    friend class toon_options;
+    using super_type = toon_options_common;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
@@ -342,7 +338,7 @@ private:
     string_type new_line_chars_;
     char_type indent_char_;
 public:
-    basic_toon_encode_options()
+    toon_encode_options()
         : escape_all_non_ascii_(false),
           escape_solidus_(false),
           pad_inside_object_braces_(false),
@@ -362,9 +358,9 @@ public:
         new_line_chars_.push_back('\n');
     }
 
-    basic_toon_encode_options(const basic_toon_encode_options&) = default;
+    toon_encode_options(const toon_encode_options&) = default;
 
-    basic_toon_encode_options(basic_toon_encode_options&& other) noexcept
+    toon_encode_options(toon_encode_options&& other) noexcept
         : super_type(std::move(other)),
           escape_all_non_ascii_(other.escape_all_non_ascii_),
           escape_solidus_(other.escape_solidus_),
@@ -388,10 +384,10 @@ public:
     {
     }
     
-    ~basic_toon_encode_options() = default;
+    ~toon_encode_options() = default;
 protected:
-    basic_toon_encode_options& operator=(const basic_toon_encode_options&) = default;
-    basic_toon_encode_options& operator=(basic_toon_encode_options&&) = default;
+    toon_encode_options& operator=(const toon_encode_options&) = default;
+    toon_encode_options& operator=(toon_encode_options&&) = default;
 public:
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
@@ -478,66 +474,65 @@ public:
 
 };
 
-template <typename CharT>
-class basic_toon_options final: public basic_toon_decode_options<CharT>, 
-                                public basic_toon_encode_options<CharT>
+class toon_options final: public toon_decode_options, 
+                                public toon_encode_options
 {
 public:
-    using char_type = CharT;
-    using string_type = std::basic_string<CharT>;
+    using char_type = char;
+    using string_type = std::string;
 
-    using basic_toon_options_common<CharT>::max_nesting_depth;
+    using toon_options_common::max_nesting_depth;
 
-    using basic_toon_decode_options<CharT>::enable_str_to_nan;
-    using basic_toon_decode_options<CharT>::enable_str_to_inf;
-    using basic_toon_decode_options<CharT>::enable_str_to_neginf;
-    using basic_toon_decode_options<CharT>::nan_to_str;
-    using basic_toon_decode_options<CharT>::inf_to_str;
-    using basic_toon_decode_options<CharT>::neginf_to_str;
-    using basic_toon_decode_options<CharT>::nan_to_num;
-    using basic_toon_decode_options<CharT>::inf_to_num;
-    using basic_toon_decode_options<CharT>::neginf_to_num;
+    using toon_decode_options::enable_str_to_nan;
+    using toon_decode_options::enable_str_to_inf;
+    using toon_decode_options::enable_str_to_neginf;
+    using toon_decode_options::nan_to_str;
+    using toon_decode_options::inf_to_str;
+    using toon_decode_options::neginf_to_str;
+    using toon_decode_options::nan_to_num;
+    using toon_decode_options::inf_to_num;
+    using toon_decode_options::neginf_to_num;
 
-    using basic_toon_decode_options<CharT>::lossless_number;
-    using basic_toon_decode_options<CharT>::lossless_bignum;
-    using basic_toon_decode_options<CharT>::allow_comments;
-    using basic_toon_decode_options<CharT>::allow_trailing_comma;
+    using toon_decode_options::lossless_number;
+    using toon_decode_options::lossless_bignum;
+    using toon_decode_options::allow_comments;
+    using toon_decode_options::allow_trailing_comma;
 #if !defined(JSONCONS_NO_DEPRECATED)
-    using basic_toon_decode_options<CharT>::err_handler;
+    using toon_decode_options::err_handler;
 #endif
-    using basic_toon_encode_options<CharT>::byte_string_format;
-    using basic_toon_encode_options<CharT>::bignum_format;
+    using toon_encode_options::byte_string_format;
+    using toon_encode_options::bignum_format;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    using basic_toon_encode_options<CharT>::line_splits;
+    using toon_encode_options::line_splits;
 #endif
-    using basic_toon_encode_options<CharT>::root_line_splits;
-    using basic_toon_encode_options<CharT>::object_object_line_splits;
-    using basic_toon_encode_options<CharT>::array_object_line_splits;
-    using basic_toon_encode_options<CharT>::object_array_line_splits;
-    using basic_toon_encode_options<CharT>::array_array_line_splits;
-    using basic_toon_encode_options<CharT>::indent_size;
-    using basic_toon_encode_options<CharT>::spaces_around_colon;
-    using basic_toon_encode_options<CharT>::spaces_around_comma;
-    using basic_toon_encode_options<CharT>::pad_inside_object_braces;
-    using basic_toon_encode_options<CharT>::pad_inside_array_brackets;
-    using basic_toon_encode_options<CharT>::new_line_chars;
-    using basic_toon_encode_options<CharT>::line_length_limit;
-    using basic_toon_encode_options<CharT>::float_format;
-    using basic_toon_encode_options<CharT>::precision;
-    using basic_toon_encode_options<CharT>::escape_all_non_ascii;
-    using basic_toon_encode_options<CharT>::escape_solidus;
+    using toon_encode_options::root_line_splits;
+    using toon_encode_options::object_object_line_splits;
+    using toon_encode_options::array_object_line_splits;
+    using toon_encode_options::object_array_line_splits;
+    using toon_encode_options::array_array_line_splits;
+    using toon_encode_options::indent_size;
+    using toon_encode_options::spaces_around_colon;
+    using toon_encode_options::spaces_around_comma;
+    using toon_encode_options::pad_inside_object_braces;
+    using toon_encode_options::pad_inside_array_brackets;
+    using toon_encode_options::new_line_chars;
+    using toon_encode_options::line_length_limit;
+    using toon_encode_options::float_format;
+    using toon_encode_options::precision;
+    using toon_encode_options::escape_all_non_ascii;
+    using toon_encode_options::escape_solidus;
 public:
 
 //  Constructors
 
-    basic_toon_options() = default;
-    basic_toon_options(const basic_toon_options&) = default;
-    basic_toon_options(basic_toon_options&&) = default;
-    basic_toon_options& operator=(const basic_toon_options&) = default;
-    basic_toon_options& operator=(basic_toon_options&&) = default;
+    toon_options() = default;
+    toon_options(const toon_options&) = default;
+    toon_options(toon_options&&) = default;
+    toon_options& operator=(const toon_options&) = default;
+    toon_options& operator=(toon_options&&) = default;
 
-    basic_toon_options& nan_to_num(const string_type& value)
+    toon_options& nan_to_num(const string_type& value)
     {
         this->enable_nan_to_num_ = true;
         this->nan_to_str_.clear();
@@ -545,7 +540,7 @@ public:
         return *this;
     }
 
-    basic_toon_options& inf_to_num(const string_type& value)
+    toon_options& inf_to_num(const string_type& value)
     {
         this->enable_inf_to_num_ = true;
         this->inf_to_str_.clear();
@@ -553,7 +548,7 @@ public:
         return *this;
     }
 
-    basic_toon_options& neginf_to_num(const string_type& value)
+    toon_options& neginf_to_num(const string_type& value)
     {
         this->enable_neginf_to_num_ = true;
         this->neginf_to_str_.clear();
@@ -561,7 +556,7 @@ public:
         return *this;
     }
 
-    basic_toon_options& nan_to_str(const string_type& value, bool enable_inverse = true)
+    toon_options& nan_to_str(const string_type& value, bool enable_inverse = true)
     {
         this->enable_nan_to_str_ = true;
         this->enable_str_to_nan_ = enable_inverse;
@@ -570,7 +565,7 @@ public:
         return *this;
     }
 
-    basic_toon_options& inf_to_str(const string_type& value, bool enable_inverse = true)
+    toon_options& inf_to_str(const string_type& value, bool enable_inverse = true)
     {
         this->enable_inf_to_str_ = true;
         this->enable_str_to_inf_ = enable_inverse;
@@ -579,7 +574,7 @@ public:
         return *this;
     }
 
-    basic_toon_options& neginf_to_str(const string_type& value, bool enable_inverse = true)
+    toon_options& neginf_to_str(const string_type& value, bool enable_inverse = true)
     {
         this->enable_neginf_to_str_ = true;
         this->enable_str_to_neginf_ = enable_inverse;
@@ -588,134 +583,134 @@ public:
         return *this;
     }
 
-    basic_toon_options&  byte_string_format(byte_string_chars_format value) {this->byte_string_format_ = value; return *this;}
+    toon_options&  byte_string_format(byte_string_chars_format value) {this->byte_string_format_ = value; return *this;}
 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
-    basic_toon_options& bigint_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
+    toon_options& bigint_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
 #endif    
 
-    basic_toon_options& bignum_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
+    toon_options& bignum_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_toon_options& line_splits(line_split_kind value) {this->root_line_splits_ = value; return *this;}
+    toon_options& line_splits(line_split_kind value) {this->root_line_splits_ = value; return *this;}
 #endif    
 
-    basic_toon_options& root_line_splits(line_split_kind value) {this->root_line_splits_ = value; return *this;}
+    toon_options& root_line_splits(line_split_kind value) {this->root_line_splits_ = value; return *this;}
 
-    basic_toon_options& object_object_line_splits(line_split_kind value) {this->object_object_line_splits_ = value; return *this;}
+    toon_options& object_object_line_splits(line_split_kind value) {this->object_object_line_splits_ = value; return *this;}
 
-    basic_toon_options& array_object_line_splits(line_split_kind value) {this->array_object_line_splits_ = value; return *this;}
+    toon_options& array_object_line_splits(line_split_kind value) {this->array_object_line_splits_ = value; return *this;}
 
-    basic_toon_options& object_array_line_splits(line_split_kind value) {this->object_array_line_splits_ = value; return *this;}
+    toon_options& object_array_line_splits(line_split_kind value) {this->object_array_line_splits_ = value; return *this;}
 
-    basic_toon_options& array_array_line_splits(line_split_kind value) {this->array_array_line_splits_ = value; return *this;}
+    toon_options& array_array_line_splits(line_split_kind value) {this->array_array_line_splits_ = value; return *this;}
 
-    basic_toon_options& indent_size(uint8_t value)
+    toon_options& indent_size(uint8_t value)
     {
         this->indent_size_ = value;
         return *this;
     }
 
-    basic_toon_options& spaces_around_colon(spaces_option value)
+    toon_options& spaces_around_colon(spaces_option value)
     {
         this->spaces_around_colon_ = value;
         return *this;
     }
 
-    basic_toon_options& spaces_around_comma(spaces_option value)
+    toon_options& spaces_around_comma(spaces_option value)
     {
         this->spaces_around_comma_ = value;
         return *this;
     }
 
-    basic_toon_options& indent_char(char_type value)
+    toon_options& indent_char(char_type value)
     {
         this->indent_char_ = value;
         return *this;
     }
 
-    basic_toon_options& pad_inside_object_braces(bool value)
+    toon_options& pad_inside_object_braces(bool value)
     {
         this->pad_inside_object_braces_ = value;
         return *this;
     }
 
-    basic_toon_options& pad_inside_array_brackets(bool value)
+    toon_options& pad_inside_array_brackets(bool value)
     {
         this->pad_inside_array_brackets_ = value;
         return *this;
     }
 
-    basic_toon_options& new_line_chars(const string_type& value)
+    toon_options& new_line_chars(const string_type& value)
     {
         this->new_line_chars_ = value;
         return *this;
     }
 
-    basic_toon_options& lossless_number(bool value) 
+    toon_options& lossless_number(bool value) 
     {
         this->lossless_number_ = value;
         return *this;
     }
 
-    basic_toon_options& lossless_bignum(bool value) 
+    toon_options& lossless_bignum(bool value) 
     {
         this->lossless_bignum_ = value;
         return *this;
     }
 
-    basic_toon_options& allow_comments(bool value) 
+    toon_options& allow_comments(bool value) 
     {
         this->allow_comments_ = value;
         return *this;
     }
 
-    basic_toon_options& allow_trailing_comma(bool value) 
+    toon_options& allow_trailing_comma(bool value) 
     {
         this->allow_trailing_comma_ = value;
         return *this;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_toon_options& err_handler(const std::function<bool(json_errc,const ser_context&)>& value) 
+    toon_options& err_handler(const std::function<bool(json_errc,const ser_context&)>& value) 
     {
         this->err_handler_ = value;
         return *this;
     }
 #endif
-    basic_toon_options& line_length_limit(std::size_t value)
+    toon_options& line_length_limit(std::size_t value)
     {
         this->line_length_limit_ = value;
         return *this;
     }
 
-    basic_toon_options& float_format(float_chars_format value)
+    toon_options& float_format(float_chars_format value)
     {
         this->float_format_ = value;
         return *this;
     }
 
-    basic_toon_options& precision(int8_t value)
+    toon_options& precision(int8_t value)
     {
         this->precision_ = value;
         return *this;
     }
 
-    basic_toon_options& escape_all_non_ascii(bool value)
+    toon_options& escape_all_non_ascii(bool value)
     {
         this->escape_all_non_ascii_ = value;
         return *this;
     }
 
-    basic_toon_options& escape_solidus(bool value)
+    toon_options& escape_solidus(bool value)
     {
         this->escape_solidus_ = value;
         return *this;
     }
 
-    basic_toon_options& max_nesting_depth(int value)
+    toon_options& max_nesting_depth(int value)
     {
         this->max_nesting_depth_ = value;
         return *this;
@@ -764,11 +759,6 @@ private:
         return state == input_state::end_quote;
     }
 };
-
-using toon_options = basic_toon_options<char>;
-using wtoon_options = basic_toon_options<wchar_t>;
-
-using toon_encode_options = basic_toon_encode_options<char>;
 
 } // namespace toon
 } // namespace jsoncons
