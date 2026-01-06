@@ -524,9 +524,19 @@ write_result try_encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 
 template <typename T, typename Alloc, typename TempAlloc, typename Sink>
 typename std::enable_if<ext_traits::is_basic_json<T>::value, write_result>::type
-try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink&& sink, 
+try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& j, Sink&& sink, 
     const toon_encode_options& options)
 {
+    if (j.is_array())
+    {
+    }
+    else if (j.is_object())
+    {
+    }
+    else
+    {
+        //encode_primitive(j, options.delimiter());
+    }
     return write_result{};
 }
 
