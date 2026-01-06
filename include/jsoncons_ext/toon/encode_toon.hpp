@@ -524,16 +524,17 @@ write_result try_encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 
 template <typename T, typename Alloc, typename TempAlloc, typename Sink>
 typename std::enable_if<ext_traits::is_basic_json<T>::value, write_result>::type
-try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink&& sink)
+try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink&& sink, 
+    const toon_encode_options& options)
 {
     return write_result{};
 }
 
 template <typename T,typename Sink>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type
-try_encode_toon(const T& val, Sink&& sink)
+try_encode_toon(const T& val, Sink&& sink, const toon_encode_options& options)
 {
-    return try_encode_toon(make_alloc_set(), val, std::forward<Sink>(sink));
+    return try_encode_toon(make_alloc_set(), val, std::forward<Sink>(sink), options);
 }
 
 template <typename T,typename CharContainer>
@@ -543,7 +544,7 @@ try_encode_toon(const T& val, CharContainer& cont,
 {
     using char_type = typename CharContainer::value_type;
 
-    return try_encode_toon(val, string_sink<CharContainer>{cont});
+    return try_encode_toon(val, string_sink<CharContainer>{cont}, options);
 }
 
 template <typename... Args>
