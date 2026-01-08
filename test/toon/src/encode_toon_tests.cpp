@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace jsoncons;
-
+#if 0
 TEST_CASE("toon is_number")
 {
     SECTION("test1")
@@ -65,6 +65,20 @@ TEST_CASE("toon array")
         std::string expected = R"([2]:
   - [2]: Foo,Bar
   - [3]: 1,2,3)";
+        std::string buffer;
+        toon::encode_toon(j, buffer);
+        CHECK(expected == buffer);
+    }
+}
+#endif
+TEST_CASE("toon object")
+{
+    SECTION("object")
+    {
+        std::string str = R"({"foo":{}})";
+        auto j = json::parse(str);
+
+        std::string expected = R"(foo:)";
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);

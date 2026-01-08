@@ -15,6 +15,7 @@
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/ser_util.hpp>
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/json_encoders.hpp>
 
 namespace jsoncons {
 namespace toon {
@@ -164,151 +165,6 @@ bool is_unquoted_safe(jsoncons::string_view str, char delimiter = ',')
     return true;
 }
 
-inline
-bool is_control_character(uint32_t c)
-{
-    return c <= 0x1F || c == 0x7f;
-}
-
-inline
-bool is_non_ascii_codepoint(uint32_t cp)
-{
-    return cp >= 0x80;
-}
-
-template <typename Sink>
-void escape_string(const char* s, std::size_t length,
-    bool escape_all_non_ascii, bool escape_solidus,
-    Sink&& sink)
-{
-    const char* begin = s;
-    const char* end = s + length;
-    for (const char* it = begin; it != end; ++it)
-    {
-        char c = *it;
-        switch (c)
-        {
-            case '\\':
-                sink.push_back('\\');
-                sink.push_back('\\');
-                break;
-            case '"':
-                sink.push_back('\\');
-                sink.push_back('\"');
-                break;
-            case '\b':
-                sink.push_back('\\');
-                sink.push_back('b');
-                break;
-            case '\f':
-                sink.push_back('\\');
-                sink.push_back('f');
-                break;
-            case '\n':
-                sink.push_back('\\');
-                sink.push_back('n');
-                break;
-            case '\r':
-                sink.push_back('\\');
-                sink.push_back('r');
-                break;
-            case '\t':
-                sink.push_back('\\');
-                sink.push_back('t');
-                break;
-            default:
-                if (escape_solidus && c == '/')
-                {
-                    sink.push_back('\\');
-                    sink.push_back('/');
-                }
-                else if (is_control_character(c) || escape_all_non_ascii)
-                {
-                    // convert to codepoint
-                    uint32_t cp;
-                    auto r = unicode_traits::to_codepoint(it, end, cp, unicode_traits::conv_flags::strict);
-                    if (r.ec != unicode_traits::conv_errc())
-                    {
-                        JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
-                    }
-                    it = r.ptr - 1;
-                    if (is_non_ascii_codepoint(cp) || is_control_character(c))
-                    {
-                        if (cp > 0xFFFF)
-                        {
-                            cp -= 0x10000;
-                            uint32_t first = (cp >> 10) + 0xD800;
-                            uint32_t second = ((cp & 0x03FF) + 0xDC00);
-
-                            sink.push_back('\\');
-                            sink.push_back('u');
-                            sink.push_back(jsoncons::to_hex_character(first >> 12 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(first >> 8 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(first >> 4 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(first & 0x000F));
-                            sink.push_back('\\');
-                            sink.push_back('u');
-                            sink.push_back(jsoncons::to_hex_character(second >> 12 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(second >> 8 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(second >> 4 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(second & 0x000F));
-                        }
-                        else
-                        {
-                            sink.push_back('\\');
-                            sink.push_back('u');
-                            sink.push_back(jsoncons::to_hex_character(cp >> 12 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(cp >> 8 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(cp >> 4 & 0x000F));
-                            sink.push_back(jsoncons::to_hex_character(cp & 0x000F));
-                        }
-                    }
-                    else
-                    {
-                        sink.push_back(c);
-                    }
-                }
-                else
-                {
-                    sink.push_back(c);
-                }
-                break;
-        }
-    }
-}
-
-inline
-byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_format format1,
-    byte_string_chars_format format2,
-    byte_string_chars_format default_format = byte_string_chars_format::base64url)
-{
-    byte_string_chars_format sink;
-    switch (format1)
-    {
-        case byte_string_chars_format::base16:
-        case byte_string_chars_format::base64:
-        case byte_string_chars_format::base64url:
-            sink = format1;
-            break;
-        default:
-            switch (format2)
-            {
-                case byte_string_chars_format::base64url:
-                case byte_string_chars_format::base64:
-                case byte_string_chars_format::base16:
-                    sink = format2;
-                    break;
-                default: // base64url
-                {
-                    sink = default_format;
-                    break;
-                }
-            }
-            break;
-    }
-    return sink;
-}
-
 template <typename Sink>
 write_result encode_string(jsoncons::string_view str, char delimiter, Sink&& sink)
 {
@@ -319,7 +175,7 @@ write_result encode_string(jsoncons::string_view str, char delimiter, Sink&& sin
     else
     {
         sink.push_back('\"');
-        escape_string(str.data(), str.size(), false, false, std::forward<Sink>(sink));
+        jsoncons::detail::escape_string(str.data(), str.size(), false, false, sink);
         sink.push_back('\"');
     }
 
@@ -500,11 +356,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
         }
         if (is_array_of_primitives(item))
         {
-            int indent = (depth+1)*options.indent();
-            for (int i = 0; i < indent; ++i)
-            {
-                sink.push_back(' ');
-            }
+            sink.append((depth+1)*options.indent(), ' ');
             sink.push_back('-');
             sink.push_back(' ');
             sink.push_back('[');
@@ -558,6 +410,18 @@ void encode_array(const Json& val, const toon_encode_options& options,
 }
 
 template <typename Json, typename Sink>
+void encode_object(const Json& val, const toon_encode_options& options, 
+    Sink&& sink, int depth, jsoncons::string_view key)
+{
+    if (!key.empty())
+    {
+        sink.append((depth+1)*options.indent(), ' ');
+        detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
+    }
+    (val);
+}
+
+template <typename Json, typename Sink>
 void encode_value(const Json& val, const toon_encode_options& options, Sink&& sink, int depth = 0)
 {
     if (val.is_array())
@@ -566,6 +430,7 @@ void encode_value(const Json& val, const toon_encode_options& options, Sink&& si
     }
     else if (val.is_object())
     {
+        encode_object(val, options, std::forward<Sink>(sink), depth, jsoncons::string_view{});
     }
     else
     {

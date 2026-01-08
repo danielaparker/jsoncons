@@ -84,6 +84,14 @@ namespace jsoncons {
             }
         }
 
+        void append(std::size_t count, const CharT ch)
+        {
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                push_back(ch);
+            }
+        }
+
         void push_back(CharT ch)
         {
             if (p_ < end_buffer_)
@@ -175,6 +183,14 @@ namespace jsoncons {
             }
         }
 
+        void append(std::size_t count, uint8_t ch)
+        {
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                push_back(ch);
+            }
+        }
+
         void push_back(uint8_t ch)
         {
             if (p_ < end_buffer_)
@@ -240,6 +256,14 @@ namespace jsoncons {
         void append(const value_type* s, std::size_t length)
         {
             buf_ptr->insert(buf_ptr->end(), s, s+length);
+        }
+
+        void append(std::size_t count, value_type ch)
+        {
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                push_back(ch);
+            }
         }
 
         void push_back(value_type ch)
