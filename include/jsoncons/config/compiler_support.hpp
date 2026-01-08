@@ -307,19 +307,24 @@
 
 // gcc and clang
 #if !defined(__CUDA_ARCH__)
+
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cplusplus)
+
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
 #  define JSONCONS_HAS_INT128
 #endif
 
 #if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
+#if defined(__clang__) 
 #if (__clang_major__ >= 4) && defined(__has_include)
 #if __has_include(<quadmath.h>)
 #  define JSONCONS_HAS_FLOAT128
 #endif
 #endif
 #endif
-#endif
+#endif 
+
+#endif // (__clang__ || __GNUC__) && __cplusplus
 
 #if defined(__GNUC__)
 #if defined(_GLIBCXX_USE_FLOAT128)
@@ -336,6 +341,7 @@
 #endif
 #endif
 #endif
+
 #endif // __CUDA_ARCH__
 
 #ifndef JSONCONS_FORCE_INLINE
