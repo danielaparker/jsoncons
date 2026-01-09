@@ -393,7 +393,7 @@
 
 /** noinline for compiler */
 #ifndef JSONCONS_NOINLINE
-#   if YYJSON_MSC_VER >= 1400
+#   if defined(YYJSON_MSC_VER) && YYJSON_MSC_VER >= 1400
 #       define JSONCONS_NOINLINE __declspec(noinline)
 #   elif JSONCONS_HAS_ATTRIBUTE(noinline) || YYJSON_GCC_VER >= 4
 #       define JSONCONS_NOINLINE __attribute__((noinline))
@@ -404,7 +404,7 @@
 
 /** align for compiler */
 #ifndef JSONCONS_ALIGN
-#   if YYJSON_MSC_VER >= 1300
+#   if defined(YYJSON_MSC_VER) && YYJSON_MSC_VER >= 1300
 #       define JSONCONS_ALIGN(x) __declspec(align(x))
 #   elif JSONCONS_HAS_ATTRIBUTE(aligned) || defined(__GNUC__)
 #       define JSONCONS_ALIGN(x) __attribute__((aligned(x)))
