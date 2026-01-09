@@ -410,6 +410,21 @@ void encode_array(const Json& val, const toon_encode_options& options,
 }
 
 template <typename Json, typename Sink>
+void encode_key_value_pair(jsoncons::string_view key, const Json& val, 
+    const toon_encode_options& options, 
+    Sink&& sink, int depth)
+{
+    if (!key.empty())
+    {
+        sink.append((depth+1)*options.indent(), ' ');
+        detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
+    }
+    for (const auto& item : val.object_range())
+    {
+    }
+}
+
+template <typename Json, typename Sink>
 void encode_object(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, jsoncons::string_view key)
 {
@@ -418,7 +433,10 @@ void encode_object(const Json& val, const toon_encode_options& options,
         sink.append((depth+1)*options.indent(), ' ');
         detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
     }
-    (val);
+    for (const auto& item : val.object_range())
+    {
+        (item);
+    }
 }
 
 template <typename Json, typename Sink>

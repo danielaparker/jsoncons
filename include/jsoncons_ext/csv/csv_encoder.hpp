@@ -43,17 +43,17 @@ public:
     using column_type = std::vector<string_type, string_allocator_type>;
     using column_path_column_map_type = std::unordered_map<string_type, column_type, std::hash<string_type>,std::equal_to<string_type>,string_vector_allocator_type>;
 private:
-    static jsoncons::basic_string_view<CharT> null_constant()
+    static jsoncons::basic_string_view<CharT> null_literal()
     {
         static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"null");
         return k;
     }
-    static jsoncons::basic_string_view<CharT> true_constant()
+    static jsoncons::basic_string_view<CharT> true_literal()
     {
         static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"true");
         return k;
     }
-    static jsoncons::basic_string_view<CharT> false_constant()
+    static jsoncons::basic_string_view<CharT> false_literal()
     {
         static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"false");
         return k;
@@ -1343,7 +1343,7 @@ private:
                 }
                 else
                 {
-                    str.append(null_constant().data(), null_constant().size());
+                    str.append(null_literal().data(), null_literal().size());
                 }
             }
             else if (val == std::numeric_limits<double>::infinity())
@@ -1358,7 +1358,7 @@ private:
                 }
                 else
                 {
-                    str.append(null_constant().data(), null_constant().size());
+                    str.append(null_literal().data(), null_literal().size());
                 }
             }
             else
@@ -1373,7 +1373,7 @@ private:
                 }
                 else
                 {
-                    str.append(null_constant().data(), null_constant().size());
+                    str.append(null_literal().data(), null_literal().size());
                 }
             }
         }
@@ -1397,17 +1397,17 @@ private:
     {
         if (val)
         {
-            str.append(true_constant().data(), true_constant().size());
+            str.append(true_literal().data(), true_literal().size());
         }
         else
         {
-            str.append(false_constant().data(), false_constant().size());
+            str.append(false_literal().data(), false_literal().size());
         }
     }
  
     void write_null_value(string_type& str) 
     {
-        str.append(null_constant().data(), null_constant().size());
+        str.append(null_literal().data(), null_literal().size());
     }
 };
 

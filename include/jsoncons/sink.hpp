@@ -86,9 +86,19 @@ namespace jsoncons {
 
         void append(std::size_t count, const CharT ch)
         {
-            for (std::size_t i = 0; i < count; ++i)
+            if (count <= std::size_t(end_buffer_ - p_))
             {
-                push_back(ch);
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    *p_++ = ch;
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    push_back(ch);
+                }
             }
         }
 
@@ -102,7 +112,7 @@ namespace jsoncons {
             {
                 stream_ptr_->write(begin_buffer_, buffer_length());
                 p_ = begin_buffer_;
-                push_back(ch);
+                *p_++ = ch;
             }
         }
     private:
@@ -185,9 +195,19 @@ namespace jsoncons {
 
         void append(std::size_t count, uint8_t ch)
         {
-            for (std::size_t i = 0; i < count; ++i)
+            if (count <= std::size_t(end_buffer_ - p_))
             {
-                push_back(ch);
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    *p_++ = ch;
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    push_back(ch);
+                }
             }
         }
 
@@ -201,7 +221,7 @@ namespace jsoncons {
             {
                 stream_ptr_->write((char*)begin_buffer_, buffer_length());
                 p_ = begin_buffer_;
-                push_back(ch);
+                *p_++ = ch;
             }
         }
     private:
@@ -255,15 +275,12 @@ namespace jsoncons {
 
         void append(const value_type* s, std::size_t length)
         {
-            buf_ptr->insert(buf_ptr->end(), s, s+length);
+            buf_ptr->append(s, length);
         }
 
         void append(std::size_t count, value_type ch)
         {
-            for (std::size_t i = 0; i < count; ++i)
-            {
-                push_back(ch);
-            }
+            buf_ptr->append(count, ch);
         }
 
         void push_back(value_type ch)
