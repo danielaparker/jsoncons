@@ -391,30 +391,6 @@
 #   endif
 #endif
 
-/** noinline for compiler */
-#ifndef JSONCONS_NOINLINE
-#   if defined(YYJSON_MSC_VER) && YYJSON_MSC_VER >= 1400
-#       define JSONCONS_NOINLINE __declspec(noinline)
-#   elif JSONCONS_HAS_ATTRIBUTE(noinline) || YYJSON_GCC_VER >= 4
-#       define JSONCONS_NOINLINE __attribute__((noinline))
-#   else
-#       define JSONCONS_NOINLINE
-#   endif
-#endif
-
-/** align for compiler */
-#ifndef JSONCONS_ALIGN
-#   if defined(YYJSON_MSC_VER) && YYJSON_MSC_VER >= 1300
-#       define JSONCONS_ALIGN(x) __declspec(align(x))
-#   elif JSONCONS_HAS_ATTRIBUTE(aligned) || defined(__GNUC__)
-#       define JSONCONS_ALIGN(x) __attribute__((aligned(x)))
-#   elif YYJSON_CPP_VER >= 201103L
-#       define JSONCONS_ALIGN(x) alignas(x)
-#   else
-#       define JSONCONS_ALIGN(x)
-#   endif
-#endif
-
 // Follows boost config/detail/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
 namespace jsoncons{
