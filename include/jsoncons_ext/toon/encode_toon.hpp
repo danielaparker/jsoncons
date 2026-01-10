@@ -207,7 +207,6 @@ void write_header(string_view key,
         }
         auto s = std::to_string(length);
         sink.append(s.data(), s.size());
-        sink.push_back(delimiter);
         sink.push_back(']');
     }
     else if (delimiter != ',')
@@ -306,6 +305,41 @@ bool is_array_of_primitives(const Json& val)
     return true;
 }
 
+template <typename Json>
+std::vector<std::string> try_get_tabular_header(const Json& val)
+{
+    if (val.empty())
+    {
+        return std::vector<std::string>{};
+    }
+
+    std::vector<std::string> first_keys;
+
+    for (const auto& item : val[0].object_range())
+    {
+        first_keys.push_back(item.key());
+    }
+
+    for (const auto& row : val.array_range())
+    {
+        std::vector<std::string> keys;
+        for (const auto& item : row.object_range())
+        {
+            if (item.value().is_array() || item.value().is_object())
+            {
+                return std::vector<std::string>{};
+            }
+            keys.push_back(item.key());
+        }
+        if (keys != first_keys)
+        {
+            return std::vector<std::string>{};
+        }
+    }
+
+    return first_keys;
+}
+
 template <typename Json, typename Sink>
 write_result encode_primitive(const Json& val, char delimiter, Sink&& sink)
 {
@@ -394,18 +428,36 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
 }
 
 template <typename Json, typename Sink>
+void encode_array_of_objects_as_tabular(const Json& val, 
+    const std::vector<std::string>& fields,
+    const toon_encode_options& options, 
+    Sink&& sink, int depth, jsoncons::string_view key)
+{
+    sink.append(depth*options.indent(), ' ');
+    write_header(key, val.size(), fields, 
+        options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
+    sink.push_back('\n');
+}
+
+template <typename Json, typename Sink>
 void encode_array(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, jsoncons::string_view key)
 {
     if (val.empty())
     {
         write_header(key, 0, std::vector<std::string>{}, options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
-        return;
     }
-    if (is_array_of_arrays(val))
+    else if (is_array_of_arrays(val))
     {
         encode_array_of_arrays(val, options, std::forward<Sink>(sink), depth, key);
-        return;
+    }
+    else if (is_array_of_objects(val))
+    {
+        auto fields = try_get_tabular_header(val);
+        if (!fields.empty())
+        {
+            encode_array_of_objects_as_tabular(val, fields, options, std::forward<Sink>(sink), depth, key);
+        }
     }
 }
 

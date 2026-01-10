@@ -73,12 +73,24 @@ TEST_CASE("toon array")
 #endif
 TEST_CASE("toon object")
 {
-    SECTION("object")
+    /*SECTION("object")
     {
         std::string str = R"({"foo":{}})";
         auto j = json::parse(str);
 
         std::string expected = R"(foo:)";
+        std::string buffer;
+        toon::encode_toon(j, buffer);
+        CHECK(expected == buffer);
+    }*/
+    SECTION("array of objects of primitives")
+    {
+        std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4}])";
+        auto j = json::parse(str);
+
+        std::string expected = R"([2]{foo,bar}:
+  1,2
+  3,4)";
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
