@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("toon is_number")
 {
     SECTION("test1")
@@ -70,23 +70,23 @@ TEST_CASE("toon array")
         CHECK(expected == buffer);
     }
 }
-#endif
+
 TEST_CASE("toon object")
 {
-    /*SECTION("object")
+    SECTION("object")
     {
         std::string str = R"({"foo":{}})";
-        auto j = json::parse(str);
+        auto j = ojson::parse(str);
 
         std::string expected = R"(foo:)";
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
-    }*/
+    }
     SECTION("array of objects of primitives")
     {
         std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4}])";
-        auto j = json::parse(str);
+        auto j = ojson::parse(str);
 
         std::string expected = R"([2]{foo,bar}:
   1,2

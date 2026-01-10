@@ -437,6 +437,33 @@ void encode_array_of_objects_as_tabular(const Json& val,
     write_header(key, val.size(), fields, 
         options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
     sink.push_back('\n');
+
+    bool first_row = true;
+    for (const auto& row : val.array_range())
+    {
+        if (!first_row)
+        {
+            sink.push_back('\n');
+        }
+        else
+        {
+            first_row = false;
+        }
+        sink.append((depth+1)*options.indent(), ' ');
+        bool first_item = true;
+        for (const auto& item : row.object_range())
+        {
+            if (!first_item)
+            {
+                sink.push_back(options.delimiter());
+            }
+            else
+            {
+                first_item = false;
+            }
+            encode_primitive(item.value(), options.delimiter(), std::forward<Sink>(sink));
+        }
+    }
 }
 
 template <typename Json, typename Sink>
@@ -466,13 +493,21 @@ void encode_key_value_pair(jsoncons::string_view key, const Json& val,
     const toon_encode_options& options, 
     Sink&& sink, int depth)
 {
-    if (!key.empty())
+    if (val.is_array())
     {
-        sink.append((depth+1)*options.indent(), ' ');
-        detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
+        encode_array(val, options, sink, depth, key);
     }
-    for (const auto& item : val.object_range())
+    else if (val.is_object())
     {
+        encode_object(val, options, sink, depth, key);
+    }
+    else
+    {
+        sink.append(depth*options.indent(), ' ');
+        detail::encode_string(key, options.delimiter(), sink);
+        sink.push_back(':');
+        sink.push_back(' ');
+        encode_primitive(val, options.delimiter(), sink);
     }
 }
 
@@ -482,12 +517,13 @@ void encode_object(const Json& val, const toon_encode_options& options,
 {
     if (!key.empty())
     {
-        sink.append((depth+1)*options.indent(), ' ');
+        sink.append(depth*options.indent(), ' ');
         detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
+        sink.push_back(':');
     }
     for (const auto& item : val.object_range())
     {
-        (item);
+        encode_key_value_pair(item.key(), item.value(), options, sink, depth);
     }
 }
 
