@@ -467,6 +467,36 @@ void encode_array_of_objects_as_tabular(const Json& val,
 }
 
 template <typename Json, typename Sink>
+void encode_object_as_list_item(const Json& val, const toon_encode_options& options, 
+    Sink&& sink, int depth)
+{
+}
+
+template <typename Json, typename Sink>
+void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options& options, 
+    Sink&& sink, int depth, jsoncons::string_view key)
+{
+    write_header(key, val.size(), std::vector<std::string>{}, 
+        options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
+    sink.push_back('\n');
+
+    for (const auto& item : val.array_range())
+    {
+        if (val.is_object())
+        {
+            encode_object_as_list_item(item, options, std::forward<Sink>(sink), depth+1);
+        }
+        else if (val.is_array())
+        {
+            encode_array(item, options, std::forward<Sink>(sink), depth + 1, jsoncons::string_view{});
+        }
+        else
+        {
+        }
+    }
+}
+
+template <typename Json, typename Sink>
 void encode_array(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, jsoncons::string_view key)
 {
@@ -484,6 +514,10 @@ void encode_array(const Json& val, const toon_encode_options& options,
         if (!fields.empty())
         {
             encode_array_of_objects_as_tabular(val, fields, options, std::forward<Sink>(sink), depth, key);
+        }
+        else
+        {
+            encode_mixed_array_as_list_items(val, options, std::forward<Sink>(sink), depth, key);
         }
     }
 }
