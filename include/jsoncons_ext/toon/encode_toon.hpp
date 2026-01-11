@@ -470,6 +470,38 @@ template <typename Json, typename Sink>
 void encode_object_as_list_item(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth)
 {
+    if (val.empty())
+    {
+        sink.append(depth*options.indent(), ' ');
+        sink.push_back('-');
+        return;
+    }
+    auto first = val.object_range().begin();
+    auto last = val.object_range().end();
+
+    if (first->value().is_array() || first->value().is_object())
+    {
+        sink.append(depth*options.indent(), ' ');
+        sink.push_back('-');
+        encode_key_value_pair(first->key(), first->value(), options, std::forward<Sink>(sink), depth+1);
+        sink.push_back('\n');
+    }
+    else
+    {
+        sink.append(depth*options.indent(), ' ');
+        sink.push_back('-');
+        sink.push_back(' ');
+        detail::encode_string(first->key(), options.delimiter(), std::forward<Sink>(sink));
+        sink.push_back(':');
+        sink.push_back(' ');
+        encode_primitive(first->value(), options.delimiter(), std::forward<Sink>(sink));
+        sink.push_back('\n');
+    }
+    for (auto it = first+1; it != last; ++it)
+    {
+        encode_key_value_pair(it->key(), it->value(), options, std::forward<Sink>(sink), depth + 1);    
+        sink.push_back('\n');
+    }
 }
 
 template <typename Json, typename Sink>
@@ -482,16 +514,21 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
 
     for (const auto& item : val.array_range())
     {
-        if (val.is_object())
+        if (item.is_object())
         {
             encode_object_as_list_item(item, options, std::forward<Sink>(sink), depth+1);
         }
-        else if (val.is_array())
+        else if (item.is_array())
         {
             encode_array(item, options, std::forward<Sink>(sink), depth + 1, jsoncons::string_view{});
         }
         else
         {
+            sink.append((depth+1)*options.indent(), ' ');
+            sink.push_back('-');
+            sink.push_back(' ');
+            encode_primitive(item, options.delimiter(), std::forward<Sink>(sink));
+            sink.push_back('\n');
         }
     }
 }
@@ -519,6 +556,10 @@ void encode_array(const Json& val, const toon_encode_options& options,
         {
             encode_mixed_array_as_list_items(val, options, std::forward<Sink>(sink), depth, key);
         }
+    }
+    else
+    {
+        encode_mixed_array_as_list_items(val, options, std::forward<Sink>(sink), depth, key);
     }
 }
 
