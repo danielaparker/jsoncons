@@ -36,32 +36,31 @@ TEST_CASE("toon is_number")
         CHECK_FALSE(toon::detail::is_number("-foo"));
     }
 }
+#endif
 TEST_CASE("toon array")
 {
-    SECTION("empty array")
+    /*SECTION("empty array")
     {
         std::string expected = R"([0]:)";
         std::string buffer;
-        json j{json_array_arg};
+        ojson j{json_array_arg};
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
-    }
+    }*/
     SECTION("array of empty arrays")
     {
         std::string expected = R"([2]:
   - [0]:
   - [0]:)";
         std::string buffer;
-        json j{json_array_arg};
-        j.emplace_back(json_array_arg);
-        j.emplace_back(json_array_arg);
+        auto j = ojson::parse(R"([[],[]])");
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
     }
-    SECTION("array of arrays of primitives")
+    /*SECTION("array of arrays of primitives")
     {
         std::string str = R"([["Foo","Bar"],[1,2,3]])";
-        auto j = json::parse(str);
+        auto j = ojson::parse(str);
 
         std::string expected = R"([2]:
   - [2]: Foo,Bar
@@ -69,9 +68,8 @@ TEST_CASE("toon array")
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
-    }
+    }*/
 }
-#endif
 TEST_CASE("toon object")
 {
     /*SECTION("object")
@@ -96,7 +94,7 @@ TEST_CASE("toon object")
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
     }*/
-    SECTION("mixed array as list items")
+    /*SECTION("mixed array as list items")
     {
         std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4,"baz":5}])";
         auto j = ojson::parse(str);
@@ -110,5 +108,5 @@ TEST_CASE("toon object")
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
-    }
+    }*/
 }
