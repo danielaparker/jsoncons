@@ -374,6 +374,11 @@ template <typename Json, typename Sink>
 void encode_array_of_arrays(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, int line, jsoncons::string_view key)
 {
+    if (line != 0)
+    {
+        sink.push_back('\n');
+    }
+    sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), std::vector<std::string>{}, 
         options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
     ++line;
@@ -426,6 +431,10 @@ void encode_array_of_objects_as_tabular(const Json& val,
     const toon_encode_options& options, 
     Sink&& sink, int depth, int line, jsoncons::string_view key)
 {
+    if (line != 0)
+    {
+        sink.push_back('\n');
+    }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), fields, 
         options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
@@ -458,6 +467,10 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
 {
     if (val.empty())
     {
+        if (line != 0)
+        {
+            sink.push_back('\n');
+        }
         sink.append(depth*options.indent(), ' ');
         sink.push_back('-');
         return;
@@ -493,10 +506,6 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
     ++line;
     for (auto it = first+1; it != last; ++it)
     {
-        if (line != 0)
-        {
-            sink.push_back('\n');
-        }
         encode_key_value_pair(it->key(), it->value(), options, std::forward<Sink>(sink), depth + 1, line);
         ++line;
     }
@@ -506,6 +515,11 @@ template <typename Json, typename Sink>
 void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, int line, jsoncons::string_view key)
 {
+    if (line != 0)
+    {
+        sink.push_back('\n');
+    }
+    sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), std::vector<std::string>{}, 
         options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
     ++line;
@@ -533,12 +547,50 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
 }
 
 template <typename Json, typename Sink>
+void encode_inline_primitive_array(const Json& val, const toon_encode_options& options, 
+    Sink&& sink, int depth, int line, jsoncons::string_view key)
+{
+    if (line != 0)
+    {
+        sink.push_back('\n');
+    }
+    sink.append(depth*options.indent(), ' ');
+    write_header(key, val.size(), std::vector<std::string>{}, options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
+    sink.push_back(' ');
+    ++line;
+
+    bool first_field = true;
+    for (const auto& item : val.array_range())
+    {
+        if (!first_field)
+        {
+            sink.push_back(options.delimiter());
+        }
+        else
+        {
+            first_field = false;
+        }
+        encode_primitive(item, options.delimiter(), std::forward<Sink>(sink));
+    }
+}
+
+template <typename Json, typename Sink>
 void encode_array(const Json& val, const toon_encode_options& options, 
     Sink&& sink, int depth, int line, jsoncons::string_view key)
 {
     if (val.empty())
     {
+        if (line != 0)
+        {
+            sink.push_back('\n');
+        }
+        sink.append(depth*options.indent(), ' ');
         write_header(key, 0, std::vector<std::string>{}, options.delimiter(), options.length_marker(), std::forward<Sink>(sink));
+        ++line;
+    }
+    else if (is_array_of_primitives(val))
+    {
+        encode_inline_primitive_array(val, options, std::forward<Sink>(sink), depth, line, key);
     }
     else if (is_array_of_arrays(val))
     {
@@ -577,6 +629,10 @@ void encode_key_value_pair(jsoncons::string_view key, const Json& val,
     }
     else
     {
+        if (line != 0)
+        {
+            sink.push_back('\n');
+        }
         sink.append(depth*options.indent(), ' ');
         detail::encode_string(key, options.delimiter(), sink);
         sink.push_back(':');
@@ -591,14 +647,27 @@ void encode_object(const Json& val, const toon_encode_options& options,
 {
     if (!key.empty())
     {
+        if (line != 0)
+        {
+            sink.push_back('\n');
+        }
         sink.append(depth*options.indent(), ' ');
         detail::encode_string(key, options.delimiter(), std::forward<Sink>(sink));
         sink.push_back(':');
-    }
-    for (const auto& item : val.object_range())
-    {
-        encode_key_value_pair(item.key(), item.value(), options, sink, depth, line);
         ++line;
+        for (const auto& item : val.object_range())
+        {
+            encode_key_value_pair(item.key(), item.value(), options, sink, depth + 1, line);
+            ++line;
+        }
+    }
+    else
+    {
+        for (const auto& item : val.object_range())
+        {
+            encode_key_value_pair(item.key(), item.value(), options, sink, depth, line);
+            ++line;
+        }
     }
 }
 
