@@ -189,7 +189,7 @@ write_result encode_string(jsoncons::string_view str, char delimiter, Sink& sink
 template <typename Sink>
 void write_header(string_view key, 
     std::size_t length,
-    const std::vector<std::string>& fields,
+    const std::vector<jsoncons::string_view>& fields,
     char delimiter,
     jsoncons::optional<char> length_marker, 
     Sink& sink)
@@ -306,14 +306,14 @@ bool is_array_of_primitives(const Json& val)
 }
 
 template <typename Json>
-std::vector<std::string> try_get_tabular_header(const Json& val)
+std::vector<jsoncons::string_view> try_get_tabular_header(const Json& val)
 {
     if (val.empty())
     {
-        return std::vector<std::string>{};
+        return std::vector<jsoncons::string_view>{};
     }
 
-    std::vector<std::string> first_keys;
+    std::vector<jsoncons::string_view> first_keys;
 
     for (const auto& item : val[0].object_range())
     {
@@ -322,18 +322,18 @@ std::vector<std::string> try_get_tabular_header(const Json& val)
 
     for (const auto& row : val.array_range())
     {
-        std::vector<std::string> keys;
+        std::vector<jsoncons::string_view> keys;
         for (const auto& item : row.object_range())
         {
             if (item.value().is_array() || item.value().is_object())
             {
-                return std::vector<std::string>{};
+                return std::vector<jsoncons::string_view>{};
             }
             keys.push_back(item.key());
         }
         if (keys != first_keys)
         {
-            return std::vector<std::string>{};
+            return std::vector<jsoncons::string_view>{};
         }
     }
 
@@ -379,7 +379,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
         sink.push_back('\n');
     }
     sink.append(depth*options.indent(), ' ');
-    write_header(key, val.size(), std::vector<std::string>{}, 
+    write_header(key, val.size(), std::vector<jsoncons::string_view>{}, 
         options.delimiter(), options.length_marker(), sink);
     ++line;
     for (const auto& item : val.array_range())
@@ -427,7 +427,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
 
 template <typename Json, typename Sink>
 void encode_array_of_objects_as_tabular(const Json& val, 
-    const std::vector<std::string>& fields,
+    const std::vector<jsoncons::string_view>& fields,
     const toon_encode_options& options, 
     Sink& sink, int depth, int line, jsoncons::string_view key)
 {
@@ -520,7 +520,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
         sink.push_back('\n');
     }
     sink.append(depth*options.indent(), ' ');
-    write_header(key, val.size(), std::vector<std::string>{}, 
+    write_header(key, val.size(), std::vector<jsoncons::string_view>{}, 
         options.delimiter(), options.length_marker(), sink);
     ++line;
 
@@ -555,7 +555,7 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
         sink.push_back('\n');
     }
     sink.append(depth*options.indent(), ' ');
-    write_header(key, val.size(), std::vector<std::string>{}, options.delimiter(), options.length_marker(), sink);
+    write_header(key, val.size(), std::vector<jsoncons::string_view>{}, options.delimiter(), options.length_marker(), sink);
     sink.push_back(' ');
     ++line;
 
@@ -585,7 +585,7 @@ void encode_array(const Json& val, const toon_encode_options& options,
             sink.push_back('\n');
         }
         sink.append(depth*options.indent(), ' ');
-        write_header(key, 0, std::vector<std::string>{}, options.delimiter(), options.length_marker(), sink);
+        write_header(key, 0, std::vector<jsoncons::string_view>{}, options.delimiter(), options.length_marker(), sink);
         ++line;
     }
     else if (is_array_of_primitives(val))
