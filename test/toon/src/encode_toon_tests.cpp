@@ -68,19 +68,6 @@ TEST_CASE("toon array")
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
     }
-}
-TEST_CASE("toon object")
-{
-    SECTION("object")
-    {
-        std::string str = R"({"foo":{}})";
-        auto j = ojson::parse(str);
-
-        std::string expected = R"(foo:)";
-        std::string buffer;
-        toon::encode_toon(j, buffer);
-        CHECK(expected == buffer);
-    }
     SECTION("array of objects of primitives")
     {
         std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4}])";
@@ -104,6 +91,29 @@ TEST_CASE("toon object")
   - foo: 3
     bar: 4
     baz: 5)";
+        std::string buffer;
+        toon::encode_toon(j, buffer);
+        CHECK(expected == buffer);
+    }
+}
+TEST_CASE("toon object")
+{
+    SECTION("object")
+    {
+        std::string str = R"({"foo":{}})";
+        auto j = ojson::parse(str);
+
+        std::string expected = R"(foo:)";
+        std::string buffer;
+        toon::encode_toon(j, buffer);
+        CHECK(expected == buffer);
+    }
+    SECTION("empty key")
+    {
+        std::string str = R"({"" : 1})";
+        auto j = ojson::parse(str);
+
+        std::string expected = R"("": 1)";
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
