@@ -29,6 +29,29 @@ JSONCONS_INLINE_CONSTEXPR jsoncons::string_view false_literal{"false", 5};
 namespace detail {
 
 inline
+bool is_unquoted_key_valid(string_view key)
+{
+    if (key.empty())
+    {
+        return false;
+    }
+    char c = key.front();
+    if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'))
+    {
+        return false;
+    }
+    for (auto it = key.begin()+1; it != key.end(); ++it)
+    {
+        c = *it;
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9') || c == '.'))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+inline
 bool is_number(jsoncons::string_view str) 
 {
     int state = 0;
@@ -172,7 +195,7 @@ bool is_unquoted_safe(jsoncons::string_view str, char delimiter = ',')
 }
 
 template <typename Sink>
-write_result encode_string(jsoncons::string_view str, char delimiter, Sink& sink)
+void encode_string(jsoncons::string_view str, char delimiter, Sink& sink)
 {
     if (is_unquoted_safe(str, delimiter))
     {
@@ -184,8 +207,21 @@ write_result encode_string(jsoncons::string_view str, char delimiter, Sink& sink
         jsoncons::detail::escape_string(str.data(), str.size(), false, false, sink);
         sink.push_back('\"');
     }
+}
 
-    return write_result{};
+template <typename Sink>
+void encode_key(jsoncons::string_view key, Sink& sink)
+{
+    if (is_unquoted_key_valid(key))
+    {
+        sink.append(key.data(), key.size());
+    }
+    else
+    {
+        sink.push_back('\"');
+        sink.append(key.data(), key.size());
+        sink.push_back('\"');
+    }
 }
 
 } // namespace detail
@@ -236,7 +272,7 @@ void write_header(jsoncons::optional<string_view> key,
 {
     if (key)
     {
-        detail::encode_string(*key, delimiter, sink);
+        detail::encode_key(*key, sink);
     }
     if (!fields.empty())
     {
@@ -287,7 +323,7 @@ void write_header(jsoncons::optional<string_view> key,
             {
                 first = false;
             }
-            sink.append(field.data(), field.size());
+            detail::encode_key(field, sink);  // key
         }
         sink.push_back('}');
     }
@@ -656,7 +692,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         sink.append(depth*options.indent(), ' ');
         sink.push_back('-');
         sink.push_back(' ');
-        detail::encode_string(first->key(), options.delimiter(), sink);
+        detail::encode_key(first->key(), sink);
         sink.push_back(':');
         sink.push_back(' ');
         encode_primitive(first->value(), options.delimiter(), sink);
@@ -901,7 +937,7 @@ void encode_key_value_pair(string_view key, const Json& val,
             sink.push_back('\n');
         }
         sink.append(depth*options.indent(), ' ');
-        detail::encode_string(key, options.delimiter(), sink);
+        detail::encode_key(key, sink);
         sink.push_back(':');
         sink.push_back(' ');
         encode_primitive(val, options.delimiter(), sink);
@@ -919,7 +955,7 @@ void encode_object(const Json& val, const toon_encode_options& options,
             sink.push_back('\n');
         }
         sink.append(depth*options.indent(), ' ');
-        detail::encode_string(*key, options.delimiter(), sink);
+        detail::encode_key(*key, sink);
         sink.push_back(':');
         ++line;
         for (const auto& item : val.object_range())
