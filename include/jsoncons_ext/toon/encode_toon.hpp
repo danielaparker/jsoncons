@@ -8,6 +8,7 @@
 #define JSONCONS_TOON_ENCODE_TOON_HPP 
 
 #include <ostream>
+#include <cctype>
 
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>
@@ -127,6 +128,10 @@ inline
 bool is_unquoted_safe(jsoncons::string_view str, char delimiter = ',')
 {
     if (str.empty())
+    {
+        return false;
+    }
+    if (std::isspace(unsigned char(str.front())) || isspace(unsigned char(str.back())))
     {
         return false;
     }

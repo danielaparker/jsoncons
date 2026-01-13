@@ -54,6 +54,7 @@ TEST_CASE("toon-tests")
     {
         toon_tests("./toon/input/encode/arrays-nested.json");
         toon_tests("./toon/input/encode/arrays-objects.json");
+        toon_tests("./toon/input/encode/arrays-primitive.json");
     }
 }
 
