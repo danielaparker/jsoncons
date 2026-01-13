@@ -670,10 +670,6 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             write_header(first->key(), first->value().size(), 
                 jsoncons::span<const jsoncons::string_view>{},
                 options.delimiter(), options.length_marker(), sink);
-            if (!first->value().empty())
-            {
-                sink.push_back(' ');
-            }
             bool first_item = true;
             for (const auto& item : first->value().array_range())
             {
@@ -683,6 +679,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
                 }
                 else
                 {
+                    sink.push_back(' ');
                     first_item = false;
                 }
                 encode_primitive(item, options.delimiter(), sink);
@@ -769,10 +766,6 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(), 
                     jsoncons::span<const jsoncons::string_view>{},
                     options.delimiter(), options.length_marker(), sink);
-                if (!item.empty())
-                {
-                    sink.push_back(' ');
-                }
                 bool first_item = true;
                 for (const auto& v : item.array_range())
                 {
@@ -782,6 +775,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                     }
                     else
                     {
+                        sink.push_back(' ');
                         first_item = false;
                     }
                     encode_primitive(v, options.delimiter(), sink);
@@ -821,10 +815,6 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, options.delimiter(), options.length_marker(), sink);
-    if (!val.empty())
-    {
-        sink.push_back(' ');
-    }
     ++line;
 
     bool first_item = true;
@@ -836,6 +826,7 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
         }
         else
         {
+            sink.push_back(' ');
             first_item = false;
         }
         encode_primitive(item, options.delimiter(), sink);
