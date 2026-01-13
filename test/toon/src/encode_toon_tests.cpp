@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("toon is_number")
 {
     SECTION("test1")
@@ -35,10 +35,10 @@ TEST_CASE("toon is_number")
         CHECK_FALSE(toon::detail::is_number("-foo"));
     }
 }
-#endif
+
 TEST_CASE("toon array")
 {
-    /*SECTION("empty array")
+    SECTION("empty array")
     {
         std::string expected = R"([0]:)";
         std::string buffer;
@@ -94,8 +94,8 @@ TEST_CASE("toon array")
         std::string buffer;
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
-    }*/
-    SECTION("nested arrays")
+    }
+    /*SECTION("nested arrays")
     {
         std::string expected = R"([2]:
   - id: 1
@@ -107,9 +107,9 @@ TEST_CASE("toon array")
         toon::encode_toon(j, buffer);
         std::cout << j << "\n\n";
         CHECK(expected == buffer);
-    }
+    }*/
 }
-#if 0
+
 TEST_CASE("toon object")
 {
     SECTION("object")
@@ -211,4 +211,4 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         CHECK(expected == buffer);
     }
 }
-#endif
+

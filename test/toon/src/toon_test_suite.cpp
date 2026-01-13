@@ -53,6 +53,7 @@ TEST_CASE("toon-tests")
     SECTION("compliance")
     {
         toon_tests("./toon/input/encode/arrays-nested.json");
+        toon_tests("./toon/input/encode/arrays-objects.json");
     }
 }
 
