@@ -34,12 +34,27 @@ void toon_tests(const std::string& fpath)
 
     auto suite = ojson::parse(is);
     const auto& tests = suite.at("tests"); 
-    for (const auto& test_group : tests.array_range())
+    for (const auto& test : tests.array_range())
     {
-        const auto& j = test_group["input"];
-        auto expected = test_group["expected"].as_string_view();
+        toon::toon_options options{};
+        if (test.contains("options"))
+        {
+            const auto& opts = test["options"]; 
+            if (opts.contains("delimiter"))
+            {
+                auto sv = opts["delimiter"].as_string_view();
+                options.delimiter(sv.front());
+            }
+            else if (opts.contains("indent"))
+            {
+                auto value = opts["indent"].as<int>();
+                options.indent(value);
+            }
+        }
+        const auto& j = test["input"];
+        auto expected = test["expected"].as_string_view();
         std::string buffer;
-        toon::encode_toon(j, buffer);
+        toon::encode_toon(j, buffer, options);
         if (expected != buffer)
         {
             std::cout << pretty_print(j) << "\n";
@@ -56,6 +71,11 @@ TEST_CASE("toon-tests")
         toon_tests("./toon/input/encode/arrays-objects.json");
         toon_tests("./toon/input/encode/arrays-primitive.json");
         toon_tests("./toon/input/encode/arrays-tabular.json");
+        toon_tests("./toon/input/encode/delimiters.json");
+        //toon_tests("./toon/input/encode/key-folding.json");
+        toon_tests("./toon/input/encode/objects.json");
+        //toon_tests("./toon/input/encode/primitives.json");
+        toon_tests("./toon/input/encode/whitespace.json");
     }
 }
 

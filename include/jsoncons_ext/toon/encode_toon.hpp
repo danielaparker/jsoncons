@@ -154,7 +154,7 @@ bool is_unquoted_safe(jsoncons::string_view str, char delimiter = ',')
     {
         return false;
     }
-    if (std::isspace(unsigned char(str.front())) || isspace(unsigned char(str.back())))
+    if (std::isspace(static_cast<unsigned char>(str.front())) || std::isspace(static_cast<unsigned char>(str.back())))
     {
         return false;
     }
@@ -219,7 +219,7 @@ void encode_key(jsoncons::string_view key, Sink& sink)
     else
     {
         sink.push_back('\"');
-        sink.append(key.data(), key.size());
+        jsoncons::detail::escape_string(key.data(), key.size(), false, false, sink);
         sink.push_back('\"');
     }
 }
@@ -283,18 +283,10 @@ void write_header(jsoncons::optional<string_view> key,
         }
         auto s = std::to_string(length);
         sink.append(s.data(), s.size());
-        sink.push_back(']');
-    }
-    else if (delimiter != ',')
-    {
-        sink.push_back('[');
-        if (length_marker)
+        if (delimiter != ',')
         {
-            sink.push_back(*length_marker);
+            sink.push_back(delimiter);
         }
-        auto s = std::to_string(length);
-        sink.append(s.data(), s.size());
-        sink.push_back(delimiter);
         sink.push_back(']');
     }
     else
@@ -306,6 +298,10 @@ void write_header(jsoncons::optional<string_view> key,
         }
         auto s = std::to_string(length);
         sink.append(s.data(), s.size());
+        if (delimiter != ',')
+        {
+            sink.push_back(delimiter);
+        }
         sink.push_back(']');
     }
 
@@ -479,6 +475,10 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
             }
             auto s = std::to_string(item.size());
             sink.append(s.data(), s.size());
+            if (options.delimiter() != ',')
+            {
+                sink.push_back(options.delimiter());
+            }
             sink.push_back(']');
             sink.push_back(':');
             if (!item.empty())
@@ -544,6 +544,10 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 }
                 auto s = std::to_string(item.size());
                 sink.append(s.data(), s.size());
+                if (options.delimiter() != ',')
+                {
+                    sink.push_back(options.delimiter());
+                }
                 sink.push_back(']');
                 sink.push_back(':');
                 if (!item.empty())
