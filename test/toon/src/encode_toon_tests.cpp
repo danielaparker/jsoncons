@@ -17,15 +17,15 @@ TEST_CASE("toon::detail::exponential_to_decimal_notation")
     SECTION("10.0e-1")
     {
         std::string str = toon::detail::exponential_to_decimal_notation("10.0e-1");
-        std::string expected = "1.00";
+        std::string expected = "1";
         CHECK(expected == str);
     }
-    /*SECTION("100e-2")
+    SECTION("100e-2")
     {
         std::string str = toon::detail::exponential_to_decimal_notation("100e-2");
         std::string expected = "1";
         CHECK(expected == str);
-    }*/
+    }
     SECTION("-1234e-2")
     {
         std::string str = toon::detail::exponential_to_decimal_notation("-1234e-2"); 

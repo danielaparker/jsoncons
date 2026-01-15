@@ -128,7 +128,16 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
         {
             num_str.insert(num_str.begin(), '0');
         }
-        num_str.insert(num_str.begin()+(num_str.size()-decimal_places-exponent), '.');
+        std::size_t pos = num_str.size()-(decimal_places+exponent);
+        auto first_non_zero = num_str.find_first_not_of('0', pos);
+        if (first_non_zero ==  std::string::npos)
+        {
+            num_str.erase(num_str.begin()+pos, num_str.end());
+        }
+        else
+        {
+            num_str.insert(num_str.begin()+(num_str.size()-decimal_places-exponent), '.');
+        }
     }
     else // shift decimal point right
     {
