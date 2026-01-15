@@ -28,6 +28,123 @@ JSONCONS_INLINE_CONSTEXPR jsoncons::string_view false_literal{"false", 5};
 
 namespace detail {
 
+enum class format_number_state{value_sign,coefficient,fraction,exponent_sign,exponent_value,err};
+
+inline
+std::string exponential_to_decimal_notation(jsoncons::string_view str)
+{
+    std::string result;
+
+    std::string num_str;
+    std::string exponent_str;
+
+    bool neg_value = false;
+    bool neg_exp = false;
+
+    std::size_t decimal_places = 0;
+
+    format_number_state state = format_number_state::value_sign;
+    for (std::size_t i = 0; i < str.size();)
+    {
+        char c = str[i];
+        switch (state)
+        {
+            case format_number_state::value_sign:
+                if (c == '-')
+                {
+                    neg_value = true;
+                    ++i;
+                }
+                state = format_number_state::coefficient;
+                break;
+            case format_number_state::coefficient:
+                if ((c >= '0' && c <= '9') || c == '-')
+                {
+                    num_str.push_back(c);
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = format_number_state::exponent_sign;
+                    ++i;
+                }
+                else if (c == '.')
+                { 
+                    state = format_number_state::fraction;
+                    ++i;
+                }
+                break;
+            case format_number_state::fraction:
+                if ((c >= '0' && c <= '9'))
+                {
+                    ++decimal_places;
+                    num_str.push_back(c);
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = format_number_state::exponent_sign;
+                    ++i;
+                }
+                break;
+            case format_number_state::exponent_sign:
+                if (c == '-')
+                {
+                    neg_exp = true;
+                    state = format_number_state::exponent_value;
+                    ++i;
+                }
+                else if (c == '+')
+                {
+                    state = format_number_state::exponent_value;
+                    ++i;
+                }
+                else
+                {
+                    state = format_number_state::exponent_value;
+                }
+                break;
+            case format_number_state::exponent_value:
+                if ((c >= '0' && c <= '9'))
+                {
+                    exponent_str.push_back(c);
+                    ++i;
+                }
+                break;
+        }
+    }
+
+    std::size_t exponent;
+    dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
+
+    std::size_t n = num_str.size();
+
+    if (neg_exp) // shift decimal point left
+    {
+        for (std::size_t i = n-decimal_places; i <= exponent; ++i)
+        {
+            num_str.insert(num_str.begin(), '0');
+        }
+        num_str.insert(num_str.begin()+(num_str.size()-decimal_places-exponent), '.');
+    }
+    else // shift decimal point right
+    {
+        for (std::size_t i = decimal_places; i < exponent; ++i)
+        {
+            num_str.insert(num_str.begin()+(n-decimal_places), '0');
+        }
+        if (decimal_places > exponent)
+        {
+            num_str.insert(num_str.begin() + (num_str.size() - exponent), '.');
+        }
+    }
+    if (neg_value)
+    {
+        num_str.insert(num_str.begin(), '-');
+    }
+    return num_str;
+}
+
 inline
 bool is_unquoted_key_valid(string_view key)
 {
@@ -51,96 +168,179 @@ bool is_unquoted_key_valid(string_view key)
     return true;
 }
 
+enum class is_number_state{initial,negative,digits_or_dot_or_exp,octal,leading_zero, 
+    leading_decimal_zero, decimal_zero, decimal_digit, exponent, digits_or_exp, digits, not_number};
+
 inline
 bool is_number(jsoncons::string_view str) 
 {
-    int state = 0;
+    is_number_state state = is_number_state::initial;
 
-    for (auto c : str)
+    for (std::size_t i = 0; i < str.size();)
     {
+        char c = str[i];
         switch (state)
         {
-            case 0:
+            case is_number_state::initial:
                 if (c == '-')
                 {
-                    state = 1;
+                    state = is_number_state::negative;
+                    ++i;
                 }
                 else if (c == '0')
                 {
-                    state = 2;
+                    state = is_number_state::leading_zero;
+                    ++i;
                 }
-                else if (c >= '1' && c <= '9')
+                else 
                 {
-                    state = 3;
+                    state = is_number_state::digits_or_dot_or_exp;
+                }
+                break;
+            case is_number_state::leading_zero:
+                if (c == '.')
+                {
+                    state = is_number_state::decimal_digit;
+                    ++i;
+                }
+                else 
+                {
+                    state = is_number_state::octal;
+                }
+                break;
+            case is_number_state::leading_decimal_zero:
+                if (c == '.')
+                {
+                    state = is_number_state::decimal_digit;
+                    ++i;
                 }
                 else
                 {
-                    state = 9;
+                    state = is_number_state::not_number;
                 }
                 break;
-            case 1: // leading minus
-                if (c == '0')
+            case is_number_state::octal:
+                if (!(c >= '0' && c <= '7'))
                 {
-                    state = 2;
-                }
-                else if (c >= '1' && c <= '9')
-                {
-                    state = 3;
+                    state = is_number_state::not_number;
                 }
                 else
                 {
-                    state = 9;
+                    ++i;
                 }
                 break;
-            case 2: // after 0
+            case is_number_state::negative: 
                 if (c == '0')
                 {
-                    state = 9;
+                    state = is_number_state::leading_decimal_zero;
+                    ++i;
+                }
+                else 
+                {
+                    state = is_number_state::digits_or_dot_or_exp;
+                }
+                break;
+            case is_number_state::decimal_zero: 
+                if (c == '0')
+                {
+                    state = is_number_state::not_number;
                 }
                 else if (c == '.')
                 {
-                    state = 4;
+                    state = is_number_state::decimal_digit;
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = is_number_state::digits_or_dot_or_exp;
+                    ++i;
                 }
                 else if (c >= '1' && c <= '9')
                 {
-                    state = 3;
+                    state = is_number_state::digits_or_dot_or_exp;
+                    ++i;
                 }
                 else
                 {
-                    state = 9;
+                    state = is_number_state::not_number;
                 }
                 break;
-            case 3: // expect digits or dot
+            case is_number_state::decimal_digit:
+                if (c >= '0' && c <= '9')
+                {
+                    state = is_number_state::digits_or_exp;
+                    ++i;
+                }
+                else
+                {
+                    state = is_number_state::not_number;
+                }
+                break;
+            case is_number_state::digits_or_dot_or_exp: 
                 if (c == '.')
                 {
-                    state = 4;
+                    state = is_number_state::decimal_digit;
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = is_number_state::exponent;
+                    ++i;
                 }
                 else if (!(c >= '0' && c <= '9'))
                 {
-                    state = 9;
-                }
-                break;
-            case 4: // expect digits
-                if (c >= '0' && c <= '9')
-                {
-                    state = 5;
+                    state = is_number_state::not_number;
                 }
                 else
                 {
-                    state = 9;
+                    ++i;
                 }
                 break;
-            case 5: // expect digits
+            case is_number_state::digits_or_exp: 
+                if (c == 'e' || c == 'E')
+                {
+                    state = is_number_state::exponent;
+                    ++i;
+                }
+                else if (!(c >= '0' && c <= '9'))
+                {
+                    state = is_number_state::not_number;
+                }
+                else
+                {
+                    ++i;
+                }
+                break;
+            case is_number_state::exponent: 
+                if ((c >= '0' && c <= '9') || c == '-')
+                {
+                    state = is_number_state::digits;
+                    ++i;
+                }
+                else
+                {
+                    state = is_number_state::not_number;
+                }
+                break;
+            case is_number_state::digits: 
                 if (!(c >= '0' && c <= '9'))
                 {
-                    state = 9;
+                    state = is_number_state::not_number;
+                }
+                else
+                {
+                    ++i;
                 }
                 break;
             default:
+                i = str.size();
                 break;
         }
     }
-    if (state == 2 || state == 3 || state == 5)
+    if (state == is_number_state::digits_or_dot_or_exp || state == is_number_state::octal 
+        || state == is_number_state::decimal_zero 
+        || state == is_number_state::digits_or_exp || state == is_number_state::digits
+        || state == is_number_state::leading_zero || state == is_number_state::leading_decimal_zero)
     {
         return true;
     }
@@ -439,7 +639,24 @@ write_result encode_primitive(const Json& val, char delimiter, Sink& sink)
     else if (val.is_number())
     {
         auto s = val.as_string();
-        sink.append(s.data(), s.size());
+        bool exponential_notation = false;
+        for (auto c : s)
+        {
+            if (c == 'e' || c == 'E')
+            {
+                exponential_notation = true;
+                break;
+            }
+        }
+        if (exponential_notation)
+        {
+            auto dec_str = detail::exponential_to_decimal_notation(s);
+            sink.append(dec_str.data(), dec_str.size());
+        }
+        else
+        {
+            sink.append(s.data(), s.size());
+        }
     }
     else if (val.is_string())
     {

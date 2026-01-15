@@ -12,6 +12,64 @@
 
 using namespace jsoncons;
 
+TEST_CASE("toon::detail::exponential_to_decimal_notation")
+{
+    SECTION("-1234e-2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234e-2"); 
+        std::string expected = "-12.34";
+        CHECK(expected == str);
+    }
+    SECTION("-1234e-8")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234e-8");
+        std::string expected = "-0.00001234";
+        CHECK(expected == str);
+    }
+    SECTION("-12e-2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-12e-2");
+        std::string expected = "-0.12";
+        CHECK(expected == str);
+    }
+    SECTION("0.1e-2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("0.1e-2");
+        std::string expected = "0.001";
+        CHECK(expected == str);
+    }
+    SECTION("-1234.5678e-2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234.5678e-2");
+        std::string expected = "-12.345678";
+        CHECK(expected == str);
+    }
+    SECTION("-1234.5678e-8")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234.5678e-8");
+        std::string expected = "-0.000012345678";
+        CHECK(expected == str);
+    }
+    SECTION("-1234e2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234e2");
+        std::string expected = "-123400";
+        CHECK(expected == str);
+    }
+    SECTION("-1234.56e2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234.56e2");
+        std::string expected = "-123456";
+        CHECK(expected == str);
+    }
+    SECTION("-1234.5678e2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("-1234.5678e2");
+        std::string expected = "-123456.78";
+        CHECK(expected == str);
+    }
+}
+
 TEST_CASE("toon is_number")
 {
     SECTION("test1")
@@ -20,7 +78,7 @@ TEST_CASE("toon is_number")
         CHECK(toon::detail::is_number("-0"));
         CHECK(toon::detail::is_number("-1"));
         CHECK_FALSE(toon::detail::is_number("-0a"));
-        CHECK_FALSE(toon::detail::is_number("00"));
+        CHECK(toon::detail::is_number("00"));  // octal like
         CHECK_FALSE(toon::detail::is_number("-00"));
         CHECK_FALSE(toon::detail::is_number("0-0"));
         CHECK(toon::detail::is_number("-0.0"));
