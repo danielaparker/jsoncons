@@ -111,6 +111,9 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
                     ++i;
                 }
                 break;
+            case format_number_state::err:
+                i = str.size();
+                break;
         }
     }
 
