@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -14,6 +14,18 @@ using namespace jsoncons;
 
 TEST_CASE("toon::detail::exponential_to_decimal_notation")
 {
+    SECTION("10.0e-1")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("10.0e-1");
+        std::string expected = "1.00";
+        CHECK(expected == str);
+    }
+    /*SECTION("100e-2")
+    {
+        std::string str = toon::detail::exponential_to_decimal_notation("100e-2");
+        std::string expected = "1";
+        CHECK(expected == str);
+    }*/
     SECTION("-1234e-2")
     {
         std::string str = toon::detail::exponential_to_decimal_notation("-1234e-2"); 

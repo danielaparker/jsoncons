@@ -4,9 +4,10 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_HPP
-#define JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_HPP
+#ifndef JSONCONS_TOON_TOON_HPP 
+#define JSONCONS_TOON_TOON_HPP 
 
-#include <jsoncons_ext/jsonschema/json_schema_factory.hpp>
+#include <jsoncons_ext/toon/encode_toon.hpp>
 
-#endif // JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_HPP
+#endif // JSONCONS_TOON_TOON_HPP 
+
