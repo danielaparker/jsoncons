@@ -68,15 +68,15 @@ TEST_CASE("toon-tests")
 {
     SECTION("compliance")
     {
-        //toon_tests("./toon/input/encode/arrays-nested.json");
-        //toon_tests("./toon/input/encode/arrays-objects.json");
-        //toon_tests("./toon/input/encode/arrays-primitive.json");
-        //toon_tests("./toon/input/encode/arrays-tabular.json");
-        //toon_tests("./toon/input/encode/delimiters.json");
+        toon_tests("./toon/input/encode/arrays-nested.json");
+        toon_tests("./toon/input/encode/arrays-objects.json");
+        toon_tests("./toon/input/encode/arrays-primitive.json");
+        toon_tests("./toon/input/encode/arrays-tabular.json");
+        toon_tests("./toon/input/encode/delimiters.json");
         //toon_tests("./toon/input/encode/key-folding.json");
-        //toon_tests("./toon/input/encode/objects.json");
+        toon_tests("./toon/input/encode/objects.json");
         toon_tests("./toon/input/encode/primitives.json");
-        //toon_tests("./toon/input/encode/whitespace.json");
+        toon_tests("./toon/input/encode/whitespace.json");
     }
 }
 
