@@ -1199,28 +1199,17 @@ public:
        return get_storage_view().size() != 0 ? true : false;
     }
 
-    explicit operator int64_t() const
+    template <typename Integer, typename = typename std::enable_if<std::is_integral<Integer>::value && sizeof(Integer) <= sizeof(int64_t)>::type>
+    explicit operator Integer() const
     {
         auto this_view = get_storage_view();
-        int64_t x = 0;
+        Integer x = 0;
         if (this_view.size() > 0)
         {
-            x = static_cast<int64_t>(this_view[0]);
+            x = static_cast<Integer>(this_view[0]);
         }
 
-        return is_negative() ? -x : x;
-    }
-
-    explicit operator word_type() const
-    {
-        auto this_view = get_storage_view();
-        word_type u = 0;
-        if ( this_view.size() > 0 )
-        {
-            u = this_view[0];
-        }
-
-        return u;
+        return is_negative() ? x*(-1) : x;
     }
 
     explicit operator double() const
