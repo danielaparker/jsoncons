@@ -7,21 +7,21 @@ Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.htm
 
 template <typename T,typename ByteContainer>
 void encode_msgpack(const T& jval, ByteContainer& cont,
-    const msgpack_decode_options& options = msgpack_decode_options());         (1)
+    const msgpack_encode_options& options = msgpack_encode_options());         (1)
 
 template <typename T>
 void encode_msgpack(const T& jval, std::ostream& os,
-    const msgpack_decode_options& options = msgpack_decode_options());         (2)
+    const msgpack_encode_options& options = msgpack_encode_options());         (2)
 
 template <typename T,typename ByteContainer>
 void encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, ByteContainer& cont,
-    const msgpack_decode_options& options = msgpack_decode_options());         (3) (since 0.171.0)
+    const msgpack_encode_options& options = msgpack_encode_options());         (3) (since 0.171.0)
 
 template <typename T>
 void encode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, std::ostream& os,
-    const msgpack_decode_options& options = msgpack_decode_options());         (4) (since 0.171.0)
+    const msgpack_encode_options& options = msgpack_encode_options());         (4) (since 0.171.0)
 ```
 
 (1) Writes a value of type T into a byte container in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 

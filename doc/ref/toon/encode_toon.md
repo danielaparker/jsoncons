@@ -7,21 +7,21 @@ Encodes a `basic_json` value into the [TOON](https://github.com/toon-format/toon
 
 template <typename T,typename ByteContainer>
 void encode_toon(const T& jval, ByteContainer& cont,
-    const toon_decode_options& options = toon_decode_options());         (1)
+    const toon_encode_options& options = toon_encode_options());         (1)
 
 template <typename T>
 void encode_toon(const T& jval, std::ostream& os,
-    const toon_decode_options& options = toon_decode_options());         (2)
+    const toon_encode_options& options = toon_encode_options());         (2)
 
 template <typename T,typename ByteContainer>
 void encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, ByteContainer& cont,
-    const toon_decode_options& options = toon_decode_options());         (3) 
+    const toon_encode_options& options = toon_encode_options());         (3) 
 
 template <typename T>
 void encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, std::ostream& os,
-    const toon_decode_options& options = toon_decode_options());         (4) 
+    const toon_encode_options& options = toon_encode_options());         (4) 
 ```
 
 (1) Writes a value of type T into a byte container in the TOON data format, using the specified (or defaulted) [options](toon_options.md). 
