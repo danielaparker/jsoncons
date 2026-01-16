@@ -422,6 +422,47 @@ TEST_CASE("bigint operations")
         CHECK(expected == b);
     }
 }
+
+TEST_CASE("bigint cast")
+{
+    SECTION("to short")
+    {
+        bigint b{(std::numeric_limits<short>::lowest)()};
+        auto val = (short)b;
+        CHECK((std::numeric_limits<short>::lowest)() == val);
+    }
+    SECTION("to int")
+    {
+        bigint b{(std::numeric_limits<int>::lowest)()};
+        auto val = (int)b;
+        CHECK((std::numeric_limits<int>::lowest)() == val);
+    }
+    SECTION("to long")
+    {
+        bigint b{(std::numeric_limits<long>::lowest)()};
+        auto val = (long)b;
+        CHECK((std::numeric_limits<long>::lowest)() == val);
+    }
+    SECTION("to long long")
+    {
+        bigint b{(std::numeric_limits<long long>::max)()};
+        auto val = (long long)b;
+        CHECK((std::numeric_limits<long long>::max)() == val);
+    }
+    SECTION("to unsigned long")
+    {
+        bigint b{(std::numeric_limits<unsigned long>::max)()};
+        auto val = (unsigned long)b;
+        CHECK((std::numeric_limits<unsigned long>::max)() == val);
+    }
+    SECTION("to unsigned long long")
+    {
+        bigint b{(std::numeric_limits<unsigned long long>::max)()};
+        auto val = (unsigned long long)b;
+        CHECK((std::numeric_limits<unsigned long long>::max)() == val);
+    }
+}
+
 TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 {
     bigint a("56654250564056135415631554531554513813"); 
