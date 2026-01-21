@@ -2721,7 +2721,7 @@ private:
 using json_parser = basic_json_parser<char>;
 using wjson_parser = basic_json_parser<wchar_t>;
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_PARSER_HPP
 
