@@ -30,7 +30,7 @@ public:
     using string_type = std::string;
 private:
 
-    int indent_{2};
+    std::size_t indent_{2};
     char delimiter_{','};
     jsoncons::optional<char> length_marker_;
     int max_nesting_depth_{1024};
@@ -47,7 +47,7 @@ protected:
 
 public:
 
-    int indent() const
+    std::size_t indent() const
     {
         return indent_;
     }
@@ -137,7 +137,7 @@ public:
     toon_options& operator=(const toon_options&) = default;
     toon_options& operator=(toon_options&&) = default;
 
-    toon_options& indent(int value)
+    toon_options& indent(std::size_t value)
     {
         this->indent_ = value;
         return *this;

@@ -35,7 +35,7 @@ namespace toon {
 struct parsed_line
 {
     std::string raw;
-    int depth{0};
+    std::size_t depth{0};
     std::size_t indent{0};
     std::string content;
     std::size_t line_num{0};
@@ -57,7 +57,7 @@ struct blank_line_info
 {
     std::size_t line_num{0};
     std::size_t indent{0};
-    int depth{0};
+    std::size_t depth{0};
 };
 
 class line_cursor
@@ -154,6 +154,7 @@ private:
     default_json_visitor default_visitor_;
     json_visitor& visitor_;
     toon_decode_options options_;
+    std::size_t indent_size_;
     std::vector<parsed_line> lines_;
     std::vector<blank_line_info> blank_lines_;
 
@@ -192,7 +193,8 @@ public:
         const TempAlloc& temp_alloc = TempAlloc())
     : source_(std::forward<Sourceable>(source)),
       visitor_(visitor),
-      options_(options)
+      options_(options),
+      indent_size_(options.indent())
     {
         (temp_alloc);
     }
@@ -230,7 +232,6 @@ public:
 
         std::size_t line_num = 1;
         std::size_t indent = 0;
-        int depth = 0;
         std::size_t start = 0;
         bool is_blank = true;
 
@@ -249,6 +250,7 @@ public:
             }
             if (str[i] == '\n')
             {
+                std::size_t depth = compute_depth_from_indent(indent, indent_size_);
                 if (is_blank)
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
@@ -263,6 +265,7 @@ public:
         }
         if (start < i)
         {
+            std::size_t depth = compute_depth_from_indent(indent, indent_size_);
             if (is_blank)
             {
                 blank_lines_.push_back(blank_line_info{line_num,indent,depth});
@@ -271,6 +274,11 @@ public:
                 depth, indent, std::string{}, line_num});
         }
 
+    }
+
+    std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size) const
+    {
+        return indent_spaces / indent_size;
     }
 };
 

@@ -34,17 +34,26 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
       REQUIRE(0 == reader.blank_lines().size());
       REQUIRE(9 == reader.lines().size());
       CHECK(0 == reader.lines()[0].indent);
+      CHECK(0 == reader.lines()[0].depth);
       CHECK("context:" == reader.lines()[0].content);
       CHECK(2 == reader.lines()[1].indent);
+      CHECK(1 == reader.lines()[1].depth);
       CHECK("task: Our favorite hikes together" == reader.lines()[1].content);
       CHECK(2 == reader.lines()[2].indent);
+      CHECK(1 == reader.lines()[2].depth);
       CHECK(2 == reader.lines()[3].indent);
+      CHECK(1 == reader.lines()[3].depth);
       CHECK("season: spring_2025" == reader.lines()[3].content);
       CHECK(0 == reader.lines()[4].indent);
+      CHECK(0 == reader.lines()[4].depth);
       CHECK(0 == reader.lines()[5].indent);
+      CHECK(0 == reader.lines()[5].depth);
       CHECK(2 == reader.lines()[6].indent);
+      CHECK(1 == reader.lines()[6].depth);
       CHECK(2 == reader.lines()[7].indent);
+      CHECK(1 == reader.lines()[7].depth);
       CHECK(2 == reader.lines()[8].indent);
+      CHECK(1 == reader.lines()[8].depth);
 
     }
 }
