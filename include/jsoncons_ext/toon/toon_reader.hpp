@@ -34,7 +34,6 @@ namespace toon {
 
 struct parsed_line
 {
-    std::string raw;
     std::size_t depth{0};
     std::size_t indent{0};
     std::string content;
@@ -153,8 +152,8 @@ private:
     source_type source_;
     default_json_visitor default_visitor_;
     json_visitor& visitor_;
-    toon_decode_options options_;
     std::size_t indent_size_;
+    bool strict_;
     std::vector<parsed_line> lines_;
     std::vector<blank_line_info> blank_lines_;
 
@@ -193,8 +192,8 @@ public:
         const TempAlloc& temp_alloc = TempAlloc())
     : source_(std::forward<Sourceable>(source)),
       visitor_(visitor),
-      options_(options),
-      indent_size_(options.indent())
+      indent_size_(options.indent()),
+      strict_(options.strict())
     {
         (temp_alloc);
     }
@@ -233,45 +232,53 @@ public:
         std::size_t line_num = 1;
         std::size_t indent = 0;
         std::size_t start = 0;
-        bool is_blank = true;
+        bool is_blank_line = true;
+        std::size_t trailing_blanks = 0;
 
         std::size_t i = 0;
         for (; i < str.size(); ++i)
         {
             char c = str[i];
-            if (is_blank && c == ' ')
+            if (is_blank_line && c == ' ')
             {
                 ++indent;
-            }
-
-            if (!(c == ' ' || c == '\t' || c == '\r' || c == '\n'))
-            {
-                is_blank = false;
             }
             if (str[i] == '\n')
             {
                 std::size_t depth = compute_depth_from_indent(indent, indent_size_);
-                if (is_blank)
+                if (is_blank_line)
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
                 }
-                lines_.push_back(parsed_line{std::string{str.data()+i, i-start},
-                    depth, indent, std::string{str.data()+(start+indent), i-(start+indent)}, line_num});
+                lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent-trailing_blanks)}, line_num});
                 ++line_num;
                 indent = 0;
-                is_blank = true;
+                is_blank_line = true;
                 start = i+1;
+                trailing_blanks = 0;
+            }
+            else
+            {
+                bool is_blank_char = (c == ' ' || c == '\t' || c == '\r' || c == '\n');
+                if (!is_blank_char)
+                {
+                    is_blank_line = false;
+                    trailing_blanks = 0;
+                }
+                else
+                {
+                    ++trailing_blanks;
+                }
             }
         }
         if (start < i)
         {
             std::size_t depth = compute_depth_from_indent(indent, indent_size_);
-            if (is_blank)
+            if (is_blank_line)
             {
                 blank_lines_.push_back(blank_line_info{line_num,indent,depth});
             }
-            lines_.push_back(parsed_line{std::string{str.data(), start, i-start},
-                depth, indent, std::string{}, line_num});
+            lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
         }
 
     }

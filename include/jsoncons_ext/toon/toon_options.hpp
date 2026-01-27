@@ -29,10 +29,7 @@ public:
     using char_type = char;
     using string_type = std::string;
 private:
-
     std::size_t indent_{2};
-    char delimiter_{','};
-    jsoncons::optional<char> length_marker_;
     int max_nesting_depth_{1024};
 
 protected:
@@ -52,16 +49,6 @@ public:
         return indent_;
     }
 
-    char delimiter() const
-    {
-        return delimiter_;
-    }
-
-    jsoncons::optional<char> length_marker() const
-    {
-        return length_marker_;
-    }
-
     int max_nesting_depth() const 
     {
         return max_nesting_depth_;
@@ -76,6 +63,7 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 private:
+    bool strict_{true};
 public:
     toon_decode_options() = default;
 
@@ -89,6 +77,7 @@ protected:
     toon_decode_options& operator=(const toon_decode_options&) = default;
     toon_decode_options& operator=(toon_decode_options&&) = default;
 public:
+    bool strict() const {return strict_;}
 }; 
 
 class toon_encode_options : public virtual toon_options_common
@@ -99,6 +88,8 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 private:
+    char delimiter_{','};
+    jsoncons::optional<char> length_marker_;
 public:
     toon_encode_options() = default;
 
@@ -114,6 +105,16 @@ protected:
     toon_encode_options& operator=(const toon_encode_options&) = default;
     toon_encode_options& operator=(toon_encode_options&&) = default;
 public:
+
+    char delimiter() const
+    {
+        return delimiter_;
+    }
+
+    jsoncons::optional<char> length_marker() const
+    {
+        return length_marker_;
+    }
 };
 
 class toon_options final: public toon_decode_options, 
@@ -124,9 +125,10 @@ public:
     using string_type = std::string;
 
     using toon_options_common::indent;
-    using toon_options_common::delimiter;
-    using toon_options_common::length_marker;
     using toon_options_common::max_nesting_depth;
+    using toon_decode_options::strict;
+    using toon_encode_options::delimiter;
+    using toon_encode_options::length_marker;
 public:
 
 //  Constructors
@@ -140,6 +142,12 @@ public:
     toon_options& indent(std::size_t value)
     {
         this->indent_ = value;
+        return *this;
+    }
+
+    toon_options& strict(std::size_t value)
+    {
+        this->strict_ = value;
         return *this;
     }
 
