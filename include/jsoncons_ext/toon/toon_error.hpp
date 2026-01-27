@@ -22,6 +22,8 @@ namespace toon {
         unexpected_eof = 1,
         source_error,
         syntax_error,
+        tab_in_indentation,
+        indent_not_multiple_of_indent_size,
         extra_character,
         max_nesting_depth_exceeded,
         single_quote,
@@ -69,13 +71,17 @@ namespace toon {
                 case toon_errc::source_error:
                     return "Source error";
                 case toon_errc::syntax_error:
-                    return "JSON syntax_error";
+                    return "TOON syntax_error";
+                case toon_errc::tab_in_indentation:
+                    return "Illegal tab in indentation in strict mode";
+                case toon_errc::indent_not_multiple_of_indent_size:
+                    return "Indent spaces must be exact multiple of indent size";
                 case toon_errc::extra_character:
-                    return "Unexpected non-whitespace character after JSON text";
+                    return "Unexpected non-whitespace character after TOON text";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:
-                    return "JSON strings cannot be quoted with single quotes";
+                    return "TOON strings cannot be quoted with single quotes";
                 case toon_errc::illegal_character_in_string:
                     return "Illegal character in string";
                 case toon_errc::extra_comma:
@@ -127,7 +133,7 @@ namespace toon {
                 case toon_errc::unexpected_character:
                     return "Unexpected character";
                 default:
-                    return "Unknown JSON parser error";
+                    return "Unknown TOON parser error";
                 }
         }
     };

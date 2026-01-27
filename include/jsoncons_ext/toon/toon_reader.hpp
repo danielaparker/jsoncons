@@ -222,10 +222,6 @@ public:
         while (!source_.eof())
         {
             auto s = source_.read_buffer();
-            if (ec)
-            {
-                return;
-            }
             str.append(s.data(), s.size());
         }
 
@@ -258,8 +254,18 @@ public:
                     trailing_blanks = 0;
                 }
             }
+            if (strict_ && is_blank_line && c == '\t')
+            {
+                ec = toon_errc::tab_in_indentation;
+                return;
+            }
             if (str[i] == '\n')
             {
+                if (strict_ && indent > 0 && indent % indent_size_ !=0)
+                {
+                    ec = toon_errc::indent_not_multiple_of_indent_size;
+                    return;
+                }
                 std::size_t depth = compute_depth_from_indent(indent, indent_size_);
                 if (is_blank_line)
                 {
