@@ -31,5 +31,8 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
       toon::toon_string_reader reader(data, decoder);
       reader.read();  
 
+      CHECK(0 == reader.blank_lines().size());
+      CHECK(9 == reader.lines().size());
+
     }
 }

@@ -233,7 +233,9 @@ public:
         int depth = 0;
         std::size_t start = 0;
         bool is_blank = true;
-        for (std::size_t i = 0; i < str.size(); ++i)
+
+        std::size_t i = 0;
+        for (; i < str.size(); ++i)
         {
             char c = str[i];
             if (is_blank && c == ' ')
@@ -256,8 +258,19 @@ public:
                 ++line_num;
                 indent = 0;
                 is_blank = true;
+                start = i;
             }
         }
+        if (start < i)
+        {
+            if (is_blank)
+            {
+                blank_lines_.push_back(blank_line_info{line_num,indent,depth});
+            }
+            lines_.push_back(parsed_line{std::string{str.data(), start, i-start},
+                depth, indent, std::string{}, line_num});
+        }
+
     }
 };
 
