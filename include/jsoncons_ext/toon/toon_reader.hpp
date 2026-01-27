@@ -36,7 +36,7 @@ struct parsed_line
 {
     std::string raw;
     int depth{0};
-    int indent{0};
+    std::size_t indent{0};
     std::string content;
     std::size_t line_num{0};
 
@@ -56,7 +56,7 @@ struct parsed_line
 struct blank_line_info
 {
     std::size_t line_num{0};
-    int indent{0};
+    std::size_t indent{0};
     int depth{0};
 };
 
@@ -229,7 +229,7 @@ public:
         }
 
         std::size_t line_num = 1;
-        int indent = 0;
+        std::size_t indent = 0;
         int depth = 0;
         std::size_t start = 0;
         bool is_blank = true;
@@ -253,12 +253,12 @@ public:
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
                 }
-                lines_.push_back(parsed_line{std::string{str.data(), start, i-start},
-                    depth, indent, std::string{}, line_num});
+                lines_.push_back(parsed_line{std::string{str.data()+i, i-start},
+                    depth, indent, std::string{str.data()+(start+indent), i-(start+indent)}, line_num});
                 ++line_num;
                 indent = 0;
                 is_blank = true;
-                start = i;
+                start = i+1;
             }
         }
         if (start < i)

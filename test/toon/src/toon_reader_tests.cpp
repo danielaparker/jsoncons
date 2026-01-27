@@ -31,8 +31,20 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
       toon::toon_string_reader reader(data, decoder);
       reader.read();  
 
-      CHECK(0 == reader.blank_lines().size());
-      CHECK(9 == reader.lines().size());
+      REQUIRE(0 == reader.blank_lines().size());
+      REQUIRE(9 == reader.lines().size());
+      CHECK(0 == reader.lines()[0].indent);
+      CHECK("context:" == reader.lines()[0].content);
+      CHECK(2 == reader.lines()[1].indent);
+      CHECK("task: Our favorite hikes together" == reader.lines()[1].content);
+      CHECK(2 == reader.lines()[2].indent);
+      CHECK(2 == reader.lines()[3].indent);
+      CHECK("season: spring_2025" == reader.lines()[3].content);
+      CHECK(0 == reader.lines()[4].indent);
+      CHECK(0 == reader.lines()[5].indent);
+      CHECK(2 == reader.lines()[6].indent);
+      CHECK(2 == reader.lines()[7].indent);
+      CHECK(2 == reader.lines()[8].indent);
 
     }
 }
