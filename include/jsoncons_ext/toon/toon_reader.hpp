@@ -36,7 +36,7 @@ struct parsed_line
 {
     std::size_t depth{0};
     std::size_t indent{0};
-    std::string content;
+    jsoncons::string_view content;
     std::size_t line_num{0};
 
     bool is_blank() const
@@ -154,6 +154,7 @@ private:
     json_visitor& visitor_;
     std::size_t indent_size_;
     bool strict_;
+    std::string raw_;
     std::vector<parsed_line> lines_;
     std::vector<blank_line_info> blank_lines_;
 
@@ -222,11 +223,10 @@ public:
 
     void parse_lines(std::error_code& ec)
     {
-        std::string str;
         while (!source_.eof())
         {
             auto s = source_.read_buffer();
-            str.append(s.data(), s.size());
+            raw_.append(s.data(), s.size());
         }
 
         std::size_t line_num = 1;
@@ -236,9 +236,9 @@ public:
         std::size_t trailing_blanks = 0;
 
         std::size_t i = 0;
-        for (; i < str.size(); ++i)
+        for (; i < raw_.size(); ++i)
         {
-            char c = str[i];
+            char c = raw_[i];
             if (c == ' ')
             {
                 if (is_blank_line)
@@ -263,7 +263,7 @@ public:
                 ec = toon_errc::tab_in_indentation;
                 return;
             }
-            if (str[i] == '\n')
+            if (c == '\n')
             {
                 if (strict_ && indent > 0 && indent % indent_size_ !=0)
                 {
@@ -275,7 +275,7 @@ public:
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
                 }
-                lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+                lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw_.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
                 ++line_num;
                 indent = 0;
                 is_blank_line = true;
@@ -290,7 +290,7 @@ public:
             {
                 blank_lines_.push_back(blank_line_info{line_num,indent,depth});
             }
-            lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+            lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw_.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
         }
 
     }
