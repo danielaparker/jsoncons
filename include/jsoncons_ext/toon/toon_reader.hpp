@@ -239,19 +239,24 @@ public:
         for (; i < str.size(); ++i)
         {
             char c = str[i];
-            bool is_blank_char = (c == ' ' || c == '\t' || c == '\r' || c == '\n');
-            if (!is_blank_char)
+            if (c == ' ')
             {
-                is_blank_line = false;
-                trailing_blanks = 0;
+                if (is_blank_line)
+                {
+                    ++indent;
+                }
+                else
+                {
+                    ++trailing_blanks;
+                }
             }
             else
             {
-                ++trailing_blanks;
-            }
-            if (is_blank_line && c == ' ')
-            {
-                ++indent;
+                is_blank_line = false;
+                if (!(c == '\n'))
+                {
+                    trailing_blanks = 0;
+                }
             }
             if (str[i] == '\n')
             {
@@ -260,7 +265,7 @@ public:
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
                 }
-                lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks-1)}, line_num});
+                lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
                 ++line_num;
                 indent = 0;
                 is_blank_line = true;
@@ -275,7 +280,7 @@ public:
             {
                 blank_lines_.push_back(blank_line_info{line_num,indent,depth});
             }
-            lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks-1)}, line_num});
+            lines_.push_back(parsed_line{depth, indent, std::string{str.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
         }
 
     }
