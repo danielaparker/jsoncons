@@ -202,6 +202,10 @@ public:
     {
         std::error_code ec;
         read(ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
     }
 
     void read(std::error_code& ec)
@@ -209,7 +213,7 @@ public:
         parse_lines(ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            return;
         }
     }
 

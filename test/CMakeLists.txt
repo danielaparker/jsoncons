@@ -206,6 +206,7 @@ add_executable(unit_tests
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
+               toon/src/toon_reader_tests.cpp
                toon/src/encode_toon_tests.cpp
                corelib/src/testmain.cpp
 )              
