@@ -4072,7 +4072,13 @@ namespace detail {
                         switch (*p_)
                         {
                             case '\'':
-                                buffer.push_back(*p_);
+                                buffer.push_back('\'');
+                                state_stack.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '\\':
+                                buffer.push_back('\\');
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
