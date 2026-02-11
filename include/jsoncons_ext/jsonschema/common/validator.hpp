@@ -12,6 +12,8 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <optional>
+#include <any>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>
@@ -239,12 +241,14 @@ namespace jsonschema {
         
         virtual validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
-            const std::string& message) const = 0;
+            const std::string& message,
+            std::optional<std::any> patch = std::nullopt) const = 0;
 
         virtual validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message,
-            const std::vector<validation_message>& details) const = 0;
+            const std::vector<validation_message>& details,
+            std::optional<std::any> patch = std::nullopt) const = 0;
     };
 
 } // namespace jsonschema
