@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
@@ -92,26 +93,30 @@ namespace jsonschema {
 
         validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
-            const std::string& message) const override
-        {
-            return validation_message(keyword_name_, 
-                eval_path,
-                schema_location_, 
-                instance_location, 
-                custom_message_.empty() ? message : custom_message_);
-        }
-
-        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
-            const jsonpointer::json_pointer& instance_location,
             const std::string& message,
-            const std::vector<validation_message>& details) const override
+            std::optional<std::any> patch = std::nullopt) const override
         {
             return validation_message(keyword_name_, 
                 eval_path,
                 schema_location_, 
                 instance_location, 
                 custom_message_.empty() ? message : custom_message_,
-                details);
+                patch);
+        }
+
+        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message,
+            const std::vector<validation_message>& details,
+            std::optional<std::any> patch = std::nullopt) const override
+        {
+            return validation_message(keyword_name_, 
+                eval_path,
+                schema_location_, 
+                instance_location, 
+                custom_message_.empty() ? message : custom_message_,
+                details,
+                patch);
         }
     };
 
@@ -1999,7 +2004,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final
+            Json& patch) const final
         {
             if (!instance.is_object())
             {
@@ -2015,7 +2020,8 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        "Required property '" + key + "' not found."));
+                        "Required property '" + key + "' not found.",
+                        &patch));
                     if(result == walk_result::abort)
                     {
                         return result;

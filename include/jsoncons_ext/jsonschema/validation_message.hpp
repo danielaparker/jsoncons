@@ -14,6 +14,8 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <optional>
+#include <any>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>
@@ -30,17 +32,20 @@ namespace jsonschema {
         jsonpointer::json_pointer instance_location_;
         std::string message_;
         std::vector<validation_message> details_;
+        std::optional<std::any> patch_;
     public:
         validation_message(std::string keyword,
             jsonpointer::json_pointer eval_path,
             uri schema_location,
             jsonpointer::json_pointer instance_location,
-            std::string message)
+            std::string message,
+            std::optional<std::any> patch = std::nullopt)
             : keyword_(std::move(keyword)), 
               eval_path_(std::move(eval_path)),
               schema_location_(std::move(schema_location)),
               instance_location_(std::move(instance_location)),
-              message_(std::move(message))
+              message_(std::move(message)),
+              patch_(patch)
         {
         }
 
@@ -49,13 +54,15 @@ namespace jsonschema {
             const uri& schema_location,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message,
-            const std::vector<validation_message>& details)
+            const std::vector<validation_message>& details,
+            std::optional<std::any> patch = std::nullopt)
             : keyword_(keyword),
               eval_path_(eval_path),
               schema_location_(schema_location),
               instance_location_(instance_location), 
               message_(message),
-              details_(details)
+              details_(details),
+              patch_(patch)
         {
         }
 
@@ -87,6 +94,11 @@ namespace jsonschema {
         const std::vector<validation_message>& details() const
         {
             return details_;
+        }
+
+        std::optional<std::any> patch() const
+        {
+            return patch_;
         }
     };
 
