@@ -135,6 +135,116 @@ public:
     }
 };
 
+inline
+std::size_t find_unquoted_char(jsoncons::string_view line, 
+    char target_char,
+    std::size_t start=0)
+{
+    bool in_quotes = false;
+    std::size_t index = jsoncons::string_view::npos;
+    bool done = false;
+    for (std::size_t i = start; !done && i < line.size(); ++i)
+    {
+        char c = line[i];
+        if (!in_quotes && c == '\"')
+        {
+            in_quotes = true;
+        }
+        else if (in_quotes && c == '\\' && i+1 < line.size())
+        {
+            ++i;
+        }
+        else if (in_quotes && c == '\"')
+        {
+            in_quotes = false;
+        }
+        if (!in_quotes && line[i] == target_char)
+        {
+            index = i;
+            done = true;
+        }
+    }
+    return index;
+}
+
+inline
+toon_errc read_key(jsoncons::string_view key_str, std::string& result)
+{
+    bool in_quotes{false};
+    std::size_t start{0};
+    std::size_t end{0};
+
+    bool terminated{false};
+    for (std::size_t i = 0; i < key_str.size() && !terminated; ++i)
+    {
+        char c = key_str[i];
+        if (start == 0 && c != ' ')
+        {
+            start = i;
+        }
+        if (!in_quotes && c == '\"')
+        {
+            start = i+1;
+            in_quotes = true;
+        }
+        else if (in_quotes && c == '\"')
+        {
+            end = i;
+            terminated = true;
+            in_quotes = false;
+        }
+        else if (c != ' ')
+        {
+            end = i;
+        }
+    }
+    if (terminated)
+    {
+        result = std::string(key_str.data() + start, (end-start));
+        return toon_errc{};
+    }
+    if (in_quotes) // unterminated_quoted_key
+    {
+        return toon_errc::unterminated_quoted_key;
+    }
+    result = std::string(key_str.data() + start, (end-start));
+    return toon_errc{};
+}
+
+inline
+void read_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
+{
+    auto bracket_start = find_unquoted_char(line, '{');
+    if (bracket_start == jsoncons::string_view::npos)
+    {
+        return;
+    }
+    jsoncons::string_view key;
+    auto key_part = jsoncons::string_view{line.data() + bracket_start, (line.size() - bracket_start)};
+
+    std::string str;
+    toon_errc ec = read_key(key_part, str);
+    if (ec != toon_errc{})
+    {
+        return;
+    }
+    auto bracket_end = find_unquoted_char(line, '}', bracket_start);
+    if (bracket_end == jsoncons::string_view::npos)
+    {
+        return;
+    }
+
+    jsoncons::string_view bracket_content;
+    if (line[bracket_start+1] == '#')
+    {
+        bracket_content = jsoncons::string_view(line.data() + (bracket_start + 2), bracket_end - (bracket_start + 2));
+    }
+    else
+    {
+        bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
+    }
+}
+
 std::vector<blank_line_info> line_cursor::default_blank_lines = std::vector<blank_line_info>{};
 
 template <typename Source=jsoncons::stream_source<char>,typename TempAlloc =std::allocator<char>>
@@ -190,13 +300,12 @@ public:
     basic_toon_reader(Sourceable&& source, 
         json_visitor& visitor,
         const toon_decode_options& options, 
-        const TempAlloc& temp_alloc = TempAlloc())
+        const TempAlloc& /*temp_alloc*/ = TempAlloc())
     : source_(std::forward<Sourceable>(source)),
       visitor_(visitor),
       indent_size_(options.indent()),
       strict_(options.strict())
     {
-        (temp_alloc);
     }
 
     void read()
@@ -211,17 +320,34 @@ public:
 
     void read(std::error_code& ec)
     {
-        parse_lines(ec);
+        read_lines(ec);
         if (ec)
         {
             return;
         }
+        std::vector<parsed_line> non_blank_lines;
+        for (const auto& ln : lines_)
+        {
+            if (!ln.is_blank())
+            {
+                non_blank_lines.push_back(ln);
+            }
+        }
+        if (non_blank_lines.empty())
+        {
+            visitor_.begin_object();
+            visitor_.end_object();
+            return;
+        }
+
+        std::vector<std::string> fields;
+        read_header(non_blank_lines[0].content, fields);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
     const std::vector<blank_line_info>& blank_lines() const {return blank_lines_;}
 
-    void parse_lines(std::error_code& ec)
+    void read_lines(std::error_code& ec)
     {
         while (!source_.eof())
         {

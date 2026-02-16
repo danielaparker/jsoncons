@@ -24,6 +24,7 @@ namespace toon {
         syntax_error,
         tab_in_indentation,
         indent_not_multiple_of_indent_size,
+        unterminated_quoted_key,
         extra_character,
         max_nesting_depth_exceeded,
         single_quote,
@@ -76,6 +77,8 @@ namespace toon {
                     return "Illegal tab in indentation in strict mode";
                 case toon_errc::indent_not_multiple_of_indent_size:
                     return "Indent spaces must be exact multiple of indent size";
+                case toon_errc::unterminated_quoted_key:
+                    return "Unterminated quoted key";
                 case toon_errc::extra_character:
                     return "Unexpected non-whitespace character after TOON text";
                 case toon_errc::max_nesting_depth_exceeded:

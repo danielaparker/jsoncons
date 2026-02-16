@@ -13,9 +13,26 @@
 
 using namespace jsoncons;
 
+TEST_CASE("toon_reader util tests")
+{
+    SECTION("test1")
+    {
+        std::size_t pos;
+
+        pos = toon::find_unquoted_char(R"(context:)", 't');
+        CHECK(3 == pos);
+        pos = toon::find_unquoted_char(R"(a:b"c:d"e)", ':');
+        CHECK(1 == pos);
+        pos = toon::find_unquoted_char(R"(a"b:c"d:e)", ':',0);
+        CHECK(7 == pos);
+        pos = toon::find_unquoted_char(R"("a:b":c)", ':',0);
+        CHECK(5 == pos);
+    }
+}
+
 TEST_CASE("toon_reader tests")
 {
-    SECTION("test 1")
+    SECTION("read lines")
     {
         std::string data = R"(context:
   task: Our favorite hikes together
@@ -96,5 +113,12 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         CHECK(2 == reader.lines()[8].indent);
         CHECK(1 == reader.lines()[8].depth);
 
+    }
+
+    SECTION("read_key")
+    {
+        std::string key;
+        toon::read_key(R"(" foo")", key);
+        CHECK(R"( foo)" == key);
     }
 }
