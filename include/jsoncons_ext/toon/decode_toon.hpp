@@ -25,11 +25,11 @@ namespace toon {
 
 // try_decode_toon
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type
-try_decode_toon(const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+try_decode_toon(const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -40,11 +40,11 @@ try_decode_toon(const CharsLike& s,
     return result_type{};
 }
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
-try_decode_toon(const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+try_decode_toon(const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -75,12 +75,12 @@ try_decode_toon(std::basic_istream<CharT>& is,
 }
 // With leading allocator_set parameter
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type
+    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -88,12 +88,12 @@ try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{};
 }
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-     ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
+     ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;

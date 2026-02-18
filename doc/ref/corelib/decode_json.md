@@ -6,20 +6,20 @@ work for all C++ classes that support jsoncons reflection traits.
 ```cpp
 #include <jsoncons/decode_json.hpp>
 
-template <typename T,typename CharsLike>
-T decode_json(const CharsLike& s,
-    const basic_json_decode_options<CharsLike::value_type>& options 
-        = basic_json_decode_options<CharsLike::value_type>());                                  (1)
+template <typename T,typename StringViewLike>
+T decode_json(const StringViewLike& s,
+    const basic_json_decode_options<StringViewLike::value_type>& options 
+        = basic_json_decode_options<StringViewLike::value_type>());                                  (1)
 
 template <typename T,typename CharT>
 T decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (2)
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc>
 T decode_json(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<CharsLike::value_type>& options 
-        = basic_json_decode_options<CharsLike::value_type>());                                  (3) (since 0.171.0)
+    const StringViewLike& s,
+    const basic_json_decode_options<StringViewLike::value_type>& options 
+        = basic_json_decode_options<StringViewLike::value_type>());                                  (3) (since 0.171.0)
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
 T decode_json(const allocator_set<Alloc,TempAlloc>& aset,
@@ -30,20 +30,20 @@ template <typename T,typename Iterator>
 T decode_json(Iterator first, Iterator last,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (5)
 
-template <typename T,typename CharsLike>
-read_result<T> try_decode_json(const CharsLike& s,
-    const basic_json_decode_options<CharsLike::value_type>& options 
-        = basic_json_decode_options<CharsLike::value_type>());                                  (6) since 1.4.0
+template <typename T,typename StringViewLike>
+read_result<T> try_decode_json(const StringViewLike& s,
+    const basic_json_decode_options<StringViewLike::value_type>& options 
+        = basic_json_decode_options<StringViewLike::value_type>());                                  (6) since 1.4.0
 
 template <typename T,typename CharT>
 read_result<T> try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (7) since 1.4.0
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc>
 read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<CharsLike::value_type>& options 
-        = basic_json_decode_options<CharsLike::value_type>());                                  (8) (since 1.4.0)
+    const StringViewLike& s,
+    const basic_json_decode_options<StringViewLike::value_type>& options 
+        = basic_json_decode_options<StringViewLike::value_type>());                                  (8) (since 1.4.0)
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
 read_result<T> try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,

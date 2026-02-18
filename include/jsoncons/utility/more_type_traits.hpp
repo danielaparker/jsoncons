@@ -688,13 +688,13 @@ namespace ext_traits {
                                    is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
-    // is_char_sequence
+    // is_string_view_like
 
     template <typename Container,typename Enable=void>
-    struct is_char_sequence : std::false_type {};
+    struct is_string_view_like : std::false_type {};
 
     template <typename Container>
-    struct is_char_sequence<Container, 
+    struct is_string_view_like<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
                                    is_character<typename Container::value_type>::value

@@ -25,7 +25,9 @@
 #include <jsoncons/ser_util.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>
 #include <jsoncons_ext/toon/toon_error.hpp>
 
@@ -212,7 +214,7 @@ toon_errc read_key(jsoncons::string_view key_str, std::string& result)
 }
 
 inline
-void read_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
+void parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
 {
     auto bracket_start = find_unquoted_char(line, '{');
     if (bracket_start == jsoncons::string_view::npos)
@@ -234,14 +236,36 @@ void read_header(jsoncons::string_view line, std::vector<std::string>& /*fields*
         return;
     }
 
-    jsoncons::string_view bracket_content;
-    if (line[bracket_start+1] == '#')
+    jsoncons::string_view bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
+    if (jsoncons::starts_with(bracket_content, "#"))
     {
-        bracket_content = jsoncons::string_view(line.data() + (bracket_start + 2), bracket_end - (bracket_start + 2));
+        bracket_content = jsoncons::string_view(bracket_content.data()+1, bracket_content.size()-1);
     }
-    else
+
+    char delimiter = ',';
+    jsoncons::string_view length_str = bracket_content;
+
+    if (jsoncons::ends_with(bracket_content, "\t"))
     {
-        bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
+        delimiter = '\t';
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+    }
+    else if (jsoncons::ends_with(bracket_content, "|"))
+    {
+        delimiter = '|';
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+    }
+    else if (jsoncons::ends_with(bracket_content, ","))
+    {
+        delimiter = ',';
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+    }
+
+    std::size_t length{0};
+    auto rc = to_integer(length_str.data(), length_str.size(), length);
+    if (rc.ec != std::errc{})
+    {
+        return;
     }
 }
 
@@ -341,7 +365,7 @@ public:
         }
 
         std::vector<std::string> fields;
-        read_header(non_blank_lines[0].content, fields);
+        parse_header(non_blank_lines[0].content, fields);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}

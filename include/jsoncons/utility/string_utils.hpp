@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UTILITY_URI_HPP
-#define JSONCONS_UTILITY_URI_HPP
+#ifndef JSONCONS_UTILITY_STRING_UTILS_HPP
+#define JSONCONS_UTILITY_STRING_UTILS_HPP
 
 #include <string> // std::string
 
@@ -14,17 +14,19 @@
 
 namespace jsoncons { 
 
-template <typename CharT>
-bool starts_with(jsoncons::basic_string_view<CharT> sv, 
-    jsoncons::basic_string_view<CharT> prefix)
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
+starts_with(const StringViewLike& sv, const StringViewLike& prefix)
 {
+    using char_type = typename StringViewLike::value_type;
+
     if (JSONCONS_UNLIKELY(sv.size() < prefix.size()))
     {
         return false;
     }
-    const CharT* p = sv.data();
-    const CharT* q = prefix.data();
-    const CharT* last = prefix.data() + prefix.size();
+    const char_type* p = sv.data();
+    const char_type* q = prefix.data();
+    const char_type* last = prefix.data() + prefix.size();
 
     while (q < last)
     {
@@ -36,24 +38,26 @@ bool starts_with(jsoncons::basic_string_view<CharT> sv,
     return true;
 }
 
-template <typename CharT>
-bool starts_with(const CharT* s, const CharT* prefix)
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
+starts_with(const StringViewLike& s, const typename StringViewLike::value_type* prefix)
 {
-    return starts_with(jsoncons::basic_string_view<CharT>(s),
-        jsoncons::basic_string_view<CharT>(prefix));
+    return starts_with(s, StringViewLike(prefix));
 }
 
-template <typename CharT>
-bool ends_with(jsoncons::basic_string_view<CharT> sv, 
-    jsoncons::basic_string_view<CharT> suffix)
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
+ends_with(const StringViewLike& sv, const StringViewLike& suffix)
 {
+    using char_type = typename StringViewLike::value_type;
+
     if (JSONCONS_UNLIKELY(sv.size() < suffix.size()))
     {
         return false;
     }
-    const CharT* p = sv.data() + (sv.size() - suffix.size());
-    const CharT* q = suffix.data();
-    const CharT* last = suffix.data() + suffix.size();
+    const char_type* p = sv.data() + (sv.size() - suffix.size());
+    const char_type* q = suffix.data();
+    const char_type* last = suffix.data() + suffix.size();
 
     while (q < last)
     {
@@ -65,23 +69,26 @@ bool ends_with(jsoncons::basic_string_view<CharT> sv,
     return true;
 }
 
-template <typename CharT>
-bool ends_with(const CharT* s, const CharT* suffix)
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
+ends_with(const StringViewLike& s, const typename StringViewLike::value_type* suffix)
 {
-    return ends_with(jsoncons::basic_string_view<CharT>(s),
-        jsoncons::basic_string_view<CharT>(suffix));
+    return ends_with(s, StringViewLike(suffix));
 }
 
-template <typename CharT>
-jsoncons::basic_string_view<CharT> strip(jsoncons::basic_string_view<CharT> sv)
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, StringViewLike>::type
+strip(const StringViewLike& sv)
 {
-    const CharT* first = sv.data();
-    const CharT* last = first + sv.size();
-    const CharT* p = first;
+    using char_type = typename StringViewLike::value_type;
+
+    const char_type* first = sv.data();
+    const char_type* last = first + sv.size();
+    const char_type* p = first;
 
     while (p < last)
     {
-        CharT c = *p;
+        char_type c = *p;
         if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r'))
         {
             break;
@@ -90,14 +97,14 @@ jsoncons::basic_string_view<CharT> strip(jsoncons::basic_string_view<CharT> sv)
     }
     if (p == last)
     {
-        return jsoncons::basic_string_view<CharT>{};
+        return StringViewLike{};
     }
 
-    const CharT* q = last;
+    const char_type* q = last;
     do
     {
         --q;
-        char c = *q;
+        char_type c = *q;
         if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r'))
         {
             break;
@@ -105,15 +112,9 @@ jsoncons::basic_string_view<CharT> strip(jsoncons::basic_string_view<CharT> sv)
     } while (q > p);
 
     std::size_t size = (p - first) + ((last-q)-1);
-    return jsoncons::basic_string_view<CharT>(p, sv.size() - size);
-}
-
-template <typename CharT>
-jsoncons::basic_string_view<CharT> strip(const CharT* s)
-{
-    return strip(jsoncons::basic_string_view<CharT>{s});
+    return StringViewLike(p, sv.size() - size);
 }
 
 } // namespace jsoncons
 
-#endif // JSONCONS_UTILITY_URI_HPP
+#endif // JSONCONS_UTILITY_STRING_UTILS_HPP
