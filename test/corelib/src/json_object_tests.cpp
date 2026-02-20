@@ -297,6 +297,40 @@ TEST_CASE("test_empty_object_move_assignment")
     CHECK(c.is_object());
 }
 
+TEST_CASE("as_or test")
+{
+    json a = json::parse(R"(
+    {
+        "key1" : "value1",
+        "key2" : "3.7",
+        "key3" : 1.5,
+        "key4" : 1
+    }
+    )");
+
+    std::string s1 = a.as_or<std::string>("null");
+    std::string s2 = a["key1"].as_or<std::string>("null");
+    std::string s3 = a["key2"].as_or<std::string>("null");
+    std::string s4 = a["key3"].as_or<std::string>("null");
+    int i1 = a["key1"].as_or<int>(-1);
+    int i2 = a["key3"].as_or<int>(-1);
+    int i3 = a["key4"].as_or<int>(-1);
+    double d1 = a["key2"].as_or<double>(-1.0);
+    double d2 = a["key3"].as_or<double>(-1.0);
+    double d3 = a["key4"].as_or<double>(-1.0);
+    
+    CHECK(s1 == std::string("null"));
+    CHECK(s2 == std::string("value1"));
+    CHECK(s3 == std::string("3.7"));
+    CHECK(s4 == std::string("null"));
+    CHECK(i1 == -1);
+    CHECK(i2 == -1);
+    CHECK(i3 == 1);
+    CHECK(d1 == -1.0);
+    CHECK(d2 == 1.5);
+    CHECK(d3 == -1.0);
+}
+
 TEST_CASE("at_or_null test")
 {
     json a = json::parse(R"(
