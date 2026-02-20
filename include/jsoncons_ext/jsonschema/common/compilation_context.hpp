@@ -113,7 +113,7 @@ namespace jsonschema {
             std::mt19937 gen{ dev() };
             std::uniform_int_distribution<std::mt19937::result_type> dist(1, 10000);
 
-            std::string str = "https:://jsoncons.com/" + std::to_string(dist(gen));
+            std::string str = "https://jsoncons.com/" + std::to_string(dist(gen));
             jsoncons::uri uri{str};
             return uri;
         }
