@@ -1541,7 +1541,7 @@ namespace jsonschema {
     public:
         maximum_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const Json& value)
             : keyword_validator<Json>("maximum", schema, schema_location, custom_message), value_(value),
-              message_{"Maximum value is " + value.template as<std::string>() + " but found"}
+              message_{"Maximum value is " + value.template as<std::string>() + " but found "}
         {
         }
 
