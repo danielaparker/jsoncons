@@ -216,7 +216,7 @@ toon_errc read_key(jsoncons::string_view key_str, std::string& result)
 inline 
 void parse_delimited_values(jsoncons::string_view line, 
     char delimiter,
-    std::vector<std::string>& tokens)
+    std::vector<jsoncons::string_view>& tokens)
 {
     bool is_quoted = false;
     std::size_t offset = 0;
@@ -228,7 +228,7 @@ void parse_delimited_values(jsoncons::string_view line,
 
         if (c == delimiter && !is_quoted)
         {
-            tokens.emplace_back(line.data()+offset, length);
+            tokens.push_back(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)));
             offset = i+1;
             length = 0;
         }
@@ -254,7 +254,7 @@ void parse_delimited_values(jsoncons::string_view line,
     }
     if (length > 0 || !tokens.empty())
     {
-        tokens.emplace_back(line.data()+offset, length);
+        tokens.push_back(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)));
     }
 }
 
@@ -325,36 +325,9 @@ toon_errc parse_header(jsoncons::string_view line, std::vector<std::string>& /*f
         }
         auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end);
 
-        bool in_quotes = false;
-        std::size_t offset = 0;
-        std::size_t len = 0;
-        std::vector<std::string> tokens;
-        for (size_t i = 0; i < fields_content.size(); ++i)
-        {
-            char c = fields_content[i];
-            if (!in_quotes && c == '\"')
-            {
-                if (len != 0)
-                {
-                    tokens.emplace_back(after_bracket.data(), len);
-                    len = 0;
-                }
-                in_quotes = true;
-            }
-            else if (in_quotes && c == '\"')
-            {
-                tokens.emplace_back(after_bracket.data()+offset, len);
-                len = 0;
-                offset = i+1;
-            }
-        }
         // Parse fields using the delimiter
-        std::vector<std::string> field_tokens;
-        parse_delimited_values(fields_content, delimiter, tokens);
-        for (auto& token : field_tokens)
-        {
-            token = jsoncons::strip(token);
-        }
+        std::vector<jsoncons::string_view> fields;
+        parse_delimited_values(fields_content, delimiter, fields);
 
         after_bracket = jsoncons::string_view(after_bracket.data()+(brace_end + 1), 
             after_bracket.size()-(brace_end + 1));

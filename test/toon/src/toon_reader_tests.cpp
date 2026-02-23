@@ -130,7 +130,7 @@ TEST_CASE("toon_reader parse_delimited_values tests")
     SECTION("test 1")
     {
         std::string line = R"(a,b,c)";
-        std::vector<std::string> values;
+        std::vector<jsoncons::string_view> values;
         toon::parse_delimited_values(line, ',', values);
 
         REQUIRE(3 == values.size());
@@ -141,7 +141,7 @@ TEST_CASE("toon_reader parse_delimited_values tests")
     SECTION("test 2")
     {
         std::string line = R"(a,"b,c",d)";
-        std::vector<std::string> values;
+        std::vector<jsoncons::string_view> values;
         toon::parse_delimited_values(line, ',', values);
 
         REQUIRE(3 == values.size());
@@ -152,7 +152,7 @@ TEST_CASE("toon_reader parse_delimited_values tests")
     SECTION("test 3")
     {
         std::string line = R"("a,b",c)";
-        std::vector<std::string> values;
+        std::vector<jsoncons::string_view> values;
         toon::parse_delimited_values(line, ',', values);
 
         REQUIRE(2 == values.size());
