@@ -259,7 +259,7 @@ void parse_delimited_values(jsoncons::string_view line,
 }
 
 inline
-toon_errc parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
+toon_errc parse_header(jsoncons::string_view line, std::vector<jsoncons::string_view>& fields)
 {
     auto bracket_start = find_unquoted_char(line, '{');
     if (bracket_start == jsoncons::string_view::npos)
@@ -326,11 +326,14 @@ toon_errc parse_header(jsoncons::string_view line, std::vector<std::string>& /*f
         auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end);
 
         // Parse fields using the delimiter
-        std::vector<jsoncons::string_view> fields;
         parse_delimited_values(fields_content, delimiter, fields);
 
         after_bracket = jsoncons::string_view(after_bracket.data()+(brace_end + 1), 
             after_bracket.size()-(brace_end + 1));
+    }
+    if (!jsoncons::starts_with(after_bracket,':'))
+    {
+        fields.clear();
     }
     return toon_errc{};
 }
@@ -410,7 +413,13 @@ public:
 
     void read(std::error_code& ec)
     {
-        read_lines(ec);
+        while (!source_.eof())
+        {
+            auto s = source_.read_buffer();
+            raw_.append(s.data(), s.size());
+        }
+
+        read_lines(raw_, ec);
         if (ec)
         {
             return;
@@ -430,21 +439,15 @@ public:
             return;
         }
 
-        std::vector<std::string> fields;
+        std::vector<jsoncons::string_view> fields;
         parse_header(non_blank_lines[0].content, fields);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
     const std::vector<blank_line_info>& blank_lines() const {return blank_lines_;}
 
-    void read_lines(std::error_code& ec)
+    void read_lines(jsoncons::string_view raw, std::error_code& ec)
     {
-        while (!source_.eof())
-        {
-            auto s = source_.read_buffer();
-            raw_.append(s.data(), s.size());
-        }
-
         std::size_t line_num = 1;
         std::size_t indent = 0;
         std::size_t start = 0;
@@ -452,9 +455,9 @@ public:
         std::size_t trailing_blanks = 0;
 
         std::size_t i = 0;
-        for (; i < raw_.size(); ++i)
+        for (; i < raw.size(); ++i)
         {
-            char c = raw_[i];
+            char c = raw[i];
             if (c == ' ')
             {
                 if (is_blank_line)
@@ -491,7 +494,7 @@ public:
                 {
                     blank_lines_.push_back(blank_line_info{line_num,indent,depth});
                 }
-                lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw_.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+                lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
                 ++line_num;
                 indent = 0;
                 is_blank_line = true;
@@ -506,7 +509,7 @@ public:
             {
                 blank_lines_.push_back(blank_line_info{line_num,indent,depth});
             }
-            lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw_.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+            lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
         }
 
     }
