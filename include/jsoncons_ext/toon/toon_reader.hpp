@@ -234,6 +234,8 @@ void parse_delimited_values(jsoncons::string_view line,
         }
         else if (!is_quoted && c == '\"')
         {
+            ++offset;
+            length = 0;
             is_quoted = true;
         }
         else if (is_quoted && c == '\\' && i+1 < line.size())
@@ -243,7 +245,7 @@ void parse_delimited_values(jsoncons::string_view line,
         }
         else if (is_quoted && c == '\"')
         {
-            offset = i+1;
+            is_quoted = false;
         }
         else
         {

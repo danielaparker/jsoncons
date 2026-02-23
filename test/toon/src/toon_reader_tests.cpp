@@ -133,9 +133,35 @@ TEST_CASE("toon_reader parse_delimited_values tests")
         std::vector<std::string> values;
         toon::parse_delimited_values(line, ',', values);
 
-        for (const auto& value : values)
+        REQUIRE(3 == values.size());
+        CHECK("a" == values[0]);
+        CHECK("b" == values[1]);
+        CHECK("c" == values[2]);
+    }
+    SECTION("test 2")
+    {
+        std::string line = R"(a,"b,c",d)";
+        std::vector<std::string> values;
+        toon::parse_delimited_values(line, ',', values);
+
+        REQUIRE(3 == values.size());
+        CHECK("a" == values[0]);
+        CHECK("b,c" == values[1]);
+        CHECK("d" == values[2]);
+    }
+    SECTION("test 3")
+    {
+        std::string line = R"("a,b",c)";
+        std::vector<std::string> values;
+        toon::parse_delimited_values(line, ',', values);
+
+        REQUIRE(2 == values.size());
+        CHECK("a,b" == values[0]);
+        CHECK("c" == values[1]);
+
+        /*for (const auto& value : values)
         {
             std::cout << value << "\n";
-        }
+        }*/
     }
 }
