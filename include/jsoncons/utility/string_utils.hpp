@@ -46,6 +46,13 @@ starts_with(const StringViewLike& s, const typename StringViewLike::value_type* 
 }
 
 template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
+starts_with(const StringViewLike& s, typename StringViewLike::value_type prefix)
+{
+    return starts_with(s, StringViewLike(&prefix, 1));
+}
+
+template <typename StringViewLike>
 typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
 ends_with(const StringViewLike& sv, const StringViewLike& suffix)
 {
@@ -74,6 +81,13 @@ typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, 
 ends_with(const StringViewLike& s, const typename StringViewLike::value_type* suffix)
 {
     return ends_with(s, StringViewLike(suffix));
+}
+
+template <typename StringViewLike>
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
+ends_with(const StringViewLike& s, typename StringViewLike::value_type suffix)
+{
+    return ends_with(s, StringViewLike(&suffix, 1));
 }
 
 template <typename StringViewLike>

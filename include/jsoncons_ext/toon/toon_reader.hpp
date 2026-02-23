@@ -213,13 +213,56 @@ toon_errc read_key(jsoncons::string_view key_str, std::string& result)
     return toon_errc{};
 }
 
+inline 
+void parse_delimited_values(jsoncons::string_view line, 
+    char delimiter,
+    std::vector<std::string>& tokens)
+{
+    bool is_quoted = false;
+    std::size_t offset = 0;
+    std::size_t length = 0;
+
+    for (size_t i = 0; i < line.size(); ++i)
+    {
+        char c = line[i];
+
+        if (c == delimiter && !is_quoted)
+        {
+            tokens.emplace_back(line.data()+offset, length);
+            offset = i+1;
+            length = 0;
+        }
+        else if (!is_quoted && c == '\"')
+        {
+            is_quoted = true;
+        }
+        else if (is_quoted && c == '\\' && i+1 < line.size())
+        {
+            length += 2;
+            ++i;
+        }
+        else if (is_quoted && c == '\"')
+        {
+            offset = i+1;
+        }
+        else
+        {
+            ++length;
+        }
+    }
+    if (length > 0 || !tokens.empty())
+    {
+        tokens.emplace_back(line.data()+offset, length);
+    }
+}
+
 inline
-void parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
+toon_errc parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields*/)
 {
     auto bracket_start = find_unquoted_char(line, '{');
     if (bracket_start == jsoncons::string_view::npos)
     {
-        return;
+        return toon_errc{};
     }
     jsoncons::string_view key;
     auto key_part = jsoncons::string_view{line.data() + bracket_start, (line.size() - bracket_start)};
@@ -228,12 +271,12 @@ void parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields
     toon_errc ec = read_key(key_part, str);
     if (ec != toon_errc{})
     {
-        return;
+        return toon_errc{};
     }
     auto bracket_end = find_unquoted_char(line, '}', bracket_start);
     if (bracket_end == jsoncons::string_view::npos)
     {
-        return;
+        return toon_errc{};
     }
 
     jsoncons::string_view bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
@@ -245,28 +288,76 @@ void parse_header(jsoncons::string_view line, std::vector<std::string>& /*fields
     char delimiter = ',';
     jsoncons::string_view length_str = bracket_content;
 
-    if (jsoncons::ends_with(bracket_content, "\t"))
+    if (jsoncons::ends_with(bracket_content, '\t'))
     {
         delimiter = '\t';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
     }
-    else if (jsoncons::ends_with(bracket_content, "|"))
+    else if (jsoncons::ends_with(bracket_content, '|'))
     {
         delimiter = '|';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
     }
-    else if (jsoncons::ends_with(bracket_content, ","))
+    else if (jsoncons::ends_with(bracket_content, ','))
     {
         delimiter = ',';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
     }
 
-    std::size_t length{0};
-    auto rc = to_integer(length_str.data(), length_str.size(), length);
-    if (rc.ec != std::errc{})
+    //std::size_t length{0};
+    //auto rc = to_integer(length_str.data(), length_str.size(), length);
+    //if (rc.ec != std::errc{})
+    //{
+    //    return toon_errc::invalid_value;
+    //}
+
+    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + bracket_end+1, 
+        line.size() - (bracket_end+1)));
+
+    if (jsoncons::starts_with(after_bracket, '{'))
     {
-        return;
+        auto brace_end = find_unquoted_char(after_bracket, '}');
+        if (brace_end == jsoncons::string_view::npos)
+        {
+            return toon_errc::unterminated_fields_segment;
+        }
+        auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end);
+
+        bool in_quotes = false;
+        std::size_t offset = 0;
+        std::size_t len = 0;
+        std::vector<std::string> tokens;
+        for (size_t i = 0; i < fields_content.size(); ++i)
+        {
+            char c = fields_content[i];
+            if (!in_quotes && c == '\"')
+            {
+                if (len != 0)
+                {
+                    tokens.emplace_back(after_bracket.data(), len);
+                    len = 0;
+                }
+                in_quotes = true;
+            }
+            else if (in_quotes && c == '\"')
+            {
+                tokens.emplace_back(after_bracket.data()+offset, len);
+                len = 0;
+                offset = i+1;
+            }
+        }
+        // Parse fields using the delimiter
+        std::vector<std::string> field_tokens;
+        parse_delimited_values(fields_content, delimiter, tokens);
+        for (auto& token : field_tokens)
+        {
+            token = jsoncons::strip(token);
+        }
+
+        after_bracket = jsoncons::string_view(after_bracket.data()+(brace_end + 1), 
+            after_bracket.size()-(brace_end + 1));
     }
+    return toon_errc{};
 }
 
 std::vector<blank_line_info> line_cursor::default_blank_lines = std::vector<blank_line_info>{};

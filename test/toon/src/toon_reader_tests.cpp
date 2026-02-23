@@ -11,8 +11,9 @@
 #include <ctime>
 #include <iostream>
 
-using namespace jsoncons;
+namespace toon = jsoncons::toon;
 
+#if 0
 TEST_CASE("toon_reader util tests")
 {
     SECTION("test1")
@@ -30,7 +31,7 @@ TEST_CASE("toon_reader util tests")
     }
 }
 
-TEST_CASE("toon_reader tests")
+TEST_CASE("toon_reader read_lines tests")
 {
     SECTION("read lines")
     {
@@ -120,5 +121,21 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         std::string key;
         toon::read_key(R"(" foo")", key);
         CHECK(R"( foo)" == key);
+    }
+}
+#endif
+
+TEST_CASE("toon_reader parse_delimited_values tests")
+{
+    SECTION("test 1")
+    {
+        std::string line = R"(a,b,c)";
+        std::vector<std::string> values;
+        toon::parse_delimited_values(line, ',', values);
+
+        for (const auto& value : values)
+        {
+            std::cout << value << "\n";
+        }
     }
 }

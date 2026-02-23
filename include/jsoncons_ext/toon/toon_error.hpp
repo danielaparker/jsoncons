@@ -25,6 +25,7 @@ namespace toon {
         tab_in_indentation,
         indent_not_multiple_of_indent_size,
         unterminated_quoted_key,
+        unterminated_fields_segment,
         extra_character,
         max_nesting_depth_exceeded,
         single_quote,
@@ -79,6 +80,8 @@ namespace toon {
                     return "Indent spaces must be exact multiple of indent size";
                 case toon_errc::unterminated_quoted_key:
                     return "Unterminated quoted key";
+                case toon_errc::unterminated_fields_segment:
+                    return "Unterminated fields segment";
                 case toon_errc::extra_character:
                     return "Unexpected non-whitespace character after TOON text";
                 case toon_errc::max_nesting_depth_exceeded:

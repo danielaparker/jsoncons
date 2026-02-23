@@ -13,6 +13,8 @@ TEST_CASE("string_utils tests")
     {
         std::string str = "Hello World";
         CHECK(jsoncons::starts_with(str, "Hel"));
+        CHECK(jsoncons::starts_with(str, 'H'));
+        CHECK_FALSE(jsoncons::starts_with(str, 'e'));
         CHECK(jsoncons::starts_with(str, ""));
         CHECK_FALSE(jsoncons::starts_with(str, "Hello World 2"));
     }
@@ -20,6 +22,8 @@ TEST_CASE("string_utils tests")
     {
         std::string str = "Hello World";
         CHECK(jsoncons::ends_with(str, "rld"));
+        CHECK(jsoncons::ends_with(str, 'd'));
+        CHECK_FALSE(jsoncons::ends_with(str, 'l'));
         CHECK(jsoncons::ends_with(str, ""));
         CHECK_FALSE(jsoncons::ends_with(str, "Hello World 2"));
     }
