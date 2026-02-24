@@ -123,7 +123,6 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         CHECK(R"( foo)" == key);
     }
 }
-#endif
 
 TEST_CASE("toon_reader parse_delimited_values tests")
 {
@@ -163,5 +162,43 @@ TEST_CASE("toon_reader parse_delimited_values tests")
         {
             std::cout << value << "\n";
         }*/
+    }
+}
+#endif
+
+
+TEST_CASE("toon_reader parse_header tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string raw = R"([3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
+  1,Blue Lake Trail,7.5,320,ana,true
+  2,Ridge Overlook,9.2,540,luis,false
+  3,Wildflower Loop,5.1,180,sam,true)";
+        std::error_code ec;
+        toon::read_lines(raw, 2, true, lines, blank_lines, ec);
+
+        REQUIRE(4 == lines.size());
+        
+        jsoncons::optional<std::string> key;
+        std::vector<jsoncons::string_view> fields;
+        toon::parse_header(lines[0].content, key, fields);
+
+        REQUIRE(6 == fields.size());
+        CHECK("id" == fields[0]);
+        CHECK("name" == fields[1]);
+        CHECK("distanceKm" == fields[2]);
+        CHECK("elevationGain" == fields[3]);
+        CHECK("companion" == fields[4]);
+        CHECK("wasSunny" == fields[5]);
+
+        /*for (const auto& field : fields)
+        {
+            std::cout << field << "\n";
+        }*/
+
     }
 }

@@ -170,7 +170,7 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
 }
 
 inline
-toon_errc read_key(jsoncons::string_view key_str, std::string& result)
+toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
 {
     bool in_quotes{false};
     std::size_t start{0};
@@ -259,23 +259,31 @@ void parse_delimited_values(jsoncons::string_view line,
 }
 
 inline
-toon_errc parse_header(jsoncons::string_view line, std::vector<jsoncons::string_view>& fields)
+toon_errc parse_header(jsoncons::string_view line, 
+    jsoncons::optional<std::string>& key,
+    std::vector<jsoncons::string_view>& fields)
 {
-    auto bracket_start = find_unquoted_char(line, '{');
+    auto bracket_start = find_unquoted_char(line, '[');
     if (bracket_start == jsoncons::string_view::npos)
     {
         return toon_errc{};
     }
-    jsoncons::string_view key;
-    auto key_part = jsoncons::string_view{line.data() + bracket_start, (line.size() - bracket_start)};
-
-    std::string str;
-    toon_errc ec = read_key(key_part, str);
-    if (ec != toon_errc{})
+    key = jsoncons::optional<std::string>{};
+    if (bracket_start > 0)
     {
-        return toon_errc{};
+        auto key_part = jsoncons::strip(jsoncons::string_view{line.data(), bracket_start});
+        if (!key_part.empty())
+        {
+            std::string key_str;
+            toon_errc ec = parse_key(key_part, key_str);
+            if (ec != toon_errc{})
+            {
+                return toon_errc{};
+            }
+            key = key_str;
+        }
     }
-    auto bracket_end = find_unquoted_char(line, '}', bracket_start);
+    auto bracket_end = find_unquoted_char(line, ']', bracket_start);
     if (bracket_end == jsoncons::string_view::npos)
     {
         return toon_errc{};
@@ -313,7 +321,7 @@ toon_errc parse_header(jsoncons::string_view line, std::vector<jsoncons::string_
     //    return toon_errc::invalid_value;
     //}
 
-    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + bracket_end+1, 
+    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + (bracket_end+1), 
         line.size() - (bracket_end+1)));
 
     if (jsoncons::starts_with(after_bracket, '{'))
@@ -323,7 +331,7 @@ toon_errc parse_header(jsoncons::string_view line, std::vector<jsoncons::string_
         {
             return toon_errc::unterminated_fields_segment;
         }
-        auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end);
+        auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end-1);
 
         // Parse fields using the delimiter
         parse_delimited_values(fields_content, delimiter, fields);
@@ -336,6 +344,86 @@ toon_errc parse_header(jsoncons::string_view line, std::vector<jsoncons::string_
         fields.clear();
     }
     return toon_errc{};
+}
+
+inline
+std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size)
+{
+    return indent_spaces / indent_size;
+}
+
+inline
+void read_lines(jsoncons::string_view raw, 
+    std::size_t indent_size,
+    bool strict,
+    std::vector<parsed_line>& lines,
+    std::vector<blank_line_info>& blank_lines,
+    std::error_code& ec)
+{
+    std::size_t line_num = 1;
+    std::size_t indent = 0;
+    std::size_t start = 0;
+    bool is_blank_line = true;
+    std::size_t trailing_blanks = 0;
+
+    std::size_t i = 0;
+    for (; i < raw.size(); ++i)
+    {
+        char c = raw[i];
+        if (c == ' ')
+        {
+            if (is_blank_line)
+            {
+                ++indent;
+            }
+            else
+            {
+                ++trailing_blanks;
+            }
+        }
+        else
+        {
+            is_blank_line = false;
+            if (!(c == '\n'))
+            {
+                trailing_blanks = 0;
+            }
+        }
+        if (strict && is_blank_line && c == '\t')
+        {
+            ec = toon_errc::tab_in_indentation;
+            return;
+        }
+        if (c == '\n')
+        {
+            if (strict && indent > 0 && indent % indent_size !=0)
+            {
+                ec = toon_errc::indent_not_multiple_of_indent_size;
+                return;
+            }
+            std::size_t depth = compute_depth_from_indent(indent, indent_size);
+            if (is_blank_line)
+            {
+                blank_lines.push_back(blank_line_info{line_num,indent,depth});
+            }
+            lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+            ++line_num;
+            indent = 0;
+            is_blank_line = true;
+            start = i+1;
+            trailing_blanks = 0;
+        }
+    }
+    if (start < i)
+    {
+        std::size_t depth = compute_depth_from_indent(indent, indent_size);
+        if (is_blank_line)
+        {
+            blank_lines.push_back(blank_line_info{line_num,indent,depth});
+        }
+        lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+    }
+
 }
 
 std::vector<blank_line_info> line_cursor::default_blank_lines = std::vector<blank_line_info>{};
@@ -419,7 +507,7 @@ public:
             raw_.append(s.data(), s.size());
         }
 
-        read_lines(raw_, ec);
+        read_lines(raw_, indent_size_, strict_, lines_, blank_lines_, ec);
         if (ec)
         {
             return;
@@ -439,85 +527,13 @@ public:
             return;
         }
 
+        jsoncons::optional<std::string> key;
         std::vector<jsoncons::string_view> fields;
-        parse_header(non_blank_lines[0].content, fields);
+        parse_header(non_blank_lines[0].content, key, fields);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
     const std::vector<blank_line_info>& blank_lines() const {return blank_lines_;}
-
-    void read_lines(jsoncons::string_view raw, std::error_code& ec)
-    {
-        std::size_t line_num = 1;
-        std::size_t indent = 0;
-        std::size_t start = 0;
-        bool is_blank_line = true;
-        std::size_t trailing_blanks = 0;
-
-        std::size_t i = 0;
-        for (; i < raw.size(); ++i)
-        {
-            char c = raw[i];
-            if (c == ' ')
-            {
-                if (is_blank_line)
-                {
-                    ++indent;
-                }
-                else
-                {
-                    ++trailing_blanks;
-                }
-            }
-            else
-            {
-                is_blank_line = false;
-                if (!(c == '\n'))
-                {
-                    trailing_blanks = 0;
-                }
-            }
-            if (strict_ && is_blank_line && c == '\t')
-            {
-                ec = toon_errc::tab_in_indentation;
-                return;
-            }
-            if (c == '\n')
-            {
-                if (strict_ && indent > 0 && indent % indent_size_ !=0)
-                {
-                    ec = toon_errc::indent_not_multiple_of_indent_size;
-                    return;
-                }
-                std::size_t depth = compute_depth_from_indent(indent, indent_size_);
-                if (is_blank_line)
-                {
-                    blank_lines_.push_back(blank_line_info{line_num,indent,depth});
-                }
-                lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
-                ++line_num;
-                indent = 0;
-                is_blank_line = true;
-                start = i+1;
-                trailing_blanks = 0;
-            }
-        }
-        if (start < i)
-        {
-            std::size_t depth = compute_depth_from_indent(indent, indent_size_);
-            if (is_blank_line)
-            {
-                blank_lines_.push_back(blank_line_info{line_num,indent,depth});
-            }
-            lines_.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
-        }
-
-    }
-
-    std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size) const
-    {
-        return indent_spaces / indent_size;
-    }
 };
 
 using toon_string_reader = basic_toon_reader<string_source<char>>;
