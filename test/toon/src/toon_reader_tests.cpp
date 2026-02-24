@@ -183,10 +183,15 @@ TEST_CASE("toon_reader parse_header tests")
 
         REQUIRE(4 == lines.size());
         
+        bool has_header{false};
         jsoncons::optional<std::string> key;
+        std::size_t length{0};
         std::vector<jsoncons::string_view> fields;
-        toon::parse_header(lines[0].content, key, fields);
+        toon::parse_header(lines[0].content, has_header, key, length, fields);
 
+        REQUIRE(has_header);
+        CHECK_FALSE(key);
+        REQUIRE(3 == length);
         REQUIRE(6 == fields.size());
         CHECK("id" == fields[0]);
         CHECK("name" == fields[1]);

@@ -210,6 +210,7 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         return toon_errc::unterminated_quoted_key;
     }
     result = std::string(key_str.data() + start, (end-start));
+
     return toon_errc{};
 }
 
@@ -260,12 +261,15 @@ void parse_delimited_values(jsoncons::string_view line,
 
 inline
 toon_errc parse_header(jsoncons::string_view line, 
+    bool& has_header,
     jsoncons::optional<std::string>& key,
+    std::size_t& length,
     std::vector<jsoncons::string_view>& fields)
 {
     auto bracket_start = find_unquoted_char(line, '[');
     if (bracket_start == jsoncons::string_view::npos)
     {
+        has_header = false;
         return toon_errc{};
     }
     key = jsoncons::optional<std::string>{};
@@ -286,6 +290,7 @@ toon_errc parse_header(jsoncons::string_view line,
     auto bracket_end = find_unquoted_char(line, ']', bracket_start);
     if (bracket_end == jsoncons::string_view::npos)
     {
+        has_header = false;
         return toon_errc{};
     }
 
@@ -314,12 +319,12 @@ toon_errc parse_header(jsoncons::string_view line,
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
     }
 
-    //std::size_t length{0};
-    //auto rc = to_integer(length_str.data(), length_str.size(), length);
-    //if (rc.ec != std::errc{})
-    //{
-    //    return toon_errc::invalid_value;
-    //}
+    auto rc = to_integer(length_str.data(), length_str.size(), length);
+    if (rc.ec != std::errc{})
+    {
+        has_header = false;
+        return toon_errc::invalid_value;
+    }
 
     auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + (bracket_end+1), 
         line.size() - (bracket_end+1)));
@@ -329,6 +334,7 @@ toon_errc parse_header(jsoncons::string_view line,
         auto brace_end = find_unquoted_char(after_bracket, '}');
         if (brace_end == jsoncons::string_view::npos)
         {
+            has_header = false;
             return toon_errc::unterminated_fields_segment;
         }
         auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end-1);
@@ -343,6 +349,7 @@ toon_errc parse_header(jsoncons::string_view line,
     {
         fields.clear();
     }
+    has_header = true;
     return toon_errc{};
 }
 
@@ -527,9 +534,11 @@ public:
             return;
         }
 
+        bool has_header{false};
         jsoncons::optional<std::string> key;
+        std::size_t length{0};
         std::vector<jsoncons::string_view> fields;
-        parse_header(non_blank_lines[0].content, key, fields);
+        parse_header(non_blank_lines[0].content, has_header, key, length, fields);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
