@@ -164,9 +164,6 @@ TEST_CASE("toon_reader parse_delimited_values tests")
         }*/
     }
 }
-#endif
-
-
 TEST_CASE("toon_reader parse_header tests")
 {
     SECTION("test 1")
@@ -183,14 +180,16 @@ TEST_CASE("toon_reader parse_header tests")
 
         REQUIRE(4 == lines.size());
         
-        bool has_header{false};
-        jsoncons::optional<std::string> key;
-        std::size_t length{0};
-        std::vector<jsoncons::string_view> fields;
-        toon::parse_header(lines[0].content, has_header, key, length, fields);
+        auto result = toon::parse_header(lines[0].content);
+        REQUIRE(result);
+        REQUIRE(*result);
+        jsoncons::optional<std::string>& key((*result)->key);
+        std::size_t& length{(*result)->length};
+        char& delimiter{(*result)->delimiter};
+        std::vector<jsoncons::string_view>& fields{(*result)->fields};
 
-        REQUIRE(has_header);
         CHECK_FALSE(key);
+        CHECK(',' == delimiter);
         REQUIRE(3 == length);
         REQUIRE(6 == fields.size());
         CHECK("id" == fields[0]);
@@ -205,5 +204,25 @@ TEST_CASE("toon_reader parse_header tests")
             std::cout << field << "\n";
         }*/
 
+    }
+}
+#endif
+
+TEST_CASE("toon_reader tests")
+{
+    SECTION("array of primitives")
+    {
+        auto expected = jsoncons::json::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"([7]: " foo", baz ,"bar ",1,true,false,null)";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
     }
 }

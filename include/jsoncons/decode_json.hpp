@@ -26,7 +26,7 @@ namespace jsoncons {
 
 template <typename T,typename StringViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const StringViewLike& s,
     const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {

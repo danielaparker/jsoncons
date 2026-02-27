@@ -27,6 +27,9 @@ namespace toon {
         unterminated_quoted_key,
         unterminated_fields_segment,
         extra_character,
+        missing_colon_after_key,
+        missing_closing_quote,
+
         max_nesting_depth_exceeded,
         single_quote,
         illegal_character_in_string,
@@ -84,6 +87,10 @@ namespace toon {
                     return "Unterminated fields segment";
                 case toon_errc::extra_character:
                     return "Unexpected non-whitespace character after TOON text";
+                case toon_errc::missing_colon_after_key:
+                    return "Missing colon after key";
+                case toon_errc::missing_closing_quote:
+                    return "Unterminated string: missing closing quote";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:

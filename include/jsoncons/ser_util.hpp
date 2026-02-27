@@ -50,15 +50,20 @@ class read_error
 {
     std::error_code ec_{};
     std::string message_arg_;
-    std::size_t line_{};
-    std::size_t column_{};
+    std::size_t line_{0};
+    std::size_t column_{0};
     
 public:
+    read_error(std::error_code ec)
+        : ec_{ec}
+    {
+    }
+    
     read_error(std::error_code ec, std::size_t line, std::size_t column)
         : ec_{ec}, line_{line}, column_{column}
     {
     }
-    
+
     read_error(std::error_code ec, const std::string& message_arg, std::size_t line, std::size_t column)
         : ec_{ec}, message_arg_(message_arg), line_{line}, column_{column}
     {

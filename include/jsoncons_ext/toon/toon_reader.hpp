@@ -25,6 +25,7 @@
 #include <jsoncons/ser_util.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/ser_util.hpp>
 #include <jsoncons/utility/read_number.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
@@ -33,6 +34,16 @@
 
 namespace jsoncons {
 namespace toon {
+
+struct header_info
+{
+    jsoncons::optional<std::string> key;
+    std::size_t length{0};
+    char delimiter{','};
+    std::vector<jsoncons::string_view> fields;
+};
+
+using header_result = read_result<jsoncons::optional<header_info>>;
 
 struct parsed_line
 {
@@ -214,6 +225,141 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
     return toon_errc{};
 }
 
+inline
+toon_errc parse_primitive(jsoncons::string_view token, json_visitor& visitor)
+{
+    token = jsoncons::strip(token);
+
+    if (jsoncons::starts_with(token, '\"'))
+    {
+        if (!jsoncons::ends_with(token, '\"') || token.size() < 2)
+        {
+            return toon_errc::missing_closing_quote;
+        }
+        visitor.string_value(jsoncons::string_view(token.data()+1, token.size()-2));
+        return toon_errc{};
+    }
+    if (token == "true")
+    {
+        visitor.bool_value(true);
+        return toon_errc{};
+    }
+    if (token == "false")
+    {
+        visitor.bool_value(false);
+        return toon_errc{};
+    }
+    if (token == "null")
+    {
+        visitor.null_value();
+        return toon_errc{};
+    }
+    
+    {
+        std::uint64_t u64;
+        auto ru64 = jsoncons::to_integer(token.data(), token.size(), u64);
+        if (ru64)
+        {
+            visitor.uint64_value(u64);
+            return toon_errc{};
+        }
+        std::int64_t i64;
+        auto ri64 = jsoncons::to_integer(token.data(), token.size(), i64);
+        if (ri64)
+        {
+            visitor.int64_value(i64);
+            return toon_errc{};
+        }
+        double d;
+        auto result = jsoncons::decstr_to_double(token.data(), token.size(), d);
+        if (result)
+        {
+            visitor.double_value(d);
+            return toon_errc{};
+        }
+    }
+    visitor.string_value(jsoncons::string_view(token.data(), token.size()));
+
+    return toon_errc{};
+
+/*
+    # Boolean and null literals
+    if is_boolean_or_null_literal(token):
+        if token == TRUE_LITERAL:
+            return True
+        if token == FALSE_LITERAL:
+            return False
+        return None  # NULL_LITERAL
+
+    # Try to parse as number using utility function
+    if token and is_numeric_literal(token):
+        try:
+            # Try int first
+            if "." not in token and "e" not in token.lower():
+                return int(token)
+            # Then float
+            return float(token)
+        except ValueError:
+            pass
+
+    # Otherwise it's an unquoted string (including octal-like "0123")
+    return token
+ */
+}
+
+inline 
+void parse_delimited_values(jsoncons::string_view line, 
+    char delimiter,
+    json_visitor& visitor)
+{
+    bool is_quoted = false;
+    std::size_t offset = 0;
+    std::size_t length = 0;
+    bool is_empty = true;
+
+    for (size_t i = 0; i < line.size(); ++i)
+    {
+        char c = line[i];
+
+        if (c == delimiter && !is_quoted)
+        {
+            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            offset = i+1;
+            length = 0;
+            is_empty = false;
+        }
+        else if (!is_quoted && c == '\"')
+        {
+            offset = i;
+            length = 0;
+            is_quoted = true;
+        }
+        else if (is_quoted && c == '\\' && i+1 < line.size())
+        {
+            length += 2;
+            ++i;
+        }
+        else if (is_quoted && c == '\"')
+        {
+            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length+2)), visitor);
+            while (++i < line.size() && line[i] != delimiter)
+            {
+            }
+            is_quoted = false;
+            offset = i+1;
+            length = 0;
+        }
+        else
+        {
+            ++length;
+        }
+    }
+    if (length > 0 || !is_empty)
+    {
+        parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+    }
+}
+
 inline 
 void parse_delimited_values(jsoncons::string_view line, 
     char delimiter,
@@ -260,19 +406,14 @@ void parse_delimited_values(jsoncons::string_view line,
 }
 
 inline
-toon_errc parse_header(jsoncons::string_view line, 
-    bool& has_header,
-    jsoncons::optional<std::string>& key,
-    std::size_t& length,
-    std::vector<jsoncons::string_view>& fields)
+header_result parse_header(jsoncons::string_view line)
 {
     auto bracket_start = find_unquoted_char(line, '[');
     if (bracket_start == jsoncons::string_view::npos)
     {
-        has_header = false;
-        return toon_errc{};
+        return header_result{};
     }
-    key = jsoncons::optional<std::string>{};
+    auto key = jsoncons::optional<std::string>{};
     if (bracket_start > 0)
     {
         auto key_part = jsoncons::strip(jsoncons::string_view{line.data(), bracket_start});
@@ -282,7 +423,7 @@ toon_errc parse_header(jsoncons::string_view line,
             toon_errc ec = parse_key(key_part, key_str);
             if (ec != toon_errc{})
             {
-                return toon_errc{};
+                return header_result{jsoncons::unexpect, ec};
             }
             key = key_str;
         }
@@ -290,68 +431,66 @@ toon_errc parse_header(jsoncons::string_view line,
     auto bracket_end = find_unquoted_char(line, ']', bracket_start);
     if (bracket_end == jsoncons::string_view::npos)
     {
-        has_header = false;
-        return toon_errc{};
+        return header_result{};
     }
 
     jsoncons::string_view bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
     if (jsoncons::starts_with(bracket_content, "#"))
     {
-        bracket_content = jsoncons::string_view(bracket_content.data()+1, bracket_content.size()-1);
+        bracket_content = jsoncons::string_view(bracket_content.data() + 1, bracket_content.size() - 1);
     }
 
-    char delimiter = ',';
     jsoncons::string_view length_str = bracket_content;
 
+    char delimiter = ',';
     if (jsoncons::ends_with(bracket_content, '\t'))
     {
         delimiter = '\t';
-        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
     else if (jsoncons::ends_with(bracket_content, '|'))
     {
         delimiter = '|';
-        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
     else if (jsoncons::ends_with(bracket_content, ','))
     {
         delimiter = ',';
-        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size()-1);
+        length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
 
+    std::size_t length{0};
     auto rc = to_integer(length_str.data(), length_str.size(), length);
     if (rc.ec != std::errc{})
     {
-        has_header = false;
-        return toon_errc::invalid_value;
+        return header_result{jsoncons::unexpect, toon_errc::invalid_value};
     }
 
-    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + (bracket_end+1), 
-        line.size() - (bracket_end+1)));
+    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + (bracket_end + 1),
+        line.size() - (bracket_end + 1)));
 
+    std::vector<jsoncons::string_view> fields;
     if (jsoncons::starts_with(after_bracket, '{'))
     {
         auto brace_end = find_unquoted_char(after_bracket, '}');
         if (brace_end == jsoncons::string_view::npos)
         {
-            has_header = false;
-            return toon_errc::unterminated_fields_segment;
+            return header_result{jsoncons::unexpect, toon_errc::unterminated_fields_segment};
         }
-        auto fields_content = jsoncons::string_view(after_bracket.data()+1, brace_end-1);
+        auto fields_content = jsoncons::string_view(after_bracket.data() + 1, brace_end - 1);
 
         // Parse fields using the delimiter
         parse_delimited_values(fields_content, delimiter, fields);
 
-        after_bracket = jsoncons::string_view(after_bracket.data()+(brace_end + 1), 
-            after_bracket.size()-(brace_end + 1));
+        after_bracket = jsoncons::string_view(after_bracket.data() + (brace_end + 1),
+            after_bracket.size() - (brace_end + 1));
     }
-    if (!jsoncons::starts_with(after_bracket,':'))
+    if (!jsoncons::starts_with(after_bracket, ':'))
     {
         fields.clear();
     }
-    has_header = true;
-    return toon_errc{};
-}
+    return header_result{jsoncons::in_place, header_info{jsoncons::optional{std::move(key)}, length, delimiter, std::move(fields)}};
+};
 
 inline
 std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size)
@@ -431,6 +570,98 @@ void read_lines(jsoncons::string_view raw,
         lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
     }
 
+}
+
+inline
+void decode_inline_array(jsoncons::string_view content, 
+    char delimiter,
+    std::size_t expected_length,
+    bool strict,
+    json_visitor& visitor)
+{
+    if (content.empty() && expected_length == 0)
+    {
+        visitor.begin_array();
+        visitor.end_array();
+    }
+    visitor.begin_array();
+    parse_delimited_values(content, delimiter, visitor);
+    visitor.end_array();
+/*
+        return []
+
+    tokens = parse_delimited_values(content, delimiter)
+    values = [parse_primitive(token) for token in tokens]
+
+    if strict and len(values) != expected_length:
+        raise ToonDecodeError(f"Expected {expected_length} values, but got {len(values)}")
+
+    return values
+*/
+}
+
+inline
+void decode_array_from_header(const std::vector<parsed_line>& lines,
+    std::size_t header_idx,
+    std::size_t header_depth,
+    const header_info& header_info,
+    bool strict,
+    json_visitor& visitor)
+{
+    const jsoncons::optional<std::string>& key(header_info.key);
+    std::size_t length{header_info.length};
+    char delimiter{header_info.delimiter};
+    const std::vector<jsoncons::string_view>& fields{header_info.fields};
+
+    const jsoncons::string_view& header_line{lines[header_idx].content};
+
+    // Check if there's inline content after the colon
+    // Use split_key_value to find the colon position (respects quoted strings)
+
+    std::size_t colon_idx = find_unquoted_char(header_line, ':');
+    if (colon_idx == jsoncons::string_view::npos)
+    {
+        // return toon_errc::missing_colon_after_key;
+    }
+    auto inline_content = jsoncons::strip(jsoncons::string_view(header_line.data() + (colon_idx + 1), header_line.size() - (colon_idx + 1)));
+
+    if (!inline_content.empty() || (fields.empty() && length == 0))
+    {
+        decode_inline_array(inline_content, delimiter, length, strict, visitor);
+        // return header_idx + 1
+    }
+/*
+
+    # Inline primitive array (can be empty if length is 0)
+    if inline_content or (not fields and length == 0):
+        # Inline primitive array (handles empty arrays like [0]:)
+        return (
+            decode_inline_array(inline_content, delimiter, length, strict),
+            header_idx + 1,
+        )
+
+    # Non-inline array
+    if fields is not None:
+        # Tabular array
+        return decode_tabular_array(
+            lines, header_idx + 1, header_depth, fields, delimiter, length, strict
+        )
+    else:
+        # List format (mixed/non-uniform)
+        return decode_list_array(lines, header_idx + 1, header_depth, delimiter, length, strict)
+*/
+}
+
+
+inline
+void decode_array(const std::vector<parsed_line>& lines,
+    std::size_t start_idx,
+    std::size_t parent_depth,
+    const header_info& header_info,
+    bool strict,
+    json_visitor& visitor)
+{
+    decode_array_from_header(lines, start_idx, parent_depth, header_info, strict, visitor);
 }
 
 std::vector<blank_line_info> line_cursor::default_blank_lines = std::vector<blank_line_info>{};
@@ -534,11 +765,12 @@ public:
             return;
         }
 
-        bool has_header{false};
-        jsoncons::optional<std::string> key;
-        std::size_t length{0};
-        std::vector<jsoncons::string_view> fields;
-        parse_header(non_blank_lines[0].content, has_header, key, length, fields);
+        auto header_result = parse_header(non_blank_lines[0].content);
+        if (header_result && *header_result && !(*header_result)->key)
+        {
+            const header_info& hdr_info(*(*header_result));
+            decode_array(lines_, 0, 0, hdr_info, strict_, visitor_);
+        }
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
