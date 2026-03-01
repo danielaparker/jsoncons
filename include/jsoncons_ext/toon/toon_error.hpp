@@ -29,6 +29,7 @@ namespace toon {
         extra_character,
         missing_colon_after_key,
         missing_closing_quote,
+        blank_lines_in_arrays,
 
         max_nesting_depth_exceeded,
         single_quote,
@@ -91,6 +92,8 @@ namespace toon {
                     return "Missing colon after key";
                 case toon_errc::missing_closing_quote:
                     return "Unterminated string: missing closing quote";
+                case toon_errc::blank_lines_in_arrays:
+                    return "Blank lines not allowed inside arrays";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:

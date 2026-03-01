@@ -45,6 +45,8 @@ struct header_info
 
 using header_result = read_result<jsoncons::optional<header_info>>;
 
+using decode_result = read_result<std::size_t>;
+
 struct parsed_line
 {
     std::size_t depth{0};
@@ -281,30 +283,6 @@ toon_errc parse_primitive(jsoncons::string_view token, json_visitor& visitor)
     visitor.string_value(jsoncons::string_view(token.data(), token.size()));
 
     return toon_errc{};
-
-/*
-    # Boolean and null literals
-    if is_boolean_or_null_literal(token):
-        if token == TRUE_LITERAL:
-            return True
-        if token == FALSE_LITERAL:
-            return False
-        return None  # NULL_LITERAL
-
-    # Try to parse as number using utility function
-    if token and is_numeric_literal(token):
-        try:
-            # Try int first
-            if "." not in token and "e" not in token.lower():
-                return int(token)
-            # Then float
-            return float(token)
-        except ValueError:
-            pass
-
-    # Otherwise it's an unquoted string (including octal-like "0123")
-    return token
- */
 }
 
 inline 
@@ -587,21 +565,167 @@ void decode_inline_array(jsoncons::string_view content,
     visitor.begin_array();
     parse_delimited_values(content, delimiter, visitor);
     visitor.end_array();
-/*
-        return []
-
-    tokens = parse_delimited_values(content, delimiter)
-    values = [parse_primitive(token) for token in tokens]
-
-    if strict and len(values) != expected_length:
-        raise ToonDecodeError(f"Expected {expected_length} values, but got {len(values)}")
-
-    return values
-*/
 }
 
 inline
-void decode_array_from_header(const std::vector<parsed_line>& lines,
+std::pair<std::size_t,char> find_first_unquoted(jsoncons::string_view line, 
+    jsoncons::span<const char> chars)
+{
+    bool in_quotes = false;
+    for (std::size_t i = 0; i < line.size(); ++i)
+    {
+        char c = line[i];
+        if (!in_quotes && c == '\"')
+        {
+            in_quotes = true;
+        }
+        else if (in_quotes && c == '\\' && i+1 < line.size())
+        {
+            ++i;
+        }
+        else if (in_quotes && c == '\"')
+        {
+            in_quotes = false;
+        }
+        if (!in_quotes)
+        {
+            for (auto chr : chars)
+            {
+                if (c == chr)
+                {
+                    return std::pair<std::size_t,char>{i, c};
+                }
+            }
+        }
+    }
+
+    return std::pair<std::size_t,char>{jsoncons::string_view::npos, ' '};
+}
+
+inline
+bool is_row_line(jsoncons::string_view line, char delimiter) 
+{
+    // Find first occurrence of delimiter or colon (single pass optimization)
+
+    char chars [2] = {delimiter, ':'};
+    auto res = find_first_unquoted(line, chars);
+
+    // No special chars found -> row
+    if (res.first == jsoncons::string_view::npos)
+        return true;
+
+    // First special char is delimiter -> row
+    // First special char is colon -> key-value
+    return res.second == delimiter;
+}
+
+inline
+decode_result decode_tabular_array(const std::vector<parsed_line>& lines,
+    std::size_t start_idx,
+    std::size_t header_depth,
+    const std::vector<jsoncons::string_view>& fields,
+    char delimiter,
+    std::size_t expected_length,
+    bool strict,
+    json_visitor& visitor)
+{
+    std::size_t i = start_idx;
+    std::size_t row_depth = header_depth + 1;
+
+    while (i < lines.size())
+    {
+        const auto& line = lines[i];
+        if (line.is_blank())
+        {
+            if (strict)
+            {
+                // In strict mode: blank lines at or above row depth are errors
+                // Blank lines dedented below row depth mean array has ended
+
+                if (line.depth >= row_depth)
+                {
+                    return decode_result{jsoncons::unexpect, toon_errc::blank_lines_in_arrays};
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                ++i;
+                continue;
+            }
+        }
+        if (line.depth < row_depth)
+        {
+            break;
+        }
+        if (line.depth > row_depth)
+        {
+            break;
+        }
+        jsoncons::string_view content = line.content;
+    }
+
+    return decode_result{1};
+}
+
+/*    result = []
+
+    while i < len(lines):
+        line = lines[i]
+
+        # Handle blank lines
+        if line.is_blank:
+            if strict:
+                # In strict mode: blank lines at or above row depth are errors
+                # Blank lines dedented below row depth mean array has ended
+                if line.depth >= row_depth:
+                    raise ToonDecodeError("Blank lines not allowed inside arrays")
+                else:
+                    break
+            else:
+                # In non-strict mode: ignore all blank lines and continue
+                i += 1
+                continue
+
+        # Stop if dedented or different depth
+        if line.depth < row_depth:
+            break
+        if line.depth > row_depth:
+            # End of tabular rows (might be next key-value)
+            break
+
+        content = line.content
+
+        # Disambiguation: check if this is a row or a key-value line
+        # A row has no unquoted colon, or delimiter before colon
+        if is_row_line(content, delimiter):
+            # Parse as row
+            tokens = parse_delimited_values(content, delimiter)
+            values = [parse_primitive(token) for token in tokens]
+
+            if strict and len(values) != len(fields):
+                raise ToonDecodeError(
+                    f"Expected {len(fields)} values in row, but got {len(values)}"
+                )
+
+            obj = {fields[j]: values[j] for j in range(min(len(fields), len(values)))}
+            result.append(obj)
+            i += 1
+        else:
+            # Not a row, end of tabular data
+            break
+
+    if strict and len(result) != expected_length:
+        raise ToonDecodeError(f"Expected {expected_length} rows, but got {len(result)}")
+
+    return result, i
+*/
+
+inline
+decode_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t header_idx,
     std::size_t header_depth,
     const header_info& header_info,
@@ -628,17 +752,19 @@ void decode_array_from_header(const std::vector<parsed_line>& lines,
     if (!inline_content.empty() || (fields.empty() && length == 0))
     {
         decode_inline_array(inline_content, delimiter, length, strict, visitor);
-        // return header_idx + 1
+        return decode_result{header_idx + 1};
     }
-/*
 
-    # Inline primitive array (can be empty if length is 0)
-    if inline_content or (not fields and length == 0):
-        # Inline primitive array (handles empty arrays like [0]:)
-        return (
-            decode_inline_array(inline_content, delimiter, length, strict),
-            header_idx + 1,
-        )
+    if (!fields.empty())
+    {
+        // Tabular array
+        return decode_tabular_array(
+            lines, header_idx + 1, header_depth, fields, delimiter, length, strict, visitor);
+        
+    }
+
+    return decode_result{header_idx + 1};
+/*
 
     # Non-inline array
     if fields is not None:
