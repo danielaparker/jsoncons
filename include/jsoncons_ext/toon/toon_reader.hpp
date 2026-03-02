@@ -701,6 +701,55 @@ bool is_row_line(jsoncons::string_view line, char delimiter)
 }
 
 inline
+decode_result decode_list_array(const std::vector<parsed_line>& lines,
+    std::size_t start_idx,
+    std::size_t header_depth,
+    char delimiter,
+    std::size_t expected_length,
+    bool strict,
+    json_visitor& visitor)
+{
+    visitor.begin_array();
+
+    std::size_t row_depth = header_depth + 1;
+
+    for (std::size_t i = start_idx; i < lines.size(); ++i)
+    {
+        const auto& line = lines[i];
+        if (line.is_blank())
+        {
+            if (strict)
+            {
+                // In strict mode: blank lines at or above row depth are errors
+                // Blank lines dedented below row depth mean array has ended
+
+                if (line.depth >= row_depth)
+                {
+                    return decode_result{jsoncons::unexpect, toon_errc::blank_lines_in_arrays};
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                ++i;
+                continue;
+            }
+        }
+        if (line.depth < row_depth)
+        {
+            break;
+        }
+    }
+
+    visitor.end_array();
+
+    return decode_result{1};
+}
+
+inline
 decode_result decode_tabular_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
     std::size_t header_depth,
@@ -852,10 +901,12 @@ decode_result decode_array_from_header(const std::vector<parsed_line>& lines,
         // Tabular array
         return decode_tabular_array(
             lines, header_idx + 1, header_depth, fields, delimiter, length, strict, visitor);
-        
     }
-
-    return decode_result{header_idx + 1};
+    else
+    {
+        return decode_list_array(
+            lines, header_idx + 1, header_depth, delimiter, length, strict, visitor);
+    }
 /*
 
     # Non-inline array

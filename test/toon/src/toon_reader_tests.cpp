@@ -237,7 +237,7 @@ TEST_CASE("toon_reader tests")
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("tabular array")
     {
         auto expected = jsoncons::json::parse(R"([
@@ -257,7 +257,31 @@ TEST_CASE("toon_reader tests")
         reader.read();
         REQUIRE(decoder.is_valid());
         auto result = decoder.get_result();
-        //CHECK(expected == result);
-        std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+        //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("list format with hyphen markers")
+    {
+            auto expected = jsoncons::json::parse(R"([
+  1,
+  { "a": 1 },
+  "text"
+])");
+            std::vector<toon::parsed_line> lines;
+            std::vector<toon::blank_line_info> blank_lines;
+
+            std::string data = R"([3]:
+  - 1
+  - a: 1
+  - text)";
+            std::error_code ec;
+
+            jsoncons::json_decoder<jsoncons::json> decoder;
+            toon::toon_string_reader reader(data, decoder);
+            reader.read();
+            REQUIRE(decoder.is_valid());
+            auto result = decoder.get_result();
+            //CHECK(expected == result);
+            std::cout << pretty_print(result) << "\n";
     }
 }
