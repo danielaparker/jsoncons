@@ -339,6 +339,87 @@ void parse_delimited_values(jsoncons::string_view line,
 }
 
 inline 
+decode_result parse_delimited_values(jsoncons::string_view line, 
+    char delimiter,
+    const std::vector<jsoncons::string_view>& fields,
+    json_visitor& visitor)
+{
+    bool is_quoted = false;
+    std::size_t offset = 0;
+    std::size_t length = 0;
+    bool is_empty = true;
+
+    std::size_t field_index = 0;
+
+    visitor.begin_object();
+    for (size_t i = 0; i < line.size(); ++i)
+    {
+        char c = line[i];
+
+        if (c == delimiter && !is_quoted)
+        {
+            if (field_index >= fields.size())
+            {
+                return decode_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
+            }
+            visitor.key(fields[field_index]);
+            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            offset = i+1;
+            length = 0;
+            is_empty = false;
+            ++field_index;
+        }
+        else if (!is_quoted && c == '\"')
+        {
+            offset = i;
+            length = 0;
+            is_quoted = true;
+        }
+        else if (is_quoted && c == '\\' && i+1 < line.size())
+        {
+            length += 2;
+            ++i;
+        }
+        else if (is_quoted && c == '\"')
+        {
+            if (field_index >= fields.size())
+            {
+                return decode_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
+            }
+            visitor.key(fields[field_index]);
+            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length+2)), visitor);
+            while (++i < line.size() && line[i] != delimiter)
+            {
+            }
+            is_quoted = false;
+            offset = i+1;
+            length = 0;
+            ++field_index;
+        }
+        else
+        {
+            ++length;
+        }
+    }
+    if (length > 0 || !is_empty)
+    {
+        if (field_index >= fields.size())
+        {
+            return decode_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
+        }
+        visitor.key(fields[field_index]);
+        parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        ++field_index;
+    }
+    if (field_index != fields.size())
+    {
+        return decode_result{jsoncons::unexpect, toon_errc::too_few_values_in_row};
+    }
+    visitor.end_object();
+    return decode_result{};
+}
+
+inline 
 void parse_delimited_values(jsoncons::string_view line, 
     char delimiter,
     std::vector<jsoncons::string_view>& tokens)
@@ -629,10 +710,11 @@ decode_result decode_tabular_array(const std::vector<parsed_line>& lines,
     bool strict,
     json_visitor& visitor)
 {
-    std::size_t i = start_idx;
+    visitor.begin_array();
+
     std::size_t row_depth = header_depth + 1;
 
-    while (i < lines.size())
+    for (std::size_t i = start_idx; i < lines.size(); ++i)
     {
         const auto& line = lines[i];
         if (line.is_blank())
@@ -666,7 +748,17 @@ decode_result decode_tabular_array(const std::vector<parsed_line>& lines,
             break;
         }
         jsoncons::string_view content = line.content;
+        if (is_row_line(content, delimiter))
+        {
+            auto r = parse_delimited_values(content, delimiter, fields, visitor);
+            if (!r)
+            {
+                return r;
+            }
+        }
     }
+
+    visitor.end_array();
 
     return decode_result{1};
 }

@@ -30,6 +30,8 @@ namespace toon {
         missing_colon_after_key,
         missing_closing_quote,
         blank_lines_in_arrays,
+        too_many_values_in_row,
+        too_few_values_in_row,
 
         max_nesting_depth_exceeded,
         single_quote,
@@ -94,6 +96,10 @@ namespace toon {
                     return "Unterminated string: missing closing quote";
                 case toon_errc::blank_lines_in_arrays:
                     return "Blank lines not allowed inside arrays";
+                case toon_errc::too_many_values_in_row:
+                    return "Too many values in tabular array row";
+                case toon_errc::too_few_values_in_row:
+                    return "Too few values in tabular array row";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:

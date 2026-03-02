@@ -13,10 +13,9 @@
 
 namespace toon = jsoncons::toon;
 
-#if 0
 TEST_CASE("toon_reader util tests")
 {
-    SECTION("test1")
+    SECTION("find_unquoted_char")
     {
         std::size_t pos;
 
@@ -29,7 +28,19 @@ TEST_CASE("toon_reader util tests")
         pos = toon::find_unquoted_char(R"("a:b":c)", ':',0);
         CHECK(5 == pos);
     }
+    SECTION("find_first_unquoted")
+    {
+        std::array<char,2> chars = {':',','};
+        auto r1 = toon::find_first_unquoted(R"(a:b,c)", chars);
+        CHECK(r1.first == 1);
+        CHECK(r1.second == ':');
+        auto r2 = toon::find_first_unquoted(R"(a"b:c",d)", chars);
+        CHECK(r2.first == 6);
+        CHECK(r2.second == ',');
+    }
 }
+
+#if 0
 
 TEST_CASE("toon_reader read_lines tests")
 {
@@ -210,7 +221,7 @@ TEST_CASE("toon_reader parse_header tests")
 
 TEST_CASE("toon_reader tests")
 {
-    SECTION("array of primitives")
+    /*SECTION("array of primitives")
     {
         auto expected = jsoncons::json::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
         std::vector<toon::parsed_line> lines;
@@ -223,6 +234,30 @@ TEST_CASE("toon_reader tests")
         toon::toon_string_reader reader(data, decoder);
         reader.read();
         REQUIRE(decoder.is_valid());
-        CHECK(expected == decoder.get_result());
+        auto result = decoder.get_result();
+        CHECK(expected == result);
+        //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("tabular array")
+    {
+        auto expected = jsoncons::json::parse(R"([
+  { "id": 1, "name": "Alice", "role": "admin" },
+  { "id": 2, "name": "Bob", "role": "user" }
+])");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"([2]{id,name,role}:
+  1,Alice,admin
+  2,Bob,user)";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        //CHECK(expected == result);
+        std::cout << pretty_print(result) << "\n";
     }
 }
