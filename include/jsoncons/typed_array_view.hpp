@@ -17,7 +17,7 @@
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/conversion.hpp>

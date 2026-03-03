@@ -1,7 +1,7 @@
 ### jsoncons::read_error
 
 ```cpp
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 ```
 
 class read_error;

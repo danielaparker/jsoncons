@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_SER_UTIL_HPP
-#define JSONCONS_SER_UTIL_HPP
+#ifndef JSONCONS_SER_UTILS_HPP
+#define JSONCONS_SER_UTILS_HPP
 
 #include <cstddef>
 #include <string>
@@ -125,4 +125,4 @@ using write_result = jsoncons::expected<void, std::error_code>;
 
 } // namespace jsoncons
 
-#endif // JSONCONS_SER_UTIL_HPP
+#endif // JSONCONS_SER_UTILS_HPP

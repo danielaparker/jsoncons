@@ -16,7 +16,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons_ext/toon/toon_reader.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>
 

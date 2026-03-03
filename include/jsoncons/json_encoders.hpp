@@ -11,7 +11,7 @@
 
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/write_number.hpp>
 
 namespace jsoncons {

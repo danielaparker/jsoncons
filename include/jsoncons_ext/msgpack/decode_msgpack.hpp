@@ -16,7 +16,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>

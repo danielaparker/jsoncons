@@ -15,7 +15,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/csv/csv_cursor.hpp>

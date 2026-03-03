@@ -22,7 +22,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {

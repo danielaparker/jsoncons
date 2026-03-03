@@ -17,7 +17,7 @@
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 
 namespace jsoncons {
