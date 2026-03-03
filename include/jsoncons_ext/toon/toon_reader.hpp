@@ -217,7 +217,7 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         }
         else if (c != ' ')
         {
-            end = i;
+            end = i+1;
         }
     }
     if (terminated)
@@ -819,10 +819,22 @@ decode_result decode_list_array(const std::vector<parsed_line>& lines,
         if (colon_idx != jsoncons::string_view::npos)
         {
             // It's an object item
-            auto field_key_str = jsoncons::strip(jsoncons::string_view{item_content.data(), colon_idx});
-            auto field_value_str = jsoncons::strip(jsoncons::string_view(item_content.data() + (colon_idx + 1), item_content.size() - (colon_idx + 1)));
-            std::string field_key;
-            parse_key(field_key_str, field_key);
+            visitor.begin_object();
+            auto key_str = jsoncons::strip(jsoncons::string_view{item_content.data(), colon_idx});
+            auto value_str = jsoncons::strip(jsoncons::string_view(item_content.data() + (colon_idx + 1), item_content.size() - (colon_idx + 1)));
+            std::string key;
+            parse_key(key_str, key);
+            if (value_str.empty())
+            {
+                // First field is nested object: fields at depth +2
+            }
+            else
+            {
+                // first field is primitive
+                visitor.key(key);
+                parse_primitive(value_str, visitor);
+            }
+            visitor.end_object();
         }
         else
         {

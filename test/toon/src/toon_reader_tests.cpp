@@ -40,11 +40,9 @@ TEST_CASE("toon_reader util tests")
     }
 }
 
-#if 0
-
 TEST_CASE("toon_reader read_lines tests")
 {
-    SECTION("read lines")
+    /*SECTION("read lines")
     {
         std::string data = R"(context:
   task: Our favorite hikes together
@@ -56,7 +54,7 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true)";
 
-      json_decoder<json> decoder;
+      jsoncons::json_decoder<json> decoder;
       toon::toon_string_reader reader(data, decoder);
       reader.read();  
 
@@ -125,12 +123,12 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         CHECK(2 == reader.lines()[8].indent);
         CHECK(1 == reader.lines()[8].depth);
 
-    }
+    }*/
 
-    SECTION("read_key")
+    SECTION("parse_key")
     {
         std::string key;
-        toon::read_key(R"(" foo")", key);
+        toon::parse_key(R"(" foo")", key);
         CHECK(R"( foo)" == key);
     }
 }
@@ -217,11 +215,10 @@ TEST_CASE("toon_reader parse_header tests")
 
     }
 }
-#endif
 
 TEST_CASE("toon_reader tests")
 {
-    /*SECTION("array of primitives")
+    SECTION("array of primitives")
     {
         auto expected = jsoncons::json::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
         std::vector<toon::parsed_line> lines;
@@ -259,7 +256,7 @@ TEST_CASE("toon_reader tests")
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("list format with hyphen markers")
     {
             auto expected = jsoncons::json::parse(R"([
