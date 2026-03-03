@@ -224,9 +224,9 @@ public:
         end_value();
     }
 
-    template <typename ByteStringLike>
-    void byte_string_value_with_tag(const ByteStringLike& value, uint64_t raw_tag,
-        typename std::enable_if<ext_traits::is_bytes_like<ByteStringLike>::value,int>::type = 0) 
+    template <typename BytesViewLike>
+    void byte_string_value_with_tag(const BytesViewLike& value, uint64_t raw_tag,
+        typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0) 
     {
         write_tag(raw_tag);
         write_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(value.data()),value.size()));

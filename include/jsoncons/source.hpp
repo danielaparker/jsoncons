@@ -659,7 +659,7 @@ namespace jsoncons {
 
         template <typename Sourceable>
         bytes_source(const Sourceable& source,
-                     typename std::enable_if<ext_traits::is_bytes_like<Sourceable>::value,int>::type = 0)
+                     typename std::enable_if<ext_traits::is_bytes_view_like<Sourceable>::value,int>::type = 0)
             : data_(reinterpret_cast<const value_type*>(source.data())), 
               current_(data_), 
               end_(data_+source.size())

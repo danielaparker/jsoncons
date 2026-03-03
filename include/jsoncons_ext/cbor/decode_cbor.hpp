@@ -27,10 +27,10 @@
 namespace jsoncons { 
 namespace cbor {
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
-try_decode_cbor(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_cbor(const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -52,10 +52,10 @@ try_decode_cbor(const BytesLike& v,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
-try_decode_cbor(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_cbor(const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -157,11 +157,11 @@ try_decode_cbor(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;
@@ -183,11 +183,11 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
     using value_type = T;

@@ -182,6 +182,13 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
     return index;
 }
 
+decode_result decode_array_from_header(const std::vector<parsed_line>& lines,
+    std::size_t header_idx,
+    std::size_t header_depth,
+    const header_info& header_info,
+    bool strict,
+    json_visitor& visitor);
+
 inline
 toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
 {
@@ -738,9 +745,60 @@ decode_result decode_list_array(const std::vector<parsed_line>& lines,
                 continue;
             }
         }
+        // Stop if indented
         if (line.depth < row_depth)
         {
             break;
+        }
+        // Must start with "- "
+        auto content = line.content;
+        if (!jsoncons::starts_with(content, "- "))
+        {
+            break;
+        }
+        auto item_content = jsoncons::strip(jsoncons::string_view(content.data()+2, content.size()-2));
+        auto header_result = parse_header(item_content);
+        if (header_result && *header_result)
+        {
+            const header_info& item_header(*(*header_result));
+            const jsoncons::optional<std::string>& key(item_header.key);
+            std::size_t length{item_header.length};
+            char item_delim{item_header.delimiter};
+            const std::vector<jsoncons::string_view>& fields{item_header.fields};
+
+            if (!key)
+            {
+                auto colon_idx = item_content.find(':');
+                if (colon_idx != jsoncons::string_view::npos)
+                {
+                    auto inline_part = jsoncons::strip(jsoncons::string_view(item_content.data()+1, item_content.size()-1));
+                    if (!inline_part.empty() || length == 0)
+                    {
+                        decode_inline_array(inline_part, item_delim, length, strict, visitor);
+                        ++i;
+                        continue;
+                    }
+                }
+            }
+            else
+            {
+                visitor.begin_object();
+                visitor.key(*key);
+                auto r = decode_array_from_header(lines, i, line.depth, item_header, strict, visitor);
+                i = *r;
+                while (i < lines.size() && lines[i].depth == line.depth + 1)
+                {
+                    const auto& field_line = lines[i];
+                    if (field_line.is_blank())
+                    {
+                        ++i;
+                        continue;
+                    }
+                    auto field_content = field_line.content;
+                    auto field_header = parse_header(field_content);
+                }
+                visitor.end_object();
+            }
         }
     }
 
@@ -811,59 +869,6 @@ decode_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
     return decode_result{1};
 }
-
-/*    result = []
-
-    while i < len(lines):
-        line = lines[i]
-
-        # Handle blank lines
-        if line.is_blank:
-            if strict:
-                # In strict mode: blank lines at or above row depth are errors
-                # Blank lines dedented below row depth mean array has ended
-                if line.depth >= row_depth:
-                    raise ToonDecodeError("Blank lines not allowed inside arrays")
-                else:
-                    break
-            else:
-                # In non-strict mode: ignore all blank lines and continue
-                i += 1
-                continue
-
-        # Stop if dedented or different depth
-        if line.depth < row_depth:
-            break
-        if line.depth > row_depth:
-            # End of tabular rows (might be next key-value)
-            break
-
-        content = line.content
-
-        # Disambiguation: check if this is a row or a key-value line
-        # A row has no unquoted colon, or delimiter before colon
-        if is_row_line(content, delimiter):
-            # Parse as row
-            tokens = parse_delimited_values(content, delimiter)
-            values = [parse_primitive(token) for token in tokens]
-
-            if strict and len(values) != len(fields):
-                raise ToonDecodeError(
-                    f"Expected {len(fields)} values in row, but got {len(values)}"
-                )
-
-            obj = {fields[j]: values[j] for j in range(min(len(fields), len(values)))}
-            result.append(obj)
-            i += 1
-        else:
-            # Not a row, end of tabular data
-            break
-
-    if strict and len(result) != expected_length:
-        raise ToonDecodeError(f"Expected {expected_length} rows, but got {len(result)}")
-
-    return result, i
-*/
 
 inline
 decode_result decode_array_from_header(const std::vector<parsed_line>& lines,

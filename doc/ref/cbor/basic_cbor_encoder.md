@@ -59,8 +59,8 @@ Reset encoder to write a new value to a new sink
     void string_value_with_tag(const string_view_type& value, 
         uint64_t raw_tag);                                                 // (since 1.2.0) 
 
-    template <typename ByteStringLike>
-    void byte_string_value_with_tag(const ByteStringLike& value, 
+    template <typename BytesViewLike>
+    void byte_string_value_with_tag(const BytesViewLike& value, 
         uint64_t raw_tag);                                                 // (since 1.2.0) 
 
     void double_value_with_tag(double value, uint64_t raw_tag);            // (since 1.2.0) 
@@ -110,13 +110,13 @@ Reset encoder to write a new value to a new sink
         semantic_tag tag=semantic_tag::none, 
         const ser_context& context=ser_context());                 (12) (until 0.152.0)
 
-    template <typename ByteStringLike>
-    bool byte_string_value(const ByteStringLike & souce, 
+    template <typename BytesViewLike>
+    bool byte_string_value(const BytesViewLike & souce, 
         semantic_tag tag=semantic_tag::none, 
         const ser_context& context=ser_context());                 (12) (since 0.152.0)
 
-    template <typename ByteStringLike>
-    bool byte_string_value(const ByteStringLike & souce, 
+    template <typename BytesViewLike>
+    bool byte_string_value(const BytesViewLike & souce, 
         uint64_t ext_tag, 
         const ser_context& context=ser_context());                 (13) (since 0.152.0)
 

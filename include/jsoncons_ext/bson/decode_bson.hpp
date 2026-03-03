@@ -28,10 +28,10 @@
 namespace jsoncons { 
 namespace bson {
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
-try_decode_bson(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_bson(const BytesViewLike& v, 
     const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -53,10 +53,10 @@ try_decode_bson(const BytesLike& v,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
-try_decode_bson(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_bson(const BytesViewLike& v, 
     const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -158,11 +158,11 @@ try_decode_bson(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;
@@ -184,11 +184,11 @@ try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const bson_decode_options& options = bson_decode_options())
 {
     using value_type = T;

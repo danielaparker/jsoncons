@@ -76,14 +76,14 @@ basic_json(const char_type* val); (21)
 
 basic_json(const char_type* val, const allocator_type& alloc);     (22)
 
-template <typename Source>
+template <typename BytesViewLike>
 basic_json(byte_string_arg_t, 
-    const Source& source, semantic_tag tag = semantic_tag::none,
+    const BytesViewLike& source, semantic_tag tag = semantic_tag::none,
     const Allocator& alloc = Allocator());                         (23)
 
-template <typename Source>
+template <typename BytesViewLike>
 basic_json(byte_string_arg_t, 
-    const Source& source, uint64_t ext_tag,
+    const BytesViewLike& source, uint64_t ext_tag,
     const Allocator& alloc = Allocator());                         (24) 
 
 basic_json(json_const_pointer_arg, const basic_json* ptr);         (25) (since 0.156.0)

@@ -676,13 +676,13 @@ namespace ext_traits {
         static constexpr bool value = is_array_like<Container>::value && !has_size<Container>::value;
     };
 
-    // is_bytes_like
+    // is_bytes_view_like
 
     template <typename Container,typename Enable=void>
-    struct is_bytes_like : std::false_type {};
+    struct is_bytes_view_like : std::false_type {};
 
     template <typename Container>
-    struct is_bytes_like<Container, 
+    struct is_bytes_view_like<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
                                    is_byte<typename Container::value_type>::value
