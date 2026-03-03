@@ -21,27 +21,27 @@
 namespace jsoncons { 
 namespace ubjson {
 
-template <typename T,typename ByteContainer>
+template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
+                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const T& j, 
-    ByteContainer& cont, 
+    BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     using char_type = typename T::char_type;
-    basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
+    basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     return j.try_dump(adaptor);
 }
 
-template <typename T,typename ByteContainer>
+template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
+                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const T& val, 
-    ByteContainer& cont, 
+    BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
 {
-    basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
+    basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
     return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
@@ -69,27 +69,27 @@ try_encode_ubjson(const T& val,
 
 // with temp_allocator_arg_t
 
-template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
+                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j, 
-    ByteContainer& cont, 
+    BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     using char_type = typename T::char_type;
-    basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
+    basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
     return j.try_dump(adaptor);
 }
 
-template <typename T,typename ByteContainer,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<ByteContainer>::value,write_result>::type 
+                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val, 
-    ByteContainer& cont, 
+    BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
 {
-    basic_ubjson_encoder<jsoncons::bytes_sink<ByteContainer>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
+    basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     return reflect::encode_traits<T>::try_encode(aset, val, encoder);
 }
 

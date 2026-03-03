@@ -28,7 +28,7 @@ namespace msgpack {
 
 template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
 try_decode_msgpack(const BytesLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -53,7 +53,7 @@ try_decode_msgpack(const BytesLike& v,
 
 template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
 try_decode_msgpack(const BytesLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -158,7 +158,7 @@ try_decode_msgpack(InputIt first, InputIt last,
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
@@ -184,7 +184,7 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_like<BytesLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
