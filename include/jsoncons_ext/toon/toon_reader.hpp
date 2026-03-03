@@ -720,7 +720,8 @@ decode_result decode_list_array(const std::vector<parsed_line>& lines,
 
     std::size_t row_depth = header_depth + 1;
 
-    for (std::size_t i = start_idx; i < lines.size(); ++i)
+    std::size_t i = start_idx;
+    while (i < lines.size())
     {
         const auto& line = lines[i];
         if (line.is_blank())
@@ -795,16 +796,54 @@ decode_result decode_list_array(const std::vector<parsed_line>& lines,
                         continue;
                     }
                     auto field_content = field_line.content;
-                    auto field_header = parse_header(field_content);
+                    auto field_header_result = parse_header(field_content);
+                    if (field_header_result && *field_header_result)
+                    {
+                        const header_info& field_header (*(*field_header_result));
+                        const jsoncons::optional<std::string>& field_key(field_header.key);
+                        std::size_t field_length{field_header.length};
+                        char field_delim{field_header.delimiter};
+                        const std::vector<jsoncons::string_view>& field_fields{field_header.fields};
+                        visitor.key(*key);
+                        auto r = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
+                        i = *r;
+                        continue;
+                    }
                 }
                 visitor.end_object();
             }
         }
+        // Check if it's an object (has colon)
+
+        std::size_t colon_idx = find_unquoted_char(item_content, ':');
+        if (colon_idx != jsoncons::string_view::npos)
+        {
+            // It's an object item
+            auto field_key_str = jsoncons::strip(jsoncons::string_view{item_content.data(), colon_idx});
+            auto field_value_str = jsoncons::strip(jsoncons::string_view(item_content.data() + (colon_idx + 1), item_content.size() - (colon_idx + 1)));
+            std::string field_key;
+            parse_key(field_key_str, field_key);
+        }
+        else
+        {
+            // Not an object, must be a primitive;
+            if (item_content.empty())
+            {
+                visitor.begin_object();
+                visitor.end_object();
+            }
+            else
+            {
+                parse_primitive(item_content, visitor);
+            }
+        }
+
+        ++i;
     }
 
     visitor.end_array();
 
-    return decode_result{1};
+    return decode_result{i};
 }
 
 inline
