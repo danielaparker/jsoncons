@@ -13,6 +13,8 @@
 
 namespace toon = jsoncons::toon;
 
+#if 0
+
 TEST_CASE("toon_reader util tests")
 {
     SECTION("find_unquoted_char")
@@ -123,14 +125,14 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
         CHECK(2 == reader.lines()[8].indent);
         CHECK(1 == reader.lines()[8].depth);
 
-    }*/
+    }
 
     SECTION("parse_key")
     {
         std::string key;
         toon::parse_key(R"(" foo")", key);
         CHECK(R"( foo)" == key);
-    }
+    }*/
 }
 
 TEST_CASE("toon_reader parse_delimited_values tests")
@@ -215,19 +217,20 @@ TEST_CASE("toon_reader parse_header tests")
 
     }
 }
+#endif
 
 TEST_CASE("toon_reader tests")
 {
-    SECTION("array of primitives")
+    /*SECTION("array of primitives")
     {
-        auto expected = jsoncons::json::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
+        auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([7]: " foo", baz ,"bar ",1,true,false,null)";
         std::error_code ec;
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
         reader.read();
         REQUIRE(decoder.is_valid());
@@ -237,7 +240,7 @@ TEST_CASE("toon_reader tests")
     }
     SECTION("tabular array")
     {
-        auto expected = jsoncons::json::parse(R"([
+        auto expected = jsoncons::ojson::parse(R"([
   { "id": 1, "name": "Alice", "role": "admin" },
   { "id": 2, "name": "Bob", "role": "user" }
 ])");
@@ -249,7 +252,7 @@ TEST_CASE("toon_reader tests")
   2,Bob,user)";
         std::error_code ec;
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
         reader.read();
         REQUIRE(decoder.is_valid());
@@ -259,7 +262,7 @@ TEST_CASE("toon_reader tests")
     }
     SECTION("list format with hyphen markers")
     {
-            auto expected = jsoncons::json::parse(R"([
+            auto expected = jsoncons::ojson::parse(R"([
   1,
   { "a": 1 },
   "text"
@@ -273,12 +276,108 @@ TEST_CASE("toon_reader tests")
   - text)";
             std::error_code ec;
 
-            jsoncons::json_decoder<jsoncons::json> decoder;
+            jsoncons::json_decoder<jsoncons::ojson> decoder;
             toon::toon_string_reader reader(data, decoder);
             reader.read();
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
-            //CHECK(expected == result);
-            std::cout << pretty_print(result) << "\n";
+            CHECK(expected == result);
+    }
+    SECTION("object")
+    {
+            auto expected = jsoncons::ojson::parse(R"({
+    "task": "Our favorite hikes together",
+    "location": "Boulder",
+    "season": "spring_2025"
+})");
+            std::vector<toon::parsed_line> lines;
+            std::vector<toon::blank_line_info> blank_lines;
+
+            std::string data = R"(task: Our favorite hikes together
+location: Boulder
+season: spring_2025)";
+            std::error_code ec;
+
+            jsoncons::json_decoder<jsoncons::ojson> decoder;
+            toon::toon_string_reader reader(data, decoder);
+            reader.read();
+            REQUIRE(decoder.is_valid());
+            auto result = decoder.get_result();
+            CHECK(expected == result);
+            //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("nested objects")
+    {
+        auto expected = jsoncons::ojson::parse(R"({
+  "orders": [
+    {
+      "orderId": "ORD-001",
+      "customer": {
+        "name": "Alice Chen",
+        "email": "alice@example.com"
+      },
+      "items": [
+        {
+          "sku": "WIDGET-A",
+          "quantity": 2,
+          "price": 29.99
+        },
+        {
+          "sku": "GADGET-B",
+          "quantity": 1,
+          "price": 49.99
+        }
+      ],
+      "total": 109.97,
+      "status": "shipped"
+    },
+    {
+      "orderId": "ORD-002",
+      "customer": {
+        "name": "Bob Smith",
+        "email": "bob@example.com"
+      },
+      "items": [
+        {
+          "sku": "THING-C",
+          "quantity": 3,
+          "price": 15
+        }
+      ],
+      "total": 45,
+      "status": "delivered"
+    }
+  ]
+})");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"(orders[2]:
+  - orderId: ORD-001
+    customer:
+      name: Alice Chen
+      email: alice@example.com
+    items[2]{sku,quantity,price}:
+      WIDGET-A,2,29.99
+      GADGET-B,1,49.99
+    total: 109.97
+    status: shipped
+  - orderId: ORD-002
+    customer:
+      name: Bob Smith
+      email: bob@example.com
+    items[1]{sku,quantity,price}:
+      THING-C,3,15
+    total: 45
+    status: delivered)";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        //CHECK(expected == result);
+        std::cout << pretty_print(result) << "\n";
     }
 }

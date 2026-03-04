@@ -194,18 +194,22 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
 inline
 toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
 {
+
     bool in_quotes{false};
     std::size_t start{0};
     std::size_t end{0};
 
     bool terminated{false};
-    for (std::size_t i = 0; i < key_str.size() && !terminated; ++i)
+
+    std::size_t i = 0;
+    while (i < key_str.size() && key_str[i] == ' ')
+    {
+        ++start;
+    }
+
+    for (;i < key_str.size() && !terminated; ++i)
     {
         char c = key_str[i];
-        if (start == 0 && c != ' ')
-        {
-            start = i;
-        }
         if (!in_quotes && c == '\"')
         {
             start = i+1;
@@ -716,73 +720,96 @@ void_result decode_object(const std::vector<parsed_line>& lines,
     bool strict,
     json_visitor& visitor)
 {
+    visitor.begin_object();
+
+    std::size_t i = start_idx;
+    std::size_t expected_depth = (start_idx == 0) ? parent_depth : parent_depth+1;
+
+    while (i < lines.size())
+    {
+        const auto& line = lines[i];
+        if (line.is_blank())
+        {
+            ++i;
+            continue;
+        }
+
+        // Stop if we've dedented below expected depth
+        if (line.depth < expected_depth)
+        {
+            break;
+        }
+
+        // Skip lines that are too deeply indented (they belong to nested structures)
+        if (line.depth > expected_depth)
+        {
+            ++i;
+            continue;
+        }
+
+        auto content = line.content;
+
+        // Check for array header
+        auto header_info_result = parse_header(content);
+        if (header_info_result && *header_info_result)
+        {
+            const header_info& hdr_info(*(*header_info_result));
+            const jsoncons::optional<std::string>& key(hdr_info.key);
+            std::size_t length{hdr_info.length};
+            char item_delim{hdr_info.delimiter};
+            const std::vector<jsoncons::string_view>& fields{hdr_info.fields};
+            if (key)
+            {
+                // Array field
+                visitor.key(*key);
+                auto r = decode_array_from_header(lines, i, line.depth, hdr_info, strict, visitor);
+                i = *r;
+                continue;
+            }
+        }
+
+        // Must be a key-value line
+        auto colon_idx = content.find(':');
+        if (colon_idx == jsoncons::string_view::npos)
+        {
+            // Invalid line, skip in non-strict mode
+            if (strict)
+            {
+                return void_result{jsoncons::unexpect, toon_errc::invalid_line};
+            }
+            ++i;
+            continue;
+        }
+        auto key_str = jsoncons::strip(jsoncons::string_view{content.data(), colon_idx});
+        auto value_str = jsoncons::strip(jsoncons::string_view(content.data() + (colon_idx + 1), content.size() - (colon_idx + 1)));
+
+        std::string key;
+        parse_key(key_str, key);
+
+        if (value_str.empty())
+        {
+            // Nested object
+            visitor.key(key);
+            decode_object(lines, i+1, line.depth, strict, visitor);
+            // Skip past nested object
+            ++i;
+            while (i < lines.size() && lines[i].depth > line.depth)
+            {
+                ++i;
+            }
+        }
+        else
+        {
+            // Primitive value
+            visitor.key(key);
+            parse_primitive(value_str, visitor);
+            ++i;
+        }
+    }
+
+    visitor.end_object();
     return void_result{};
 }
-
-/*
-    result: Dict[str, Any] = {}
-    i = start_idx
-    expected_depth = parent_depth if start_idx == 0 else parent_depth + 1
-
-    while i < len(lines):
-        line = lines[i]
-
-        # Skip blank lines outside arrays (allowed)
-        if line.is_blank:
-            i += 1
-            continue
-
-        # Stop if we've dedented below expected depth
-        if line.depth < expected_depth:
-            break
-
-        # Skip lines that are too deeply indented (they belong to nested structures)
-        if line.depth > expected_depth:
-            i += 1
-            continue
-
-        content = line.content
-
-        # Check for array header
-        header_info = parse_header(content)
-        if header_info is not None:
-            key, length, delimiter, fields = header_info
-            if key is not None:
-                # Array field
-                array_val, next_i = decode_array_from_header(
-                    lines, i, line.depth, header_info, strict
-                )
-                result[key] = array_val
-                i = next_i
-                continue
-
-        # Must be a key-value line
-        try:
-            key_str, value_str = split_key_value(content)
-        except ToonDecodeError:
-            # Invalid line, skip in non-strict mode
-            if strict:
-                raise
-            i += 1
-            continue
-
-        key = parse_key(key_str)
-
-        # Check if value is empty (nested object)
-        if not value_str:
-            # Nested object
-            result[key] = decode_object(lines, i + 1, line.depth, strict)
-            # Skip past nested object
-            i += 1
-            while i < len(lines) and lines[i].depth > line.depth:
-                i += 1
-        else:
-            # Primitive value
-            result[key] = parse_primitive(value_str)
-            i += 1
-
-    return result
-*/
 
 inline
 line_result decode_list_array(const std::vector<parsed_line>& lines,
@@ -873,6 +900,8 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         continue;
                     }
                     auto field_content = field_line.content;
+
+                    // Check for array header
                     auto field_header_result = parse_header(field_content);
                     if (field_header_result && *field_header_result)
                     {
@@ -886,6 +915,32 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         i = *r;
                         continue;
                     }
+                    std::size_t colon_idx = find_unquoted_char(field_content, ':');
+                    if (colon_idx != jsoncons::string_view::npos)
+                    {
+                        auto field_key_str = jsoncons::strip(jsoncons::string_view{field_content.data(), colon_idx});
+                        auto field_value_str = jsoncons::strip(jsoncons::string_view(field_content.data() + (colon_idx + 1), field_content.size() - (colon_idx + 1)));
+                        std::string field_key;
+                        parse_key(field_key_str, field_key);
+                        if (field_value_str.empty())
+                        {
+                            visitor.key(field_key);
+                            decode_object(
+                                lines, i + 1, field_line.depth, strict, visitor
+                            );
+                            ++i;
+                            while (i < lines.size() && lines[i].depth > field_line.depth)
+                            {
+                                ++i;
+                            }
+                        }
+                        else
+                        {
+                            visitor.key(field_key);
+                            parse_primitive(field_value_str, visitor);
+                        }
+                    }
+
                 }
                 visitor.end_object();
             }
@@ -1170,9 +1225,35 @@ public:
         auto header_info_result = parse_header(non_blank_lines[0].content);
         if (header_info_result && *header_info_result && !(*header_info_result)->key)
         {
+            // Root array
             const header_info& hdr_info(*(*header_info_result));
             decode_array(lines_, 0, 0, hdr_info, strict_, visitor_);
+            return;
         }
+
+        // Determine root form (Section 5)
+        const auto& first_line = non_blank_lines[0];
+
+        // Check if it's a single primitive
+        if (non_blank_lines.size() == 1)
+        {
+            auto line_content = first_line.content;
+            // Check if it's not a key-value line
+            auto colon_idx = line_content.find(':');
+            if (colon_idx == jsoncons::string_view::npos)
+            {
+                // Not a key-value, check if it's a header
+                if (!header_info_result || !(*header_info_result))
+                {
+                    // Single primitive
+                    parse_primitive(line_content, visitor_);
+                    return;
+                }
+            }
+        }
+
+        // Otherwise, root object
+        decode_object(lines_, 0, 0, strict_, visitor_);
     }
 
     const std::vector<parsed_line>& lines() const {return lines_;}
