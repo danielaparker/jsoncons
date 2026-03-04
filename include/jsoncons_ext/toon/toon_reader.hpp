@@ -758,16 +758,13 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         auto header_info_result = parse_header(content);
         if (header_info_result && *header_info_result)
         {
-            const header_info& hdr_info(*(*header_info_result));
-            const jsoncons::optional<std::string>& key(hdr_info.key);
-            std::size_t length{hdr_info.length};
-            char item_delim{hdr_info.delimiter};
-            const std::vector<jsoncons::string_view>& fields{hdr_info.fields};
+            const header_info& header(*(*header_info_result));
+            const jsoncons::optional<std::string>& key(header.key);
             if (key)
             {
                 // Array field
                 visitor.key(*key);
-                auto r = decode_array_from_header(lines, i, line.depth, hdr_info, strict, visitor);
+                auto r = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
                 i = *r;
                 continue;
             }
@@ -874,7 +871,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             const jsoncons::optional<std::string>& key(item_header.key);
             std::size_t length{item_header.length};
             char item_delim{item_header.delimiter};
-            const std::vector<jsoncons::string_view>& fields{item_header.fields};
 
             if (!key)
             {
@@ -911,13 +907,9 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     if (field_header_result && *field_header_result)
                     {
                         const header_info& field_header (*(*field_header_result));
-                        const jsoncons::optional<std::string>& field_key(field_header.key);
-                        std::size_t field_length{field_header.length};
-                        char field_delim{field_header.delimiter};
-                        const std::vector<jsoncons::string_view>& field_fields{field_header.fields};
                         visitor.key(*key);
-                        auto r = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
-                        i = *r;
+                        auto r1 = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
+                        i = *r1;
                         continue;
                     }
                     std::size_t colon_idx = find_unquoted_char(field_content, ':');
@@ -1066,7 +1058,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     bool strict,
     json_visitor& visitor)
 {
-    const jsoncons::optional<std::string>& key(header_info.key);
+    //const jsoncons::optional<std::string>& key(header_info.key);
     std::size_t length{header_info.length};
     char delimiter{header_info.delimiter};
     const std::vector<jsoncons::string_view>& fields{header_info.fields};
@@ -1231,8 +1223,8 @@ public:
         if (header_info_result && *header_info_result && !(*header_info_result)->key)
         {
             // Root array
-            const header_info& hdr_info(*(*header_info_result));
-            decode_array(lines_, 0, 0, hdr_info, strict_, visitor_);
+            const header_info& header(*(*header_info_result));
+            decode_array(lines_, 0, 0, header, strict_, visitor_);
             return;
         }
 
