@@ -659,6 +659,11 @@ void decode_inline_array(jsoncons::string_view content,
     visitor.begin_array();
     parse_delimited_values(content, delimiter, visitor);
     visitor.end_array();
+
+    if (strict && expected_length != 1)
+    {
+        // error
+    }
 }
 
 inline
