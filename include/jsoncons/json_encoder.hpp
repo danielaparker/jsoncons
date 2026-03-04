@@ -558,12 +558,7 @@ namespace jsoncons {
             {
                 //std::cout << "noesc\n";
                 sink_.push_back('\"');
-                const CharT* begin = sv.data();
-                const CharT* end = begin + sv.length();
-                for (const CharT* it = begin; it != end; ++it)
-                {
-                    sink_.push_back(*it);
-                }
+                sink_.append(sv.data(), sv.length());
                 sink_.push_back('\"');
                 column_ += (sv.length()+2);
             }
@@ -1270,12 +1265,7 @@ namespace jsoncons {
             {
                 //std::cout << "noesc\n";
                 sink_.push_back('\"');
-                const CharT* begin = sv.data();
-                const CharT* end = begin + sv.length();
-                for (const CharT* it = begin; it != end; ++it)
-                {
-                    sink_.push_back(*it);
-                }
+                sink_.append(sv.data(), sv.length());
                 sink_.push_back('\"');
             }
             else if (tag == semantic_tag::bigint)
