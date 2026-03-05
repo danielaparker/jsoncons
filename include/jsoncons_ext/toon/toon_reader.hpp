@@ -956,6 +956,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     }
                     else
                     {
+                        visitor.key(field_key);
                         parse_primitive(field_value_str, visitor);
                         ++i;
                     }
