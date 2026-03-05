@@ -810,7 +810,6 @@ inline
 line_result decode_list_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
     std::size_t header_depth,
-    char delimiter,
     std::size_t expected_length,
     bool strict,
     json_visitor& visitor)
@@ -989,11 +988,11 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     i = *r1;
                     continue;
                 }
-                std::size_t colon_idx = find_unquoted_char(field_content, ':');
-                if (colon_idx != jsoncons::string_view::npos)
+                std::size_t field_colon_idx = find_unquoted_char(field_content, ':');
+                if (field_colon_idx != jsoncons::string_view::npos)
                 {
-                    auto field_key_str = jsoncons::strip(jsoncons::string_view{field_content.data(), colon_idx});
-                    auto field_value_str = jsoncons::strip(jsoncons::string_view(field_content.data() + (colon_idx + 1), field_content.size() - (colon_idx + 1)));
+                    auto field_key_str = jsoncons::strip(jsoncons::string_view{field_content.data(), field_colon_idx});
+                    auto field_value_str = jsoncons::strip(jsoncons::string_view(field_content.data() + (field_colon_idx + 1), field_content.size() - (field_colon_idx + 1)));
                     std::string field_key;
                     parse_key(field_key_str, field_key);
                     if (field_value_str.empty())
@@ -1153,7 +1152,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     else
     {
         return decode_list_array(
-            lines, header_idx + 1, header_depth, delimiter, length, strict, visitor);
+            lines, header_idx + 1, header_depth, length, strict, visitor);
     }
 }
 
