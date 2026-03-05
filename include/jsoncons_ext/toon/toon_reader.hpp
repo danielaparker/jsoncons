@@ -76,82 +76,6 @@ struct blank_line_info
     std::size_t depth{0};
 };
 
-class line_cursor
-{
-    static std::vector<blank_line_info> default_blank_lines;
-
-    const std::vector<parsed_line>& lines_;
-    const std::vector<blank_line_info>& blank_lines_;
-    std::size_t index_{0};
-
-public:
-    line_cursor(const std::vector<parsed_line>& lines,
-        const std::vector<blank_line_info> blank_lines = default_blank_lines)
-      : lines_(lines), blank_lines_(blank_lines)
-    {
-    }
-
-    const std::vector<blank_line_info>& blank_lines() const
-    {
-        return blank_lines_;
-    }
-
-    const parsed_line& peek() const
-    {
-        JSONCONS_ASSERT(index_ < lines_.size());
-        return lines_[index_];
-    }
-
-    const parsed_line& next() 
-    {
-        JSONCONS_ASSERT(index_ < lines_.size());
-        const auto& line = lines_[index_];
-        ++index_;
-        return line;
-    }
-
-    const parsed_line& current() const
-    {
-        JSONCONS_ASSERT(index_ < lines_.size());
-        return lines_[index_];
-    }
-
-    void advance()
-    {
-        ++index_;
-    }
-
-    bool at_end() const
-    {
-        return index_ == lines_.size();
-    }
-
-    std::size_t length() const
-    {
-        return lines_.size();
-    }
-
-    const parsed_line& peek_at_depth(std::size_t target_depth) const
-    {
-        JSONCONS_ASSERT(target_depth < lines_.size());
-        return lines_[target_depth];
-    }
-
-    bool has_more_at_depth(std::size_t target_depth) const
-    {
-        return target_depth < lines_.size();
-    }
-
-    void skip_deeper_than(std::size_t depth) 
-    {
-        if (!(depth < lines_.size()))
-        {
-            return;
-        }
-        index_ = lines_.size(); 
-    }
-};
-
 inline
 std::size_t find_unquoted_char(jsoncons::string_view line, 
     char target_char,
@@ -1188,8 +1112,6 @@ void decode_array(const std::vector<parsed_line>& lines,
 {
     decode_array_from_header(lines, start_idx, parent_depth, header_info, strict, visitor);
 }
-
-std::vector<blank_line_info> line_cursor::default_blank_lines = std::vector<blank_line_info>{};
 
 template <typename Source=jsoncons::stream_source<char>,typename TempAlloc =std::allocator<char>>
 class basic_toon_reader 

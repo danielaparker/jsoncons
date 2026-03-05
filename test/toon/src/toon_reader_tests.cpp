@@ -305,7 +305,7 @@ season: spring_2025)";
             auto result = decoder.get_result();
             CHECK(expected == result);
             //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("nested objects")
     {
         auto expected = jsoncons::ojson::parse(R"({
@@ -371,6 +371,49 @@ season: spring_2025)";
     total: 45
     status: delivered)";
         std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        //CHECK(expected == result);
+        std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("nested objects 2")
+    {
+        auto expected = jsoncons::ojson::parse(R"({
+  "orders": [
+    {
+      "orderId": "ORD-001",
+      "customer": {
+        "name": "Alice Chen",
+        "email": "alice@example.com"
+      },
+      "items": [
+        {
+          "sku": "WIDGET-A",
+          "quantity": 2,
+          "price": 29.99
+        },
+        {
+          "sku": "GADGET-B",
+          "quantity": 1,
+          "price": 49.99
+        }
+      ],
+      "total": 109.97,
+      "status": "shipped"
+    }
+  ]
+})");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"(orders[1]:
+  - orderId: ORD-001
+    total: 109.97
+    status: shipped)";
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
