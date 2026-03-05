@@ -1,0 +1,83 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Validation errors - length mismatches, invalid escapes, syntax errors, delimiter mismatches",
+  "tests": [
+    {
+      "name": "throws on array length mismatch (inline primitives - too many)",
+      "input": "tags[2]: a,b,c",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.1"
+    },
+    {
+      "name": "throws on array length mismatch (list format - too many)",
+      "input": "items[1]:\n  - 1\n  - 2",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.1"
+    },
+    {
+      "name": "throws on tabular row value count mismatch with header field count",
+      "input": "items[2]{id,name}:\n  1,Ada\n  2",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.1"
+    },
+    {
+      "name": "throws on tabular row count mismatch with header length",
+      "input": "[1]{id}:\n  1\n  2",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.1"
+    },
+    {
+      "name": "throws on invalid escape sequence",
+      "input": "\"a\\x\"",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.2"
+    },
+    {
+      "name": "throws on unterminated string",
+      "input": "\"unterminated",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.2"
+    },
+    {
+      "name": "throws on missing colon in key-value context",
+      "input": "a:\n  user",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.2"
+    },
+    {
+      "name": "throws on two primitives at root depth in strict mode",
+      "input": "hello\nworld",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "5"
+    },
+    {
+      "name": "throws on delimiter mismatch (header declares tab, row uses comma)",
+      "input": "items[2\t]{a\tb}:\n  1,2\n  3,4",
+      "expected": null,
+      "shouldError": true,
+      "specSection": "14.2"
+    },
+    {
+      "name": "throws on mismatched delimiter between bracket and brace fields",
+      "input": "items[2\t]{a,b}:\n  1\t2\n  3\t4",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "6"
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Delimiter decoding - tab and pipe delimiter parsing, delimiter-aware value splitting",
+  "tests": [
+    {
+      "name": "parses primitive arrays with tab delimiter",
+      "input": "tags[3\t]: reading\tgaming\tcoding",
+      "expected": {
+        "tags": ["reading", "gaming", "coding"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses primitive arrays with pipe delimiter",
+      "input": "tags[3|]: reading|gaming|coding",
+      "expected": {
+        "tags": ["reading", "gaming", "coding"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses primitive arrays with comma delimiter",
+      "input": "tags[3]: reading,gaming,coding",
+      "expected": {
+        "tags": ["reading", "gaming", "coding"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses tabular arrays with tab delimiter",
+      "input": "items[2\t]{sku\tqty\tprice}:\n  A1\t2\t9.99\n  B2\t1\t14.5",
+      "expected": {
+        "items": [
+          { "sku": "A1", "qty": 2, "price": 9.99 },
+          { "sku": "B2", "qty": 1, "price": 14.5 }
+        ]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses tabular arrays with pipe delimiter",
+      "input": "items[2|]{sku|qty|price}:\n  A1|2|9.99\n  B2|1|14.5",
+      "expected": {
+        "items": [
+          { "sku": "A1", "qty": 2, "price": 9.99 },
+          { "sku": "B2", "qty": 1, "price": 14.5 }
+        ]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses nested arrays with tab delimiter",
+      "input": "pairs[2\t]:\n  - [2\t]: a\tb\n  - [2\t]: c\td",
+      "expected": {
+        "pairs": [["a", "b"], ["c", "d"]]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses nested arrays with pipe delimiter",
+      "input": "pairs[2|]:\n  - [2|]: a|b\n  - [2|]: c|d",
+      "expected": {
+        "pairs": [["a", "b"], ["c", "d"]]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses nested arrays inside list items with default comma delimiter",
+      "input": "items[1\t]:\n  - tags[3]: a,b,c",
+      "expected": {
+        "items": [{ "tags": ["a", "b", "c"] }]
+      },
+      "specSection": "11",
+      "note": "Parent uses tab, nested defaults to comma"
+    },
+    {
+      "name": "parses nested arrays inside list items with default comma delimiter when parent uses pipe",
+      "input": "items[1|]:\n  - tags[3]: a,b,c",
+      "expected": {
+        "items": [{ "tags": ["a", "b", "c"] }]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses root-level array with tab delimiter",
+      "input": "[3\t]: x\ty\tz",
+      "expected": ["x", "y", "z"],
+      "specSection": "11"
+    },
+    {
+      "name": "parses root-level array with pipe delimiter",
+      "input": "[3|]: x|y|z",
+      "expected": ["x", "y", "z"],
+      "specSection": "11"
+    },
+    {
+      "name": "parses root-level array of objects with tab delimiter",
+      "input": "[2\t]{id}:\n  1\n  2",
+      "expected": [{ "id": 1 }, { "id": 2 }],
+      "specSection": "11"
+    },
+    {
+      "name": "parses root-level array of objects with pipe delimiter",
+      "input": "[2|]{id}:\n  1\n  2",
+      "expected": [{ "id": 1 }, { "id": 2 }],
+      "specSection": "11"
+    },
+    {
+      "name": "parses values containing tab delimiter when quoted",
+      "input": "items[3\t]: a\t\"b\\tc\"\td",
+      "expected": {
+        "items": ["a", "b\tc", "d"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses values containing pipe delimiter when quoted",
+      "input": "items[3|]: a|\"b|c\"|d",
+      "expected": {
+        "items": ["a", "b|c", "d"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "does not split on commas when using tab delimiter",
+      "input": "items[2\t]: a,b\tc,d",
+      "expected": {
+        "items": ["a,b", "c,d"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "does not split on commas when using pipe delimiter",
+      "input": "items[2|]: a,b|c,d",
+      "expected": {
+        "items": ["a,b", "c,d"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses tabular values containing comma with comma delimiter",
+      "input": "items[2]{id,note}:\n  1,\"a,b\"\n  2,\"c,d\"",
+      "expected": {
+        "items": [
+          { "id": 1, "note": "a,b" },
+          { "id": 2, "note": "c,d" }
+        ]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "does not require quoting commas with tab delimiter",
+      "input": "items[2\t]{id\tnote}:\n  1\ta,b\n  2\tc,d",
+      "expected": {
+        "items": [
+          { "id": 1, "note": "a,b" },
+          { "id": 2, "note": "c,d" }
+        ]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "does not require quoting commas in object values",
+      "input": "note: a,b",
+      "expected": {
+        "note": "a,b"
+      },
+      "specSection": "11",
+      "note": "Object values don't require comma quoting regardless of delimiter"
+    },
+    {
+      "name": "object values in list items follow document delimiter",
+      "input": "items[2\t]:\n  - status: a,b\n  - status: c,d",
+      "expected": {
+        "items": [{ "status": "a,b" }, { "status": "c,d" }]
+      },
+      "specSection": "11",
+      "note": "Active delimiter is tab, but object values use document delimiter for quoting"
+    },
+    {
+      "name": "object values with comma must be quoted when document delimiter is comma",
+      "input": "items[2]:\n  - status: \"a,b\"\n  - status: \"c,d\"",
+      "expected": {
+        "items": [{ "status": "a,b" }, { "status": "c,d" }]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses nested array values containing pipe delimiter",
+      "input": "pairs[1|]:\n  - [2|]: a|\"b|c\"",
+      "expected": {
+        "pairs": [["a", "b|c"]]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses nested array values containing tab delimiter",
+      "input": "pairs[1\t]:\n  - [2\t]: a\t\"b\\tc\"",
+      "expected": {
+        "pairs": [["a", "b\tc"]]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "preserves quoted ambiguity with pipe delimiter",
+      "input": "items[3|]: \"true\"|\"42\"|\"-3.14\"",
+      "expected": {
+        "items": ["true", "42", "-3.14"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "preserves quoted ambiguity with tab delimiter",
+      "input": "items[3\t]: \"true\"\t\"42\"\t\"-3.14\"",
+      "expected": {
+        "items": ["true", "42", "-3.14"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses structural-looking strings when quoted with pipe delimiter",
+      "input": "items[3|]: \"[5]\"|\"{key}\"|\"- item\"",
+      "expected": {
+        "items": ["[5]", "{key}", "- item"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses structural-looking strings when quoted with tab delimiter",
+      "input": "items[3\t]: \"[5]\"\t\"{key}\"\t\"- item\"",
+      "expected": {
+        "items": ["[5]", "{key}", "- item"]
+      },
+      "specSection": "11"
+    },
+    {
+      "name": "parses tabular headers with keys containing the active delimiter",
+      "input": "items[2|]{\"a|b\"}:\n  1\n  2",
+      "expected": {
+        "items": [{ "a|b": 1 }, { "a|b": 2 }]
+      },
+      "specSection": "11"
+    }
+  ]
+}

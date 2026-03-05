@@ -1,0 +1,217 @@
+{
+  "version": "3.0",
+  "category": "decode",
+  "description": "Nested and mixed array decoding - list format, arrays of arrays, root arrays, mixed types",
+  "tests": [
+    {
+      "name": "parses list arrays for non-uniform objects",
+      "input": "items[2]:\n  - id: 1\n    name: First\n  - id: 2\n    name: Second\n    extra: true",
+      "expected": {
+        "items": [
+          { "id": 1, "name": "First" },
+          { "id": 2, "name": "Second", "extra": true }
+        ]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses list arrays with empty items",
+      "input": "items[3]:\n  - first\n  - second\n  -",
+      "expected": {
+        "items": ["first", "second", {}]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses list arrays with deeply nested objects",
+      "input": "items[2]:\n  - properties:\n      state:\n        type: string\n  - id: 2",
+      "expected": {
+        "items": [
+          {
+            "properties": {
+              "state": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "id": 2
+          }
+        ]
+      },
+      "specSection": "10"
+    },
+    {
+      "name": "parses list arrays containing objects with nested properties",
+      "input": "items[1]:\n  - id: 1\n    nested:\n      x: 1",
+      "expected": {
+        "items": [
+          { "id": 1, "nested": { "x": 1 } }
+        ]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses list items whose first field is a tabular array",
+      "input": "items[1]:\n  - users[2]{id,name}:\n      1,Ada\n      2,Bob\n    status: active",
+      "expected": {
+        "items": [
+          {
+            "users": [
+              { "id": 1, "name": "Ada" },
+              { "id": 2, "name": "Bob" }
+            ],
+            "status": "active"
+          }
+        ]
+      },
+      "specSection": "10",
+      "note": "Canonical encoding: tabular header on hyphen line, rows at depth +2, sibling fields at depth +1"
+    },
+    {
+      "name": "parses single-field list-item object with tabular array",
+      "input": "items[1]:\n  - users[2]{id,name}:\n      1,Ada\n      2,Bob",
+      "expected": {
+        "items": [
+          {
+            "users": [
+              { "id": 1, "name": "Ada" },
+              { "id": 2, "name": "Bob" }
+            ]
+          }
+        ]
+      },
+      "specSection": "10",
+      "note": "Single-field list-item object: only the tabular array, no sibling fields"
+    },
+    {
+      "name": "parses objects containing arrays (including empty arrays) in list format",
+      "input": "items[1]:\n  - name: Ada\n    data[0]:",
+      "expected": {
+        "items": [
+          { "name": "Ada", "data": [] }
+        ]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses arrays of arrays within objects",
+      "input": "items[1]:\n  - matrix[2]:\n      - [2]: 1,2\n      - [2]: 3,4\n    name: grid",
+      "expected": {
+        "items": [
+          { "matrix": [[1, 2], [3, 4]], "name": "grid" }
+        ]
+      },
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses nested arrays of primitives",
+      "input": "pairs[2]:\n  - [2]: a,b\n  - [2]: c,d",
+      "expected": {
+        "pairs": [["a", "b"], ["c", "d"]]
+      },
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses quoted strings and mixed lengths in nested arrays",
+      "input": "pairs[2]:\n  - [2]: a,b\n  - [3]: \"c,d\",\"e:f\",\"true\"",
+      "expected": {
+        "pairs": [["a", "b"], ["c,d", "e:f", "true"]]
+      },
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses empty inner arrays",
+      "input": "pairs[2]:\n  - [0]:\n  - [0]:",
+      "expected": {
+        "pairs": [[], []]
+      },
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses mixed-length inner arrays",
+      "input": "pairs[2]:\n  - [1]: 1\n  - [2]: 2,3",
+      "expected": {
+        "pairs": [[1], [2, 3]]
+      },
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses root-level primitive array inline",
+      "input": "[5]: x,y,\"true\",true,10",
+      "expected": ["x", "y", "true", true, 10],
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses root-level array of uniform objects in tabular format",
+      "input": "[2]{id}:\n  1\n  2",
+      "expected": [{ "id": 1 }, { "id": 2 }],
+      "specSection": "9.3"
+    },
+    {
+      "name": "parses root-level array of non-uniform objects in list format",
+      "input": "[2]:\n  - id: 1\n  - id: 2\n    name: Ada",
+      "expected": [{ "id": 1 }, { "id": 2, "name": "Ada" }],
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses root-level array mixing primitive, object, and array of objects in list format",
+      "input": "[3]:\n  - summary\n  - id: 1\n    name: Ada\n  - [2]:\n    - id: 2\n    - status: draft",
+      "expected": ["summary", { "id": 1, "name": "Ada" }, [{ "id": 2 }, { "status": "draft" }]],
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses root-level array of arrays",
+      "input": "[2]:\n  - [2]: 1,2\n  - [0]:",
+      "expected": [[1, 2], []],
+      "specSection": "9.2"
+    },
+    {
+      "name": "parses empty root-level array",
+      "input": "[0]:",
+      "expected": [],
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses complex mixed object with arrays and nested objects",
+      "input": "user:\n  id: 123\n  name: Ada\n  tags[2]: reading,gaming\n  active: true\n  prefs[0]:",
+      "expected": {
+        "user": {
+          "id": 123,
+          "name": "Ada",
+          "tags": ["reading", "gaming"],
+          "active": true,
+          "prefs": []
+        }
+      },
+      "specSection": "8"
+    },
+    {
+      "name": "parses arrays mixing primitives, objects, and strings in list format",
+      "input": "items[3]:\n  - 1\n  - a: 1\n  - text",
+      "expected": {
+        "items": [1, { "a": 1 }, "text"]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses arrays mixing objects and arrays",
+      "input": "items[2]:\n  - a: 1\n  - [2]: 1,2",
+      "expected": {
+        "items": [{ "a": 1 }, [1, 2]]
+      },
+      "specSection": "9.4"
+    },
+    {
+      "name": "parses quoted key with list array format",
+      "input": "\"x-items\"[2]:\n  - id: 1\n  - id: 2",
+      "expected": {
+        "x-items": [
+          { "id": 1 },
+          { "id": 2 }
+        ]
+      },
+      "specSection": "9.4"
+    }
+  ]
+}

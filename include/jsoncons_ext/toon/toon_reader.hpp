@@ -35,6 +35,7 @@
 namespace jsoncons {
 namespace toon {
 
+inline
 jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
 {
     using result_type = jsoncons::expected<std::string,toon_errc>;
@@ -849,13 +850,14 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
         {
             break;
         }
-        // Must start with "- "
+        // Must start with "-"
         auto content = line.content;
-        if (!jsoncons::starts_with(content, "- "))
+        if (!jsoncons::starts_with(content, "-"))
         {
             break;
         }
-        auto item_content = jsoncons::strip(jsoncons::string_view(content.data()+2, content.size()-2));
+        // Remove "- " prefix
+        auto item_content = jsoncons::strip(jsoncons::string_view(content.data()+1, content.size()-1));
         auto header_info_result = parse_header(item_content);
         if (header_info_result && *header_info_result)
         {
@@ -1029,6 +1031,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 visitor.begin_object();
                 visitor.end_object();
+                ++i;
             }
             else
             {
@@ -1133,7 +1136,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t colon_idx = find_unquoted_char(header_line, ':');
     if (colon_idx == jsoncons::string_view::npos)
     {
-        // return toon_errc::missing_colon_after_key;
+        return line_result{jsoncons::unexpect, toon_errc::missing_colon_after_key};
     }
     auto inline_content = jsoncons::strip(jsoncons::string_view(header_line.data() + (colon_idx + 1), header_line.size() - (colon_idx + 1)));
 

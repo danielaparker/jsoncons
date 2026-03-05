@@ -1,0 +1,175 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Number decoding edge cases - trailing zeros, exponent forms, negative zero",
+  "tests": [
+    {
+      "name": "parses number with trailing zeros in fractional part",
+      "input": "value: 1.5000",
+      "expected": {
+        "value": 1.5
+      },
+      "specSection": "4",
+      "note": "Decoders accept trailing zeros; numeric value is 1.5"
+    },
+    {
+      "name": "parses negative number with positive exponent",
+      "input": "value: -1E+03",
+      "expected": {
+        "value": -1000
+      },
+      "specSection": "4",
+      "note": "Exponent forms are accepted by decoders"
+    },
+    {
+      "name": "parses lowercase exponent",
+      "input": "value: 2.5e2",
+      "expected": {
+        "value": 250
+      },
+      "specSection": "4"
+    },
+    {
+      "name": "parses uppercase exponent with negative sign",
+      "input": "value: 3E-02",
+      "expected": {
+        "value": 0.03
+      },
+      "specSection": "4"
+    },
+    {
+      "name": "parses negative zero as zero",
+      "input": "value: -0",
+      "expected": {
+        "value": 0
+      },
+      "specSection": "4",
+      "note": "Negative zero decodes to 0; most host environments do not distinguish -0 from 0"
+    },
+    {
+      "name": "parses negative zero with fractional part",
+      "input": "value: -0.0",
+      "expected": {
+        "value": 0
+      },
+      "specSection": "4"
+    },
+    {
+      "name": "parses array with mixed numeric forms",
+      "input": "nums[5]: 42,-1E+03,1.5000,-0,2.5e2",
+      "expected": {
+        "nums": [42, -1000, 1.5, 0, 250]
+      },
+      "specSection": "4",
+      "note": "Decoders normalize all numeric forms to host numeric values"
+    },
+    {
+      "name": "treats leading zero as string not number",
+      "input": "value: 05",
+      "expected": {
+        "value": "05"
+      },
+      "specSection": "4",
+      "note": "Forbidden leading zeros cause tokens to be treated as strings"
+    },
+    {
+      "name": "parses very small exponent",
+      "input": "value: 1e-10",
+      "expected": {
+        "value": 0.0000000001
+      },
+      "specSection": "4"
+    },
+    {
+      "name": "parses integer with positive exponent",
+      "input": "value: 5E+00",
+      "expected": {
+        "value": 5
+      },
+      "specSection": "4",
+      "note": "Exponent +00 results in the integer 5"
+    },
+    {
+      "name": "parses zero with exponent as number",
+      "input": "value: 0e1",
+      "expected": {
+        "value": 0
+      },
+      "specSection": "4",
+      "note": "Exponent forms with a zero integer part (0e1) are valid numbers"
+    },
+    {
+      "name": "parses negative zero with exponent as number",
+      "input": "value: -0e1",
+      "expected": {
+        "value": 0
+      },
+      "specSection": "4",
+      "note": "Negative zero with exponent (-0e1) decodes to numeric 0"
+    },
+    {
+      "name": "parses exponent notation",
+      "input": "1e6",
+      "expected": 1000000,
+      "specSection": "4"
+    },
+    {
+      "name": "parses exponent notation with uppercase E",
+      "input": "1E+6",
+      "expected": 1000000,
+      "specSection": "4"
+    },
+    {
+      "name": "parses negative exponent notation",
+      "input": "-1e-3",
+      "expected": -0.001,
+      "specSection": "4"
+    },
+    {
+      "name": "treats unquoted leading-zero number as string",
+      "input": "05",
+      "expected": "05",
+      "specSection": "4",
+      "note": "Leading zeros make it a string"
+    },
+    {
+      "name": "treats unquoted multi-leading-zero as string",
+      "input": "007",
+      "expected": "007",
+      "specSection": "4"
+    },
+    {
+      "name": "treats unquoted octal-like as string",
+      "input": "0123",
+      "expected": "0123",
+      "specSection": "4"
+    },
+    {
+      "name": "treats leading-zero in object value as string",
+      "input": "a: 05",
+      "expected": { "a": "05" },
+      "specSection": "4"
+    },
+    {
+      "name": "treats leading-zeros in array as strings",
+      "input": "nums[3]: 05,007,0123",
+      "expected": { "nums": ["05", "007", "0123"] },
+      "specSection": "4"
+    },
+    {
+      "name": "treats unquoted negative leading-zero number as string",
+      "input": "-05",
+      "expected": "-05",
+      "specSection": "4",
+      "note": "Negative numbers with leading zeros in the integer part are treated as strings"
+    },
+    {
+      "name": "treats negative leading-zeros in array as strings",
+      "input": "nums[2]: -05,-007",
+      "expected": {
+        "nums": ["-05", "-007"]
+      },
+      "specSection": "4"
+    }
+  ]
+}

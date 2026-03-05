@@ -1,0 +1,61 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Whitespace tolerance in decoding - surrounding spaces around delimiters and values",
+  "tests": [
+    {
+      "name": "tolerates spaces around commas in inline arrays",
+      "input": "tags[3]: a , b , c",
+      "expected": {
+        "tags": ["a", "b", "c"]
+      },
+      "specSection": "12",
+      "note": "Surrounding whitespace SHOULD be tolerated; tokens are trimmed"
+    },
+    {
+      "name": "tolerates spaces around pipes in inline arrays",
+      "input": "tags[3|]: a | b | c",
+      "expected": {
+        "tags": ["a", "b", "c"]
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "tolerates spaces around tabs in inline arrays",
+      "input": "tags[3\t]: a \t b \t c",
+      "expected": {
+        "tags": ["a", "b", "c"]
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "tolerates leading and trailing spaces in tabular row values",
+      "input": "items[2]{id,name}:\n  1 , Alice \n  2 , Bob ",
+      "expected": {
+        "items": [
+          { "id": 1, "name": "Alice" },
+          { "id": 2, "name": "Bob" }
+        ]
+      },
+      "specSection": "12",
+      "note": "Values in tabular rows are trimmed"
+    },
+    {
+      "name": "tolerates spaces around delimiters with quoted values",
+      "input": "items[3]: \"a\" , \"b\" , \"c\"",
+      "expected": {
+        "items": ["a", "b", "c"]
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "parses empty tokens as empty string",
+      "input": "items[3]: a,,c",
+      "expected": {
+        "items": ["a", "", "c"]
+      },
+      "specSection": "12",
+      "note": "Empty token (nothing between delimiters) decodes to empty string"
+    }
+  ]
+}

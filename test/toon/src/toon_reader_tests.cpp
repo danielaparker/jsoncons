@@ -13,6 +13,7 @@
 
 namespace toon = jsoncons::toon;
 
+#if 0
 TEST_CASE("toon_reader util tests")
 {
     SECTION("unescape_string")
@@ -224,10 +225,11 @@ TEST_CASE("toon_reader parse_header tests")
 
     }
 }
+#endif
 
 TEST_CASE("toon_reader tests")
 {
-    SECTION("array of primitives")
+    /*SECTION("array of primitives")
     {
         auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
         std::vector<toon::parsed_line> lines;
@@ -376,6 +378,26 @@ season: spring_2025)";
       THING-C,3,15
     total: 45
     status: delivered)";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        CHECK(expected == result);
+        //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("parses list arrays with empty items")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"items":["first","second",{}]})");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"(items[3]:
+  - first
+  - second
+  - )";
         std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;

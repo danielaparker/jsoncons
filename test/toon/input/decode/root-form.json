@@ -1,0 +1,17 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Root form detection - empty document, single primitive, multiple primitives",
+  "tests": [
+    {
+      "name": "parses empty document as empty object",
+      "input": "",
+      "expected": {},
+      "options": {
+        "strict": true
+      },
+      "specSection": "5",
+      "note": "Empty input (no non-empty lines) decodes to empty object"
+    }
+  ]
+}
