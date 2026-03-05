@@ -15,6 +15,15 @@ namespace toon = jsoncons::toon;
 
 TEST_CASE("toon_reader util tests")
 {
+    SECTION("unescape_string")
+    {
+        auto result1 = toon::unescape_string(jsoncons::string_view(R"(hello\\nworld)"));
+        REQUIRE(result1);
+        CHECK(R"(hello\nworld)" == *result1);
+        auto result2 = toon::unescape_string(jsoncons::string_view(R"(hello\\nworld)"));
+        REQUIRE(result2);
+        CHECK(R"(hello\nworld)" == *result2);
+    }
     SECTION("find_unquoted_char")
     {
         std::size_t pos;

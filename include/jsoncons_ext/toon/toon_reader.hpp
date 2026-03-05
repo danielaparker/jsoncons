@@ -35,6 +35,64 @@
 namespace jsoncons {
 namespace toon {
 
+jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
+{
+    using result_type = jsoncons::expected<std::string,toon_errc>;
+
+    result_type result{};
+
+    std::string& str{*result};
+
+    std::size_t i = 0;
+
+    while (i < value.size())
+    {
+        if (value[i] == '\\')
+        {
+            if (i + 1 >= value.size())
+            {
+                return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
+            }
+            char next_char = value[i + 1];
+            if (next_char == 'n')
+            {
+                str.push_back('\n');
+                i += 2;
+                continue;
+            }
+            if (next_char == 't')
+            {
+                str.push_back('\t');
+                i += 2;
+                continue;
+            }
+            if (next_char == 'r')
+            {
+                str.push_back('\r');
+                i += 2;
+                continue;
+            }
+            if (next_char == '\\')
+            {
+                str.push_back('\\');
+                i += 2;
+                continue;
+            }
+            if (next_char == '\"')
+            {
+                str.push_back('\"');
+                i += 2;
+                continue;
+            }
+            return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
+        }
+        str.push_back(value[i]);
+        ++i;
+    }
+
+    return result;
+}
+
 struct header_info
 {
     jsoncons::optional<std::string> key;
@@ -118,7 +176,6 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
 inline
 toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
 {
-
     bool in_quotes{false};
     std::size_t start{0};
     std::size_t end{0};
@@ -144,6 +201,13 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
             end = i;
             terminated = true;
             in_quotes = false;
+            auto res = unescape_string(jsoncons::string_view(key_str.data() + start, (end-start)));
+            if (!res) 
+            {
+                return res.error();
+            }
+            result = *res;
+            return toon_errc{};
         }
         else if (c != ' ')
         {
@@ -175,7 +239,12 @@ toon_errc parse_primitive(jsoncons::string_view token, json_visitor& visitor)
         {
             return toon_errc::missing_closing_quote;
         }
-        visitor.string_value(jsoncons::string_view(token.data()+1, token.size()-2));
+        auto result = unescape_string(jsoncons::string_view(token.data()+1, token.size()-2));
+        if (!result)
+        {
+            return result.error();
+        }
+        visitor.string_value(*result);
         return toon_errc{};
     }
     if (token == "true")
@@ -299,7 +368,6 @@ line_result parse_delimited_values(jsoncons::string_view line,
             {
                 return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
-            std::cout << "parse_delimited_values.378 key: " << fields[field_index] << "\n";
             visitor.key(fields[field_index]);
             parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
             offset = i+1;
@@ -324,7 +392,6 @@ line_result parse_delimited_values(jsoncons::string_view line,
             {
                 return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
-            std::cout << "parse_delimited_values.403 key: " << fields[field_index] << "\n";
             visitor.key(fields[field_index]);
             parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length+2)), visitor);
             while (++i < line.size() && line[i] != delimiter)
@@ -346,7 +413,6 @@ line_result parse_delimited_values(jsoncons::string_view line,
         {
             return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
         }
-        std::cout << "parse_delimited_values.425 key: " << fields[field_index] << "\n";
         visitor.key(fields[field_index]);
         parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
         ++field_index;
@@ -690,7 +756,6 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             if (key)
             {
                 // Array field
-                std::cout << "decode_object.769 key: " << *key << "\n";
                 visitor.key(*key);
                 auto r = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
                 i = *r;
@@ -719,7 +784,6 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         if (value_str.empty())
         {
             // Nested object
-            std::cout << "decode_object.798 key: " << key << "\n";
             visitor.key(key);
             decode_object(lines, i+1, line.depth, strict, visitor);
             // Skip past nested object
@@ -732,7 +796,6 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         else
         {
             // Primitive value
-            std::cout << "decode_object.811 key: " << key << "\n";
             visitor.key(key);
             parse_primitive(value_str, visitor);
             ++i;
@@ -819,7 +882,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             else
             {
                 visitor.begin_object();
-                std::cout << "decode_list_array.898 key: " << *key << "\n";
                 visitor.key(*key);
                 auto r = decode_array_from_header(lines, i, line.depth, item_header, strict, visitor);
                 i = *r;
@@ -840,7 +902,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         const header_info& field_header (*(*field_header_result));
                         const jsoncons::optional<std::string>& field_key(field_header.key);
 
-                        std::cout << "decode_list_array.917 key: " << *field_key << "\n";
                         visitor.key(*field_key);
                         auto r1 = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
                         i = *r1;
@@ -855,7 +916,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         parse_key(field_key_str, field_key);
                         if (field_value_str.empty())
                         {
-                            std::cout << "decode_list_array.932 key: " << field_key << "\n";
                             visitor.key(field_key);
                             decode_object(
                                 lines, i + 1, field_line.depth, strict, visitor
@@ -868,7 +928,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         }
                         else
                         {
-                            std::cout << "decode_list_array.945 key: " << field_key << "\n";
                             visitor.key(field_key);
                             parse_primitive(field_value_str, visitor);
                         }
@@ -892,7 +951,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             if (value_str.empty())
             {
                 // First field is nested object: fields at depth +2
-                std::cout << "decode_list_array.969 key: " << key << "\n";
                 visitor.key(key);
                 decode_object(lines, i + 1, line.depth + 1, strict, visitor);
                 // Skip nested content
@@ -905,7 +963,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             else
             {
                 // first field is primitive
-                std::cout << "decode_list_array.982 key: " << key << "\n";
                 visitor.key(key);
                 parse_primitive(value_str, visitor);
                 ++i;
@@ -927,7 +984,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 {
                     const header_info& field_header (*(*field_header_result));
                     const auto& field_key{field_header.key};
-                    std::cout << "decode_list_array.1004 key: " << *field_key << "\n";
                     visitor.key(*field_key);
                     auto r1 = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
                     i = *r1;
@@ -943,7 +999,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     if (field_value_str.empty())
                     {
                         // Nested object
-                        std::cout << "decode_list_array.917 key: " << field_key << "\n";
                         visitor.key(field_key);
                         decode_object(
                             lines, i + 1, field_line.depth, strict, visitor

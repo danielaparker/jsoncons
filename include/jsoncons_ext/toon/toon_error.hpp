@@ -33,6 +33,7 @@ namespace toon {
         too_many_values_in_row,
         too_few_values_in_row,
         invalid_line,
+        invalid_escape_sequence,
 
         max_nesting_depth_exceeded,
         single_quote,
@@ -103,6 +104,8 @@ namespace toon {
                     return "Too few values in tabular array row";
                 case toon_errc::invalid_line:
                     return "Invalid line";
+                case toon_errc::invalid_escape_sequence:
+                    return "Invalid escape sequence";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:
