@@ -169,7 +169,7 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
 
 line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t header_idx,
-    std::size_t header_depth,
+    std::size_t base_depth,
     const header_info& header_info,
     bool strict,
     json_visitor& visitor);
@@ -561,9 +561,7 @@ header_result parse_header(jsoncons::string_view line)
 inline
 std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size)
 {
-    std::size_t n = static_cast<std::size_t>(std::floor(static_cast<double>(indent_spaces) / static_cast<double>(indent_size)));
-    std::cout << "DEPTH: " << n << "\n";
-    return n;
+    return static_cast<std::size_t>(std::floor(static_cast<double>(indent_spaces) / static_cast<double>(indent_size)));
 }
 
 inline
@@ -718,14 +716,14 @@ bool is_row_line(jsoncons::string_view line, char delimiter)
 inline
 void_result decode_object(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
-    std::size_t parent_depth,
+    std::size_t base_depth,
     bool strict,
     json_visitor& visitor)
 {
     visitor.begin_object();
 
     std::size_t i = start_idx;
-    std::size_t expected_depth = (start_idx == 0) ? parent_depth : parent_depth+1;
+    std::size_t expected_depth = (start_idx == 0) ? base_depth : base_depth+1;
 
     while (i < lines.size())
     {
@@ -817,14 +815,14 @@ void_result decode_object(const std::vector<parsed_line>& lines,
 inline
 line_result decode_list_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
-    std::size_t header_depth,
+    std::size_t base_depth,
     std::size_t expected_length,
     bool strict,
     json_visitor& visitor)
 {
     visitor.begin_array();
 
-    std::size_t item_depth = header_depth + 1;
+    std::size_t item_depth = base_depth + 1;
 
     std::size_t i = start_idx;
     while (i < lines.size())
@@ -882,7 +880,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 auto colon_idx = item_content.find(':');
                 if (colon_idx != jsoncons::string_view::npos)
                 {
-                    auto inline_part = jsoncons::strip(jsoncons::string_view(item_content.data()+1, item_content.size()-1));
+                    auto inline_part = jsoncons::strip(jsoncons::string_view(item_content.data()+(colon_idx+1), item_content.size()-(colon_idx+1)));
                     if (!inline_part.empty() || length == 0)
                     {
                         decode_inline_array(inline_part, item_delim, length, strict, visitor);
@@ -1074,7 +1072,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
 inline
 line_result decode_tabular_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
-    std::size_t header_depth,
+    std::size_t base_depth,
     const std::vector<jsoncons::string_view>& fields,
     char delimiter,
     std::size_t expected_length,
@@ -1084,7 +1082,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
     visitor.begin_array();
 
     std::size_t i = start_idx;
-    std::size_t row_depth = header_depth + 1;
+    std::size_t row_depth = base_depth + 1;
 
     while (i < lines.size())
     {
@@ -1117,8 +1115,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
         }
         if (line.depth > row_depth)
         {
-            std::cout << "line.depth exceeds row_depth" << "\n";
-            //break;
+            break;
         }
         jsoncons::string_view content = line.content;
         if (is_row_line(content, delimiter))
@@ -1144,7 +1141,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 inline
 line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t header_idx,
-    std::size_t header_depth,
+    std::size_t base_depth,
     const header_info& header_info,
     bool strict,
     json_visitor& visitor)
@@ -1172,16 +1169,18 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
         return line_result{header_idx + 1};
     }
 
+    // Check for tabular-first list-item object: `- key[N]{fields}:`
     if (!fields.empty())
     {
         // Tabular array
+        // Use baseDepth + 1 for the array so rows are at baseDepth + 2
         return decode_tabular_array(
-            lines, header_idx + 1, header_depth, fields, delimiter, length, strict, visitor);
+            lines, header_idx + 1, base_depth+1, fields, delimiter, length, strict, visitor);
     }
     else
     {
         return decode_list_array(
-            lines, header_idx + 1, header_depth, length, strict, visitor);
+            lines, header_idx + 1, base_depth, length, strict, visitor);
     }
 }
 
@@ -1189,12 +1188,12 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
 inline
 void decode_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
-    std::size_t parent_depth,
+    std::size_t base_depth,
     const header_info& header_info,
     bool strict,
     json_visitor& visitor)
 {
-    decode_array_from_header(lines, start_idx, parent_depth, header_info, strict, visitor);
+    decode_array_from_header(lines, start_idx, base_depth, header_info, strict, visitor);
 }
 
 template <typename Source=jsoncons::stream_source<char>,typename TempAlloc =std::allocator<char>>

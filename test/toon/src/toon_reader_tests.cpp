@@ -431,14 +431,27 @@ season: spring_2025)";
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
     }*/
-    SECTION("parses list items whose first field is a tabular array")
+    SECTION("parses arrays of arrays within objects")
     {
-        auto expected = jsoncons::ojson::parse(R"({"items":[{"users":[{"id":1,"name":"Ada"},{"id":2,"name":"Bob"}],"status":
-  "active"}]})");
+        auto expected = jsoncons::ojson::parse(R"({
+    "items": [
+        {
+            "matrix": [
+                [
+                    1,
+                    2
+                ]
+            ]
+        }
+    ]
+})");
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = "items[1]:\n  - users[2]{id,name}:\n      1,Ada\n      2,Bob\n    status: active";
+        std::string data = R"(items[1]:
+  - matrix[1]:
+      - [2]: 1,2)";
+
         std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -447,6 +460,7 @@ season: spring_2025)";
         REQUIRE(decoder.is_valid());
         auto result = decoder.get_result();
         //CHECK(expected == result);
+        std::cout << pretty_print(expected) << "\n";
         std::cout << pretty_print(result) << "\n";
     }
 }
