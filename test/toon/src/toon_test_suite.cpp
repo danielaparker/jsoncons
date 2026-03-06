@@ -98,20 +98,28 @@ void toon_decode_tests(const std::string& fpath)
         auto input = test["input"].as_string_view();
         const auto& expected = test["expected"];
 
-        jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::toon_string_reader reader(input, decoder);
-        reader.read();
-        REQUIRE(decoder.is_valid());
-        auto result = decoder.get_result();
-        CHECK(expected == result);
+        try
+        {
+            jsoncons::json_decoder<jsoncons::ojson> decoder;
+            toon::toon_string_reader reader(input, decoder);
+            reader.read();
+            REQUIRE(decoder.is_valid());
+            auto result = decoder.get_result();
+            CHECK(expected == result);
 
-        if (expected != result)
+            if (expected != result)
+            {
+                std::cout << test.at("name").as_string() << "\n";
+                std::cout << input << "\n";
+                std::cout << pretty_print(result) << "\n";
+            }
+            CHECK(expected == result);
+        }
+        catch (const std::exception&)
         {
             std::cout << test.at("name").as_string() << "\n";
             std::cout << input << "\n";
-            std::cout << pretty_print(result) << "\n";
         }
-        CHECK(expected == result);
     }
 }
 

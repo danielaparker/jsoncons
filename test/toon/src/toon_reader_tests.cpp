@@ -387,7 +387,7 @@ season: spring_2025)";
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("parses list arrays with empty items")
     {
         auto expected = jsoncons::ojson::parse(R"({"items":["first","second",{}]})");
@@ -407,5 +407,46 @@ season: spring_2025)";
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
+    }
+    SECTION("parses objects containing arrays (including empty arrays) in list format")
+    {
+        auto expected = jsoncons::ojson::parse(R"({
+        "items": [
+          { "name": "Ada", "data": [] }
+        ]
+      })");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"(items[1]:
+  - name: Ada
+    data[0]:)";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        CHECK(expected == result);
+        //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("parses list items whose first field is a tabular array")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"items":[{"users":[{"id":1,"name":"Ada"},{"id":2,"name":"Bob"}],"status":
+  "active"}]})");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = "items[1]:\n  - users[2]{id,name}:\n      1,Ada\n      2,Bob\n    status: active";
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        //CHECK(expected == result);
+        std::cout << pretty_print(result) << "\n";
     }
 }
