@@ -561,7 +561,9 @@ header_result parse_header(jsoncons::string_view line)
 inline
 std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size)
 {
-    return indent_spaces / indent_size;
+    std::size_t n = static_cast<std::size_t>(std::floor(static_cast<double>(indent_spaces) / static_cast<double>(indent_size)));
+    std::cout << "DEPTH: " << n << "\n";
+    return n;
 }
 
 inline
@@ -763,7 +765,7 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             {
                 // Array field
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
+                auto next_i_result = decode_array_from_header(lines, i, line.depth/*+1*/, header, strict, visitor);
                 i = *next_i_result;
                 continue;
             }
