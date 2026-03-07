@@ -763,7 +763,7 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             {
                 // Array field
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, i, line.depth/*+1*/, header, strict, visitor);
+                auto next_i_result = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
                 i = *next_i_result;
                 continue;
             }
@@ -877,6 +877,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
 
             if (!key)
             {
+                // - [N]: inline array
                 auto colon_idx = item_content.find(':');
                 if (colon_idx != jsoncons::string_view::npos)
                 {
@@ -885,6 +886,13 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     {
                         decode_inline_array(inline_part, item_delim, length, strict, visitor);
                         ++i;
+                        continue;
+                    }
+                    else // TEST
+                    {
+                        auto next_i_result = decode_list_array(
+                            lines, i + 1, base_depth, length, strict, visitor);
+                        i = *next_i_result;
                         continue;
                     }
                 }
@@ -1172,10 +1180,18 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     // Check for tabular-first list-item object: `- key[N]{fields}:`
     if (!fields.empty())
     {
-        // Tabular array
-        // Use baseDepth + 1 for the array so rows are at baseDepth + 2
-        return decode_tabular_array(
-            lines, header_idx + 1, base_depth+1, fields, delimiter, length, strict, visitor);
+        if (base_depth != 0)
+        {
+            // Tabular array
+            // Use base_depth + 1 for the array so rows are at base_depth + 2
+            return decode_tabular_array(
+                lines, header_idx + 1, base_depth+1, fields, delimiter, length, strict, visitor);
+        }
+        else
+        {
+            return decode_tabular_array(
+                lines, header_idx + 1, base_depth, fields, delimiter, length, strict, visitor);
+        }
     }
     else
     {
@@ -1301,7 +1317,7 @@ public:
             ec = header_result.error().code();
             return;
         }
-        if (header_result && *header_result && !(*header_result)->key)
+        if (*header_result && !(*header_result)->key)
         {
             // Root array
             const header_info& header(*(*header_result));

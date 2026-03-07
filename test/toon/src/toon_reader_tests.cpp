@@ -290,7 +290,7 @@ TEST_CASE("toon_reader tests")
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
             CHECK(expected == result);
-    }
+    }*/
     SECTION("object")
     {
             auto expected = jsoncons::ojson::parse(R"({
@@ -312,8 +312,9 @@ season: spring_2025)";
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
             CHECK(expected == result);
-            //std::cout << pretty_print(result) << "\n";
+            std::cout << pretty_print(result) << "\n";
     }
+    /*
     SECTION("nested objects")
     {
         auto expected = jsoncons::ojson::parse(R"({
@@ -431,26 +432,19 @@ season: spring_2025)";
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
     }*/
-    SECTION("parses arrays of arrays within objects")
+    SECTION("parses root-level array mixing primitive, object, and array of objects in list format")
     {
-        auto expected = jsoncons::ojson::parse(R"({
-    "items": [
-        {
-            "matrix": [
-                [
-                    1,
-                    2
-                ]
-            ]
-        }
-    ]
-})");
+        auto expected = jsoncons::ojson::parse(R"(["summary",{"id":1,"name":"Ada"},[{"id":2},{"status":"draft"}]])");
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(items[1]:
-  - matrix[1]:
-      - [2]: 1,2)";
+        std::string data = R"([3]:
+  - summary
+  - id: 1
+    name: Ada
+  - [2]:
+    - id: 2
+    - status: draft)";
 
         std::error_code ec;
 
