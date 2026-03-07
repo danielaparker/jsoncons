@@ -13,7 +13,6 @@
 
 namespace toon = jsoncons::toon;
 
-#if 0
 TEST_CASE("toon_reader util tests")
 {
     SECTION("unescape_string")
@@ -48,8 +47,20 @@ TEST_CASE("toon_reader util tests")
         CHECK(r2.first == 6);
         CHECK(r2.second == ',');
     }
+    SECTION("split_key_value")
+    {
+        auto r1 = toon::split_key_value(R"(a:b,c)");
+
+        CHECK("a" == r1->first);
+        CHECK("b,c" == r1->second);
+        auto r2 = toon::split_key_value(R"("b:c":d)");
+        REQUIRE(r2);
+        CHECK(R"("b:c")" == r2->first);
+        CHECK("d" == r2->second);
+    }
 }
 
+#if 0
 TEST_CASE("toon_reader read_lines tests")
 {
     /*SECTION("read lines")
@@ -312,7 +323,7 @@ season: spring_2025)";
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
             CHECK(expected == result);
-            std::cout << pretty_print(result) << "\n";
+            //std::cout << pretty_print(result) << "\n";
     }
     /*
     SECTION("nested objects")
@@ -453,8 +464,8 @@ season: spring_2025)";
         reader.read();
         REQUIRE(decoder.is_valid());
         auto result = decoder.get_result();
-        //CHECK(expected == result);
-        std::cout << pretty_print(expected) << "\n";
-        std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+        //std::cout << pretty_print(expected) << "\n";
+        //std::cout << pretty_print(result) << "\n";
     }
 }

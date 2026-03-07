@@ -140,6 +140,18 @@ TEST_CASE("toon-tests")
     SECTION("decode")
     {
         toon_decode_tests("./toon/input/decode/arrays-nested.json");
+        //toon_decode_tests("./toon/input/decode/arrays-primitive.json");
+        //toon_decode_tests("./toon/input/decode/arrays-tabular.json");
+        //toon_decode_tests("./toon/input/decode/blank-lines.json");
+        //toon_decode_tests("./toon/input/decode/delimiters.json");
+        //toon_decode_tests("./toon/input/indentation-errors.json");
+        //toon_decode_tests("./toon/input/numbers.json");
+        //toon_decode_tests("./toon/input/objects.json");
+        //toon_decode_tests("./toon/input/path-expansion.json");
+        //toon_decode_tests("./toon/input/primitives.json");
+        //toon_decode_tests("./toon/input/root-form.json");
+        //toon_decode_tests("./toon/input/validation-errors.json");
+        //toon_decode_tests("./toon/input/whitespace.json");
     }
 }
 

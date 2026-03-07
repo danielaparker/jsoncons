@@ -167,6 +167,20 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
     return index;
 }
 
+inline 
+jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>> split_key_value(jsoncons::string_view line)
+{
+    auto colon_idx = find_unquoted_char(line, ':');
+    if (colon_idx == jsoncons::string_view::npos)
+    {
+        return jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>>{};
+    }
+    return jsoncons::optional{std::make_pair(
+        jsoncons::strip(jsoncons::string_view{line.data(),colon_idx}),
+        jsoncons::strip(jsoncons::string_view{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
+    };
+}
+
 line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t header_idx,
     std::size_t base_depth,
