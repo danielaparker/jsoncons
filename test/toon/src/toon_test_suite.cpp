@@ -139,9 +139,9 @@ TEST_CASE("toon-tests")
     }*/
     SECTION("decode")
     {
-        toon_decode_tests("./toon/input/decode/arrays-nested.json");
+        //toon_decode_tests("./toon/input/decode/arrays-nested.json");
         //toon_decode_tests("./toon/input/decode/arrays-primitive.json");
-        //toon_decode_tests("./toon/input/decode/arrays-tabular.json");
+        toon_decode_tests("./toon/input/decode/arrays-tabular.json");
         //toon_decode_tests("./toon/input/decode/blank-lines.json");
         //toon_decode_tests("./toon/input/decode/delimiters.json");
         //toon_decode_tests("./toon/input/indentation-errors.json");

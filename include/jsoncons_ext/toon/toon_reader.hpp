@@ -315,6 +315,8 @@ void parse_delimited_values(jsoncons::string_view line,
     std::size_t offset = 0;
     std::size_t length = 0;
     bool is_empty = true;
+    std::size_t num_items = 0;
+    std::size_t num_delimiters = 0;
 
     for (size_t i = 0; i < line.size(); ++i)
     {
@@ -323,9 +325,11 @@ void parse_delimited_values(jsoncons::string_view line,
         if (c == delimiter && !is_quoted)
         {
             parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            ++num_items;
             offset = i+1;
             length = 0;
             is_empty = false;
+            ++num_delimiters;
         }
         else if (!is_quoted && c == '\"')
         {
@@ -340,10 +344,17 @@ void parse_delimited_values(jsoncons::string_view line,
         }
         else if (is_quoted && c == '\"')
         {
-            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length+2)), visitor);
-            while (++i < line.size() && line[i] != delimiter)
+            parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            ++num_items;
+            while (++i < line.size())
             {
+                if (line[i] == delimiter)
+                {
+                    ++num_delimiters;
+                    break;
+                }
             }
+            is_empty = false;
             is_quoted = false;
             offset = i+1;
             length = 0;
@@ -353,7 +364,7 @@ void parse_delimited_values(jsoncons::string_view line,
             ++length;
         }
     }
-    if (length > 0 || !is_empty)
+    if ((length > 0 || !is_empty) && (num_delimiters == num_items))
     {
         parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
     }

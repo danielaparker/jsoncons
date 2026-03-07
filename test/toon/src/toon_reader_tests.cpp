@@ -13,6 +13,7 @@
 
 namespace toon = jsoncons::toon;
 
+#if 0
 TEST_CASE("toon_reader util tests")
 {
     SECTION("unescape_string")
@@ -66,7 +67,6 @@ TEST_CASE("toon_reader util tests")
     }
 }
 
-#if 0
 TEST_CASE("toon_reader read_lines tests")
 {
     /*SECTION("read lines")
@@ -307,7 +307,7 @@ TEST_CASE("toon_reader tests")
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
             CHECK(expected == result);
-    }*/
+    }
     SECTION("object")
     {
             auto expected = jsoncons::ojson::parse(R"({
@@ -331,7 +331,7 @@ season: spring_2025)";
             CHECK(expected == result);
             //std::cout << pretty_print(result) << "\n";
     }
-    /*
+    
     SECTION("nested objects")
     {
         auto expected = jsoncons::ojson::parse(R"({
@@ -448,7 +448,7 @@ season: spring_2025)";
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("parses root-level array mixing primitive, object, and array of objects in list format")
     {
         auto expected = jsoncons::ojson::parse(R"(["summary",{"id":1,"name":"Ada"},[{"id":2},{"status":"draft"}]])");
@@ -462,6 +462,25 @@ season: spring_2025)";
   - [2]:
     - id: 2
     - status: draft)";
+
+        std::error_code ec;
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(data, decoder);
+        reader.read();
+        REQUIRE(decoder.is_valid());
+        auto result = decoder.get_result();
+        CHECK(expected == result);
+        //std::cout << pretty_print(expected) << "\n";
+        //std::cout << pretty_print(result) << "\n";
+    }*/
+    SECTION("parses strings with delimiters in arrays")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"items":["a","b,c","d:e"]})");
+        std::vector<toon::parsed_line> lines;
+        std::vector<toon::blank_line_info> blank_lines;
+
+        std::string data = R"(items[3]: a,"b,c","d:e")";
 
         std::error_code ec;
 
