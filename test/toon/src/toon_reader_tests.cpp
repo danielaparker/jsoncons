@@ -57,6 +57,12 @@ TEST_CASE("toon_reader util tests")
         REQUIRE(r2);
         CHECK(R"("b:c")" == r2->first);
         CHECK("d" == r2->second);
+        auto r3 = toon::split_key_value(R"("b c" d)");
+        REQUIRE_FALSE(r3);
+        auto r4 = toon::split_key_value(R"( "b:c"  :   d  )");
+        REQUIRE(r4);
+        CHECK(R"("b:c")" == r4->first);
+        CHECK("d" == r4->second);
     }
 }
 
