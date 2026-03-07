@@ -783,9 +783,8 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             }
         }
 
-        // Must be a key-value line
-        auto colon_idx = content.find(':');
-        if (colon_idx == jsoncons::string_view::npos)
+        auto kv = split_key_value(content);
+        if (!kv)
         {
             // Invalid line, skip in non-strict mode
             if (strict)
@@ -795,8 +794,9 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             ++i;
             continue;
         }
-        auto key_str = jsoncons::strip(jsoncons::string_view{content.data(), colon_idx});
-        auto value_str = jsoncons::strip(jsoncons::string_view(content.data() + (colon_idx + 1), content.size() - (colon_idx + 1)));
+
+        auto key_str = kv->first;
+        auto value_str = kv->second;
 
         std::string key;
         parse_key(key_str, key);
@@ -943,37 +943,34 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         i = *r1;
                         continue;
                     }
-                    std::size_t colon_idx = find_unquoted_char(field_content, ':');
-                    if (colon_idx != jsoncons::string_view::npos)
+
+                    auto kv = split_key_value(field_content);
+                    if (!kv)
                     {
-                        auto field_key_str = jsoncons::strip(jsoncons::string_view{field_content.data(), colon_idx});
-                        auto field_value_str = jsoncons::strip(jsoncons::string_view(field_content.data() + (colon_idx + 1), field_content.size() - (colon_idx + 1)));
-                        std::string field_key;
-                        parse_key(field_key_str, field_key);
-                        if (field_value_str.empty())
+                        break;
+                    }
+                    auto field_key_str = kv->first;
+                    auto field_value_str = kv->second;
+                    std::string field_key;
+                    parse_key(field_key_str, field_key);
+                    if (field_value_str.empty())
+                    {
+                        visitor.key(field_key);
+                        decode_object(
+                            lines, i + 1, field_line.depth, strict, visitor
+                        );
+                        ++i;
+                        while (i < lines.size() && lines[i].depth > field_line.depth)
                         {
-                            visitor.key(field_key);
-                            decode_object(
-                                lines, i + 1, field_line.depth, strict, visitor
-                            );
-                            ++i;
-                            while (i < lines.size() && lines[i].depth > field_line.depth)
-                            {
-                                ++i;
-                            }
-                        }
-                        else
-                        {
-                            visitor.key(field_key);
-                            parse_primitive(field_value_str, visitor);
                             ++i;
                         }
                     }
                     else
                     {
-                        break;
+                        visitor.key(field_key);
+                        parse_primitive(field_value_str, visitor);
+                        ++i;
                     }
-
                 }
                 visitor.end_object();
                 continue;
@@ -981,13 +978,13 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
         }
         // Check if it's an object (has colon)
 
-        std::size_t colon_idx = find_unquoted_char(item_content, ':');
-        if (colon_idx != jsoncons::string_view::npos)
+        auto kv = split_key_value(item_content);
+        if (kv)
         {
             // It's an object item
             visitor.begin_object();
-            auto key_str = jsoncons::strip(jsoncons::string_view{item_content.data(), colon_idx});
-            auto value_str = jsoncons::strip(jsoncons::string_view(item_content.data() + (colon_idx + 1), item_content.size() - (colon_idx + 1)));
+            auto key_str = kv->first;
+            auto value_str = kv->second;
             std::string key;
             parse_key(key_str, key);
             if (value_str.empty())
@@ -1035,36 +1032,34 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     i = *r1;
                     continue;
                 }
-                std::size_t field_colon_idx = find_unquoted_char(field_content, ':');
-                if (field_colon_idx != jsoncons::string_view::npos)
+
+                auto field_kv = split_key_value(field_content);
+                if (!field_kv)
                 {
-                    auto field_key_str = jsoncons::strip(jsoncons::string_view{field_content.data(), field_colon_idx});
-                    auto field_value_str = jsoncons::strip(jsoncons::string_view(field_content.data() + (field_colon_idx + 1), field_content.size() - (field_colon_idx + 1)));
-                    std::string field_key;
-                    parse_key(field_key_str, field_key);
-                    if (field_value_str.empty())
+                    break;
+                }
+                auto field_key_str = field_kv->first;
+                auto field_value_str = field_kv->second;
+                std::string field_key;
+                parse_key(field_key_str, field_key);
+                if (field_value_str.empty())
+                {
+                    // Nested object
+                    visitor.key(field_key);
+                    decode_object(
+                        lines, i + 1, field_line.depth, strict, visitor
+                    );
+                    ++i;
+                    while (i < lines.size() && lines[i].depth > field_line.depth)
                     {
-                        // Nested object
-                        visitor.key(field_key);
-                        decode_object(
-                            lines, i + 1, field_line.depth, strict, visitor
-                        );
-                        ++i;
-                        while (i < lines.size() && lines[i].depth > field_line.depth)
-                        {
-                            ++i;
-                        }
-                    }
-                    else
-                    {
-                        visitor.key(field_key);
-                        parse_primitive(field_value_str, visitor);
                         ++i;
                     }
                 }
                 else
                 {
-                    break;
+                    visitor.key(field_key);
+                    parse_primitive(field_value_str, visitor);
+                    ++i;
                 }
             }
             visitor.end_object();
@@ -1347,8 +1342,9 @@ public:
         {
             auto line_content = first_line.content;
             // Check if it's not a key-value line
-            auto colon_idx = line_content.find(':');
-            if (colon_idx == jsoncons::string_view::npos)
+
+            auto kv = split_key_value(line_content);
+            if (!kv)
             {
                 // Not a key-value, check if it's a header
                 if (!header_result || !(*header_result))
