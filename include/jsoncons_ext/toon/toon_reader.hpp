@@ -175,7 +175,7 @@ jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>> split
     {
         return jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>>{};
     }
-    return jsoncons::optional{std::make_pair(
+    return jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>>{std::make_pair(
         jsoncons::strip(jsoncons::string_view{line.data(),colon_idx}),
         jsoncons::strip(jsoncons::string_view{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
     };
