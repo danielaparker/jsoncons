@@ -590,7 +590,7 @@ header_result parse_header(jsoncons::string_view line)
     {
         fields.clear();
     }
-    return header_result{jsoncons::in_place, header_info{jsoncons::optional{std::move(key)}, length, delimiter, std::move(fields)}};
+    return header_result{jsoncons::in_place, header_info{jsoncons::optional<std::string>{std::move(key)}, length, delimiter, std::move(fields)}};
 };
 
 inline
