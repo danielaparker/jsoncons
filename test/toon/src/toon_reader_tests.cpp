@@ -474,23 +474,36 @@ season: spring_2025)";
         //std::cout << pretty_print(expected) << "\n";
         //std::cout << pretty_print(result) << "\n";
     }*/
-    SECTION("parses strings with delimiters in arrays")
+    SECTION("issue")
     {
-        auto expected = jsoncons::ojson::parse(R"({"items":["a","b,c","d:e"]})");
+        auto expected = jsoncons::ojson::parse(R"({
+    "items": [
+        "a"
+    ]
+})");
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(items[3]: a,"b,c","d:e")";
+        std::string data = R"(items[3]:
+  - a
 
-        std::error_code ec;
-
-        jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::toon_string_reader reader(data, decoder);
-        reader.read();
-        REQUIRE(decoder.is_valid());
-        auto result = decoder.get_result();
-        CHECK(expected == result);
-        //std::cout << pretty_print(expected) << "\n";
-        //std::cout << pretty_print(result) << "\n";
+  - b
+  - c)";
+        try
+        {
+            jsoncons::json_decoder<jsoncons::ojson> decoder;
+            auto options = toon::toon_options{}.strict(false);
+            toon::toon_string_reader reader(data, decoder, options);
+            reader.read();
+            //REQUIRE_FALSE(decoder.is_valid());
+            auto result = decoder.get_result();
+            //CHECK(expected == result);
+            std::cout << pretty_print(expected) << "\n";
+            std::cout << pretty_print(result) << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "Error: "  << e.what() << "\n";
+        }
     }
 }

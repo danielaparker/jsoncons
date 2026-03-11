@@ -29,7 +29,8 @@ namespace toon {
         extra_character,
         missing_colon_after_key,
         missing_closing_quote,
-        blank_lines_in_arrays,
+        blank_lines_in_array,
+        blank_lines_in_object,
         too_many_values_in_row,
         too_few_values_in_row,
         invalid_line,
@@ -96,8 +97,10 @@ namespace toon {
                     return "Missing colon after key";
                 case toon_errc::missing_closing_quote:
                     return "Unterminated string: missing closing quote";
-                case toon_errc::blank_lines_in_arrays:
+                case toon_errc::blank_lines_in_array:
                     return "Blank lines not allowed inside arrays";
+                case toon_errc::blank_lines_in_object:
+                    return "Blank lines not allowed inside objects";
                 case toon_errc::too_many_values_in_row:
                     return "Too many values in tabular array row";
                 case toon_errc::too_few_values_in_row:
