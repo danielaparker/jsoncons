@@ -484,22 +484,18 @@ season: spring_2025)";
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(items[3]:
-  - a
-
-  - b
-  - c)";
+        std::string data = "a: 1\n   \nb: 2";
         try
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
-            auto options = toon::toon_options{}.strict(false);
+            auto options = toon::toon_options{}.strict(true);
             toon::toon_string_reader reader(data, decoder, options);
             reader.read();
             //REQUIRE_FALSE(decoder.is_valid());
-            auto result = decoder.get_result();
+            //auto result = decoder.get_result();
             //CHECK(expected == result);
-            std::cout << pretty_print(expected) << "\n";
-            std::cout << pretty_print(result) << "\n";
+            //std::cout << pretty_print(expected) << "\n";
+            //std::cout << pretty_print(result) << "\n";
         }
         catch (const std::exception& e)
         {

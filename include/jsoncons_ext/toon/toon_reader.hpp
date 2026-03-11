@@ -617,7 +617,23 @@ void read_lines(jsoncons::string_view raw,
     for (; i < raw.size(); ++i)
     {
         char c = raw[i];
-        if (c == ' ')
+        if (c == '\t')
+        {
+            if (is_blank_line)
+            {
+                if (strict)
+                {
+                    ec = toon_errc::tab_in_indentation;
+                    return;
+                }
+                else
+                {
+                    indent += indent_size;
+                    continue;
+                }
+            }
+        }
+        else if (c == ' ')
         {
             if (is_blank_line)
             {
@@ -630,20 +646,15 @@ void read_lines(jsoncons::string_view raw,
         }
         else
         {
-            is_blank_line = false;
             if (!(c == '\n'))
             {
+                is_blank_line = false;
                 trailing_blanks = 0;
             }
         }
-        if (strict && is_blank_line && c == '\t')
-        {
-            ec = toon_errc::tab_in_indentation;
-            return;
-        }
         if (c == '\n')
         {
-            if (strict && indent > 0 && indent % indent_size !=0)
+            if (strict && !is_blank_line && indent > 0 && indent % indent_size !=0)
             {
                 ec = toon_errc::indent_not_multiple_of_indent_size;
                 return;
@@ -663,10 +674,15 @@ void read_lines(jsoncons::string_view raw,
     }
     if (start < i)
     {
+        if (strict && !is_blank_line && indent > 0 && indent % indent_size != 0)
+        {
+            ec = toon_errc::indent_not_multiple_of_indent_size;
+            return;
+        }
         std::size_t depth = compute_depth_from_indent(indent, indent_size);
         if (is_blank_line)
         {
-            blank_lines.push_back(blank_line_info{line_num,indent,depth});
+            blank_lines.push_back(blank_line_info{line_num, indent, depth});
         }
         lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
     }

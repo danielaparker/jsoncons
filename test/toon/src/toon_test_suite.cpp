@@ -112,42 +112,40 @@ void toon_decode_tests(const std::string& fpath)
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
             toon::toon_string_reader reader(input, decoder, options);
+            reader.read();
             if (should_error)
             {
-                //std::cout << test.at("name").as_string() << "\n";
-                //std::cout << "shouldError: " << should_error << "\n";
-                //std::cout << input << "\n";
-                REQUIRE_THROWS(reader.read());
+                std::cout << test.at("name").as_string() << "\n";
+                std::cout << input << "\n";
+                REQUIRE(!should_error);
             }
-            else
+            if (!decoder.is_valid())
             {
-                reader.read();
-                if (!decoder.is_valid())
-                {
-                    std::cout << test.at("name").as_string() << "\n";
-                    std::cout << input << "\n";
-                }
-                REQUIRE(decoder.is_valid());
-                auto result = decoder.get_result();
-                CHECK(expected == result);
-
-                if (expected != result)
-                {
-                    std::cout << "shouldError: " << should_error << "\n";
-                    std::cout << test.at("name").as_string() << "\n";
-                    std::cout << input << "\n";
-                    std::cout << pretty_print(result) << "\n";
-                }
-                CHECK(expected == result);
+                std::cout << test.at("name").as_string() << "\n";
+                std::cout << input << "\n";
             }
+            REQUIRE(decoder.is_valid());
+            auto result = decoder.get_result();
+            CHECK(expected == result);
+
+            if (expected != result)
+            {
+                std::cout << "shouldError: " << should_error << "\n";
+                std::cout << test.at("name").as_string() << "\n";
+                std::cout << input << "\n";
+                std::cout << pretty_print(result) << "\n";
+            }
+            CHECK(expected == result);
         }
         catch (const std::exception&)
         {
-            std::cout << "Except shouldError: " << should_error << "\n";
-            std::cout << test.at("name").as_string() << "\n";
-            std::cout << input << "\n";
-            throw;
-            //CHECK(true == should_error);
+            if (!should_error)
+            {
+                std::cout << "Except shouldError: " << should_error << "\n";
+                std::cout << test.at("name").as_string() << "\n";
+                std::cout << input << "\n";
+                CHECK(should_error);
+            }
         }
     }
 }
@@ -173,7 +171,7 @@ TEST_CASE("toon-tests")
         toon_decode_tests("./toon/input/decode/arrays-tabular.json");
         toon_decode_tests("./toon/input/decode/blank-lines.json");
         toon_decode_tests("./toon/input/decode/delimiters.json");
-        //toon_decode_tests("./toon/input/decode/indentation-errors.json");
+        toon_decode_tests("./toon/input/decode/indentation-errors.json");
         //toon_decode_tests("./toon/input/decode/numbers.json");
         //toon_decode_tests("./toon/input/decode/objects.json");
         //toon_decode_tests("./toon/input/decode/path-expansion.json");
