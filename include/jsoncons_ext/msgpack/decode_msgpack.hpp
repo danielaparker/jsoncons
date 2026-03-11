@@ -26,7 +26,7 @@
 namespace jsoncons { 
 namespace msgpack {
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
                         ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const BytesViewLike& v, 

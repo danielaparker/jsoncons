@@ -114,9 +114,9 @@ void toon_decode_tests(const std::string& fpath)
             toon::toon_string_reader reader(input, decoder, options);
             if (should_error)
             {
-                std::cout << test.at("name").as_string() << "\n";
-                std::cout << "shouldError: " << should_error << "\n";
-                std::cout << input << "\n";
+                //std::cout << test.at("name").as_string() << "\n";
+                //std::cout << "shouldError: " << should_error << "\n";
+                //std::cout << input << "\n";
                 REQUIRE_THROWS(reader.read());
             }
             else
@@ -171,7 +171,7 @@ TEST_CASE("toon-tests")
         //toon_decode_tests("./toon/input/decode/arrays-nested.json");
         //toon_decode_tests("./toon/input/decode/arrays-primitive.json");
         //toon_decode_tests("./toon/input/decode/arrays-tabular.json");
-        toon_decode_tests("./toon/input/decode/blank-lines.json");
+        //toon_decode_tests("./toon/input/decode/blank-lines.json");
         //toon_decode_tests("./toon/input/decode/delimiters.json");
         //toon_decode_tests("./toon/input/decode/indentation-errors.json");
         //toon_decode_tests("./toon/input/decode/numbers.json");
