@@ -244,9 +244,47 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
 }
 
 inline
-toon_errc parse_primitive(jsoncons::string_view token, json_visitor& visitor)
+toon_errc parse_number(const char* data, std::size_t length, 
+    json_visitor& visitor)
+{
+    std::uint64_t u64;
+    auto ru64 = jsoncons::to_integer(data, length, u64);
+    if (ru64)
+    {
+        visitor.uint64_value(u64);
+        return toon_errc{};
+    }
+    std::int64_t i64;
+    auto ri64 = jsoncons::to_integer(data, length, i64);
+    if (ri64)
+    {
+        visitor.int64_value(i64);
+        return toon_errc{};
+    }
+    double d;
+    auto result = jsoncons::decstr_to_double(data, length, d);
+    if (result)
+    {
+        visitor.double_value(d);
+        return toon_errc{};
+    }
+
+    visitor.string_value(jsoncons::string_view(data, length));
+
+    return toon_errc{};
+}
+
+inline
+toon_errc parse_primitive(jsoncons::string_view token, 
+    json_visitor& visitor)
 {
     token = jsoncons::strip(token);
+
+    if (token.empty())
+    {
+        visitor.string_value(jsoncons::string_view{});
+        return toon_errc{};
+    }
 
     if (jsoncons::starts_with(token, '\"'))
     {
@@ -277,30 +315,11 @@ toon_errc parse_primitive(jsoncons::string_view token, json_visitor& visitor)
         visitor.null_value();
         return toon_errc{};
     }
-    
+    if ((token[0] >= '0' && token[0] <= '9') || token[0] == '-')
     {
-        std::uint64_t u64;
-        auto ru64 = jsoncons::to_integer(token.data(), token.size(), u64);
-        if (ru64)
-        {
-            visitor.uint64_value(u64);
-            return toon_errc{};
-        }
-        std::int64_t i64;
-        auto ri64 = jsoncons::to_integer(token.data(), token.size(), i64);
-        if (ri64)
-        {
-            visitor.int64_value(i64);
-            return toon_errc{};
-        }
-        double d;
-        auto result = jsoncons::decstr_to_double(token.data(), token.size(), d);
-        if (result)
-        {
-            visitor.double_value(d);
-            return toon_errc{};
-        }
+        return parse_number(token.data(), token.size(), visitor);
     }
+        
     visitor.string_value(jsoncons::string_view(token.data(), token.size()));
 
     return toon_errc{};
