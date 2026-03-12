@@ -1,3 +1,42 @@
 [
+  {
+    "given": {
+      "foo": {
+        "bar": "baz"
+      }
+    },
+    "cases": [
+      {
+        "comment": "Comparator expression evaluates to true boolean",
+        "expression": "foo.bar == 'baz'",
+        "result": true
+      },
+      {
+        "comment": "Comparator expression evaluates to false boolean",
+        "expression": "foo.bar == 'bar'",
+        "result": false
+      },
+      {
+        "comment": "Multi select list comparator value expression evaluates to true boolean",
+        "expression": "[foo.bar == 'baz']",
+        "result": [ true ]
+      },
+      {
+        "comment": "Multi select list comparator value expression evaluates to false boolean",
+        "expression": "[foo.bar == 'bar']",
+        "result": [ false ]
+      },
+      {
+        "comment": "Multi select hash comparator value expression evaluates to true boolean",
+        "expression": "{value: foo.bar == 'baz'}",
+        "result": { "value": true }
+      },
+      {
+        "comment": "Multi select hash comparator value expression evaluates to false boolean",
+        "expression": "{value: foo.bar == 'bar'}",
+        "result": { "value": false }
+      }
+    ]
+  }
 ]
 

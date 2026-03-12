@@ -90,6 +90,10 @@ void jmespath_tests(const std::string& fpath)
 
 TEST_CASE("jmespath-tests")
 {
+    SECTION("Tests")
+    {
+        jmespath_tests("./jmespath/input/test.json");
+    }
     SECTION("Examples and tutorials")
     {
         jmespath_tests("./jmespath/input/examples/jmespath-examples.json"); 

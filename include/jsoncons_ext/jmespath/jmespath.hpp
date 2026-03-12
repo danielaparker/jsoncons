@@ -4431,8 +4431,8 @@ namespace detail {
                                     push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
                                     if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                     state_stack.back() = expr_state::multi_select_list;
-                                    state_stack.push_back(expr_state::rhs_expression);                                
-                                    state_stack.push_back(expr_state::lhs_expression);                                
+                                    state_stack.push_back(expr_state::rhs_expression);
+                                    state_stack.push_back(expr_state::lhs_expression);
                                     context_stack.push_back(expression_context<Json>{});
                                 }
                                 break;
@@ -4490,7 +4490,8 @@ namespace detail {
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 break;
                             default:
-                                state_stack.back() = expr_state::key_val_expr;
+                                state_stack.back() = expr_state::expect_rbrace;
+                                state_stack.push_back(expr_state::key_val_expr);
                                 break;
                         }
                         break;
@@ -4906,16 +4907,7 @@ namespace detail {
                             case ',':
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
-                                state_stack.back() = expr_state::key_val_expr; 
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '[':
-                            case '{':
-                                state_stack.push_back(expr_state::lhs_expression);
-                                break;
-                            case '.':
-                                state_stack.push_back(expr_state::sub_expression);
+                                state_stack.push_back(expr_state::key_val_expr); 
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4942,8 +4934,9 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ':':
-                                state_stack.back() = expr_state::expect_rbrace;
+                                state_stack.back() = expr_state::rhs_expression;
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
