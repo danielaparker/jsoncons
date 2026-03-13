@@ -385,6 +385,8 @@ namespace detail {
         }
     };
 
+    template<class Ch,typename Traits = std::char_traits<CharT>> constexpr std::size_t basic_string_view<Ch,Traits>::npos;
+
     // ==
     template <typename CharT,typename Traits>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
