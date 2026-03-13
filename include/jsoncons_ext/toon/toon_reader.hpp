@@ -183,6 +183,7 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
     {
         std::size_t exponent;
         auto r = dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
+        JSONCONS_ASSERT(r);
 
         std::size_t n = num_str.size();
 
