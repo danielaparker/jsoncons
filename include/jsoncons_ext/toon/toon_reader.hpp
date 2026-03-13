@@ -47,7 +47,6 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
 
     bool neg_value = false;
     bool neg_exp = false;
-    bool has_dot = false;
     bool not_a_number = false;
 
     std::size_t decimal_places = 0;
@@ -111,7 +110,6 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
                 else if (c == '.')
                 { 
                     state = parse_number_state::fraction;
-                    has_dot = true;
                     ++i;
                 }
                 else
@@ -441,6 +439,10 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         {
             start = i+1;
             in_quotes = true;
+        }
+        else if (in_quotes && c == '\\')
+        {
+            ++i;
         }
         else if (in_quotes && c == '\"')
         {

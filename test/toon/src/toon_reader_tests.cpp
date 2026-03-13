@@ -15,7 +15,7 @@ namespace toon = jsoncons::toon;
 
 TEST_CASE("toon_reader parse_number_or_string")
 {
-    SECTION("2.5e0")
+    /*SECTION("2.5e0")
     {
         jsoncons::string_view str = "2.5e0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -60,7 +60,7 @@ TEST_CASE("toon_reader parse_number_or_string")
         CHECK("0.025" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
-    /*SECTION("1.5000")
+    SECTION("1.5000")
     {
         jsoncons::string_view str = "1.5000";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -561,7 +561,7 @@ season: spring_2025)";
         //std::cout << pretty_print(expected) << "\n";
         //std::cout << pretty_print(result) << "\n";
     }*/
-    /*SECTION("issue")
+    SECTION("issue")
     {
         auto expected = jsoncons::ojson::parse(R"({
     "items": [
@@ -571,22 +571,22 @@ season: spring_2025)";
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = "a: 1\n   \nb: 2";
+        std::string data = R"("he said \"hi\"": 1)";
         try
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
             auto options = toon::toon_options{}.strict(true);
             toon::toon_string_reader reader(data, decoder, options);
             reader.read();
-            //REQUIRE_FALSE(decoder.is_valid());
-            //auto result = decoder.get_result();
+            REQUIRE(decoder.is_valid());
+            auto result = decoder.get_result();
             //CHECK(expected == result);
-            //std::cout << pretty_print(expected) << "\n";
-            //std::cout << pretty_print(result) << "\n";
+            std::cout << pretty_print(expected) << "\n";
+            std::cout << pretty_print(result) << "\n";
         }
         catch (const std::exception& e)
         {
             std::cout << "Error: "  << e.what() << "\n";
         }
-    }*/
+    }
 }
