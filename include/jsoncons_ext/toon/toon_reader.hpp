@@ -205,10 +205,9 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
         }
         else // shift decimal point right
         {
-            for (std::size_t i = decimal_places; i < exponent; ++i)
+            if (exponent > decimal_places)
             {
-                //num_str.insert(num_str.begin() + (n - decimal_places), '0');
-                num_str.push_back('0');
+                num_str.append(exponent - decimal_places, '0');
             }
             if (decimal_places > exponent)
             {

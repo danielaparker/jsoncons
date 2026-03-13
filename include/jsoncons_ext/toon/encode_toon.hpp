@@ -141,9 +141,9 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
     }
     else // shift decimal point right
     {
-        for (std::size_t i = decimal_places; i < exponent; ++i)
+        if (exponent > decimal_places)
         {
-            num_str.insert(num_str.begin()+(n-decimal_places), '0');
+            num_str.append(exponent - decimal_places, '0');
         }
         if (decimal_places > exponent)
         {
