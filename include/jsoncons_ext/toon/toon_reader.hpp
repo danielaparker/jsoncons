@@ -909,7 +909,7 @@ header_result parse_header(jsoncons::string_view line)
         fields.clear();
     }
     return header_result{jsoncons::in_place, header_info{jsoncons::optional<std::string>{std::move(key)}, length, delimiter, std::move(fields)}};
-};
+}
 
 inline
 std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t indent_size)
