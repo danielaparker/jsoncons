@@ -28,7 +28,7 @@ JSONCONS_INLINE_CONSTEXPR jsoncons::string_view false_literal{"false", 5};
 
 namespace detail {
 
-enum class format_number_state{value_sign,coefficient,fraction,exponent_sign,exponent_value,err};
+enum class format_number_state{value_sign,digits,fraction,exponent_sign,exponent_value,err};
 
 inline
 std::string exponential_to_decimal_notation(jsoncons::string_view str)
@@ -55,9 +55,9 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
                     neg_value = true;
                     ++i;
                 }
-                state = format_number_state::coefficient;
+                state = format_number_state::digits;
                 break;
-            case format_number_state::coefficient:
+            case format_number_state::digits:
                 if ((c >= '0' && c <= '9') || c == '-')
                 {
                     num_str.push_back(c);

@@ -172,7 +172,7 @@ TEST_CASE("toon-tests")
         toon_decode_tests("./toon/input/decode/blank-lines.json");
         toon_decode_tests("./toon/input/decode/delimiters.json");
         toon_decode_tests("./toon/input/decode/indentation-errors.json");
-        //toon_decode_tests("./toon/input/decode/numbers.json");
+        toon_decode_tests("./toon/input/decode/numbers.json");
         //toon_decode_tests("./toon/input/decode/objects.json");
         //toon_decode_tests("./toon/input/decode/path-expansion.json");
         //toon_decode_tests("./toon/input/decode/primitives.json");

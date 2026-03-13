@@ -35,6 +35,237 @@
 namespace jsoncons {
 namespace toon {
 
+enum class parse_number_state{sign,zero,digits,fraction,exponent_sign,exponent_value,err};
+
+inline
+toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visitor& visitor)
+{
+    std::string result;
+
+    std::string num_str;
+    std::string exponent_str;
+
+    bool neg_value = false;
+    bool neg_exp = false;
+    bool has_dot = false;
+    bool not_a_number = false;
+
+    std::size_t decimal_places = 0;
+
+    parse_number_state state = parse_number_state::sign;
+    for (std::size_t i = 0; i < str.size() && !not_a_number;)
+    {
+        char c = str[i];
+        switch (state)
+        {
+            case parse_number_state::sign:
+                if (c == '-')
+                {
+                    neg_value = true;
+                    ++i;
+                }
+                if (i < str.size() && str[i] == '0')
+                {
+                    num_str.push_back('0');
+                    state = parse_number_state::zero;
+                    if (++i == str.size())
+                    {
+                        neg_value = false;
+                    }
+                }
+                else
+                {
+                    state = parse_number_state::digits;
+                }
+                break;
+            case parse_number_state::zero:
+                if (c == '.')
+                {
+                    state = parse_number_state::digits;
+                    ++i;
+                }
+                else
+                {
+                    if ((str.size() - i) == 2 && (str[i] == 'e' || str[i] == 'E') && str[i + 1] == '1')
+                    {
+                        num_str.push_back('0');
+                        i += 2;
+                    }
+                    else
+                    {
+                        not_a_number = true;
+                    }
+                }
+                break;
+            case parse_number_state::digits:
+                if ((c >= '0' && c <= '9') || c == '-')
+                {
+                    num_str.push_back(c);
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = parse_number_state::exponent_sign;
+                    ++i;
+                }
+                else if (c == '.')
+                { 
+                    state = parse_number_state::fraction;
+                    has_dot = true;
+                    ++i;
+                }
+                else
+                {
+                    not_a_number = true;
+                }
+                break;
+            case parse_number_state::fraction:
+                if ((c >= '0' && c <= '9'))
+                {
+                    ++decimal_places;
+                    num_str.push_back(c);
+                    ++i;
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    state = parse_number_state::exponent_sign;
+                    ++i;
+                }
+                else
+                {
+                    not_a_number = true;
+                }
+                break;
+            case parse_number_state::exponent_sign:
+                if (c == '-')
+                {
+                    neg_exp = true;
+                    state = parse_number_state::exponent_value;
+                    ++i;
+                }
+                else if (c == '+')
+                {
+                    state = parse_number_state::exponent_value;
+                    ++i;
+                }
+                else
+                {
+                    state = parse_number_state::exponent_value;
+                }
+                break;
+            case parse_number_state::exponent_value:
+                if ((c >= '0' && c <= '9'))
+                {
+                    exponent_str.push_back(c);
+                    ++i;
+                }
+                else
+                {
+                    not_a_number = true;
+                }
+                break;
+            case parse_number_state::err:
+                i = str.size();
+                break;
+            default:
+                not_a_number = true;
+                break;
+        }
+    }
+
+    if (not_a_number)
+    {
+        visitor.string_value(str);
+        return toon_errc{};
+    }
+
+    if (!exponent_str.empty())
+    {
+        std::size_t exponent;
+        auto r = dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
+
+        std::size_t n = num_str.size();
+
+        if (neg_exp) // shift decimal point left
+        {
+            for (std::size_t i = n - decimal_places; i <= exponent; ++i)
+            {
+                num_str.insert(num_str.begin(), '0');
+            }
+            std::size_t pos = num_str.size() - (decimal_places + exponent);
+            auto first_non_zero = num_str.find_first_not_of('0', pos);
+            if (first_non_zero == std::string::npos)
+            {
+                num_str.erase(num_str.begin() + pos, num_str.end());
+            }
+            else
+            {
+                num_str.insert(num_str.begin() + (num_str.size() - decimal_places - exponent), '.');
+            }
+        }
+        else // shift decimal point right
+        {
+            for (std::size_t i = decimal_places; i < exponent; ++i)
+            {
+                //num_str.insert(num_str.begin() + (n - decimal_places), '0');
+                num_str.push_back('0');
+            }
+            if (decimal_places > exponent)
+            {
+                num_str.insert(num_str.begin() + (num_str.size() - (decimal_places- exponent)), '.');
+            }
+        }
+    }
+    else
+    {
+        if (decimal_places > 0)
+        {
+            num_str.insert(num_str.begin() + (num_str.size()-decimal_places), '.');
+        }
+
+    }
+    if (neg_value)
+    {
+        num_str.insert(num_str.begin(), '-');
+    }
+
+    if (not_a_number)
+    {
+        visitor.string_value(str);
+        return toon_errc{};
+    }
+    else
+    {
+
+        std::uint64_t u64;
+        auto ru64 = jsoncons::to_integer(num_str.data(), num_str.size(), u64);
+        if (ru64)
+        {
+            visitor.uint64_value(u64);
+            return toon_errc{};
+        }
+        std::int64_t i64;
+        auto ri64 = jsoncons::to_integer(num_str.data(), num_str.size(), i64);
+        if (ri64)
+        {
+            visitor.int64_value(i64);
+            return toon_errc{};
+        }
+
+        double d;
+        auto rd = jsoncons::decstr_to_double(num_str.data(), num_str.size(), d);
+        if (rd)
+        {
+            visitor.double_value(d);
+            return toon_errc{};
+        }
+
+        visitor.string_value(str);
+    }
+
+    return toon_errc{};
+}
+
 inline
 jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
 {
@@ -247,6 +478,43 @@ inline
 toon_errc parse_number(const char* data, std::size_t length, 
     json_visitor& visitor)
 {
+    if (length == 0)
+    {
+        visitor.string_value(jsoncons::string_view{});
+        return toon_errc{};
+    }
+    const char* cur = data;
+    bool sign = (*cur == '-');
+    cur += sign;
+    std::size_t len = length - sign;
+    if (len == 0)
+    {
+        visitor.string_value(jsoncons::string_view{data, length});
+        return toon_errc{};
+    }
+
+    if (len >= 2 && *cur == '0' && *(cur+1) != '.')
+    {
+        visitor.string_value(jsoncons::string_view(data, length));
+        return toon_errc{};
+    }
+
+    const char* end = data + length;
+    bool dot = false;
+    while (cur < end)
+    {
+        if (*cur == '.')
+        {
+            dot = true;
+        }
+        else if (!((*cur >= '0' && *cur <= '9') || (!dot && (*cur == 'e' || *cur == 'E' || *cur == '-' || *cur == '+'))))
+        {
+            visitor.string_value(jsoncons::string_view(data, length));
+            return toon_errc{};
+        }
+        ++cur;
+    }
+
     std::uint64_t u64;
     auto ru64 = jsoncons::to_integer(data, length, u64);
     if (ru64)
@@ -261,6 +529,7 @@ toon_errc parse_number(const char* data, std::size_t length,
         visitor.int64_value(i64);
         return toon_errc{};
     }
+
     double d;
     auto result = jsoncons::decstr_to_double(data, length, d);
     if (result)
@@ -315,14 +584,7 @@ toon_errc parse_primitive(jsoncons::string_view token,
         visitor.null_value();
         return toon_errc{};
     }
-    if ((token[0] >= '0' && token[0] <= '9') || token[0] == '-')
-    {
-        return parse_number(token.data(), token.size(), visitor);
-    }
-        
-    visitor.string_value(jsoncons::string_view(token.data(), token.size()));
-
-    return toon_errc{};
+    return parse_number_or_string(token, visitor);
 }
 
 inline 
