@@ -35,6 +35,9 @@ namespace toon {
         too_few_values_in_row,
         invalid_line,
         invalid_escape_sequence,
+        inline_array_length_mismatch,
+        list_array_length_mismatch,
+        tabular_array_length_mismatch,
 
         max_nesting_depth_exceeded,
         single_quote,
@@ -109,6 +112,12 @@ namespace toon {
                     return "Invalid line";
                 case toon_errc::invalid_escape_sequence:
                     return "Invalid escape sequence";
+                case toon_errc::inline_array_length_mismatch:
+                    return "Inline array length mismatch";
+                case toon_errc::list_array_length_mismatch:
+                    return "List array length mismatch";
+                case toon_errc::tabular_array_length_mismatch:
+                    return "Tabular array length mismatch";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
                 case toon_errc::single_quote:

@@ -38,8 +38,10 @@ namespace toon {
 enum class parse_number_state{sign,zero,digits,fraction,exponent_sign,exponent_value,err};
 
 inline
-toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visitor& visitor)
+jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string_view str, jsoncons::json_visitor& visitor)
 {
+    using result_type = jsoncons::expected<void,std::error_code>;
+
     std::string result;
 
     std::string num_str;
@@ -174,7 +176,7 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
     if (not_a_number)
     {
         visitor.string_value(str);
-        return toon_errc{};
+        return result_type{};
     }
 
     if (!exponent_str.empty())
@@ -230,7 +232,7 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
     if (not_a_number)
     {
         visitor.string_value(str);
-        return toon_errc{};
+        return result_type{};
     }
     else
     {
@@ -240,14 +242,14 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
         if (ru64)
         {
             visitor.uint64_value(u64);
-            return toon_errc{};
+            return result_type{};
         }
         std::int64_t i64;
         auto ri64 = jsoncons::to_integer(num_str.data(), num_str.size(), i64);
         if (ri64)
         {
             visitor.int64_value(i64);
-            return toon_errc{};
+            return result_type{};
         }
 
         double d;
@@ -255,13 +257,13 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
         if (rd)
         {
             visitor.double_value(d);
-            return toon_errc{};
+            return result_type{};
         }
 
         visitor.string_value(str);
     }
 
-    return toon_errc{};
+    return result_type{};
 }
 
 inline
@@ -546,54 +548,60 @@ toon_errc parse_number(const char* data, std::size_t length,
 }
 
 inline
-toon_errc parse_primitive(jsoncons::string_view token, 
+jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view token, 
     json_visitor& visitor)
 {
+    using result_type = jsoncons::expected<void,std::error_code>;
+
     token = jsoncons::strip(token);
 
     if (token.empty())
     {
         visitor.string_value(jsoncons::string_view{});
-        return toon_errc{};
+        return result_type{};
     }
 
     if (jsoncons::starts_with(token, '\"'))
     {
         if (!jsoncons::ends_with(token, '\"') || token.size() < 2)
         {
-            return toon_errc::missing_closing_quote;
+            return result_type{jsoncons::unexpect, toon_errc::missing_closing_quote};
         }
         auto result = unescape_string(jsoncons::string_view(token.data()+1, token.size()-2));
         if (!result)
         {
-            return result.error();
+            return result_type{jsoncons::unexpect, result.error()};
         }
         visitor.string_value(*result);
-        return toon_errc{};
+        return result_type{};
     }
     if (token == "true")
     {
         visitor.bool_value(true);
-        return toon_errc{};
+        return result_type{};
     }
     if (token == "false")
     {
         visitor.bool_value(false);
-        return toon_errc{};
+        return result_type{};
     }
     if (token == "null")
     {
         visitor.null_value();
-        return toon_errc{};
+        return result_type{};
     }
     return parse_number_or_string(token, visitor);
 }
 
 inline 
-void parse_delimited_values(jsoncons::string_view line, 
+jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string_view line, 
     char delimiter,
+    std::size_t expected_length,
+    bool strict,
     json_visitor& visitor)
 {
+    using result_type = jsoncons::expected<void,std::error_code>;
+
     bool is_quoted = false;
     std::size_t offset = 0;
     std::size_t length = 0;
@@ -607,7 +615,11 @@ void parse_delimited_values(jsoncons::string_view line,
 
         if (c == delimiter && !is_quoted)
         {
-            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            if (!r)
+            {
+                return result_type{jsoncons::unexpect, r.error()};
+            }
             ++num_items;
             offset = i+1;
             length = 0;
@@ -627,7 +639,11 @@ void parse_delimited_values(jsoncons::string_view line,
         }
         else if (is_quoted && c == '\"')
         {
-            parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            auto r = parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            if (!r)
+            {
+                return result_type{jsoncons::unexpect, r.error()};
+            }
             ++num_items;
             while (++i < line.size())
             {
@@ -649,8 +665,15 @@ void parse_delimited_values(jsoncons::string_view line,
     }
     if ((length > 0 || !is_empty) && (num_delimiters == num_items))
     {
-        parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        if (!r)
+        {
+            return result_type{jsoncons::unexpect, r.error()};
+        }
+        ++num_items;
     }
+
+    return strict && expected_length != num_items ? result_type{jsoncons::unexpect, toon_errc::inline_array_length_mismatch} : result_type{};
 }
 
 inline 
@@ -680,7 +703,11 @@ line_result parse_delimited_values(jsoncons::string_view line,
                 return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
             visitor.key(fields[field_index]);
-            parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            if (!r)
+            {
+                return line_result{jsoncons::unexpect, r.error()};
+            }
             ++num_items;
             ++num_delimiters;
             offset = i+1;
@@ -706,7 +733,11 @@ line_result parse_delimited_values(jsoncons::string_view line,
                 return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
             visitor.key(fields[field_index]);
-            parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            auto r = parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            if (!r)
+            {
+                return line_result{jsoncons::unexpect, r.error()};
+            }
             ++num_items;
             while (++i < line.size())
             {
@@ -733,7 +764,11 @@ line_result parse_delimited_values(jsoncons::string_view line,
             return line_result{jsoncons::unexpect, toon_errc::too_many_values_in_row};
         }
         visitor.key(fields[field_index]);
-        parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        if (!r)
+        {
+            return line_result{jsoncons::unexpect, r.error()};
+        }
         ++field_index;
     }
     if (field_index != fields.size())
@@ -973,26 +1008,28 @@ void read_lines(jsoncons::string_view raw,
 }
 
 inline
-void decode_inline_array(jsoncons::string_view content, 
+jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::string_view content, 
     char delimiter,
     std::size_t expected_length,
     bool strict,
     json_visitor& visitor)
 {
+    using result_type = jsoncons::expected<void,std::error_code>;
+
     if (content.empty() && expected_length == 0)
     {
         visitor.begin_array();
         visitor.end_array();
-        return;
+        return result_type{};
     }
     visitor.begin_array();
-    parse_delimited_values(content, delimiter, visitor);
-    visitor.end_array();
-
-    if (strict && expected_length != 1)
+    auto r = parse_delimited_values(content, delimiter, expected_length, strict, visitor);
+    if (!r)
     {
-        // error
+        return r;
     }
+    visitor.end_array();
+    return result_type{};
 }
 
 inline
@@ -1141,7 +1178,11 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         {
             // Primitive value
             visitor.key(key);
-            parse_primitive(value_str, visitor);
+            auto r = parse_primitive(value_str, visitor);
+            if (!r)
+            {
+                return void_result{jsoncons::unexpect, r.error()};
+            }
             ++i;
         }
     }
@@ -1162,6 +1203,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
 
     std::size_t item_depth = base_depth + 1;
 
+    std::size_t row_count = 0;
     std::size_t i = start_idx;
     while (i < lines.size())
     {
@@ -1172,7 +1214,6 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 // In strict mode: blank lines at or above row depth are errors
                 // Blank lines dedented below row depth mean array has ended
-
                 if ((i-start_idx) < expected_length)
                 {
                     return line_result{jsoncons::unexpect, toon_errc::blank_lines_in_array};
@@ -1222,11 +1263,16 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     auto inline_part = jsoncons::strip(jsoncons::string_view(item_content.data()+(colon_idx+1), item_content.size()-(colon_idx+1)));
                     if (!inline_part.empty() || length == 0)
                     {
-                        decode_inline_array(inline_part, item_delim, length, strict, visitor);
+                        auto r = decode_inline_array(inline_part, item_delim, length, strict, visitor);
+                        if (!r)
+                        {
+                            return line_result{jsoncons::unexpect, r.error()};
+                        }
                         ++i;
+                        ++row_count;
                         continue;
                     }
-                    else // TEST
+                    else 
                     {
                         auto next_i_result = decode_list_array(
                             lines, i + 1, base_depth, length, strict, visitor);
@@ -1235,6 +1281,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                             return next_i_result;
                         }
                         i = *next_i_result;
+                        ++row_count;
                         continue;
                     }
                 }
@@ -1304,11 +1351,16 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     else
                     {
                         visitor.key(field_key);
-                        parse_primitive(field_value_str, visitor);
+                        auto r = parse_primitive(field_value_str, visitor);
+                        if (!r)
+                        {
+                            return line_result{jsoncons::unexpect, r.error()};
+                        }
                         ++i;
                     }
                 }
                 visitor.end_object();
+                ++row_count;
                 continue;
             }
         }
@@ -1339,7 +1391,11 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 // first field is primitive
                 visitor.key(key);
-                parse_primitive(value_str, visitor);
+                auto r = parse_primitive(value_str, visitor);
+                if (!r)
+                {
+                    return line_result{jsoncons::unexpect, r.error()};
+                }
                 ++i;
             }
             // Remaining fields at depth + 1
@@ -1398,11 +1454,16 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 else
                 {
                     visitor.key(field_key);
-                    parse_primitive(field_value_str, visitor);
+                    auto r = parse_primitive(field_value_str, visitor);
+                    if (!r)
+                    {
+                        return line_result{jsoncons::unexpect, r.error()};
+                    }
                     ++i;
                 }
             }
             visitor.end_object();
+            ++row_count;
         }
         else
         {
@@ -1411,19 +1472,26 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 visitor.begin_object();
                 visitor.end_object();
+                ++row_count;
                 ++i;
             }
             else
             {
-                parse_primitive(item_content, visitor);
+                auto r = parse_primitive(item_content, visitor);
+                if (!r)
+                {
+                    return line_result{jsoncons::unexpect, r.error()};
+                }
+                ++row_count;
                 ++i;
             }
         }
+
     }
 
     visitor.end_array();
 
-    return line_result{i};
+    return strict && expected_length != row_count ? line_result{jsoncons::unexpect, toon_errc::list_array_length_mismatch} : line_result{i};
 }
 
 inline
@@ -1440,6 +1508,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
     std::size_t i = start_idx;
     std::size_t row_depth = base_depth + 1;
+    std::size_t row_count =0;
 
     while (i < lines.size())
     {
@@ -1482,6 +1551,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
             {
                 return r;
             }
+            ++row_count;
             ++i;
         }
         else
@@ -1492,7 +1562,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
     visitor.end_array();
 
-    return line_result{i};
+    return strict && expected_length != row_count ? line_result{jsoncons::unexpect, toon_errc::tabular_array_length_mismatch} : line_result{i};
 }
 
 inline
@@ -1522,7 +1592,11 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
 
     if (!inline_content.empty() || (fields.empty() && length == 0))
     {
-        decode_inline_array(inline_content, delimiter, length, strict, visitor);
+        auto r = decode_inline_array(inline_content, delimiter, length, strict, visitor);
+        if (!r)
+        {
+            return line_result(jsoncons::unexpect, r.error());
+        }
         return line_result{header_idx + 1};
     }
 
@@ -1694,7 +1768,11 @@ public:
                 if (!header_result || !(*header_result))
                 {
                     // Single primitive
-                    parse_primitive(line_content, visitor_);
+                    auto r = parse_primitive(line_content, visitor_);
+                    if (!r)
+                    {
+                        ec = r.error();
+                    }
                     return;
                 }
             }

@@ -571,7 +571,10 @@ season: spring_2025)";
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(tags[2]: a,b,c)";
+        std::string data = R"(items[3]:
+  - first
+  - second
+  -)";
         try
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
