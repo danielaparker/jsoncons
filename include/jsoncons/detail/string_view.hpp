@@ -385,7 +385,7 @@ namespace detail {
         }
     };
 
-    template<class CharT,typename Traits = std::char_traits<CharT>> constexpr std::size_t basic_string_view<CharT,Traits>::npos;
+    template<class CharT,typename Traits> constexpr std::size_t basic_string_view<CharT,Traits>::npos;
 
     // ==
     template <typename CharT,typename Traits>
