@@ -188,10 +188,9 @@ toon_errc parse_number_or_string(jsoncons::string_view str, jsoncons::json_visit
 
         if (neg_exp) // shift decimal point left
         {
-            std::size_t nplaces = exponent >= (n - decimal_places) ? ((exponent - (n - decimal_places)) + 1) : 0;
-            if (nplaces > 0)
+            if ((exponent+decimal_places+1) > n)
             {
-                num_str.insert(num_str.begin(), nplaces, '0');
+                num_str.insert(num_str.begin(), ((exponent+decimal_places+1) - n), '0');
             }
             std::size_t pos = num_str.size() - (decimal_places + exponent);
             auto first_non_zero = num_str.find_first_not_of('0', pos);
