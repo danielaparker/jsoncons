@@ -15,7 +15,7 @@ namespace toon = jsoncons::toon;
 
 TEST_CASE("toon_reader parse_number_or_string")
 {
-    /*SECTION("2.5e0")
+    SECTION("2.5e0")
     {
         jsoncons::string_view str = "2.5e0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -66,7 +66,8 @@ TEST_CASE("toon_reader parse_number_or_string")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::parse_number_or_string(str, decoder);
         REQUIRE(decoder.is_valid());
-        std::cout << decoder.get_result() << "\n";
+        CHECK("1.5" == decoder.get_result().as_string());
+        //std::cout << decoder.get_result() << "\n";
     }
     SECTION("test 0e1")
     {
@@ -74,7 +75,8 @@ TEST_CASE("toon_reader parse_number_or_string")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::parse_number_or_string(str, decoder);
         REQUIRE(decoder.is_valid());
-        std::cout << decoder.get_result() << "\n";
+        CHECK("0" == decoder.get_result().as_string());
+        //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-0e1")
     {
@@ -82,7 +84,8 @@ TEST_CASE("toon_reader parse_number_or_string")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::parse_number_or_string(str, decoder);
         REQUIRE(decoder.is_valid());
-        std::cout << decoder.get_result() << "\n";
+        CHECK("0" == decoder.get_result().as_string());
+        //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-05")
     {
@@ -90,7 +93,8 @@ TEST_CASE("toon_reader parse_number_or_string")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::parse_number_or_string(str, decoder);
         REQUIRE(decoder.is_valid());
-        std::cout << decoder.get_result() << "\n";
+        CHECK(jsoncons::ojson{"-05"} == decoder.get_result());
+        //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-0")
     {
@@ -98,12 +102,13 @@ TEST_CASE("toon_reader parse_number_or_string")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::parse_number_or_string(str, decoder);
         REQUIRE(decoder.is_valid());
-        std::cout << decoder.get_result() << "\n";
-    }*/
+        CHECK("0" == decoder.get_result().as_string());
+    }
 }
+
 TEST_CASE("toon_reader util tests")
 {
-    /*SECTION("unescape_string")
+    SECTION("unescape_string")
     {
         auto result1 = toon::unescape_string(jsoncons::string_view(R"(hello\\nworld)"));
         REQUIRE(result1);
@@ -151,7 +156,7 @@ TEST_CASE("toon_reader util tests")
         REQUIRE(r4);
         CHECK(R"("b:c")" == r4->first);
         CHECK("d" == r4->second);
-    }*/
+    }
 }
 #if 0
 TEST_CASE("toon_reader read_lines tests")

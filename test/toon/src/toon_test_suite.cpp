@@ -152,7 +152,7 @@ void toon_decode_tests(const std::string& fpath)
 
 TEST_CASE("toon-tests")
 {
-    /*SECTION("encode")
+    SECTION("encode")
     {
         toon_encode_tests("./toon/input/encode/arrays-nested.json");
         toon_encode_tests("./toon/input/encode/arrays-objects.json");
@@ -163,7 +163,7 @@ TEST_CASE("toon-tests")
         toon_encode_tests("./toon/input/encode/objects.json");
         toon_encode_tests("./toon/input/encode/primitives.json");
         toon_encode_tests("./toon/input/encode/whitespace.json");
-    }*/
+    }
     SECTION("decode")
     {
         toon_decode_tests("./toon/input/decode/arrays-nested.json");

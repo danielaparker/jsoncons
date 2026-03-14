@@ -1667,9 +1667,6 @@ private:
     json_visitor& visitor_;
     std::size_t indent_size_;
     bool strict_;
-    std::string raw_;
-    std::vector<parsed_line> lines_;
-    std::vector<blank_line_info> blank_lines_;
 
     // Noncopyable and nonmoveable
     basic_toon_reader(const basic_toon_reader&) = delete;
@@ -1723,19 +1720,23 @@ public:
 
     void read(std::error_code& ec)
     {
+        std::string raw;
+        std::vector<parsed_line> lines;
+        std::vector<blank_line_info> blank_lines;
+
         while (!source_.eof())
         {
             auto s = source_.read_buffer();
-            raw_.append(s.data(), s.size());
+            raw.append(s.data(), s.size());
         }
 
-        read_lines(raw_, indent_size_, strict_, lines_, blank_lines_, ec);
+        read_lines(raw, indent_size_, strict_, lines, blank_lines, ec);
         if (ec)
         {
             return;
         }
         std::vector<parsed_line> non_blank_lines;
-        for (const auto& ln : lines_)
+        for (const auto& ln : lines)
         {
             if (!ln.is_blank())
             {
@@ -1759,7 +1760,7 @@ public:
         {
             // Root array
             const header_info& header(*(*header_result));
-            auto r1 = decode_array(lines_, 0, 0, header, strict_, visitor_);
+            auto r1 = decode_array(lines, 0, 0, header, strict_, visitor_);
             if (!r1)
             {
                 ec = r1.error().code();
@@ -1794,15 +1795,12 @@ public:
         }
 
         // Otherwise, root object
-        auto r = decode_object(lines_, 0, 0, strict_, visitor_);
+        auto r = decode_object(lines, 0, 0, strict_, visitor_);
         if (!r)
         {
             ec = r.error().code();
         }
     }
-
-    const std::vector<parsed_line>& lines() const {return lines_;}
-    const std::vector<blank_line_info>& blank_lines() const {return blank_lines_;}
 };
 
 using toon_string_reader = basic_toon_reader<string_source<char>>;

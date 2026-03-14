@@ -38,34 +38,8 @@ namespace toon {
         inline_array_length_mismatch,
         list_array_length_mismatch,
         tabular_array_length_mismatch,
-
-        max_nesting_depth_exceeded,
-        single_quote,
-        illegal_character_in_string,
-        extra_comma,
-        expected_key,
-        expected_value,
         invalid_value,
-        expected_colon,
-        illegal_control_character,
-        illegal_escaped_character,
-        expected_codepoint_surrogate_pair,
-        invalid_hex_escape_sequence,
-        invalid_unicode_escape_sequence,
-        leading_zero,
-        invalid_number,
-        expected_comma_or_rbrace,
-        expected_comma_or_rbracket,
-        unexpected_rbracket,
-        unexpected_rbrace,
-        illegal_comment,
-        expected_continuation_byte,
-        over_long_utf8_sequence,
-        illegal_codepoint,
-        illegal_surrogate_value,
-        unpaired_high_surrogate,
-        illegal_unicode_character,
-        unexpected_character
+        max_nesting_depth_exceeded 
     };
 
     class toon_error_category_impl
@@ -120,58 +94,8 @@ namespace toon {
                     return "Tabular array length mismatch";
                 case toon_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
-                case toon_errc::single_quote:
-                    return "TOON strings cannot be quoted with single quotes";
-                case toon_errc::illegal_character_in_string:
-                    return "Illegal character in string";
-                case toon_errc::extra_comma:
-                    return "Extra comma";
-                case toon_errc::expected_key:
-                    return "Expected object member key";
-                case toon_errc::expected_value:
-                    return "Expected value";
                 case toon_errc::invalid_value:
                     return "Invalid value";
-                case toon_errc::expected_colon:
-                    return "Expected name separator ':'";
-                case toon_errc::illegal_control_character:
-                    return "Illegal control character in string";
-                case toon_errc::illegal_escaped_character:
-                    return "Illegal escaped character in string";
-                case toon_errc::expected_codepoint_surrogate_pair:
-                    return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
-                case toon_errc::invalid_hex_escape_sequence:
-                    return "Invalid codepoint, expected hexadecimal digit.";
-                case toon_errc::invalid_unicode_escape_sequence:
-                    return "Invalid codepoint, expected four hexadecimal digits.";
-                case toon_errc::leading_zero:
-                    return "A number cannot have a leading zero";
-                case toon_errc::invalid_number:
-                    return "Invalid number";
-                case toon_errc::expected_comma_or_rbrace:
-                    return "Expected comma or right brace '}'";
-                case toon_errc::expected_comma_or_rbracket:
-                    return "Expected comma or right bracket ']'";
-                case toon_errc::unexpected_rbrace:
-                    return "Unexpected right brace '}'";
-                case toon_errc::unexpected_rbracket:
-                    return "Unexpected right bracket ']'";
-                case toon_errc::illegal_comment:
-                    return "Illegal comment";
-                case toon_errc::expected_continuation_byte:
-                    return "Expected continuation byte";
-                case toon_errc::over_long_utf8_sequence:
-                    return "Over long UTF-8 sequence";
-                case toon_errc::illegal_codepoint:
-                    return "Illegal codepoint (>= 0xd800 && <= 0xdfff)";
-                case toon_errc::illegal_surrogate_value:
-                    return "UTF-16 surrogate values are illegal in UTF-32";
-                case toon_errc::unpaired_high_surrogate:
-                    return "Expected low surrogate following the high surrogate";
-                case toon_errc::illegal_unicode_character:
-                    return "Illegal unicode character";
-                case toon_errc::unexpected_character:
-                    return "Unexpected character";
                 default:
                     return "Unknown TOON parser error";
                 }

@@ -1,6 +1,24 @@
 1.6.0
 -----
 
+- Fixed bugs:
+
+    - Git PR #673: Fix warning for non clang builds on linux
+
+    - Git Issue #675: std::chrono conversion does not compile with libc++
+
+    - Git PR #679: Fix double colon in url generator
+
+    - Git PR #680: Added missing space after "found" in maximum_validator
+
+    - Git PR #685: optimize semantic_tag::noesc write_string
+
+    - Git PR #687: jmespath: allow rhs_expression in a keyvalue - expression
+
+- Enhancements
+
+    - Added **toon** extension
+
 1.5.0
 -----
 
