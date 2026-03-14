@@ -561,7 +561,7 @@ season: spring_2025)";
         //std::cout << pretty_print(expected) << "\n";
         //std::cout << pretty_print(result) << "\n";
     }*/
-    SECTION("issue")
+    /*SECTION("issue")
     {
         auto expected = jsoncons::ojson::parse(R"({
     "items": [
@@ -571,10 +571,8 @@ season: spring_2025)";
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(items[3]:
-  - first
-  - second
-  -)";
+        std::string data = R"(a:
+  user)";
         try
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -584,12 +582,12 @@ season: spring_2025)";
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
             //CHECK(expected == result);
-            std::cout << pretty_print(expected) << "\n";
-            std::cout << pretty_print(result) << "\n";
+            //std::cout << pretty_print(expected) << "\n";
+            //std::cout << pretty_print(result) << "\n";
         }
         catch (const std::exception& e)
         {
             std::cout << "Error: "  << e.what() << "\n";
         }
-    }
+    }*/
 }

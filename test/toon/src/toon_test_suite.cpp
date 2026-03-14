@@ -177,8 +177,8 @@ TEST_CASE("toon-tests")
         //toon_decode_tests("./toon/input/decode/path-expansion.json");
         toon_decode_tests("./toon/input/decode/primitives.json");
         toon_decode_tests("./toon/input/decode/root-form.json");
-        //toon_decode_tests("./toon/input/decode/validation-errors.json");
-        //toon_decode_tests("./toon/input/decode/whitespace.json");
+        toon_decode_tests("./toon/input/decode/validation-errors.json");
+        toon_decode_tests("./toon/input/decode/whitespace.json");
     }
 }
 

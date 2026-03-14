@@ -33,7 +33,7 @@ namespace toon {
         blank_lines_in_object,
         too_many_values_in_row,
         too_few_values_in_row,
-        invalid_line,
+        missing_colon,
         invalid_escape_sequence,
         inline_array_length_mismatch,
         list_array_length_mismatch,
@@ -108,8 +108,8 @@ namespace toon {
                     return "Too many values in tabular array row";
                 case toon_errc::too_few_values_in_row:
                     return "Too few values in tabular array row";
-                case toon_errc::invalid_line:
-                    return "Invalid line";
+                case toon_errc::missing_colon:
+                    return "Missing colon in key-value context";
                 case toon_errc::invalid_escape_sequence:
                     return "Invalid escape sequence";
                 case toon_errc::inline_array_length_mismatch:

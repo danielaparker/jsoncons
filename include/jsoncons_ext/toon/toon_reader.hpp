@@ -337,8 +337,6 @@ using header_result = read_result<jsoncons::optional<header_info>>;
 
 using line_result = read_result<std::size_t>;
 
-using void_result = jsoncons::expected<void, read_error>;
-
 struct parsed_line
 {
     std::size_t depth{0};
@@ -399,14 +397,16 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
 }
 
 inline 
-jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>> split_key_value(jsoncons::string_view line)
+jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::error_code> split_key_value(jsoncons::string_view line)
 {
+    using result_type = jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::error_code>;
+
     auto colon_idx = find_unquoted_char(line, ':');
     if (colon_idx == jsoncons::string_view::npos)
     {
-        return jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>>{};
+        return result_type{jsoncons::unexpect, toon_errc::missing_colon};
     }
-    return jsoncons::optional<std::pair<jsoncons::string_view,jsoncons::string_view>>{std::make_pair(
+    return result_type{std::make_pair(
         jsoncons::strip(jsoncons::string_view{line.data(),colon_idx}),
         jsoncons::strip(jsoncons::string_view{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
     };
@@ -1085,12 +1085,14 @@ bool is_row_line(jsoncons::string_view line, char delimiter)
 }
 
 inline
-void_result decode_object(const std::vector<parsed_line>& lines,
+jsoncons::expected<void,read_error> decode_object(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
     std::size_t base_depth,
     bool strict,
     json_visitor& visitor)
 {
+    using result_type = jsoncons::expected<void, read_error>;
+
     visitor.begin_object();
 
     std::size_t i = start_idx;
@@ -1124,7 +1126,7 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         auto header_result = parse_header(content);
         if (!header_result)
         {
-            return void_result{jsoncons::unexpect, header_result.error()};
+            return result_type{jsoncons::unexpect, header_result.error()};
         }
         if (*header_result)
         {
@@ -1137,7 +1139,7 @@ void_result decode_object(const std::vector<parsed_line>& lines,
                 auto next_i_result = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
                 if (!next_i_result)
                 {
-                    return void_result(jsoncons::unexpect, next_i_result.error());
+                    return result_type(jsoncons::unexpect, next_i_result.error());
                 }
                 i = *next_i_result;
                 continue;
@@ -1150,7 +1152,7 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             // Invalid line, skip in non-strict mode
             if (strict)
             {
-                return void_result{jsoncons::unexpect, toon_errc::invalid_line};
+                return result_type{jsoncons::unexpect, kv.error()};
             }
             ++i;
             continue;
@@ -1166,7 +1168,11 @@ void_result decode_object(const std::vector<parsed_line>& lines,
         {
             // Nested object
             visitor.key(key);
-            decode_object(lines, i+1, line.depth, strict, visitor);
+            auto r = decode_object(lines, i+1, line.depth, strict, visitor);
+            if (!r)
+            {
+                return result_type{jsoncons::unexpect, r.error()};
+            }
             // Skip past nested object
             ++i;
             while (i < lines.size() && lines[i].depth > line.depth)
@@ -1181,14 +1187,14 @@ void_result decode_object(const std::vector<parsed_line>& lines,
             auto r = parse_primitive(value_str, visitor);
             if (!r)
             {
-                return void_result{jsoncons::unexpect, r.error()};
+                return result_type{jsoncons::unexpect, r.error()};
             }
             ++i;
         }
     }
 
     visitor.end_object();
-    return void_result{};
+    return result_type{};
 }
 
 inline
@@ -1339,9 +1345,11 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     if (field_value_str.empty())
                     {
                         visitor.key(field_key);
-                        decode_object(
-                            lines, i + 1, field_line.depth, strict, visitor
-                        );
+                        auto r = decode_object(lines, i + 1, field_line.depth, strict, visitor);
+                        if (!r)
+                        {
+                            return line_result{jsoncons::unexpect, r.error()};
+                        }
                         ++i;
                         while (i < lines.size() && lines[i].depth > field_line.depth)
                         {
@@ -1379,7 +1387,11 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 // First field is nested object: fields at depth +2
                 visitor.key(key);
-                decode_object(lines, i + 1, line.depth + 1, strict, visitor);
+                auto r = decode_object(lines, i + 1, line.depth + 1, strict, visitor);
+                if (!r)
+                {
+                    return line_result{jsoncons::unexpect, r.error()};
+                }
                 // Skip nested content
                 ++i;
                 while (i < lines.size() && lines[i].depth > line.depth + 1)
@@ -1442,9 +1454,12 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 {
                     // Nested object
                     visitor.key(field_key);
-                    decode_object(
-                        lines, i + 1, field_line.depth, strict, visitor
-                    );
+                    auto r = decode_object(lines, i + 1, field_line.depth, strict, visitor);
+                    if (!r)
+                    {
+                        return line_result{jsoncons::unexpect, r.error()};
+                    }
+
                     ++i;
                     while (i < lines.size() && lines[i].depth > field_line.depth)
                     {
