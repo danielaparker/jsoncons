@@ -13,7 +13,6 @@
 
 namespace toon = jsoncons::toon;
 
-#if 0
 TEST_CASE("toon_reader parse_number_or_string")
 {
     SECTION("2.5e0")
@@ -335,11 +334,10 @@ TEST_CASE("toon_reader parse_header tests")
 
     }
 }
-#endif
 
 TEST_CASE("toon_reader tests")
 {
-    /*SECTION("array of primitives")
+    SECTION("array of primitives")
     {
         auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
         std::vector<toon::parsed_line> lines;
@@ -377,8 +375,8 @@ TEST_CASE("toon_reader tests")
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }*/
-    /*SECTION("list format with hyphen markers")
+    }
+    SECTION("list format with hyphen markers")
     {
             auto expected = jsoncons::ojson::parse(R"([
   1,
@@ -566,12 +564,23 @@ season: spring_2025)";
         CHECK(expected == result);
         //std::cout << pretty_print(expected) << "\n";
         //std::cout << pretty_print(result) << "\n";
-    }*/
+    }
     SECTION("parses list items whose first field is a tabular array")
     {
         auto expected = jsoncons::ojson::parse(R"({
     "items": [
-        "a"
+        {
+            "users": [
+                {
+                    "id": 1,
+                    "name": "Ada"
+                },
+                {
+                    "id": 2,
+                    "name": "Bob"
+                }
+            ]
+        }
     ]
 })");
         std::vector<toon::parsed_line> lines;
@@ -589,9 +598,9 @@ season: spring_2025)";
             reader.read();
             REQUIRE(decoder.is_valid());
             auto result = decoder.get_result();
-            //CHECK(expected == result);
+            CHECK(expected == result);
             //std::cout << pretty_print(expected) << "\n";
-            std::cout << pretty_print(result) << "\n";
+            //std::cout << pretty_print(result) << "\n";
         }
         catch (const std::exception& e)
         {

@@ -1,27 +1,17 @@
 ### jsoncons::toon::encode_toon
 
-Encodes a `basic_json` value into the [TOON](https://github.com/toon-format/toon) data format.
+Encodes a `basic_json` value into the [toon-format](https://github.com/toon-format/toon) data format.
 
 ```cpp
 #include <jsoncons_ext/toon/encode_toon.hpp>
 
-template <typename T,typename BytesLike>
-void encode_toon(const T& jval, BytesLike& cont,
-    const toon_encode_options& options = toon_encode_options());         (1)
+template <typename T,typename StringLike>
+void encode_toon(const T& jval, StringLike& cont,
+    const toon_encode_options& options = toon_encode_options());         (1) (since 1.6.0)
 
 template <typename T>
 void encode_toon(const T& jval, std::ostream& os,
-    const toon_encode_options& options = toon_encode_options());         (2)
-
-template <typename T,typename BytesLike>
-void encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
-    const T& jval, BytesLike& cont,
-    const toon_encode_options& options = toon_encode_options());         (3) 
-
-template <typename T>
-void encode_toon(const allocator_set<Alloc,TempAlloc>& aset,
-    const T& jval, std::ostream& os,
-    const toon_encode_options& options = toon_encode_options());         (4) 
+    const toon_encode_options& options = toon_encode_options());         (2) (since 1.6.0)
 ```
 
 (1) Writes a value of type T into a byte container in the TOON data format, using the specified (or defaulted) [options](toon_options.md). 
@@ -34,21 +24,18 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
 or support jsoncons reflection traits. 
 
-Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../corelib/allocator_set.md) is passed as an additional argument.
-
 ### Examples
 
-#### TOON example
+#### Encode to string
 
 ```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/toon/toon.hpp>
 #include <iostream>
 
-using namespace jsoncons;
 namespace toon = jsoncons::toon;
 
-int main() 
+int main()
 {
     std::string str = R"({
   "context": {
@@ -85,7 +72,7 @@ int main()
   ]
 }
         )";
-    auto j = ojson::parse(str);
+    auto j = jsoncons::ojson::parse(str);
 
     std::string buffer;
     toon::encode_toon(j, buffer);
@@ -105,3 +92,5 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true
 ```
+
+Exanple credit: [toon-format](https://github.com/toon-format/toon)

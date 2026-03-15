@@ -1,4 +1,4 @@
-master
+master (1.6.0 preview)
 -----=
 
 - Fixed bugs:
@@ -17,7 +17,7 @@ master
 
 - Enhancements
 
-    - Added **toon** extension
+    - Added **toon-format** extension
 
 1.5.0
 -----
