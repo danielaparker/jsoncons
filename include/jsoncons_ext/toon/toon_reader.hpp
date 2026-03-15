@@ -1325,7 +1325,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         const jsoncons::optional<std::string>& field_key(field_header.key);
 
                         visitor.key(*field_key);
-                        auto r1 = decode_array_from_header(lines, true, i, field_line.depth, field_header, strict, visitor);
+                        auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, strict, visitor);
                         if (!r1)
                         {
                             return r1;
@@ -1433,7 +1433,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     const header_info& field_header (*(*field_header_result));
                     const auto& field_key{field_header.key};
                     visitor.key(*field_key);
-                    auto r1 = decode_array_from_header(lines, true, i, field_line.depth, field_header, strict, visitor);
+                    auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, strict, visitor);
                     if (!r1)
                     {
                         return r1;
