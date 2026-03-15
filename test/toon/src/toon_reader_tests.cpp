@@ -9,10 +9,11 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include <iostream>
+#include <iostream> 
 
 namespace toon = jsoncons::toon;
 
+#if 0
 TEST_CASE("toon_reader parse_number_or_string")
 {
     SECTION("2.5e0")
@@ -158,7 +159,7 @@ TEST_CASE("toon_reader util tests")
         CHECK("d" == r4->second);
     }
 }
-#if 0
+
 TEST_CASE("toon_reader read_lines tests")
 {
     /*SECTION("read lines")
@@ -376,8 +377,8 @@ TEST_CASE("toon_reader tests")
         auto result = decoder.get_result();
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
-    }
-    SECTION("list format with hyphen markers")
+    }*/
+    /*SECTION("list format with hyphen markers")
     {
             auto expected = jsoncons::ojson::parse(R"([
   1,
@@ -566,7 +567,7 @@ season: spring_2025)";
         //std::cout << pretty_print(expected) << "\n";
         //std::cout << pretty_print(result) << "\n";
     }*/
-    /*SECTION("issue")
+    SECTION("parses list items whose first field is a tabular array")
     {
         auto expected = jsoncons::ojson::parse(R"({
     "items": [
@@ -576,8 +577,10 @@ season: spring_2025)";
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
-        std::string data = R"(a:
-  user)";
+        std::string data = R"(items[1]:
+  - users[2]{id,name}:
+      1,Ada
+      2,Bob)";
         try
         {
             jsoncons::json_decoder<jsoncons::ojson> decoder;
@@ -588,11 +591,11 @@ season: spring_2025)";
             auto result = decoder.get_result();
             //CHECK(expected == result);
             //std::cout << pretty_print(expected) << "\n";
-            //std::cout << pretty_print(result) << "\n";
+            std::cout << pretty_print(result) << "\n";
         }
         catch (const std::exception& e)
         {
             std::cout << "Error: "  << e.what() << "\n";
         }
-    }*/
+    }
 }

@@ -413,6 +413,7 @@ jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::e
 }
 
 line_result decode_array_from_header(const std::vector<parsed_line>& lines,
+    bool list_item,
     std::size_t header_idx,
     std::size_t base_depth,
     const header_info& header_info,
@@ -1136,7 +1137,7 @@ jsoncons::expected<void,read_error> decode_object(const std::vector<parsed_line>
             {
                 // Array field
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, i, line.depth, header, strict, visitor);
+                auto next_i_result = decode_array_from_header(lines, false, i, line.depth, header, strict, visitor);
                 if (!next_i_result)
                 {
                     return result_type(jsoncons::unexpect, next_i_result.error());
@@ -1296,7 +1297,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 visitor.begin_object();
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, i, line.depth, item_header, strict, visitor);
+                auto next_i_result = decode_array_from_header(lines, true, i, line.depth, item_header, strict, visitor);
                 if (!next_i_result)
                 {
                     return next_i_result;
@@ -1324,7 +1325,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         const jsoncons::optional<std::string>& field_key(field_header.key);
 
                         visitor.key(*field_key);
-                        auto r1 = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
+                        auto r1 = decode_array_from_header(lines, true, i, field_line.depth, field_header, strict, visitor);
                         if (!r1)
                         {
                             return r1;
@@ -1432,7 +1433,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     const header_info& field_header (*(*field_header_result));
                     const auto& field_key{field_header.key};
                     visitor.key(*field_key);
-                    auto r1 = decode_array_from_header(lines, i, field_line.depth, field_header, strict, visitor);
+                    auto r1 = decode_array_from_header(lines, true, i, field_line.depth, field_header, strict, visitor);
                     if (!r1)
                     {
                         return r1;
@@ -1582,13 +1583,14 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
 inline
 line_result decode_array_from_header(const std::vector<parsed_line>& lines,
+    bool list_item,
     std::size_t header_idx,
     std::size_t base_depth,
     const header_info& header_info,
     bool strict,
     json_visitor& visitor)
 {
-    //const jsoncons::optional<std::string>& key(header_info.key);
+    const jsoncons::optional<std::string>& key(header_info.key);
     std::size_t length{header_info.length};
     char delimiter{header_info.delimiter};
     const std::vector<jsoncons::string_view>& fields{header_info.fields};
@@ -1618,7 +1620,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     // Check for tabular-first list-item object: `- key[N]{fields}:`
     if (!fields.empty())
     {
-        if (base_depth != 0)
+        if (key && list_item)
         {
             // Tabular array
             // Use base_depth + 1 for the array so rows are at base_depth + 2
@@ -1647,7 +1649,7 @@ line_result decode_array(const std::vector<parsed_line>& lines,
     bool strict,
     json_visitor& visitor)
 {
-    return decode_array_from_header(lines, start_idx, base_depth, header_info, strict, visitor);
+    return decode_array_from_header(lines, false, start_idx, base_depth, header_info, strict, visitor);
 }
 
 template <typename Source=jsoncons::stream_source<char>,typename TempAlloc =std::allocator<char>>
