@@ -66,7 +66,17 @@ try_decode_toon(std::istream& is,
     using value_type = T;
     using result_type = read_result<value_type>;
 
-    return result_type{};
+    std::error_code ec;   
+    jsoncons::json_decoder<T> decoder;
+    toon_stream_reader reader(is, decoder, options);
+
+    reader.read(ec);
+    if (ec)
+    {
+        return result_type{jsoncons::unexpect, ec};
+    }
+
+    return result_type{decoder.get_result()};
 }
 
 template <typename T>

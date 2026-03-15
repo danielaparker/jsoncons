@@ -133,7 +133,8 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
     total: 45
     status: delivered)";
 
-        auto result = toon::try_decode_toon<jsoncons::ojson>(toon_str);
+        std::stringstream is(toon_str);
+        auto result = toon::try_decode_toon<jsoncons::ojson>(is);
         REQUIRE(result);
         CHECK(expected == *result);
     }
