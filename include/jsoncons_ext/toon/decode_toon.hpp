@@ -46,6 +46,7 @@ try_decode_toon(const StringViewLike& s,
     return result_type{decoder.get_result()};
 }
 
+/*
 template <typename T,typename StringViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
     ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
@@ -57,6 +58,7 @@ try_decode_toon(const StringViewLike& s,
 
     return result_type{};
 }
+*/
 
 template <typename T>
 typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
@@ -79,6 +81,7 @@ try_decode_toon(std::istream& is,
     return result_type{decoder.get_result()};
 }
 
+/*
 template <typename T>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
 try_decode_toon(std::istream& is,
@@ -89,8 +92,11 @@ try_decode_toon(std::istream& is,
 
     return result_type{};
 }
+*/
+
 // With leading allocator_set parameter
 
+/*
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
     ext_traits::is_sequence_of<StringViewLike,char>::value,read_result<T>>::type
@@ -140,6 +146,7 @@ try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 
     return result_type{};
 }
+*/
 
 template <typename T, typename... Args>
 T decode_toon(Args&& ... args)
