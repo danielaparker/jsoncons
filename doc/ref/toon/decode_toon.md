@@ -231,6 +231,6 @@ Example credit: [toon-format](https://github.com/toon-format/toon)
 
 ### See also
 
-[encode_json](encode_json.md)
+[encode_toon](encode_toon.md)
 
 

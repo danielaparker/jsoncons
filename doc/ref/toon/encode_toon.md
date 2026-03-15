@@ -94,3 +94,8 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
 ```
 
 Exanple credit: [toon-format](https://github.com/toon-format/toon)
+
+### See also
+
+[decode_toon](decode_toon.md)
+

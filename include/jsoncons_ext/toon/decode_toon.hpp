@@ -96,7 +96,7 @@ typename std::enable_if<ext_traits::is_basic_json<T>::value &&
     ext_traits::is_sequence_of<StringViewLike,char>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     const StringViewLike& s,
-    const toon_decode_options& options = toon_decode_options<typename StringViewLike::value_type>())
+    const toon_decode_options& options = toon_decode_options())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
