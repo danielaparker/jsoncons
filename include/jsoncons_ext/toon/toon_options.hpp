@@ -20,6 +20,8 @@
 namespace jsoncons {
 namespace toon {
 
+enum class toon_delimiter_kind : char {comma=',', tab='\t', pipe='|'};
+
 class toon_options;
 
 class toon_options_common
@@ -88,7 +90,7 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 private:
-    char delimiter_{','};
+    toon_delimiter_kind delimiter_{toon_delimiter_kind::comma};
     jsoncons::optional<char> length_marker_;
 public:
     toon_encode_options() = default;
@@ -106,7 +108,7 @@ protected:
     toon_encode_options& operator=(toon_encode_options&&) = default;
 public:
 
-    char delimiter() const
+    toon_delimiter_kind delimiter() const
     {
         return delimiter_;
     }
@@ -151,7 +153,7 @@ public:
         return *this;
     }
 
-    toon_options& delimiter(char value)
+    toon_options& delimiter(toon_delimiter_kind value)
     {
         this->delimiter_ = value;
         return *this;

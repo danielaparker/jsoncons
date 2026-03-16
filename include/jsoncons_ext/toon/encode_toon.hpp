@@ -687,7 +687,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, 
-        options.delimiter(), options.length_marker(), sink);
+        static_cast<char>(options.delimiter()), options.length_marker(), sink);
     ++line;
     for (const auto& item : val.array_range())
     {
@@ -704,9 +704,9 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
             }
             auto s = std::to_string(item.size());
             sink.append(s.data(), s.size());
-            if (options.delimiter() != ',')
+            if (options.delimiter() != toon_delimiter_kind::comma)
             {
-                sink.push_back(options.delimiter());
+                sink.push_back(static_cast<char>(options.delimiter()));
             }
             sink.push_back(']');
             sink.push_back(':');
@@ -719,13 +719,13 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
             {
                 if (!first2)
                 {
-                    sink.push_back(options.delimiter());
+                    sink.push_back(static_cast<char>(options.delimiter()));
                 }
                 else
                 {
                     first2 = false;
                 }
-                encode_primitive(item2, options.delimiter(), sink);
+                encode_primitive(item2, static_cast<char>(options.delimiter()), sink);
             }
         }
         else
@@ -747,14 +747,14 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
         {
             if (!first_item)
             {
-                sink.push_back(options.delimiter());
+                sink.push_back(static_cast<char>(options.delimiter()));
             }
             else
             {
                 sink.push_back(' ');
                 first_item = false;
             }
-            encode_primitive(item, options.delimiter(), sink);
+            encode_primitive(item, static_cast<char>(options.delimiter()), sink);
         }
     }
     else if (is_array_of_arrays(val))
@@ -774,9 +774,9 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 }
                 auto s = std::to_string(item.size());
                 sink.append(s.data(), s.size());
-                if (options.delimiter() != ',')
+                if (static_cast<char>(options.delimiter()) != ',')
                 {
-                    sink.push_back(options.delimiter());
+                    sink.push_back(static_cast<char>(options.delimiter()));
                 }
                 sink.push_back(']');
                 sink.push_back(':');
@@ -789,13 +789,13 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 {
                     if (!first2)
                     {
-                        sink.push_back(options.delimiter());
+                        sink.push_back(static_cast<char>(options.delimiter()));
                     }
                     else
                     {
                         first2 = false;
                     }
-                    encode_primitive(item2, options.delimiter(), sink);
+                    encode_primitive(item2, static_cast<char>(options.delimiter()), sink);
                 }
             }
             else
@@ -819,13 +819,13 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 {
                     if (!first_item)
                     {
-                        sink.push_back(options.delimiter());
+                        sink.push_back(static_cast<char>(options.delimiter()));
                     }
                     else
                     {
                         first_item = false;
                     }
-                    encode_primitive(row.at(field), options.delimiter(), sink);
+                    encode_primitive(row.at(field), static_cast<char>(options.delimiter()), sink);
                 }
                 ++line;
             }
@@ -857,7 +857,7 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 sink.append((depth+1)*options.indent(), ' ');
                 sink.push_back('-');
                 sink.push_back(' ');
-                encode_primitive(item, options.delimiter(), sink);
+                encode_primitive(item, static_cast<char>(options.delimiter()), sink);
             }
             ++line;
         }
@@ -876,7 +876,7 @@ void encode_array_of_objects_as_tabular(const Json& val,
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), fields, 
-        options.delimiter(), options.length_marker(), sink);
+        static_cast<char>(options.delimiter()), options.length_marker(), sink);
     ++line;
 
     for (const auto& row : val.array_range())
@@ -888,13 +888,13 @@ void encode_array_of_objects_as_tabular(const Json& val,
         {
             if (!first_item)
             {
-                sink.push_back(options.delimiter());
+                sink.push_back(static_cast<char>(options.delimiter()));
             }
             else
             {
                 first_item = false;
             }
-            encode_primitive(row.at(field), options.delimiter(), sink);
+            encode_primitive(row.at(field), static_cast<char>(options.delimiter()), sink);
         }
         ++line;
     }
@@ -929,7 +929,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         detail::encode_key(first->key(), sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(first->value(), options.delimiter(), sink);
+        encode_primitive(first->value(), static_cast<char>(options.delimiter()), sink);
     }
     else if (is_json_array(first->value()))
     {
@@ -944,7 +944,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             sink.push_back(' ');
             write_header(first->key(), first->value().size(), 
                 jsoncons::span<const jsoncons::string_view>{},
-                options.delimiter(), options.length_marker(), sink);
+                static_cast<char>(options.delimiter()), options.length_marker(), sink);
             encode_array_content(first->value(), options, sink, depth, line);
         }
         else
@@ -964,7 +964,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             }
             write_header(first->key(), first->value().size(), 
                 fields,
-                options.delimiter(), options.length_marker(), sink);
+                static_cast<char>(options.delimiter()), options.length_marker(), sink);
             encode_array_content(first->value(), options, sink, depth+1, line);
         }
         ++line;
@@ -998,7 +998,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, 
-        options.delimiter(), options.length_marker(), sink);
+        static_cast<char>(options.delimiter()), options.length_marker(), sink);
     ++line;
 
     for (const auto& item : val.array_range())
@@ -1009,7 +1009,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
             sink.append((depth+1)*options.indent(), ' ');
             sink.push_back('-');
             sink.push_back(' ');
-            encode_primitive(item, options.delimiter(), sink);
+            encode_primitive(item, static_cast<char>(options.delimiter()), sink);
         }
         else if (is_json_object(item))
         {
@@ -1028,7 +1028,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 sink.push_back(' ');
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(), 
                     jsoncons::span<const jsoncons::string_view>{},
-                    options.delimiter(), options.length_marker(), sink);
+                    static_cast<char>(options.delimiter()), options.length_marker(), sink);
                 encode_array_content(item, options, sink, depth, line); // +2 in toon-pthon
             }
             else
@@ -1048,7 +1048,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 }
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(),
                     fields,
-                    options.delimiter(), options.length_marker(), sink);
+                    static_cast<char>(options.delimiter()), options.length_marker(), sink);
                 encode_array_content(item, options, sink, depth+1, line); // +2 in toon-pthon
             }
         }
@@ -1065,7 +1065,7 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
         sink.push_back('\n');
     }
     sink.append(depth*options.indent(), ' ');
-    write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, options.delimiter(), options.length_marker(), sink);
+    write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, static_cast<char>(options.delimiter()), options.length_marker(), sink);
     ++line;
 
     bool first_item = true;
@@ -1073,14 +1073,14 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
     {
         if (!first_item)
         {
-            sink.push_back(options.delimiter());
+            sink.push_back(static_cast<char>(options.delimiter()));
         }
         else
         {
             sink.push_back(' ');
             first_item = false;
         }
-        encode_primitive(item, options.delimiter(), sink);
+        encode_primitive(item, static_cast<char>(options.delimiter()), sink);
     }
 }
 
@@ -1095,7 +1095,7 @@ void encode_array(const Json& val, const toon_encode_options& options,
             sink.push_back('\n');
         }
         sink.append(depth*options.indent(), ' ');
-        write_header(key, 0, jsoncons::span<const jsoncons::string_view>{}, options.delimiter(), options.length_marker(), sink);
+        write_header(key, 0, jsoncons::span<const jsoncons::string_view>{}, static_cast<char>(options.delimiter()), options.length_marker(), sink);
         ++line;
         return;
     }
@@ -1150,7 +1150,7 @@ void encode_key_value_pair(string_view key, const Json& val,
         detail::encode_key(key, sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(val, options.delimiter(), sink);
+        encode_primitive(val, static_cast<char>(options.delimiter()), sink);
     }
 }
 
@@ -1199,7 +1199,7 @@ void encode_value(const Json& val, const toon_encode_options& options, Sink& sin
     else
     {
         sink.append(depth*options.indent(), ' ');
-        encode_primitive(val, options.delimiter(), sink);
+        encode_primitive(val, static_cast<char>(options.delimiter()), sink);
     }
 }
 
