@@ -18,10 +18,10 @@ Option|Reading|Writing|Default|comment
 delimiter|Default delimiter character for arrays|Delimiter character for arrays|**,**|
 indent|Number of spaces to indent each level|Number of spaces to indent each level.|2|
 length_marker|&nbsp;|Optional marker for prefixing array lengths|None|
-strict|Strict mode|&nbsp;|**true**|
+strict|See [strict mode errors and diagnostics](https://github.com/toon-format/spec/blob/main/SPEC.md#14-strict-mode-errors-and-diagnostics-authoritative-checklist)|&nbsp;|**true**|
 max_nesting_depth|Maximum nesting depth allowed when reading toon-format|Maximum nesting depth allowed when writing toon-format|**1024**|
 
-#### Constructors
+#### Constructor
 
     toon_options()
 Constructs a `toon_options` with default values. 
