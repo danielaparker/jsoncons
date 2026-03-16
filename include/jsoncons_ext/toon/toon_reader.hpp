@@ -18,19 +18,14 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/read_number.hpp>
-#include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
-#include <jsoncons_ext/toon/toon_options.hpp>
 #include <jsoncons_ext/toon/toon_error.hpp>
+#include <jsoncons_ext/toon/toon_options.hpp>
 
 namespace jsoncons {
 namespace toon {
@@ -427,15 +422,13 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
     std::size_t start{0};
     std::size_t end{0};
 
-    bool terminated{false};
-
     std::size_t i = 0;
     while (i < key_str.size() && key_str[i] == ' ')
     {
         ++start;
     }
 
-    for (;i < key_str.size() && !terminated; ++i)
+    for (;i < key_str.size(); ++i)
     {
         char c = key_str[i];
         if (!in_quotes && c == '\"')
@@ -450,8 +443,6 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         else if (in_quotes && c == '\"')
         {
             end = i;
-            terminated = true;
-            in_quotes = false;
             auto res = unescape_string(jsoncons::string_view(key_str.data() + start, (end-start)));
             if (!res) 
             {
@@ -464,11 +455,6 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         {
             end = i+1;
         }
-    }
-    if (terminated)
-    {
-        result = std::string(key_str.data() + start, (end-start));
-        return toon_errc{};
     }
     if (in_quotes) // unterminated_quoted_key
     {

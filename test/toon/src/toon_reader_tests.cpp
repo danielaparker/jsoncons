@@ -5,10 +5,8 @@
 #include <jsoncons_ext/toon/toon_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <catch/catch.hpp>
-#include <sstream>
 #include <vector>
 #include <utility>
-#include <ctime>
 #include <iostream> 
 
 namespace toon = jsoncons::toon;
@@ -312,8 +310,8 @@ TEST_CASE("toon_reader parse_header tests")
         REQUIRE(result);
         REQUIRE(*result);
         jsoncons::optional<std::string>& key((*result)->key);
-        std::size_t& length{(*result)->length};
-        char& delimiter{(*result)->delimiter};
+        std::size_t length = (*result)->length;
+        char delimiter = (*result)->delimiter;
         std::vector<jsoncons::string_view>& fields{(*result)->fields};
 
         CHECK_FALSE(key);
@@ -340,8 +338,6 @@ TEST_CASE("toon_reader tests")
     SECTION("array of primitives")
     {
         auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([7]: " foo", baz ,"bar ",1,true,false,null)";
         std::error_code ec;
@@ -360,8 +356,6 @@ TEST_CASE("toon_reader tests")
   { "id": 1, "name": "Alice", "role": "admin" },
   { "id": 2, "name": "Bob", "role": "user" }
 ])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([2]{id,name,role}:
   1,Alice,admin
@@ -383,8 +377,6 @@ TEST_CASE("toon_reader tests")
   { "a": 1 },
   "text"
 ])");
-            std::vector<toon::parsed_line> lines;
-            std::vector<toon::blank_line_info> blank_lines;
 
             std::string data = R"([3]:
   - 1
@@ -406,8 +398,6 @@ TEST_CASE("toon_reader tests")
     "location": "Boulder",
     "season": "spring_2025"
 })");
-            std::vector<toon::parsed_line> lines;
-            std::vector<toon::blank_line_info> blank_lines;
 
             std::string data = R"(task: Our favorite hikes together
 location: Boulder
@@ -466,8 +456,6 @@ season: spring_2025)";
     }
   ]
 })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(orders[2]:
   - orderId: ORD-001
@@ -500,8 +488,6 @@ season: spring_2025)";
     SECTION("parses list arrays with empty items")
     {
         auto expected = jsoncons::ojson::parse(R"({"items":["first","second",{}]})");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[3]:
   - first
@@ -524,8 +510,6 @@ season: spring_2025)";
           { "name": "Ada", "data": [] }
         ]
       })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[1]:
   - name: Ada
@@ -543,8 +527,6 @@ season: spring_2025)";
     SECTION("parses root-level array mixing primitive, object, and array of objects in list format")
     {
         auto expected = jsoncons::ojson::parse(R"(["summary",{"id":1,"name":"Ada"},[{"id":2},{"status":"draft"}]])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([3]:
   - summary
@@ -583,8 +565,6 @@ season: spring_2025)";
         }
     ]
 })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[1]:
   - users[2]{id,name}:
