@@ -13,13 +13,13 @@ class toon_options;
 Specifies options for reading and writing [toon-format](https://github.com/toon-format/toon).
 
 
-Option|Reading|Writing|Default|comment
-------|-------|-------|-------|------
-delimiter|&nbsp;|[Delimiter character](toon_delimiter_kind.md) for arrays|**toon_delimiter_kind::comma**|
-indent|Number of spaces to indent each level|Number of spaces to indent each level.|2|
-length_marker|&nbsp;|Optional marker for prefixing array lengths|None|
-strict|See [strict mode errors and diagnostics](https://github.com/toon-format/spec/blob/main/SPEC.md#14-strict-mode-errors-and-diagnostics-authoritative-checklist)|&nbsp;|**true**|
-max_nesting_depth|Maximum nesting depth allowed when reading toon-format|Maximum nesting depth allowed when writing toon-format|**1024**|
+Option|Reading|Writing|Default
+------|-------|-------|-------
+delimiter|&nbsp;|[Delimiter character](toon_delimiter_kind.md) for arrays|**comma**
+indent|Number of spaces to indent each level|Number of spaces to indent each level.|**2**
+length_marker|&nbsp;|Optional marker for prefixing array lengths|None
+strict|See [strict mode errors and diagnostics](https://github.com/toon-format/spec/blob/main/SPEC.md#14-strict-mode-errors-and-diagnostics-authoritative-checklist)|&nbsp;|**true**
+max_nesting_depth|Maximum nesting depth allowed when reading toon-format|Maximum nesting depth allowed when writing toon-format|**1024**
 
 #### Constructor
 

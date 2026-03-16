@@ -478,10 +478,12 @@ template <typename Sink>
 void write_header(jsoncons::optional<string_view> key, 
     std::size_t length,
     const jsoncons::span<const jsoncons::string_view>& fields,
-    char delimiter,
-    jsoncons::optional<char> length_marker, 
+    const toon_encode_options& options,
     Sink& sink)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+    jsoncons::optional<char> length_marker = options.length_marker(); 
+
     if (key)
     {
         detail::encode_key(*key, sink);
@@ -687,7 +689,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, 
-        static_cast<char>(options.delimiter()), options.length_marker(), sink);
+        options, sink);
     ++line;
     for (const auto& item : val.array_range())
     {
@@ -876,7 +878,7 @@ void encode_array_of_objects_as_tabular(const Json& val,
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), fields, 
-        static_cast<char>(options.delimiter()), options.length_marker(), sink);
+        options, sink);
     ++line;
 
     for (const auto& row : val.array_range())
@@ -944,7 +946,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             sink.push_back(' ');
             write_header(first->key(), first->value().size(), 
                 jsoncons::span<const jsoncons::string_view>{},
-                static_cast<char>(options.delimiter()), options.length_marker(), sink);
+                options, sink);
             encode_array_content(first->value(), options, sink, depth, line);
         }
         else
@@ -964,7 +966,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             }
             write_header(first->key(), first->value().size(), 
                 fields,
-                static_cast<char>(options.delimiter()), options.length_marker(), sink);
+                options, sink);
             encode_array_content(first->value(), options, sink, depth+1, line);
         }
         ++line;
@@ -998,7 +1000,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
     }
     sink.append(depth*options.indent(), ' ');
     write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, 
-        static_cast<char>(options.delimiter()), options.length_marker(), sink);
+        options, sink);
     ++line;
 
     for (const auto& item : val.array_range())
@@ -1028,7 +1030,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 sink.push_back(' ');
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(), 
                     jsoncons::span<const jsoncons::string_view>{},
-                    static_cast<char>(options.delimiter()), options.length_marker(), sink);
+                    options, sink);
                 encode_array_content(item, options, sink, depth, line); // +2 in toon-pthon
             }
             else
@@ -1048,7 +1050,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 }
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(),
                     fields,
-                    static_cast<char>(options.delimiter()), options.length_marker(), sink);
+                    options, sink);
                 encode_array_content(item, options, sink, depth+1, line); // +2 in toon-pthon
             }
         }
@@ -1065,7 +1067,7 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
         sink.push_back('\n');
     }
     sink.append(depth*options.indent(), ' ');
-    write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, static_cast<char>(options.delimiter()), options.length_marker(), sink);
+    write_header(key, val.size(), jsoncons::span<const jsoncons::string_view>{}, options, sink);
     ++line;
 
     bool first_item = true;
@@ -1095,7 +1097,7 @@ void encode_array(const Json& val, const toon_encode_options& options,
             sink.push_back('\n');
         }
         sink.append(depth*options.indent(), ' ');
-        write_header(key, 0, jsoncons::span<const jsoncons::string_view>{}, static_cast<char>(options.delimiter()), options.length_marker(), sink);
+        write_header(key, 0, jsoncons::span<const jsoncons::string_view>{}, options, sink);
         ++line;
         return;
     }
