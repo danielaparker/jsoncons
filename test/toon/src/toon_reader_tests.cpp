@@ -5,21 +5,19 @@
 #include <jsoncons_ext/toon/toon_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <catch/catch.hpp>
-#include <sstream>
 #include <vector>
 #include <utility>
-#include <ctime>
 #include <iostream> 
 
 namespace toon = jsoncons::toon;
 
-TEST_CASE("toon_reader parse_number_or_string")
+TEST_CASE("toon_reader parse_primitive")
 {
     SECTION("2.5e0")
     {
         jsoncons::string_view str = "2.5e0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("2.5" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
@@ -28,7 +26,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "2.5E1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("25" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
@@ -37,7 +35,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "2.5e2";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("250" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
@@ -46,7 +44,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "2.5E-0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("2.5" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
@@ -55,7 +53,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "2.5E-2";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0.025" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
@@ -64,7 +62,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "1.5000";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("1.5" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
@@ -73,7 +71,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "0e1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
@@ -82,7 +80,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "-0e1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
@@ -91,7 +89,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "-05";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK(jsoncons::ojson{"-05"} == decoder.get_result());
         //std::cout << decoder.get_result() << "\n";
@@ -100,7 +98,7 @@ TEST_CASE("toon_reader parse_number_or_string")
     {
         jsoncons::string_view str = "-0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_number_or_string(str, decoder);
+        toon::parse_primitive(str, decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
     }
@@ -299,12 +297,16 @@ TEST_CASE("toon_reader parse_header tests")
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
+        auto options = toon::toon_options{}
+            .indent(2)
+            .strict(true);
+
         std::string raw = R"([3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   1,Blue Lake Trail,7.5,320,ana,true
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true)";
         std::error_code ec;
-        toon::read_lines(raw, 2, true, lines, blank_lines, ec);
+        toon::read_lines(raw, options, lines, blank_lines, ec);
 
         REQUIRE(4 == lines.size());
         
@@ -312,8 +314,8 @@ TEST_CASE("toon_reader parse_header tests")
         REQUIRE(result);
         REQUIRE(*result);
         jsoncons::optional<std::string>& key((*result)->key);
-        std::size_t& length{(*result)->length};
-        char& delimiter{(*result)->delimiter};
+        std::size_t length = (*result)->length;
+        char delimiter = (*result)->delimiter;
         std::vector<jsoncons::string_view>& fields{(*result)->fields};
 
         CHECK_FALSE(key);
@@ -340,8 +342,6 @@ TEST_CASE("toon_reader tests")
     SECTION("array of primitives")
     {
         auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([7]: " foo", baz ,"bar ",1,true,false,null)";
         std::error_code ec;
@@ -360,8 +360,6 @@ TEST_CASE("toon_reader tests")
   { "id": 1, "name": "Alice", "role": "admin" },
   { "id": 2, "name": "Bob", "role": "user" }
 ])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([2]{id,name,role}:
   1,Alice,admin
@@ -383,8 +381,6 @@ TEST_CASE("toon_reader tests")
   { "a": 1 },
   "text"
 ])");
-            std::vector<toon::parsed_line> lines;
-            std::vector<toon::blank_line_info> blank_lines;
 
             std::string data = R"([3]:
   - 1
@@ -406,8 +402,6 @@ TEST_CASE("toon_reader tests")
     "location": "Boulder",
     "season": "spring_2025"
 })");
-            std::vector<toon::parsed_line> lines;
-            std::vector<toon::blank_line_info> blank_lines;
 
             std::string data = R"(task: Our favorite hikes together
 location: Boulder
@@ -466,8 +460,6 @@ season: spring_2025)";
     }
   ]
 })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(orders[2]:
   - orderId: ORD-001
@@ -500,8 +492,6 @@ season: spring_2025)";
     SECTION("parses list arrays with empty items")
     {
         auto expected = jsoncons::ojson::parse(R"({"items":["first","second",{}]})");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[3]:
   - first
@@ -524,8 +514,6 @@ season: spring_2025)";
           { "name": "Ada", "data": [] }
         ]
       })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[1]:
   - name: Ada
@@ -543,8 +531,6 @@ season: spring_2025)";
     SECTION("parses root-level array mixing primitive, object, and array of objects in list format")
     {
         auto expected = jsoncons::ojson::parse(R"(["summary",{"id":1,"name":"Ada"},[{"id":2},{"status":"draft"}]])");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"([3]:
   - summary
@@ -583,8 +569,6 @@ season: spring_2025)";
         }
     ]
 })");
-        std::vector<toon::parsed_line> lines;
-        std::vector<toon::blank_line_info> blank_lines;
 
         std::string data = R"(items[1]:
   - users[2]{id,name}:

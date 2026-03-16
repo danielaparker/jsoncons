@@ -44,7 +44,7 @@ void toon_encode_tests(const std::string& fpath)
             if (opts.contains("delimiter"))
             {
                 auto sv = opts["delimiter"].as_string_view();
-                options.delimiter(sv.front());
+                options.delimiter(static_cast<toon::toon_delimiter_kind>(sv.front()));
             }
             if (opts.contains("indent"))
             {
@@ -88,7 +88,7 @@ void toon_decode_tests(const std::string& fpath)
             if (opts.contains("delimiter"))
             {
                 auto sv = opts["delimiter"].as_string_view();
-                options.delimiter(sv.front());
+                options.delimiter(static_cast<toon::toon_delimiter_kind>(sv.front()));
             }
             if (opts.contains("indent"))
             {

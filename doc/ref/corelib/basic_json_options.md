@@ -22,7 +22,7 @@ neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a stri
 nan_to_num| |Sets a number replacement for `NaN` when writing JSON|Unenabled|
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON|Unenabled|
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON|Unenabled|
-max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON|**1024**|
+max_nesting_depth|Maximum nesting depth allowed when reading JSON|Maximum nesting depth allowed when writing JSON|**1024**|
 lossless_bignum|When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces +- infinity.| |**true**|(since 1.4.0)</br>(until 1.5.0)
  |When parsing an integer value, and value is out-of-range, produces a string with tag `semantic_tag::bigint` if **true**, otherwise parses as double. When parsing floating point values, and value is out-of-range, produces a string with tag `semantic_tag::bigdec` if **true**, otherwise produces `+- infinity`.| |**true**|(since 1.5.0)
 lossless_number|If **true**, reads numbers with exponents and fractional parts as strings with tag `semantic_tag::bigdec`.| |**false**|
@@ -86,7 +86,7 @@ Move constructor.
 
 #### Setters
 
-    basic_json_options& max_nesting_depth(int depth)
+    basic_json_options& max_nesting_depth(int depth) 
     basic_json_options& decode_escaped_unicode(bool value); 
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
     basic_json_options& inf_to_str(const string_type& value, bool enable_inverse = true); 
