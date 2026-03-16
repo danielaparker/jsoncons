@@ -297,12 +297,16 @@ TEST_CASE("toon_reader parse_header tests")
         std::vector<toon::parsed_line> lines;
         std::vector<toon::blank_line_info> blank_lines;
 
+        auto options = toon::toon_options{}
+            .indent(2)
+            .strict(true);
+
         std::string raw = R"([3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   1,Blue Lake Trail,7.5,320,ana,true
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true)";
         std::error_code ec;
-        toon::read_lines(raw, 2, true, lines, blank_lines, ec);
+        toon::read_lines(raw, options, lines, blank_lines, ec);
 
         REQUIRE(4 == lines.size());
         
