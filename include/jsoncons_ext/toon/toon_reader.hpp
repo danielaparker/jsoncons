@@ -118,17 +118,17 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
         visitor.string_value(*result);
         return result_type{};
     }
-    if (token == "true")
+    if (token.size() == 4 && token[0] == 't' &&  token[1] == 'r' && token[2] == 'u' &&  token[3] == 'e')
     {
         visitor.bool_value(true);
         return result_type{};
     }
-    if (token == "false")
+    if (token.size() == 5 && token[0] == 'f' &&  token[1] == 'a' && token[2] == 'l' &&  token[3] == 's' &&  token[4] == 'e')
     {
         visitor.bool_value(false);
         return result_type{};
     }
-    if (token == "null")
+    if (token.size() == 4 && token[0] == 'n' &&  token[1] == 'u' && token[2] == 'l' &&  token[3] == 'l')
     {
         visitor.null_value();
         return result_type{};
