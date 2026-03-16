@@ -324,7 +324,7 @@ struct header_info
 {
     jsoncons::optional<std::string> key;
     std::size_t length{0};
-    toon_delimiter_kind delimiter{toon_delimiter_kind::comma};
+    char delimiter{','};
     std::vector<jsoncons::string_view> fields;
 };
 
@@ -600,7 +600,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
     {
         char c = line[i];
 
-        if (c == static_cast<char>(delimiter) && !is_quoted)
+        if (c == delimiter && !is_quoted)
         {
             auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
             if (!r)
@@ -634,7 +634,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
             ++num_items;
             while (++i < line.size())
             {
-                if (line[i] == static_cast<char>(delimiter))
+                if (line[i] == delimiter)
                 {
                     ++num_delimiters;
                     break;
@@ -848,20 +848,20 @@ header_result parse_header(jsoncons::string_view line)
 
     jsoncons::string_view length_str = bracket_content;
 
-    toon_delimiter_kind delimiter = toon_delimiter_kind::comma;
+    char delimiter = ',';
     if (jsoncons::ends_with(bracket_content, '\t'))
     {
-        delimiter = toon_delimiter_kind::tab;
+        delimiter = '\t';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
     else if (jsoncons::ends_with(bracket_content, '|'))
     {
-        delimiter = toon_delimiter_kind::pipe;
+        delimiter = '|';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
     else if (jsoncons::ends_with(bracket_content, ','))
     {
-        delimiter = toon_delimiter_kind::comma;
+        delimiter = ',';
         length_str = jsoncons::string_view(bracket_content.data(), bracket_content.size() - 1);
     }
 
@@ -886,7 +886,7 @@ header_result parse_header(jsoncons::string_view line)
         auto fields_content = jsoncons::string_view(after_bracket.data() + 1, brace_end - 1);
 
         // Parse fields using the delimiter
-        parse_delimited_values(fields_content, static_cast<char>(delimiter), fields);
+        parse_delimited_values(fields_content, delimiter, fields);
 
         after_bracket = jsoncons::string_view(after_bracket.data() + (brace_end + 1),
             after_bracket.size() - (brace_end + 1));
@@ -998,7 +998,7 @@ void read_lines(jsoncons::string_view raw,
 
 inline
 jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::string_view content, 
-    toon_delimiter_kind delimiter,
+    char delimiter,
     std::size_t expected_length,
     const toon_decode_options& options,
     json_visitor& visitor)
@@ -1014,7 +1014,7 @@ jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::string_vi
         return result_type{};
     }
     visitor.begin_array();
-    auto r = parse_delimited_values(content, static_cast<char>(delimiter), expected_length, strict, visitor);
+    auto r = parse_delimited_values(content, delimiter, expected_length, strict, visitor);
     if (!r)
     {
         return r;
@@ -1059,11 +1059,11 @@ std::pair<std::size_t,char> find_first_unquoted(jsoncons::string_view line,
 }
 
 inline
-bool is_row_line(jsoncons::string_view line, toon_delimiter_kind delimiter) 
+bool is_row_line(jsoncons::string_view line, char delimiter) 
 {
     // Find first occurrence of delimiter or colon (single pass optimization)
 
-    char chars [2] = {static_cast<char>(delimiter), ':'};
+    char chars [2] = {delimiter, ':'};
     auto res = find_first_unquoted(line, chars);
 
     // No special chars found -> row
@@ -1072,7 +1072,7 @@ bool is_row_line(jsoncons::string_view line, toon_delimiter_kind delimiter)
 
     // First special char is delimiter -> row
     // First special char is colon -> key-value
-    return res.second == static_cast<char>(delimiter);
+    return res.second == delimiter;
 }
 
 inline
@@ -1253,7 +1253,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             const header_info& item_header(*(*item_header_result));
             const jsoncons::optional<std::string>& key(item_header.key);
             std::size_t length{item_header.length};
-            toon_delimiter_kind item_delim{item_header.delimiter};
+            char item_delim{item_header.delimiter};
 
             if (!key)
             {
@@ -1509,7 +1509,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
     std::size_t base_depth,
     const std::vector<jsoncons::string_view>& fields,
-    toon_delimiter_kind delimiter,
+    char delimiter,
     std::size_t expected_length,
     const toon_decode_options& options,
     json_visitor& visitor)
@@ -1558,7 +1558,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
         jsoncons::string_view content = line.content;
         if (is_row_line(content, delimiter))
         {
-            auto r = parse_delimited_values(content, static_cast<char>(delimiter), fields, visitor);
+            auto r = parse_delimited_values(content, delimiter, fields, visitor);
             if (!r)
             {
                 return r;
@@ -1588,7 +1588,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
 {
     const jsoncons::optional<std::string>& key(header_info.key);
     std::size_t length{header_info.length};
-    toon_delimiter_kind delimiter{header_info.delimiter};
+    char delimiter{header_info.delimiter};
     const std::vector<jsoncons::string_view>& fields{header_info.fields};
 
     const jsoncons::string_view& header_line{lines[header_idx].content};

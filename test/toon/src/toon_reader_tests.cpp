@@ -315,11 +315,11 @@ TEST_CASE("toon_reader parse_header tests")
         REQUIRE(*result);
         jsoncons::optional<std::string>& key((*result)->key);
         std::size_t length = (*result)->length;
-        toon::toon_delimiter_kind delimiter = (*result)->delimiter;
+        char delimiter = (*result)->delimiter;
         std::vector<jsoncons::string_view>& fields{(*result)->fields};
 
         CHECK_FALSE(key);
-        CHECK(toon::toon_delimiter_kind::comma == delimiter);
+        CHECK(',' == delimiter);
         REQUIRE(3 == length);
         REQUIRE(6 == fields.size());
         CHECK("id" == fields[0]);
