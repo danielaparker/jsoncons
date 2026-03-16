@@ -30,12 +30,109 @@
 namespace jsoncons {
 namespace toon {
 
+inline
+jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
+{
+    using result_type = jsoncons::expected<std::string,toon_errc>;
+
+    result_type result{};
+
+    std::string& str{*result};
+
+    std::size_t i = 0;
+
+    while (i < value.size())
+    {
+        if (value[i] == '\\')
+        {
+            if (i + 1 >= value.size())
+            {
+                return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
+            }
+            char next_char = value[i + 1];
+            if (next_char == 'n')
+            {
+                str.push_back('\n');
+                i += 2;
+                continue;
+            }
+            if (next_char == 't')
+            {
+                str.push_back('\t');
+                i += 2;
+                continue;
+            }
+            if (next_char == 'r')
+            {
+                str.push_back('\r');
+                i += 2;
+                continue;
+            }
+            if (next_char == '\\')
+            {
+                str.push_back('\\');
+                i += 2;
+                continue;
+            }
+            if (next_char == '\"')
+            {
+                str.push_back('\"');
+                i += 2;
+                continue;
+            }
+            return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
+        }
+        str.push_back(value[i]);
+        ++i;
+    }
+
+    return result;
+}
+
 enum class parse_number_state{sign,zero,digits,fraction,exponent_sign,exponent_value,err};
 
 inline
-jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string_view str, jsoncons::json_visitor& visitor)
+jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view token, jsoncons::json_visitor& visitor)
 {
     using result_type = jsoncons::expected<void,std::error_code>;
+
+    token = jsoncons::strip(token);
+
+    if (token.empty())
+    {
+        visitor.string_value(jsoncons::string_view{});
+        return result_type{};
+    }
+
+    if (jsoncons::starts_with(token, '\"'))
+    {
+        if (!jsoncons::ends_with(token, '\"') || token.size() < 2)
+        {
+            return result_type{jsoncons::unexpect, toon_errc::missing_closing_quote};
+        }
+        auto result = unescape_string(jsoncons::string_view(token.data()+1, token.size()-2));
+        if (!result)
+        {
+            return result_type{jsoncons::unexpect, result.error()};
+        }
+        visitor.string_value(*result);
+        return result_type{};
+    }
+    if (token == "true")
+    {
+        visitor.bool_value(true);
+        return result_type{};
+    }
+    if (token == "false")
+    {
+        visitor.bool_value(false);
+        return result_type{};
+    }
+    if (token == "null")
+    {
+        visitor.null_value();
+        return result_type{};
+    }
 
     std::string result;
 
@@ -49,9 +146,9 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
     std::size_t decimal_places = 0;
 
     parse_number_state state = parse_number_state::sign;
-    for (std::size_t i = 0; i < str.size() && !not_a_number;)
+    for (std::size_t i = 0; i < token.size() && !not_a_number;)
     {
-        char c = str[i];
+        char c = token[i];
         switch (state)
         {
             case parse_number_state::sign:
@@ -60,11 +157,11 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
                     neg_value = true;
                     ++i;
                 }
-                if (i < str.size() && str[i] == '0')
+                if (i < token.size() && token[i] == '0')
                 {
                     num_str.push_back('0');
                     state = parse_number_state::zero;
-                    if (++i == str.size())
+                    if (++i == token.size())
                     {
                         neg_value = false;
                     }
@@ -82,7 +179,7 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
                 }
                 else
                 {
-                    if ((str.size() - i) == 2 && (str[i] == 'e' || str[i] == 'E') && str[i + 1] == '1')
+                    if ((token.size() - i) == 2 && (token[i] == 'e' || token[i] == 'E') && token[i + 1] == '1')
                     {
                         num_str.push_back('0');
                         i += 2;
@@ -160,7 +257,7 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
                 }
                 break;
             case parse_number_state::err:
-                i = str.size();
+                i = token.size();
                 break;
             default:
                 not_a_number = true;
@@ -170,7 +267,7 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
 
     if (not_a_number)
     {
-        visitor.string_value(str);
+        visitor.string_value(token);
         return result_type{};
     }
 
@@ -226,7 +323,7 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
 
     if (not_a_number)
     {
-        visitor.string_value(str);
+        visitor.string_value(token);
         return result_type{};
     }
     else
@@ -255,69 +352,10 @@ jsoncons::expected<void,std::error_code> parse_number_or_string(jsoncons::string
             return result_type{};
         }
 
-        visitor.string_value(str);
+        visitor.string_value(token);
     }
 
     return result_type{};
-}
-
-inline
-jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
-{
-    using result_type = jsoncons::expected<std::string,toon_errc>;
-
-    result_type result{};
-
-    std::string& str{*result};
-
-    std::size_t i = 0;
-
-    while (i < value.size())
-    {
-        if (value[i] == '\\')
-        {
-            if (i + 1 >= value.size())
-            {
-                return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
-            }
-            char next_char = value[i + 1];
-            if (next_char == 'n')
-            {
-                str.push_back('\n');
-                i += 2;
-                continue;
-            }
-            if (next_char == 't')
-            {
-                str.push_back('\t');
-                i += 2;
-                continue;
-            }
-            if (next_char == 'r')
-            {
-                str.push_back('\r');
-                i += 2;
-                continue;
-            }
-            if (next_char == '\\')
-            {
-                str.push_back('\\');
-                i += 2;
-                continue;
-            }
-            if (next_char == '\"')
-            {
-                str.push_back('\"');
-                i += 2;
-                continue;
-            }
-            return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
-        }
-        str.push_back(value[i]);
-        ++i;
-    }
-
-    return result;
 }
 
 struct header_info
@@ -532,52 +570,6 @@ toon_errc parse_number(const char* data, std::size_t length,
     visitor.string_value(jsoncons::string_view(data, length));
 
     return toon_errc{};
-}
-
-inline
-jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view token, 
-    json_visitor& visitor)
-{
-    using result_type = jsoncons::expected<void,std::error_code>;
-
-    token = jsoncons::strip(token);
-
-    if (token.empty())
-    {
-        visitor.string_value(jsoncons::string_view{});
-        return result_type{};
-    }
-
-    if (jsoncons::starts_with(token, '\"'))
-    {
-        if (!jsoncons::ends_with(token, '\"') || token.size() < 2)
-        {
-            return result_type{jsoncons::unexpect, toon_errc::missing_closing_quote};
-        }
-        auto result = unescape_string(jsoncons::string_view(token.data()+1, token.size()-2));
-        if (!result)
-        {
-            return result_type{jsoncons::unexpect, result.error()};
-        }
-        visitor.string_value(*result);
-        return result_type{};
-    }
-    if (token == "true")
-    {
-        visitor.bool_value(true);
-        return result_type{};
-    }
-    if (token == "false")
-    {
-        visitor.bool_value(false);
-        return result_type{};
-    }
-    if (token == "null")
-    {
-        visitor.null_value();
-        return result_type{};
-    }
-    return parse_number_or_string(token, visitor);
 }
 
 inline 
