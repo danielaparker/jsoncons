@@ -22,6 +22,8 @@ namespace toon {
 
 enum class toon_delimiter_kind : char {comma=',', tab='\t', pipe='|'};
 
+enum class key_folding_kind {off, safe};
+
 class toon_options;
 
 class toon_options_common
@@ -66,6 +68,7 @@ public:
     using typename super_type::string_type;
 private:
     bool strict_{true};
+    key_folding_kind expand_paths_{key_folding_kind::off};
 public:
     toon_decode_options() = default;
 
@@ -80,6 +83,7 @@ protected:
     toon_decode_options& operator=(toon_decode_options&&) = default;
 public:
     bool strict() const {return strict_;}
+    key_folding_kind expand_paths() const {return expand_paths_;}
 }; 
 
 class toon_encode_options : public virtual toon_options_common
@@ -92,6 +96,8 @@ public:
 private:
     toon_delimiter_kind delimiter_{toon_delimiter_kind::comma};
     jsoncons::optional<char> length_marker_;
+    key_folding_kind key_folding_{key_folding_kind::off};
+    std::size_t flatten_depth_{1024};
 public:
     toon_encode_options() = default;
 
@@ -117,6 +123,10 @@ public:
     {
         return length_marker_;
     }
+
+    key_folding_kind key_folding() const {return key_folding_;}
+
+    std::size_t flatten_depth() const {return flatten_depth_;}
 };
 
 class toon_options final: public toon_decode_options, 
@@ -129,8 +139,11 @@ public:
     using toon_options_common::indent;
     using toon_options_common::max_nesting_depth;
     using toon_decode_options::strict;
+    using toon_decode_options::expand_paths;
     using toon_encode_options::delimiter;
     using toon_encode_options::length_marker;
+    using toon_encode_options::key_folding;
+    using toon_encode_options::flatten_depth;
 public:
 
 //  Constructors
@@ -162,6 +175,24 @@ public:
     toon_options& length_marker(jsoncons::optional<char> value)
     {
         this->length_marker_ = value;
+        return *this;
+    }
+
+    toon_options& key_folding(key_folding_kind value)
+    {
+        this->key_folding_ = value;
+        return *this;
+    }
+
+    toon_options& flatten_depth(std::size_t value)
+    {
+        this->flatten_depth_ = value;
+        return *this;
+    }
+
+    toon_options& expand_paths(key_folding_kind value)
+    {
+        this->expand_paths_ = value;
         return *this;
     }
 
