@@ -15,7 +15,7 @@ Specifies options for reading and writing [toon-format](https://github.com/toon-
 
 Option|Reading|Writing|Default|comment
 ------|-------|-------|-------|------
-delimiter|Default delimiter character for arrays|Delimiter character for arrays|**,**|
+delimiter|&nbsp;|[Delimiter character](toon_delimiter_kind.md) for arrays|**toon_delimiter_kind::comma**|
 indent|Number of spaces to indent each level|Number of spaces to indent each level.|2|
 length_marker|&nbsp;|Optional marker for prefixing array lengths|None|
 strict|See [strict mode errors and diagnostics](https://github.com/toon-format/spec/blob/main/SPEC.md#14-strict-mode-errors-and-diagnostics-authoritative-checklist)|&nbsp;|**true**|
@@ -28,7 +28,7 @@ Constructs a `toon_options` with default values.
 
 #### Setters
 
-    toon_options& delimiter(char value) 
+    toon_options& delimiter(toon_delimiter_kind value) 
     toon_options& indent(int value) 
     toon_options& length_marker(jsoncons::optional<char> value) 
     toon_options& strict(bool value) 
