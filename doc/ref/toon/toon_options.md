@@ -12,7 +12,7 @@ class toon_options;
 
 Specifies options for reading and writing [toon-format](https://github.com/toon-format/toon).
 
-Option|Reading|Writing|Default|Comment
+Option|Reading|Writing|Default|Note
 ------|-------|-------|-------|-------
 indent|Number of spaces to indent each level|Number of spaces to indent each level.|**2**
 max_nesting_depth|Maximum nesting depth allowed when reading toon-format|Maximum nesting depth allowed when writing toon-format|**1024**
