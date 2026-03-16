@@ -683,6 +683,8 @@ template <typename Json, typename Sink>
 void encode_array_of_arrays(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (line != 0)
     {
         sink.push_back('\n');
@@ -708,7 +710,7 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
             sink.append(s.data(), s.size());
             if (options.delimiter() != toon_delimiter_kind::comma)
             {
-                sink.push_back(static_cast<char>(options.delimiter()));
+                sink.push_back(delimiter);
             }
             sink.push_back(']');
             sink.push_back(':');
@@ -721,13 +723,13 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
             {
                 if (!first2)
                 {
-                    sink.push_back(static_cast<char>(options.delimiter()));
+                    sink.push_back(delimiter);
                 }
                 else
                 {
                     first2 = false;
                 }
-                encode_primitive(item2, static_cast<char>(options.delimiter()), sink);
+                encode_primitive(item2, delimiter, sink);
             }
         }
         else
@@ -742,6 +744,8 @@ template <typename Json, typename Sink>
 void encode_array_content(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (is_array_of_primitives(val))
     {
         bool first_item = true;
@@ -749,14 +753,14 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
         {
             if (!first_item)
             {
-                sink.push_back(static_cast<char>(options.delimiter()));
+                sink.push_back(delimiter);
             }
             else
             {
                 sink.push_back(' ');
                 first_item = false;
             }
-            encode_primitive(item, static_cast<char>(options.delimiter()), sink);
+            encode_primitive(item, delimiter, sink);
         }
     }
     else if (is_array_of_arrays(val))
@@ -776,9 +780,9 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 }
                 auto s = std::to_string(item.size());
                 sink.append(s.data(), s.size());
-                if (static_cast<char>(options.delimiter()) != ',')
+                if (delimiter != ',')
                 {
-                    sink.push_back(static_cast<char>(options.delimiter()));
+                    sink.push_back(delimiter);
                 }
                 sink.push_back(']');
                 sink.push_back(':');
@@ -791,13 +795,13 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 {
                     if (!first2)
                     {
-                        sink.push_back(static_cast<char>(options.delimiter()));
+                        sink.push_back(delimiter);
                     }
                     else
                     {
                         first2 = false;
                     }
-                    encode_primitive(item2, static_cast<char>(options.delimiter()), sink);
+                    encode_primitive(item2, delimiter, sink);
                 }
             }
             else
@@ -821,13 +825,13 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 {
                     if (!first_item)
                     {
-                        sink.push_back(static_cast<char>(options.delimiter()));
+                        sink.push_back(delimiter);
                     }
                     else
                     {
                         first_item = false;
                     }
-                    encode_primitive(row.at(field), static_cast<char>(options.delimiter()), sink);
+                    encode_primitive(row.at(field), delimiter, sink);
                 }
                 ++line;
             }
@@ -859,7 +863,7 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 sink.append((depth+1)*options.indent(), ' ');
                 sink.push_back('-');
                 sink.push_back(' ');
-                encode_primitive(item, static_cast<char>(options.delimiter()), sink);
+                encode_primitive(item, delimiter, sink);
             }
             ++line;
         }
@@ -872,6 +876,8 @@ void encode_array_of_objects_as_tabular(const Json& val,
     const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (line != 0)
     {
         sink.push_back('\n');
@@ -890,13 +896,13 @@ void encode_array_of_objects_as_tabular(const Json& val,
         {
             if (!first_item)
             {
-                sink.push_back(static_cast<char>(options.delimiter()));
+                sink.push_back(delimiter);
             }
             else
             {
                 first_item = false;
             }
-            encode_primitive(row.at(field), static_cast<char>(options.delimiter()), sink);
+            encode_primitive(row.at(field), delimiter, sink);
         }
         ++line;
     }
@@ -906,6 +912,8 @@ template <typename Json, typename Sink>
 void encode_object_as_list_item(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (val.empty())
     {
         if (line != 0)
@@ -931,7 +939,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         detail::encode_key(first->key(), sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(first->value(), static_cast<char>(options.delimiter()), sink);
+        encode_primitive(first->value(), delimiter, sink);
     }
     else if (is_json_array(first->value()))
     {
@@ -965,8 +973,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
                 fields = try_get_tabular_header(first->value());
             }
             write_header(first->key(), first->value().size(), 
-                fields,
-                options, sink);
+                fields, options, sink);
             encode_array_content(first->value(), options, sink, depth+1, line);
         }
         ++line;
@@ -994,6 +1001,8 @@ template <typename Json, typename Sink>
 void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (line != 0)
     {
         sink.push_back('\n');
@@ -1011,7 +1020,7 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
             sink.append((depth+1)*options.indent(), ' ');
             sink.push_back('-');
             sink.push_back(' ');
-            encode_primitive(item, static_cast<char>(options.delimiter()), sink);
+            encode_primitive(item, delimiter, sink);
         }
         else if (is_json_object(item))
         {
@@ -1062,6 +1071,8 @@ template <typename Json, typename Sink>
 void encode_inline_primitive_array(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (line != 0)
     {
         sink.push_back('\n');
@@ -1075,14 +1086,14 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
     {
         if (!first_item)
         {
-            sink.push_back(static_cast<char>(options.delimiter()));
+            sink.push_back(delimiter);
         }
         else
         {
             sink.push_back(' ');
             first_item = false;
         }
-        encode_primitive(item, static_cast<char>(options.delimiter()), sink);
+        encode_primitive(item, delimiter, sink);
     }
 }
 
@@ -1134,6 +1145,8 @@ void encode_key_value_pair(string_view key, const Json& val,
     const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     if (is_json_array(val))
     {
         encode_array(val, options, sink, depth, line, key);
@@ -1152,7 +1165,7 @@ void encode_key_value_pair(string_view key, const Json& val,
         detail::encode_key(key, sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(val, static_cast<char>(options.delimiter()), sink);
+        encode_primitive(val, delimiter, sink);
     }
 }
 
@@ -1189,6 +1202,8 @@ void encode_object(const Json& val, const toon_encode_options& options,
 template <typename Json, typename Sink>
 void encode_value(const Json& val, const toon_encode_options& options, Sink& sink, int depth)
 {
+    char delimiter = static_cast<char>(options.delimiter());
+
     int line{0};
     if (is_json_array(val))
     {
@@ -1201,7 +1216,7 @@ void encode_value(const Json& val, const toon_encode_options& options, Sink& sin
     else
     {
         sink.append(depth*options.indent(), ' ');
-        encode_primitive(val, static_cast<char>(options.delimiter()), sink);
+        encode_primitive(val, delimiter, sink);
     }
 }
 
