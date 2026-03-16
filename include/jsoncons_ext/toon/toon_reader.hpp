@@ -134,8 +134,6 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
         return result_type{};
     }
 
-    std::string result;
-
     std::string num_str;
     std::string exponent_str;
 
