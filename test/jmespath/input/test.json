@@ -37,6 +37,51 @@
         "result": { "value": false }
       }
     ]
+  },
+  {
+    "given": {},
+    "cases": [
+      {
+        "comment": "Floor function applied to a float should return integer",
+        "expression": "to_string(floor(`3.7`))",
+        "result": "3"
+      },
+      {
+        "comment": "Floor function applied to a negative float should return integer",
+        "expression": "to_string(floor(`-3.7`))",
+        "result": "-4"
+      },
+      {
+        "comment": "Floor function applied to an integer should return the same integer",
+        "expression": "to_string(floor(`3`))",
+        "result": "3"
+      },
+      {
+        "comment": "Floor function applied to a negative integer should return the same integer",
+        "expression": "to_string(floor(`-3`))",
+        "result": "-3"
+      },
+      {
+        "comment": "Ceil function applied to a float should return integer",
+        "expression": "to_string(ceil(`3.7`))",
+        "result": "4"
+      },
+      {
+        "comment": "Ceil function applied to a negative float should return integer",
+        "expression": "to_string(ceil(`-3.7`))",
+        "result": "-3"
+      },
+      {
+        "comment": "Ceil function applied to an integer should return the same integer",
+        "expression": "to_string(ceil(`3`))",
+        "result": "3"
+      },
+      {
+        "comment": "Ceil function applied to a negative integer should return the same integer",
+        "expression": "to_string(ceil(`-3`))",
+        "result": "-3"
+      }
+    ]
   }
 ]
 

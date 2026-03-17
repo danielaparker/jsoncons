@@ -1387,11 +1387,11 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return *context.create_json(arg0);
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::ceil(arg0.template as<double>()));
+                        return *context.create_json(static_cast<int64_t>(std::ceil(arg0.template as<double>())));
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -1523,11 +1523,11 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return *context.create_json(arg0);
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::floor(arg0.template as<double>()));
+                        return *context.create_json(static_cast<int64_t>(std::floor(arg0.template as<double>())));
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
