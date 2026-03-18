@@ -80,6 +80,11 @@
         "comment": "Ceil function applied to a negative integer should return the same integer",
         "expression": "to_string(ceil(`-3`))",
         "result": "-3"
+      },
+      {
+        "comment": "Ceil function applied to a large double not in int64_t range should return as double",
+        "expression": "ceil(`1e20`)",
+        "result": 1e20
       }
     ]
   }

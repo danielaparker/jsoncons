@@ -1387,11 +1387,22 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0);
+                        return arg0;
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(static_cast<int64_t>(std::ceil(arg0.template as<double>())));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::ceil(dbl0);
+                        if (dbl0 >= std::numeric_limits<int64_t>::lowest() && dbl0 <= (std::numeric_limits<int64_t>::max)()) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -1527,7 +1538,18 @@ namespace detail {
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(static_cast<int64_t>(std::floor(arg0.template as<double>())));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::floor(dbl0);
+                        if (dbl0 >= std::numeric_limits<int64_t>::lowest() && dbl0 <= (std::numeric_limits<int64_t>::max)()) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
