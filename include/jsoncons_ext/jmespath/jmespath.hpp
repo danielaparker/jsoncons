@@ -1397,7 +1397,7 @@ namespace detail {
                             return context.null_value();
                         }
                         dbl0 = std::ceil(dbl0);
-                        if (dbl0 >= std::numeric_limits<int64_t>::lowest() && dbl0 <= (std::numeric_limits<int64_t>::max)()) {
+                        if (dbl0 >= static_cast<double>(std::numeric_limits<int64_t>::lowest()) && static_cast<double>(dbl0 <= (std::numeric_limits<int64_t>::max)())) {
                             return *context.create_json(static_cast<int64_t>(dbl0));
                         }
                         else {
@@ -1544,7 +1544,7 @@ namespace detail {
                             return context.null_value();
                         }
                         dbl0 = std::floor(dbl0);
-                        if (dbl0 >= std::numeric_limits<int64_t>::lowest() && dbl0 <= (std::numeric_limits<int64_t>::max)()) {
+                        if (dbl0 >= static_cast<double>(std::numeric_limits<int64_t>::lowest()) && dbl0 <= static_cast<double>((std::numeric_limits<int64_t>::max)())) {
                             return *context.create_json(static_cast<int64_t>(dbl0));
                         }
                         else {
