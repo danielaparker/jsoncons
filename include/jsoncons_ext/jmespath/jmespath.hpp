@@ -1240,8 +1240,8 @@ namespace detail {
     template <typename Json>
     class jmespath_evaluator 
     {
-        static constexpr double max_double_to_int64 = static_cast<double>(int64_t(1) << std::numeric_limits<int64_t>::digits);
-        static constexpr double min_double_to_int64 = -max_double_to_int64;
+        static constexpr double max_double_to_int64 = 9223372036854775807.0;
+        static constexpr double min_double_to_int64 = -9223372036854775808.0;
 
     public:
         typedef typename Json::char_type char_type;
