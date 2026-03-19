@@ -1240,6 +1240,9 @@ namespace detail {
     template <typename Json>
     class jmespath_evaluator 
     {
+        static constexpr double max_double_to_int64 = static_cast<double>(int64_t(1) << std::numeric_limits<int64_t>::digits);
+        static constexpr double min_double_to_int64 = -max_double_to_int64;
+
     public:
         typedef typename Json::char_type char_type;
         typedef typename Json::char_traits_type char_traits_type;
@@ -1397,7 +1400,7 @@ namespace detail {
                             return context.null_value();
                         }
                         dbl0 = std::ceil(dbl0);
-                        if (dbl0 >= static_cast<double>(std::numeric_limits<int64_t>::lowest()) && static_cast<double>(dbl0 <= (std::numeric_limits<int64_t>::max)())) {
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
                             return *context.create_json(static_cast<int64_t>(dbl0));
                         }
                         else {
@@ -1544,7 +1547,7 @@ namespace detail {
                             return context.null_value();
                         }
                         dbl0 = std::floor(dbl0);
-                        if (dbl0 >= static_cast<double>(std::numeric_limits<int64_t>::lowest()) && dbl0 <= static_cast<double>((std::numeric_limits<int64_t>::max)())) {
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
                             return *context.create_json(static_cast<int64_t>(dbl0));
                         }
                         else {
