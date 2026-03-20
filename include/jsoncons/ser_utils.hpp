@@ -102,10 +102,13 @@ public:
             str.append(": ");
         }
         str.append(ec_.message());
-        if (line_ != 0 && column_ != 0)
+        if (line_ != 0)
         {
             str.append(" at line ");
             str.append(std::to_string(line_));
+        }
+        if (line_ != 0 && column_ != 0)
+        {
             str.append(" and column ");
             str.append(std::to_string(column_));
         }
