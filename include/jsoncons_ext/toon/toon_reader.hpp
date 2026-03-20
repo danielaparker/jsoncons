@@ -1682,15 +1682,18 @@ public:
     void read()
     {
         std::error_code ec;
-        read(ec);
-        if (ec)
+        auto result = try_read();
+        if (!result)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(ser_error(result.error().code()));
         }
     }
 
-    void read(std::error_code& ec)
+    jsoncons::expected<void,read_error> try_read()
     {
+        using result_type = jsoncons::expected<void, read_error>;
+
+        std::error_code ec;
         std::string raw;
         std::vector<parsed_line> lines;
         std::vector<blank_line_info> blank_lines;
@@ -1704,7 +1707,7 @@ public:
         read_lines(raw, options_, lines, blank_lines, ec);
         if (ec)
         {
-            return;
+            return result_type{jsoncons::unexpect, ec};
         }
         std::vector<parsed_line> non_blank_lines;
         for (const auto& ln : lines)
@@ -1718,14 +1721,13 @@ public:
         {
             visitor_.begin_object();
             visitor_.end_object();
-            return;
+            return result_type{};
         }
 
         auto header_result = parse_header(non_blank_lines[0].content);
         if (!header_result)
         {
-            ec = header_result.error().code();
-            return;
+            return result_type{jsoncons::unexpect, header_result.error()};
         }
         if (*header_result && !(*header_result)->key)
         {
@@ -1734,9 +1736,9 @@ public:
             auto r1 = decode_array_from_header(lines, false, 0, 0, header, options_, visitor_);
             if (!r1)
             {
-                ec = r1.error().code();
+                return result_type{jsoncons::unexpect, r1.error().code()};
             }
-            return;
+            return result_type{};
         }
 
         // Determine root form (Section 5)
@@ -1758,9 +1760,9 @@ public:
                     auto r = parse_primitive(line_content, visitor_);
                     if (!r)
                     {
-                        ec = r.error();
+                        return result_type{jsoncons::unexpect, r.error()};
                     }
-                    return;
+                    return result_type{};
                 }
             }
         }
@@ -1769,8 +1771,9 @@ public:
         auto r = decode_object(lines, 0, 0, options_, visitor_);
         if (!r)
         {
-            ec = r.error().code();
+            return result_type{jsoncons::unexpect, r.error().code()};
         }
+        return result_type{};
     }
 };
 

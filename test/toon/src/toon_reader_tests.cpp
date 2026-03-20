@@ -592,3 +592,20 @@ season: spring_2025)";
         }
     }
 }
+
+
+TEST_CASE("toon_reader errors")
+{
+    SECTION("test1")
+    {
+        std::string data = R"(tags[2]: a,b,c)";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.strict(true);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        std::error_code ec;
+        auto result = reader.try_read();
+        REQUIRE_FALSE(result);
+        std::cout << result.error().message() << "\n";
+    }
+}
