@@ -598,6 +598,8 @@ TEST_CASE("toon_reader errors")
 {
     SECTION("test1")
     {
+        std::string expected = "Inline array length mismatch at line 1";
+
         std::string data = R"(tags[2]: a,b,c)";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         auto options = toon::toon_options{}.strict(true);
@@ -606,6 +608,6 @@ TEST_CASE("toon_reader errors")
         std::error_code ec;
         auto result = reader.try_read();
         REQUIRE_FALSE(result);
-        std::cout << result.error().message() << "\n";
+        CHECK(expected == result.error().message());
     }
 }
