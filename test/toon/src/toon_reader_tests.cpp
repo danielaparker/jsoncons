@@ -305,8 +305,8 @@ TEST_CASE("toon_reader parse_header tests")
   1,Blue Lake Trail,7.5,320,ana,true
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true)";
-        std::error_code ec;
-        toon::read_lines(raw, options, lines, blank_lines, ec);
+        auto r = toon::read_lines(raw, options, lines, blank_lines);
+        REQUIRE(r);
 
         REQUIRE(4 == lines.size());
         
@@ -344,7 +344,6 @@ TEST_CASE("toon_reader tests")
         auto expected = jsoncons::ojson::parse(R"([" foo", "baz" ,"bar ",1,true,false,null])");
 
         std::string data = R"([7]: " foo", baz ,"bar ",1,true,false,null)";
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -364,7 +363,6 @@ TEST_CASE("toon_reader tests")
         std::string data = R"([2]{id,name,role}:
   1,Alice,admin
   2,Bob,user)";
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -386,7 +384,6 @@ TEST_CASE("toon_reader tests")
   - 1
   - a: 1
   - text)";
-            std::error_code ec;
 
             jsoncons::json_decoder<jsoncons::ojson> decoder;
             toon::toon_string_reader reader(data, decoder);
@@ -406,7 +403,6 @@ TEST_CASE("toon_reader tests")
             std::string data = R"(task: Our favorite hikes together
 location: Boulder
 season: spring_2025)";
-            std::error_code ec;
 
             jsoncons::json_decoder<jsoncons::ojson> decoder;
             toon::toon_string_reader reader(data, decoder);
@@ -479,7 +475,6 @@ season: spring_2025)";
       THING-C,3,15
     total: 45
     status: delivered)";
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -497,7 +492,6 @@ season: spring_2025)";
   - first
   - second
   - )";
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -518,7 +512,6 @@ season: spring_2025)";
         std::string data = R"(items[1]:
   - name: Ada
     data[0]:)";
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -539,8 +532,6 @@ season: spring_2025)";
   - [2]:
     - id: 2
     - status: draft)";
-
-        std::error_code ec;
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         toon::toon_string_reader reader(data, decoder);
@@ -596,6 +587,34 @@ season: spring_2025)";
 
 TEST_CASE("toon_reader errors")
 {
+    SECTION("indentation errors")
+    {
+        std::string expected = "Indent spaces must be exact multiple of indent size at line 11";
+
+        std::string data = "a:\n   b: 1";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.strict(true);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE_FALSE(result);
+        CHECK(expected == result.error().message());
+        //std::cout << result.error().message() << "\n";
+    }
+    SECTION("blank lines")
+    {
+        std::string expected = "Blank lines not allowed inside arrays at line 3";
+
+        std::string data = "items[3]:\n  - a\n\n  - b\n  - c";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.strict(true);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE_FALSE(result);
+        CHECK(expected == result.error().message());
+        //std::cout << result.error().message() << "\n";
+    }
     SECTION("test1")
     {
         std::string expected = "Inline array length mismatch at line 1";
@@ -605,7 +624,6 @@ TEST_CASE("toon_reader errors")
         auto options = toon::toon_options{}.strict(true);
         toon::toon_string_reader reader(data, decoder, options);
 
-        std::error_code ec;
         auto result = reader.try_read();
         REQUIRE_FALSE(result);
         CHECK(expected == result.error().message());

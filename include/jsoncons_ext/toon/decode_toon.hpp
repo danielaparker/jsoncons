@@ -36,7 +36,6 @@ try_decode_toon(const StringViewLike& s,
 
     json_decoder<T> decoder;
     toon_string_reader reader(s, decoder, options);
-    std::error_code ec;
     auto result = reader.try_read();
     if (!result)
     {
@@ -68,7 +67,6 @@ try_decode_toon(std::istream& is,
     using value_type = T;
     using result_type = read_result<value_type>;
 
-    std::error_code ec;   
     jsoncons::json_decoder<T> decoder;
     toon_stream_reader reader(is, decoder, options);
 

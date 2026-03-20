@@ -897,12 +897,13 @@ std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t ind
 }
 
 inline
-void read_lines(jsoncons::string_view raw, 
+jsoncons::expected<void,jsoncons::read_error> read_lines(jsoncons::string_view raw, 
     const toon_decode_options& options,
     std::vector<parsed_line>& lines,
-    std::vector<blank_line_info>& blank_lines,
-    std::error_code& ec)
+    std::vector<blank_line_info>& blank_lines)
 {
+    using result_type = jsoncons::expected<void,jsoncons::read_error>;
+
     std::size_t indent_size = options.indent();
     bool strict = options.strict();
 
@@ -922,8 +923,7 @@ void read_lines(jsoncons::string_view raw,
             {
                 if (strict)
                 {
-                    ec = toon_errc::tab_in_indentation;
-                    return;
+                    return result_type{jsoncons::unexpect, toon_errc::tab_in_indentation, i+1, 0};
                 }
                 else
                 {
@@ -955,8 +955,7 @@ void read_lines(jsoncons::string_view raw,
         {
             if (strict && !is_blank_line && indent > 0 && indent % indent_size !=0)
             {
-                ec = toon_errc::indent_not_multiple_of_indent_size;
-                return;
+                return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, i+1, 0};
             }
             std::size_t depth = compute_depth_from_indent(indent, indent_size);
             if (is_blank_line)
@@ -975,8 +974,7 @@ void read_lines(jsoncons::string_view raw,
     {
         if (strict && !is_blank_line && indent > 0 && indent % indent_size != 0)
         {
-            ec = toon_errc::indent_not_multiple_of_indent_size;
-            return;
+            return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, i+1, 0};
         }
         std::size_t depth = compute_depth_from_indent(indent, indent_size);
         if (is_blank_line)
@@ -986,6 +984,7 @@ void read_lines(jsoncons::string_view raw,
         lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
     }
 
+    return result_type{};
 }
 
 inline
@@ -1674,7 +1673,6 @@ public:
     {
         using result_type = jsoncons::expected<void, read_error>;
 
-        std::error_code ec;
         std::string raw;
         std::vector<parsed_line> lines;
         std::vector<blank_line_info> blank_lines;
@@ -1685,10 +1683,10 @@ public:
             raw.append(s.data(), s.size());
         }
 
-        read_lines(raw, options_, lines, blank_lines, ec);
-        if (ec)
+        auto r_lines = read_lines(raw, options_, lines, blank_lines);
+        if (!r_lines)
         {
-            return result_type{jsoncons::unexpect, ec};
+            return result_type{jsoncons::unexpect, r_lines.error()};
         }
         std::vector<parsed_line> non_blank_lines;
         for (const auto& ln : lines)
