@@ -1240,6 +1240,9 @@ namespace detail {
     template <typename Json>
     class jmespath_evaluator 
     {
+        static constexpr double max_double_to_int64 = 9223372036854775807.0;
+        static constexpr double min_double_to_int64 = -9223372036854775808.0;
+
     public:
         typedef typename Json::char_type char_type;
         typedef typename Json::char_traits_type char_traits_type;
@@ -1387,11 +1390,22 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return arg0;
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::ceil(arg0.template as<double>()));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::ceil(dbl0);
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -1523,11 +1537,22 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return *context.create_json(arg0);
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::floor(arg0.template as<double>()));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::floor(dbl0);
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
