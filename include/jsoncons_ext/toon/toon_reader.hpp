@@ -1680,22 +1680,28 @@ public:
         }
         const std::vector<parsed_line>& lines{*r_lines};
 
-        std::vector<parsed_line> non_blank_lines;
-        for (const auto& ln : lines)
+        std::size_t count = 0;
+        jsoncons::string_view first_line_content{};
+
+        for (std::size_t i = 0; i < lines.size() && count < 2; ++i)
         {
-            if (!ln.is_blank())
+            if (!lines[i].is_blank())
             {
-                non_blank_lines.push_back(ln);
+                if (count == 0)
+                {
+                    first_line_content = lines[i].content;
+                }
+                ++count;
             }
         }
-        if (non_blank_lines.empty())
+        if (count == 0)
         {
             visitor_.begin_object();
             visitor_.end_object();
             return result_type{};
         }
 
-        auto header_result = parse_header(non_blank_lines[0].content);
+        auto header_result = parse_header(first_line_content);
         if (!header_result)
         {
             return result_type{jsoncons::unexpect, header_result.error(), 1, 0};
@@ -1713,22 +1719,19 @@ public:
         }
 
         // Determine root form (Section 5)
-        const auto& first_line = non_blank_lines[0];
 
         // Check if it's a single primitive
-        if (non_blank_lines.size() == 1)
+        if (count == 1)
         {
-            auto line_content = first_line.content;
             // Check if it's not a key-value line
-
-            auto kv = split_key_value(line_content);
+            auto kv = split_key_value(first_line_content);
             if (!kv)
             {
                 // Not a key-value, check if it's a header
                 if (!header_result || !(*header_result))
                 {
                     // Single primitive
-                    auto r = parse_primitive(line_content, visitor_);
+                    auto r = parse_primitive(first_line_content, visitor_);
                     if (!r)
                     {
                         return result_type{jsoncons::unexpect, r.error()};
