@@ -15,6 +15,10 @@ master (1.6.0 preview)
 
     - Git PR #687: jmespath: allow rhs_expression in a keyvalue - expression
 
+    - Git PR #688,#689: jmespath: where possible without losing information,
+      store the result of `ceil` and `floor` as `basic_json` integer values
+      rather than double values.
+
 - Enhancements
 
     - Added **toon-format** extension
