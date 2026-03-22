@@ -1193,7 +1193,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 // Blank lines dedented below row depth mean array has ended
                 if ((i-start_idx) < expected_length)
                 {
-                    return line_result{jsoncons::unexpect, toon_errc::blank_lines_in_array, i+1, 0};
+                    return line_result{jsoncons::unexpect, toon_errc::blank_lines_in_array, line.line_num, 0};
                 }
                 else
                 {
@@ -1243,7 +1243,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         auto r = decode_inline_array(inline_part, item_delim, length, options, visitor);
                         if (!r)
                         {
-                            return line_result{jsoncons::unexpect, r.error(), i+1, 0};
+                            return line_result{jsoncons::unexpect, r.error(), line.line_num, 0};
                         }
                         ++i;
                         ++row_count;
@@ -1429,7 +1429,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     auto r = parse_primitive(field_value_str, visitor);
                     if (!r)
                     {
-                        return line_result{jsoncons::unexpect, r.error(), i+1, 0};
+                        return line_result{jsoncons::unexpect, r.error(), field_line.line_num, 0};
                     }
                     ++i;
                 }
@@ -1452,7 +1452,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 auto r = parse_primitive(item_content, visitor);
                 if (!r)
                 {
-                    return line_result{jsoncons::unexpect, r.error(), i+1, 0};
+                    return line_result{jsoncons::unexpect, r.error(), line.line_num, 0};
                 }
                 ++row_count;
                 ++i;
@@ -1496,7 +1496,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
                 if ((i-start_idx) < expected_length)
                 {
-                    return line_result{jsoncons::unexpect, toon_errc::blank_lines_in_array, i+1, 0};
+                    return line_result{jsoncons::unexpect, toon_errc::blank_lines_in_array, line.line_num, 0};
                 }
                 else
                 {
@@ -1523,7 +1523,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
             auto r = parse_delimited_values(content, delimiter, fields, visitor);
             if (!r)
             {
-                return line_result{jsoncons::unexpect, r.error(), i + 1, 0};
+                return line_result{jsoncons::unexpect, r.error(), line.line_num, 0};
             }
             ++row_count;
             ++i;
@@ -1536,7 +1536,8 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
 
     visitor.end_array();
 
-    return strict && expected_length != row_count ? line_result{jsoncons::unexpect, toon_errc::tabular_array_length_mismatch} : line_result{i};
+    return strict && expected_length != row_count ? 
+        line_result{jsoncons::unexpect, toon_errc::tabular_array_length_mismatch,i+1,0} : line_result{i};
 }
 
 inline
