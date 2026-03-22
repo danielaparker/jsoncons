@@ -588,7 +588,7 @@ TEST_CASE("toon_reader errors")
 {
     SECTION("indentation errors")
     {
-        std::string expected = "Indent spaces must be exact multiple of indent size at line 11";
+        std::string expected = "Indent spaces must be exact multiple of indent size at line 2";
 
         std::string data = "a:\n   b: 1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
