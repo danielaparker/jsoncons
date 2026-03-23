@@ -21,8 +21,7 @@ Type `BytesLike` must be back insertable and have member type `value_type` with 
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the TOON data format, using the specified (or defaulted) [options](toon_options.md). 
-Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 
-or support jsoncons reflection traits. 
+Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md). 
 
 ### Examples
 
