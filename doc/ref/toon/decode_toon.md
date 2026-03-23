@@ -53,13 +53,13 @@ or support [json_type_traits](../json_type_traits/json_type_traits.md).
 
 #### Return value
 
-(1)-(5) Deserialized value
+(1)-(2) Deserialized value
 
-(6)-(10) [read_result<T>](read_result.md)
+(3)-(4) [read_result<T>](read_result.md)
 
 #### Exceptions
 
-(1)-(5) Throw [ser_error](ser_error.md) if decode fails.
+(1)-(2) Throw [ser_error](ser_error.md) if decode fails.
 
 Any overload may throw `std::bad_alloc` if memory allocation fails.
 
