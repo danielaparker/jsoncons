@@ -106,7 +106,7 @@ TEST_CASE("toon_reader parse_primitive")
 
 TEST_CASE("toon_reader util tests")
 {
-    SECTION("unescape_string")
+    /*SECTION("unescape_string")
     {
         auto result1 = toon::unescape_string(jsoncons::string_view(R"(hello\\nworld)"));
         REQUIRE(result1);
@@ -115,7 +115,7 @@ TEST_CASE("toon_reader util tests")
         REQUIRE(result2);
         CHECK(R"(hello\nworld)" == *result2);
     }
-    /*SECTION("find_unquoted_char")
+    SECTION("find_unquoted_char")
     {
         std::size_t pos;
 

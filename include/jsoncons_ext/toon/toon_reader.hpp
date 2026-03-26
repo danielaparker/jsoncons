@@ -133,7 +133,7 @@ jsoncons::span<char> strip(jsoncons::span<char> sv)
 }
 
 inline
-jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
+jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::span<char> value)
 {
     using result_type = jsoncons::expected<std::string,toon_errc>;
 
@@ -212,7 +212,7 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::span<char> to
         {
             return result_type{jsoncons::unexpect, toon_errc::missing_closing_quote};
         }
-        auto result = unescape_string(jsoncons::string_view(token.data()+1, token.size()-2));
+        auto result = unescape_string(jsoncons::span<char>(token.data()+1, token.size()-2));
         if (!result)
         {
             return result_type{jsoncons::unexpect, result.error()};
@@ -530,9 +530,9 @@ std::size_t find_unquoted_char(jsoncons::span<char> line,
 }
 
 inline 
-jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::span<char>>,std::error_code> split_key_value(jsoncons::span<char> line)
+jsoncons::expected<std::pair<jsoncons::span<char>,jsoncons::span<char>>,std::error_code> split_key_value(jsoncons::span<char> line)
 {
-    using result_type = jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::span<char>>,std::error_code>;
+    using result_type = jsoncons::expected<std::pair<jsoncons::span<char>,jsoncons::span<char>>,std::error_code>;
 
     auto colon_idx = find_unquoted_char(line, ':');
     if (colon_idx == jsoncons::string_view::npos)
@@ -540,7 +540,7 @@ jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::span<char>>,std::er
         return result_type{jsoncons::unexpect, toon_errc::missing_colon};
     }
     return result_type{std::make_pair(
-        jsoncons::strip(jsoncons::string_view{line.data(),colon_idx}),
+        strip(jsoncons::span<char>{line.data(),colon_idx}),
         strip(jsoncons::span<char>{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
     };
 }
@@ -554,7 +554,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     json_visitor& visitor);
 
 inline
-toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
+toon_errc parse_key(jsoncons::span<char> key_str, std::string& result)
 {
     bool in_quotes{false};
     std::size_t start{0};
@@ -581,7 +581,7 @@ toon_errc parse_key(jsoncons::string_view key_str, std::string& result)
         else if (in_quotes && c == '\"')
         {
             end = i;
-            auto res = unescape_string(jsoncons::string_view(key_str.data() + start, (end-start)));
+            auto res = unescape_string(jsoncons::span<char>(key_str.data() + start, (end-start)));
             if (!res) 
             {
                 return res.error();
@@ -916,7 +916,7 @@ header_result parse_header(jsoncons::span<char> line)
     auto key = jsoncons::optional<std::string>{};
     if (bracket_start > 0)
     {
-        auto key_part = jsoncons::strip(jsoncons::string_view{line.data(), bracket_start});
+        auto key_part = strip(jsoncons::span<char>{line.data(), bracket_start});
         if (!key_part.empty())
         {
             std::string key_str;
