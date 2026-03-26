@@ -31,6 +31,108 @@ namespace jsoncons {
 namespace toon {
 
 inline
+bool starts_with(jsoncons::span<char> sv, jsoncons::span<char> prefix)
+{
+    if (JSONCONS_UNLIKELY(sv.size() < prefix.size()))
+    {
+        return false;
+    }
+    const char* p = sv.data();
+    const char* q = prefix.data();
+    const char* last = prefix.data() + prefix.size();
+
+    while (q < last)
+    {
+        if (*q++ != *p++)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+inline
+bool starts_with(jsoncons::span<char> s, char* prefix)
+{
+    return starts_with(s, jsoncons::span<char>(prefix,strlen(prefix)));
+}
+
+inline
+bool starts_with(jsoncons::span<char> s, char prefix)
+{
+    return starts_with(s, jsoncons::span<char>(&prefix, 1));
+}
+
+inline
+bool ends_with(jsoncons::span<char> sv, jsoncons::span<char> suffix)
+{
+    if (JSONCONS_UNLIKELY(sv.size() < suffix.size()))
+    {
+        return false;
+    }
+    const char* p = sv.data() + (sv.size() - suffix.size());
+    const char* q = suffix.data();
+    const char* last = suffix.data() + suffix.size();
+
+    while (q < last)
+    {
+        if (*q++ != *p++)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+inline
+bool ends_with(jsoncons::span<char> s, char* suffix)
+{
+    return ends_with(s, jsoncons::span<char>(suffix, strlen(suffix)));
+}
+
+inline
+bool ends_with(jsoncons::span<char> s, char suffix)
+{
+    return ends_with(s, jsoncons::span<char>(&suffix, 1));
+}
+
+inline
+jsoncons::span<char> strip(jsoncons::span<char> sv)
+{
+    char* first = sv.data();
+    char* last = first + sv.size();
+    char* p = first;
+
+    while (p < last)
+    {
+        char c = *p;
+        if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r'))
+        {
+            break;
+        }
+        ++p;
+    }
+    if (p == last)
+    {
+        return jsoncons::span<char>{};
+    }
+
+    char* q = last;
+    do
+    {
+        --q;
+        char c = *q;
+        if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r'))
+        {
+            break;
+        }
+    } while (q > p);
+
+    std::size_t size = (p - first) + ((last-q)-1);
+    return jsoncons::span<char>{p, sv.size() - size};
+}
+
+inline
 jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view value)
 {
     using result_type = jsoncons::expected<std::string,toon_errc>;
@@ -92,11 +194,11 @@ jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::string_view 
 enum class parse_number_state{sign,zero,digits,fraction,exponent_sign,exponent_value,err};
 
 inline
-jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view token, jsoncons::json_visitor& visitor)
+jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::span<char> token, jsoncons::json_visitor& visitor)
 {
     using result_type = jsoncons::expected<void,std::error_code>;
 
-    token = jsoncons::strip(token);
+    token = strip(token);
 
     if (token.empty())
     {
@@ -104,9 +206,9 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
         return result_type{};
     }
 
-    if (jsoncons::starts_with(token, '\"'))
+    if (starts_with(token, '\"'))
     {
-        if (!jsoncons::ends_with(token, '\"') || token.size() < 2)
+        if (!ends_with(token, '\"') || token.size() < 2)
         {
             return result_type{jsoncons::unexpect, toon_errc::missing_closing_quote};
         }
@@ -265,7 +367,7 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
 
     if (not_a_number)
     {
-        visitor.string_value(token);
+        visitor.string_value(jsoncons::string_view(token.data(), token.size()));
         return result_type{};
     }
 
@@ -321,7 +423,7 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
 
     if (not_a_number)
     {
-        visitor.string_value(token);
+        visitor.string_value(jsoncons::string_view(token.data(), token.size()));
         return result_type{};
     }
     else
@@ -350,7 +452,7 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::string_view t
             return result_type{};
         }
 
-        visitor.string_value(token);
+        visitor.string_value(jsoncons::string_view(token.data(), token.size()));
     }
 
     return result_type{};
@@ -372,7 +474,7 @@ struct parsed_line
 {
     std::size_t depth{0};
     std::size_t indent{0};
-    jsoncons::string_view content;
+    jsoncons::span<char> content;
     std::size_t line_num{0};
 
     bool is_blank() const
@@ -396,7 +498,7 @@ struct c
 };
 
 inline
-std::size_t find_unquoted_char(jsoncons::string_view line, 
+std::size_t find_unquoted_char(jsoncons::span<char> line, 
     char target_char,
     std::size_t start=0)
 {
@@ -428,9 +530,9 @@ std::size_t find_unquoted_char(jsoncons::string_view line,
 }
 
 inline 
-jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::error_code> split_key_value(jsoncons::string_view line)
+jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::span<char>>,std::error_code> split_key_value(jsoncons::span<char> line)
 {
-    using result_type = jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::error_code>;
+    using result_type = jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::span<char>>,std::error_code>;
 
     auto colon_idx = find_unquoted_char(line, ':');
     if (colon_idx == jsoncons::string_view::npos)
@@ -439,7 +541,7 @@ jsoncons::expected<std::pair<jsoncons::string_view,jsoncons::string_view>,std::e
     }
     return result_type{std::make_pair(
         jsoncons::strip(jsoncons::string_view{line.data(),colon_idx}),
-        jsoncons::strip(jsoncons::string_view{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
+        strip(jsoncons::span<char>{line.data()+(colon_idx+1), line.size()-(colon_idx+1)}))
     };
 }
 
@@ -571,7 +673,7 @@ toon_errc parse_number(const char* data, std::size_t length,
 }
 
 inline 
-jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string_view line, 
+jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::span<char> line, 
     char delimiter,
     std::size_t expected_length,
     bool strict,
@@ -592,7 +694,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
 
         if (c == delimiter && !is_quoted)
         {
-            auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            auto r = parse_primitive(strip(jsoncons::span<char>(line.data()+offset, length)), visitor);
             if (!r)
             {
                 return result_type{jsoncons::unexpect, r.error()};
@@ -616,7 +718,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
         }
         else if (is_quoted && c == '\"')
         {
-            auto r = parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            auto r = parse_primitive(jsoncons::span<char>(line.data()+offset, length+2), visitor);
             if (!r)
             {
                 return result_type{jsoncons::unexpect, r.error()};
@@ -642,7 +744,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
     }
     if ((length > 0 || !is_empty) && (num_delimiters == num_items))
     {
-        auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        auto r = parse_primitive(strip(jsoncons::span<char>(line.data()+offset, length)), visitor);
         if (!r)
         {
             return result_type{jsoncons::unexpect, r.error()};
@@ -654,7 +756,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
 }
 
 inline 
-jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string_view line, 
+jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::span<char> line, 
     char delimiter,
     const std::vector<jsoncons::string_view>& fields,
     json_visitor& visitor)
@@ -682,7 +784,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
                 return result_type{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
             visitor.key(fields[field_index]);
-            auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+            auto r = parse_primitive(strip(jsoncons::span<char>(line.data()+offset, length)), visitor);
             if (!r)
             {
                 return result_type{jsoncons::unexpect, r.error()};
@@ -712,7 +814,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
                 return result_type{jsoncons::unexpect, toon_errc::too_many_values_in_row};
             }
             visitor.key(fields[field_index]);
-            auto r = parse_primitive(jsoncons::string_view(line.data()+offset, length+2), visitor);
+            auto r = parse_primitive(jsoncons::span<char>(line.data()+offset, length+2), visitor);
             if (!r)
             {
                 return result_type{jsoncons::unexpect, r.error()};
@@ -743,7 +845,7 @@ jsoncons::expected<void,std::error_code> parse_delimited_values(jsoncons::string
             return result_type{jsoncons::unexpect, toon_errc::too_many_values_in_row};
         }
         visitor.key(fields[field_index]);
-        auto r = parse_primitive(jsoncons::strip(jsoncons::string_view(line.data()+offset, length)), visitor);
+        auto r = parse_primitive(strip(jsoncons::span<char>(line.data()+offset, length)), visitor);
         if (!r)
         {
             return result_type{jsoncons::unexpect, r.error()};
@@ -804,7 +906,7 @@ void parse_delimited_values(jsoncons::string_view line,
 }
 
 inline
-header_result parse_header(jsoncons::string_view line)
+header_result parse_header(jsoncons::span<char> line)
 {
     auto bracket_start = find_unquoted_char(line, '[');
     if (bracket_start == jsoncons::string_view::npos)
@@ -864,11 +966,11 @@ header_result parse_header(jsoncons::string_view line)
         return header_result{jsoncons::unexpect, toon_errc::invalid_value};
     }
 
-    auto after_bracket = jsoncons::strip(jsoncons::string_view(line.data() + (bracket_end + 1),
+    auto after_bracket = strip(jsoncons::span<char>(line.data() + (bracket_end + 1),
         line.size() - (bracket_end + 1)));
 
     std::vector<jsoncons::string_view> fields;
-    if (jsoncons::starts_with(after_bracket, '{'))
+    if (starts_with(after_bracket, '{'))
     {
         auto brace_end = find_unquoted_char(after_bracket, '}');
         if (brace_end == jsoncons::string_view::npos)
@@ -880,10 +982,10 @@ header_result parse_header(jsoncons::string_view line)
         // Parse fields using the delimiter
         parse_delimited_values(fields_content, delimiter, fields);
 
-        after_bracket = jsoncons::string_view(after_bracket.data() + (brace_end + 1),
+        after_bracket = jsoncons::span<char>(after_bracket.data() + (brace_end + 1),
             after_bracket.size() - (brace_end + 1));
     }
-    if (!jsoncons::starts_with(after_bracket, ':'))
+    if (!starts_with(after_bracket, ':'))
     {
         fields.clear();
     }
@@ -897,7 +999,7 @@ std::size_t compute_depth_from_indent(std::size_t indent_spaces, std::size_t ind
 }
 
 inline
-read_result<std::vector<parsed_line>> read_lines(jsoncons::string_view raw, 
+read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw, 
     const toon_decode_options& options)
 {
     using result_type = read_result<std::vector<parsed_line>>;
@@ -958,7 +1060,7 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::string_view raw,
                 return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, line_num, 0};
             }
             std::size_t depth = compute_depth_from_indent(indent, indent_size);
-            lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+            lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
             ++line_num;
             indent = 0;
             is_blank_line = true;
@@ -973,14 +1075,14 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::string_view raw,
             return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, line_num, 0};
         }
         std::size_t depth = compute_depth_from_indent(indent, indent_size);
-        lines.push_back(parsed_line{depth, indent, jsoncons::string_view{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+        lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
     }
 
     return result_type{std::move(lines)};
 }
 
 inline
-jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::string_view content, 
+jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::span<char> content, 
     char delimiter,
     std::size_t expected_length,
     const toon_decode_options& options,
@@ -1007,7 +1109,7 @@ jsoncons::expected<void,std::error_code> decode_inline_array(jsoncons::string_vi
 }
 
 inline
-std::pair<std::size_t,char> find_first_unquoted(jsoncons::string_view line, 
+std::pair<std::size_t,char> find_first_unquoted(jsoncons::span<char> line, 
     jsoncons::span<const char> chars)
 {
     bool in_quotes = false;
@@ -1042,7 +1144,7 @@ std::pair<std::size_t,char> find_first_unquoted(jsoncons::string_view line,
 }
 
 inline
-bool is_row_line(jsoncons::string_view line, char delimiter) 
+bool is_row_line(jsoncons::span<char> line, char delimiter) 
 {
     // Find first occurrence of delimiter or colon (single pass optimization)
 
@@ -1213,12 +1315,12 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
         }
         // Must start with "-"
         auto content = line.content;
-        if (!jsoncons::starts_with(content, "-"))
+        if (!starts_with(content, '-'))
         {
             break;
         }
         // Remove "- " prefix
-        auto item_content = jsoncons::strip(jsoncons::string_view(content.data()+1, content.size()-1));
+        auto item_content = strip(jsoncons::span<char>(content.data()+1, content.size()-1));
         auto item_header_result = parse_header(item_content);
         if (!item_header_result)
         {
@@ -1234,10 +1336,11 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             if (!key)
             {
                 // - [N]: inline array
-                auto colon_idx = item_content.find(':');
-                if (colon_idx != jsoncons::string_view::npos)
+                auto it = std::find(item_content.begin(), item_content.end(), ':');
+                if (it != item_content.end())
                 {
-                    auto inline_part = jsoncons::strip(jsoncons::string_view(item_content.data()+(colon_idx+1), item_content.size()-(colon_idx+1)));
+                    auto colon_idx = it - item_content.begin();
+                    auto inline_part = strip(jsoncons::span<char>(item_content.data()+(colon_idx+1), item_content.size()-(colon_idx+1)));
                     if (!inline_part.empty() || length == 0)
                     {
                         auto r = decode_inline_array(inline_part, item_delim, length, options, visitor);
@@ -1517,7 +1620,7 @@ line_result decode_tabular_array(const std::vector<parsed_line>& lines,
         {
             break;
         }
-        jsoncons::string_view content = line.content;
+        auto content = line.content;
         if (is_row_line(content, delimiter))
         {
             auto r = parse_delimited_values(content, delimiter, fields, visitor);
@@ -1554,7 +1657,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     char delimiter{header_info.delimiter};
     const std::vector<jsoncons::string_view>& fields{header_info.fields};
 
-    const jsoncons::string_view& header_line{lines[header_idx].content};
+    const jsoncons::span<char>& header_line{lines[header_idx].content};
 
     // Check if there's inline content after the colon
     // Use split_key_value to find the colon position (respects quoted strings)
@@ -1564,7 +1667,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     {
         return line_result{jsoncons::unexpect, toon_errc::missing_colon_after_key, header_idx+1, 0};
     }
-    auto inline_content = jsoncons::strip(jsoncons::string_view(header_line.data() + (colon_idx + 1), header_line.size() - (colon_idx + 1)));
+    auto inline_content = strip(jsoncons::span<char>(header_line.data() + (colon_idx + 1), header_line.size() - (colon_idx + 1)));
 
     if (!inline_content.empty() || (fields.empty() && length == 0))
     {
@@ -1674,7 +1777,7 @@ public:
             raw.append(s.data(), s.size());
         }
 
-        auto r_lines = read_lines(raw, options_);
+        auto r_lines = read_lines(jsoncons::span<char>{&raw[0], raw.size()}, options_);
         if (!r_lines)
         {
             return result_type{jsoncons::unexpect, r_lines.error()};

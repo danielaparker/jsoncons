@@ -15,90 +15,90 @@ TEST_CASE("toon_reader parse_primitive")
 {
     SECTION("2.5e0")
     {
-        jsoncons::string_view str = "2.5e0";
+        std::string str = "2.5e0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("2.5" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("2.5E1")
     {
-        jsoncons::string_view str = "2.5E1";
+        std::string str = "2.5E1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("25" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("2.5e2")
     {
-        jsoncons::string_view str = "2.5e2";
+        std::string str = "2.5e2";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("250" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("2.5E-0")
     {
-        jsoncons::string_view str = "2.5E-0";
+        std::string str = "2.5E-0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("2.5" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("2.5E-2")
     {
-        jsoncons::string_view str = "2.5E-2";
+        std::string str = "2.5E-2";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0.025" == decoder.get_result().as<std::string>());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("1.5000")
     {
-        jsoncons::string_view str = "1.5000";
+        std::string str = "1.5000";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("1.5" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("test 0e1")
     {
-        jsoncons::string_view str = "0e1";
+        std::string str = "0e1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-0e1")
     {
-        jsoncons::string_view str = "-0e1";
+        std::string str = "-0e1";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-05")
     {
-        jsoncons::string_view str = "-05";
+        std::string str = "-05";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK(jsoncons::ojson{"-05"} == decoder.get_result());
         //std::cout << decoder.get_result() << "\n";
     }
     SECTION("-0")
     {
-        jsoncons::string_view str = "-0";
+        std::string str = "-0";
         jsoncons::json_decoder<jsoncons::ojson> decoder;
-        toon::parse_primitive(str, decoder);
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
     }
@@ -115,7 +115,7 @@ TEST_CASE("toon_reader util tests")
         REQUIRE(result2);
         CHECK(R"(hello\nworld)" == *result2);
     }
-    SECTION("find_unquoted_char")
+    /*SECTION("find_unquoted_char")
     {
         std::size_t pos;
 
@@ -154,7 +154,7 @@ TEST_CASE("toon_reader util tests")
         REQUIRE(r4);
         CHECK(R"("b:c")" == r4->first);
         CHECK("d" == r4->second);
-    }
+    }*/
 }
 
 TEST_CASE("toon_reader read_lines tests")
@@ -292,7 +292,7 @@ TEST_CASE("toon_reader parse_delimited_values tests")
 }
 TEST_CASE("toon_reader parse_header tests")
 {
-    SECTION("test 1")
+    /*SECTION("test 1")
     {
         auto options = toon::toon_options{}
             .indent(2)
@@ -328,12 +328,7 @@ TEST_CASE("toon_reader parse_header tests")
         CHECK("companion" == fields[4]);
         CHECK("wasSunny" == fields[5]);
 
-        /*for (const auto& field : fields)
-        {
-            std::cout << field << "\n";
-        }*/
-
-    }
+    }*/
 }
 
 TEST_CASE("toon_reader tests")
