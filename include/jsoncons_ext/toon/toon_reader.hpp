@@ -565,8 +565,10 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     json_visitor& visitor);
 
 inline
-toon_errc parse_key(jsoncons::span<char> key_str, std::string& result)
+jsoncons::expected<jsoncons::string_view, toon_errc> parse_key(jsoncons::span<char> key_str)
 {
+    using result_type = jsoncons::expected<jsoncons::string_view, toon_errc>;
+
     bool in_quotes{false};
     std::size_t start{0};
     std::size_t end{0};
@@ -577,12 +579,12 @@ toon_errc parse_key(jsoncons::span<char> key_str, std::string& result)
         ++start;
     }
 
-    for (;i < key_str.size(); ++i)
+    for (; i < key_str.size(); ++i)
     {
         char c = key_str[i];
         if (!in_quotes && c == '\"')
         {
-            start = i+1;
+            start = i + 1;
             in_quotes = true;
         }
         else if (in_quotes && c == '\\')
@@ -592,26 +594,19 @@ toon_errc parse_key(jsoncons::span<char> key_str, std::string& result)
         else if (in_quotes && c == '\"')
         {
             end = i;
-            auto res = unescape_string(jsoncons::span<char>(key_str.data() + start, (end-start)));
-            if (!res) 
-            {
-                return res.error();
-            }
-            result = std::string{*res};
-            return toon_errc{};
+            return unescape_string(jsoncons::span<char>(key_str.data() + start, (end - start)));
         }
         else if (c != ' ')
         {
-            end = i+1;
+            end = i + 1;
         }
     }
     if (in_quotes) // unterminated_quoted_key
     {
-        return toon_errc::unterminated_quoted_key;
+        return result_type{jsoncons::unexpect, toon_errc::unterminated_quoted_key};
     }
-    result = std::string(key_str.data() + start, (end-start));
 
-    return toon_errc{};
+    return result_type{jsoncons::string_view(key_str.data() + start, (end - start))};
 }
 
 inline
@@ -930,13 +925,12 @@ header_result parse_header(jsoncons::span<char> line)
         auto key_part = strip(jsoncons::span<char>{line.data(), bracket_start});
         if (!key_part.empty())
         {
-            std::string key_str;
-            toon_errc ec = parse_key(key_part, key_str);
-            if (ec != toon_errc{})
+            auto rkey = parse_key(key_part);
+            if (!rkey)
             {
-                return header_result{jsoncons::unexpect, ec};
+                return header_result{jsoncons::unexpect, rkey.error()};
             }
-            key = key_str;
+            key = std::string{*rkey};
         }
     }
     auto bracket_end = find_unquoted_char(line, ']', bracket_start);
@@ -1248,8 +1242,12 @@ line_result decode_object(const std::vector<parsed_line>& lines,
         auto key_str = kv->first;
         auto value_str = kv->second;
 
-        std::string key;
-        parse_key(key_str, key);
+        auto rkey = parse_key(key_str);
+        if (!rkey)
+        {
+            return line_result{jsoncons::unexpect, rkey.error(), i+1, 0};
+        }
+        auto key = *rkey;
 
         if (value_str.empty())
         {
@@ -1425,8 +1423,12 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     }
                     auto field_key_str = kv->first;
                     auto field_value_str = kv->second;
-                    std::string field_key;
-                    parse_key(field_key_str, field_key);
+                    auto rfield_key = parse_key(field_key_str);
+                    if (!rfield_key)
+                    {
+                        return line_result{jsoncons::unexpect, rfield_key.error(), i+1, 0};
+                    }
+                    auto field_key = *rfield_key;
                     if (field_value_str.empty())
                     {
                         visitor.key(field_key);
@@ -1462,8 +1464,12 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             visitor.begin_object();
             auto key_str = kv->first;
             auto value_str = kv->second;
-            std::string key;
-            parse_key(key_str, key);
+            auto rkey = parse_key(key_str);
+            if (!rkey)
+            {
+                return line_result{jsoncons::unexpect, rkey.error(), i+1, 0};
+            }
+            auto key = *rkey;
             if (value_str.empty())
             {
                 // First field is nested object: fields at depth +2
@@ -1524,8 +1530,12 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 }
                 auto field_key_str = field_kv->first;
                 auto field_value_str = field_kv->second;
-                std::string field_key;
-                parse_key(field_key_str, field_key);
+                auto rfield_key = parse_key(field_key_str);
+                if (!rfield_key)
+                {
+                    return line_result{jsoncons::unexpect, rfield_key.error(), i + 1, 0};
+                }
+                auto field_key = *rfield_key;
                 if (field_value_str.empty())
                 {
                     // Nested object
