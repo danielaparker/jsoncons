@@ -471,7 +471,7 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::span<char> to
 
 struct header_info
 {
-    jsoncons::optional<std::string> key;
+    jsoncons::optional<jsoncons::string_view> key;
     std::size_t length{0};
     char delimiter{','};
     std::vector<jsoncons::string_view> fields;
@@ -919,7 +919,7 @@ header_result parse_header(jsoncons::span<char> line)
     {
         return header_result{};
     }
-    auto key = jsoncons::optional<std::string>{};
+    auto key = jsoncons::optional<jsoncons::string_view>{};
     if (bracket_start > 0)
     {
         auto key_part = strip(jsoncons::span<char>{line.data(), bracket_start});
@@ -930,7 +930,7 @@ header_result parse_header(jsoncons::span<char> line)
             {
                 return header_result{jsoncons::unexpect, rkey.error()};
             }
-            key = std::string{*rkey};
+            key = *rkey;
         }
     }
     auto bracket_end = find_unquoted_char(line, ']', bracket_start);
@@ -994,7 +994,7 @@ header_result parse_header(jsoncons::span<char> line)
     {
         fields.clear();
     }
-    return header_result{jsoncons::in_place, header_info{jsoncons::optional<std::string>{std::move(key)}, length, delimiter, std::move(fields)}};
+    return header_result{jsoncons::in_place, header_info{jsoncons::optional<jsoncons::string_view>{key}, length, delimiter, std::move(fields)}};
 }
 
 inline
@@ -1212,7 +1212,7 @@ line_result decode_object(const std::vector<parsed_line>& lines,
         if (*header_result)
         {
             const header_info& header(*(*header_result));
-            const jsoncons::optional<std::string>& key(header.key);
+            auto key = header.key;
             if (key)
             {
                 // Array field
@@ -1338,7 +1338,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
         if (*item_header_result)
         {
             const header_info& item_header(*(*item_header_result));
-            const jsoncons::optional<std::string>& key(item_header.key);
+            auto key = item_header.key;
             std::size_t length{item_header.length};
             char item_delim{item_header.delimiter};
 
@@ -1404,7 +1404,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     if (*field_header_result)
                     {
                         const header_info& field_header (*(*field_header_result));
-                        const jsoncons::optional<std::string>& field_key(field_header.key);
+                        auto field_key = field_header.key;
 
                         visitor.key(*field_key);
                         auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor);
@@ -1512,7 +1512,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 if (*field_header_result)
                 {
                     const header_info& field_header (*(*field_header_result));
-                    const auto& field_key{field_header.key};
+                    auto field_key = field_header.key;
                     visitor.key(*field_key);
                     auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor);
                     if (!r1)
@@ -1673,7 +1673,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     const toon_decode_options& options,
     json_visitor& visitor)
 {
-    const jsoncons::optional<std::string>& key(header_info.key);
+    auto key = header_info.key;
     std::size_t length{header_info.length};
     char delimiter{header_info.delimiter};
     const std::vector<jsoncons::string_view>& fields{header_info.fields};
