@@ -1245,7 +1245,7 @@ line_result decode_object(const std::vector<parsed_line>& lines,
         auto rkey = parse_key(key_str);
         if (!rkey)
         {
-            return line_result{jsoncons::unexpect, rkey.error(), i+1, 0};
+            return line_result{jsoncons::unexpect, rkey.error(), line.line_num, 0};
         }
         auto key = *rkey;
 
@@ -1426,7 +1426,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     auto rfield_key = parse_key(field_key_str);
                     if (!rfield_key)
                     {
-                        return line_result{jsoncons::unexpect, rfield_key.error(), i+1, 0};
+                        return line_result{jsoncons::unexpect, rfield_key.error(), field_line.line_num, 0};
                     }
                     auto field_key = *rfield_key;
                     if (field_value_str.empty())
@@ -1445,7 +1445,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         auto r = parse_primitive(field_value_str, visitor);
                         if (!r)
                         {
-                            return line_result{jsoncons::unexpect, r.error(), i+1, 0};
+                            return line_result{jsoncons::unexpect, r.error(), field_line.line_num, 0};
                         }
                         ++i;
                     }
@@ -1467,7 +1467,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             auto rkey = parse_key(key_str);
             if (!rkey)
             {
-                return line_result{jsoncons::unexpect, rkey.error(), i+1, 0};
+                return line_result{jsoncons::unexpect, rkey.error(), line.line_num, 0};
             }
             auto key = *rkey;
             if (value_str.empty())
@@ -1488,7 +1488,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 auto r = parse_primitive(value_str, visitor);
                 if (!r)
                 {
-                    return line_result{jsoncons::unexpect, r.error(), i+1, 0};
+                    return line_result{jsoncons::unexpect, r.error(), line.line_num, 0};
                 }
                 ++i;
             }
