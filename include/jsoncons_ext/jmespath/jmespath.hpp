@@ -3142,8 +3142,8 @@ namespace detail {
             token<Json> variable_;
             std::vector<token<Json>> tokens_;
         public:
-            variable_expression(std::vector<token<Json>>&& tokens, token<Json>&& variable)
-                : tokens_(std::move(tokens)), variable_(std::move(variable))
+            variable_expression(token<Json>&& variable, std::vector<token<Json>>&& tokens)
+                : variable_(std::move(variable)), tokens_(std::move(tokens))
             {
             }
 
@@ -5243,7 +5243,7 @@ namespace detail {
                         toks.emplace_back(current_node_arg);
                     }
                     std::reverse(toks.begin(), toks.end());
-                    auto expr = resources.create_expression(variable_expression(std::move(toks), std::move(*it)));
+                    auto expr = resources.create_expression(variable_expression(std::move(*it), std::move(toks)));
                     ++it;
                     output_stack.erase(it.base(), output_stack.end());
                     output_stack.emplace_back(expr);
