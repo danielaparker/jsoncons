@@ -133,9 +133,9 @@ jsoncons::span<char> strip(jsoncons::span<char> sv)
 }
 
 inline
-jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::span<char> value)
+jsoncons::expected<jsoncons::string_view,toon_errc> unescape_string(jsoncons::span<char> value)
 {
-    using result_type = jsoncons::expected<std::string,toon_errc>;
+    using result_type = jsoncons::expected<jsoncons::string_view,toon_errc>;
 
     char* cur = value.data(); 
     char* end = cur + value.size();
@@ -148,16 +148,12 @@ jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::span<char> v
         }
         ++cur;
     }
-    return result_type{std::string{value.data(), value.size()}};
+    return result_type{jsoncons::string_view{value.data(), value.size()}};
 
 copy_escape:
 
-    result_type result{};
-    std::string& str{*result};
-
     char* dst = cur;
 
-    str = std::string{value.data(), std::size_t(cur - value.data())};
     while (cur < end)
     {
         if (*cur == '\\')
@@ -170,45 +166,40 @@ copy_escape:
             if (next_char == 'n')
             {
                 *dst++ = '\n';
-                str.push_back('\n');
                 cur += 2;
                 continue;
             }
             if (next_char == 't')
             {
                 *dst++ = '\t';
-                str.push_back('\t');
                 cur += 2;
                 continue;
             }
             if (next_char == 'r')
             {
                 *dst++ = '\r';
-                str.push_back('\r');
                 cur += 2;
                 continue;
             }
             if (next_char == '\\')
             {
                 *dst++ = '\\';
-                str.push_back('\\');
                 cur += 2;
                 continue;
             }
             if (next_char == '\"')
             {
                 *dst++ = '\"';
-                str.push_back('\"');
                 cur += 2;
                 continue;
             }
             return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
         }
-        str.push_back(*cur);
         *dst++ = *cur++;
     }
 
-    return result;
+    return result_type{jsoncons::string_view{value.data(), std::size_t(dst - value.data())}
+};
 }
 
 enum class parse_number_state{sign,zero,digits,fraction,exponent_sign,exponent_value,err};
@@ -606,7 +597,7 @@ toon_errc parse_key(jsoncons::span<char> key_str, std::string& result)
             {
                 return res.error();
             }
-            result = *res;
+            result = std::string{*res};
             return toon_errc{};
         }
         else if (c != ' ')
