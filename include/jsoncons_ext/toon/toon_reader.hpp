@@ -137,55 +137,68 @@ jsoncons::expected<std::string,toon_errc> unescape_string(jsoncons::span<char> v
 {
     using result_type = jsoncons::expected<std::string,toon_errc>;
 
-    result_type result{};
+    char* cur = value.data(); 
+    char* end = cur + value.size();
 
+    while (cur < end)
+    {
+        if (*cur == '\\')
+        {
+            goto copy_escape;
+        }
+        ++cur;
+    }
+    return result_type{std::string{value.data(), value.size()}};
+
+copy_escape:
+
+    result_type result{};
     std::string& str{*result};
 
-    std::size_t i = 0;
-
-    while (i < value.size())
+    str = std::string{value.data(), std::size_t(cur - value.data())};
+    while (cur < end)
     {
-        if (value[i] == '\\')
+        if (*cur == '\\')
         {
-            if (i + 1 >= value.size())
+            if (cur + 1 == end)
             {
                 return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
             }
-            char next_char = value[i + 1];
+            char next_char = *(cur+1);
             if (next_char == 'n')
             {
                 str.push_back('\n');
-                i += 2;
+                cur += 2;
                 continue;
             }
             if (next_char == 't')
             {
                 str.push_back('\t');
-                i += 2;
+                cur += 2;
                 continue;
             }
             if (next_char == 'r')
             {
                 str.push_back('\r');
-                i += 2;
+                cur += 2;
                 continue;
             }
             if (next_char == '\\')
             {
                 str.push_back('\\');
-                i += 2;
+                cur += 2;
                 continue;
             }
             if (next_char == '\"')
             {
                 str.push_back('\"');
-                i += 2;
+                cur += 2;
                 continue;
             }
             return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
         }
-        str.push_back(value[i]);
-        ++i;
+        str.push_back(*cur);
+        ++cur;
     }
 
     return result;
