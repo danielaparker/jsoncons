@@ -155,6 +155,8 @@ copy_escape:
     result_type result{};
     std::string& str{*result};
 
+    char* dst = cur;
+
     str = std::string{value.data(), std::size_t(cur - value.data())};
     while (cur < end)
     {
@@ -167,30 +169,35 @@ copy_escape:
             char next_char = *(cur+1);
             if (next_char == 'n')
             {
+                *dst++ = '\n';
                 str.push_back('\n');
                 cur += 2;
                 continue;
             }
             if (next_char == 't')
             {
+                *dst++ = '\t';
                 str.push_back('\t');
                 cur += 2;
                 continue;
             }
             if (next_char == 'r')
             {
+                *dst++ = '\r';
                 str.push_back('\r');
                 cur += 2;
                 continue;
             }
             if (next_char == '\\')
             {
+                *dst++ = '\\';
                 str.push_back('\\');
                 cur += 2;
                 continue;
             }
             if (next_char == '\"')
             {
+                *dst++ = '\"';
                 str.push_back('\"');
                 cur += 2;
                 continue;
@@ -198,7 +205,7 @@ copy_escape:
             return result_type{jsoncons::unexpect, toon_errc::invalid_escape_sequence};
         }
         str.push_back(*cur);
-        ++cur;
+        *dst++ = *cur++;
     }
 
     return result;
