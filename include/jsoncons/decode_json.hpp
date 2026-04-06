@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,22 +17,22 @@
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 
 namespace jsoncons {
 
 // try_decode_json
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type
-try_decode_json(const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+try_decode_json(const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
 
     std::error_code ec;   
     jsoncons::json_decoder<T> decoder;
@@ -49,15 +49,15 @@ try_decode_json(const CharsLike& s,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
-try_decode_json(const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+try_decode_json(const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
 
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, ec);
@@ -155,16 +155,16 @@ try_decode_json(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type
+    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
 
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
 
@@ -182,16 +182,16 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-     ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type
+     ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
-    const CharsLike& s,
-    const basic_json_decode_options<typename CharsLike::value_type>& options = basic_json_decode_options<typename CharsLike::value_type>())
+    const StringViewLike& s,
+    const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
     using value_type = T;
     using result_type = read_result<value_type>;
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
 
     std::error_code ec;
     basic_json_cursor<char_type,string_source<char_type>,TempAlloc> cursor(

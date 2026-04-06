@@ -1,0 +1,173 @@
+{
+  "version": "1.5",
+  "category": "decode",
+  "description": "Path expansion with safe mode, deep merge, conflict resolution tied to strict mode",
+  "tests": [
+    {
+      "name": "expands dotted key to nested object in safe mode",
+      "input": "a.b.c: 1",
+      "expected": {
+        "a": {
+          "b": {
+            "c": 1
+          }
+        }
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "expands dotted key with inline array",
+      "input": "data.meta.items[2]: a,b",
+      "expected": {
+        "data": {
+          "meta": {
+            "items": ["a", "b"]
+          }
+        }
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "expands dotted key with tabular array",
+      "input": "a.b.items[2]{id,name}:\n  1,A\n  2,B",
+      "expected": {
+        "a": {
+          "b": {
+            "items": [
+              { "id": 1, "name": "A" },
+              { "id": 2, "name": "B" }
+            ]
+          }
+        }
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "preserves literal dotted keys when expansion is off",
+      "input": "user.name: Ada",
+      "expected": {
+        "user.name": "Ada"
+      },
+      "options": {
+        "expandPaths": "off"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "expands and deep-merges preserving document-order insertion",
+      "input": "a.b.c: 1\na.b.d: 2\na.e: 3",
+      "expected": {
+        "a": {
+          "b": {
+            "c": 1,
+            "d": 2
+          },
+          "e": 3
+        }
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "throws on expansion conflict (object vs primitive) when strict=true",
+      "input": "a.b: 1\na: 2",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "expandPaths": "safe",
+        "strict": true
+      },
+      "specSection": "14.5"
+    },
+    {
+      "name": "throws on expansion conflict (object vs array) when strict=true",
+      "input": "a.b: 1\na[2]: 2,3",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "expandPaths": "safe",
+        "strict": true
+      },
+      "specSection": "14.5"
+    },
+    {
+      "name": "applies LWW when strict=false (primitive overwrites expanded object)",
+      "input": "a.b: 1\na: 2",
+      "expected": {
+        "a": 2
+      },
+      "options": {
+        "expandPaths": "safe",
+        "strict": false
+      },
+      "specSection": "13.4",
+      "note": "Document order determines winner: later key overwrites earlier"
+    },
+    {
+      "name": "applies LWW when strict=false (expanded object overwrites primitive)",
+      "input": "a: 1\na.b: 2",
+      "expected": {
+        "a": {
+          "b": 2
+        }
+      },
+      "options": {
+        "expandPaths": "safe",
+        "strict": false
+      },
+      "specSection": "13.4",
+      "note": "Document order determines winner: later key overwrites earlier"
+    },
+    {
+      "name": "preserves quoted dotted key as literal when expandPaths=safe",
+      "input": "a.b: 1\n\"c.d\": 2",
+      "expected": {
+        "a": {
+          "b": 1
+        },
+        "c.d": 2
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "preserves non-IdentifierSegment keys as literals",
+      "input": "full-name.x: 1",
+      "expected": {
+        "full-name.x": 1
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    },
+    {
+      "name": "expands keys creating empty nested objects",
+      "input": "a.b.c:",
+      "expected": {
+        "a": {
+          "b": {
+            "c": {}
+          }
+        }
+      },
+      "options": {
+        "expandPaths": "safe"
+      },
+      "specSection": "13.4"
+    }
+  ]
+}

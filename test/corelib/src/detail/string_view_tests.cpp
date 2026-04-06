@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
 #include <unordered_map>

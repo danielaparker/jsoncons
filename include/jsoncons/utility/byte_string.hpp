@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -363,9 +363,9 @@ namespace detail {
         {
         }
     
-        template <typename Container>
-        constexpr explicit byte_string_view(const Container& cont,
-                          typename std::enable_if<ext_traits::is_byte_sequence<Container>::value,int>::type = 0) 
+        template <typename BytesViewLike>
+        constexpr explicit byte_string_view(const BytesViewLike& cont,
+                          typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0) 
             : data_(reinterpret_cast<const uint8_t*>(cont.data())), size_(cont.size())
         {
         }

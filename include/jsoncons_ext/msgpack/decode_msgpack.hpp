@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +16,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
@@ -26,10 +26,10 @@
 namespace jsoncons { 
 namespace msgpack {
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
-try_decode_msgpack(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_msgpack(const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
     using value_type = T;
@@ -51,10 +51,10 @@ try_decode_msgpack(const BytesLike& v,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike>
+template <typename T,typename BytesViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
-try_decode_msgpack(const BytesLike& v, 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+try_decode_msgpack(const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
     using value_type = T;
@@ -156,11 +156,11 @@ try_decode_msgpack(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
     using value_type = T;
@@ -182,11 +182,11 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_byte_sequence<BytesLike>::value,read_result<T>>::type 
+                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& v, 
+    const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
     using value_type = T;

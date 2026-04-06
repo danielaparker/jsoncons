@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,7 +20,7 @@
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/binary.hpp>

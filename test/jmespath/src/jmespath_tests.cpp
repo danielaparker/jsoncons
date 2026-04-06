@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -90,6 +90,10 @@ void jmespath_tests(const std::string& fpath)
 
 TEST_CASE("jmespath-tests")
 {
+    SECTION("Tests")
+    {
+        jmespath_tests("./jmespath/input/test.json");
+    }
     SECTION("Examples and tutorials")
     {
         jmespath_tests("./jmespath/input/examples/jmespath-examples.json"); 

@@ -150,6 +150,7 @@ add_executable(unit_tests
                corelib/src/utility/extension_traits_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
                corelib/src/utility/read_number_tests.cpp
+               corelib/src/utility/string_utils_tests.cpp
                corelib/src/utility/unicode_conv_tests.cpp
                corelib/src/utility/uri_tests.cpp
                corelib/src/wjson_tests.cpp
@@ -206,6 +207,9 @@ add_executable(unit_tests
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
+               toon/src/toon_reader_tests.cpp
+               toon/src/decode_toon_tests.cpp
+               toon/src/encode_toon_tests.cpp
                corelib/src/testmain.cpp
 )              
 

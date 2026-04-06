@@ -1,3 +1,107 @@
 [
+  {
+    "given": {
+      "foo": {
+        "bar": "baz"
+      }
+    },
+    "cases": [
+      {
+        "comment": "Comparator expression evaluates to true boolean",
+        "expression": "foo.bar == 'baz'",
+        "result": true
+      },
+      {
+        "comment": "Comparator expression evaluates to false boolean",
+        "expression": "foo.bar == 'bar'",
+        "result": false
+      },
+      {
+        "comment": "Multi select list comparator value expression evaluates to true boolean",
+        "expression": "[foo.bar == 'baz']",
+        "result": [ true ]
+      },
+      {
+        "comment": "Multi select list comparator value expression evaluates to false boolean",
+        "expression": "[foo.bar == 'bar']",
+        "result": [ false ]
+      },
+      {
+        "comment": "Multi select hash comparator value expression evaluates to true boolean",
+        "expression": "{value: foo.bar == 'baz'}",
+        "result": { "value": true }
+      },
+      {
+        "comment": "Multi select hash comparator value expression evaluates to false boolean",
+        "expression": "{value: foo.bar == 'bar'}",
+        "result": { "value": false }
+      }
+    ]
+  },
+  {
+    "given": {},
+    "cases": [
+      {
+        "comment": "Floor function applied to a float should return integer",
+        "expression": "to_string(floor(`3.7`))",
+        "result": "3"
+      },
+      {
+        "comment": "Floor function applied to a negative float should return integer",
+        "expression": "to_string(floor(`-3.7`))",
+        "result": "-4"
+      },
+      {
+        "comment": "Floor function applied to an integer should return the same integer",
+        "expression": "to_string(floor(`3`))",
+        "result": "3"
+      },
+      {
+        "comment": "Floor function applied to a negative integer should return the same integer",
+        "expression": "to_string(floor(`-3`))",
+        "result": "-3"
+      },
+      {
+        "comment": "Ceil function applied to a float should return integer",
+        "expression": "to_string(ceil(`3.7`))",
+        "result": "4"
+      },
+      {
+        "comment": "Ceil function applied to a negative float should return integer",
+        "expression": "to_string(ceil(`-3.7`))",
+        "result": "-3"
+      },
+      {
+        "comment": "Ceil function applied to an integer should return the same integer",
+        "expression": "to_string(ceil(`3`))",
+        "result": "3"
+      },
+      {
+        "comment": "Ceil function applied to a negative integer should return the same integer",
+        "expression": "to_string(ceil(`-3`))",
+        "result": "-3"
+      },
+      {
+        "comment": "Value at 2^53 boundary (max safe integer)",
+        "expression": "ceil(`9007199254740992.0`)",
+        "result": 9007199254740992
+      },
+      {
+        "comment": "Negative value at -2^53 boundary",
+        "expression": "floor(`-9007199254740992.0`)",
+        "result": -9007199254740992
+      },
+      {
+        "comment": "Value beyond safe range remains as double (does not overflow to negative integer)",
+        "expression": "ceil(`9223372036854775807.2`)",
+        "result": 9.223372036854776e+18
+      },
+      {
+        "comment": "Negative value beyond safe range remains as double",
+        "expression": "floor(`-9223372036854775808.2`)",
+        "result": -9.223372036854776e+18
+      }
+    ]
+  }
 ]
 

@@ -1,0 +1,74 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Tabular array decoding - parsing arrays of uniform objects with headers",
+  "tests": [
+    {
+      "name": "parses tabular arrays of uniform objects",
+      "input": "items[2]{sku,qty,price}:\n  A1,2,9.99\n  B2,1,14.5",
+      "expected": {
+        "items": [
+          { "sku": "A1", "qty": 2, "price": 9.99 },
+          { "sku": "B2", "qty": 1, "price": 14.5 }
+        ]
+      },
+      "specSection": "9.3"
+    },
+    {
+      "name": "parses nulls and quoted values in tabular rows",
+      "input": "items[2]{id,value}:\n  1,null\n  2,\"test\"",
+      "expected": {
+        "items": [
+          { "id": 1, "value": null },
+          { "id": 2, "value": "test" }
+        ]
+      },
+      "specSection": "9.3"
+    },
+    {
+      "name": "parses quoted colon in tabular row as data",
+      "input": "items[2]{id,note}:\n  1,\"a:b\"\n  2,\"c:d\"",
+      "expected": {
+        "items": [
+          { "id": 1, "note": "a:b" },
+          { "id": 2, "note": "c:d" }
+        ]
+      },
+      "specSection": "9.3"
+    },
+    {
+      "name": "parses quoted header keys in tabular arrays",
+      "input": "items[2]{\"order:id\",\"full name\"}:\n  1,Ada\n  2,Bob",
+      "expected": {
+        "items": [
+          { "order:id": 1, "full name": "Ada" },
+          { "order:id": 2, "full name": "Bob" }
+        ]
+      },
+      "specSection": "9.3"
+    },
+    {
+      "name": "parses quoted key with tabular array format",
+      "input": "\"x-items\"[2]{id,name}:\n  1,Ada\n  2,Bob",
+      "expected": {
+        "x-items": [
+          { "id": 1, "name": "Ada" },
+          { "id": 2, "name": "Bob" }
+        ]
+      },
+      "specSection": "9.3"
+    },
+    {
+      "name": "treats unquoted colon as terminator for tabular rows and start of key-value pair",
+      "input": "items[2]{id,name}:\n  1,Alice\n  2,Bob\ncount: 2",
+      "expected": {
+        "items": [
+          { "id": 1, "name": "Alice" },
+          { "id": 2, "name": "Bob" }
+        ],
+        "count": 2
+      },
+      "specSection": "9.3"
+    }
+  ]
+}

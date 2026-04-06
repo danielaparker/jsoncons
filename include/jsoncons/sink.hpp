@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -84,6 +84,24 @@ namespace jsoncons {
             }
         }
 
+        void append(std::size_t count, const CharT ch)
+        {
+            if (count <= std::size_t(end_buffer_ - p_))
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    *p_++ = ch;
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    push_back(ch);
+                }
+            }
+        }
+
         void push_back(CharT ch)
         {
             if (p_ < end_buffer_)
@@ -94,7 +112,7 @@ namespace jsoncons {
             {
                 stream_ptr_->write(begin_buffer_, buffer_length());
                 p_ = begin_buffer_;
-                push_back(ch);
+                *p_++ = ch;
             }
         }
     private:
@@ -175,6 +193,24 @@ namespace jsoncons {
             }
         }
 
+        void append(std::size_t count, uint8_t ch)
+        {
+            if (count <= std::size_t(end_buffer_ - p_))
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    *p_++ = ch;
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    push_back(ch);
+                }
+            }
+        }
+
         void push_back(uint8_t ch)
         {
             if (p_ < end_buffer_)
@@ -185,7 +221,7 @@ namespace jsoncons {
             {
                 stream_ptr_->write((char*)begin_buffer_, buffer_length());
                 p_ = begin_buffer_;
-                push_back(ch);
+                *p_++ = ch;
             }
         }
     private:
@@ -239,7 +275,12 @@ namespace jsoncons {
 
         void append(const value_type* s, std::size_t length)
         {
-            buf_ptr->insert(buf_ptr->end(), s, s+length);
+            buf_ptr->append(s, length);
+        }
+
+        void append(std::size_t count, value_type ch)
+        {
+            buf_ptr->append(count, ch);
         }
 
         void push_back(value_type ch)

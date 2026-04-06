@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,7 +21,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
@@ -417,7 +417,7 @@ namespace jsoncons {
     using json_stream_reader = basic_json_reader<char,stream_source<char>>;
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_READER_HPP
 

@@ -1,0 +1,184 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Strict mode indentation validation - non-multiple indentation, tab characters, custom indent sizes",
+  "tests": [
+    {
+      "name": "throws on object field with non-multiple indentation (3 spaces with indent=2)",
+      "input": "a:\n   b: 1",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "indent": 2,
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "throws on list item with non-multiple indentation (3 spaces with indent=2)",
+      "input": "items[2]:\n   - id: 1\n   - id: 2",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "indent": 2,
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "throws on non-multiple indentation with custom indent=4 (3 spaces)",
+      "input": "a:\n   b: 1",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "indent": 4,
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "accepts correct indentation with custom indent size (4 spaces with indent=4)",
+      "input": "a:\n    b: 1",
+      "expected": {
+        "a": {
+          "b": 1
+        }
+      },
+      "options": {
+        "indent": 4,
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "throws on tab character used in indentation",
+      "input": "a:\n\tb: 1",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "throws on mixed tabs and spaces in indentation",
+      "input": "a:\n \tb: 1",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "throws on tab at start of line",
+      "input": "\ta: 1",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.3"
+    },
+    {
+      "name": "accepts tabs in quoted string values",
+      "input": "text: \"hello\tworld\"",
+      "expected": {
+        "text": "hello\tworld"
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts tabs in quoted keys",
+      "input": "\"key\ttab\": value",
+      "expected": {
+        "key\ttab": "value"
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts tabs in quoted array elements",
+      "input": "items[2]: \"a\tb\",\"c\td\"",
+      "expected": {
+        "items": ["a\tb", "c\td"]
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts non-multiple indentation when strict=false",
+      "input": "a:\n   b: 1",
+      "expected": {
+        "a": {
+          "b": 1
+        }
+      },
+      "options": {
+        "indent": 2,
+        "strict": false
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts deeply nested non-multiples when strict=false",
+      "input": "a:\n   b:\n     c: 1",
+      "expected": {
+        "a": {
+          "b": {
+            "c": 1
+          }
+        }
+      },
+      "options": {
+        "indent": 2,
+        "strict": false
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "parses empty lines without validation errors",
+      "input": "a: 1\n\nb: 2",
+      "expected": {
+        "a": 1,
+        "b": 2
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "parses root-level content (0 indentation) as always valid",
+      "input": "a: 1\nb: 2\nc: 3",
+      "expected": {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "parses lines with only spaces without validation if empty",
+      "input": "a: 1\n   \nb: 2",
+      "expected": {
+        "a": 1,
+        "b": 2
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    }
+  ]
+}

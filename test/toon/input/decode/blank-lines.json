@@ -1,0 +1,153 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Blank line handling - strict mode errors on blank lines inside arrays, accepts blank lines outside arrays",
+  "tests": [
+    {
+      "name": "throws on blank line inside list array",
+      "input": "items[3]:\n  - a\n\n  - b\n  - c",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.4"
+    },
+    {
+      "name": "throws on blank line inside tabular array",
+      "input": "items[2]{id}:\n  1\n\n  2",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.4"
+    },
+    {
+      "name": "throws on multiple blank lines inside array",
+      "input": "items[2]:\n  - a\n\n\n  - b",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.4"
+    },
+    {
+      "name": "throws on blank line with spaces inside array",
+      "input": "items[2]:\n  - a\n  \n  - b",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.4"
+    },
+    {
+      "name": "throws on blank line in nested list array",
+      "input": "outer[2]:\n  - inner[2]:\n    - a\n\n    - b\n  - x",
+      "expected": null,
+      "shouldError": true,
+      "options": {
+        "strict": true
+      },
+      "specSection": "14.4"
+    },
+    {
+      "name": "accepts blank line between root-level fields",
+      "input": "a: 1\n\nb: 2",
+      "expected": {
+        "a": 1,
+        "b": 2
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts trailing newline at end of file",
+      "input": "a: 1\n",
+      "expected": {
+        "a": 1
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts multiple trailing newlines",
+      "input": "a: 1\n\n\n",
+      "expected": {
+        "a": 1
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts blank line after array ends",
+      "input": "items[1]:\n  - a\n\nb: 2",
+      "expected": {
+        "items": ["a"],
+        "b": 2
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "accepts blank line between nested object fields",
+      "input": "a:\n  b: 1\n\n  c: 2",
+      "expected": {
+        "a": {
+          "b": 1,
+          "c": 2
+        }
+      },
+      "options": {
+        "strict": true
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "ignores blank lines inside list array when strict=false",
+      "input": "items[3]:\n  - a\n\n  - b\n  - c",
+      "expected": {
+        "items": ["a", "b", "c"]
+      },
+      "options": {
+        "strict": false
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "ignores blank lines inside tabular array when strict=false",
+      "input": "items[2]{id,name}:\n  1,Alice\n\n  2,Bob",
+      "expected": {
+        "items": [
+          { "id": 1, "name": "Alice" },
+          { "id": 2, "name": "Bob" }
+        ]
+      },
+      "options": {
+        "strict": false
+      },
+      "specSection": "12"
+    },
+    {
+      "name": "ignores multiple blank lines in arrays when strict=false",
+      "input": "items[2]:\n  - a\n\n\n  - b",
+      "expected": {
+        "items": ["a", "b"]
+      },
+      "options": {
+        "strict": false
+      },
+      "specSection": "12"
+    }
+  ]
+}

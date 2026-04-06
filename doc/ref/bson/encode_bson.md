@@ -5,29 +5,29 @@ Encodes a C++ data structure to the [Binary JSON (BSON)](http://bsonspec.org/) d
 ```cpp
 #include <jsoncons_ext/bson/bson.hpp>
 
-template <typename T,typename ByteContainer>
-void encode_bson(const T& jval, ByteContainer& cont,
-    const bson_decode_options& options = bson_decode_options());            (1) 
+template <typename T,typename BytesLike>
+void encode_bson(const T& jval, BytesLike& cont,
+    const bson_encode_options& options = bson_encode_options());            (1) 
 
 template <typename T>
 void encode_bson(const T& jval, std::ostream& os,
-    const bson_decode_options& options = bson_decode_options());            (2)
+    const bson_encode_options& options = bson_encode_options());            (2)
 
-template <typename T,typename ByteContainer>
+template <typename T,typename BytesLike>
 void encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
-    const T& jval, ByteContainer& cont,
-    const bson_decode_options& options = bson_decode_options());            (3) (since 0.171.0) 
+    const T& jval, BytesLike& cont,
+    const bson_encode_options& options = bson_encode_options());            (3) (since 0.171.0) 
 
 template <typename T>
 void encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
     const T& jval, std::ostream& os,
-    const bson_decode_options& options = bson_decode_options());            (4) (since 0.171.0)
+    const bson_encode_options& options = bson_encode_options());            (4) (since 0.171.0)
 ```
 
 (1) Writes a value of type T into a byte container in the BSON data format, using the specified (or defaulted) [options](bson_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
 or support jsoncons reflection traits. 
-Type `ByteContainer` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
+Type `BytesLike` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the BSON data format, using the specified (or defaulted) [options](bson_options.md). 

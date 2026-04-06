@@ -1,0 +1,111 @@
+{
+  "version": "1.4",
+  "category": "decode",
+  "description": "Primitive array decoding - inline arrays of strings, numbers, booleans, quoted strings",
+  "tests": [
+    {
+      "name": "parses string arrays inline",
+      "input": "tags[3]: reading,gaming,coding",
+      "expected": {
+        "tags": ["reading", "gaming", "coding"]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses number arrays inline",
+      "input": "nums[3]: 1,2,3",
+      "expected": {
+        "nums": [1, 2, 3]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses mixed primitive arrays inline",
+      "input": "data[4]: x,y,true,10",
+      "expected": {
+        "data": ["x", "y", true, 10]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses empty arrays",
+      "input": "items[0]:",
+      "expected": {
+        "items": []
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses single-item array with empty string",
+      "input": "items[1]: \"\"",
+      "expected": {
+        "items": [""]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses multi-item array with empty string",
+      "input": "items[3]: a,\"\",b",
+      "expected": {
+        "items": ["a", "", "b"]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses whitespace-only strings in arrays",
+      "input": "items[2]: \" \",\"  \"",
+      "expected": {
+        "items": [" ", "  "]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses strings with delimiters in arrays",
+      "input": "items[3]: a,\"b,c\",\"d:e\"",
+      "expected": {
+        "items": ["a", "b,c", "d:e"]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses strings that look like primitives when quoted",
+      "input": "items[4]: x,\"true\",\"42\",\"-3.14\"",
+      "expected": {
+        "items": ["x", "true", "42", "-3.14"]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses strings with structural tokens in arrays",
+      "input": "items[3]: \"[5]\",\"- item\",\"{key}\"",
+      "expected": {
+        "items": ["[5]", "- item", "{key}"]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses quoted key with inline array",
+      "input": "\"my-key\"[3]: 1,2,3",
+      "expected": {
+        "my-key": [1, 2, 3]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses quoted key containing brackets with inline array",
+      "input": "\"key[test]\"[3]: 1,2,3",
+      "expected": {
+        "key[test]": [1, 2, 3]
+      },
+      "specSection": "9.1"
+    },
+    {
+      "name": "parses quoted key with empty array",
+      "input": "\"x-custom\"[0]:",
+      "expected": {
+        "x-custom": []
+      },
+      "specSection": "9.1"
+    }
+  ]
+}

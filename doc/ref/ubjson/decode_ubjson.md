@@ -5,17 +5,17 @@ Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data 
 ```cpp
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 
-template <typename T,typename BytesLike>
-T decode_ubjson(const BytesLike& source,
+template <typename T,typename BytesViewLike>
+T decode_ubjson(const BytesViewLike& source,
     const bson_decode_options& options = bson_decode_options());               (1) (since 0.152.0)
 
 template <typename T>
 T decode_ubjson(std::istream>& is,
     const bson_decode_options& options = bson_decode_options());               (2)
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc>
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc>
 T decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& source,
+    const BytesViewLike& source,
     const ubjson_decode_options& options = ubjson_decode_options());           (3) (since 0.171.0)
 
 template <typename T,typename Alloc,typename TempAlloc>
@@ -27,17 +27,17 @@ template <typename T,typename InputIt>
 T decode_ubjson(InputIt first, InputIt last,
     const bson_decode_options& options = bson_decode_options());               (5)
 
-template <typename T,typename BytesLike>
-read_result<T> try_decode_ubjson(const BytesLike& source,
+template <typename T,typename BytesViewLike>
+read_result<T> try_decode_ubjson(const BytesViewLike& source,
     const bson_decode_options& options = bson_decode_options());               (6) (since 1.4.0)
 
 template <typename T>
 read_result<T> try_decode_ubjson(std::istream>& is,
     const bson_decode_options& options = bson_decode_options());               (7) (since 1.4.0)
 
-template <typename T,typename BytesLike,typename Alloc,typename TempAlloc>
+template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc>
 read_result<T> try_decode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
-    const BytesLike& source,
+    const BytesViewLike& source,
     const ubjson_decode_options& options = ubjson_decode_options());           (8) (since 1.4.0)
 
 template <typename T,typename Alloc,typename TempAlloc>
@@ -51,7 +51,7 @@ read_result<T> try_decode_ubjson(InputIt first, InputIt last,
 ```
 
 (1) Reads UBJSON data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](ubjson_options.md). 
-Type `BytesLike` must be a container that has member functions `data()` and `size()`, 
+Type `BytesViewLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 Type 'T' must be an instantiation of [basic_json](../corelib/basic_json.md) 

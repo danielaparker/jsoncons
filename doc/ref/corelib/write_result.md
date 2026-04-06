@@ -1,7 +1,7 @@
 ### jsoncons::write_result
 
 ```cpp
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 
 using write_result = jsoncons::expected<void,std::error_code>;
 ```

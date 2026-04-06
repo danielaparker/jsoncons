@@ -1,11 +1,11 @@
-/// Copyright 2013-2025 Daniel Parker
+/// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_SER_UTIL_HPP
-#define JSONCONS_SER_UTIL_HPP
+#ifndef JSONCONS_SER_UTILS_HPP
+#define JSONCONS_SER_UTILS_HPP
 
 #include <cstddef>
 #include <string>
@@ -50,15 +50,20 @@ class read_error
 {
     std::error_code ec_{};
     std::string message_arg_;
-    std::size_t line_{};
-    std::size_t column_{};
+    std::size_t line_{0};
+    std::size_t column_{0};
     
 public:
+    read_error(std::error_code ec)
+        : ec_{ec}
+    {
+    }
+    
     read_error(std::error_code ec, std::size_t line, std::size_t column)
         : ec_{ec}, line_{line}, column_{column}
     {
     }
-    
+
     read_error(std::error_code ec, const std::string& message_arg, std::size_t line, std::size_t column)
         : ec_{ec}, message_arg_(message_arg), line_{line}, column_{column}
     {
@@ -97,10 +102,13 @@ public:
             str.append(": ");
         }
         str.append(ec_.message());
-        if (line_ != 0 && column_ != 0)
+        if (line_ != 0)
         {
             str.append(" at line ");
             str.append(std::to_string(line_));
+        }
+        if (line_ != 0 && column_ != 0)
+        {
             str.append(" and column ");
             str.append(std::to_string(column_));
         }
@@ -120,4 +128,4 @@ using write_result = jsoncons::expected<void, std::error_code>;
 
 } // namespace jsoncons
 
-#endif // JSONCONS_SER_UTIL_HPP
+#endif // JSONCONS_SER_UTILS_HPP

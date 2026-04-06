@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -1240,6 +1240,9 @@ namespace detail {
     template <typename Json>
     class jmespath_evaluator 
     {
+        static constexpr double max_double_to_int64 = static_cast<double>(uint64_t(1u) << std::numeric_limits<double>::digits); // 2^53
+        static constexpr double min_double_to_int64 = -static_cast<double>(uint64_t(1u) << std::numeric_limits<double>::digits); // -2^53
+
     public:
         typedef typename Json::char_type char_type;
         typedef typename Json::char_traits_type char_traits_type;
@@ -1387,11 +1390,22 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return arg0;
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::ceil(arg0.template as<double>()));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::ceil(dbl0);
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -1523,11 +1537,22 @@ namespace detail {
                     case json_type::uint64:
                     case json_type::int64:
                     {
-                        return *context.create_json(arg0.template as<double>());
+                        return *context.create_json(arg0);
                     }
                     case json_type::float64:
                     {
-                        return *context.create_json(std::floor(arg0.template as<double>()));
+                        auto dbl0 = arg0.template as<double>();
+                        if (!std::isfinite(dbl0)) {
+                            ec = jmespath_errc::invalid_type;
+                            return context.null_value();
+                        }
+                        dbl0 = std::floor(dbl0);
+                        if (dbl0 >= min_double_to_int64 && dbl0 <= max_double_to_int64) {
+                            return *context.create_json(static_cast<int64_t>(dbl0));
+                        }
+                        else {
+                            return *context.create_json(dbl0);
+                        }
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -4431,8 +4456,8 @@ namespace detail {
                                     push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
                                     if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                     state_stack.back() = expr_state::multi_select_list;
-                                    state_stack.push_back(expr_state::rhs_expression);                                
-                                    state_stack.push_back(expr_state::lhs_expression);                                
+                                    state_stack.push_back(expr_state::rhs_expression);
+                                    state_stack.push_back(expr_state::lhs_expression);
                                     context_stack.push_back(expression_context<Json>{});
                                 }
                                 break;
@@ -4490,7 +4515,8 @@ namespace detail {
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 break;
                             default:
-                                state_stack.back() = expr_state::key_val_expr;
+                                state_stack.back() = expr_state::expect_rbrace;
+                                state_stack.push_back(expr_state::key_val_expr);
                                 break;
                         }
                         break;
@@ -4906,16 +4932,7 @@ namespace detail {
                             case ',':
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
-                                state_stack.back() = expr_state::key_val_expr; 
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '[':
-                            case '{':
-                                state_stack.push_back(expr_state::lhs_expression);
-                                break;
-                            case '.':
-                                state_stack.push_back(expr_state::sub_expression);
+                                state_stack.push_back(expr_state::key_val_expr); 
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4942,8 +4959,9 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ':':
-                                state_stack.back() = expr_state::expect_rbrace;
+                                state_stack.back() = expr_state::rhs_expression;
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;

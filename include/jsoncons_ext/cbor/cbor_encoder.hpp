@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -26,7 +26,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
@@ -224,9 +224,9 @@ public:
         end_value();
     }
 
-    template <typename ByteStringLike>
-    void byte_string_value_with_tag(const ByteStringLike& value, uint64_t raw_tag,
-        typename std::enable_if<ext_traits::is_byte_sequence<ByteStringLike>::value,int>::type = 0) 
+    template <typename BytesViewLike>
+    void byte_string_value_with_tag(const BytesViewLike& value, uint64_t raw_tag,
+        typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0) 
     {
         write_tag(raw_tag);
         write_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(value.data()),value.size()));

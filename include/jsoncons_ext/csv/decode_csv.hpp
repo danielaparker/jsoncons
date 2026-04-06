@@ -1,4 +1,4 @@
-/// Copyright 2013-2025 Daniel Parker
+/// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,7 +15,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/csv/csv_cursor.hpp>
@@ -26,12 +26,12 @@
 namespace jsoncons { 
 namespace csv {
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type 
-try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
+                        ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
+try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -52,12 +52,12 @@ try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename Chars
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename CharsLike>
+template <typename T,typename StringViewLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type 
-try_decode_csv(const CharsLike& s, const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
+                        ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
+try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -163,14 +163,14 @@ try_decode_csv(InputIt first, InputIt last,
 
 // With leading allocator_set parameter
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<CharsLike,typename T::char_type>::value,read_result<T>>::type 
+                        ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
-           const CharsLike& s, 
-           const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
+           const StringViewLike& s, 
+           const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 
@@ -191,14 +191,14 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     return result_type{decoder.get_result()};
 }
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc >
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_char_sequence<CharsLike>::value,read_result<T>>::type 
+                        ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
-           const CharsLike& s, 
-           const basic_csv_decode_options<typename CharsLike::value_type>& options = basic_csv_decode_options<typename CharsLike::value_type>())
+           const StringViewLike& s, 
+           const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
-    using char_type = typename CharsLike::value_type;
+    using char_type = typename StringViewLike::value_type;
     using value_type = T;
     using result_type = read_result<value_type>;
 

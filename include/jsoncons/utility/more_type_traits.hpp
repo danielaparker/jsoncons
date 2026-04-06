@@ -1,4 +1,4 @@
-// Copyright 2013-2025 Daniel Parker
+// Copyright 2013-2026 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -676,25 +676,25 @@ namespace ext_traits {
         static constexpr bool value = is_array_like<Container>::value && !has_size<Container>::value;
     };
 
-    // is_byte_sequence
+    // is_bytes_view_like
 
     template <typename Container,typename Enable=void>
-    struct is_byte_sequence : std::false_type {};
+    struct is_bytes_view_like : std::false_type {};
 
     template <typename Container>
-    struct is_byte_sequence<Container, 
+    struct is_bytes_view_like<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
                                    is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
-    // is_char_sequence
+    // is_string_view_like
 
     template <typename Container,typename Enable=void>
-    struct is_char_sequence : std::false_type {};
+    struct is_string_view_like : std::false_type {};
 
     template <typename Container>
-    struct is_char_sequence<Container, 
+    struct is_string_view_like<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
                                    is_character<typename Container::value_type>::value

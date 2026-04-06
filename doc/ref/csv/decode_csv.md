@@ -5,19 +5,19 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <typename T,typename CharsLike>
-T decode_csv(const CharsLike& s, 
+template <typename T,typename StringViewLike>
+T decode_csv(const StringViewLike& s, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (1)
 
 template <typename T,typename CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (2)
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc>
 T decode_csv(allocator_set<Alloc,TempAlloc> aset,
-    const CharsLike& s,                                                                      (3)
-    const basic_csv_decode_options<CharsLike::value_type>& options = 
-        basic_csv_decode_options<CharsLike::value_type>()); 
+    const StringViewLike& s,                                                                      (3)
+    const basic_csv_decode_options<StringViewLike::value_type>& options = 
+        basic_csv_decode_options<StringViewLike::value_type>()); 
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
 T decode_csv(allocator_set<Alloc,TempAlloc> aset,
@@ -28,19 +28,19 @@ template <typename T,typename InputIt>
 T decode_csv(InputIt first, InputIt last,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (5) (since 0.153.0)
 
-template <typename T,typename CharsLike>
-read_result<T> try_decode_csv(const CharsLike& s, 
+template <typename T,typename StringViewLike>
+read_result<T> try_decode_csv(const StringViewLike& s, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (6) (since 1.4.0)
 
 template <typename T,typename CharT>
 read_result<T> try_decode_csv(std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));    (7) (since 1.4.0)
 
-template <typename T,typename CharsLike,typename Alloc,typename TempAlloc>
+template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc>
 read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> aset,
-    const CharsLike& s,                                                                      (8) (since 1.4.0)
-    const basic_csv_decode_options<CharsLike::value_type>& options = 
-        basic_csv_decode_options<CharsLike::value_type>()); 
+    const StringViewLike& s,                                                                      (8) (since 1.4.0)
+    const basic_csv_decode_options<StringViewLike::value_type>& options = 
+        basic_csv_decode_options<StringViewLike::value_type>()); 
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
 read_result<T> try_decode_csv(allocator_set<Alloc,TempAlloc> aset,
