@@ -27,7 +27,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_util.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \

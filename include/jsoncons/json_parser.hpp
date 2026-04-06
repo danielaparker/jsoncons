@@ -27,12 +27,9 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-<<<<<<< HEAD
-#include <jsoncons/ser_util.hpp>
-#include <jsoncons/json_tokenizer.hpp>
-=======
 #include <jsoncons/ser_utils.hpp>
->>>>>>> 24d28c09cccce746646d71ceb1d53f4afd94ee69
+#include <jsoncons/json_tokenizer.hpp>
+#include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {
