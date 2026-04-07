@@ -97,10 +97,8 @@ inline bool is_end_container(staj_event_flags flags) noexcept
     return (flags & mask) != staj_event_flags{};
 }
 
-using staj_event_type = staj_event_flags;
-
 template <typename CharT>
-std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_flags tag)
 {
     static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
     static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
@@ -118,67 +116,67 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
 
     switch (tag)
     {
-        case staj_event_type::begin_array:
+        case staj_event_flags::begin_array:
         {
             os << begin_array_name;
             break;
         }
-        case staj_event_type::end_array:
+        case staj_event_flags::end_array:
         {
             os << end_array_name;
             break;
         }
-        case staj_event_type::begin_object:
+        case staj_event_flags::begin_object:
         {
             os << begin_object_name;
             break;
         }
-        case staj_event_type::end_object:
+        case staj_event_flags::end_object:
         {
             os << end_object_name;
             break;
         }
-        case staj_event_type::key:
+        case staj_event_flags::key:
         {
             os << key_name;
             break;
         }
-        case staj_event_type::string_value:
+        case staj_event_flags::string_value:
         {
             os << string_value_name;
             break;
         }
-        case staj_event_type::byte_string_value:
+        case staj_event_flags::byte_string_value:
         {
             os << byte_string_value_name;
             break;
         }
-        case staj_event_type::null_value:
+        case staj_event_flags::null_value:
         {
             os << null_value_name;
             break;
         }
-        case staj_event_type::bool_value:
+        case staj_event_flags::bool_value:
         {
             os << bool_value_name;
             break;
         }
-        case staj_event_type::int64_value:
+        case staj_event_flags::int64_value:
         {
             os << int64_value_name;
             break;
         }
-        case staj_event_type::uint64_value:
+        case staj_event_flags::uint64_value:
         {
             os << uint64_value_name;
             break;
         }
-        case staj_event_type::half_value:
+        case staj_event_flags::half_value:
         {
             os << half_value_name;
             break;
         }
-        case staj_event_type::double_value:
+        case staj_event_flags::double_value:
         {
             os << double_value_name;
             break;
@@ -190,7 +188,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
 template <typename CharT>
 class basic_staj_event
 {
-    staj_event_type event_type_;
+    staj_event_flags event_type_;
     semantic_tag tag_;
     uint64_t ext_tag_{0};
     union
@@ -208,53 +206,53 @@ public:
     using char_type = CharT;
     using string_view_type = jsoncons::basic_string_view<char_type>;
 
-    basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
+    basic_staj_event(staj_event_flags event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), value_()
     {
     }
 
-    basic_staj_event(staj_event_type event_type, std::size_t length, semantic_tag tag = semantic_tag::none)
+    basic_staj_event(staj_event_flags event_type, std::size_t length, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), value_(), length_(length)
     {
     }
 
     basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_event_type::null_value), tag_(tag), value_()
+        : event_type_(staj_event_flags::null_value), tag_(tag), value_()
     {
     }
 
     basic_staj_event(bool value, semantic_tag tag)
-        : event_type_(staj_event_type::bool_value), tag_(tag)
+        : event_type_(staj_event_flags::bool_value), tag_(tag)
     {
         value_.bool_value_ = value;
     }
 
     basic_staj_event(int64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::int64_value), tag_(tag)
+        : event_type_(staj_event_flags::int64_value), tag_(tag)
     {
         value_.int64_value_ = value;
     }
 
     basic_staj_event(uint64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::uint64_value), tag_(tag)
+        : event_type_(staj_event_flags::uint64_value), tag_(tag)
     {
         value_.uint64_value_ = value;
     }
 
     basic_staj_event(half_arg_t, uint16_t value, semantic_tag tag)
-        : event_type_(staj_event_type::half_value), tag_(tag)
+        : event_type_(staj_event_flags::half_value), tag_(tag)
     {
         value_.half_value_ = value;
     }
 
     basic_staj_event(double value, semantic_tag tag)
-        : event_type_(staj_event_type::double_value), tag_(tag)
+        : event_type_(staj_event_flags::double_value), tag_(tag)
     {
         value_.double_value_ = value;
     }
 
     basic_staj_event(const string_view_type& s,
-        staj_event_type event_type,
+        staj_event_flags event_type,
         semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), length_(s.length())
     {
@@ -262,7 +260,7 @@ public:
     }
 
     basic_staj_event(const byte_string_view& s,
-        staj_event_type event_type,
+        staj_event_flags event_type,
         semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), length_(s.size())
     {
@@ -270,7 +268,7 @@ public:
     }
 
     basic_staj_event(const byte_string_view& s,
-        staj_event_type event_type,
+        staj_event_flags event_type,
         uint64_t ext_tag)
         : event_type_(event_type), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
     {
@@ -312,30 +310,30 @@ public:
 
         switch (event_type_)
         {
-            case staj_event_type::key:
-            case staj_event_type::string_value:
+            case staj_event_flags::key:
+            case staj_event_flags::string_value:
             {
                 return jsoncons::make_obj_using_allocator<T>(alloc, value_.string_data_, length_);
             }
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
                 bytes_to_string(value_.byte_string_data_, value_.byte_string_data_+length_, tag(), s);
                 return s;
             }
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
                 jsoncons::from_integer(value_.uint64_value_, s);
                 return s;
             }
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
                 jsoncons::from_integer(value_.int64_value_, s);
                 return s;
             }
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
                 jsoncons::write_double f{float_chars_format::general,0};
@@ -343,18 +341,18 @@ public:
                 f(x, s);
                 return s;
             }
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
                 jsoncons::write_double f{float_chars_format::general,0};
                 f(value_.double_value_, s);
                 return s;
             }
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
             {
                 return jsoncons::make_obj_using_allocator<T>(alloc, value_.bool_value_ ? true_constant : false_constant);
             }
-            case staj_event_type::null_value:
+            case staj_event_flags::null_value:
             {
                 return jsoncons::make_obj_using_allocator<T>(alloc, null_constant);
             }
@@ -373,8 +371,8 @@ public:
         T s;
         switch (event_type_)
         {
-        case staj_event_type::key:
-        case staj_event_type::string_value:
+        case staj_event_flags::key:
+        case staj_event_flags::string_value:
             s = T(value_.string_data_, length_);
             break;
         default:
@@ -391,7 +389,7 @@ public:
         T s;
         switch (event_type_)
         {
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
                 s = T(value_.byte_string_data_, length_);
                 break;
             default:
@@ -408,14 +406,14 @@ public:
     {
         switch (event_type_)
         {
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
             {
                 auto v = jsoncons::make_obj_using_allocator<T>(alloc, 
                     value_.byte_string_data_, 
                     value_.byte_string_data_+length_);
                 return v;
             }
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
             {
                 auto v = jsoncons::make_obj_using_allocator<T>(alloc);
                 auto r = string_to_bytes(value_.string_data_, value_.string_data_+length_, tag(), v);
@@ -437,7 +435,7 @@ public:
     {
         switch (event_type_)
         {
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
             {
                 IntegerType val;
                 auto result = jsoncons::to_integer(value_.string_data_, length_, val);
@@ -448,15 +446,15 @@ public:
                 }
                 return val;
             }
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
                 return static_cast<IntegerType>(value_.half_value_);
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 return static_cast<IntegerType>(value_.double_value_);
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 return static_cast<IntegerType>(value_.int64_value_);
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 return static_cast<IntegerType>(value_.uint64_value_);
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 return static_cast<IntegerType>(value_.bool_value_ ? 1 : 0);
             default:
                 ec = conv_errc::not_integer;
@@ -478,7 +476,7 @@ public:
         return as_bool(ec);
     }
 
-    staj_event_type event_type() const noexcept { return event_type_; }
+    staj_event_flags event_type() const noexcept { return event_type_; }
 
     semantic_tag tag() const noexcept { return tag_; }
 
@@ -490,20 +488,20 @@ private:
     {
         switch (event_type_)
         {
-            case staj_event_type::key:
-            case staj_event_type::string_value:
+            case staj_event_flags::key:
+            case staj_event_flags::string_value:
             {
                 double val{0};
                 jsoncons::decstr_to_double(value_.string_data_, length_, val);
                 return val;
             }
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 return value_.double_value_;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 return static_cast<double>(value_.int64_value_);
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 return static_cast<double>(value_.uint64_value_);
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
             {
                 double x = binary::decode_half(value_.half_value_);
                 return static_cast<double>(x);
@@ -518,13 +516,13 @@ private:
     {
         switch (event_type_)
         {
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 return value_.bool_value_;
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 return value_.double_value_ != 0.0;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 return value_.int64_value_ != 0;
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 return value_.uint64_value_ != 0;
             default:
                 ec = conv_errc::not_bool;
@@ -538,43 +536,43 @@ public:
     {
         switch (event_type())
         {
-            case staj_event_type::begin_array:
+            case staj_event_flags::begin_array:
                 visitor.begin_array(tag(), context);
                 break;
-            case staj_event_type::end_array:
+            case staj_event_flags::end_array:
                 visitor.end_array(context);
                 break;
-            case staj_event_type::begin_object:
+            case staj_event_flags::begin_object:
                 visitor.begin_object(tag(), context, ec);
                 break;
-            case staj_event_type::end_object:
+            case staj_event_flags::end_object:
                 visitor.end_object(context, ec);
                 break;
-            case staj_event_type::key:
+            case staj_event_flags::key:
                 visitor.key(string_view_type(value_.string_data_,length_), context);
                 break;
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
                 visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
                 break;
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
                 visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
                 break;
-            case staj_event_type::null_value:
+            case staj_event_flags::null_value:
                 visitor.null_value(tag(), context);
                 break;
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 visitor.bool_value(value_.bool_value_, tag(), context);
                 break;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 visitor.int64_value(value_.int64_value_, tag(), context);
                 break;
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 visitor.uint64_value(value_.uint64_value_, tag(), context);
                 break;
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
                 visitor.half_value(value_.half_value_, tag(), context);
                 break;
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 visitor.double_value(value_.double_value_, tag(), context);
                 break;
             default:
@@ -588,43 +586,43 @@ public:
     {
         switch (event_type())
         {
-            case staj_event_type::key:
+            case staj_event_flags::key:
                 visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
                 break;
-            case staj_event_type::begin_array:
+            case staj_event_flags::begin_array:
                 visitor.begin_array(tag(), context);
                 break;
-            case staj_event_type::end_array:
+            case staj_event_flags::end_array:
                 visitor.end_array(context);
                 break;
-            case staj_event_type::begin_object:
+            case staj_event_flags::begin_object:
                 visitor.begin_object(tag(), context, ec);
                 break;
-            case staj_event_type::end_object:
+            case staj_event_flags::end_object:
                 visitor.end_object(context, ec);
                 break;
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
                 visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
                 break;
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
                 visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
                 break;
-            case staj_event_type::null_value:
+            case staj_event_flags::null_value:
                 visitor.null_value(tag(), context);
                 break;
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 visitor.bool_value(value_.bool_value_, tag(), context);
                 break;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 visitor.int64_value(value_.int64_value_, tag(), context);
                 break;
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 visitor.uint64_value(value_.uint64_value_, tag(), context);
                 break;
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
                 visitor.half_value(value_.half_value_, tag(), context);
                 break;
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 visitor.double_value(value_.double_value_, tag(), context);
                 break;
             default:
@@ -633,6 +631,8 @@ public:
     }
 
 };
+
+using staj_event_type = staj_event_flags;
 
 } // namespace jsoncons
 
