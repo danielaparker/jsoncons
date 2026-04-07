@@ -76,7 +76,7 @@ TEST_CASE("staj_array_iterator tests")
         auto filtered_c = cursor |
             [&](const staj_event& event, const ser_context&) -> bool
         {
-            if (event.event_type() == staj_event_type::key &&
+            if (event.event_type() == staj_event_flags::key &&
                 event.get<jsoncons::string_view>() == "firstName")
             {
                 author_next = true;
@@ -91,15 +91,15 @@ TEST_CASE("staj_array_iterator tests")
         };
 
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().event_type() == staj_event_flags::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("Tom"));
         filtered_c.next();
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().event_type() == staj_event_flags::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("Catherine"));
         filtered_c.next();
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().event_type() == staj_event_flags::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("William"));
         filtered_c.next();
         REQUIRE(filtered_c.done());

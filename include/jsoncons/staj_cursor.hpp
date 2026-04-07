@@ -56,7 +56,7 @@ private:
     std::size_t index_{0};
 public:
     basic_staj_visitor()
-        : event_(staj_event_type::null_value),
+        : event_(staj_event_flags::null_value),
           state_(), data_(), shape_()
     {
     }
@@ -65,7 +65,7 @@ public:
 
     void reset()
     {
-        event_ = staj_event_type::null_value;
+        event_ = staj_event_flags::null_value;
         state_ = {};
         data_ = {};
         shape_ = {};
@@ -384,49 +384,49 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_object, tag);
+        event_ = basic_staj_event<CharT>(staj_event_flags::begin_object, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_object, length, tag);
+        event_ = basic_staj_event<CharT>(staj_event_flags::begin_object, length, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::end_object);
+        event_ = basic_staj_event<CharT>(staj_event_flags::end_object);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_array, tag);
+        event_ = basic_staj_event<CharT>(staj_event_flags::begin_array, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_array, length, tag);
+        event_ = basic_staj_event<CharT>(staj_event_flags::begin_array, length, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::end_array);
+        event_ = basic_staj_event<CharT>(staj_event_flags::end_array);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(name, staj_event_type::key);
+        event_ = basic_staj_event<CharT>(name, staj_event_flags::key);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
+        event_ = basic_staj_event<CharT>(staj_event_flags::null_value, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -438,7 +438,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
+        event_ = basic_staj_event<CharT>(s, staj_event_flags::string_value, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -447,7 +447,7 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
+        event_ = basic_staj_event<CharT>(s, staj_event_flags::byte_string_value, tag);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -456,7 +456,7 @@ private:
         const ser_context&,
         std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, ext_tag);
+        event_ = basic_staj_event<CharT>(s, staj_event_flags::byte_string_value, ext_tag);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -670,7 +670,7 @@ public:
 
     virtual void array_expected(std::error_code& ec)
     {
-        if (!(current().event_type() == staj_event_type::begin_array || current().event_type() == staj_event_type::byte_string_value))
+        if (!(current().event_type() == staj_event_flags::begin_array || current().event_type() == staj_event_flags::byte_string_value))
         {
             ec = conv_errc::not_vector;
         }
@@ -784,44 +784,44 @@ read_result<Json> to_json_single(const allocator_set<Alloc,TempAlloc>& aset,
     std::error_code ec;
     switch (cursor.current().event_type())
     {
-        case staj_event_type::string_value:
+        case staj_event_flags::string_value:
         {
             auto sv = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
             if (ec) return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
             return result_type{jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(),
                 sv.data(), sv.length(), cursor.current().tag())};
         }
-        case staj_event_type::byte_string_value:
+        case staj_event_flags::byte_string_value:
         {
             auto j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), 
                 byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        case staj_event_type::null_value:
+        case staj_event_flags::null_value:
         {
             return result_type(Json{null_arg, semantic_tag::none});
         }
-        case staj_event_type::bool_value:
+        case staj_event_flags::bool_value:
         {
             auto j = Json{cursor.current().template get<bool>(ec), cursor.current().tag()};
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        case staj_event_type::int64_value:
+        case staj_event_flags::int64_value:
         {
             auto j = Json{cursor.current().template get<std::int64_t>(ec), cursor.current().tag()};
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        case staj_event_type::uint64_value:
+        case staj_event_flags::uint64_value:
         {
             auto j = Json{cursor.current().template get<std::uint64_t>(ec), cursor.current().tag()};
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        case staj_event_type::half_value:
+        case staj_event_flags::half_value:
         {
             auto j = Json{half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag()};
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        case staj_event_type::double_value:
+        case staj_event_flags::double_value:
         {
             auto j = Json{cursor.current().template get<double>(ec), cursor.current().tag()};
             return !ec ? result_type(std::move(j)) : result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
@@ -843,13 +843,13 @@ read_result<Json> to_json_container(const allocator_set<Alloc,TempAlloc>& aset,
 
     std::error_code ec;
 
-    auto cont = cursor.current().event_type() == staj_event_type::begin_object ? 
+    auto cont = cursor.current().event_type() == staj_event_flags::begin_object ? 
         jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none) : 
         jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_array_arg, semantic_tag::none);
     std::vector<Json*,json_ptr_allocator_type> stack(aset.get_temp_allocator());
     stack.push_back(std::addressof(cont));
     key_type key(aset.get_temp_allocator());
-    if (cursor.current().event_type() == staj_event_type::begin_object)
+    if (cursor.current().event_type() == staj_event_flags::begin_object)
     {
         goto begin_object;
     }
@@ -865,19 +865,19 @@ begin_object:
     {
         switch (cursor.current().event_type())
         {
-            case staj_event_type::begin_object:
+            case staj_event_flags::begin_object:
             {
                 auto result = stack.back()->try_emplace(key, json_object_arg);
                 stack.push_back(std::addressof(result.first->value()));
                 goto begin_object;
             }
-            case staj_event_type::begin_array:
+            case staj_event_flags::begin_array:
             {
                 auto result = stack.back()->try_emplace(key, json_array_arg);
                 stack.push_back(std::addressof(result.first->value()));
                 goto begin_array;
             }
-            case staj_event_type::key:
+            case staj_event_flags::key:
             {
                 auto sv = cursor.current().template get<basic_string_view<char_type>>(ec);
                 if (JSONCONS_UNLIKELY(ec))
@@ -887,59 +887,59 @@ begin_object:
                 key = key_type(sv.data(), sv.length(), aset.get_temp_allocator());
                 break;
             }
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
                 stack.back()->try_emplace(key, cursor.current().template get<jsoncons::basic_string_view<char_type>>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
                 stack.back()->try_emplace(key, byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::null_value:
+            case staj_event_flags::null_value:
                 stack.back()->try_emplace(key, null_arg);
                 break;
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 stack.back()->try_emplace(key, cursor.current().template get<bool>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 stack.back()->try_emplace(key, cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 stack.back()->try_emplace(key, cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
                 stack.back()->try_emplace(key, half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 stack.back()->try_emplace(key, cursor.current().template get<double>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::end_object:
+            case staj_event_flags::end_object:
                 stack.pop_back();
                 if (stack.empty())
                 {
@@ -972,71 +972,71 @@ begin_array:
     {
         switch (cursor.current().event_type())
         {
-            case staj_event_type::begin_object:
+            case staj_event_flags::begin_object:
             {
                 auto& result = stack.back()->emplace_back(json_object_arg);
                 stack.push_back(std::addressof(result));
                 goto begin_object;
             }
-            case staj_event_type::begin_array:
+            case staj_event_flags::begin_array:
             {
                 auto& result = stack.back()->emplace_back(json_array_arg);
                 stack.push_back(std::addressof(result));
                 goto begin_array;
             }
-            case staj_event_type::string_value:
+            case staj_event_flags::string_value:
                 stack.back()->emplace_back(cursor.current().template get<jsoncons::basic_string_view<char_type>>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::byte_string_value:
+            case staj_event_flags::byte_string_value:
                 stack.back()->emplace_back(byte_string_arg, cursor.current().template get<byte_string_view>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::null_value:
+            case staj_event_flags::null_value:
                 stack.back()->emplace_back(null_arg);
                 break;
-            case staj_event_type::bool_value:
+            case staj_event_flags::bool_value:
                 stack.back()->emplace_back(cursor.current().template get<bool>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::int64_value:
+            case staj_event_flags::int64_value:
                 stack.back()->emplace_back(cursor.current().template get<std::int64_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::uint64_value:
+            case staj_event_flags::uint64_value:
                 stack.back()->emplace_back(cursor.current().template get<std::uint64_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::half_value:
+            case staj_event_flags::half_value:
                 stack.back()->emplace_back(half_arg, cursor.current().template get<std::uint16_t>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::double_value:
+            case staj_event_flags::double_value:
                 stack.back()->emplace_back(cursor.current().template get<double>(ec), cursor.current().tag());
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
                 break;
-            case staj_event_type::end_array:
+            case staj_event_flags::end_array:
                 stack.pop_back();
                 if (stack.empty())
                 {
