@@ -1,3 +1,19 @@
+1.7.0
+-----
+
+- Fixed bugs:
+
+    - Git Issue #690: JMESPath let expression with operator in variable binding 
+
+- Enhanced:
+
+    - Git Issue #692: Redefined enum `staj_event_type` as a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html).
+      This allows us to write e.g.
+      ```cpp
+      constexpr auto mask = staj_event_type::begin_array | staj_event_type::begin_object;
+      if ((event_type & mask) != staj_event_type{}) {/*...*/}
+      ```  
+
 1.6.0
 -----
 
