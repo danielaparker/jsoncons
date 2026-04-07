@@ -367,7 +367,7 @@ public:
             read_next(visitor, ec);
             parser_.cursor_mode(true);
             parser_.mark_level(0);
-            if (current().event_type() == staj_event_flags::begin_object)
+            if (current().event_type() == staj_event_types::begin_object)
             {
                 cursor_visitor_.end_object(*this);
             }

@@ -174,7 +174,7 @@ struct decode_traits<std::pair<T1, T2>>
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        if (cursor.current().event_type() != staj_event_flags::begin_array)
+        if (cursor.current().event_type() != staj_event_types::begin_array)
         {
             return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column());
         }
@@ -205,7 +205,7 @@ struct decode_traits<std::pair<T1, T2>>
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
 
-        if (cursor.current().event_type() != staj_event_flags::end_array)
+        if (cursor.current().event_type() != staj_event_types::end_array)
         {
             return result_type(jsoncons::unexpect, conv_errc::not_pair, cursor.line(), cursor.column()); 
         }
@@ -237,13 +237,13 @@ struct decode_traits<T,
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        if (cursor.current().event_type() != staj_event_flags::begin_array)
+        if (cursor.current().event_type() != staj_event_types::begin_array)
         {
             return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
-        while (cursor.current().event_type() != staj_event_flags::end_array && !ec)
+        while (cursor.current().event_type() != staj_event_types::end_array && !ec)
         {
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
@@ -283,7 +283,7 @@ struct decode_traits<T,
         }
         switch (cursor.current().event_type())
         {
-            case staj_event_flags::byte_string_value:
+            case staj_event_types::byte_string_value:
             {
                 auto bytes = cursor.current().template get<byte_string_view>(ec);
                 if (!ec) 
@@ -305,7 +305,7 @@ struct decode_traits<T,
                     return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
                 }
             }
-            case staj_event_flags::begin_array:
+            case staj_event_types::begin_array:
             {
                 T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 if (cursor.current().size() > 0)
@@ -313,7 +313,7 @@ struct decode_traits<T,
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                 }
                 cursor.next(ec);
-                while (cursor.current().event_type() != staj_event_flags::end_array && !ec)
+                while (cursor.current().event_type() != staj_event_types::end_array && !ec)
                 {
                     auto r = decode_traits<element_type>::try_decode(aset, cursor);
                     if (!r)
@@ -373,7 +373,7 @@ struct decode_traits<T,
         }
         switch (cursor.current().event_type())
         {
-            case staj_event_flags::begin_array:
+            case staj_event_types::begin_array:
             {
                 T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 if (cursor.current().size() > 0)
@@ -381,7 +381,7 @@ struct decode_traits<T,
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                 }
                 cursor.next(ec);
-                while (cursor.current().event_type() != staj_event_flags::end_array && !ec)
+                while (cursor.current().event_type() != staj_event_types::end_array && !ec)
                 {
                     auto r = decode_traits<element_type>::try_decode(aset, cursor);
                     if (!r)
@@ -439,7 +439,7 @@ struct decode_traits<T,
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        if (cursor.current().event_type() != staj_event_flags::begin_array)
+        if (cursor.current().event_type() != staj_event_types::begin_array)
         {
             return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
@@ -448,7 +448,7 @@ struct decode_traits<T,
             reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
         }
         cursor.next(ec);
-        while (cursor.current().event_type() != staj_event_flags::end_array && !ec)
+        while (cursor.current().event_type() != staj_event_types::end_array && !ec)
         {
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
@@ -499,7 +499,7 @@ struct decode_traits<T,
         }
 
         T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
-        if (cursor.current().event_type() != staj_event_flags::begin_array)
+        if (cursor.current().event_type() != staj_event_types::begin_array)
         {
             return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
@@ -508,7 +508,7 @@ struct decode_traits<T,
             reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
         }
         cursor.next(ec);
-        while (cursor.current().event_type() != staj_event_flags::end_array && !ec)
+        while (cursor.current().event_type() != staj_event_types::end_array && !ec)
         {
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
@@ -553,12 +553,12 @@ struct decode_traits<std::array<T,N>>
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        if (cursor.current().event_type() != staj_event_flags::begin_array)
+        if (cursor.current().event_type() != staj_event_types::begin_array)
         {
             return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
         }
         cursor.next(ec);
-        for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_flags::end_array && !ec; ++i)
+        for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_types::end_array && !ec; ++i)
         {
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
@@ -596,7 +596,7 @@ struct decode_traits<T,
         std::error_code ec;
 
         auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
-        if (cursor.current().event_type() != staj_event_flags::begin_object)
+        if (cursor.current().event_type() != staj_event_types::begin_object)
         {
             return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; 
         }
@@ -606,9 +606,9 @@ struct decode_traits<T,
         }
         cursor.next(ec);
 
-        while (cursor.current().event_type() != staj_event_flags::end_object && !ec)
+        while (cursor.current().event_type() != staj_event_types::end_object && !ec)
         {
-            if (cursor.current().event_type() != staj_event_flags::key)
+            if (cursor.current().event_type() != staj_event_types::key)
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }
@@ -669,7 +669,7 @@ struct decode_traits<T,
         std::error_code ec;
 
         T val;
-        if (cursor.current().event_type() != staj_event_flags::begin_object)
+        if (cursor.current().event_type() != staj_event_types::begin_object)
         {
             return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; 
         }
@@ -679,9 +679,9 @@ struct decode_traits<T,
         }
         cursor.next(ec);
 
-        while (cursor.current().event_type() != staj_event_flags::end_object && !ec)
+        while (cursor.current().event_type() != staj_event_types::end_object && !ec)
         {
-            if (cursor.current().event_type() != staj_event_flags::key)
+            if (cursor.current().event_type() != staj_event_types::key)
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }

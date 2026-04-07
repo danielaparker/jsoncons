@@ -5,13 +5,15 @@
 
     - Git Issue #690: JMESPath let expression with operator in variable binding 
 
-- Enhanced:
+- Enhancements:
 
     - Git Issue #692: Redefined enum `staj_event_type` as a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html).
+      Following BitMask Type naming conventions, changed the type name to be plural (`staj_event_types`) and 
+      for backwards compatibility, alaised it back to its origonal name (`staj_event_type`).  
       This allows us to write e.g.
       ```cpp
-      constexpr auto mask = staj_event_type::begin_array | staj_event_type::begin_object;
-      if ((event_type & mask) != staj_event_type{}) {/*...*/}
+      constexpr auto mask = staj_event_types::begin_array | staj_event_types::begin_object;
+      if ((event_type & mask) != staj_event_types{}) {/*...*/}
       ```  
 
 1.6.0

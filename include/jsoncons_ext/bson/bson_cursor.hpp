@@ -155,7 +155,7 @@ public:
 
     void array_expected(std::error_code& ec) override
     {
-        if (cursor_visitor_.event().event_type() == staj_event_flags::begin_object)
+        if (cursor_visitor_.event().event_type() == staj_event_types::begin_object)
         {
             parser_.array_expected(cursor_visitor_, ec);
         }
@@ -195,7 +195,7 @@ public:
             read_next(visitor, ec);
             parser_.cursor_mode(true);
             parser_.mark_level(0);
-            if (current().event_type() == staj_event_flags::begin_object)
+            if (current().event_type() == staj_event_types::begin_object)
             {
                 cursor_visitor_.end_object(*this);
             }

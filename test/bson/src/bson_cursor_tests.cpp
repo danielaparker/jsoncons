@@ -43,39 +43,39 @@ TEST_CASE("bson_cursor reputon test")
     {
         bson::bson_bytes_cursor cursor(data);
 
-        CHECK(staj_event_flags::begin_object == cursor.current().event_type());
+        CHECK(staj_event_types::begin_object == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::string_value == cursor.current().event_type());
+        CHECK(staj_event_types::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::begin_array == cursor.current().event_type());
+        CHECK(staj_event_types::begin_array == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::begin_object == cursor.current().event_type());
+        CHECK(staj_event_types::begin_object == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::string_value == cursor.current().event_type());
+        CHECK(staj_event_types::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::string_value == cursor.current().event_type());
+        CHECK(staj_event_types::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::string_value == cursor.current().event_type());
+        CHECK(staj_event_types::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::double_value == cursor.current().event_type());
+        CHECK(staj_event_types::double_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::end_object == cursor.current().event_type());
+        CHECK(staj_event_types::end_object == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::end_array == cursor.current().event_type());
+        CHECK(staj_event_types::end_array == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_event_flags::end_object == cursor.current().event_type());
+        CHECK(staj_event_types::end_object == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -174,25 +174,25 @@ void check_bson_cursor_document(std::string info, CursorType& cursor,
     INFO(info);
 
     REQUIRE_FALSE(cursor.done());
-    CHECK(staj_event_flags::begin_object == cursor.current().event_type());
+    CHECK(staj_event_types::begin_object == cursor.current().event_type());
     CHECK(semantic_tag::none == cursor.current().tag());
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(staj_event_flags::key == cursor.current().event_type());
+    CHECK(staj_event_types::key == cursor.current().event_type());
     CHECK(semantic_tag::none == cursor.current().tag());
     CHECK(expectedKey == cursor.current().template get<std::string>());
     CHECK(expectedKey == cursor.current().template get<jsoncons::string_view>());
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(staj_event_flags::int64_value == cursor.current().event_type());
+    CHECK(staj_event_types::int64_value == cursor.current().event_type());
     CHECK(semantic_tag::none == cursor.current().tag());
     CHECK(expectedValue == cursor.current().template get<int>());
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(staj_event_flags::end_object == cursor.current().event_type());
+    CHECK(staj_event_types::end_object == cursor.current().event_type());
     CHECK(semantic_tag::none == cursor.current().tag());
 
     // Extra next() required to pop out of document state
@@ -285,13 +285,13 @@ TEMPLATE_TEST_CASE("bson_cursor reset test", "",
         cursor.reset(input2, ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_event_flags::begin_object == cursor.current().event_type());
+        CHECK(staj_event_types::begin_object == cursor.current().event_type());
         CHECK(semantic_tag::none == cursor.current().tag());
         REQUIRE_FALSE(cursor.done());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_event_flags::key == cursor.current().event_type());
+        CHECK(staj_event_types::key == cursor.current().event_type());
         CHECK(semantic_tag::none == cursor.current().tag());
         CHECK(std::string("b") == cursor.current().template get<std::string>());
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
