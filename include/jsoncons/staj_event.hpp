@@ -70,8 +70,8 @@ operator^(staj_event_types lhs, staj_event_types rhs) noexcept
 
 JSONCONS_ATTRIBUTE_NODISCARD
 constexpr staj_event_types
-operator~(staj_event_types flags) noexcept
-{ return (staj_event_types)~(uint64_t)flags; }
+operator~(staj_event_types types) noexcept
+{ return (staj_event_types)~(uint64_t)types; }
 
 constexpr staj_event_types&
 operator|=(staj_event_types& lhs, staj_event_types rhs) noexcept
@@ -85,16 +85,16 @@ constexpr staj_event_types&
 operator^=(staj_event_types& lhs, staj_event_types rhs) noexcept
 { return lhs = lhs ^ rhs; }
 
-inline bool is_begin_container(staj_event_types flags) noexcept
+inline bool is_begin_container(staj_event_types types) noexcept
 {
     static const staj_event_types mask{ staj_event_types::begin_object | staj_event_types::begin_array };
-    return (flags & mask) != staj_event_types{};
+    return (types & mask) != staj_event_types{};
 }
 
-inline bool is_end_container(staj_event_types flags) noexcept
+inline bool is_end_container(staj_event_types types) noexcept
 {
     static const staj_event_types mask{ staj_event_types::end_object | staj_event_types::end_array };
-    return (flags & mask) != staj_event_types{};
+    return (types & mask) != staj_event_types{};
 }
 
 template <typename CharT>
