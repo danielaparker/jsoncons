@@ -137,6 +137,7 @@ TEST_CASE("encode_bson overloads")
         std::string s;
         std::stringstream ss(s);
         bson::encode_bson(person, ss);
+        std::cout << "buf: " << s << "\n";
         json other = bson::decode_bson<json>(ss);
         CHECK(other == person);
     }

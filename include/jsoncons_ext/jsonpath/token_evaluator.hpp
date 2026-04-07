@@ -158,12 +158,46 @@ namespace jsonpath {
     };
     JSONCONS_INLINE_CONSTEXPR argument_arg_t argument_arg{};
 
-    enum class result_options {
+    enum class result_options : unsigned {
 #if !defined(JSONCONS_NO_DEPRECATED)
         value=0, 
 #endif
         nodups=1, sort=2, sort_descending=4, path=8};
 
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr result_options
+operator|(result_options lhs, result_options rhs) noexcept
+{ return (result_options)((unsigned)lhs | (unsigned)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr result_options
+operator&(result_options lhs, result_options rhs) noexcept
+{ return (result_options)((unsigned)lhs & (unsigned)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr result_options
+operator^(result_options lhs, result_options rhs) noexcept
+{ return (result_options)((unsigned)lhs ^ (unsigned)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr result_options
+operator~(result_options flags) noexcept
+{ return (result_options)~(unsigned)flags; }
+
+constexpr result_options&
+operator|=(result_options& lhs, result_options rhs) noexcept
+{ return lhs = lhs | rhs; }
+
+constexpr result_options&
+operator&=(result_options& lhs, result_options rhs) noexcept
+{ return lhs = lhs & rhs; }
+
+constexpr result_options&
+operator^=(result_options& lhs, result_options rhs) noexcept
+{ return lhs = lhs ^ rhs; }
+
+/*
     inline constexpr result_options operator~(result_options a)
     {
         return static_cast<result_options>(~static_cast<unsigned int>(a));
@@ -198,7 +232,7 @@ namespace jsonpath {
     {
         return (a = a | b);
     }
-
+*/
     template <typename Json>
     class parameter;
 
