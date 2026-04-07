@@ -63,6 +63,81 @@ TEST_CASE("jmespath let tests")
     }
 }
 
+TEST_CASE("jmespath let with operator binding expression")
+{
+    SECTION("Test 1 unary not operator")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(let $op = !foo in $op)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 2 unary not operator")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"({"value":true})");
+
+        std::string query = R"(let $op = !foo in { value: $op })";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 3 binary or operator")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(let $op = foo || bar in $op)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 4 binary or operator: multiple bindings")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"([true,false])");
+
+        std::string query = R"(let $or = foo || bar, $and = foo && bar in [$or, $and])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 5 binary or operator: let as rhs of binary operator")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(bar && let $op = foo || bar in $op)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 6 binary or operator: logical parenthesis")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(let $op = bar && (foo || bar) in $op)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+}
+
 TEST_CASE("jmespath let as valid identifiers")
 {
     auto doc = jsoncons::json::parse(R"(
