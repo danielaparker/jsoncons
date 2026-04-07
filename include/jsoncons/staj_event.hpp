@@ -36,7 +36,7 @@
 
 namespace jsoncons {
 
-enum class staj_event_type : uint64_t
+enum class staj_event_flags : uint64_t
 {
     string_value      = 0b0000000000000001,
     byte_string_value = 0b0000000000000010,
@@ -54,48 +54,50 @@ enum class staj_event_type : uint64_t
 };
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr staj_event_type
-operator|(staj_event_type lhs, staj_event_type rhs) noexcept
-{ return (staj_event_type)((uint64_t)lhs | (uint64_t)rhs); }
+constexpr staj_event_flags
+operator|(staj_event_flags lhs, staj_event_flags rhs) noexcept
+{ return (staj_event_flags)((uint64_t)lhs | (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr staj_event_type
-operator&(staj_event_type lhs, staj_event_type rhs) noexcept
-{ return (staj_event_type)((uint64_t)lhs & (uint64_t)rhs); }
+constexpr staj_event_flags
+operator&(staj_event_flags lhs, staj_event_flags rhs) noexcept
+{ return (staj_event_flags)((uint64_t)lhs & (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr staj_event_type
-operator^(staj_event_type lhs, staj_event_type rhs) noexcept
-{ return (staj_event_type)((uint64_t)lhs ^ (uint64_t)rhs); }
+constexpr staj_event_flags
+operator^(staj_event_flags lhs, staj_event_flags rhs) noexcept
+{ return (staj_event_flags)((uint64_t)lhs ^ (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr staj_event_type
-operator~(staj_event_type flags) noexcept
-{ return (staj_event_type)~(uint64_t)flags; }
+constexpr staj_event_flags
+operator~(staj_event_flags flags) noexcept
+{ return (staj_event_flags)~(uint64_t)flags; }
 
-constexpr staj_event_type&
-operator|=(staj_event_type& lhs, staj_event_type rhs) noexcept
+constexpr staj_event_flags&
+operator|=(staj_event_flags& lhs, staj_event_flags rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr staj_event_type&
-operator&=(staj_event_type& lhs, staj_event_type rhs) noexcept
+constexpr staj_event_flags&
+operator&=(staj_event_flags& lhs, staj_event_flags rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr staj_event_type&
-operator^=(staj_event_type& lhs, staj_event_type rhs) noexcept
+constexpr staj_event_flags&
+operator^=(staj_event_flags& lhs, staj_event_flags rhs) noexcept
 { return lhs = lhs ^ rhs; }
 
-inline bool is_begin_container(staj_event_type event_type) noexcept
+inline bool is_begin_container(staj_event_flags flags) noexcept
 {
-    static const uint64_t mask{ uint64_t(staj_event_type::begin_object) & uint64_t(staj_event_type::begin_array) };
-    return (uint64_t(event_type) & mask) == mask;
+    static const staj_event_flags mask{ staj_event_flags::begin_object | staj_event_flags::begin_array };
+    return (flags & mask) != staj_event_flags{};
 }
 
-inline bool is_end_container(staj_event_type event_type) noexcept
+inline bool is_end_container(staj_event_flags flags) noexcept
 {
-    static const uint64_t mask{ uint64_t(staj_event_type::end_object) & uint64_t(staj_event_type::end_array) };
-    return (uint64_t(event_type) & mask) == mask;
+    static const staj_event_flags mask{ staj_event_flags::end_object | staj_event_flags::end_array };
+    return (flags & mask) != staj_event_flags{};
 }
+
+using staj_event_type = staj_event_flags;
 
 template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
