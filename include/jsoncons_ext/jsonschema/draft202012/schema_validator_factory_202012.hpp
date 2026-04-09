@@ -90,11 +90,11 @@ namespace draft202012 {
         keyword_validator_factory<Json> factory_;
 
     public:
-        schema_validator_factory_202012(Json&& sch, const validator_factory_factory_type& factory_factory, 
+        schema_validator_factory_202012(const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
-            : schema_validator_factory_base<Json>(schema_version::draft202012(), std::move(sch),
+            : schema_validator_factory_base<Json>(schema_version::draft202012(), 
                 factory_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
               factory_(this)
         {

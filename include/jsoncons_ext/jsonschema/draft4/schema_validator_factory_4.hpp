@@ -49,10 +49,10 @@ namespace draft4 {
         keyword_validator_factory<Json> factory_;
 
     public:
-        schema_validator_factory_4(Json&& sch, const validator_factory_factory_type& factory_factory, 
+        schema_validator_factory_4(const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : schema_validator_factory_base<Json>(schema_version::draft4(), std::move(sch), factory_factory, options, schema_store_ptr, resolve_funcs),
+            : schema_validator_factory_base<Json>(schema_version::draft4(), factory_factory, options, schema_store_ptr, resolve_funcs),
               factory_(this)
         {
             init();

@@ -41,7 +41,6 @@ namespace jsonschema {
 
     private:
         std::string spec_version_;
-        std::unique_ptr<Json> root_schema_;
         validator_factory_factory_type factory_factory_;
         evaluation_options options_;
         schema_store_type* schema_store_ptr_;
@@ -58,17 +57,16 @@ namespace jsonschema {
 
     public:
 
-        schema_validator_factory_base(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
+        schema_validator_factory_base(const std::string& version, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs)
             : spec_version_(version), factory_factory_(factory_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
-            root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
         }
 
-        schema_validator_factory_base(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
+        schema_validator_factory_base(const std::string& version, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary)
@@ -76,7 +74,6 @@ namespace jsonschema {
               schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs), vocabulary_(vocabulary)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
-            root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
         }
 
         virtual ~schema_validator_factory_base() = default;
@@ -93,16 +90,16 @@ namespace jsonschema {
             return spec_version_;
         }
         
-        void build_schema() 
+        void build_schema(const Json& root_schema) 
         {
             anchor_uri_map_type anchor_dict;
-            root_ = make_schema_validator(compilation_context<Json>(uri_wrapper(options_.default_base_uri())), *root_schema_, {}, anchor_dict);
+            root_ = make_schema_validator(compilation_context<Json>(uri_wrapper(options_.default_base_uri())), root_schema, {}, anchor_dict);
         }
 
-        void build_schema(const std::string& retrieval_uri) 
+        void build_schema(const Json& root_schema, const std::string& retrieval_uri) 
         {
             anchor_uri_map_type anchor_dict;
-            root_ = make_schema_validator(compilation_context<Json>(uri_wrapper(retrieval_uri)), *root_schema_, {}, anchor_dict);
+            root_ = make_schema_validator(compilation_context<Json>(uri_wrapper(retrieval_uri)), root_schema, {}, anchor_dict);
         }
 
         evaluation_options options() const
@@ -165,7 +162,7 @@ namespace jsonschema {
 
             resolve_references();
 
-            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_schema_), std::move(root_), std::move(schema_validators_));
+            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schema_validators_));
         }
 
         void resolve_references()
@@ -311,24 +308,24 @@ namespace jsonschema {
                     {
                         if ((*it).value().as_string_view() == schema())
                         {
-                            return make_schema_validator(context, std::move(sch), keys, anchor_dict);
+                            return make_schema_validator(context, sch, keys, anchor_dict);
                         }
                         else
                         {
-                            auto schema_validator_factory_base = factory_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
-                            schema_validator_factory_base->build_schema(context.get_base_uri().string());
+                            auto schema_validator_factory_base = factory_factory_(sch, options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
+                            schema_validator_factory_base->build_schema(sch, context.get_base_uri().string());
                             schema_val = schema_validator_factory_base->get_schema_validator();
                         }
                     }
                     else
                     {
-                        return make_schema_validator(context, std::move(sch), keys, anchor_dict);
+                        return make_schema_validator(context, sch, keys, anchor_dict);
                     }
                     break;
                 }
                 case json_type::boolean:
                 {
-                    return make_schema_validator(context, std::move(sch), keys, anchor_dict);
+                    return make_schema_validator(context, sch, keys, anchor_dict);
                 }
                 default:
                     JSONCONS_THROW(schema_error("Schema must be object or boolean"));
