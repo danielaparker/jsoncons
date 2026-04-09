@@ -1243,14 +1243,6 @@ namespace detail {
     };
     
     template <typename Json>
-    struct expression_context
-    {
-        using string_type = std::basic_string<typename Json::char_type>;
-
-        expression_context() = default;
-    };
-
-    template <typename Json>
     class jmespath_evaluator 
     {
         static constexpr double max_double_to_int64 = static_cast<double>(uint64_t(1u) << std::numeric_limits<double>::digits); // 2^53
@@ -3508,7 +3500,6 @@ namespace detail {
             std::error_code& ec)
         {
             static_resources resources{funcs};
-            std::vector<expression_context<Json>> context_stack;
             std::vector<expr_state> state_stack;
             std::vector<token<Json>> output_stack;
             string_type key_buffer;
@@ -3534,7 +3525,6 @@ namespace detail {
                     {
                         state_stack.back() = expr_state::rhs_expression;
                         state_stack.push_back(expr_state::lhs_expression);
-                        context_stack.push_back(expression_context<Json>{});
                         break;
                     }
                     case expr_state::rhs_expression:
@@ -3584,16 +3574,12 @@ namespace detail {
                             case ')':
                             {
                                 state_stack.pop_back();
-                                JSONCONS_ASSERT(!context_stack.empty());
-                                context_stack.pop_back();
                                 break;
                             }
                             default:
                                 if (state_stack.size() > 1) 
                                 {
                                     state_stack.pop_back();
-                                    JSONCONS_ASSERT(!context_stack.empty());
-                                    context_stack.pop_back();
                                 }
                                 else
                                 {
@@ -3698,7 +3684,6 @@ namespace detail {
                                 state_stack.back() = expr_state::expect_rparen;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 break;
                             }
                             case '!':
@@ -3824,7 +3809,6 @@ namespace detail {
                                 state_stack.push_back(expr_state::expression_type);
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3833,7 +3817,6 @@ namespace detail {
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;
@@ -3881,7 +3864,6 @@ namespace detail {
                                 state_stack.back() = expr_state::expect_in_or_comma;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 break;
                             }
                             default:
@@ -4394,7 +4376,6 @@ namespace detail {
                                 state_stack.back() = expr_state::filter;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4434,7 +4415,6 @@ namespace detail {
                                     state_stack.back() = expr_state::multi_select_list;
                                     state_stack.push_back(expr_state::rhs_expression);
                                     state_stack.push_back(expr_state::lhs_expression);
-                                    context_stack.push_back(expression_context<Json>{});
                                 }
                                 break;
                             case ']': // []
@@ -4449,7 +4429,6 @@ namespace detail {
                                 state_stack.back() = expr_state::multi_select_list;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;
@@ -4476,7 +4455,6 @@ namespace detail {
                                 state_stack.back() = expr_state::multi_select_list;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;
@@ -4837,7 +4815,6 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                JSONCONS_ASSERT(!context_stack.empty());
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::lhs_expression);
@@ -4937,7 +4914,6 @@ namespace detail {
                             case ':':
                                 state_stack.back() = expr_state::rhs_expression;
                                 state_stack.push_back(expr_state::lhs_expression);
-                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4962,8 +4938,6 @@ namespace detail {
                 {
                     case expr_state::rhs_expression:
                         state_stack.pop_back();
-                        JSONCONS_ASSERT(!context_stack.empty());
-                        context_stack.pop_back();
                         break;
                     case expr_state::substitute_variable:
                     {
@@ -5004,14 +4978,10 @@ namespace detail {
             }
 
             state_stack.pop_back();
-            JSONCONS_ASSERT(!context_stack.empty());
-            context_stack.pop_back();
             
             push_token(end_of_expression_arg, resources, output_stack, ec);
             if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
 
-            JSONCONS_ASSERT(context_stack.empty());
-            
             if (output_stack.front().type() != token_kind::literal)
             {
                 output_stack.insert(output_stack.begin(), token<Json>{current_node_arg});
