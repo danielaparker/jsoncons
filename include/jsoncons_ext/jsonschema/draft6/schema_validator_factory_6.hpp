@@ -50,7 +50,7 @@ namespace draft6 {
 
     public:
         schema_validator_factory_6(const validator_factory_factory_type& factory_factory, 
-            evaluation_options options, schema_store_type* schema_store_ptr,
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
             : schema_validator_factory_base<Json>(schema_version::draft6(), factory_factory, options, schema_store_ptr, resolve_funcs),
               factory_(this)

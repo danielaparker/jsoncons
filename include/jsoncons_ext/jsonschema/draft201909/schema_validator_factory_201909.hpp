@@ -91,7 +91,7 @@ namespace draft201909 {
 
     public:
         schema_validator_factory_201909(const validator_factory_factory_type& factory_factory, 
-            evaluation_options options, schema_store_type* schema_store_ptr,
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
             : schema_validator_factory_base<Json>(schema_version::draft201909(), 
