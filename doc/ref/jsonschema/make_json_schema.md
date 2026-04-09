@@ -5,43 +5,43 @@
 
 template <typename Json>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
-    evaluation_options options = evaluation_options{});        
+    const evaluation_options& options = evaluation_options{});        
                                                                (1)
 template <typename Json>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
-    evaluation_options options = evaluation_options{});        
+json_schema<Json> make_json_schema(const Json& sch,                        (since 0.175.0)
+    const evaluation_options& options = evaluation_options{});        
 
 template <typename Json,typename SchemaResolver>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const SchemaResolver& resolver,                               
-    evaluation_options options = evaluation_options{});        (2)
+    const evaluation_options& options = evaluation_options{});        (2)
 
 template <typename Json,typename SchemaResolver>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
+json_schema<Json> make_json_schema(const Json& sch,                        (since 0.175.0)
     const SchemaResolver& resolver,                               
-    evaluation_options options = evaluation_options{});        
+    const evaluation_options& options = evaluation_options{});        
 
 template <typename Json>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const std::string& retrieval_uri,                          
-    evaluation_options options = evaluation_options{});         
+    const evaluation_options& options = evaluation_options{});         
                                                                (3)
 template <typename Json>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) 
+json_schema<Json> make_json_schema(const Json& sch,                        (since 0.175.0) 
     const std::string& retrieval_uri,                          
-    evaluation_options options = evaluation_options{});         
+    const evaluation_options& options = evaluation_options{});         
 
 template <typename Json,typename SchemaResolver>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const std::string& retrieval_uri,                          
     const SchemaResolver& resolver, 
-    evaluation_options options = evaluation_options{});         
+    const evaluation_options& options = evaluation_options{});         
                                                                (4)
 template <typename Json,typename SchemaResolver>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) 
+json_schema<Json> make_json_schema(const Json& sch,                        (since 0.175.0) 
     const std::string& retrieval_uri,                          
     const SchemaResolver& resolver, 
-    evaluation_options options = evaluation_options{});         
+    const evaluation_options& options = evaluation_options{});         
 ```
 
 Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
