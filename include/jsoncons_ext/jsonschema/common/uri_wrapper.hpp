@@ -22,16 +22,16 @@ namespace jsonschema {
 
     class uri_wrapper
     {
+        using char_type = char;
+        using string_view_type = jsoncons::string_view;
+
         jsoncons::uri uri_;
         std::string identifier_;
-        bool has_plain_name_fragment_;
+        bool has_plain_name_fragment_{false};
     public:
-        uri_wrapper()
-            : has_plain_name_fragment_(false)
-        {
-        }
+        uri_wrapper() = default;
 
-        explicit uri_wrapper(const std::string& uri)
+        explicit uri_wrapper(string_view_type uri)
         {
             uri_ = jsoncons::uri(uri);
             if (!uri_.encoded_fragment().empty())
@@ -109,7 +109,14 @@ namespace jsonschema {
             return result; 
         }
 
-        uri_wrapper append(const std::string& field) const
+        uri_wrapper append(const char_type* field) const
+        {
+            return append(jsoncons::string_view{field});
+        }
+
+        template <typename StringViewLike>
+        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,uri_wrapper>::type
+        append(const StringViewLike& field) const
         {
             if (has_plain_name_fragment())
                 return *this;

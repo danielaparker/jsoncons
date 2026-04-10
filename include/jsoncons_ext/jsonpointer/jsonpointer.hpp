@@ -252,9 +252,17 @@ namespace jsonpointer {
             tokens_.clear();
         }
 
-        basic_json_pointer& append(const string_type& s) 
+        basic_json_pointer& append(const char_type* s) 
         {
             tokens_.push_back(s);
+            return *this;
+        }
+
+        template <typename StringViewLike>
+        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        append(const StringViewLike& s) 
+        {
+            tokens_.emplace_back(s.data(), s.size());
             return *this;
         }
 
@@ -269,10 +277,16 @@ namespace jsonpointer {
             return *this;
         }
 
-        basic_json_pointer& operator/=(const string_type& s) 
+        basic_json_pointer& operator/=(const char_type* s) 
         {
-            tokens_.push_back(s);
-            return *this;
+            return append(s);
+        }
+
+        template <typename StringViewLike>
+        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        operator/=(const StringViewLike& s) 
+        {
+            return append(s);
         }
 
         template <typename IntegerType>
