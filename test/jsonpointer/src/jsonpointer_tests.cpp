@@ -314,7 +314,7 @@ TEST_CASE("jsonpointer concatenation")
     {
         jsonpointer::json_pointer ptr;
         ptr /= "a/b";
-        ptr /= "0";
+        ptr /= jsoncons::string_view("0");
 
         auto it = ptr.begin();
         auto end = ptr.end();
