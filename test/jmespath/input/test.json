@@ -1,5 +1,18 @@
 [
   {
+    "given": [
+      { "foo": "bar" },
+      { "foo": "baz" }
+    ],
+    "cases": [
+      {
+        "comment": "expression with operator and no parens",
+        "expression": "map(&foo == 'bar' && 'yes' || 'no', @)",
+        "result": [ "yes", "no" ]
+      }
+    ]
+  },
+  {
     "given": {
       "foo": {
         "bar": "baz"
