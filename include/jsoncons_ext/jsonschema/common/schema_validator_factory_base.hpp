@@ -141,7 +141,7 @@ namespace jsonschema {
                         {
                             anchor_uri_map_type anchor_dict2;
                             this->save_schema(make_cross_draft_schema_validator(compilation_context<Json>(uri_wrapper(loc.base())), 
-                                std::move(external_sch), {}, anchor_dict2));
+                                external_sch, {}, anchor_dict2));
                             found = true;
                         }
                     }
