@@ -5173,6 +5173,7 @@ namespace detail {
                 }
                 case token_kind::end_expression_type:
                 {
+                    unwind_rparen(output_stack, ec);
                     std::vector<token<Json>> toks;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::begin_expression_type)
@@ -5350,14 +5351,9 @@ namespace detail {
                     break;
                 }
                 case token_kind::begin_filter:
-                    output_stack.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token<Json>(lparen_arg));
-                    break;
                 case token_kind::begin_multi_select_list:
-                    output_stack.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token<Json>(lparen_arg));
-                    break;
                 case token_kind::begin_multi_select_hash:
+                case token_kind::begin_expression_type:
                     output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
@@ -5370,7 +5366,6 @@ namespace detail {
                     break;
                 case token_kind::key:
                 case token_kind::pipe:
-                case token_kind::begin_expression_type:
                     output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::argument:
