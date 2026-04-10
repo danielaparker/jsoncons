@@ -690,14 +690,25 @@ namespace ext_traits {
 
     // is_string_view_like
 
-    template <typename Container,typename Enable=void>
+    template <typename StringViewLike,typename Enable=void>
     struct is_string_view_like : std::false_type {};
 
-    template <typename Container>
-    struct is_string_view_like<Container, 
-           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
-                                   has_size<Container>::value &&
-                                   is_character<typename Container::value_type>::value
+    template <typename StringViewLike>
+    struct is_string_view_like<StringViewLike, 
+           typename std::enable_if<has_data_exact<const typename StringViewLike::value_type*,const StringViewLike>::value &&
+                                   has_size<StringViewLike>::value &&
+                                   is_character<typename StringViewLike::value_type>::value
+    >::type> : std::true_type {};
+
+    // is_string_view_of
+
+    template <typename StringViewLike,typename CharT,typename Enable=void>
+    struct is_string_view_of : std::false_type {};
+
+    template <typename StringViewLike,typename CharT>
+    struct is_string_view_of<StringViewLike,CharT, 
+        typename std::enable_if<is_string_view_like<StringViewLike>::value &&
+                 std::is_same<typename StringViewLike::value_type,CharT>::value
     >::type> : std::true_type {};
 
     // is_sequence_of

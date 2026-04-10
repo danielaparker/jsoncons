@@ -259,7 +259,7 @@ namespace jsonpointer {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
         append(const StringViewLike& s) 
         {
             tokens_.emplace_back(s.data(), s.size());

@@ -115,7 +115,7 @@ namespace jsonschema {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,uri_wrapper>::type
+        typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,uri_wrapper>::type
         append(const StringViewLike& field) const
         {
             if (has_plain_name_fragment())

@@ -1939,7 +1939,7 @@ namespace jsoncons {
 
         template <typename Source>
         static
-        typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+        typename std::enable_if<ext_traits::is_string_view_of<Source,char_type>::value,basic_json>::type
         parse(const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
@@ -1965,7 +1965,7 @@ namespace jsoncons {
 
         template <typename Source,typename TempAlloc >
         static
-        typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+        typename std::enable_if<ext_traits::is_string_view_of<Source,char_type>::value,basic_json>::type
             parse(const allocator_set<allocator_type,TempAlloc>& aset, const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
@@ -2135,7 +2135,7 @@ namespace jsoncons {
 
         template <typename Source>
         static
-        typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+        typename std::enable_if<ext_traits::is_string_view_of<Source,char_type>::value,basic_json>::type
         parse(const Source& source, 
               const basic_json_decode_options<char_type>& options, 
               std::function<bool(json_errc,const ser_context&)> err_handler)
@@ -2162,7 +2162,7 @@ namespace jsoncons {
 
         template <typename Source>
         static
-        typename std::enable_if<ext_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+        typename std::enable_if<ext_traits::is_string_view_of<Source,char_type>::value,basic_json>::type
         parse(const Source& source, 
             std::function<bool(json_errc,const ser_context&)> err_handler)
         {
