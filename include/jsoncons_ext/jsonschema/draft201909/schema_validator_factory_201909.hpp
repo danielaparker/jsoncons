@@ -194,7 +194,7 @@ namespace draft201909 {
         }
 
         schema_validator_ptr_type make_schema_validator(const compilation_context<Json>& context, 
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys, anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_base_uri().string() << ", " << new_context.get_base_uri().string() << "\n\n";
@@ -259,7 +259,7 @@ namespace draft201909 {
                 {
                     for (const auto& def : (*it).value().object_range())
                     {
-                        std::string sub_keys[] = { "definitions", def.key() };
+                        jsoncons::string_view sub_keys[] = { "definitions", def.key() };
                         defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                     }
                     known_keywords.insert("definitions");
@@ -270,7 +270,7 @@ namespace draft201909 {
             {
                 for (const auto& def : (*it).value().object_range())
                 {
-                    std::string sub_keys[] = { "$defs", def.key() };
+                    jsoncons::string_view sub_keys[] = { "$defs", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                 }
                 known_keywords.insert("$defs");
@@ -329,21 +329,21 @@ namespace draft201909 {
                 it = sch.find("if");
                 if (it != sch.object_range().end()) 
                 {
-                    std::string sub_keys[] = { "if" };
+                    jsoncons::string_view sub_keys[] = { "if" };
                     if_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
     
                 it = sch.find("then");
                 if (it != sch.object_range().end()) 
                 {
-                    std::string sub_keys[] = { "then" };
+                    jsoncons::string_view sub_keys[] = { "then" };
                     then_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
     
                 it = sch.find("else");
                 if (it != sch.object_range().end()) 
                 {
-                    std::string sub_keys[] = { "else" };
+                    jsoncons::string_view sub_keys[] = { "else" };
                     else_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
                 if (if_validator || then_validator || else_validator)
@@ -455,7 +455,7 @@ namespace draft201909 {
     private:
 
         compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent, 
-            const Json& sch, jsoncons::span<const std::string> keys) const override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<uri_wrapper> new_uris;

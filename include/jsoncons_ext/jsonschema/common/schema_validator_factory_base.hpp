@@ -290,13 +290,13 @@ namespace jsonschema {
         }
 
         virtual compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent,
-            const Json& sch, jsoncons::span<const std::string> keys) const = 0;
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const = 0;
 
         virtual schema_validator_ptr_type make_schema_validator(const compilation_context<Json>& context, 
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys, anchor_uri_map_type& anchor_dict) = 0;
 
         schema_validator_ptr_type make_cross_draft_schema_validator(const compilation_context<Json>& context, 
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys, anchor_uri_map_type& anchor_dict)
         {
             schema_validator_ptr_type schema_val = schema_validator_ptr_type{};
             switch (sch.type())

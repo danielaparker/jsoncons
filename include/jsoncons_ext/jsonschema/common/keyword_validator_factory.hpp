@@ -65,7 +65,7 @@ namespace jsonschema {
 
             for (const auto& prop : sch.object_range())
             {
-                std::string sub_keys[] = {keyword, prop.key()};
+                jsoncons::string_view sub_keys[] = {keyword, prop.key()};
                 properties.emplace(std::make_pair(prop.key(), 
                     factory_->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
@@ -87,7 +87,7 @@ namespace jsonschema {
             
             for (const auto& prop : sch.object_range())
             {
-                std::string sub_keys[] = {keyword};
+                jsoncons::string_view sub_keys[] = {keyword};
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
@@ -132,7 +132,7 @@ namespace jsonschema {
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             uri schema_location = context.make_schema_location("not");
-            std::string not_key[] = { "not" };
+            jsoncons::string_view not_key[] = { "not" };
             return jsoncons::make_unique<not_validator<Json>>(parent, schema_location, context.get_custom_message("not"), 
                 factory_->make_cross_draft_schema_validator(context, sch, not_key, anchor_dict));
         }
@@ -515,7 +515,7 @@ namespace jsonschema {
         {
             uri schema_location = context.make_schema_location("contains");
 
-            std::string sub_keys[] = { "contains" };
+            jsoncons::string_view sub_keys[] = { "contains" };
 
             std::unique_ptr<max_contains_keyword<Json>> max_contains;
             auto it = parent.find("maxContains");
@@ -568,7 +568,8 @@ namespace jsonschema {
             std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { "allOf", std::to_string(c++) };
+                auto temp_str = std::to_string(c++);
+                jsoncons::string_view sub_keys[] = { "allOf", temp_str };
                 subschemas.emplace_back(factory_->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<all_of_validator<Json>>(parent, std::move(schema_location), 
@@ -584,7 +585,8 @@ namespace jsonschema {
             std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { "anyOf", std::to_string(c++) };
+                auto temp_str = std::to_string(c++);
+                jsoncons::string_view sub_keys[] = { "anyOf", temp_str };
                 subschemas.emplace_back(factory_->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<any_of_validator<Json>>(parent, std::move(schema_location), 
@@ -600,7 +602,8 @@ namespace jsonschema {
             std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { "oneOf", std::to_string(c++) };
+                auto temp_str = std::to_string(c++);
+                jsoncons::string_view sub_keys[] = { "oneOf", temp_str };
                 subschemas.emplace_back(factory_->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<one_of_validator<Json>>(parent, std::move(schema_location), 
@@ -631,7 +634,7 @@ namespace jsonschema {
                     case json_type::boolean:
                     case json_type::object:
                     {
-                        std::string sub_keys[] = {"dependencies"};
+                        jsoncons::string_view sub_keys[] = {"dependencies"};
                         dependent_schemas.emplace(dep.key(),
                             factory_->make_cross_draft_schema_validator(context, dep.value(), sub_keys, anchor_dict));
                         break;
@@ -653,7 +656,7 @@ namespace jsonschema {
             uri schema_location = context.get_base_uri();
             schema_validator_ptr_type property_names_schema_validator;
 
-            std::string sub_keys[] = { "propertyNames"};
+            jsoncons::string_view sub_keys[] = { "propertyNames"};
             property_names_schema_validator = factory_->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
             return jsoncons::make_unique<property_names_validator<Json>>(parent, std::move(schema_location), context.get_custom_message("propertyNames"),
@@ -704,7 +707,7 @@ namespace jsonschema {
                     case json_type::boolean:
                     case json_type::object:
                     {
-                        std::string sub_keys[] = {"dependentSchemas"};
+                        jsoncons::string_view sub_keys[] = {"dependentSchemas"};
                         dependent_schemas.emplace(dep.key(),
                             factory_->make_cross_draft_schema_validator(context, dep.value(), sub_keys, anchor_dict));
                         break;
@@ -734,7 +737,8 @@ namespace jsonschema {
                 std::size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
-                    std::string sub_keys[] = {"items", std::to_string(c++)};
+                    auto temp_str = std::to_string(c++);
+                    jsoncons::string_view sub_keys[] = {"items", temp_str};
 
                     prefix_item_validators.emplace_back(factory_->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
                 }
@@ -743,7 +747,7 @@ namespace jsonschema {
                 if (it != parent.object_range().end()) 
                 {
                     uri items_location{context.make_schema_location("additionalItems")};
-                    std::string sub_keys[] = {"additionalItems"};
+                    jsoncons::string_view sub_keys[] = {"additionalItems"};
                     items_val = jsoncons::make_unique<items_keyword<Json>>("additionalItems", parent, items_location, 
                         context.get_custom_message("additionalItems"),
                         factory_->make_cross_draft_schema_validator(context, (*it).value(), sub_keys, anchor_dict));
@@ -760,7 +764,7 @@ namespace jsonschema {
         {
             uri schema_location{context.make_schema_location(keyword_name)};
 
-            std::string sub_keys[] = {keyword_name};
+            jsoncons::string_view sub_keys[] = {keyword_name};
 
             return jsoncons::make_unique<items_validator<Json>>(keyword_name, parent, schema_location,
                 context.get_custom_message(keyword_name), 
@@ -773,7 +777,7 @@ namespace jsonschema {
             std::string keyword = "unevaluatedProperties";
             uri schema_location = context.get_base_uri();
 
-            std::string sub_keys[] = {keyword};
+            jsoncons::string_view sub_keys[] = {keyword};
 
             return jsoncons::make_unique<unevaluated_properties_validator<Json>>(parent, std::move(schema_location),
                 context.get_custom_message(keyword),
@@ -785,7 +789,7 @@ namespace jsonschema {
         {
             uri schema_location = context.get_base_uri();
 
-            std::string sub_keys[] = {"unevaluatedItems"};
+            jsoncons::string_view sub_keys[] = {"unevaluatedItems"};
 
             return jsoncons::make_unique<unevaluated_items_validator<Json>>(parent, std::move(schema_location), context.get_custom_message("unevaluatedItems"),               
                 factory_->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
@@ -802,7 +806,7 @@ namespace jsonschema {
             std::vector<keyword_validator_ptr_type> validators;
             schema_validator_ptr_type additional_properties;
 
-            std::string sub_keys[] = {keyword};
+            jsoncons::string_view sub_keys[] = {keyword};
             additional_properties = factory_->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
             return jsoncons::make_unique<additional_properties_validator<Json>>(parent, additional_properties->schema_location(),
@@ -825,7 +829,8 @@ namespace jsonschema {
                 std::size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
-                    std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
+                    auto temp_str = std::to_string(c++);
+                    jsoncons::string_view sub_keys[] = {"prefixItems", temp_str};
 
                     prefix_item_validators.emplace_back(factory_->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
                 }
@@ -834,7 +839,7 @@ namespace jsonschema {
                 if (it != parent.object_range().end()) 
                 {
                     uri items_location{context.make_schema_location("items")};
-                    std::string sub_keys[] = { "additionalItems" };
+                    jsoncons::string_view sub_keys[] = { "additionalItems" };
 
                     items_val = jsoncons::make_unique<items_keyword<Json>>("items", parent, items_location,
                         context.get_custom_message("items"),

@@ -117,7 +117,7 @@ namespace draft4 {
         }
 
         schema_validator_ptr_type make_schema_validator( 
-            const compilation_context<Json>& context, const Json& sch, jsoncons::span<const std::string> keys, 
+            const compilation_context<Json>& context, const Json& sch, jsoncons::span<const jsoncons::string_view> keys, 
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
@@ -150,7 +150,7 @@ namespace draft4 {
                         {
                             for (const auto& def : it2->value().object_range())
                             {
-                                std::string sub_keys[] = { "definitions", def.key() };
+                                jsoncons::string_view sub_keys[] = { "definitions", def.key() };
                                 defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                             }
                         }
@@ -202,7 +202,7 @@ namespace draft4 {
             {
                 for (const auto& def : (*it).value().object_range())
                 {
-                    std::string sub_keys[] = { "definitions", def.key() };
+                    jsoncons::string_view sub_keys[] = { "definitions", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                 }
             }
@@ -347,7 +347,7 @@ namespace draft4 {
     private:
 
         compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent, 
-            const Json& sch, jsoncons::span<const std::string> keys) const override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<uri_wrapper> new_uris;
