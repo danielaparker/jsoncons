@@ -4016,6 +4016,24 @@ namespace jsoncons {
             }
         }
 
+        template <typename T,typename U>
+        typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
+        as_or(U&& default_value) const
+        {
+            static_assert(std::is_convertible<U&&, T>::value,
+                          "as_or: U must be convertible to T");
+            using T_type_traits = json_type_traits<basic_json,T>;
+            if (T_type_traits::is(*this))
+            {
+                T val = T_type_traits::as(*this);
+                return val;
+            }
+            else
+            {
+                return static_cast<T>(std::forward<U>(default_value));
+            }
+        }
+
         const basic_json& at_or_null(const string_view_type& key) const
         {
             switch (storage_kind())
