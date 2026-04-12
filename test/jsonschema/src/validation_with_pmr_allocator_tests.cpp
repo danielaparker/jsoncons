@@ -65,8 +65,8 @@ TEST_CASE("jsonschema pmr allocator tests")
 
         auto compiled = jsonschema::make_json_schema(schema);
 
-        //bool result = compiled.is_valid(instance);
-        //CHECK(result);
+        bool result = compiled.is_valid(instance);
+        CHECK_FALSE(result);
     }
 }
 
