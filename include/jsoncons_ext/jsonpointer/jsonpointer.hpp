@@ -367,7 +367,18 @@ namespace jsonpointer {
         }
 
         // Non-member functions
-        friend basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const string_type& rhs)
+        friend 
+        basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const char_type* rhs)
+        {
+            basic_json_pointer<CharT> p(lhs);
+            p /= rhs;
+            return p;
+        }
+
+        // Non-member functions
+        template <typename StringViewLike>
+        friend typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
+        operator/(const basic_json_pointer<CharT>& lhs, const StringViewLike& rhs)
         {
             basic_json_pointer<CharT> p(lhs);
             p /= rhs;
