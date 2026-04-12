@@ -3945,11 +3945,11 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "evaluated_properties"
-                        auto prop_it = results.evaluated_properties.find(prop.key());
+                        auto prop_it = results.evaluated_properties.find(std::string(prop.name()));
                         if (prop_it == results.evaluated_properties.end()) 
                         {
-                            eval_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
-                            jsonpointer::json_pointer prop_location = instance_location / prop.key();
+                            eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                            jsonpointer::json_pointer prop_location = instance_location / prop.name();
 
                             walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(), 

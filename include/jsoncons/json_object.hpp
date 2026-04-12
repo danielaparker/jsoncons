@@ -106,6 +106,11 @@ namespace jsoncons {
         {
         }
 
+        string_view_type name() const
+        {
+            return string_view_type{key_.data(), key_.size()};
+        }
+
         const key_type& key() const
         {
             return key_;

@@ -215,7 +215,7 @@ namespace jsonschema {
                 {
                     for (const auto& subsch : value.object_range())
                     {
-                        insert_unknown_keyword(new_uri, subsch.key(), subsch.value());
+                        insert_unknown_keyword(new_uri, std::string(subsch.name()), subsch.value());
                     }
                 }
             }

@@ -417,7 +417,7 @@ namespace draft202012 {
             {
                 for (const auto& key_value : sch.object_range())
                 {
-                    auto factory_it = validation_factory_map_.find(key_value.key());
+                    auto factory_it = validation_factory_map_.find(std::string(key_value.name()));
                     if (factory_it != validation_factory_map_.end())
                     {
                         auto validator = (*factory_it).second(context, key_value.value(), sch, local_anchor_dict);
@@ -566,7 +566,8 @@ namespace draft202012 {
                         {
                             for (const auto& item : value.object_range())
                             {
-                                custom_messages[item.key()] =  item.value().template as<std::string>();
+                                //custom_messages[item.key()] =  item.value().template as<std::string>();
+                                custom_messages.emplace(item.name(), item.value().template as<std::string>());
                             }
                         }
                         else if (value.is_string())
