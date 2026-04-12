@@ -16,6 +16,14 @@
       if ((event_type & mask) != staj_event_types{}) {/*...*/}
       ```  
 
+    - The `basic_json_pointer` operator `/` now accepts a `basic_string_view` as a right-hand argument,
+      and member function `append` now accepts a `basic_string_view` as an argument.
+
+    - The class `key_value` has a new member `name` that returns a `basic_string_view` of the key.
+
+    - jsonschema validation now supports validation of instances of `jsoncons::pmr::json` and `jsoncons::pmr::ojson`.
+      Note that temporary allocations still use `std::allocator`.
+
 1.6.0
 -----
 

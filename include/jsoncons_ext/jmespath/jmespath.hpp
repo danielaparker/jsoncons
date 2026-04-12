@@ -29,6 +29,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 

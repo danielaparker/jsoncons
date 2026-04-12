@@ -14,6 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -221,14 +222,6 @@ namespace draft202012 {
                     for (const auto& uri : new_context.uris()) 
                     { 
                         this->insert_schema(uri, p);
-                        /*for (const auto& item : sch.object_range())
-                        {
-                            if (known_keywords().find(item.key()) == known_keywords().end())
-                            {
-                                std::cout << "  " << item.key() << "\n";
-                                this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
-                            }
-                        }*/
                     }          
                     break;
                 }
@@ -249,7 +242,7 @@ namespace draft202012 {
             std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
             std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
-            std::map<std::string,schema_validator_ptr_type> defs;
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
             anchor_uri_map_type local_anchor_dict;
 
             auto it = sch.find("$dynamicAnchor"); 
@@ -417,7 +410,7 @@ namespace draft202012 {
             {
                 for (const auto& key_value : sch.object_range())
                 {
-                    auto factory_it = validation_factory_map_.find(std::string(key_value.name()));
+                    auto factory_it = validation_factory_map_.find(key_value.key().c_str());
                     if (factory_it != validation_factory_map_.end())
                     {
                         auto validator = (*factory_it).second(context, key_value.value(), sch, local_anchor_dict);

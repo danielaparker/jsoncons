@@ -15,6 +15,7 @@
 #include <utility>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>

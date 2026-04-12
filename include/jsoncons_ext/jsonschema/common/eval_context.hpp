@@ -102,14 +102,14 @@ public:
         }
     }
 
-    eval_context(const eval_context& parent, const std::string& name)
+    eval_context(const eval_context& parent, jsoncons::string_view name)
         : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
           flags_(parent.flags_)
           
     {
     }
 
-    eval_context(const eval_context& parent, const std::string& name,
+    eval_context(const eval_context& parent, jsoncons::string_view name,
         evaluation_flags flags)
         : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
           flags_(flags)

@@ -14,6 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -250,7 +251,7 @@ namespace draft201909 {
             std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;
             std::set<std::string> known_keywords;
             bool recursive_anchor = false;
-            std::map<std::string,schema_validator_ptr_type> defs;
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
 
             if (this->options().compatibility_mode())
             {
@@ -410,7 +411,7 @@ namespace draft201909 {
             {
                 for (const auto& key_value : sch.object_range())
                 {
-                    auto factory_it = validation_factory_map_.find(std::string(key_value.name()));
+                    auto factory_it = validation_factory_map_.find(key_value.key().c_str());
                     if (factory_it != validation_factory_map_.end())
                     {
                         auto validator = (*factory_it).second(context, key_value.value(), sch, anchor_dict);

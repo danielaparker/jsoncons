@@ -26,6 +26,7 @@
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/format.hpp>
@@ -2574,7 +2575,7 @@ namespace jsonschema {
         using schema_validator_ptr_type = typename schema_validator<Json>::schema_validator_ptr_type;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::map<std::string, schema_validator_ptr_type> properties_;
+        std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> properties_;
     public:
         properties_validator(const properties_validator&) = delete;
         properties_validator& operator=(const properties_validator&) = delete;
@@ -2582,7 +2583,7 @@ namespace jsonschema {
         properties_validator& operator=(properties_validator&&) = default;
 
         properties_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
-            std::map<std::string, schema_validator_ptr_type>&& properties)
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>>&& properties)
             : keyword_validator<Json>("properties", schema, std::move(schema_location), custom_message),
               properties_(std::move(properties))
         {
@@ -2612,12 +2613,12 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                auto prop_it = properties_.find(std::string(prop.name()));
+                auto prop_it = properties_.find(prop.key().c_str());
 
                 // check if it is in "properties"
                 if (prop_it != properties_.end()) 
                 {
-                    eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                    eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                     std::size_t errors = reporter.error_count();
@@ -2683,7 +2684,7 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                auto prop_it = properties_.find(std::string(prop.name()));
+                auto prop_it = properties_.find(prop.key().c_str());
 
                 if (prop_it != properties_.end()) 
                 {
@@ -2767,7 +2768,7 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
             for (const auto& prop : instance.object_range()) 
             {
-                eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                 jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                 // check all matching "patternProperties"
@@ -2814,7 +2815,7 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
             for (const auto& prop : instance.object_range()) 
             {
-                eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                 jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                 // check all matching "patternProperties"
@@ -2922,16 +2923,19 @@ namespace jsonschema {
                 {
                     for (const auto& prop : instance.object_range()) 
                     {
-                        eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                        eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                         jsonpointer::json_pointer prop_location = instance_location / prop.key();
                         // check if it is in "allowed properties"
-                        auto prop_it = allowed_properties.find(std::string(prop.name()));
+                        auto prop_it = allowed_properties.find(prop.key().c_str());
                         if (prop_it == allowed_properties.end()) 
                         {
+                            std::string message{"Additional property '"};
+                            message.append(prop.key().c_str());
+                            message.append("' not allowed by schema.");
                             walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(),
                                 prop_location, 
-                                "Additional property '" + std::string(prop.name()) + "' not allowed by schema."));
+                                message));
                             if (result == walk_result::abort)
                             {
                                 return result;
@@ -2954,10 +2958,10 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "allowed properties"
-                        auto prop_it = allowed_properties.find(std::string(prop.name()));
+                        auto prop_it = allowed_properties.find(prop.key().c_str());
                         if (prop_it == allowed_properties.end()) 
                         {
-                            eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                            eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                             jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                             // finally, check "additionalProperties" 
@@ -2973,10 +2977,13 @@ namespace jsonschema {
                             }
                             if (!local_reporter.errors.empty())
                             {
+                                std::string message{"Additional property '"};
+                                message.append(prop.key().c_str());
+                                message.append("' found but was invalid.");
                                 result = reporter.error(this->make_validation_message(
                                     this_context.eval_path(),
                                     instance_location, 
-                                    "Additional property '" + std::string(prop.name()) + "' found but was invalid."));
+                                    message));
                                 if (result == walk_result::abort)
                                 {
                                     return result;
@@ -3033,10 +3040,10 @@ namespace jsonschema {
                 for (const auto& prop : instance.object_range()) 
                 {
                     // check if it is in "allowed properties"
-                    auto prop_it = allowed_properties.find(std::string(prop.name()));
+                    auto prop_it = allowed_properties.find(prop.key().c_str());
                     if (prop_it == allowed_properties.end()) 
                     {
-                        eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                        eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                         jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                         result = additional_properties_->walk(prop_context, prop.value() , prop_location, reporter);
@@ -3058,11 +3065,11 @@ namespace jsonschema {
         using schema_validator_ptr_type = typename schema_validator<Json>::schema_validator_ptr_type;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::map<std::string, keyword_validator_ptr_type> dependent_required_;
+        std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>> dependent_required_;
 
     public:
         dependent_required_validator(const Json& schema, const uri& schema_location,
-            std::map<std::string, keyword_validator_ptr_type>&& dependent_required,
+            std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>>&& dependent_required,
             const std::string& custom_message = std::string{}
         )
             : keyword_validator<Json>("dependentRequired", schema, std::move(schema_location),
@@ -3143,12 +3150,12 @@ namespace jsonschema {
         using schema_validator_ptr_type = typename schema_validator<Json>::schema_validator_ptr_type;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::map<std::string, schema_validator_ptr_type> dependent_schemas_;
+        std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> dependent_schemas_;
 
     public:
         dependent_schemas_validator(const Json& schema, const uri& schema_location,
             const std::string& custom_message,
-            std::map<std::string, schema_validator_ptr_type>&& dependent_schemas
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>>&& dependent_schemas
         )
             : keyword_validator<Json>("dependentSchemas", schema, std::move(schema_location),
                 custom_message), 
@@ -3320,13 +3327,13 @@ namespace jsonschema {
         using schema_validator_ptr_type = typename schema_validator<Json>::schema_validator_ptr_type;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::map<std::string, keyword_validator_ptr_type> dependent_required_;
-        std::map<std::string, schema_validator_ptr_type> dependent_schemas_;
+        std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>> dependent_required_;
+        std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> dependent_schemas_;
 
     public:
         dependencies_validator(const Json& schema, const uri& schema_location,
-            std::map<std::string, keyword_validator_ptr_type>&& dependent_required,
-            std::map<std::string, schema_validator_ptr_type>&& dependent_schemas,
+            std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>>&& dependent_required,
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>>&& dependent_schemas,
             const std::string& custom_message = std::string{}
         )
             : keyword_validator<Json>("dependencies", schema, std::move(schema_location),
@@ -3945,16 +3952,19 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "evaluated_properties"
-                        auto prop_it = results.evaluated_properties.find(std::string(prop.name()));
+                        auto prop_it = results.evaluated_properties.find(prop.key().c_str());
                         if (prop_it == results.evaluated_properties.end()) 
                         {
-                            eval_context<Json> prop_context{this_context, std::string(prop.name()), evaluation_flags{}};
+                            eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                             jsonpointer::json_pointer prop_location = instance_location / prop.name();
 
+                            std::string message{"Unevaluated property '"};
+                            message.append(prop.key().c_str());
+                            message.append("' but the schema does not allow unevaluated properties.");
                             walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(), 
                                 prop_location,
-                                "Unevaluated property '" + std::string(prop.name()) + "' but the schema does not allow unevaluated properties."));
+                                message));
                             if (result == walk_result::abort)
                             {
                                 return result;
@@ -3978,7 +3988,7 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "evaluated_properties"
-                        auto prop_it = results.evaluated_properties.find(std::string(prop.name()));
+                        auto prop_it = results.evaluated_properties.find(prop.key().c_str());
                         if (prop_it == results.evaluated_properties.end()) 
                         {
                             //std::cout << "Not in evaluated properties: " << prop.key() << "\n";

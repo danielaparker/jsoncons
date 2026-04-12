@@ -15,6 +15,7 @@
 #include <utility>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
@@ -61,7 +62,7 @@ namespace jsonschema {
             std::string keyword = "properties";
             uri schema_location = context.get_base_uri();
 
-            std::map<std::string, schema_validator_ptr_type> properties;
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> properties;
 
             for (const auto& prop : sch.object_range())
             {
@@ -614,8 +615,8 @@ namespace jsonschema {
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             uri schema_location = context.get_base_uri();
-            std::map<std::string, keyword_validator_ptr_type> dependent_required;
-            std::map<std::string, schema_validator_ptr_type> dependent_schemas;
+            std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>> dependent_required;
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> dependent_schemas;
 
             //std::cout << "dependencies" << "\n" << pretty_print(sch) << "\n";
 
@@ -669,7 +670,7 @@ namespace jsonschema {
             const compilation_context<Json>& context, const Json& sch, const Json& parent)
         {
             uri schema_location = context.get_base_uri();
-            std::map<std::string, keyword_validator_ptr_type> dependent_required;
+            std::map<std::string, keyword_validator_ptr_type,transparent_string_less<std::string>> dependent_required;
 
             for (const auto& dep : sch.object_range())
             {
@@ -698,7 +699,7 @@ namespace jsonschema {
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             uri schema_location = context.get_base_uri();
-            std::map<std::string, schema_validator_ptr_type> dependent_schemas;
+            std::map<std::string, schema_validator_ptr_type,transparent_string_less<std::string>> dependent_schemas;
 
             for (const auto& dep : sch.object_range())
             {

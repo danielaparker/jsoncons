@@ -14,6 +14,37 @@
 
 namespace jsoncons { 
 
+template <typename Key>
+struct transparent_string_less {
+    using is_transparent = void;
+    using char_type = typename Key::value_type;
+
+    bool operator()(const Key& lhs, const Key& rhs) const
+    {
+        return lhs < rhs;
+    }
+
+    bool operator()(const Key& lhs, jsoncons::string_view rhs) const
+    {
+        return lhs < rhs;
+    }
+
+    bool operator()(const char_type* lhs, const Key& rhs) const
+    {
+        return lhs < rhs;
+    }
+
+    bool operator()(jsoncons::string_view lhs, const Key& rhs) const
+    {
+        return lhs < rhs;
+    }
+
+    bool operator()(const Key& lhs, const char_type* rhs) const
+    {
+        return lhs < rhs;
+    }
+};
+
 template <typename StringViewLike>
 typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
 starts_with(const StringViewLike& sv, const StringViewLike& prefix)

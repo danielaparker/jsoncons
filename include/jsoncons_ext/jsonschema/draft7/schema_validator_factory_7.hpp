@@ -14,6 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -156,7 +157,7 @@ namespace draft7 {
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
                         std::vector<keyword_validator_ptr_type> validators;
-                        std::map<std::string,schema_validator_ptr_type> defs;
+                        std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
 
                         auto it2 = sch.find("definitions");
                         if (it2 != sch.object_range().end()) 
@@ -186,7 +187,7 @@ namespace draft7 {
                         this->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
-                            if (known_keywords().find(std::string(item.key())) == known_keywords().end())
+                            if (known_keywords().find(item.key().c_str()) == known_keywords().end())
                             {
                                 this->insert_unknown_keyword(uri, std::string(item.key()), item.value()); // save unknown keywords for later reference
                             }
@@ -208,7 +209,7 @@ namespace draft7 {
             jsoncons::optional<jsoncons::uri> id = context.id();
             jsoncons::optional<Json> default_value;
             std::vector<keyword_validator_ptr_type> validators;
-            std::map<std::string,schema_validator_ptr_type> defs;
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
 
             auto it = sch.find("definitions");
             if (it != sch.object_range().end()) 

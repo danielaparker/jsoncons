@@ -13,6 +13,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
+
 #include <jsoncons_ext/jsonschema/common/eval_context.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validator.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
@@ -234,7 +236,7 @@ namespace jsonschema {
         std::vector<keyword_validator_ptr_type> validators_; 
         std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val_;
         std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val_;
-        std::map<std::string,schema_validator_ptr_type> defs_;
+        std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs_;
         jsoncons::optional<Json> default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
@@ -250,7 +252,7 @@ namespace jsonschema {
         object_schema_validator(const uri& schema_location,
             const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_ptr_type>&& validators, 
-            std::map<std::string,schema_validator_ptr_type>&& defs,
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>>&& defs,
             jsoncons::optional<Json>&& default_value)
             : schema_location_(schema_location),
               id_(id),
@@ -267,7 +269,7 @@ namespace jsonschema {
             std::vector<keyword_validator_ptr_type>&& validators,
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
-            std::map<std::string,schema_validator_ptr_type>&& defs,
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>>&& defs,
             jsoncons::optional<Json>&& default_value, bool recursive_anchor)
             : schema_location_(schema_location),
               id_(id),
@@ -286,7 +288,7 @@ namespace jsonschema {
             std::vector<keyword_validator_ptr_type>&& validators, 
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
-            std::map<std::string,schema_validator_ptr_type>&& defs,
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>>&& defs,
             jsoncons::optional<Json>&& default_value,
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
             anchor_schema_map_type&& anchor_dict)

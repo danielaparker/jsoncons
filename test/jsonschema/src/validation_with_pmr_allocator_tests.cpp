@@ -20,7 +20,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema pmr allocator tests")
 {
-    SECTION("Basic")
+    SECTION("Fail")
     {
         char buffer[1024] = {}; // a small buffer on the stack
         //char* last = buffer + sizeof(buffer);
