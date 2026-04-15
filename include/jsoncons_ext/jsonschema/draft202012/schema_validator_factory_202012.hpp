@@ -36,6 +36,7 @@ namespace draft202012 {
     class schema_validator_factory_202012 : public schema_validator_factory_base<Json> 
     {
     public:
+        using schema_readers_type = schema_readers<Json>;
         using schema_store_type = typename schema_validator_factory_base<Json>::schema_store_type;
         using validator_factory_factory_type = typename schema_validator_factory_base<Json>::validator_factory_factory_type;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -497,43 +498,13 @@ namespace draft202012 {
             std::string custom_message;
             if (sch.is_object())
             {
-                this->read_id_201909_latest(parent, sch, id, new_uris);
-                auto it = sch.find("$anchor"); 
-                if (it != sch.object_range().end()) 
-                {
-                    auto anchor = (*it).value().template as<std::string>();
-                    if (!this->validate_anchor(anchor))
-                    {
-                        JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
-                    }
-                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
-                    uri_wrapper identifier{ new_uri };
-                    if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
-                    {
-                        new_uris.emplace_back(std::move(identifier)); 
-                    }                  
-                }
-                it = sch.find("$dynamicAnchor"); 
-                if (it != sch.object_range().end()) 
-                {
-                    auto anchor = (*it).value().template as<std::string>();
-                    if (!this->validate_anchor(anchor))
-                    {
-                        JSONCONS_THROW(schema_error("Invalid $dynamicAnchor " + anchor));
-                    }
-                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
-                    uri_wrapper identifier{ new_uri };
-                    if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
-                    {
-                        new_uris.emplace_back(std::move(identifier)); 
-                    }
-                }
+                schema_readers_type::read_id_201909_latest(parent, sch, id, new_uris);
+                schema_readers_type::read_anchor(sch, new_uris);
+                schema_readers_type::read_dynamic_anchor(sch, new_uris);
 
                 if (this->options().enable_custom_error_message())
                 {
-                    this->read_custom_error_message(sch, custom_messages, custom_message);
+                    schema_readers_type::read_custom_error_message(sch, custom_messages, custom_message);
                 }
             }
 

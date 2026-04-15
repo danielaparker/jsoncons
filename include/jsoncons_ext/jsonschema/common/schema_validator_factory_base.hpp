@@ -19,6 +19,7 @@
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_readers.hpp>
 #include <jsoncons_ext/jsonschema/evaluation_options.hpp>
 
 namespace jsoncons {
@@ -259,37 +260,6 @@ namespace jsonschema {
             return orig;
         }
 
-        static bool validate_anchor(const std::string& s)
-        {
-            if (s.empty())
-            {
-                return false;
-            }
-            if (!((s[0] >= 'a' && s[0] <= 'z') || (s[0] >= 'A' && s[0] <= 'Z')))
-            {
-                return false;
-            }
-
-            for (std::size_t i = 1; i < s.size(); ++i)
-            {
-                switch (s[i])
-                {
-                    case '-':
-                    case '_':
-                    case ':':
-                    case '.':
-                        break;
-                    default:
-                        if (!((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9')))
-                        {
-                            return false;
-                        }
-                        break;
-                }
-            }
-            return true;
-        }
-
         virtual compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent,
             const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const = 0;
 
@@ -364,84 +334,9 @@ namespace jsonschema {
                 }
             }
         }
-
-        static void read_id_4(const compilation_context<Json>& parent, const Json& sch, 
-            jsoncons::optional<uri>& id,
-            std::vector<uri_wrapper>& new_uris)
-        {
-            auto it = sch.find("id"); // If id is found, this schema can be referenced by the id
-            if (it != sch.object_range().end()) 
-            {
-                if (!(*it).value().is_string())
-                {
-                    JSONCONS_THROW(schema_error("id must be string"));
-                }
-                uri relative((*it).value().as_string_view()); 
-                auto resolved = parent.get_base_uri().resolve(relative);
-                id = resolved;
-                //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
-                // Add it to the list if it is not already there
-
-                uri_wrapper new_uri{resolved};
-                if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
-                {
-                    new_uris.emplace_back(new_uri); 
-                }
-            }
-        }
-
-        static void read_id_6_7(const compilation_context<Json>& parent, const Json& sch, 
-            jsoncons::optional<uri>& id,
-            std::vector<uri_wrapper>& new_uris)
-        {
-            auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
-            if (it != sch.object_range().end()) 
-            {
-                if (!(*it).value().is_string())
-                {
-                    JSONCONS_THROW(schema_error("$id must be string"));
-                }
-                uri relative((*it).value().as_string_view()); 
-                auto resolved = parent.get_base_uri().resolve(relative);
-                id = resolved;
-                //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
-                // Add it to the list if it is not already there
-
-                uri_wrapper new_uri{resolved};
-                if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
-                {
-                    new_uris.emplace_back(new_uri); 
-                }
-            }
-        }
-
-        static void read_custom_error_message(const Json& sch, 
-            std::unordered_map<std::string, std::string>& custom_messages,
-            std::string& custom_message) 
-        {
-            auto it = sch.find("errorMessage"); 
-            if (it != sch.object_range().end()) 
-            {
-                const auto& value = it->value();
-                if (value.is_object())
-                {
-                    for (const auto& item : value.object_range())
-                    {
-                        if (item.value().is_string())
-                        {
-                            custom_messages.emplace(item.name(), item.value().as_string_view());
-                        }
-                    }
-                }
-                else if (value.is_string())
-                {
-                    custom_message = value.template as<std::string>();
-                }
-            }
-        }
     };
 
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_VALIDATOR_FACTORY_BASE_HPP

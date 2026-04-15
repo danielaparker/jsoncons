@@ -36,6 +36,7 @@ namespace draft6 {
     class schema_validator_factory_6 : public schema_validator_factory_base<Json> 
     {
     public:
+        using schema_readers_type = schema_readers<Json>;
         using schema_store_type = typename schema_validator_factory_base<Json>::schema_store_type;
         using validator_factory_factory_type = typename schema_validator_factory_base<Json>::validator_factory_factory_type;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -322,11 +323,11 @@ namespace draft6 {
             std::string custom_message;
             if (sch.is_object())
             {
-                this->read_id_6_7(parent, sch, id, new_uris);
+                schema_readers_type::read_id_6_7(parent, sch, id, new_uris);
 
                 if (this->options().enable_custom_error_message())
                 {
-                    this->read_custom_error_message(sch, custom_messages, custom_message);
+                    schema_readers_type::read_custom_error_message(sch, custom_messages, custom_message);
                 }
             }
 
