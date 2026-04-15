@@ -241,7 +241,7 @@ namespace jsonschema {
             { 
                 case json_type::string: 
                 {
-                    auto type = sch.template as<std::string>();
+                    auto type = sch.as_string_view();
                     if (type == "null")
                     {
                         expected_types.push_back(json_schema_type::null);
@@ -272,7 +272,11 @@ namespace jsonschema {
                     }
                     else
                     {
-                        JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type '" + type + "'"));
+                        std::string message{schema_location.string()};
+                        message.append(": Invalid type '");
+                        message.append(type.data(), type.size());
+                        message.append("'");
+                        JSONCONS_THROW(schema_error(message));
                     }
                     break;
                 } 
@@ -281,7 +285,7 @@ namespace jsonschema {
                 {
                     for (const auto& item : sch.array_range())
                     {
-                        auto type = item.template as<std::string>();
+                        auto type = item.as_string_view();
                         if (type == "null")
                         {
                             expected_types.push_back(json_schema_type::null);
@@ -312,7 +316,11 @@ namespace jsonschema {
                         }
                         else
                         {
-                            JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type '" + type + "'"));
+                            std::string message{schema_location.string()};
+                            message.append(": Invalid type '");
+                            message.append(type.data(), type.size());
+                            message.append("'");
+                            JSONCONS_THROW(schema_error(message));
                         }
                     }
                     break;
