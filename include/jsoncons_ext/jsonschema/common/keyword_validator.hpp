@@ -650,11 +650,10 @@ namespace jsonschema {
 
             eval_context<Json> this_context(context, this->keyword_name());
 
-            auto s = instance.template as<std::string>();
-            if (!std::regex_search(s, regex_))
+            if (!std::regex_search(instance.as_cstring(), regex_))
             {
                 std::string message("String '");
-                message.append(s);
+                message.append(instance.as_cstring());
                 message.append("' does not match pattern '");
                 message.append(pattern_string_);
                 message.append("'.");
