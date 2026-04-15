@@ -124,7 +124,7 @@ public:
             if (!validate_anchor(anchor))
             {
                 std::string message{"Invalid $anchor "};
-                message.append(anchor);
+                message.append(anchor.data(), anchor.size());
                 JSONCONS_THROW(schema_error(message));
             }
             auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
@@ -151,7 +151,7 @@ public:
             if (!validate_anchor(anchor))
             {
                 std::string message{"Invalid $dynamicAnchor "};
-                message.append(anchor);
+                message.append(anchor.data(), anchor.size());
                 JSONCONS_THROW(schema_error(message));
             }
             auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
