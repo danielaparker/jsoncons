@@ -205,7 +205,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const 
+            jsoncons::optional<Json>& patch) const 
         {
             return do_validate(context, instance, instance_location, results, reporter, patch);
         }
@@ -226,7 +226,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const = 0;
+            jsoncons::optional<Json>& patch) const = 0;
 
         virtual walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const = 0;

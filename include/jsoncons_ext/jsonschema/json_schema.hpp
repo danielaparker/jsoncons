@@ -177,7 +177,9 @@ namespace jsonschema {
             error_reporter_adaptor adaptor(std::forward<MsgReporter>(reporter));
             eval_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, adaptor, patch);
+            jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
+            root_->validate(context, instance, instance_location, results, adaptor, temp);
+            patch = std::move(*temp);
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
@@ -189,7 +191,9 @@ namespace jsonschema {
             fail_early_reporter reporter;
             eval_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
+            jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
+            root_->validate(context, instance, instance_location, results, reporter, temp);
+            patch = std::move(*temp);
         }
 
         // Validate input JSON against a JSON Schema with a provided json_visitor

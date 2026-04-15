@@ -193,7 +193,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -249,7 +249,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             auto rit = context.dynamic_scope().rbegin();
             auto rend = context.dynamic_scope().rend();
@@ -348,7 +348,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "dynamic_ref_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
             //std::cout << "results:\n";
@@ -443,7 +443,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -516,7 +516,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -587,7 +587,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -641,7 +641,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -694,7 +694,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer&,
             evaluation_results& /*results*/, 
             error_reporter&,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             return walk_result::advance;
         }
@@ -730,7 +730,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -784,7 +784,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
             {
@@ -837,7 +837,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
             {
@@ -891,7 +891,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
             {
@@ -948,7 +948,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter,
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -1075,7 +1075,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
             {
@@ -1155,7 +1155,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1215,7 +1215,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
@@ -1224,12 +1224,12 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
-            Json local_patch1(json_array_arg);
+            jsoncons::optional<Json> local_patch1(jsoncons::in_place, json_array_arg);
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
-                Json local_patch2{json_array_arg};
+                jsoncons::optional<Json> local_patch2{jsoncons::in_place, json_array_arg};
                 eval_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
@@ -1241,9 +1241,9 @@ namespace jsonschema {
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
-                    for (auto& item : local_patch2.array_range())
+                    for (auto& item : local_patch2->array_range())
                     {
-                        local_patch1.push_back(std::move(item));
+                        local_patch1->push_back(std::move(item));
                     }
                     ++count;
                 }
@@ -1253,9 +1253,12 @@ namespace jsonschema {
             if (count > 0)
             {
                 results.merge(local_results1);
-                for (auto& item : local_patch1.array_range())
+                if (patch)
                 {
-                    patch.push_back(std::move(item));
+                    for (auto& item : local_patch1->array_range())
+                    {
+                        patch->push_back(std::move(item));
+                    }
                 }
             }
             else 
@@ -1321,7 +1324,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
@@ -1330,12 +1333,12 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
-            Json local_patch1(json_array_arg);
+            jsoncons::optional<Json> local_patch1(jsoncons::in_place, json_array_arg);
             std::vector<std::size_t> indices;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
-                Json local_patch2{json_array_arg};
+                jsoncons::optional<Json> local_patch2(jsoncons::in_place, json_array_arg);
                 eval_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
@@ -1348,9 +1351,9 @@ namespace jsonschema {
                 {
                     local_results1.merge(local_results2);
                     indices.push_back(i);
-                    for (auto& item : local_patch2.array_range())
+                    for (auto& item : local_patch2->array_range())
                     {
-                        local_patch1.push_back(std::move(item));
+                        local_patch1->push_back(std::move(item));
                     }
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1359,9 +1362,12 @@ namespace jsonschema {
             if (indices.size() == 1)
             {
                 results.merge(local_results1);
-                for (auto& item : local_patch1.array_range())
+                if (patch)
                 {
-                    patch.push_back(std::move(item));
+                    for (auto& item : local_patch1->array_range())
+                    {
+                        patch->push_back(std::move(item));
+                    }
                 }
             }
             else 
@@ -1445,7 +1451,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]\n";
 
@@ -1551,7 +1557,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final 
+            jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1647,7 +1653,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final 
+            jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1743,7 +1749,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1839,7 +1845,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final 
+            jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1933,7 +1939,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_number())
             {
@@ -1999,7 +2005,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
             {
@@ -2055,7 +2061,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
             {
@@ -2108,7 +2114,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
             {
@@ -2170,7 +2176,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (if_val_) 
             {
@@ -2285,7 +2291,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -2342,7 +2348,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter,
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             if (value_ != instance)
             {
@@ -2421,7 +2427,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/,
             error_reporter& reporter, 
-            Json& /*patch*/) const final
+            jsoncons::optional<Json>& /*patch*/) const final
         {
             //std::cout << "type_validator.do_validate " << context.eval_path().string() << instance << "\n";
             //for (auto& type : expected_types_ )
@@ -2592,7 +2598,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch,
+            jsoncons::optional<Json>& patch,
             std::unordered_set<std::string>& allowed_properties) const 
         {
             //std::cout << "properties_validator begin[" << context.eval_path().string() << "," << this->schema_location().string() << "]\n";
@@ -2705,7 +2711,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             std::unordered_set<std::string> allowed_properties;
             return validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
@@ -2718,13 +2724,16 @@ namespace jsonschema {
             return walk(context, instance, instance_location, reporter, allowed_properties);
         }
 
-        void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, const Json& default_value) const
+        void update_patch(jsoncons::optional<Json>& patch, const jsonpointer::json_pointer& instance_location, const Json& default_value) const
         {
             Json j;
             j.try_emplace("op", "add"); 
             j.try_emplace("path", instance_location.string()); 
             j.try_emplace("value", default_value); 
-            patch.push_back(std::move(j));
+            if (patch)
+            {
+                patch->push_back(std::move(j));
+            }
         }
     };
 
@@ -2749,7 +2758,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location, 
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch,
+            jsoncons::optional<Json>& patch,
             std::unordered_set<std::string>& allowed_properties) const 
         {
             (void)context;
@@ -2841,7 +2850,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             std::unordered_set<std::string> allowed_properties;
             return validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
@@ -2888,7 +2897,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -3083,7 +3092,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -3168,7 +3177,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -3249,7 +3258,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -3348,7 +3357,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -3515,7 +3524,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -3675,7 +3684,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter,
-            Json& patch,
+            jsoncons::optional<Json>& patch,
             std::size_t data_index) const 
         {
             if (!instance.is_array())
@@ -3800,7 +3809,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter,
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -3929,7 +3938,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "unevaluated_properties_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
             //std::cout << "results:\n";
@@ -4043,7 +4052,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]";
             //std::cout << "results:\n";
