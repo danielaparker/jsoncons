@@ -597,9 +597,9 @@ namespace jsonschema {
             if (validate_ != nullptr) 
             {
                 eval_context<Json> this_context(context, this->keyword_name());
-                auto s = instance.template as<std::string>();
+                auto sv = instance.as_string_view();
 
-                walk_result result = validate_(*this, this_context.eval_path(), instance_location, s, reporter);
+                walk_result result = validate_(*this, this_context.eval_path(), instance_location, sv, reporter);
                 if (result == walk_result::abort)
                 {
                     return result;

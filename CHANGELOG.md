@@ -24,6 +24,8 @@
     - jsonschema validation now supports validation of instances of `jsoncons::pmr::json` and `jsoncons::pmr::ojson`.
       Note that temporary allocations still use `std::allocator`.
 
+    - Reduced allocations in jsonschema compilation and validation.
+
 1.6.0
 -----
 
