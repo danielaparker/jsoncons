@@ -322,51 +322,13 @@ namespace draft6 {
             std::string custom_message;
             if (sch.is_object())
             {
-                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
-                if (it != sch.object_range().end()) 
-                {
-                    uri relative((*it).value().template as<std::string>()); 
-                    auto resolved = parent.get_base_uri().resolve(relative);
-                    id = resolved;
-                    uri_wrapper new_uri{resolved};
-
-                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
-                    // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
-                    {
-                        new_uris.emplace_back(new_uri); 
-                    }
-                }
+                this->read_id_6_7(parent, sch, id, new_uris);
 
                 if (this->options().enable_custom_error_message())
                 {
-                    it = sch.find("errorMessage"); 
-                    if (it != sch.object_range().end()) 
-                    {
-                        const auto& value = it->value();
-                        if (value.is_object())
-                        {
-                            for (const auto& item : value.object_range())
-                            {
-                                //custom_messages[item.key()] =  item.value().template as<std::string>();
-                                custom_messages.emplace(item.name(), item.value().template as<std::string>());
-                            }
-                        }
-                        else if (value.is_string())
-                        {
-                            custom_message = value.template as<std::string>();
-                        }
-                    }
+                    this->read_custom_error_message(sch, custom_messages, custom_message);
                 }
             }
-
-/*
-            std::cout << "Absolute URI: " << parent.get_base_uri().string() << "\n";
-            for (const auto& uri : new_uris)
-            {
-                std::cout << "    " << uri.string() << "\n";
-            }
-*/
 
             return compilation_context<Json>(new_uris, id, custom_messages, custom_message);
         }

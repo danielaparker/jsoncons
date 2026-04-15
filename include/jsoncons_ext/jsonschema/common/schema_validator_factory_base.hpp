@@ -333,6 +333,112 @@ namespace jsonschema {
             }
             return schema_val;
         }
+
+        static void read_id_201909_latest(const compilation_context<Json>& parent, const Json& sch, 
+            jsoncons::optional<uri>& id,
+            std::vector<uri_wrapper>& new_uris)
+        {
+            auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+            if (it != sch.object_range().end()) 
+            {
+                if (!(*it).value().is_string())
+                {
+                    JSONCONS_THROW(schema_error("$id must be string"));
+                }
+                auto sv = (*it).value().as_string_view();
+                uri relative(sv); 
+                if (relative.has_fragment())
+                {
+                    std::string message{sv};
+                    message.append(": Drafts 2019-09 and later do not allow $id with fragment");
+                    JSONCONS_THROW(schema_error(message));
+                }
+                auto resolved = parent.get_base_uri().resolve(relative);
+                id = resolved;
+                uri_wrapper new_uri{resolved};
+                //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                // Add it to the list if it is not already there
+                if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                {
+                    new_uris.emplace_back(new_uri); 
+                }
+            }
+        }
+
+        static void read_id_4(const compilation_context<Json>& parent, const Json& sch, 
+            jsoncons::optional<uri>& id,
+            std::vector<uri_wrapper>& new_uris)
+        {
+            auto it = sch.find("id"); // If id is found, this schema can be referenced by the id
+            if (it != sch.object_range().end()) 
+            {
+                if (!(*it).value().is_string())
+                {
+                    JSONCONS_THROW(schema_error("id must be string"));
+                }
+                uri relative((*it).value().as_string_view()); 
+                auto resolved = parent.get_base_uri().resolve(relative);
+                id = resolved;
+                //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                // Add it to the list if it is not already there
+
+                uri_wrapper new_uri{resolved};
+                if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                {
+                    new_uris.emplace_back(new_uri); 
+                }
+            }
+        }
+
+        static void read_id_6_7(const compilation_context<Json>& parent, const Json& sch, 
+            jsoncons::optional<uri>& id,
+            std::vector<uri_wrapper>& new_uris)
+        {
+            auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+            if (it != sch.object_range().end()) 
+            {
+                if (!(*it).value().is_string())
+                {
+                    JSONCONS_THROW(schema_error("$id must be string"));
+                }
+                uri relative((*it).value().as_string_view()); 
+                auto resolved = parent.get_base_uri().resolve(relative);
+                id = resolved;
+                //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                // Add it to the list if it is not already there
+
+                uri_wrapper new_uri{resolved};
+                if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                {
+                    new_uris.emplace_back(new_uri); 
+                }
+            }
+        }
+
+        static void read_custom_error_message(const Json& sch, 
+            std::unordered_map<std::string, std::string>& custom_messages,
+            std::string& custom_message) 
+        {
+            auto it = sch.find("errorMessage"); 
+            if (it != sch.object_range().end()) 
+            {
+                const auto& value = it->value();
+                if (value.is_object())
+                {
+                    for (const auto& item : value.object_range())
+                    {
+                        if (item.value().is_string())
+                        {
+                            custom_messages.emplace(item.name(), item.value().as_string_view());
+                        }
+                    }
+                }
+                else if (value.is_string())
+                {
+                    custom_message = value.template as<std::string>();
+                }
+            }
+        }
     };
 
 } // namespace jsonschema
