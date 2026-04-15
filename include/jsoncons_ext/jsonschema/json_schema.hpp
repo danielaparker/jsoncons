@@ -131,12 +131,12 @@ namespace jsonschema {
         {
             throwing_error_listener reporter;
             jsonpointer::json_pointer instance_location{};
-            Json patch(json_array_arg);
+            jsoncons::optional<Json> patch{jsoncons::in_place, jsoncons::json_array_arg};
 
             eval_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, reporter, patch);
-            return patch;
+            return patch ? *patch : Json{json_array_arg};
         }
 
         // Validate input JSON against a JSON Schema 
@@ -144,7 +144,7 @@ namespace jsonschema {
         {
             fail_early_reporter reporter;
             jsonpointer::json_pointer instance_location{};
-            Json patch(json_array_arg);
+            jsoncons::optional<Json> patch{};
 
             eval_context<Json> context;
             evaluation_results results;
@@ -158,7 +158,7 @@ namespace jsonschema {
         validate(const Json& instance, const MsgReporter& reporter) const
         {
             jsonpointer::json_pointer instance_location{};
-            Json patch(json_array_arg);
+            jsoncons::optional<Json> patch;
 
             error_reporter_adaptor adaptor(reporter);
             eval_context<Json> context;
@@ -172,28 +172,40 @@ namespace jsonschema {
         validate(const Json& instance, MsgReporter&& reporter, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
-            patch = Json(json_array_arg);
 
             error_reporter_adaptor adaptor(std::forward<MsgReporter>(reporter));
             eval_context<Json> context;
             evaluation_results results;
             jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
             root_->validate(context, instance, instance_location, results, adaptor, temp);
-            patch = std::move(*temp);
+            if (temp)
+            {
+                patch = std::move(*temp);
+            }
+            else
+            {
+                patch = Json(json_array_arg);
+            }
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         void validate(const Json& instance, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
-            patch = Json(json_array_arg);
 
             fail_early_reporter reporter;
             eval_context<Json> context;
             evaluation_results results;
             jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
             root_->validate(context, instance, instance_location, results, reporter, temp);
-            patch = std::move(*temp);
+            if (temp)
+            {
+                patch = std::move(*temp);
+            }
+            else
+            {
+                patch = Json(json_array_arg);
+            }
         }
 
         // Validate input JSON against a JSON Schema with a provided json_visitor
@@ -201,7 +213,7 @@ namespace jsonschema {
         {
             visitor.begin_array();
             jsonpointer::json_pointer instance_location{};
-            Json patch{json_array_arg};
+            jsoncons::optional<Json> patch;
 
             validation_message_to_json_events adaptor{ visitor };
             eval_context<Json> context;
@@ -218,18 +230,6 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location{};
 
             root_->walk(eval_context<Json>{}, instance, instance_location, reporter);
-        }
-        
-    private:
-        // Validate input JSON against a JSON Schema with a provided error reporter
-        void validate2(const Json& instance, error_reporter& reporter, Json& patch) const
-        {
-            jsonpointer::json_pointer instance_location{};
-            patch = Json(json_array_arg);
-
-            eval_context<Json> context;
-            evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
         }
     };
 

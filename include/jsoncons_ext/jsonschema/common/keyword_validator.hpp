@@ -1224,7 +1224,7 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
-            jsoncons::optional<Json> local_patch1(jsoncons::in_place, json_array_arg);
+            auto local_patch1 = patch ? jsoncons::optional<Json>{jsoncons::in_place, json_array_arg} : jsoncons::optional<Json>{};
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
@@ -1241,9 +1241,12 @@ namespace jsonschema {
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
-                    for (auto& item : local_patch2->array_range())
+                    if (local_patch1 && local_patch2)
                     {
-                        local_patch1->push_back(std::move(item));
+                        for (auto& item : local_patch2->array_range())
+                        {
+                            local_patch1->push_back(std::move(item));
+                        }
                     }
                     ++count;
                 }
@@ -1253,7 +1256,7 @@ namespace jsonschema {
             if (count > 0)
             {
                 results.merge(local_results1);
-                if (patch)
+                if (patch && local_patch1)
                 {
                     for (auto& item : local_patch1->array_range())
                     {
@@ -1333,12 +1336,12 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
-            jsoncons::optional<Json> local_patch1(jsoncons::in_place, json_array_arg);
+            auto local_patch1 = patch ? jsoncons::optional<Json>{jsoncons::in_place, json_array_arg} : jsoncons::optional<Json>{};
             std::vector<std::size_t> indices;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
-                jsoncons::optional<Json> local_patch2(jsoncons::in_place, json_array_arg);
+                auto local_patch2 = patch ? jsoncons::optional<Json>{jsoncons::in_place, json_array_arg} : jsoncons::optional<Json>{};
                 eval_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
@@ -1351,9 +1354,12 @@ namespace jsonschema {
                 {
                     local_results1.merge(local_results2);
                     indices.push_back(i);
-                    for (auto& item : local_patch2->array_range())
+                    if (local_patch1 && local_patch2)
                     {
-                        local_patch1->push_back(std::move(item));
+                        for (auto& item : local_patch2->array_range())
+                        {
+                            local_patch1->push_back(std::move(item));
+                        }
                     }
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1362,7 +1368,7 @@ namespace jsonschema {
             if (indices.size() == 1)
             {
                 results.merge(local_results1);
-                if (patch)
+                if (patch && local_patch1)
                 {
                     for (auto& item : local_patch1->array_range())
                     {
