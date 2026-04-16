@@ -385,61 +385,61 @@ namespace jsonschema {
             std::string format = sch.template as<std::string>();
 
             std::string message_key;
-            validate_format validate;
+            validate_format<Json> validate;
             if (format == "date-time")
             {
                 message_key = "format.date-time";
-                validate = rfc3339_date_time_check;
+                validate = rfc3339_date_time_check<Json>;
             }
             else if (format == "date") 
             {
                 message_key = "format.date";
-                validate = rfc3339_date_check;
+                validate = rfc3339_date_check<Json>;
             } 
             else if (format == "time") 
             {
                 message_key = "format.time";
-                validate = rfc3339_time_check;
+                validate = rfc3339_time_check<Json>;
             } 
             else if (format == "email") 
             {
                 message_key = "format.email";
-                validate = email_check;
+                validate = email_check<Json>;
             } 
             else if (format == "hostname") 
             {
                 message_key = "format.hostname";
-                validate = hostname_check;
+                validate = hostname_check<Json>;
             } 
             else if (format == "ipv4") 
             {
                 message_key = "format.ipv4";
-                validate = ipv4_check;
+                validate = ipv4_check<Json>;
             } 
             else if (format == "ipv6") 
             {
                 message_key = "format.ipv6";
-                validate = ipv6_check;
+                validate = ipv6_check<Json>;
             } 
             else if (format == "regex") 
             {
                 message_key = "format.regex";
-                validate = regex_check;
+                validate = regex_check<Json>;
             } 
             else if (format == "json-pointer") 
             {
                 message_key = "format.json-pointer";
-                validate = jsonpointer_check;
+                validate = jsonpointer_check<Json>;
             } 
             else if (format == "uri") 
             {
                 message_key = "format.uri";
-                validate = uri_check;
+                validate = uri_check<Json>;
             } 
             else if (format == "uri-reference") 
             {
                 message_key = "format.uri-reference";
-                validate = uri_reference_check;
+                validate = uri_reference_check<Json>;
             } 
             else
             {

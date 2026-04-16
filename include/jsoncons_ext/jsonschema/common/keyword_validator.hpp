@@ -29,7 +29,7 @@
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/format.hpp>
+#include <jsoncons_ext/jsonschema/common/format_validators.hpp>
 #include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 #include <jsoncons_ext/jsonschema/common/validator.hpp>
 
@@ -192,7 +192,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -248,7 +248,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             auto rit = context.dynamic_scope().rbegin();
@@ -347,7 +347,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "dynamic_ref_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
@@ -442,7 +442,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -515,7 +515,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -573,10 +573,10 @@ namespace jsonschema {
         using keyword_validator_ptr_type = std::unique_ptr<keyword_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        validate_format validate_;
+        validate_format<Json> validate_;
 
     public:
-        format_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const validate_format& validate)
+        format_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const validate_format<Json>& validate)
             : keyword_validator<Json>("format", schema, schema_location, custom_message), validate_(validate)
         {
         }
@@ -586,7 +586,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -640,7 +640,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -693,7 +693,7 @@ namespace jsonschema {
         walk_result do_validate(const Json&, 
             const jsonpointer::json_pointer&,
             evaluation_results& /*results*/, 
-            error_reporter&,
+            error_reporter<Json>&,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             return walk_result::advance;
@@ -729,7 +729,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -783,7 +783,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_string())
@@ -836,7 +836,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
@@ -890,7 +890,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
@@ -947,7 +947,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
@@ -1074,7 +1074,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_array())
@@ -1154,13 +1154,13 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results;
-            collecting_error_listener local_reporter;
+            collecting_error_listener<Json> local_reporter;
             walk_result result = schema_val_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
             if (result == walk_result::abort)
             {
@@ -1214,12 +1214,12 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
-            collecting_error_listener local_reporter;
+            collecting_error_listener<Json> local_reporter;
 
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1326,12 +1326,12 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
-            collecting_error_listener local_reporter;
+            collecting_error_listener<Json> local_reporter;
 
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1456,13 +1456,13 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]\n";
 
             evaluation_results local_results1;
-            collecting_error_listener local_reporter;
+            collecting_error_listener<Json> local_reporter;
 
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1562,7 +1562,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -1658,7 +1658,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -1754,7 +1754,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -1850,7 +1850,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -1944,7 +1944,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_number())
@@ -2010,7 +2010,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
@@ -2066,7 +2066,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
@@ -2119,7 +2119,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (!instance.is_object())
@@ -2181,12 +2181,12 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (if_val_) 
             {
-                collecting_error_listener local_reporter;
+                collecting_error_listener<Json> local_reporter;
                 evaluation_results local_results;
                 
                 eval_context<Json> if_context(context, "if");
@@ -2296,7 +2296,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
@@ -2353,7 +2353,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& /*patch*/) const final
         {
             if (value_ != instance)
@@ -2432,7 +2432,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/,
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& /*patch*/) const final
         {
             //std::cout << "type_validator.do_validate " << context.eval_path().string() << instance << "\n";
@@ -2603,7 +2603,7 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch,
             std::unordered_set<std::string>& allowed_properties) const 
         {
@@ -2716,7 +2716,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             std::unordered_set<std::string> allowed_properties;
@@ -2763,7 +2763,7 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch,
             std::unordered_set<std::string>& allowed_properties) const 
         {
@@ -2855,7 +2855,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             std::unordered_set<std::string> allowed_properties;
@@ -2902,7 +2902,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
@@ -2982,7 +2982,7 @@ namespace jsonschema {
                             //std::cout << "additional_properties_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
                             
                             //std::cout << " !!!additionalProperties!!!";
-                            collecting_error_listener local_reporter;
+                            collecting_error_listener<Json> local_reporter;
 
                             walk_result result = additional_properties_->validate(prop_context, prop.value() , prop_location, results, local_reporter, patch);
                             if (result == walk_result::abort)
@@ -3097,7 +3097,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
@@ -3182,7 +3182,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
@@ -3263,7 +3263,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
@@ -3362,7 +3362,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
@@ -3427,7 +3427,7 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, 
             const jsonpointer::json_pointer& instance_location,
             std::size_t count, 
-            error_reporter& reporter) const 
+            error_reporter<Json>& reporter) const 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -3474,7 +3474,7 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, 
             const jsonpointer::json_pointer& instance_location,
             std::size_t count, 
-            error_reporter& reporter) const 
+            error_reporter<Json>& reporter) const 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -3529,7 +3529,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
@@ -3545,7 +3545,7 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
 
             std::size_t contains_count = 0;
-            collecting_error_listener local_reporter;
+            collecting_error_listener<Json> local_reporter;
 
             std::size_t index = 0;
             std::size_t start = 0;
@@ -3689,7 +3689,7 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch,
             std::size_t data_index) const 
         {
@@ -3814,7 +3814,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter,
+            error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
@@ -3943,7 +3943,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "unevaluated_properties_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
@@ -4057,7 +4057,7 @@ namespace jsonschema {
         walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
             //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]";

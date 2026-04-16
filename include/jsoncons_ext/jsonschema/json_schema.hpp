@@ -68,7 +68,8 @@ namespace jsonschema {
         }
     };
 
-    class throwing_error_listener : public error_reporter
+    template <typename Json>
+    class throwing_error_listener : public error_reporter<Json>
     {
         walk_result do_error(const validation_message& msg) override
         {
@@ -76,7 +77,8 @@ namespace jsonschema {
         }
     };
   
-    class fail_early_reporter : public error_reporter
+    template <typename Json>
+    class fail_early_reporter : public error_reporter<Json>
     {
         walk_result do_error(const validation_message&) override
         {
@@ -86,7 +88,8 @@ namespace jsonschema {
 
     using error_reporter_t = std::function<walk_result(const validation_message& msg)>;
 
-    struct error_reporter_adaptor : public error_reporter
+    template <typename Json>
+    struct error_reporter_adaptor : public error_reporter<Json>
     {
         error_reporter_t reporter_;
 
@@ -129,7 +132,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a default throwing error reporter
         Json validate(const Json& instance) const
         {
-            throwing_error_listener reporter;
+            throwing_error_listener<Json> reporter;
             jsonpointer::json_pointer instance_location{};
             jsoncons::optional<Json> patch{jsoncons::in_place, jsoncons::json_array_arg};
 
@@ -142,7 +145,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_reporter reporter;
+            fail_early_reporter<Json> reporter;
             jsonpointer::json_pointer instance_location{};
             jsoncons::optional<Json> patch{};
 
@@ -160,7 +163,7 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location{};
             jsoncons::optional<Json> patch;
 
-            error_reporter_adaptor adaptor(reporter);
+            error_reporter_adaptor<Json> adaptor(reporter);
             eval_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
@@ -173,7 +176,7 @@ namespace jsonschema {
         {
             jsonpointer::json_pointer instance_location{};
 
-            error_reporter_adaptor adaptor(std::forward<MsgReporter>(reporter));
+            error_reporter_adaptor<Json> adaptor(std::forward<MsgReporter>(reporter));
             eval_context<Json> context;
             evaluation_results results;
             jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -193,7 +196,7 @@ namespace jsonschema {
         {
             jsonpointer::json_pointer instance_location{};
 
-            fail_early_reporter reporter;
+            fail_early_reporter<Json> reporter;
             eval_context<Json> context;
             evaluation_results results;
             jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -218,7 +221,7 @@ namespace jsonschema {
             validation_message_to_json_events adaptor{ visitor };
             eval_context<Json> context;
             evaluation_results results;
-            error_reporter_adaptor reporter(adaptor);
+            error_reporter_adaptor<Json> reporter(adaptor);
             root_->validate(context, instance, instance_location, results, reporter, patch);
             visitor.end_array();
             visitor.flush();

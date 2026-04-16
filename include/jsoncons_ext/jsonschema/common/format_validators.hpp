@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_HPP
-#define JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATORS_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATORS_HPP
 
 #include <cassert>
 #include <cstddef>
@@ -955,18 +955,19 @@ namespace jsonschema {
     }
 
     // format checkers
+    template <typename Json>
     using validate_format = std::function<walk_result(const validation_message_factory& message_factory,
         const jsonpointer::json_pointer& eval_path, 
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv, 
-        error_reporter& reporter)>;
+        error_reporter<Json>& reporter)>;
 
-    inline
+    template <typename Json>
     walk_result uri_check(const validation_message_factory& message_factory, 
         const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         std::error_code ec;
         auto u = uri::parse(sv, ec);
@@ -1002,11 +1003,11 @@ namespace jsonschema {
         return walk_result::advance;
     }
 
-    inline
+    template <typename Json>
     walk_result uri_reference_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         std::error_code ec;
         auto u = uri::parse(sv, ec);
@@ -1028,11 +1029,11 @@ namespace jsonschema {
         return walk_result::advance;
     }
 
-    inline
+    template <typename Json>
     walk_result jsonpointer_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         std::error_code ec;
         jsonpointer::json_pointer::parse(sv, ec);
@@ -1054,11 +1055,11 @@ namespace jsonschema {
     }
 
     
-    inline
+    template <typename Json>
     walk_result rfc3339_date_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         if (!validate_date_time_rfc3339(sv,date_time_type::date))
         {
@@ -1077,11 +1078,11 @@ namespace jsonschema {
         return walk_result::advance;
     }
 
-    inline
+    template <typename Json>
     walk_result rfc3339_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         if (!validate_date_time_rfc3339(sv, date_time_type::time))        
         {
@@ -1100,11 +1101,11 @@ namespace jsonschema {
         return walk_result::advance;
     }
 
-    inline
+    template <typename Json>
     walk_result rfc3339_date_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter)
+        error_reporter<Json>& reporter)
     {
         if (!validate_date_time_rfc3339(sv, date_time_type::date_time))        
         {
@@ -1123,11 +1124,11 @@ namespace jsonschema {
         return walk_result::advance;
     }
 
-    inline
+    template <typename Json>
     walk_result email_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter) 
+        error_reporter<Json>& reporter) 
     {
         if (!validate_email_rfc5322(sv))        
         {
@@ -1146,11 +1147,11 @@ namespace jsonschema {
         return walk_result::advance;
     } 
 
-    inline
+    template <typename Json>
     walk_result hostname_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter) 
+        error_reporter<Json>& reporter) 
     {
         if (!validate_hostname_rfc1034(sv))
         {
@@ -1169,11 +1170,11 @@ namespace jsonschema {
         return walk_result::advance;
     } 
 
-    inline
+    template <typename Json>
     walk_result ipv4_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter) 
+        error_reporter<Json>& reporter) 
     {
         if (!validate_ipv4_rfc2673(sv))
         {
@@ -1192,11 +1193,11 @@ namespace jsonschema {
         return walk_result::advance;
     } 
 
-    inline
+    template <typename Json>
     walk_result ipv6_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter) 
+        error_reporter<Json>& reporter) 
     {
         if (!validate_ipv6_rfc2373(sv))
         {
@@ -1215,11 +1216,11 @@ namespace jsonschema {
         return walk_result::advance;
     } 
 
-    inline
+    template <typename Json>
     walk_result regex_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter& reporter) 
+        error_reporter<Json>& reporter) 
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
         JSONCONS_TRY 
@@ -1247,4 +1248,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONSCHEMA_FORMAT_VALIDATOR_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATORS_HPP

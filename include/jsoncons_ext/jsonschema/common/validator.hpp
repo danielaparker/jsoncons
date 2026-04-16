@@ -34,13 +34,12 @@ namespace jsonschema {
     };
 
     // Interface for validation error handlers
+    template <typename Json>
     class error_reporter
     {
         std::size_t error_count_{0};
     public:
-        error_reporter()
-        {
-        }
+        error_reporter() = default;
 
         virtual ~error_reporter() = default;
 
@@ -59,7 +58,8 @@ namespace jsonschema {
         virtual walk_result do_error(const validation_message& /* e */) = 0;
     };
 
-    struct collecting_error_listener : public error_reporter
+    template <typename Json>
+    struct collecting_error_listener : public error_reporter<Json>
     {
         std::vector<validation_message> errors;
 
@@ -204,7 +204,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const 
         {
             return do_validate(context, instance, instance_location, results, reporter, patch);
@@ -225,7 +225,7 @@ namespace jsonschema {
         virtual walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& reporter, 
+            error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const = 0;
 
         virtual walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance, 
