@@ -14,7 +14,6 @@
 #include <regex>
 #include <catch/catch.hpp>
  
-using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch;
 
@@ -22,7 +21,7 @@ TEST_CASE("jsonschema patch tests")
 {
     SECTION("oneOf")
     {
-        json schema = json::parse(R"(
+        auto schema = jsoncons::json::parse(R"(
 {
   "$id": "https://example.com/oneOf",
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -49,24 +48,24 @@ TEST_CASE("jsonschema patch tests")
 }
         )");
 
-        const json data = json::parse(R"(
+        auto data = jsoncons::json::parse(R"(
 {
   "bar": "bar-custom"
 }
         )");
 
-        const jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema)); 
+        auto compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-        const json expectedPatch{jsoncons::json_array_arg};
+        jsoncons::json expectedPatch{jsoncons::json_array_arg};
 
-        json resultPatch;
+        jsoncons::json resultPatch;
         compiled.validate(data, resultPatch);
 
         CHECK(expectedPatch == resultPatch);
     }
     SECTION("anyOf")
     {
-        json schema = json::parse(R"(
+        auto schema = jsoncons::json::parse(R"(
 {
   "$id": "https://example.com/oneOf",
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -93,17 +92,17 @@ TEST_CASE("jsonschema patch tests")
 }
         )");
 
-        const json data = json::parse(R"(
+        auto data = jsoncons::json::parse(R"(
 {
   "bar": "bar-custom"
 }
         )");
 
-        const jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema)); 
+        auto compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-        const json expectedPatch{jsoncons::json_array_arg};
+        jsoncons::json expectedPatch{jsoncons::json_array_arg};
 
-        json resultPatch;
+        jsoncons::json resultPatch;
         compiled.validate(data, resultPatch);
 
         CHECK(expectedPatch == resultPatch);
@@ -188,20 +187,20 @@ TEST_CASE("jsonschema reporter patch tests")
 }
         )";
 
-        json schema = json::parse(schema_str);
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
-        json data = json::parse(data_str);
-        json patch;
+        auto schema = jsoncons::json::parse(schema_str);
+        auto compiled = jsonschema::make_json_schema(schema);
+        auto data = jsoncons::json::parse(data_str);
+        jsoncons::json patch{jsoncons::json_array_arg};
 
         // reporter that patching
         auto reporter = [](const jsonschema::validation_message& msg, 
-                           jsoncons::optional<json>& patch) -> jsonschema::walk_result
+                           jsoncons::optional<jsoncons::json>& patch) -> jsonschema::walk_result
         {
             if (patch)
             {
                 if (msg.message().find("Required property") != std::string::npos && msg.message().find("not found") != std::string::npos)
                 {
-                    json j;
+                    jsoncons::json j;
                     j.try_emplace("op", "add");
                     j.try_emplace("path", msg.instance_location().string() + "/veggieLike");
                     j.try_emplace("value", false);
@@ -210,18 +209,16 @@ TEST_CASE("jsonschema reporter patch tests")
                     //there could be "return jsonschema::walk_result::advance_no_error;" for saying to validator "its not error, go forward!"
                 }
             }
-            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
+            //std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
             return jsonschema::walk_result::advance;
         };
         compiled.validate(data, reporter, patch);
 
-        std::cout << "\n(3) Re-validate\n\n";
+        //std::cout << "PATCH:\n" << pretty_print(patch) << "\n";
 
-        std::cout << "PATCH:\n" << pretty_print(patch) << "\n";
+        jsoncons::jsonpatch::apply_patch<jsoncons::json>(data, patch);
 
-        jsoncons::jsonpatch::apply_patch<json>(data, patch);
-
-        std::cout << "PATCHED DATA:\n" << pretty_print(data) << "\n";
+        //std::cout << "PATCHED DATA:\n" << pretty_print(data) << "\n";
 
         CHECK(compiled.is_valid(data));
     }
