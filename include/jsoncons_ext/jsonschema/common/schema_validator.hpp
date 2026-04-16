@@ -202,7 +202,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!value_)
             {
@@ -210,7 +210,8 @@ namespace jsonschema {
                     context.eval_path(),
                     this->schema_location(), 
                     instance_location, 
-                    "False schema always fails"));
+                    "False schema always fails"),
+                    patch);
             }
             return walk_result::advance;
         }

@@ -71,7 +71,8 @@ namespace jsonschema {
     template <typename Json>
     class throwing_error_listener : public error_reporter<Json>
     {
-        walk_result do_error(const validation_message& msg) override
+        walk_result do_error(const validation_message& msg,
+            jsoncons::optional<Json>&) override
         {
             JSONCONS_THROW(validation_error(msg.instance_location().string() + ": " + msg.message()));
         }
@@ -80,7 +81,8 @@ namespace jsonschema {
     template <typename Json>
     class fail_early_reporter : public error_reporter<Json>
     {
-        walk_result do_error(const validation_message&) override
+        walk_result do_error(const validation_message&, 
+            jsoncons::optional<Json>&) override
         {
             return walk_result::abort;
         }
@@ -98,7 +100,8 @@ namespace jsonschema {
         {
         }
     private:
-        walk_result do_error(const validation_message& e) override
+        walk_result do_error(const validation_message& e, 
+            jsoncons::optional<Json>& /*patch*/) override
         {
             return reporter_(e);
         }

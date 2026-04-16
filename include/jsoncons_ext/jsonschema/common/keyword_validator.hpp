@@ -203,7 +203,8 @@ namespace jsonschema {
                     this_context.eval_path(),
                     this->schema_location(), 
                     instance_location, 
-                    "Unresolved schema reference " + this->schema_location().string()));
+                    "Unresolved schema reference " + this->schema_location().string()),
+                    patch);
             }
 
             return referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
@@ -276,7 +277,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "Unresolved schema reference " + this->schema_location().string()));
+                    "Unresolved schema reference " + this->schema_location().string()), patch);
                 return result;
             }
 
@@ -443,7 +444,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -462,7 +463,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        "Content is not a base64 string"));
+                        "Content is not a base64 string"), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -474,7 +475,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "unable to check for contentEncoding '" + content_encoding_ + "'"));
+                    "unable to check for contentEncoding '" + content_encoding_ + "'"), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -516,7 +517,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -548,7 +549,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        std::string("Content is not JSON: ") + ec.message()));
+                        std::string("Content is not JSON: ") + ec.message()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -587,7 +588,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -599,7 +600,7 @@ namespace jsonschema {
                 eval_context<Json> this_context(context, this->keyword_name());
                 auto sv = instance.as_string_view();
 
-                walk_result result = validate_(*this, this_context.eval_path(), instance_location, sv, reporter);
+                walk_result result = validate_(*this, this_context.eval_path(), instance_location, sv, reporter, patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -641,7 +642,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -660,7 +661,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -730,7 +731,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -746,7 +747,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::string("Number of characters must be at most ") + std::to_string(max_length_)));
+                    std::string("Number of characters must be at most ") + std::to_string(max_length_)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -784,7 +785,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_string())
             {
@@ -800,7 +801,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::string("Number of characters must be at least ") + std::to_string(min_length_)));
+                    std::string("Number of characters must be at least ") + std::to_string(min_length_)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -837,7 +838,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -853,7 +854,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -891,7 +892,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -907,7 +908,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -965,7 +966,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         item_location, 
-                        "Item at index '0' but the schema does not allow any items."));
+                        "Item at index '0' but the schema does not allow any items."), patch);
                     return result;
                 }
                 else if (schema_val_->always_succeeds())
@@ -1075,7 +1076,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_array())
             {
@@ -1089,7 +1090,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "Array items are not unique"));
+                    "Array items are not unique"), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1172,7 +1173,7 @@ namespace jsonschema {
                 result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "Instance must not be valid against schema"));
+                    "Instance must not be valid against schema"), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1270,7 +1271,7 @@ namespace jsonschema {
                     this_context.eval_path(),
                     instance_location, 
                     "Must be valid against at least one schema, but found no matching schemas", 
-                    local_reporter.errors));
+                    local_reporter.errors), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1399,7 +1400,7 @@ namespace jsonschema {
                     this_context.eval_path(),
                     instance_location, 
                     message, 
-                    local_reporter.errors));
+                    local_reporter.errors), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1507,7 +1508,7 @@ namespace jsonschema {
                     this_context.eval_path(),
                     instance_location, 
                     "Must be valid against all schemas, but found unmatched schemas", 
-                    local_reporter.errors));
+                    local_reporter.errors), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -1563,7 +1564,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final 
+            jsoncons::optional<Json>& patch) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1574,7 +1575,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1588,7 +1589,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1606,7 +1607,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1620,7 +1621,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1659,7 +1660,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final 
+            jsoncons::optional<Json>& patch) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1670,7 +1671,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1684,7 +1685,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1702,7 +1703,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1716,7 +1717,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1755,7 +1756,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1766,7 +1767,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1780,7 +1781,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1798,7 +1799,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1812,7 +1813,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1851,7 +1852,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final 
+            jsoncons::optional<Json>& patch) const final 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -1862,7 +1863,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1876,7 +1877,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1894,7 +1895,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1908,7 +1909,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        message_ + instance.template as<std::string>()));
+                        message_ + instance.template as<std::string>()), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -1945,7 +1946,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_number())
             {
@@ -1961,7 +1962,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
+                        instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -2011,7 +2012,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -2027,7 +2028,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        "Required property '" + key + "' not found."));
+                        "Required property '" + key + "' not found."), patch);
                     if(result == walk_result::abort)
                     {
                         return result;
@@ -2067,7 +2068,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -2083,7 +2084,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -2120,7 +2121,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (!instance.is_object())
             {
@@ -2135,7 +2136,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -2297,7 +2298,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -2316,7 +2317,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "'" + instance.template as<std::string>() + "' is not a valid enum value."));
+                    "'" + instance.template as<std::string>() + "' is not a valid enum value."), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -2354,7 +2355,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter<Json>& reporter,
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             if (value_ != instance)
             {
@@ -2363,7 +2364,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    "Instance is not const"));
+                    "Instance is not const"), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -2433,7 +2434,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/,
             error_reporter<Json>& reporter, 
-            jsoncons::optional<Json>& /*patch*/) const final
+            jsoncons::optional<Json>& patch) const final
         {
             //std::cout << "type_validator.do_validate " << context.eval_path().string() << instance << "\n";
             //for (auto& type : expected_types_ )
@@ -2526,7 +2527,7 @@ namespace jsonschema {
                 return reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    message));
+                    message), patch);
             }
             return walk_result::advance;
         }
@@ -2949,7 +2950,7 @@ namespace jsonschema {
                             walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(),
                                 prop_location, 
-                                message));
+                                message), patch);
                             if (result == walk_result::abort)
                             {
                                 return result;
@@ -2997,7 +2998,7 @@ namespace jsonschema {
                                 result = reporter.error(this->make_validation_message(
                                     this_context.eval_path(),
                                     instance_location, 
-                                    message));
+                                    message), patch);
                                 if (result == walk_result::abort)
                                 {
                                     return result;
@@ -3281,7 +3282,7 @@ namespace jsonschema {
                     return reporter.error(this->make_validation_message(
                         this_context.eval_path(),
                         instance_location, 
-                        "Instance has properties but the schema does not allow any property names."));
+                        "Instance has properties but the schema does not allow any property names."), patch);
                 }
                 else if (schema_val_->always_succeeds())
                 {
@@ -3427,7 +3428,8 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, 
             const jsonpointer::json_pointer& instance_location,
             std::size_t count, 
-            error_reporter<Json>& reporter) const 
+            error_reporter<Json>& reporter,
+            jsoncons::optional<Json>& patch) const 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -3439,7 +3441,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -3474,7 +3476,8 @@ namespace jsonschema {
         walk_result validate(const eval_context<Json>& context, 
             const jsonpointer::json_pointer& instance_location,
             std::size_t count, 
-            error_reporter<Json>& reporter) const 
+            error_reporter<Json>& reporter,
+            jsoncons::optional<Json>& patch) const 
         {
             eval_context<Json> this_context(context, this->keyword_name());
 
@@ -3485,7 +3488,7 @@ namespace jsonschema {
                 walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
                     instance_location, 
-                    std::move(message)));
+                    std::move(message)), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -3590,7 +3593,7 @@ namespace jsonschema {
             {
                 if (max_contains_)
                 {
-                    walk_result result = max_contains_->validate(this_context, instance_location, contains_count, reporter);
+                    walk_result result = max_contains_->validate(this_context, instance_location, contains_count, reporter, patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -3598,7 +3601,7 @@ namespace jsonschema {
                 }
                 if (min_contains_)
                 {
-                    walk_result result = min_contains_->validate(this_context, instance_location, contains_count, reporter);
+                    walk_result result = min_contains_->validate(this_context, instance_location, contains_count, reporter, patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -3611,7 +3614,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     instance_location, 
                     "Expected at least one array item to match 'contains' schema.",
-                    local_reporter.errors));
+                    local_reporter.errors), patch);
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -3706,7 +3709,7 @@ namespace jsonschema {
                     walk_result result = reporter.error(this->make_validation_message(
                         items_context.eval_path(), 
                         item_location,
-                        "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."));
+                        "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."), patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -3978,7 +3981,7 @@ namespace jsonschema {
                             walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(), 
                                 prop_location,
-                                message));
+                                message), patch);
                             if (result == walk_result::abort)
                             {
                                 return result;
@@ -4088,7 +4091,7 @@ namespace jsonschema {
                             walk_result result = reporter.error(this->make_validation_message(
                                 item_context.eval_path(), 
                                 item_location,
-                                "Unevaluated item at index '" + std::to_string(index) + "' but the schema does not allow unevaluated items."));
+                                "Unevaluated item at index '" + std::to_string(index) + "' but the schema does not allow unevaluated items."), patch);
                             if (result == walk_result::abort)
                             {
                                 return result;

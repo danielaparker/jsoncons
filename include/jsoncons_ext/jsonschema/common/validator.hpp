@@ -43,10 +43,10 @@ namespace jsonschema {
 
         virtual ~error_reporter() = default;
 
-        walk_result error(const validation_message& msg)
+        walk_result error(const validation_message& msg, jsoncons::optional<Json>& patch)
         {
             ++error_count_;
-            return do_error(msg);
+            return do_error(msg, patch);
         }
 
         std::size_t error_count() const
@@ -55,7 +55,8 @@ namespace jsonschema {
         }
 
     private:
-        virtual walk_result do_error(const validation_message& /* e */) = 0;
+        virtual walk_result do_error(const validation_message& /* msg */, 
+            jsoncons::optional<Json>& /*patch*/) = 0;
     };
 
     template <typename Json>
@@ -64,7 +65,8 @@ namespace jsonschema {
         std::vector<validation_message> errors;
 
     private:
-        walk_result do_error(const validation_message& msg) final
+        walk_result do_error(const validation_message& msg, 
+            jsoncons::optional<Json>& /*patch*/) final
         {
             errors.push_back(msg);
             return walk_result::advance;

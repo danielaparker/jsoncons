@@ -960,14 +960,16 @@ namespace jsonschema {
         const jsonpointer::json_pointer& eval_path, 
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv, 
-        error_reporter<Json>& reporter)>;
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)>;
 
     template <typename Json>
     walk_result uri_check(const validation_message_factory& message_factory, 
         const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         std::error_code ec;
         auto u = uri::parse(sv, ec);
@@ -980,7 +982,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -994,7 +996,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1007,7 +1009,8 @@ namespace jsonschema {
     walk_result uri_reference_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         std::error_code ec;
         auto u = uri::parse(sv, ec);
@@ -1020,7 +1023,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1033,7 +1036,8 @@ namespace jsonschema {
     walk_result jsonpointer_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         std::error_code ec;
         jsonpointer::json_pointer::parse(sv, ec);
@@ -1045,7 +1049,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1059,7 +1063,8 @@ namespace jsonschema {
     walk_result rfc3339_date_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         if (!validate_date_time_rfc3339(sv,date_time_type::date))
         {
@@ -1069,7 +1074,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1082,7 +1087,8 @@ namespace jsonschema {
     walk_result rfc3339_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         if (!validate_date_time_rfc3339(sv, date_time_type::time))        
         {
@@ -1092,7 +1098,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1105,7 +1111,8 @@ namespace jsonschema {
     walk_result rfc3339_date_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter)
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch)
     {
         if (!validate_date_time_rfc3339(sv, date_time_type::date_time))        
         {
@@ -1115,7 +1122,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path,  
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1128,7 +1135,8 @@ namespace jsonschema {
     walk_result email_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter) 
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch) 
     {
         if (!validate_email_rfc5322(sv))        
         {
@@ -1138,7 +1146,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1151,7 +1159,8 @@ namespace jsonschema {
     walk_result hostname_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter) 
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch) 
     {
         if (!validate_hostname_rfc1034(sv))
         {
@@ -1161,7 +1170,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1174,7 +1183,8 @@ namespace jsonschema {
     walk_result ipv4_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter) 
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch) 
     {
         if (!validate_ipv4_rfc2673(sv))
         {
@@ -1184,7 +1194,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1197,7 +1207,8 @@ namespace jsonschema {
     walk_result ipv6_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter) 
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch) 
     {
         if (!validate_ipv6_rfc2373(sv))
         {
@@ -1207,7 +1218,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
@@ -1220,7 +1231,8 @@ namespace jsonschema {
     walk_result regex_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
-        error_reporter<Json>& reporter) 
+        error_reporter<Json>& reporter,
+        jsoncons::optional<Json>& patch) 
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
         JSONCONS_TRY 
@@ -1235,7 +1247,7 @@ namespace jsonschema {
             walk_result result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
-                message));
+                message), patch);
             if (result == walk_result::abort)
             {
                 return result;
