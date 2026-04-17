@@ -956,7 +956,7 @@ namespace jsonschema {
 
     // format checkers
     template <typename Json>
-    using validate_format = std::function<walk_result(const validation_message_factory& message_factory,
+    using validate_format = std::function<walk_state(const validation_message_factory& message_factory,
         const jsonpointer::json_pointer& eval_path, 
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv, 
@@ -964,7 +964,7 @@ namespace jsonschema {
         jsoncons::optional<Json>& patch)>;
 
     template <typename Json>
-    walk_result uri_check(const validation_message_factory& message_factory, 
+    walk_state uri_check(const validation_message_factory& message_factory, 
         const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
@@ -979,11 +979,11 @@ namespace jsonschema {
             message.append(sv.data(), sv.size());
             message.append("': ");
             message.append(ec.message());
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
@@ -993,20 +993,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not an absolute URI.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     template <typename Json>
-    walk_result uri_reference_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state uri_reference_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1020,20 +1020,20 @@ namespace jsonschema {
             message.append(sv.data(), sv.size());
             message.append("': ");
             message.append(ec.message());
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     template <typename Json>
-    walk_result jsonpointer_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state jsonpointer_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1046,21 +1046,21 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid JSONPointer.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     
     template <typename Json>
-    walk_result rfc3339_date_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state rfc3339_date_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1071,20 +1071,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a RFC 3339 date string.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     template <typename Json>
-    walk_result rfc3339_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state rfc3339_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1095,20 +1095,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a RFC 3339 time string.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     template <typename Json>
-    walk_result rfc3339_date_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state rfc3339_date_time_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1119,20 +1119,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a RFC 3339 date-time string.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path,  
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     }
 
     template <typename Json>
-    walk_result email_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state email_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1143,20 +1143,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid email address as defined by RFC 5322.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     } 
 
     template <typename Json>
-    walk_result hostname_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state hostname_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1167,20 +1167,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid hostname as defined by RFC 3986 Appendix A.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     } 
 
     template <typename Json>
-    walk_result ipv4_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state ipv4_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1191,20 +1191,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid IPv4 address as defined by RFC 2673.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     } 
 
     template <typename Json>
-    walk_result ipv6_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state ipv6_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1215,20 +1215,20 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid IPv6 address as defined by RFC 2373.");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
-        return walk_result::advance;
+        return walk_state::advance;
     } 
 
     template <typename Json>
-    walk_result regex_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
+    walk_state regex_check(const validation_message_factory& message_factory, const jsonpointer::json_pointer& eval_path,
         const jsonpointer::json_pointer& instance_location, 
         jsoncons::string_view sv,
         error_reporter<Json>& reporter,
@@ -1244,17 +1244,17 @@ namespace jsonschema {
             std::string message{"'"};
             message.append(sv.data(), sv.size());
             message.append("' is not a valid ECMAScript regular expression. ");
-            walk_result result = reporter.error(message_factory.make_validation_message(
+            walk_state result = reporter.error(message_factory.make_validation_message(
                 eval_path, 
                 instance_location, 
                 message), patch);
-            if (result == walk_result::abort)
+            if (result == walk_state::abort)
             {
                 return result;
             }
         }
 #endif
-        return walk_result::advance;
+        return walk_state::advance;
     } 
 
 } // namespace jsonschema

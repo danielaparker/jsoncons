@@ -69,10 +69,10 @@ TEST_CASE("jsonschema custom message tests")
         auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
-        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
         {
             messages.push_back(msg.message());
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter);
 
@@ -94,10 +94,10 @@ TEST_CASE("jsonschema custom message tests")
         auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
-        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
         {
             messages.push_back(msg.message());
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter);
 
@@ -117,10 +117,10 @@ TEST_CASE("jsonschema custom message tests")
         auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
-        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
         {
             messages.push_back(msg.message());
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter);
         
@@ -141,10 +141,10 @@ TEST_CASE("jsonschema custom message tests")
         auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
-        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
         {
             messages.push_back(msg.message());
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter);
 
@@ -196,10 +196,10 @@ TEST_CASE("jsonschema custom message with format keyword")
         auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
-        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
         {
             messages.push_back(msg.message());
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter);
 

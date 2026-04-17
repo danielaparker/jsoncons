@@ -194,7 +194,7 @@ TEST_CASE("jsonschema reporter patch tests")
 
         // reporter that patching
         auto reporter = [](const jsonschema::validation_message& msg, 
-                           jsoncons::optional<jsoncons::json>& patch) -> jsonschema::walk_result
+                           jsoncons::optional<jsoncons::json>& patch) -> jsonschema::walk_state
         {
             if (patch)
             {
@@ -206,11 +206,11 @@ TEST_CASE("jsonschema reporter patch tests")
                     j.try_emplace("value", false);
                     patch->push_back(std::move(j));
 
-                    //there could be "return jsonschema::walk_result::advance_no_error;" for saying to validator "its not error, go forward!"
+                    //there could be "return jsonschema::walk_state::advance_no_error;" for saying to validator "its not error, go forward!"
                 }
             }
             //std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
-            return jsonschema::walk_result::advance;
+            return jsonschema::walk_state::advance;
         };
         compiled.validate(data, reporter, patch);
 

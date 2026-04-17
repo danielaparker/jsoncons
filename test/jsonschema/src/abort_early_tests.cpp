@@ -90,10 +90,10 @@ TEST_CASE("jsonschema stop early tests")
 
         ojson expected = ojson::parse(expected_str);
         ojson results{ jsoncons::json_object_arg };
-        auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_state
             {
                 results.try_emplace(message.instance_location().string(), message.message());
-                return jsonschema::walk_result::advance;
+                return jsonschema::walk_state::advance;
             };
         compiled.validate(data, reporter);
         CHECK(expected == results);
@@ -110,10 +110,10 @@ TEST_CASE("jsonschema stop early tests")
 
         ojson expected = ojson::parse(expected_str);
         ojson results{jsoncons::json_object_arg};
-        auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_result
+        auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_state
             {
                 results.try_emplace(message.instance_location().string(), message.message());
-                return jsonschema::walk_result::abort;
+                return jsonschema::walk_state::abort;
             };
         compiled.validate(data, reporter);
         CHECK(expected == results);
