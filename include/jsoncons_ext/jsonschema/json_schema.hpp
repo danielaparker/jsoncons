@@ -88,12 +88,19 @@ class fail_early_reporter : public error_reporter<Json>
     }
 };
 
-template <typename Json,typename Reporter,typename = typename std::enable_if<ext_traits::is_function_object_1_exact<Reporter,walk_state,validation_message>::value>::type>
-struct error_reporter_adaptor_1 : public error_reporter<Json>
+template <typename Json,typename Reporter,typename Enable=void>
+struct error_reporter_adaptor : public error_reporter<Json>
+{
+};
+
+template <typename Json,typename Reporter>
+struct error_reporter_adaptor<Json,Reporter,
+        typename std::enable_if<ext_traits::is_function_object_1_exact<Reporter,walk_state,validation_message>::value>::type>
+    : public error_reporter<Json>
 {
     Reporter reporter_;
 
-    error_reporter_adaptor_1(const Reporter& reporter)
+    error_reporter_adaptor(const Reporter& reporter)
         : reporter_(reporter)
     {
     }
@@ -105,12 +112,15 @@ private:
     }
 };
 
-template <typename Json,typename Reporter,typename = typename std::enable_if<ext_traits::is_function_object_2_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
-struct error_reporter_adaptor_2 : public error_reporter<Json>
+
+template <typename Json,typename Reporter>
+struct error_reporter_adaptor<Json,Reporter,
+        typename std::enable_if<ext_traits::is_function_object_2_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
+    : public error_reporter<Json>
 {
     Reporter reporter_;
 
-    error_reporter_adaptor_2(const Reporter& reporter)
+    error_reporter_adaptor(const Reporter& reporter)
         : reporter_(reporter)
     {
     }
@@ -181,7 +191,7 @@ public:
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor_1<Json,MsgReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,MsgReporter> adaptor(reporter);
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
@@ -194,7 +204,7 @@ public:
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor_1<Json,MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
+        error_reporter_adaptor<Json,MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -217,7 +227,7 @@ public:
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor_2<Json,MsgReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,MsgReporter> adaptor(reporter);
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
@@ -230,7 +240,7 @@ public:
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor_2<Json, MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
+        error_reporter_adaptor<Json, MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -275,7 +285,7 @@ public:
         validation_message_to_json_events adaptor{ visitor };
         eval_context<Json> context;
         evaluation_results results;
-        error_reporter_adaptor_1<Json, validation_message_to_json_events> reporter(adaptor);
+        error_reporter_adaptor<Json, validation_message_to_json_events> reporter(adaptor);
         root_->validate(context, instance, instance_location, results, reporter, patch);
         visitor.end_array();
         visitor.flush();

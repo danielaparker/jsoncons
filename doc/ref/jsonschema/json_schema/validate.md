@@ -43,6 +43,10 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
     <td>A function object with signature equivalent to 
     <pre>
            <a href="../walk_result.md">walk_result</a> fun(const <a href="../validation_message.md">validation_message</a>& msg);</pre>
+     or (since 1.7.0)
+    <pre>
+           <a href="../walk_result.md">walk_result</a> fun(const <a href="../validation_message.md">validation_message</a>& msg, 
+               jsoncons::optional<Json>& patch);</pre>
 </td> 
   </tr>
   <tr>
