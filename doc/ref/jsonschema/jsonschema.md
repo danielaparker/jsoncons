@@ -25,10 +25,6 @@ For earlier releases, please refer to [jsonschema (until 0.174.0)](https://githu
     <td><a href="schema_version.md">schema_version</a></td>
     <td>Supported JSON Schema dialects.</td> 
   </tr>
-  <tr>
-    <td><a href="json_validator.md">json_validator</a></td>
-    <td>JSON Schema validator. Deprecated (since 0.174.0)</td> 
-  </tr>
 </table>
 
 ### Functions

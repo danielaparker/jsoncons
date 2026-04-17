@@ -104,6 +104,9 @@ struct error_reporter_adaptor<Json,Reporter,
         : reporter_(reporter)
     {
     }
+
+    error_reporter_adaptor& operator=(const Reporter& reporter) = delete;
+
 private:
     walk_state do_error(const validation_message& msg, 
         jsoncons::optional<Json>& /*patch*/) override
@@ -124,6 +127,9 @@ struct error_reporter_adaptor<Json,Reporter,
         : reporter_(reporter)
     {
     }
+
+    error_reporter_adaptor& operator=(const Reporter& reporter) = delete;
+
 private:
     walk_state do_error(const validation_message& msg, 
         jsoncons::optional<Json>& patch) override
@@ -131,9 +137,6 @@ private:
         return reporter_(msg, patch);
     }
 };
-   
-template <typename Json>
-class json_validator;
 
 template <typename Json>
 class json_schema
@@ -143,7 +146,6 @@ class json_schema
 
     document_schema_validator_type root_;
     
-    friend class json_validator<Json>;
 public:
     json_schema(document_schema_validator_type&& root)
         : root_(std::move(root))
@@ -186,12 +188,12 @@ public:
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename CustomReporter>
     typename std::enable_if<ext_traits::is_function_object_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, const CustomReporter& reporter) const
+    validate(const Json& instance, CustomReporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
@@ -222,12 +224,12 @@ public:
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename CustomReporter>
     typename std::enable_if<ext_traits::is_function_object_2_exact<CustomReporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, const CustomReporter& reporter) const
+    validate(const Json& instance, CustomReporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
