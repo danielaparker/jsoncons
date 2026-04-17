@@ -184,27 +184,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename MsgReporter>
-    typename std::enable_if<ext_traits::is_function_object_1_exact<MsgReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, const MsgReporter& reporter) const
+    template <typename CustomReporter>
+    typename std::enable_if<ext_traits::is_function_object_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, const CustomReporter& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,MsgReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,CustomReporter> adaptor(reporter);
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename MsgReporter>
-    typename std::enable_if<ext_traits::is_function_object_1_exact<MsgReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, MsgReporter&& reporter, Json& patch) const
+    template <typename CustomReporter>
+    typename std::enable_if<ext_traits::is_function_object_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json,MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
+        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -220,27 +220,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename MsgReporter>
-    typename std::enable_if<ext_traits::is_function_object_2_exact<MsgReporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, const MsgReporter& reporter) const
+    template <typename CustomReporter>
+    typename std::enable_if<ext_traits::is_function_object_2_exact<CustomReporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, const CustomReporter& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,MsgReporter> adaptor(reporter);
+        error_reporter_adaptor<Json,CustomReporter> adaptor(reporter);
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename MsgReporter>
-    typename std::enable_if<ext_traits::is_function_object_2_exact<MsgReporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, MsgReporter&& reporter, Json& patch) const
+    template <typename CustomReporter>
+    typename std::enable_if<ext_traits::is_function_object_2_exact<CustomReporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json, MsgReporter> adaptor(std::forward<MsgReporter>(reporter));
+        error_reporter_adaptor<Json, CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};

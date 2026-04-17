@@ -17,8 +17,8 @@ class json_validator
 
     Json validate(const Json& instance) const;  (2)
 
-    template <typename MsgReporter>
-    Json validate(const Json& instance, const MsgReporter& reporter) const;  (3)
+    template <typename CustomReporter>
+    Json validate(const Json& instance, const CustomReporter& reporter) const;  (3)
 
 (1) Validates input JSON against a JSON Schema and returns false upon the 
 first schema violation.

@@ -5,11 +5,11 @@ void validate(const Json& instance) const;                                      
 
 void validate(const Json& instance, Json& patch) const;                               (2)
 
-template <typename MsgReporter>
-void validate(const Json& instance, const MsgReporter& reporter) const;               (3)
+template <typename CustomReporter>
+void validate(const Json& instance, const CustomReporter& reporter) const;               (3)
 
-template <typename MsgReporter>
-void validate(const Json& instance, const MsgReporter& reporter, Json& patch) const;  (4)
+template <typename CustomReporter>
+void validate(const Json& instance, const CustomReporter& reporter, Json& patch) const;  (4)
 
 void validate(const Json& instance, json_visitor<Json>& visitor) const;               (5)
 ```
