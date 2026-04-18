@@ -17,7 +17,7 @@ Walks through a JSON schema to collect information.
   <tr>
     <td>reporter</td>
     <td>A function object which returns a <a href="../walk_result.md">walk_result</a> (<a href="../walk_state.md">walk_state</a> since 1.7.0)
-    to indicates whether to keep walking through the schema or stop. The signature of the function should be signature equivalent to 
+    to indicates whether to keep walking through the schema or stop. The signature of the function should be equivalent to 
     <pre>
 walk_result fun(const std::string& keyword,
     const Json& schema, const uri& schema_location,
