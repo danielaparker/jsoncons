@@ -215,10 +215,10 @@ std::string json_str = R"(
         std::vector<jsoncons::jsonschema::validation_message> result;
 
         auto reporter =
-        [&result](const jsoncons::jsonschema::validation_message& message) -> jsoncons::jsonschema::walk_result
+        [&result](const jsoncons::jsonschema::validation_message& message) -> jsoncons::jsonschema::walk_state
             {
                 result.push_back(message);
-                return jsoncons::jsonschema::walk_result::advance;
+                return jsoncons::jsonschema::walk_state::advance;
             };
 
         std::string schemaString = R"(

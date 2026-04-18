@@ -16,6 +16,7 @@
 #include <utility> // std::pair
 
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 namespace jsoncons { 
 namespace csv {

@@ -21,6 +21,7 @@
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
@@ -252,9 +253,17 @@ namespace jsonpointer {
             tokens_.clear();
         }
 
-        basic_json_pointer& append(const string_type& s) 
+        basic_json_pointer& append(const char_type* s) 
         {
             tokens_.push_back(s);
+            return *this;
+        }
+
+        template <typename StringViewLike>
+        typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
+        append(const StringViewLike& s) 
+        {
+            tokens_.emplace_back(s.data(), s.size());
             return *this;
         }
 
@@ -269,10 +278,16 @@ namespace jsonpointer {
             return *this;
         }
 
-        basic_json_pointer& operator/=(const string_type& s) 
+        basic_json_pointer& operator/=(const char_type* s) 
         {
-            tokens_.push_back(s);
-            return *this;
+            return append(s);
+        }
+
+        template <typename StringViewLike>
+        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        operator/=(const StringViewLike& s) 
+        {
+            return append(s);
         }
 
         template <typename IntegerType>
@@ -353,7 +368,18 @@ namespace jsonpointer {
         }
 
         // Non-member functions
-        friend basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const string_type& rhs)
+        friend 
+        basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const char_type* rhs)
+        {
+            basic_json_pointer<CharT> p(lhs);
+            p /= rhs;
+            return p;
+        }
+
+        // Non-member functions
+        template <typename StringViewLike>
+        friend typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
+        operator/(const basic_json_pointer<CharT>& lhs, const StringViewLike& rhs)
         {
             basic_json_pointer<CharT> p(lhs);
             p /= rhs;

@@ -183,7 +183,7 @@ add_executable(unit_tests
                jsonschema/src/abort_early_tests.cpp
                jsonschema/src/custom_message_tests.cpp
                jsonschema/src/dynamic_ref_tests.cpp
-               jsonschema/src/format_validator_tests.cpp
+               jsonschema/src/format_validators_tests.cpp
                jsonschema/src/json_schema_walk_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_draft201909_tests.cpp
@@ -194,6 +194,7 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_keyword_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                jsonschema/src/validation_report_tests.cpp
+               jsonschema/src/validation_with_pmr_allocator_tests.cpp
                mergepatch/src/mergepatch_test_suite.cpp
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp

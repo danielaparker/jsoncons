@@ -36,33 +36,65 @@
 
 namespace jsoncons {
 
-enum class staj_event_type : uint8_t
+enum class staj_event_type : uint64_t
 {
-    key = 0,                // 0000
-    string_value = 1,       // 0001
-    byte_string_value = 2,  // 0010
-    null_value = 3,         // 0011
-    bool_value = 4,         // 0100
-    int64_value = 5,        // 0101
-    uint64_value = 6,       // 0110
-    half_value = 8,         // 1000
-    double_value = 9,       // 1001
-    begin_object = 13,      // 1101
-    end_object = 7,         // 0111    
-    begin_array = 14,       // 1110
-    end_array = 15          // 1111
+    string_value      = 0b0000000000000001,
+    byte_string_value = 0b0000000000000010,
+    null_value        = 0b0000000000000100,
+    bool_value        = 0b0000000000001000,
+    int64_value       = 0b0000000000010000,
+    uint64_value      = 0b0000000000100000,
+    half_value        = 0b0000000001000000,
+    double_value      = 0b0000000010000000,
+    begin_object      = 0b0000000100000000,
+    end_object        = 0b0000001000000000,   
+    begin_array       = 0b0000010000000000,
+    end_array         = 0b0000100000000000,
+    key               = 0b0001000000000000
 };
 
-inline bool is_begin_container(staj_event_type event_type) noexcept
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr staj_event_type
+operator|(staj_event_type lhs, staj_event_type rhs) noexcept
+{ return (staj_event_type)((uint64_t)lhs | (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr staj_event_type
+operator&(staj_event_type lhs, staj_event_type rhs) noexcept
+{ return (staj_event_type)((uint64_t)lhs & (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr staj_event_type
+operator^(staj_event_type lhs, staj_event_type rhs) noexcept
+{ return (staj_event_type)((uint64_t)lhs ^ (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr staj_event_type
+operator~(staj_event_type types) noexcept
+{ return (staj_event_type)~(uint64_t)types; }
+
+constexpr staj_event_type&
+operator|=(staj_event_type& lhs, staj_event_type rhs) noexcept
+{ return lhs = lhs | rhs; }
+
+constexpr staj_event_type&
+operator&=(staj_event_type& lhs, staj_event_type rhs) noexcept
+{ return lhs = lhs & rhs; }
+
+constexpr staj_event_type&
+operator^=(staj_event_type& lhs, staj_event_type rhs) noexcept
+{ return lhs = lhs ^ rhs; }
+
+inline bool is_begin_container(staj_event_type types) noexcept
 {
-    static const uint8_t mask{ uint8_t(staj_event_type::begin_object) & uint8_t(staj_event_type::begin_array) };
-    return (uint8_t(event_type) & mask) == mask;
+    static const staj_event_type mask{ staj_event_type::begin_object | staj_event_type::begin_array };
+    return (types & mask) != staj_event_type{};
 }
 
-inline bool is_end_container(staj_event_type event_type) noexcept
+inline bool is_end_container(staj_event_type types) noexcept
 {
-    static const uint8_t mask{ uint8_t(staj_event_type::end_object) & uint8_t(staj_event_type::end_array) };
-    return (uint8_t(event_type) & mask) == mask;
+    static const staj_event_type mask{ staj_event_type::end_object | staj_event_type::end_array };
+    return (types & mask) != staj_event_type{};
 }
 
 template <typename CharT>

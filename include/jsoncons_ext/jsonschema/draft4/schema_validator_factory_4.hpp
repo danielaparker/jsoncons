@@ -14,6 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+#include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -35,6 +36,7 @@ namespace draft4 {
     class schema_validator_factory_4 : public schema_validator_factory_base<Json> 
     {
     public:
+        using schema_readers_type = schema_readers<Json>;
         using schema_store_type = typename schema_validator_factory_base<Json>::schema_store_type;
         using validator_factory_factory_type = typename schema_validator_factory_base<Json>::validator_factory_factory_type;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -49,10 +51,10 @@ namespace draft4 {
         keyword_validator_factory<Json> factory_;
 
     public:
-        schema_validator_factory_4(Json&& sch, const validator_factory_factory_type& factory_factory, 
-            evaluation_options options, schema_store_type* schema_store_ptr,
+        schema_validator_factory_4(const validator_factory_factory_type& factory_factory, 
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : schema_validator_factory_base<Json>(schema_version::draft4(), std::move(sch), factory_factory, options, schema_store_ptr, resolve_funcs),
+            : schema_validator_factory_base<Json>(schema_version::draft4(), factory_factory, options, schema_store_ptr, resolve_funcs),
               factory_(this)
         {
             init();
@@ -117,7 +119,7 @@ namespace draft4 {
         }
 
         schema_validator_ptr_type make_schema_validator( 
-            const compilation_context<Json>& context, const Json& sch, jsoncons::span<const std::string> keys, 
+            const compilation_context<Json>& context, const Json& sch, jsoncons::span<const jsoncons::string_view> keys, 
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
@@ -143,14 +145,14 @@ namespace draft4 {
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
                         std::vector<keyword_validator_ptr_type> validators;
-                        std::map<std::string,schema_validator_ptr_type> defs;
+                        std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
 
                         auto it2 = sch.find("definitions");
                         if (it2 != sch.object_range().end()) 
                         {
                             for (const auto& def : it2->value().object_range())
                             {
-                                std::string sub_keys[] = { "definitions", def.key() };
+                                jsoncons::string_view sub_keys[] = { "definitions", def.key() };
                                 defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                             }
                         }
@@ -173,9 +175,9 @@ namespace draft4 {
                         this->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
-                            if (known_keywords().find(item.key()) == known_keywords().end())
+                            if (known_keywords().find(item.key().c_str()) == known_keywords().end())
                             {
-                                this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                                this->insert_unknown_keyword(uri, std::string(item.name()), item.value()); // save unknown keywords for later reference
                             }
                         }
                     }          
@@ -195,14 +197,14 @@ namespace draft4 {
             jsoncons::optional<jsoncons::uri> id = context.id();
             jsoncons::optional<Json> default_value;
             std::vector<keyword_validator_ptr_type> validators;
-            std::map<std::string,schema_validator_ptr_type> defs;
+            std::map<std::string,schema_validator_ptr_type,transparent_string_less<std::string>> defs;
 
             auto it = sch.find("definitions");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& def : (*it).value().object_range())
                 {
-                    std::string sub_keys[] = { "definitions", def.key() };
+                    jsoncons::string_view sub_keys[] = { "definitions", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                 }
             }
@@ -215,7 +217,7 @@ namespace draft4 {
 
             for (const auto& key_value : sch.object_range())
             {
-                auto factory_it = keyword_factory_map_.find(key_value.key());
+                auto factory_it = keyword_factory_map_.find(key_value.key().c_str());
                 if (factory_it != keyword_factory_map_.end())
                 {
                     auto validator = (*factory_it).second(context, key_value.value(), sch, anchor_dict);
@@ -347,7 +349,7 @@ namespace draft4 {
     private:
 
         compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent, 
-            const Json& sch, jsoncons::span<const std::string> keys) const override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<uri_wrapper> new_uris;
@@ -373,49 +375,13 @@ namespace draft4 {
             std::string custom_message;
             if (sch.is_object())
             {
-                auto it = sch.find("id"); // If id is found, this schema can be referenced by the id
-                if (it != sch.object_range().end()) 
-                {
-                    uri relative((*it).value().template as<std::string>()); 
-                    auto resolved = parent.get_base_uri().resolve(relative);
-                    id = resolved;
-                    uri_wrapper new_uri{ resolved };
-                    //std::cout << "id: " << id << ", " << new_uri.string() << "\n";
-                    // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
-                    {
-                        new_uris.emplace_back(new_uri); 
-                    }
-                }
+                schema_readers_type::read_id_4(parent, sch, id, new_uris);
 
                 if (this->options().enable_custom_error_message())
                 {
-                    it = sch.find("errorMessage"); 
-                    if (it != sch.object_range().end()) 
-                    {
-                        const auto& value = it->value();
-                        if (value.is_object())
-                        {
-                            for (const auto& item : value.object_range())
-                            {
-                                custom_messages[item.key()] =  item.value().template as<std::string>();
-                            }
-                        }
-                        else if (value.is_string())
-                        {
-                            custom_message = value.template as<std::string>();
-                        }
-                    }
+                    schema_readers_type::read_custom_error_message(sch, custom_messages, custom_message);
                 }
             }
-
-/*
-            std::cout << "Absolute URI: " << parent.get_base_uri().string() << "\n";
-            for (const auto& uri : new_uris)
-            {
-                std::cout << "    " << uri.string() << "\n";
-            }
-*/
 
             return compilation_context<Json>(new_uris, id, custom_messages, custom_message);
         }

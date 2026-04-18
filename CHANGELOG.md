@@ -1,3 +1,36 @@
+master (1.7.0 preview)
+----------------------
+
+- Fixed bugs:
+
+    - Git Issue #690: JMESPath let expression with operator in variable binding 
+
+- Changes
+
+    - The jsonschema enum class `walk_result` has been renamed to `walk_state`. 
+    For backwards compatibility, the old name `walk_result` has been aliased to `walk_state`.
+
+- Enhancements:
+
+    - Git Issue #692: Redefined enum `staj_event_type` as a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html).
+      This allows us to write e.g.
+      ```cpp
+      constexpr auto mask = staj_event_type::begin_array | staj_event_type::begin_object;
+      if ((event_type & mask) != staj_event_type{}) {/*...*/}
+      ```  
+
+    - The `basic_json_pointer` operator `/` now accepts a `basic_string_view` as a right-hand argument,
+      and member function `append` now accepts a `basic_string_view` as an argument.
+
+    - The class `key_value` has a new member `name` that returns a `basic_string_view` of the key.
+
+    - jsonschema validation now supports validation of instances of `jsoncons::pmr::json` and `jsoncons::pmr::ojson`.
+      Note that temporary allocations still use `std::allocator`.
+
+    - Reduced allocations in jsonschema compilation and validation.
+
+    - Git Discussion #678: "Make json-patches in custom report that will fix validating object", is now supported
+
 1.6.0
 -----
 

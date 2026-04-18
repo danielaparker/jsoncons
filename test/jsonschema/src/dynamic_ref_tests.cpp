@@ -84,7 +84,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
             json data = json::parse(data_str);
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_result
+            auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_state
             {
                 //std::cout << "  Failed: " << "eval_path: " << msg.eval_path().string() << ", schema_location: " << msg.schema_location().string() << ", " << msg.instance_location().string() << ": " << msg.message() << "\n";
                 //for (const auto& err : msg.nested_errors())
@@ -92,7 +92,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
                     //std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 //}
                 ++error_count;
-                return jsonschema::walk_result::advance;
+                return jsonschema::walk_state::advance;
             };
             compiled.validate(data, reporter);
             CHECK(error_count > 0);
@@ -172,7 +172,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
             json data = json::parse(data_str);
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_result
+            auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_state
                 {
                     //std::cout << "  Failed: " << "eval_path: " << msg.eval_path().string() << ", schema_location: " << msg.schema_location().string() << ", " << msg.instance_location().string() << ": " << msg.message() << "\n";
                     //for (const auto& err : msg.nested_errors())
@@ -180,7 +180,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
                         //std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                     //}
                     ++error_count;
-                    return jsonschema::walk_result::advance;
+                    return jsonschema::walk_state::advance;
                 };
             compiled.validate(data, reporter);
             CHECK(error_count > 0);
@@ -251,7 +251,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
             json data(jsoncons::null_type{});
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+            auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
             {
                 std::cout << "  Failed: " << "eval_path: " << msg.eval_path().string() << ", schema_location: " << msg.schema_location().string() << ", " << msg.instance_location().string() << ": " << msg.message() << "\n";
                 for (const auto& err : msg.details())
@@ -259,7 +259,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
                     std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 }
                 ++error_count;
-                return jsonschema::walk_result::advance;
+                return jsonschema::walk_state::advance;
             };
             compiled.validate(data, reporter);
             CHECK(0 == error_count);

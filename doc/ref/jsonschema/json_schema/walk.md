@@ -53,7 +53,7 @@ int main()
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "A representation of a person, company, organization, or place",
+  "description": "Arrays of strings and objects",
   "type": "object",
   "properties": {
     "fruits": {

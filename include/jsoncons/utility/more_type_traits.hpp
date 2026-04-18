@@ -690,14 +690,25 @@ namespace ext_traits {
 
     // is_string_view_like
 
-    template <typename Container,typename Enable=void>
+    template <typename StringViewLike,typename Enable=void>
     struct is_string_view_like : std::false_type {};
 
-    template <typename Container>
-    struct is_string_view_like<Container, 
-           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
-                                   has_size<Container>::value &&
-                                   is_character<typename Container::value_type>::value
+    template <typename StringViewLike>
+    struct is_string_view_like<StringViewLike, 
+           typename std::enable_if<has_data_exact<const typename StringViewLike::value_type*,const StringViewLike>::value &&
+                                   has_size<StringViewLike>::value &&
+                                   is_character<typename StringViewLike::value_type>::value
+    >::type> : std::true_type {};
+
+    // is_string_view_of
+
+    template <typename StringViewLike,typename CharT,typename Enable=void>
+    struct is_string_view_of : std::false_type {};
+
+    template <typename StringViewLike,typename CharT>
+    struct is_string_view_of<StringViewLike,CharT, 
+        typename std::enable_if<is_string_view_like<StringViewLike>::value &&
+                 std::is_same<typename StringViewLike::value_type,CharT>::value
     >::type> : std::true_type {};
 
     // is_sequence_of
@@ -814,8 +825,8 @@ namespace impl {
     using
     is_constructible_from_data_size = is_detected<construct_from_data_size_t,T,Data,Size>;
 
-    // is_unary_function_object
-    // is_unary_function_object_exact
+    // is_function_object_1
+    // is_function_object_1_exact
 
     template <typename FunctionObject,typename Arg>
         using
@@ -823,14 +834,14 @@ namespace impl {
 
     template <typename FunctionObject,typename Arg>
         using
-        is_unary_function_object = is_detected<unary_function_object_t, FunctionObject, Arg>;
+        is_function_object_1 = is_detected<unary_function_object_t, FunctionObject, Arg>;
 
     template <typename FunctionObject,typename T,typename Arg>
     using
-    is_unary_function_object_exact = is_detected_exact<T,unary_function_object_t, FunctionObject, Arg>;
+    is_function_object_1_exact = is_detected_exact<T,unary_function_object_t, FunctionObject, Arg>;
 
-    // is_binary_function_object
-    // is_binary_function_object_exact
+    // is_function_object_2
+    // is_function_object_2_exact
 
     template <typename FunctionObject,typename Arg1,typename Arg2>
         using
@@ -838,11 +849,11 @@ namespace impl {
 
     template <typename FunctionObject,typename Arg1,typename Arg2>
         using
-        is_binary_function_object = is_detected<binary_function_object_t, FunctionObject, Arg1, Arg2>;
+        is_function_object_2 = is_detected<binary_function_object_t, FunctionObject, Arg1, Arg2>;
 
     template <typename FunctionObject,typename T,typename Arg1,typename Arg2>
     using
-    is_binary_function_object_exact = is_detected_exact<T,binary_function_object_t, FunctionObject, Arg1, Arg2>;
+    is_function_object_2_exact = is_detected_exact<T,binary_function_object_t, FunctionObject, Arg1, Arg2>;
 
     template <typename Source,typename Enable=void>
     struct is_convertible_to_string_view : std::false_type {};
