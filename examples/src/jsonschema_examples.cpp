@@ -710,7 +710,7 @@ void validate_with_patch_to_fix_document() // (since 1.7.0)
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 
-void validate_usimg_pmr_allocator()
+void validate_usimg_pmr_allocator() // (SINCE 1.7.0)
 {
     char buffer[1024] = {}; // a small buffer on the stack
     std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
@@ -733,13 +733,16 @@ void validate_usimg_pmr_allocator()
   },
   "type": "array",
   "items": { "$ref": "#/$defs/point" },
-  "minItems": 3,
-  "maxItems": 1
+  "minItems": 1,
+  "maxItems": 3
 }
 
     )");
 
-    auto instance = jsoncons::pmr::json::parse(jsoncons::make_alloc_set(alloc), R"(
+    char buffer2[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer), std::size(buffer) };
+    std::pmr::polymorphic_allocator<char> alloc2(&pool);
+    auto instance = jsoncons::pmr::json::parse(jsoncons::make_alloc_set(alloc2), R"(
 [
   {
     "x": 2.5,
@@ -757,7 +760,10 @@ void validate_usimg_pmr_allocator()
     bool result = compiled.is_valid(instance);
     assert(!result);
 
-    jsoncons::json_decoder<ojson> decoder;
+    char buffer3[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool3{ std::data(buffer), std::size(buffer) };
+    std::pmr::polymorphic_allocator<char> alloc3(&pool);
+    jsoncons::json_decoder<jsoncons::pmr::json> decoder{alloc3};
     compiled.validate(instance, decoder);
     assert(decoder.is_valid());
     auto output = decoder.get_result();
@@ -789,7 +795,7 @@ int main()
     resolve_uri_example();
 
     validate_with_patch_to_fix_document(); // (since 1.7.0)
-    validate_usimg_pmr_allocator();    
+    validate_usimg_pmr_allocator(); // (since 1.7.0)    
 
     std::cout << "\n";
 }

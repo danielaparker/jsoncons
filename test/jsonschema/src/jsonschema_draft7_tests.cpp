@@ -220,8 +220,8 @@ TEST_CASE("jsonschema draft7 tests")
       },
       "type": "array",
       "items": { "$ref": "#/unknown-keyword/point" },
-      "minItems": 3,
-      "maxItems": 1
+      "minItems": 1,
+      "maxItems": 3
     }
  )");
 
