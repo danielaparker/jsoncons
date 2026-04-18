@@ -45,9 +45,9 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
     The signature of the function should be equivalent to 
     <pre>
        <a href="../walk_result.md">walk_result</a> fun(const <a href="../validation_message.md">validation_message</a>& msg);</pre>
-     or (since 1.7.0)
+     or 
     <pre>
-       <a href="../walk_state.md">walk_state</a> fun(const <a href="../validation_message.md">validation_message</a>& msg, 
+       <a href="../walk_state.md">walk_state</a> fun(const <a href="../validation_message.md">validation_message</a>& msg,    (since 1.7.0)
            jsoncons::optional&lt;Json&gt;& patch);</pre>
 </td> 
   </tr>
