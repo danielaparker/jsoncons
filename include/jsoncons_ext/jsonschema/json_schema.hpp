@@ -160,16 +160,15 @@ public:
     json_schema& operator=(json_schema&&) = default;
 
     // Validate input JSON against a JSON Schema with a default throwing error reporter
-    Json validate(const Json& instance) const
+    void validate(const Json& instance) const
     {
         throwing_error_listener<Json> reporter;
         jsonpointer::json_pointer instance_location{};
-        jsoncons::optional<Json> patch{jsoncons::in_place, jsoncons::json_array_arg};
+        jsoncons::optional<Json> patch{};
 
-        eval_context<Json> context;
-        evaluation_results results;
+        eval_context<Json> context{};
+        evaluation_results results{};
         root_->validate(context, instance, instance_location, results, reporter, patch);
-        return patch ? *patch : Json{json_array_arg};
     }
 
     // Validate input JSON against a JSON Schema 
