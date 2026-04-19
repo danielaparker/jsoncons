@@ -593,7 +593,6 @@ namespace detail {
         {
         }
 
-
         std::size_t precedence_level() const 
         {
             return precedence_level_;
