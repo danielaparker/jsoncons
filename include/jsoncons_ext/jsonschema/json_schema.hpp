@@ -293,7 +293,7 @@ public:
     }
 
     template <typename Reporter>
-    typename std::enable_if<ext_traits::is_function_object<Reporter,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
     walk(const Json& instance, const Reporter& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
