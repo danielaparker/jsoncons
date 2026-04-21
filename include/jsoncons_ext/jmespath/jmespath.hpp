@@ -3241,7 +3241,7 @@ namespace detail {
             std::vector<expression_type*> expressions_;
         public:
             operation_expression(operator_kind oper, const operator_base<Json>* operation)
-                : operator_(operation), expression_type(oper, false)
+                : expression_type(oper, false), operator_(operation)
             {
             }
 
