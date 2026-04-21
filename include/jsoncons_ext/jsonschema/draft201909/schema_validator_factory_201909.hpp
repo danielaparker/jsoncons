@@ -96,7 +96,7 @@ namespace draft201909 {
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
-            : schema_validator_factory_base<Json>(schema_version::draft201909(), 
+            : schema_validator_factory_base<Json>(schema_version::draft201909(), std::unique_ptr<Json>{}, 
               factory_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
               factory_(this) 
         {

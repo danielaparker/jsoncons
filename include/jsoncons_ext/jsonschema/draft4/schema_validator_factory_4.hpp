@@ -54,7 +54,7 @@ namespace draft4 {
         schema_validator_factory_4(const validator_factory_factory_type& factory_factory, 
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : schema_validator_factory_base<Json>(schema_version::draft4(), factory_factory, options, schema_store_ptr, resolve_funcs),
+            : schema_validator_factory_base<Json>(schema_version::draft4(), std::unique_ptr<Json>{}, factory_factory, options, schema_store_ptr, resolve_funcs),
               factory_(this)
         {
             init();
