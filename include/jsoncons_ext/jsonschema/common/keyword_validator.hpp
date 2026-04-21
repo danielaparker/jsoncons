@@ -481,7 +481,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -555,7 +555,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -604,7 +604,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -664,7 +664,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 #else
@@ -693,7 +693,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 #endif
@@ -748,7 +748,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -801,7 +801,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -853,7 +853,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -906,7 +906,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1014,7 +1014,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -1101,7 +1101,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1172,7 +1172,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1265,7 +1265,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -1393,7 +1393,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -1500,7 +1500,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -1613,7 +1613,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1708,7 +1708,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1803,7 +1803,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1898,7 +1898,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -1957,7 +1957,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2016,7 +2016,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2069,7 +2069,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2121,7 +2121,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2299,7 +2299,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2345,7 +2345,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2544,7 +2544,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -2656,7 +2656,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -2788,7 +2788,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -2992,7 +2992,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3101,7 +3101,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3184,7 +3184,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3278,7 +3278,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3373,7 +3373,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -3417,7 +3417,7 @@ namespace jsonschema {
         walk_state walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -3463,7 +3463,7 @@ namespace jsonschema {
         walk_state walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const 
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -3598,7 +3598,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3733,7 +3733,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3850,7 +3850,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3992,7 +3992,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 
@@ -4120,7 +4120,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
         }
     };
 

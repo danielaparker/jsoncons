@@ -77,7 +77,7 @@ namespace jsonschema {
 
         virtual ~walk_reporter() = default;
 
-        walk_state operator()(const std::string& keyword,
+        walk_state walk(const std::string& keyword,
             const Json& schema, const uri& schema_location,
             const Json& instance, const jsonpointer::json_pointer& instance_location,
             jsoncons::optional<Json>& patch) 
