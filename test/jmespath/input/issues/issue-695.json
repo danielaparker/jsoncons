@@ -1,0 +1,91 @@
+[
+  // issue 695 - and, or operator short circuit
+  {
+    "given": {
+      "value": 1
+    },
+    "cases": [
+      {
+        "comment": "short circuit or operator",
+        "expression": "type(@) == 'object' && value || sum([].value)",
+        "result": 1
+      },
+      {
+        "comment": "short circuit or operator, the error case",
+        "expression": "type(@) == 'array' && value || sum([].value)",
+        "error": "invalid-type"
+      }
+    ]
+  },
+  {
+    "given": {
+      "value": 1
+    },
+    "cases": [
+      {
+        "comment": "short circuit and operator",
+        "expression": "type(@) == 'array' && sum([].value) || value",
+        "result": 1
+      },
+      {
+        "comment": "short circuit and operator, the error case",
+        "expression": "type(@) == 'object' && sum([].value) || value",
+        "error": "invalid-type"
+      }
+    ]
+  },
+  {
+    "given": {
+      "True": true,
+      "False": false,
+      "Number": 5
+    },
+    "cases": [
+      {
+        "comment": "and or precedence, no parentheses",
+        "expression": "False && True || Number",
+        "result": 5
+      },
+      {
+        "comment": "and or precedence, parentheses",
+        "expression": "(False && True) || Number",
+        "result": 5
+      },
+      {
+        "comment": "and or precedence, parentheses",
+        "expression": "False && (True || Number) ",
+        "result": false
+      },
+      {
+        "comment": "and left associative, no parentheses",
+        "expression": "False && True && sum([].Number)",
+        "result": false
+      },
+      {
+        "comment": "and left associative, parentheses",
+        "expression": "(False && True) && sum([].Number)",
+        "result": false
+      },
+      {
+        "comment": "and left associative, no parenthese",
+        "expression": "False && (True && sum([].Number))",
+        "result": false
+      },
+      {
+        "comment": "or left associative, no parentheses",
+        "expression": "True || False || sum([].Number)",
+        "result": true
+      },
+      {
+        "comment": "or left associative, parentheses",
+        "expression": "(True || False) || sum([].Number)",
+        "result": true
+      },
+      {
+        "comment": "or left associative, no parenthese",
+        "expression": "True || (False || sum([].Number))",
+        "result": true
+      }
+    ]
+  }
+]

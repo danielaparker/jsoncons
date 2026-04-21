@@ -58,10 +58,6 @@ namespace jmespath {
         {
             switch (oper)
             {
-                case operator_kind::projection_op:
-                    return 11;
-                case operator_kind::flatten_projection_op:
-                    return 11;
                 case operator_kind::or_op:
                     return 9;
                 case operator_kind::and_op:
@@ -74,6 +70,9 @@ namespace jmespath {
                 case operator_kind::gt_op:
                 case operator_kind::gte_op:
                     return 5;
+                case operator_kind::projection_op:
+                case operator_kind::flatten_projection_op:
+                    return 3;
                 case operator_kind::not_op:
                     return 1;
                 default:
@@ -547,62 +546,102 @@ namespace jmespath {
 namespace detail {
 
     template <typename Json>
-    class unary_operator
+    class operator_base
     {
     public:
-        using reference = typename Json::const_reference;
-    private:
+        using reference = const Json&;
+        using expression_type = expr_base_impl<Json>;
+    protected:
         std::size_t precedence_level_;
         bool is_right_associative_;
 
     protected:
-        virtual ~unary_operator() = default; 
+        virtual ~operator_base() = default;
     public:
-        unary_operator(operator_kind oper)
-            : precedence_level_(operator_table::precedence_level(oper)), 
-              is_right_associative_(operator_table::is_right_associative(oper))
+        operator_base(operator_kind oper)
+            : precedence_level_(operator_table::precedence_level(oper)),
+            is_right_associative_(operator_table::is_right_associative(oper))
         {
         }
 
-        std::size_t precedence_level() const 
+        std::size_t precedence_level() const
         {
             return precedence_level_;
         }
         bool is_right_associative() const
         {
             return is_right_associative_;
+        }
+
+        virtual reference evaluate(reference val, const std::vector<expression_type*>& exprs, eval_context<Json>&, std::error_code& ec) const = 0;
+    };
+
+    template <typename Json>
+    class unary_operator : public operator_base<Json>
+    {
+    public:
+        using reference = const Json&;
+        using expression_type = expr_base_impl<Json>;
+    public:
+        unary_operator(operator_kind oper)
+            : operator_base<Json>(oper)
+        {
+        }
+
+        reference evaluate(reference val, const std::vector<expression_type*>& expressions, eval_context<Json>& context, std::error_code& ec) const override final
+        {
+            JSONCONS_ASSERT(expressions.size() == 1);
+            reference op_val = expressions[0]->evaluate(val, context, ec);
+            return evaluate(op_val, context, ec);
         }
 
         virtual reference evaluate(reference val, eval_context<Json>&, std::error_code& ec) const = 0;
     };
 
     template <typename Json>
-    class binary_operator
+    class binary_operator : public operator_base<Json>
     {
-    public:  
-        using reference = typename Json::const_reference;
-    private:
-        std::size_t precedence_level_;
-        bool is_right_associative_;
-    protected:
-        virtual ~binary_operator() = default; 
+    public:
+        using reference = const Json&;
+        using expression_type = expr_base_impl<Json>;
     public:
         binary_operator(operator_kind oper)
-            : precedence_level_(operator_table::precedence_level(oper)), 
-              is_right_associative_(operator_table::is_right_associative(oper))
+            : operator_base<Json>(oper)
         {
         }
 
-        std::size_t precedence_level() const 
+        reference evaluate(reference val, const std::vector<expression_type*>& expressions, eval_context<Json>& context, std::error_code& ec) const override final
         {
-            return precedence_level_;
-        }
-        bool is_right_associative() const
-        {
-            return is_right_associative_;
+            JSONCONS_ASSERT(expressions.size() == 2);
+            reference lhs = expressions[0]->evaluate(val, context, ec);
+            reference rhs = expressions[1]->evaluate(val, context, ec);
+            return evaluate(lhs, rhs, context, ec);
         }
 
         virtual reference evaluate(reference lhs, reference rhs, eval_context<Json>&, std::error_code& ec) const = 0;
+    };
+
+    template <typename Json>
+    class logical_operator : public operator_base<Json>
+    {
+    public:
+        using reference = const Json&;
+        using expression_type = expr_base_impl<Json>;
+    public:
+        logical_operator(operator_kind oper)
+            : operator_base<Json>(oper)
+        {
+        }
+
+        reference evaluate(reference val, const std::vector<expression_type*>& expressions, eval_context<Json>& context, std::error_code& ec) const override final
+        {
+            JSONCONS_ASSERT(expressions.size() == 2);
+            reference lhs = expressions[0]->evaluate(val, context, ec);
+            const expression_type* rhs = expressions[1];
+            return evaluate(lhs, val, rhs, context, ec);
+        }
+
+        virtual reference evaluate(reference lhs, reference val, const expression_type* rhs, eval_context<Json>& context, std::error_code& ec) const = 0;
     };
 
     enum class token_kind 
@@ -621,8 +660,7 @@ namespace detail {
         key,
         literal,
         expression,
-        binary_operator,
-        unary_operator,
+        operation,
         function,
         end_function,
         argument,
@@ -632,6 +670,35 @@ namespace detail {
         variable,
         variable_expression,
         variable_binding
+    };
+
+    struct token_table final
+    {
+        static int precedence_level(token_kind tok)
+        {
+            switch (tok)
+            {
+            case token_kind::begin_filter:
+            case token_kind::begin_multi_select_list:
+            case token_kind::begin_multi_select_hash:
+            case token_kind::begin_expression_type:
+            case token_kind::variable:
+            case token_kind::key:
+            case token_kind::function:
+            case token_kind::argument:
+            case token_kind::separator:
+            case token_kind::current_node:
+                return 15;
+            case token_kind::pipe:
+                return 13;
+            case token_kind::operation:
+                //   return 5..1 see operator_table
+                JSONCONS_ASSERT(false);
+                break;
+            default:
+                return 0;
+            }
+        }
     };
 
     struct literal_arg_t
@@ -760,6 +827,12 @@ namespace detail {
     };
     JSONCONS_INLINE_CONSTEXPR variable_binding_arg_t variable_binding_arg{};
 
+    struct operation_arg_t
+    {
+        explicit operation_arg_t() = default;
+    };
+    JSONCONS_INLINE_CONSTEXPR operation_arg_t operation_arg{};
+
     struct slice
     {
         jsoncons::optional<int64_t> start_;
@@ -839,8 +912,6 @@ namespace detail {
         union
         {
             expr_base_impl<Json>* expression_;
-            const unary_operator<Json>* unary_operator_;
-            const binary_operator<Json>* binary_operator_;
             const function_base<Json>* function_;
             Json value_;
         };
@@ -923,15 +994,9 @@ namespace detail {
         {
         }
 
-        token(const unary_operator<Json>* expression) noexcept
-            : type_(token_kind::unary_operator),
-              unary_operator_(expression)
-        {
-        }
-
-        token(const binary_operator<Json>* expression) noexcept
-            : type_(token_kind::binary_operator),
-              binary_operator_(expression)
+        token(operation_arg_t, expr_base_impl<Json>* expression) noexcept
+            : type_(token_kind::operation),
+              expression_(expression)
         {
         }
 
@@ -1059,8 +1124,7 @@ namespace detail {
 
         bool is_operator() const
         {
-            return type_ == token_kind::unary_operator || 
-                   type_ == token_kind::binary_operator; 
+            return type_ == token_kind::operation; 
         }
 
         bool is_variable() const
@@ -1072,17 +1136,12 @@ namespace detail {
         {
             switch(type_)
             {
-                case token_kind::unary_operator:
-                    JSONCONS_ASSERT(unary_operator_ != nullptr);
-                    return unary_operator_->precedence_level();
-                case token_kind::binary_operator:
-                    JSONCONS_ASSERT(binary_operator_ != nullptr);
-                    return binary_operator_->precedence_level();
+                case token_kind::operation:
                 case token_kind::expression:
                     JSONCONS_ASSERT(expression_ != nullptr);
                     return expression_->precedence_level();
                 default:
-                    return 0;
+                    return token_table::precedence_level(type_);
             }
         }
 
@@ -1095,12 +1154,7 @@ namespace detail {
         {
             switch(type_)
             {
-                case token_kind::unary_operator:
-                    JSONCONS_ASSERT(unary_operator_ != nullptr);
-                    return unary_operator_->is_right_associative();
-                case token_kind::binary_operator:
-                    JSONCONS_ASSERT(binary_operator_ != nullptr);
-                    return binary_operator_->is_right_associative();
+                case token_kind::operation:
                 case token_kind::expression:
                     JSONCONS_ASSERT(expression_ != nullptr);
                     return expression_->is_right_associative();
@@ -1122,14 +1176,9 @@ namespace detail {
                 case token_kind::literal:
                     new (&value_) Json(std::move(other.value_));
                     break;
+                case token_kind::operation:
                 case token_kind::expression:
                     expression_ = other.expression_;
-                    break;
-                case token_kind::unary_operator:
-                    unary_operator_ = other.unary_operator_;
-                    break;
-                case token_kind::binary_operator:
-                    binary_operator_ = other.binary_operator_;
                     break;
                 case token_kind::function:
                     function_ = other.function_;
@@ -1152,14 +1201,9 @@ namespace detail {
                 case token_kind::literal:
                     new (&value_) Json(other.value_);
                     break;
+                case token_kind::operation:
                 case token_kind::expression:
                     expression_ = other.expression_;
-                    break;
-                case token_kind::unary_operator:
-                    unary_operator_ = other.unary_operator_;
-                    break;
-                case token_kind::binary_operator:
-                    binary_operator_ = other.binary_operator_;
                     break;
                 case token_kind::function:
                     function_ = other.function_;
@@ -2541,23 +2585,12 @@ namespace detail {
                         stack.push_back(j);
                         break;
                     }
-                    case token_kind::unary_operator:
+                    case token_kind::operation:
                     {
                         JSONCONS_ASSERT(!stack.empty());
                         pointer ptr = std::addressof(stack.back().value());
                         stack.pop_back();
-                        reference r = t.unary_operator_->evaluate(*ptr, context, ec);
-                        stack.emplace_back(r);
-                        break;
-                    }
-                    case token_kind::binary_operator:
-                    {
-                        JSONCONS_ASSERT(stack.size() >= 2);
-                        pointer rhs = std::addressof(stack.back().value());
-                        stack.pop_back();
-                        pointer lhs = std::addressof(stack.back().value());
-                        stack.pop_back();
-                        reference r = t.binary_operator_->evaluate(*lhs,*rhs, context, ec);
+                        reference r = t.expression_->evaluate(*ptr, context, ec);
                         stack.emplace_back(r);
                         break;
                     }
@@ -2612,44 +2645,38 @@ namespace detail {
 
         // Implementations
 
-        class or_operator final : public binary_operator<Json>
+        class or_operator final : public logical_operator<Json>
         {
         public:
             or_operator()
-                : binary_operator<Json>(operator_kind::or_op)
+                : logical_operator<Json>(operator_kind::or_op)
             {
             }
 
-            reference evaluate(reference lhs, reference rhs, eval_context<Json>& context, std::error_code&) const override
+            reference evaluate(reference lhs, reference val, const expression_type* rhs, eval_context<Json>& context, std::error_code& ec) const override
             {
-                if (lhs.is_null() && rhs.is_null())
-                {
-                    return context.null_value();
-                }
                 if (!is_false(lhs))
                 {
                     return lhs;
                 }
-                else
-                {
-                    return rhs;
-                }
+
+                return rhs->evaluate(val, context, ec);
             }
         };
 
-        class and_operator final : public binary_operator<Json>
+        class and_operator final : public logical_operator<Json>
         {
         public:
             and_operator()
-                : binary_operator<Json>(operator_kind::and_op)
+                : logical_operator<Json>(operator_kind::and_op)
             {
             }
 
-            reference evaluate(reference lhs, reference rhs, eval_context<Json>&, std::error_code&) const override
+            reference evaluate(reference lhs, reference val, const expression_type* rhs, eval_context<Json>& context, std::error_code& ec) const override
             {
                 if (is_true(lhs))
                 {
-                    return rhs;
+                    return rhs->evaluate(val, context, ec);
                 }
                 else
                 {
@@ -3207,6 +3234,29 @@ namespace detail {
             }
         };
 
+        class operation_expression final : public expression_type
+        {
+        private:
+            const operator_base<Json>* operator_;
+            std::vector<expression_type*> expressions_;
+        public:
+            operation_expression(operator_kind oper, const operator_base<Json>* operation)
+                : expression_type(oper, false), operator_(operation)
+            {
+            }
+
+            void add_expression(expression_type* expr) override
+            {
+                expressions_.emplace_back(expr);
+            }
+
+            reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(operator_);
+                return operator_->evaluate(val, expressions_, context, ec);
+            }
+        };
+
         class static_resources
         {
             struct MyHash
@@ -3329,61 +3379,106 @@ namespace detail {
                 return it2->second.get();
             }
 
-            const unary_operator<Json>* get_not_operator() const
+            const operator_base<Json>* get_not_operator() const
             {
                 static const not_expression not_oper;
 
                 return &not_oper;
             }
 
-            const binary_operator<Json>* get_or_operator() const
+            const operator_base<Json>* get_or_operator() const
             {
                 static const or_operator or_oper;
 
                 return &or_oper;
             }
 
-            const binary_operator<Json>* get_and_operator() const
+            const operator_base<Json>* get_and_operator() const
             {
                 static const and_operator and_oper;
 
                 return &and_oper;
             }
 
-            const binary_operator<Json>* get_eq_operator() const
+            const operator_base<Json>* get_eq_operator() const
             {
                 static const eq_operator eq_oper;
                 return &eq_oper;
             }
 
-            const binary_operator<Json>* get_ne_operator() const
+            const operator_base<Json>* get_ne_operator() const
             {
                 static const ne_operator ne_oper;
                 return &ne_oper;
             }
 
-            const binary_operator<Json>* get_lt_operator() const
+            const operator_base<Json>* get_lt_operator() const
             {
                 static const lt_operator lt_oper;
                 return &lt_oper;
             }
 
-            const binary_operator<Json>* get_lte_operator() const
+            const operator_base<Json>* get_lte_operator() const
             {
                 static const lte_operator lte_oper;
                 return &lte_oper;
             }
 
-            const binary_operator<Json>* get_gt_operator() const
+            const operator_base<Json>* get_gt_operator() const
             {
                 static const gt_operator gt_oper;
                 return &gt_oper;
             }
 
-            const binary_operator<Json>* get_gte_operator() const
+            const operator_base<Json>* get_gte_operator() const
             {
                 static const gte_operator gte_oper;
                 return &gte_oper;
+            }
+
+            expression_type* create_not_operation()
+            {
+                return create_expression(operation_expression(operator_kind::not_op, get_not_operator()));
+            }
+
+            expression_type* create_or_operation()
+            {
+                return create_expression(operation_expression(operator_kind::or_op, get_or_operator()));
+            }
+
+            expression_type* create_and_operation()
+            {
+                return create_expression(operation_expression(operator_kind::and_op, get_and_operator()));
+            }
+
+            expression_type* create_eq_operation()
+            {
+                return create_expression(operation_expression(operator_kind::eq_op, get_eq_operator()));
+            }
+
+            expression_type* create_ne_operation()
+            {
+                return create_expression(operation_expression(operator_kind::ne_op, get_ne_operator()));
+            }
+
+            expression_type* create_lt_operation()
+            {
+                return create_expression(operation_expression(operator_kind::lt_op, get_lt_operator()));
+            }
+
+            expression_type* create_lte_operation()
+            {
+                return create_expression(operation_expression(operator_kind::lte_op, get_lte_operator()));
+            }
+
+            expression_type* create_gt_operation()
+            {
+                return create_expression(operation_expression(operator_kind::gt_op, get_gt_operator()));
+            }
+
+            expression_type* create_gte_operation()
+            {
+                return create_expression(operation_expression(operator_kind::gte_op, get_gte_operator()));
             }
         };
 
@@ -3690,7 +3785,7 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token<Json>(resources.get_not_operator()), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_not_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 break;
                             }
@@ -3977,7 +4072,6 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(lparen_arg, resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
@@ -4678,16 +4772,14 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_lte_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_lte_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources.get_lt_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_lt_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back();
                                 break;
@@ -4699,16 +4791,14 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_gte_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_gte_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources.get_gt_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_gt_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 break;
@@ -4720,8 +4810,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_eq_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_eq_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
@@ -4738,8 +4827,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_ne_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_ne_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
@@ -4774,8 +4862,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token<Json>(resources.get_or_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_or_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); 
                                 ++p_;
@@ -4794,8 +4881,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token<Json>(resources.get_and_operator()), resources, output_stack, ec);
-                                push_token(token<Json>(current_node_arg), resources, output_stack, ec);
+                                push_token(token<Json>(operation_arg, resources.create_and_operation()), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.pop_back(); // expect_and
                                 ++p_;
@@ -5018,11 +5104,41 @@ namespace detail {
             }
         }
 
-        void unwind_rparen(std::vector<token<Json>>& output_stack, std::error_code& ec)
+        std::vector<token<Json>> unwind_roperator(std::vector<token<Json>>& output_stack, const token<Json>& op)
+        {
+            std::vector<token<Json>> toks;
+            auto it = output_stack.rbegin();
+            while (it != output_stack.rend() && ((*it).is_operator()
+                || op.precedence_level() > (*it).precedence_level()
+                || (op.precedence_level() == (*it).precedence_level() && op.is_right_associative())))
+            {
+                toks.emplace_back(std::move(*it));
+                ++it;
+            }
+
+            if (toks.empty()) {
+                return toks;
+            }
+
+            if (toks.back().type() != token_kind::literal)
+            {
+                toks.emplace_back(current_node_arg);
+            }
+            std::reverse(toks.begin(), toks.end());
+            output_stack.erase(it.base(), output_stack.end());
+            return toks;
+        }
+
+        void unwind_rparen(static_resources& resources, std::vector<token<Json>>& output_stack, std::error_code& ec)
         {
             auto it = operator_stack_.rbegin();
             while (it != operator_stack_.rend() && !(*it).is_lparen())
             {
+                if ((*it).is_operator()) {
+                    auto rhs = unwind_roperator(output_stack, *it);
+                    JSONCONS_ASSERT(!rhs.empty());
+                    (*it).expression_->add_expression(resources.create_expression(function_expression(std::move(rhs))));
+                }
                 output_stack.push_back(std::move(*it));
                 ++it;
             }
@@ -5046,7 +5162,7 @@ namespace detail {
             {
                 case token_kind::end_filter:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     std::vector<token<Json>> toks;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::begin_filter)
@@ -5081,7 +5197,7 @@ namespace detail {
                 }
                 case token_kind::end_multi_select_list:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     std::vector<std::vector<token<Json>>> vals;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::begin_multi_select_list)
@@ -5125,7 +5241,7 @@ namespace detail {
                 }
                 case token_kind::end_multi_select_hash:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     std::vector<key_tokens> key_toks;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::begin_multi_select_hash)
@@ -5173,7 +5289,7 @@ namespace detail {
                 }
                 case token_kind::end_expression_type:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     std::vector<token<Json>> toks;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::begin_expression_type)
@@ -5200,7 +5316,7 @@ namespace detail {
                     break;
                 case token_kind::variable_expression:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     std::vector<token<Json>> toks;
                     auto it = output_stack.rbegin();
                     while (it != output_stack.rend() && (*it).type() != token_kind::variable)
@@ -5247,12 +5363,12 @@ namespace detail {
                     break;
                 case token_kind::rparen:
                     {
-                        unwind_rparen(output_stack, ec);
+                        unwind_rparen(resources, output_stack, ec);
                         break;
                     }
                 case token_kind::end_function:
                     {
-                        unwind_rparen(output_stack, ec);
+                        unwind_rparen(resources, output_stack, ec);
                         std::vector<token<Json>> toks;
                         auto it = output_stack.rbegin();
                         std::size_t arg_count = 0;
@@ -5261,6 +5377,10 @@ namespace detail {
                             if ((*it).type() == token_kind::argument)
                             {
                                 ++arg_count;
+                                if (!toks.empty() && toks.back().type() != token_kind::literal)
+                                {
+                                    toks.emplace_back(current_node_arg);
+                                }
                             }
                             toks.emplace_back(std::move(*it));
                             ++it;
@@ -5309,43 +5429,64 @@ namespace detail {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend())
                         {
+                            if (it->is_operator()) {
+                                auto rhs = unwind_roperator(output_stack, *it);
+                                JSONCONS_ASSERT(!rhs.empty());
+                                it->expression_->add_expression(resources.create_expression(function_expression(std::move(rhs))));
+                            }
                             output_stack.push_back(std::move(*it));
                             ++it;
                         }
                         operator_stack_.clear();
                         break;
                     }
-                case token_kind::unary_operator:
-                case token_kind::binary_operator:
+                case token_kind::operation:
                 {
-                    if (operator_stack_.empty() || operator_stack_.back().is_lparen())
-                    {
-                        operator_stack_.emplace_back(std::move(tok));
-                    }
-                    else if (tok.precedence_level() < operator_stack_.back().precedence_level()
-                             || (tok.precedence_level() == operator_stack_.back().precedence_level() && tok.is_right_associative()))
-                    {
-                        operator_stack_.emplace_back(std::move(tok));
-                    }
-                    else
+                    if (!operator_stack_.empty() && !operator_stack_.back().is_lparen())
                     {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend() && (*it).is_operator()
                                && (tok.precedence_level() > (*it).precedence_level()
-                             || (tok.precedence_level() == (*it).precedence_level() && tok.is_right_associative())))
+                                   || (tok.precedence_level() == (*it).precedence_level() && !tok.is_right_associative())))
                         {
+                            auto rhs = unwind_roperator(output_stack, *it);
+                            JSONCONS_ASSERT(!rhs.empty());
+                            it->expression_->add_expression(resources.create_expression(function_expression(std::move(rhs))));
                             output_stack.push_back(std::move(*it));
                             ++it;
                         }
 
-                        operator_stack_.erase(it.base(),operator_stack_.end());
-                        operator_stack_.emplace_back(std::move(tok));
+                        operator_stack_.erase(it.base(), operator_stack_.end());
                     }
+                    std::vector<token<Json>> lhs;
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && ((*it).is_operator()
+                        || tok.precedence_level() > (*it).precedence_level()
+                        || (tok.precedence_level() == (*it).precedence_level() && !tok.is_right_associative())))
+                    {
+                        lhs.emplace_back(std::move(*it));
+                        ++it;
+                    }
+                    if (lhs.empty()) {
+                        operator_stack_.emplace_back(std::move(tok));
+                        break;
+                    }
+                    if (lhs.back().type() != token_kind::literal)
+                    {
+                        lhs.emplace_back(current_node_arg);
+                    }
+                    std::reverse(lhs.begin(), lhs.end());
+                    output_stack.erase(it.base(), output_stack.end());
+
+                    JSONCONS_ASSERT(tok.expression_);
+                    tok.expression_->add_expression(resources.create_expression(function_expression(std::move(lhs))));
+
+                    operator_stack_.emplace_back(std::move(tok));
                     break;
                 }
                 case token_kind::separator:
                 {
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
@@ -5369,7 +5510,7 @@ namespace detail {
                     output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::argument:
-                    unwind_rparen(output_stack, ec);
+                    unwind_rparen(resources, output_stack, ec);
                     output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::lparen:
