@@ -28,14 +28,6 @@ namespace jsonschema {
     // For backwards compatibility
     using walk_result = walk_state;
 
-    template <typename Json>
-    struct json_schema_traits    
-    {
-        using walk_reporter_type = std::function<walk_state(const std::string& keyword,
-            const Json& schema, const uri& schema_location,
-            const Json& instance, const jsonpointer::json_pointer& instance_location)>;      
-    };
-
     // Interface for validation error handlers
     template <typename Json>
     class error_reporter
@@ -74,6 +66,30 @@ namespace jsonschema {
             errors.push_back(msg);
             return walk_state::advance;
         }
+    };
+
+    // Interface for validation error handlers
+    template <typename Json>
+    class walk_reporter
+    {
+    public:
+        walk_reporter() = default;
+
+        virtual ~walk_reporter() = default;
+
+        walk_state operator()(const std::string& keyword,
+            const Json& schema, const uri& schema_location,
+            const Json& instance, const jsonpointer::json_pointer& instance_location,
+            jsoncons::optional<Json>& patch) 
+        {
+            return do_walk(keyword, schema, schema_location, instance, instance_location, patch);
+        }
+
+    private:
+        virtual walk_state do_walk(const std::string& keyword,
+            const Json& schema, const uri& schema_location,
+            const Json& instance, const jsonpointer::json_pointer& instance_location,
+            jsoncons::optional<Json>& patch) = 0;
     };
 
     class range
@@ -199,8 +215,6 @@ namespace jsonschema {
     class validator_base 
     {
     public:
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
-
         virtual ~validator_base() = default;
 
         virtual const uri& schema_location() const = 0;
@@ -216,9 +230,9 @@ namespace jsonschema {
         }
 
         walk_state walk(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
+            const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const
         {
-            return do_walk(context, instance, instance_location, reporter);
+            return do_walk(context, instance, instance_location, reporter, patch);
         }
         
         virtual bool always_fails() const = 0;
@@ -234,7 +248,8 @@ namespace jsonschema {
             jsoncons::optional<Json>& patch) const = 0;
 
         virtual walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const = 0;
+            const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, 
+            jsoncons::optional<Json>& patch) const = 0;
    };
 
     class validation_message_factory
