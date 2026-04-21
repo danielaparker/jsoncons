@@ -33,7 +33,7 @@ namespace jsonschema {
     {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        using validator_factory_factory_type = std::function<std::unique_ptr<schema_validator_factory_base<Json>>(const Json&,
+        using validator_factory_factory_type = std::function<std::unique_ptr<schema_validator_factory_base<Json>>(const Json&,const Json&,
             const evaluation_options&,schema_store_type*,const std::vector<resolve_uri_type<Json>>&,
             const std::unordered_map<std::string,bool>&)>;
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -289,7 +289,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_validator_factory_base = factory_factory_(sch, options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
+                            auto schema_validator_factory_base = factory_factory_(Json{}, sch, options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
                             schema_validator_factory_base->build_schema(sch, context.get_base_uri().string());
                             schema_val = schema_validator_factory_base->get_schema_validator();
                         }
