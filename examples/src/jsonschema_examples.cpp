@@ -22,7 +22,7 @@ void validate_three_ways()
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "A representation of a person, company, organization, or place",
+  "description": "Arrays of strings and objects",
   "type": "object",
   "properties": {
     "fruits": {
@@ -523,7 +523,7 @@ void walk_example() // since 0.175.0
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "A representation of a person, company, organization, or place",
+  "description": "Arrays of strings and objects",
   "type": "object",
   "properties": {
     "fruits": {
@@ -607,6 +607,171 @@ void walk_example() // since 0.175.0
     compiled.walk(data, reporter);
 }
 
+void validate_with_patch_to_fix_document() // (since 1.7.0)
+{
+  std::string schema_str = R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Arrays of strings and objects",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/veggie" }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [ "veggieName", "veggieLike" ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )";
+
+    std::string data_str = R"(
+{
+  "fruits": [ "apple", "orange", "pear" ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "carrot",
+      "veggieLike": false
+    },
+    {
+      "veggieName": "Swiss Chard"
+    }
+  ]
+}
+    )";
+
+    auto schema = jsoncons::json::parse(schema_str);
+    auto compiled = jsonschema::make_json_schema(schema);
+    auto data = jsoncons::json::parse(data_str);
+    jsoncons::json patch{jsoncons::json_array_arg};
+
+    // reporter that patching
+    auto reporter = [](const jsonschema::validation_message& msg,
+        jsoncons::optional<jsoncons::json>& patch) -> jsonschema::walk_state
+        {
+            if (patch)
+            {
+                if (msg.message().find("Required property") != std::string::npos && msg.message().find("not found") != std::string::npos)
+                {
+                    jsoncons::json j;
+                    j.try_emplace("op", "add");
+                    j.try_emplace("path", msg.instance_location().string() + "/veggieLike");
+                    j.try_emplace("value", false);
+                    patch->push_back(std::move(j));
+
+                    //there could be "return jsonschema::walk_state::advance_no_error;" for saying to validator "its not error, go forward!"
+                }
+            }
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
+            return jsonschema::walk_state::advance;
+        };
+
+    std::cout << "\n(1) Validate and create patch\n\n";
+
+    compiled.validate(data, reporter, patch);
+
+    std::cout << "\nPATCH:\n" << pretty_print(patch) << "\n";
+
+    std::cout << "\n(2) Apply patch\n";
+
+    jsonpatch::apply_patch<jsoncons::json>(data, patch);
+
+    std::cout << "\n\nPATCHED DATA:\n" << pretty_print(data) << "\n";
+
+    std::cout << "\n(3) Re-validate\n\n";
+    assert(compiled.is_valid(data));
+}
+
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
+#include <memory_resource> 
+
+void validate_usimg_pmr_allocator() // (SINCE 1.7.0)
+{
+    char buffer[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
+    std::pmr::polymorphic_allocator<char> alloc(&pool);
+
+    auto schema = jsoncons::pmr::json::parse(jsoncons::make_alloc_set(alloc), R"(
+{
+  "$id": "https://example.com/polygon",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "point": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false,
+      "required": [ "x", "y" ]
+    }
+  },
+  "type": "array",
+  "items": { "$ref": "#/$defs/point" },
+  "minItems": 1,
+  "maxItems": 3
+}
+
+    )");
+
+    char buffer2[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer), std::size(buffer) };
+    std::pmr::polymorphic_allocator<char> alloc2(&pool);
+    auto instance = jsoncons::pmr::json::parse(jsoncons::make_alloc_set(alloc2), R"(
+[
+  {
+    "x": 2.5,
+    "y": 1.3
+  },
+  {
+    "x": 1,
+    "z": 6.7
+  }
+]
+    )");
+
+    auto compiled = jsonschema::make_json_schema(schema);
+
+    bool result = compiled.is_valid(instance);
+    assert(!result);
+
+    char buffer3[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool3{ std::data(buffer), std::size(buffer) };
+    std::pmr::polymorphic_allocator<char> alloc3(&pool);
+    jsoncons::json_decoder<jsoncons::pmr::json> decoder{alloc3};
+    compiled.validate(instance, decoder);
+    assert(decoder.is_valid());
+    auto output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
+}
+
+#endif
+
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
@@ -628,7 +793,10 @@ int main()
     walk_example();
     
     resolve_uri_example();
-    
+
+    validate_with_patch_to_fix_document(); // (since 1.7.0)
+    validate_usimg_pmr_allocator(); // (since 1.7.0)    
+
     std::cout << "\n";
 }
 

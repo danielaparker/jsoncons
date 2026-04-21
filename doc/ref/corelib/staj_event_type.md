@@ -22,7 +22,7 @@ enum class staj_event_type
 ```
 Indicates the type of a staj event.
 
-Since 1.7.0, `staj_event_type` is defined as an alias to [staj_event_types](staj_event_types.md), a 
+Since 1.7.0, `staj_event_type` is defined as a
 [BitMaskType](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html). This 
 allows us to write e.g.
 

@@ -183,7 +183,7 @@ add_executable(unit_tests
                jsonschema/src/abort_early_tests.cpp
                jsonschema/src/custom_message_tests.cpp
                jsonschema/src/dynamic_ref_tests.cpp
-               jsonschema/src/format_validator_tests.cpp
+               jsonschema/src/format_validators_tests.cpp
                jsonschema/src/json_schema_walk_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_draft201909_tests.cpp

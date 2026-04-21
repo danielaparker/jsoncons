@@ -28,6 +28,11 @@ namespace ns {
           T2 aT2;
     };
 
+    struct wstring_example {
+        std::wstring name;
+        std::uint8_t value{};
+    };
+
     template <typename T1>
     struct struct_t1_all_m
     {
@@ -519,6 +524,8 @@ JSONCONS_N_MEMBER_TRAITS(ns::Bar, 1, bar)
 JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
 JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
 
+JSONCONS_N_MEMBER_TRAITS(ns::wstring_example, 0, name, value)
+
 void test_is_json_type_traits_declared(std::true_type)
 {
 }
@@ -565,6 +572,20 @@ namespace
         using difference_type = std::ptrdiff_t;
     };
 } // namespace
+
+TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS with wstring tests")
+{
+    SECTION("test 1")
+    {
+        ns::wstring_example ex{L"test", 200};
+        wjson j = wjson(ex);
+        //std::wcout << L"Serialized: " << j.as<std::wstring>() << std::endl;
+
+        ns::wstring_example decoded = j.as<ns::wstring_example>();
+        //std::wcout << L"Decoded: name=" << decoded.name
+        //    << L", value=" << static_cast<int>(decoded.value) << std::endl;
+    }
+}
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 {

@@ -16,12 +16,12 @@ Walks through a JSON schema to collect information.
   </tr>
   <tr>
     <td>reporter</td>
-    <td>A function object with signature equivalent to 
+    <td>A function object which returns a <a href="../walk_result.md">walk_result</a> (<a href="../walk_state.md">walk_state</a> since 1.7.0)
+    to indicates whether to keep walking through the schema or stop. The signature of the function should be equivalent to 
     <pre>
 walk_result fun(const std::string& keyword,
     const Json& schema, const uri& schema_location,
     const Json& instance, const jsonpointer::json_pointer& instance_location)</pre>
-that returns a <a href="../walk_result.md">walk_result</a> to indicate whether to continue or stop.
 </td> 
   </tr>
 </table>
@@ -53,7 +53,7 @@ int main()
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "A representation of a person, company, organization, or place",
+  "description": "Arrays of strings and objects",
   "type": "object",
   "properties": {
     "fruits": {

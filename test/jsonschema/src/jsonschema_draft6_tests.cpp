@@ -61,7 +61,7 @@ namespace {
                     //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     std::size_t errors = 0;
-                    auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+                    auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state
                     {
                         ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());
@@ -75,7 +75,7 @@ namespace {
                                 std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                             }
                         }
-                        return jsonschema::walk_result::advance;
+                        return jsonschema::walk_state::advance;
                     };
                     compiled.validate(test_case.at("data"), reporter);
                     if (errors == 0)
@@ -195,8 +195,8 @@ TEST_CASE("jsonschema draft6 tests")
       },
       "type": "array",
       "items": { "$ref": "#/unknown-keyword/point" },
-      "minItems": 3,
-      "maxItems": 1
+      "minItems": 1,
+      "maxItems": 3
     }
  )");
 

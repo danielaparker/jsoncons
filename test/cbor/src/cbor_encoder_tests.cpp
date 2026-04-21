@@ -591,10 +591,10 @@ TEST_CASE("test cbor encode with raw tags")
         
         cbor::cbor_bytes_cursor cursor(data);
         CHECK(0xB1 == cursor.raw_tag());
-        CHECK(jsoncons::staj_event_types::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
         CHECK(0xC1 == cursor.raw_tag());
-        CHECK(jsoncons::staj_event_types::null_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_event_type::null_value == cursor.current().event_type());
         cursor.next();
         CHECK(0xC2 == cursor.raw_tag());
         CHECK(false == cursor.current().get<bool>());
@@ -612,6 +612,6 @@ TEST_CASE("test cbor encode with raw tags")
         CHECK(std::vector<uint8_t>{0x01,0x02,0x03} == cursor.current().get<std::vector<uint8_t>>());
         cursor.next();
         CHECK(0xD1 == cursor.raw_tag());
-        CHECK(jsoncons::staj_event_types::begin_object == cursor.current().event_type());
+        CHECK(jsoncons::staj_event_type::begin_object == cursor.current().event_type());
     }
 }
