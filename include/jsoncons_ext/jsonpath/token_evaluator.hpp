@@ -3206,7 +3206,7 @@ namespace detail {
         }
 
         template <typename Callback>
-        typename std::enable_if<ext_traits::is_functor_2<Callback,const path_node_type&,reference>::value,void>::type
+        typename std::enable_if<ext_traits::is_function_object<Callback,const path_node_type&,reference>::value,void>::type
         evaluate(eval_context<Json,JsonReference>& context, 
             reference root,
             const path_node_type& path, 

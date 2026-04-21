@@ -52,7 +52,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename Callback>
-    typename std::enable_if<ext_traits::is_functor_2<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
     json_query(const Json& root, 
                const typename Json::string_view_type& path, 
                Callback callback,
@@ -74,7 +74,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename Callback,typename TempAlloc >
-    typename std::enable_if<ext_traits::is_functor_2<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
     json_query(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
         const Json& root, const typename Json::string_view_type& path, 
         Callback callback,
@@ -140,7 +140,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename BinaryCallback>
-    typename std::enable_if<ext_traits::is_functor_2<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
     json_replace(Json& root, const typename Json::string_view_type& path , BinaryCallback callback, 
                  const custom_functions<Json>& funcs = custom_functions<Json>())
     {
@@ -167,7 +167,7 @@ namespace jsonpath {
     }
 
     template <typename Json,typename BinaryCallback,typename TempAlloc >
-    typename std::enable_if<ext_traits::is_functor_2<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
     json_replace(const allocator_set<typename Json::allocator_type,TempAlloc>& aset, 
         Json& root, const typename Json::string_view_type& path , BinaryCallback callback, 
         const custom_functions<Json>& funcs = custom_functions<Json>())
@@ -196,7 +196,7 @@ namespace jsonpath {
 
     // Legacy replace function
     template <typename Json,typename UnaryCallback>
-    typename std::enable_if<ext_traits::is_functor_1<UnaryCallback,Json>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object<UnaryCallback,Json>::value,void>::type
     json_replace(Json& root, const typename Json::string_view_type& path , UnaryCallback callback)
     {
         using jsonpath_traits_type = jsoncons::jsonpath::legacy_jsonpath_traits<Json, Json&>;

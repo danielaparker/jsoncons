@@ -47,21 +47,21 @@ TEST_CASE("ext_traits tests is_propagating_allocator")
 
 TEST_CASE("ext_traits function object tests")
 {
-    SECTION("is_functor_1")
+    SECTION("is_function_object (1 arg)")
     {
-        CHECK_FALSE(ext_traits::is_functor_1<std::string,int>::value);
+        CHECK_FALSE(ext_traits::is_function_object<std::string,int>::value);
     }
-    SECTION("is_functor_1_exact")
+    SECTION("is_function_object_exact (1 arg)")
     {
-        CHECK_FALSE(ext_traits::is_functor_1_exact<std::string, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object_exact<std::string, int, int>::value);
     }
-    SECTION("is_functor_2")
+    SECTION("is_function_object (2 args)")
     {
-        CHECK_FALSE(ext_traits::is_functor_2<std::string, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object<std::string, int, int>::value);
     }
-    SECTION("is_functor_1_exact")
+    SECTION("is_function_object_exact (2 args)")
     {
-        CHECK_FALSE(ext_traits::is_functor_2_exact<std::string, int, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object_exact<std::string, int, int, int>::value);
     }
 }
 

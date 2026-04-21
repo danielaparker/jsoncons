@@ -95,7 +95,7 @@ struct error_reporter_adaptor : public error_reporter<Json>
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<ext_traits::is_functor_1_exact<Reporter,walk_state,validation_message>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -118,7 +118,7 @@ private:
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<ext_traits::is_functor_2_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -185,27 +185,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_functor_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_functor_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -221,27 +221,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_functor_2_exact<CustomReporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_functor_2_exact<CustomReporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json, CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json, Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -291,9 +291,10 @@ public:
         visitor.end_array();
         visitor.flush();
     }
-    
-    template <typename WalkReporter>
-    void walk(const Json& instance, const WalkReporter& reporter) const
+
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object<Reporter,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
+    walk(const Json& instance, const Reporter& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
 
