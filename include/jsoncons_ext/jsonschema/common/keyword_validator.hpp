@@ -79,7 +79,7 @@ namespace jsonschema {
             return keyword_name_;
         }
 
-        const Json& constraints() const override
+        const Json& constraint() const override
         {
             return *schema_ptr_;
         }

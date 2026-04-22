@@ -162,7 +162,7 @@ private:
         const Json& instance, const jsonpointer::json_pointer& instance_location,
         jsoncons::optional<Json>& /*patch*/) final
     {
-        return reporter_(property.keyword(), property.constraints(), property.schema_location(), instance, instance_location);
+        return reporter_(property.keyword(), property.constraint(), property.schema_location(), instance, instance_location);
     }
 };
 

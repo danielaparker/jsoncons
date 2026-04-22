@@ -811,9 +811,9 @@ TEST_CASE("jsonschema walk keyword test")
                 //std::cout << "keyword: " << keyword << "\n";
                 if (property.keyword() == "type")
                 {
-                    REQUIRE(property.constraints().is_object());
-                    auto it = property.constraints().find("type");
-                    if (it != property.constraints().object_range().end())
+                    REQUIRE(property.constraint().is_object());
+                    auto it = property.constraint().find("type");
+                    if (it != property.constraint().object_range().end())
                     {
                         result.try_emplace(instance_location.string(), it->value());
                     }
