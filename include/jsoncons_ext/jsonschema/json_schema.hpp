@@ -372,7 +372,16 @@ public:
         jsonpointer::json_pointer instance_location{};
         walk_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
 
-        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, patch);
+        jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
+        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, temp);
+        if (temp)
+        {
+            patch = std::move(*temp);
+        }
+        else
+        {
+            patch = Json(json_array_arg);
+        }
     }
 };
 
