@@ -87,5 +87,22 @@
         "result": true
       }
     ]
-  }
+  },
+  {
+    "given": {
+      "value": [1,"2"]
+    },
+    "cases": [
+      {
+        "comment": "short circuit or operator",
+        "expression": "`true` || max(value)",
+        "result": true
+      },
+     {
+        "comment": "invalid type",
+        "expression": "max(value) || `true`",
+        "error": "invalid-type"
+      }
+     ]
+  } 
 ]
