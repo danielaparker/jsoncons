@@ -22,12 +22,12 @@ Walks through a JSON schema to collect information.
 walk_result fun(const std::string& keyword,
     const Json& schema, const uri& schema_location,
     const Json& instance, const jsonpointer::json_pointer& instance_location)</pre>
-</td> 
 or
     <pre>
-walk_result fun(const <a href="../schema_property.md">schema_property&lt;Json&gt;&/> property,
+walk_result fun(const <a href="../schema_property.md">schema_property&lt;Json&gt;&</a> property,
     const Json& instance, const jsonpointer::json_pointer& instance_location,      (since 1.7.0)
     jsoncons::optional<Json>& patch)</pre>
+</td> 
   </tr>
 </table>
 

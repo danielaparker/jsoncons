@@ -7,8 +7,6 @@ template <typename Json>
 schema_property;
 ```
 
-<br>
-
 #### Destructor
 
     ~schema_property() = default;
