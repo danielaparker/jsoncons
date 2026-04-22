@@ -52,7 +52,7 @@ namespace jsonschema {
     };
 
     template <typename Json>
-    class keyword_base : public validation_message_factory
+    class keyword_base : public validation_message_factory, public schema_property<Json>
     {
         std::string keyword_name_;
         const Json* schema_ptr_;
@@ -74,17 +74,17 @@ namespace jsonschema {
         keyword_base& operator=(const keyword_base&) = delete;
         keyword_base& operator=(keyword_base&&) = default;
 
-        const std::string& keyword_name() const 
+        const std::string& keyword() const override
         {
             return keyword_name_;
         }
 
-        const Json& schema() const
+        const Json& constraint() const override
         {
             return *schema_ptr_;
         }
 
-        const uri& schema_location() const 
+        const uri& schema_location() const override
         {
             return schema_location_;
         }
@@ -157,7 +157,7 @@ namespace jsonschema {
 
     public:
         ref_validator(const Json& schema, const ref_validator& other)
-            : keyword_validator<Json>(other.keyword_name(), schema, other.schema_location()),
+            : keyword_validator<Json>(other.keyword(), schema, other.schema_location()),
                   referred_schema_{other.referred_schema_}
         {
         }
@@ -192,11 +192,11 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (!referred_schema_)
             {
-                return reporter.error(validation_message(this->keyword_name(), 
+                return reporter.error(validation_message(this->keyword(), 
                     this_context.eval_path(),
                     this->schema_location(), 
                     instance_location, 
@@ -214,7 +214,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             return referred_schema_->walk(this_context, instance, instance_location, reporter, patch);           
         }
     };
@@ -267,7 +267,7 @@ namespace jsonschema {
                 }
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             if (schema_ptr == nullptr)
             {
                 walk_state result = reporter.error(this->make_validation_message(
@@ -308,7 +308,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             return schema_ptr->walk(this_context, instance, instance_location, reporter, patch);
         }
     };
@@ -330,8 +330,6 @@ namespace jsonschema {
         }
 
         void set_referred_schema(const schema_validator<Json>* target) final { tentative_target_ = target; }
-
-        const jsoncons::uri& value() const { return value_.uri(); }
 
         uri get_base_uri() const
         {
@@ -384,7 +382,7 @@ namespace jsonschema {
 
             //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             return schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
@@ -411,7 +409,7 @@ namespace jsonschema {
                 }
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             return schema_ptr->walk(this_context, instance, instance_location, reporter, patch);
         }
     };
@@ -445,7 +443,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (content_encoding_ == "base64")
             {
@@ -481,7 +479,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -529,7 +527,7 @@ namespace jsonschema {
                 str = std::move(content);
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (content_media_type_ == "application/json")
             {
@@ -555,7 +553,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -589,7 +587,7 @@ namespace jsonschema {
 
             if (validate_ != nullptr) 
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
                 auto sv = instance.as_string_view();
 
                 walk_state result = validate_(*this, this_context.eval_path(), instance_location, sv, reporter, patch);
@@ -604,7 +602,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -640,7 +638,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (!std::regex_search(instance.as_cstring(), regex_))
             {
@@ -664,7 +662,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 #else
@@ -693,7 +691,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 #endif
@@ -727,7 +725,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -748,7 +746,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -780,7 +778,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -801,7 +799,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -832,7 +830,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.size() > max_items_)
             {
@@ -853,7 +851,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -885,7 +883,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.size() < min_items_)
             {
@@ -906,7 +904,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -941,7 +939,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.size() > 0 && schema_val_)
             {
@@ -1014,7 +1012,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -1067,7 +1065,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (are_unique_ && !array_has_unique_items(instance))
             {
@@ -1101,7 +1099,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1141,7 +1139,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             evaluation_results local_results;
             collecting_error_listener<Json> local_reporter;
@@ -1172,7 +1170,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1204,7 +1202,7 @@ namespace jsonschema {
 
             collecting_error_listener<Json> local_reporter;
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             evaluation_results local_results1;
             auto local_patch1 = patch ? jsoncons::optional<Json>{jsoncons::in_place, json_array_arg} : jsoncons::optional<Json>{};
@@ -1265,12 +1263,12 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
@@ -1315,7 +1313,7 @@ namespace jsonschema {
 
             collecting_error_listener<Json> local_reporter;
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             evaluation_results local_results1;
             auto local_patch1 = patch ? jsoncons::optional<Json>{jsoncons::in_place, json_array_arg} : jsoncons::optional<Json>{};
@@ -1393,13 +1391,13 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
@@ -1440,12 +1438,12 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
-            //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]\n";
+            //std::cout << this->keyword() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]\n";
 
             evaluation_results local_results1;
             collecting_error_listener<Json> local_reporter;
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
@@ -1500,12 +1498,12 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
@@ -1545,7 +1543,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final 
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.is_int64() && value_.is_int64())
             {
@@ -1613,7 +1611,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1640,7 +1638,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final 
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.is_int64() && value_.is_int64())
             {
@@ -1708,7 +1706,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1735,7 +1733,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.is_int64() && value_.is_int64())
             {
@@ -1803,7 +1801,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1830,7 +1828,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final 
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.is_int64() && value_.is_int64())
             {
@@ -1898,7 +1896,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1927,7 +1925,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             double value = instance.template as<double>();
             if (value != 0) // Exclude zero
@@ -1957,7 +1955,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -1993,7 +1991,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& key : items_)
             {
@@ -2016,7 +2014,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2050,7 +2048,7 @@ namespace jsonschema {
             
             if (instance.size() > max_properties_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
 
                 std::string message("Maximum number of properties is " + std::to_string(max_properties_));
                 message.append(" but found " + std::to_string(instance.size()));
@@ -2069,7 +2067,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2101,7 +2099,7 @@ namespace jsonschema {
             }
             if (instance.size() < min_properties_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
 
                 std::string message("Minimum number of properties is " + std::to_string(min_properties_));
                 message.append(" but found " + std::to_string(instance.size()));
@@ -2121,7 +2119,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2270,7 +2268,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch) const final
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             bool in_range = false;
             for (const auto& item : value_.array_range())
@@ -2299,7 +2297,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2328,7 +2326,7 @@ namespace jsonschema {
         {
             if (value_ != instance)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
 
                 walk_state result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
@@ -2345,7 +2343,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2410,7 +2408,7 @@ namespace jsonschema {
             //    std::cout << "    " << to_string(type) << "\n";
             //}
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             bool is_type_found = expected_types_.empty();
 
@@ -2544,7 +2542,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -2588,7 +2586,7 @@ namespace jsonschema {
             //}
             //std::cout << "\n";
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& prop : instance.object_range()) 
             {
@@ -2656,7 +2654,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -2747,7 +2745,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             for (const auto& prop : instance.object_range()) 
             {
                 eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
@@ -2788,14 +2786,14 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
             (void)context;
 #if defined(JSONCONS_HAS_STD_REGEX)
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             for (const auto& prop : instance.object_range()) 
             {
                 eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
@@ -2900,7 +2898,7 @@ namespace jsonschema {
 
             if (additional_properties_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
                 if (additional_properties_->always_fails())
                 {
                     for (const auto& prop : instance.object_range()) 
@@ -2992,7 +2990,7 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3020,7 +3018,7 @@ namespace jsonschema {
 
             if (additional_properties_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
                 for (const auto& prop : instance.object_range()) 
                 {
                     // check if it is in "allowed properties"
@@ -3074,7 +3072,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& dep : dependent_required_) 
             {
@@ -3101,13 +3099,13 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& dep : dependent_required_) 
             {
@@ -3158,7 +3156,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& dep : dependent_schemas_) 
             {
@@ -3184,13 +3182,13 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& dep : dependent_schemas_) 
             {
@@ -3238,7 +3236,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.size() > 0 && schema_val_)
             {
@@ -3278,13 +3276,13 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (instance.size() > 0 && schema_val_)
             {
@@ -3336,7 +3334,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             for (const auto& dep : dependent_required_) 
             {
@@ -3373,7 +3371,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -3395,7 +3393,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch) const 
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (count > max_value_)
             {
@@ -3417,7 +3415,7 @@ namespace jsonschema {
         walk_state walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -3442,7 +3440,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter,
             jsoncons::optional<Json>& patch) const 
         {
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             if (count < min_value_)
             {
@@ -3463,7 +3461,7 @@ namespace jsonschema {
         walk_state walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const 
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -3507,7 +3505,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
 
             std::size_t contains_count = 0;
             collecting_error_listener<Json> local_reporter;
@@ -3598,13 +3596,13 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
 
-            eval_context<Json> this_context(context, this->keyword_name());
+            eval_context<Json> this_context(context, this->keyword());
             
             for (std::size_t index = 0; index < instance.size(); ++index)
             {
@@ -3663,7 +3661,7 @@ namespace jsonschema {
             }
             if (data_index < instance.size() && items_val_)
             {
-                eval_context<Json> items_context(context, this->keyword_name());
+                eval_context<Json> items_context(context, this->keyword());
                 if (items_val_->always_fails())
                 {
                     jsonpointer::json_pointer item_location = instance_location / data_index;
@@ -3733,14 +3731,14 @@ namespace jsonschema {
             {
                 return walk_state::advance;
             }
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
             }
             if (data_index < instance.size() && items_val_)
             {
-                eval_context<Json> items_context(context, this->keyword_name());
+                eval_context<Json> items_context(context, this->keyword());
                 for (; data_index < instance.size(); ++data_index)
                 {
                     jsonpointer::json_pointer item_location = instance_location / data_index;
@@ -3788,7 +3786,7 @@ namespace jsonschema {
         
             std::size_t data_index = 0;
         
-            eval_context<Json> prefix_items_context(context, this->keyword_name());
+            eval_context<Json> prefix_items_context(context, this->keyword());
 
             std::size_t start = 0;
             std::size_t end = 0;
@@ -3850,7 +3848,7 @@ namespace jsonschema {
                 return walk_state::advance;
             }
 
-            walk_state result = reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            walk_state result = reporter.walk(*this, instance, instance_location, patch);
             if (result == walk_state::abort)
             {
                 return result;
@@ -3858,7 +3856,7 @@ namespace jsonschema {
 
             std::size_t data_index = 0;
 
-            eval_context<Json> prefix_items_context(context, this->keyword_name());
+            eval_context<Json> prefix_items_context(context, this->keyword());
 
             for (std::size_t schema_index=0; 
                   schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
@@ -3923,7 +3921,7 @@ namespace jsonschema {
 
             if (schema_val_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
                 if (schema_val_->always_fails())
                 {
                     for (const auto& prop : instance.object_range()) 
@@ -3992,7 +3990,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 
@@ -4022,7 +4020,7 @@ namespace jsonschema {
             error_reporter<Json>& reporter, 
             jsoncons::optional<Json>& patch) const final
         {
-            //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]";
+            //std::cout << this->keyword() << " [" << context.eval_path().string() << ", " << this->schema_location().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results.evaluated_items)
             //{
@@ -4036,7 +4034,7 @@ namespace jsonschema {
 
             if (schema_val_)
             {
-                eval_context<Json> this_context(context, this->keyword_name());
+                eval_context<Json> this_context(context, this->keyword());
                 if (schema_val_->always_fails())
                 {
                     for (std::size_t index = 0; index < instance.size(); ++index) 
@@ -4120,7 +4118,7 @@ namespace jsonschema {
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
-            return reporter.walk(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location, patch);
+            return reporter.walk(*this, instance, instance_location, patch);
         }
     };
 

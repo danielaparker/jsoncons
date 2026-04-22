@@ -402,7 +402,7 @@ namespace jsonschema {
             //std::cout << "validators:\n";
             for (auto& val : validators_)
             {               
-                //std::cout << "    " << val->keyword_name() << "\n";
+                //std::cout << "    " << val->keyword() << "\n";
                 walk_state result = val->validate(this_context, instance, instance_location, local_results, reporter, patch);
                 if (result == walk_state::abort)
                 {
@@ -455,7 +455,7 @@ namespace jsonschema {
             eval_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
-                //std::cout << "    " << val->keyword_name() << "\n";
+                //std::cout << "    " << val->keyword() << "\n";
                 walk_state result = val->walk(this_context, instance, instance_location, reporter, patch);
                 if (result == walk_state::abort)
                 {
