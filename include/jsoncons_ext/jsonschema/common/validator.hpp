@@ -68,6 +68,15 @@ namespace jsonschema {
         }
     };
 
+    template <typename Json>
+    class schema_property 
+    {
+    public:
+        virtual const std::string& keyword() const = 0; 
+        virtual const Json& constraints() const = 0;
+        virtual const uri& schema_location() const = 0; 
+    };
+
     // Interface for validation error handlers
     template <typename Json>
     class walk_reporter
@@ -77,17 +86,15 @@ namespace jsonschema {
 
         virtual ~walk_reporter() = default;
 
-        walk_state walk(const std::string& keyword,
-            const Json& schema, const uri& schema_location,
+        walk_state walk(const schema_property<Json>& property,
             const Json& instance, const jsonpointer::json_pointer& instance_location,
             jsoncons::optional<Json>& patch) 
         {
-            return do_walk(keyword, schema, schema_location, instance, instance_location, patch);
+            return do_walk(property, instance, instance_location, patch);
         }
 
     private:
-        virtual walk_state do_walk(const std::string& keyword,
-            const Json& schema, const uri& schema_location,
+        virtual walk_state do_walk(const schema_property<Json>& property,
             const Json& instance, const jsonpointer::json_pointer& instance_location,
             jsoncons::optional<Json>& patch) = 0;
     };

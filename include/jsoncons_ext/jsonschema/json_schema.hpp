@@ -145,7 +145,7 @@ struct walk_reporter_adaptor : public walk_reporter<Json>
 
 template <typename Json,typename Reporter>
 struct walk_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value>::type>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value>::type>
     : public walk_reporter<Json>
 {
     Reporter reporter_;
@@ -158,15 +158,36 @@ struct walk_reporter_adaptor<Json,Reporter,
     walk_reporter_adaptor& operator=(const Reporter& reporter) = delete;
 
 private:
-    walk_state do_walk(const std::string& keyword,
-            const Json& schema, const uri& schema_location,
-            const Json& instance, const jsonpointer::json_pointer& instance_location,
-            jsoncons::optional<Json>& /*patch*/) final
+    walk_state do_walk(const schema_property<Json>& property,
+        const Json& instance, const jsonpointer::json_pointer& instance_location,
+        jsoncons::optional<Json>& /*patch*/) final
     {
-        return reporter_(keyword, schema, schema_location, instance, instance_location);
+        return reporter_(property.keyword(), property.constraints(), property.schema_location(), instance, instance_location);
     }
 };
 
+template <typename Json,typename Reporter>
+struct walk_reporter_adaptor<Json,Reporter,
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&>::value>::type>
+    : public walk_reporter<Json>
+{
+    Reporter reporter_;
+
+    walk_reporter_adaptor(const Reporter& reporter)
+        : reporter_(reporter)
+    {
+    }
+
+    walk_reporter_adaptor& operator=(const Reporter& reporter) = delete;
+
+private:
+    walk_state do_walk(const schema_property<Json>& property,
+        const Json& instance, const jsonpointer::json_pointer& instance_location,
+        jsoncons::optional<Json>& /*patch*/) final
+    {
+        return reporter_(property, instance, instance_location);
+    }
+};
 
 template <typename Json,typename Reporter>
 struct walk_reporter_adaptor<Json,Reporter,
@@ -348,6 +369,17 @@ public:
 
     template <typename Reporter>
     typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
+    walk(const Json& instance, Reporter&& reporter) const
+    {
+        jsoncons::optional<Json> patch;
+        jsonpointer::json_pointer instance_location{};
+        walk_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
+
+        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, patch);
+    }
+
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
     walk(const Json& instance, Reporter&& reporter) const
     {
         jsoncons::optional<Json> patch;
