@@ -72,6 +72,7 @@ namespace jsonschema {
     class schema_property 
     {
     public:
+        virtual ~schema_property() = default;
         virtual const std::string& keyword() const = 0; 
         virtual const Json& constraints() const = 0;
         virtual const uri& schema_location() const = 0; 

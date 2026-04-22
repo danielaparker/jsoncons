@@ -804,7 +804,9 @@ TEST_CASE("jsonschema walk keyword test")
 
             ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const jsonschema::schema_property<ojson>& property,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const ojson& /*instance*/, 
+                const jsoncons::jsonpointer::json_pointer& instance_location, 
+                jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (property.keyword() == "type")

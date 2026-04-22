@@ -23,6 +23,11 @@ walk_result fun(const std::string& keyword,
     const Json& schema, const uri& schema_location,
     const Json& instance, const jsonpointer::json_pointer& instance_location)</pre>
 </td> 
+or
+    <pre>
+walk_result fun(const schema_property<Json>& property,
+    const Json& instance, const jsonpointer::json_pointer& instance_location,   (since 1.7.0)
+    jsoncons::optional<Json>& patch)</pre>
   </tr>
 </table>
 
