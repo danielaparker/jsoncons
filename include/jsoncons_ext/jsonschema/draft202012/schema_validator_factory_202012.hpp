@@ -92,11 +92,13 @@ namespace draft202012 {
         keyword_validator_factory<Json> factory_;
 
     public:
-        schema_validator_factory_202012(const validator_factory_factory_type& factory_factory, 
-            const evaluation_options& options, schema_store_type* schema_store_ptr,
+        schema_validator_factory_202012(std::unique_ptr<Json>&& root_schema,
+            const validator_factory_factory_type& factory_factory, 
+            const evaluation_options& options, 
+            schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
-            : schema_validator_factory_base<Json>(schema_version::draft202012(), 
+            : schema_validator_factory_base<Json>(schema_version::draft202012(), std::move(root_schema),
                 factory_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
               factory_(this)
         {

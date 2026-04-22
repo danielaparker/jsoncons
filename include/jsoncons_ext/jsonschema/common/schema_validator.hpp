@@ -48,11 +48,12 @@ namespace jsonschema {
     {
         using schema_validator_ptr_type = std::unique_ptr<schema_validator<Json>>;
 
+        std::unique_ptr<Json> root_schema_;
         schema_validator_ptr_type schema_val_;
         std::vector<schema_validator_ptr_type> schemas_;
     public:
-        document_schema_validator(schema_validator_ptr_type&& schema_val, std::vector<schema_validator_ptr_type>&& schemas)
-            : schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
+        document_schema_validator(std::unique_ptr<Json>&& root_schema, schema_validator_ptr_type&& schema_val, std::vector<schema_validator_ptr_type>&& schemas)
+            : root_schema_(std::move(root_schema)), schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
         {
             if (schema_val_ == nullptr)
                 JSONCONS_THROW(schema_error("There is no schema to validate an instance against"));
