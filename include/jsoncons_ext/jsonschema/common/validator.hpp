@@ -28,6 +28,9 @@ namespace jsonschema {
     // For backwards compatibility
     using walk_result = walk_state;
 
+    template <typename Json>
+    class keyword_base;
+
     // Interface for validation error handlers
     template <typename Json>
     class error_reporter
@@ -68,16 +71,6 @@ namespace jsonschema {
         }
     };
 
-    template <typename Json>
-    class schema_property 
-    {
-    public:
-        virtual ~schema_property() = default;
-        virtual const std::string& keyword() const = 0; 
-        virtual const Json& constraint() const = 0;
-        virtual const uri& schema_location() const = 0; 
-    };
-
     // Interface for validation error handlers
     template <typename Json>
     class walk_reporter
@@ -87,7 +80,7 @@ namespace jsonschema {
 
         virtual ~walk_reporter() = default;
 
-        walk_state walk(const schema_property<Json>& property,
+        walk_state walk(const keyword_base<Json>& property,
             const Json& instance, const jsonpointer::json_pointer& instance_location,
             jsoncons::optional<Json>& patch) 
         {
@@ -95,7 +88,7 @@ namespace jsonschema {
         }
 
     private:
-        virtual walk_state do_walk(const schema_property<Json>& property,
+        virtual walk_state do_walk(const keyword_base<Json>& property,
             const Json& instance, const jsonpointer::json_pointer& instance_location,
             jsoncons::optional<Json>& patch) = 0;
     };

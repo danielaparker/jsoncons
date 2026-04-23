@@ -52,7 +52,7 @@ namespace jsonschema {
     };
 
     template <typename Json>
-    class keyword_base : public validation_message_factory, public schema_property<Json>
+    class keyword_base : public validation_message_factory
     {
         std::string keyword_name_;
         const Json* schema_ptr_;
@@ -74,17 +74,17 @@ namespace jsonschema {
         keyword_base& operator=(const keyword_base&) = delete;
         keyword_base& operator=(keyword_base&&) = default;
 
-        const std::string& keyword() const override
+        const std::string& keyword() const
         {
             return keyword_name_;
         }
 
-        const Json& constraint() const override
+        const Json& constraint() const
         {
             return *schema_ptr_;
         }
 
-        const uri& schema_location() const override
+        const uri& schema_location() const 
         {
             return schema_location_;
         }

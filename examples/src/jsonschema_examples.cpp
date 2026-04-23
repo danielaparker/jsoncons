@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
 #include <jsoncons/json.hpp>
@@ -14,7 +15,8 @@
 using jsoncons::json;
 using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
-namespace jsonpatch = jsoncons::jsonpatch; 
+namespace jsonpointer = jsoncons::jsonpointer;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 void validate_three_ways() 
 {
@@ -561,8 +563,8 @@ void walk_example() // since 0.175.0
 }
     )";
 
-    ojson schema = ojson::parse(schema_str);
-    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+    auto schema = jsoncons::ojson::parse(schema_str);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
 
     std::string data_str = R"(
 {
@@ -585,12 +587,12 @@ void walk_example() // since 0.175.0
     )";
 
     // Data
-    ojson data = ojson::parse(data_str);
+    auto data = jsoncons::ojson::parse(data_str);
 
-    auto reporter = [](const std::string& keyword, 
-        const ojson& schema, 
+    auto reporter = [](const std::string& keyword,
+        const jsoncons::ojson& schema,
         const jsoncons::uri& /*schema_location*/,
-        const ojson& /*instance*/, 
+        const jsoncons::ojson& /*instance*/,
         const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
         {
             if (keyword == "type")
@@ -604,6 +606,99 @@ void walk_example() // since 0.175.0
             }
             return jsonschema::walk_result::advance;
         };
+    compiled.walk(data, reporter);
+}
+
+void walk_example2() // since 1.7.0
+{
+    std::string schema_str = R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Arrays of strings and objects",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/veggie"
+      }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [
+        "veggieName",
+        "veggieLike"
+      ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )";
+
+    auto schema = jsoncons::ojson::parse(schema_str);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
+
+    std::string data_str = R"(
+{
+  "fruits": [
+    "apple",
+    "orange",
+    "pear"
+  ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": false
+    }
+  ]
+}
+    )";
+
+    // Data
+    auto data = jsoncons::ojson::parse(data_str);
+
+    auto reporter = [&schema](const std::string& keyword,
+        const jsoncons::uri& schema_location,
+        const ojson& /*instance*/, 
+        const jsoncons::jsonpointer::json_pointer& instance_location, 
+        jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
+    {
+        //std::cout << "keyword: " << keyword << "\n";
+
+        if (keyword == "type")
+        {
+            const auto& subschema = jsonpointer::get(schema, schema_location.fragment()); 
+            auto it = subschema.find("type");
+            if (it != subschema.object_range().end())
+            {
+                std::cout << instance_location.string() << ": " << it->value() << "\n";
+            }
+        }
+        return jsonschema::walk_state::advance;
+    };
+
     compiled.walk(data, reporter);
 }
 
@@ -789,13 +884,15 @@ int main()
     draft_07_example();
     
     cross_schema_example();
-    
-    walk_example();
-    
+
     resolve_uri_example();
 
     validate_with_patch_to_fix_document(); // (since 1.7.0)
     validate_usimg_pmr_allocator(); // (since 1.7.0)    
+
+    walk_example();
+    std::cout << "_____________________________\n\n";
+    walk_example2();  // (since 1.7.0)
 
     std::cout << "\n";
 }
