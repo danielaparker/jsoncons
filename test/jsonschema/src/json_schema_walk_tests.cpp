@@ -815,7 +815,8 @@ TEST_CASE("jsonschema walk keyword test")
 
                 if (keyword == "type")
                 {
-                    const auto& subschema = jsonpointer::get(schema, schema_location.fragment()); 
+                    auto location = schema_location.fragment();
+                    const auto& subschema = jsonpointer::get(schema, location); 
                     REQUIRE(subschema.is_object());
                     auto it = subschema.find("type");
                     if (it != subschema.object_range().end())

@@ -689,7 +689,8 @@ void walk_example2() // since 1.7.0
 
         if (keyword == "type")
         {
-            const auto& subschema = jsonpointer::get(schema, schema_location.fragment()); 
+            auto location = schema_location.fragment();
+            const auto& subschema = jsonpointer::get(schema, location); 
             auto it = subschema.find("type");
             if (it != subschema.object_range().end())
             {
