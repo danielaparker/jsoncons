@@ -1,8 +1,11 @@
 ### jsoncons::jsonschema::json_schema<Json>::walk
 
 ```cpp
-template <typename WalkReporter>
-void walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
+template <typename Reporter>
+void walk(const Json& instance, const Reporter& reporter) const; (since 0.175.0)
+
+template <typename Reporter>
+void walk(const Json& instance, const Reporter& reporter, jsoncons::optional<Json>& patch) const; (since 0.175.0)
 ```
 
 Walks through a JSON schema to collect information.
