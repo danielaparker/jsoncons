@@ -5,7 +5,7 @@ template <typename Reporter>
 void walk(const Json& instance, const Reporter& reporter) const; (since 0.175.0)
 
 template <typename Reporter>
-void walk(const Json& instance, const Reporter& reporter, jsoncons::optional<Json>& patch) const; (since 0.175.0)
+void walk(const Json& instance, const Reporter& reporter, Json& patch) const; (since 0.175.0)
 ```
 
 Walks through a JSON schema to collect information.
@@ -17,7 +17,7 @@ Walks through a JSON schema to collect information.
     <td>instance</td>
     <td>Input Json</td> 
   </tr>
-  <tr>
+  <tr> 
     <td>reporter</td>
     <td>A function object which returns a <a href="../walk_result.md">walk_result</a> (<a href="../walk_state.md">walk_state</a> since 1.7.0)
     to indicates whether to keep walking through the schema or stop. The signature of the function should be equivalent to 
