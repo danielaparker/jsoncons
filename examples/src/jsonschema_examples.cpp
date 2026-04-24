@@ -654,7 +654,7 @@ void walk_example2() // since 1.7.0
     )";
 
     auto schema = jsoncons::ojson::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(schema); // don't move, need schema later
+    auto compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     std::string data_str = R"(
 {
@@ -679,20 +679,15 @@ void walk_example2() // since 1.7.0
     // Data
     auto data = jsoncons::ojson::parse(data_str);
 
-    auto reporter = [&schema](const std::string& keyword,
-        const jsoncons::uri& schema_location,
+    auto reporter = [](const jsonschema::schema_property<jsoncons::ojson>& property,
         const ojson& /*instance*/, 
         const jsoncons::jsonpointer::json_pointer& instance_location, 
         jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
     {
-        //std::cout << "keyword: " << keyword << "\n";
-
-        if (keyword == "type")
+        if (property.keyword() == "type")
         {
-            auto location = schema_location.fragment();
-            const auto& subschema = jsonpointer::get(schema, location); 
-            auto it = subschema.find("type");
-            if (it != subschema.object_range().end())
+            auto it = property.subschemas().find("type");
+            if (it != property.subschemas().object_range().end())
             {
                 std::cout << instance_location.string() << ": " << it->value() << "\n";
             }
