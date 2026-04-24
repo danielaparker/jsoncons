@@ -5,7 +5,6 @@
 // See https://github.com/danielaparker/jsoncons for latest version
 
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons/json.hpp>
 
 #include <jsoncons/utility/byte_string.hpp>
@@ -18,7 +17,6 @@
 using jsoncons::json;
 using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
-namespace jsonpointer = jsoncons::jsonpointer;
 
 TEST_CASE("jsonschema walk tests")
 {
@@ -777,11 +775,11 @@ TEST_CASE("jsonschema walk keyword test")
             std::cout << e.what() << "\n";
         }
     }
-    SECTION("allOf using external schema")
+    SECTION("allOf 2")
     {
         try
         {
-            auto schema = ojson::parse(R"(
+            ojson schema = ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "anyOf": [
@@ -794,7 +792,7 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            auto compiled = jsonschema::make_json_schema(schema); // don't move, need schema later
+            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
             ojson data = ojson::parse(R"(
 1
@@ -805,27 +803,24 @@ TEST_CASE("jsonschema walk keyword test")
             )");
 
             ojson result(jsoncons::json_object_arg);
-            auto reporter = [&schema,&result](const std::string& keyword,
-                const jsoncons::uri& schema_location,
+            auto reporter = [&](const jsonschema::schema_property<ojson>& property,
                 const ojson& /*instance*/, 
                 const jsoncons::jsonpointer::json_pointer& instance_location, 
                 jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
-
-                if (keyword == "type")
+                if (property.keyword() == "type")
                 {
-                    auto location = schema_location.fragment();
-                    const auto& subschema = jsonpointer::get(schema, location); 
-                    REQUIRE(subschema.is_object());
-                    auto it = subschema.find("type");
-                    if (it != subschema.object_range().end())
+                    REQUIRE(property.subschemas().is_object());
+                    auto it = property.subschemas().find("type");
+                    if (it != property.subschemas().object_range().end())
                     {
                         result.try_emplace(instance_location.string(), it->value());
                     }
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -833,7 +828,6 @@ TEST_CASE("jsonschema walk keyword test")
         catch (const std::exception& e)
         {
             std::cout << e.what() << "\n";
-            CHECK(false);
         }
     }
 }
