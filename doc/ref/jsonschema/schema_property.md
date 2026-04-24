@@ -9,7 +9,7 @@ schema_property;
 
 #### Destructor
 
-    ~schema_property() = default;
+    virtual ~schema_property() = default;
 
 #### Member functions
 
@@ -20,6 +20,6 @@ Returns a property keyword.
 Returns the subschemas for this property
 
     virtual const jsoncons::uri& schema_location() const = 0;
-Returns the location of the constraint in the JSON Schema.
+Returns the location of the subschemas in the root Schema.
 
 

@@ -4,22 +4,22 @@
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
 template <typename Json>
-json_schema<Json> make_json_schema(Json sch,                      (1)   (since 0.175.0)
+json_schema<Json> make_json_schema(Json root_schema,                      (1)   (since 0.175.0)
     const evaluation_options& options = evaluation_options{});            
                                                                                                                               
 template <typename Json,typename SchemaResolver>
-json_schema<Json> make_json_schema(Json sch,                      (2)   (since 0.175.0)
+json_schema<Json> make_json_schema(Json root_schema,                      (2)   (since 0.175.0)
     const SchemaResolver& resolver,                                  
     const evaluation_options& options = evaluation_options{});        
                                                                   
 template <typename Json>
-json_schema<Json> make_json_schema(Json sch,                              
-    const std::string& retrieval_uri,                             (3)   (since 0.175.0) 
+json_schema<Json> make_json_schema(Json root_schema,                              
+    const std::string& retrieval_uri,                                     (3)   (since 0.175.0) 
     const evaluation_options& options = evaluation_options{});         
                                                                                                                                    
 template <typename Json,typename SchemaResolver>
-json_schema<Json> make_json_schema(Json sch,                        
-    const std::string& retrieval_uri,                             (4)   (since 0.175.0)
+json_schema<Json> make_json_schema(Json root_schema,                        
+    const std::string& retrieval_uri,                                     (4)   (since 0.175.0)
     const SchemaResolver& resolver,                                  
     const evaluation_options& options = evaluation_options{});         
                                                                   
@@ -99,7 +99,7 @@ int main()
 }
 )");
 
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
 
     json data = json::parse(R"(["foo", 42])");
 
@@ -153,7 +153,7 @@ int main()
 }
 )");
 
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
 
     json data = json::parse(R"({"foo": "foo","bar": "bar","baz": "baz"})");
 
@@ -197,7 +197,7 @@ int main()
 )");
 
     // Need to supply default version because schema does not have $schema keyword  
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema,
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema),
         jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()));
 
     json data = json::parse(R"([ null, 2, 3, "foo" ])");
@@ -255,7 +255,7 @@ int main()
     }
 }
 )");
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
 
     json data = json::parse(R"({"thing" : 10})");
 
