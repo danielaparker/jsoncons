@@ -781,7 +781,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            auto schema = ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "anyOf": [
@@ -794,7 +794,7 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            auto compiled = jsonschema::make_json_schema(schema); // don't move, need schema later
 
             ojson data = ojson::parse(R"(
 1

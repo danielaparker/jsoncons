@@ -146,7 +146,7 @@ int main()
     )";
 
     auto schema = jsoncons::ojson::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(schema);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
     auto data = jsoncons::ojson::parse(data_str);
 
     std::cout << "\n(1) Validate using exceptions\n";
@@ -273,7 +273,7 @@ int main()
     )";
 
     auto schema = jsoncons::json::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(schema);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
     auto data = jsoncons::json::parse(data_str);
     jsoncons::json patch{jsoncons::json_array_arg};
 

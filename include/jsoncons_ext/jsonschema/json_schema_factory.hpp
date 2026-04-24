@@ -226,7 +226,7 @@ namespace jsonschema {
 
     template <typename Json,typename SchemaResolver>
     typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
-    make_json_schema(const Json& sch, const std::string& retrieval_uri, const SchemaResolver& resolver, 
+    make_json_schema(Json sch, const std::string& retrieval_uri, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -235,14 +235,14 @@ namespace jsonschema {
         
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>, resolver}};
-        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(std::move(sch)), options, &schema_store, resolve_funcs, vocabulary);
 
         schema_validator_factory_base->build_schema(retrieval_uri);
         return json_schema<Json>(schema_validator_factory_base->get_schema_validator());
     }
 
     template <typename Json>
-    json_schema<Json> make_json_schema(const Json& sch, const std::string& retrieval_uri, 
+    json_schema<Json> make_json_schema(Json sch, const std::string& retrieval_uri, 
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -251,7 +251,7 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>}};
-        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(std::move(sch)), options, &schema_store, resolve_funcs, vocabulary);
 
         schema_validator_factory_base->build_schema(retrieval_uri);
         return json_schema<Json>(schema_validator_factory_base->get_schema_validator());
@@ -259,7 +259,7 @@ namespace jsonschema {
 
     template <typename Json,typename SchemaResolver>
     typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
-    make_json_schema(const Json& sch, const SchemaResolver& resolver, 
+    make_json_schema(Json sch, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -268,14 +268,14 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>, resolver}};
-        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(std::move(sch)), options, &schema_store, resolve_funcs, vocabulary);
 
         schema_validator_factory_base->build_schema();
         return json_schema<Json>(schema_validator_factory_base->get_schema_validator());
     }
-
+ 
     template <typename Json>
-    json_schema<Json> make_json_schema(const Json& sch, 
+    json_schema<Json> make_json_schema(Json sch, 
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -284,7 +284,7 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>}};
-        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto schema_validator_factory_base = factory_factory(jsoncons::make_unique<Json>(std::move(sch)), options, &schema_store, resolve_funcs, vocabulary);
 
         schema_validator_factory_base->build_schema();
         return json_schema<Json>(schema_validator_factory_base->get_schema_validator());

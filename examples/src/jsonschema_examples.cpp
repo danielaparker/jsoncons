@@ -654,7 +654,7 @@ void walk_example2() // since 1.7.0
     )";
 
     auto schema = jsoncons::ojson::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(std::move(schema));
+    auto compiled = jsonschema::make_json_schema(schema); // don't move, need schema later
 
     std::string data_str = R"(
 {

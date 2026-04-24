@@ -5,6 +5,8 @@ master (1.7.0 preview)
 
     - Git Issue #690: JMESPath let expression with operator in variable binding 
 
+    - Git Issue #697: Fixed warning when using wide characters and mapping to integer types narrower than **wchar_t**.
+
 - Changes
 
     - The jsonschema enum class `walk_result` has been renamed to `walk_state`. 
@@ -30,6 +32,8 @@ master (1.7.0 preview)
     - Reduced allocations in jsonschema compilation and validation.
 
     - Git Discussion #678: "Make json-patches in custom report that will fix validating object", is now supported
+
+    - Git Issue #695: Optimized for JMESPath short circuit of **or** and **and** operators via PR #698 
 
 1.6.0
 -----
