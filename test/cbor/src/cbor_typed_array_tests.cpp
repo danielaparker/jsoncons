@@ -93,7 +93,7 @@ TEST_CASE("cbor typed array cursor tests")
         };
 
         cbor::cbor_bytes_cursor cursor(input);
-        CHECK(staj_event_type::begin_array == cursor.current().event_type());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_typed_array());
 
         my_cbor_visitor visitor;

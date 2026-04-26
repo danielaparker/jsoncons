@@ -14,11 +14,13 @@ master (1.7.0 preview)
 
 - Enhancements:
 
-    - Git Issue #692: Redefined enum `staj_event_type` as a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html).
-      This allows us to write e.g.
+    - Git Issue #692: Redefined `staj_event_type` as an alias to `staj_events`, which meets the requirements 
+    of a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html), and means that the 
+    bitwise operators operator&, operator|, operator^, operator~, operator&=, operator|=, and operator^= 
+    are defined for this type. This allows us to write e.g.
       ```cpp
-      constexpr auto mask = staj_event_type::begin_array | staj_event_type::begin_object;
-      if ((event_type & mask) != staj_event_type{}) {/*...*/}
+      constexpr auto mask = staj_events::begin_array | staj_events::begin_object;
+      if ((event_type & mask) != staj_events{}) {/*...*/}
       ```  
 
     - The `basic_json_pointer` operator `/` now accepts a `basic_string_view` as a right-hand argument,
