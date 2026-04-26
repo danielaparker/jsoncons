@@ -2,7 +2,7 @@
 
 ```cpp
 template <typename Reporter>
-void walk(const Json& instance, const Reporter& reporter) const; (since 0.175.0)
+void walk(const Json& instance, const Reporter& reporter) const;              (since 0.175.0)
 
 template <typename Reporter>
 void walk(const Json& instance, const Reporter& reporter, Json& patch) const; (since 1.7.0)
@@ -29,7 +29,7 @@ or
     <pre>
 <a href="../walk_state.md">walk_state</a> fun(const <a href="../schema_property.md">schema_property&lt;Json&gt;&</a> property,
     const Json& instance, const jsonpointer::json_pointer& instance_location,      (since 1.7.0)
-    jsoncons::optional<Json>& patch)</pre>
+    jsoncons::optional&lt;Json&gt;& patch)</pre>
 </td> 
   </tr>
 </table>

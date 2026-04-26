@@ -1,9 +1,9 @@
 ### jsoncons::jsonschema::json_schema<Json>::validate
 
 ```cpp
-void validate(const Json& instance) const;                                            (1)
+void validate(const Json& instance) const;                                      (1)
 
-void validate(const Json& instance, Json& patch) const;                               (2)
+void validate(const Json& instance, Json& patch) const;                         (2)
 
 template <typename Reporter>
 void validate(const Json& instance, Reporter&& reporter) const;                 (3)
@@ -11,7 +11,7 @@ void validate(const Json& instance, Reporter&& reporter) const;                 
 template <typename Reporter>
 void validate(const Json& instance, Reporter&& reporter, Json& patch) const;    (4)
 
-void validate(const Json& instance, json_visitor& visitor) const;                     (5)
+void validate(const Json& instance, json_visitor& visitor) const;               (5)
 ```
 
 (1) Validates input JSON against a JSON Schema with a default error reporter
