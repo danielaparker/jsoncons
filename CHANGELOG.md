@@ -14,10 +14,11 @@ master (1.7.0 preview)
 
 - Enhancements:
 
-    - Git Issue #692: Redefined `staj_event_type` as an alias to `staj_events`, which meets the requirements 
-    of a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html), and means that the 
-    bitwise operators operator&, operator|, operator^, operator~, operator&=, operator|=, and operator^= 
-    are defined for this type. This allows us to write e.g.
+    - Git Issue #692: The enum `staj_event_type` has been redefined as a [BitMask Type](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html),
+    which means that the bitwise operators operator&, operator|, operator^, operator~, operator&=, operator|=, and operator^= 
+    are now defined for this type. The enum has been renamed to `staj_events`, following the convention that 
+    bitmask types have plural names, but aliased back to its original name `staj_event_type` for backwards compatibility. 
+    This allows us to write e.g.
       ```cpp
       constexpr auto mask = staj_events::begin_array | staj_events::begin_object;
       if ((event_type & mask) != staj_events{}) {/*...*/}
