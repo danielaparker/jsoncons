@@ -220,7 +220,7 @@ int main()
     )";
 
     auto schema = jsoncons::ojson::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(std::move(schema));
+    auto compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     std::string data_str = R"(
 {
@@ -245,23 +245,22 @@ int main()
     // Data
     auto data = jsoncons::ojson::parse(data_str);
 
-    auto reporter = [](const std::string& keyword,
-        const jsoncons::ojson& schema,
-        const jsoncons::uri& /*schema_location*/,
-        const jsoncons::ojson& /*instance*/,
-        const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+    auto reporter = [](const jsonschema::schema_property<jsoncons::ojson>& property,
+        const ojson& /*instance*/, 
+        const jsoncons::jsonpointer::json_pointer& instance_location, 
+        jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
+    {
+        if (property.keyword() == "type")
         {
-            if (keyword == "type")
+            auto it = property.subschemas().find("type");
+            if (it != property.subschemas().object_range().end())
             {
-                assert(schema.is_object());
-                auto it = schema.find("type");
-                if (it != schema.object_range().end())
-                {
-                    std::cout << instance_location.string() << ": " << it->value() << "\n";
-                }
+                std::cout << instance_location.string() << ": " << it->value() << "\n";
             }
-            return jsonschema::walk_result::advance;
-        };
+        }
+        return jsonschema::walk_state::advance;
+    };
+
     compiled.walk(data, reporter);
 }
 ```
