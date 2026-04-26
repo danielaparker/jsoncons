@@ -100,7 +100,8 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("Issues")
     {
-        jmespath_tests("./jmespath/input/issues/issues.json"); 
+        jmespath_tests("./jmespath/input/issues/issues.json");
+        jmespath_tests("./jmespath/input/issues/issue-695.json");
     }
     SECTION("compliance")
     {

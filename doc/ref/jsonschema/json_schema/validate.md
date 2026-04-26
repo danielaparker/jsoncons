@@ -1,17 +1,17 @@
 ### jsoncons::jsonschema::json_schema<Json>::validate
 
 ```cpp
-void validate(const Json& instance) const;                                               (1)
+void validate(const Json& instance) const;                                            (1)
 
-void validate(const Json& instance, Json& patch) const;                                  (2)
+void validate(const Json& instance, Json& patch) const;                               (2)
 
-template <typename CustomReporter>
-void validate(const Json& instance, CustomReporter&& reporter) const;               (3)
+template <typename Reporter>
+void validate(const Json& instance, Reporter&& reporter) const;                 (3)
 
-template <typename CustomReporter>
-void validate(const Json& instance, CustomReporter&& reporter, Json& patch) const;  (4)
+template <typename Reporter>
+void validate(const Json& instance, Reporter&& reporter, Json& patch) const;    (4)
 
-void validate(const Json& instance, json_visitor& visitor) const;                        (5)
+void validate(const Json& instance, json_visitor& visitor) const;                     (5)
 ```
 
 (1) Validates input JSON against a JSON Schema with a default error reporter
@@ -40,12 +40,14 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
   </tr>
   <tr>
     <td>reporter</td>
-    <td>A function object with signature equivalent to 
+    <td>A function object which returns a <a href="../walk_result.md">walk_result</a> (<a href="../walk_state.md">walk_state</a> since 1.7.0)
+    to indicates whether to keep validating or stop. 
+    The signature of the function should be equivalent to 
     <pre>
        <a href="../walk_result.md">walk_result</a> fun(const <a href="../validation_message.md">validation_message</a>& msg);</pre>
-     or (since 1.7.0)
+     or 
     <pre>
-       <a href="../walk_state.md">walk_state</a> fun(const <a href="../validation_message.md">validation_message</a>& msg, 
+       <a href="../walk_state.md">walk_state</a> fun(const <a href="../validation_message.md">validation_message</a>& msg,    (since 1.7.0)
            jsoncons::optional&lt;Json&gt;& patch);</pre>
 </td> 
   </tr>
@@ -144,7 +146,7 @@ int main()
     )";
 
     auto schema = jsoncons::ojson::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(schema);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
     auto data = jsoncons::ojson::parse(data_str);
 
     std::cout << "\n(1) Validate using exceptions\n";
@@ -271,7 +273,7 @@ int main()
     )";
 
     auto schema = jsoncons::json::parse(schema_str);
-    auto compiled = jsonschema::make_json_schema(schema);
+    auto compiled = jsonschema::make_json_schema(std::move(schema));
     auto data = jsoncons::json::parse(data_str);
     jsoncons::json patch{jsoncons::json_array_arg};
 

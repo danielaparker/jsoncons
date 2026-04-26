@@ -825,35 +825,20 @@ namespace impl {
     using
     is_constructible_from_data_size = is_detected<construct_from_data_size_t,T,Data,Size>;
 
-    // is_function_object_1
-    // is_function_object_1_exact
+    // is_function_object
+    // is_function_object_exact
 
-    template <typename FunctionObject,typename Arg>
+    template <typename FunctionObject,typename... Args>
         using
-        unary_function_object_t = decltype(std::declval<FunctionObject>()(std::declval<Arg>()));
+        function_object_t = decltype(std::declval<FunctionObject>()(std::declval<Args>()...));
 
-    template <typename FunctionObject,typename Arg>
+    template <typename FunctionObject,typename... Args>
         using
-        is_function_object_1 = is_detected<unary_function_object_t, FunctionObject, Arg>;
+        is_function_object = is_detected<function_object_t, FunctionObject, Args ...>;
 
-    template <typename FunctionObject,typename T,typename Arg>
+    template <typename FunctionObject,typename T,typename... Args>
     using
-    is_function_object_1_exact = is_detected_exact<T,unary_function_object_t, FunctionObject, Arg>;
-
-    // is_function_object_2
-    // is_function_object_2_exact
-
-    template <typename FunctionObject,typename Arg1,typename Arg2>
-        using
-        binary_function_object_t = decltype(std::declval<FunctionObject>()(std::declval<Arg1>(),std::declval<Arg2>()));
-
-    template <typename FunctionObject,typename Arg1,typename Arg2>
-        using
-        is_function_object_2 = is_detected<binary_function_object_t, FunctionObject, Arg1, Arg2>;
-
-    template <typename FunctionObject,typename T,typename Arg1,typename Arg2>
-    using
-    is_function_object_2_exact = is_detected_exact<T,binary_function_object_t, FunctionObject, Arg1, Arg2>;
+    is_function_object_exact = is_detected_exact<T,function_object_t, FunctionObject, Args ...>;
 
     template <typename Source,typename Enable=void>
     struct is_convertible_to_string_view : std::false_type {};

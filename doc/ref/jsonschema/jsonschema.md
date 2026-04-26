@@ -355,7 +355,7 @@ int main()
 }
     )");
 
-    auto compiled = jsoncons::jsonschema::make_json_schema(schema,
+    auto compiled = jsoncons::jsonschema::make_json_schema(std::move(schema),
         jsonschema::evaluation_options{}.require_format_validation(true));
 
     json data = json::parse(R"(
@@ -453,7 +453,7 @@ int main()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema), resolver);
 
         std::string root_dir = "./input/jsonschema";
         auto resolver = [&](const jsoncons::uri& uri) -> json
@@ -588,7 +588,7 @@ int main()
         json data = json::parse(data_str);
 
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
 
         // Test that input is valid before attempting to decode
         if (compiled.is_valid(data))
@@ -660,7 +660,7 @@ int main()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;

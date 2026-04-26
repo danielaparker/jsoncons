@@ -44,8 +44,8 @@ TEST_CASE("jsonschema pmr allocator tests")
   },
   "type": "array",
   "items": { "$ref": "#/$defs/point" },
-  "minItems": 3,
-  "maxItems": 1
+  "minItems": 1,
+  "maxItems": 3
 }
 
         )");

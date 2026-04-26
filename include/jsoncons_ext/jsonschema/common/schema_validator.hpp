@@ -26,7 +26,6 @@ namespace jsonschema {
     class schema_validator : public validator_base<Json>
     {
     public:
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
 
     public:
@@ -48,13 +47,13 @@ namespace jsonschema {
     class document_schema_validator : public schema_validator<Json>
     {
         using schema_validator_ptr_type = std::unique_ptr<schema_validator<Json>>;
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
+        std::unique_ptr<Json> root_schema_;
         schema_validator_ptr_type schema_val_;
         std::vector<schema_validator_ptr_type> schemas_;
     public:
-        document_schema_validator(schema_validator_ptr_type&& schema_val, std::vector<schema_validator_ptr_type>&& schemas)
-            : schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
+        document_schema_validator(std::unique_ptr<Json>&& root_schema, schema_validator_ptr_type&& schema_val, std::vector<schema_validator_ptr_type>&& schemas)
+            : root_schema_(std::move(root_schema)), schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
         {
             if (schema_val_ == nullptr)
                 JSONCONS_THROW(schema_error("There is no schema to validate an instance against"));
@@ -107,9 +106,9 @@ namespace jsonschema {
 
         walk_state walk(const eval_context<Json>& context, 
             const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
+            const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) 
         {
-            return do_walk(context, instance, instance_location, reporter);
+            return do_walk(context, instance, instance_location, reporter, patch);
         }
         
     private:
@@ -125,10 +124,10 @@ namespace jsonschema {
         }
 
         walk_state do_walk(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
+            const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
-            return schema_val_->walk(context, instance, instance_location, reporter);
+            return schema_val_->walk(context, instance, instance_location, reporter, patch);
         }
     };
 
@@ -137,7 +136,6 @@ namespace jsonschema {
     {
     public:
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri schema_location_;
         bool value_;
@@ -217,7 +215,8 @@ namespace jsonschema {
         }
 
         walk_state do_walk(const eval_context<Json>& /*context*/, const Json& /*instance*/,
-            const jsonpointer::json_pointer& /*instance_location*/, const walk_reporter_type& /*reporter*/) const final 
+            const jsonpointer::json_pointer& /*instance_location*/, 
+            walk_reporter<Json>& /*reporter*/, jsoncons::optional<Json>& /*patch*/) const final 
         {
             return walk_state::advance;
         }
@@ -230,7 +229,6 @@ namespace jsonschema {
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
         using anchor_schema_map_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri schema_location_;
         jsoncons::optional<jsoncons::uri> id_;
@@ -404,7 +402,7 @@ namespace jsonschema {
             //std::cout << "validators:\n";
             for (auto& val : validators_)
             {               
-                //std::cout << "    " << val->keyword_name() << "\n";
+                //std::cout << "    " << val->keyword() << "\n";
                 walk_state result = val->validate(this_context, instance, instance_location, local_results, reporter, patch);
                 if (result == walk_state::abort)
                 {
@@ -452,13 +450,13 @@ namespace jsonschema {
         }
 
         walk_state do_walk(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final 
+            const jsonpointer::json_pointer& instance_location, walk_reporter<Json>& reporter, jsoncons::optional<Json>& patch) const final 
         {           
             eval_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
-                //std::cout << "    " << val->keyword_name() << "\n";
-                walk_state result = val->walk(this_context, instance, instance_location, reporter);
+                //std::cout << "    " << val->keyword() << "\n";
+                walk_state result = val->walk(this_context, instance, instance_location, reporter, patch);
                 if (result == walk_state::abort)
                 {
                     return result;
@@ -466,7 +464,7 @@ namespace jsonschema {
             }
             if (unevaluated_properties_val_)
             {
-                walk_state result = unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter);
+                walk_state result = unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter, patch);
                 if (result == walk_state::abort)
                 {
                     return result;
@@ -475,7 +473,7 @@ namespace jsonschema {
 
             if (unevaluated_items_val_)
             {
-                walk_state result = unevaluated_items_val_->walk(this_context, instance, instance_location, reporter);
+                walk_state result = unevaluated_items_val_->walk(this_context, instance, instance_location, reporter, patch);
                 if (result == walk_state::abort)
                 {
                     return result;

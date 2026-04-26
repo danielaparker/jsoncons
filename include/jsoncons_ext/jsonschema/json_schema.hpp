@@ -95,7 +95,7 @@ struct error_reporter_adaptor : public error_reporter<Json>
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<ext_traits::is_function_object_1_exact<Reporter,walk_state,validation_message>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -118,7 +118,7 @@ private:
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<ext_traits::is_function_object_2_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -135,6 +135,57 @@ private:
         jsoncons::optional<Json>& patch) override
     {
         return reporter_(msg, patch);
+    }
+};
+
+template <typename Json,typename Reporter,typename Enable=void>
+struct walk_reporter_adaptor : public walk_reporter<Json>
+{
+};
+
+template <typename Json,typename Reporter>
+struct walk_reporter_adaptor<Json,Reporter,
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value>::type>
+    : public walk_reporter<Json>
+{
+    Reporter reporter_;
+
+    walk_reporter_adaptor(const Reporter& reporter)
+        : reporter_(reporter)
+    {
+    }
+
+    walk_reporter_adaptor& operator=(const Reporter& reporter) = delete;
+
+private:
+    walk_state do_walk(const schema_property<Json>& property,
+        const Json& instance, const jsonpointer::json_pointer& instance_location,
+        jsoncons::optional<Json>& /*patch*/) final
+    {
+        return reporter_(property.keyword(), property.subschemas(), property.schema_location(), instance, instance_location);
+    }
+};
+
+template <typename Json,typename Reporter>
+struct walk_reporter_adaptor<Json,Reporter,
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value>::type>
+    : public walk_reporter<Json>
+{
+    Reporter reporter_;
+
+    walk_reporter_adaptor(const Reporter& reporter)
+        : reporter_(reporter)
+    {
+    }
+
+    walk_reporter_adaptor& operator=(const Reporter& reporter) = delete;
+
+private:
+    walk_state do_walk(const schema_property<Json>& property,
+        const Json& instance, const jsonpointer::json_pointer& instance_location,
+        jsoncons::optional<Json>& patch) final
+    {
+        return reporter_(property, instance, instance_location, patch);
     }
 };
 
@@ -160,16 +211,15 @@ public:
     json_schema& operator=(json_schema&&) = default;
 
     // Validate input JSON against a JSON Schema with a default throwing error reporter
-    Json validate(const Json& instance) const
+    void validate(const Json& instance) const
     {
         throwing_error_listener<Json> reporter;
         jsonpointer::json_pointer instance_location{};
-        jsoncons::optional<Json> patch{jsoncons::in_place, jsoncons::json_array_arg};
+        jsoncons::optional<Json> patch{};
 
-        eval_context<Json> context;
-        evaluation_results results;
+        eval_context<Json> context{};
+        evaluation_results results{};
         root_->validate(context, instance, instance_location, results, reporter, patch);
-        return patch ? *patch : Json{json_array_arg};
     }
 
     // Validate input JSON against a JSON Schema 
@@ -186,27 +236,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_function_object_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_function_object_1_exact<CustomReporter,walk_state,validation_message>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -222,27 +272,27 @@ public:
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_function_object_2_exact<CustomReporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
         jsoncons::optional<Json> patch;
 
-        error_reporter_adaptor<Json,CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         root_->validate(context, instance, instance_location, results, adaptor, patch);
     }
 
     // Validate input JSON against a JSON Schema with a provided error reporter
-    template <typename CustomReporter>
-    typename std::enable_if<ext_traits::is_function_object_2_exact<CustomReporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
-    validate(const Json& instance, CustomReporter&& reporter, Json& patch) const
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
+    validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
 
-        error_reporter_adaptor<Json, CustomReporter> adaptor(std::forward<CustomReporter>(reporter));
+        error_reporter_adaptor<Json, Reporter> adaptor(std::forward<Reporter>(reporter));
         eval_context<Json> context;
         evaluation_results results;
         jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
@@ -292,13 +342,46 @@ public:
         visitor.end_array();
         visitor.flush();
     }
-    
-    template <typename WalkReporter>
-    void walk(const Json& instance, const WalkReporter& reporter) const
+
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
+    walk(const Json& instance, Reporter&& reporter) const
+    {
+        jsoncons::optional<Json> patch;
+        jsonpointer::json_pointer instance_location{};
+        walk_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
+
+        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, patch);
+    }
+
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
+    walk(const Json& instance, Reporter&& reporter) const
+    {
+        jsoncons::optional<Json> patch;
+        jsonpointer::json_pointer instance_location{};
+        walk_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
+
+        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, patch);
+    }
+
+    template <typename Reporter>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
+    walk(const Json& instance, Reporter&& reporter, jsoncons::optional<Json>& patch) const
     {
         jsonpointer::json_pointer instance_location{};
+        walk_reporter_adaptor<Json,Reporter> adaptor(std::forward<Reporter>(reporter));
 
-        root_->walk(eval_context<Json>{}, instance, instance_location, reporter);
+        jsoncons::optional<Json> temp{jsoncons::in_place, jsoncons::json_array_arg};
+        root_->walk(eval_context<Json>{}, instance, instance_location, adaptor, temp);
+        if (temp)
+        {
+            patch = std::move(*temp);
+        }
+        else
+        {
+            patch = Json(json_array_arg);
+        }
     }
 };
 

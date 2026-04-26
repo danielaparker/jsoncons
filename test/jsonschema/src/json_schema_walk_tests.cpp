@@ -123,6 +123,7 @@ TEST_CASE("jsonschema walk tests")
             }
             return jsonschema::walk_state::advance;
         };
+        schema = ojson::null(); // walk mustn't try to access memory in original schema
         compiled.walk(data, reporter);
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
@@ -206,6 +207,7 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
         }
@@ -260,6 +262,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
         }
@@ -305,6 +308,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -358,6 +362,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -407,6 +412,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -453,6 +459,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -501,6 +508,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -547,6 +555,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -594,6 +603,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -647,6 +657,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -700,6 +711,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -753,6 +765,62 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            compiled.walk(data, reporter);
+            CHECK(expected == result);
+            //std::cout << result << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+    }
+    SECTION("allOf 2")
+    {
+        try
+        {
+            ojson schema = ojson::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "anyOf": [
+        {
+            "type": "integer"
+        },
+        {
+            "minimum": 2
+        }
+    ]
+}
+                    )");
+            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+
+            ojson data = ojson::parse(R"(
+1
+            )");
+
+            ojson expected = ojson::parse(R"(      
+{"":"integer"}
+            )");
+
+            ojson result(jsoncons::json_object_arg);
+            auto reporter = [&](const jsonschema::schema_property<ojson>& property,
+                const ojson& /*instance*/, 
+                const jsoncons::jsonpointer::json_pointer& instance_location, 
+                jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
+            {
+                //std::cout << "keyword: " << keyword << "\n";
+                if (property.keyword() == "type")
+                {
+                    REQUIRE(property.subschemas().is_object());
+                    auto it = property.subschemas().find("type");
+                    if (it != property.subschemas().object_range().end())
+                    {
+                        result.try_emplace(instance_location.string(), it->value());
+                    }
+                }
+                return jsonschema::walk_state::advance;
+            };
+            schema = ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
