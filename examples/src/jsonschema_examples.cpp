@@ -774,8 +774,6 @@ void validate_with_patch_to_fix_document() // (since 1.7.0)
                     j.try_emplace("path", msg.instance_location().string() + "/veggieLike");
                     j.try_emplace("value", false);
                     patch->push_back(std::move(j));
-
-                    //there could be "return jsonschema::walk_state::advance_no_error;" for saying to validator "its not error, go forward!"
                 }
             }
             std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
