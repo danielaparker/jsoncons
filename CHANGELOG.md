@@ -1,5 +1,5 @@
-master (1.7.0 preview)
-----------------------
+Release 1.7.0
+-------------
 
 - Fixed bugs:
 
