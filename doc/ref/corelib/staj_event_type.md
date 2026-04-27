@@ -10,7 +10,7 @@ enum class staj_event_type
     null_value,
     bool_value,
     int64_value,
-    uint64_value,
+    uint64_value,                       (until 1.7.0)
     half_value,
     double_value,
     begin_array,
@@ -19,18 +19,13 @@ enum class staj_event_type
     end_object,
     key
 };
+
+using staj_event_type = staj_events;    (since 1.7.0)
 ```
 Indicates the type of a staj event.
 
-Since 1.7.0, `staj_event_type` is defined as a
-[BitMaskType](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html). This 
-allows us to write e.g.
-
-```cpp
-constexpr auto mask = staj_event_type::begin_array | staj_event_type::begin_object;
-if ((event_type & mask) != staj_event_type{}) 
-{
-    /*...*/
-}
-```  
+Since 1.7.0, `staj_event_type` is aliased to [staj_events](staj_events.md),
+which meets the requirements of a [BitMaskType](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html),
+and means that the bitwise operators operator&, operator|, operator^, operator~, operator&=, operator|=, and operator^= 
+are defined for this type.
 

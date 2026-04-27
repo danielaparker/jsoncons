@@ -112,7 +112,7 @@ namespace detail {
         using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
         using byte_string_type = basic_byte_string<byte_allocator_type>;
 
-        staj_event_type event_type;
+        staj_events event_type;
         string_type string_value;
         byte_string_type byte_string_value;
         union
@@ -124,7 +124,7 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag, const TempAlloc& alloc)
+        parse_event(staj_events event_type, semantic_tag tag, const TempAlloc& alloc)
             : event_type(event_type), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -133,7 +133,7 @@ namespace detail {
         }
 
         parse_event(const string_view_type& value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::string_value), 
+            : event_type(staj_events::string_value), 
               string_value(value.data(),value.length(),alloc), 
               byte_string_value(alloc),
               tag(tag)
@@ -141,7 +141,7 @@ namespace detail {
         }
 
         parse_event(const byte_string_view& value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::byte_string_value), 
+            : event_type(staj_events::byte_string_value), 
               string_value(alloc),
               byte_string_value(value.data(),value.size(),alloc), 
               tag(tag)
@@ -149,7 +149,7 @@ namespace detail {
         }
 
         parse_event(bool value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::bool_value), 
+            : event_type(staj_events::bool_value), 
               string_value(alloc),
               byte_string_value(alloc),
               bool_value(value), 
@@ -158,7 +158,7 @@ namespace detail {
         }
 
         parse_event(int64_t value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::int64_value), 
+            : event_type(staj_events::int64_value), 
               string_value(alloc),
               byte_string_value(alloc),
               int64_value(value), 
@@ -167,7 +167,7 @@ namespace detail {
         }
 
         parse_event(uint64_t value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::uint64_value), 
+            : event_type(staj_events::uint64_value), 
               string_value(alloc),
               byte_string_value(alloc),
               uint64_value(value), 
@@ -176,7 +176,7 @@ namespace detail {
         }
 
         parse_event(double value, semantic_tag tag, const TempAlloc& alloc)
-            : event_type(staj_event_type::double_value), 
+            : event_type(staj_events::double_value), 
               string_value(alloc),
               byte_string_value(alloc),
               double_value(value), 
@@ -193,31 +193,31 @@ namespace detail {
         {
             switch (event_type)
             {
-                case staj_event_type::begin_array:
+                case staj_events::begin_array:
                     visitor.begin_array(tag, ser_context());
                     break;
-                case staj_event_type::end_array:
+                case staj_events::end_array:
                     visitor.end_array(ser_context());
                     break;
-                case staj_event_type::string_value:
+                case staj_events::string_value:
                     visitor.string_value(string_value, tag, ser_context());
                     break;
-                case staj_event_type::byte_string_value:
+                case staj_events::byte_string_value:
                     visitor.byte_string_value(byte_string_value, tag, ser_context());
                     break;
-                case staj_event_type::null_value:
+                case staj_events::null_value:
                     visitor.null_value(tag, ser_context());
                     break;
-                case staj_event_type::bool_value:
+                case staj_events::bool_value:
                     visitor.bool_value(bool_value, tag, ser_context());
                     break;
-                case staj_event_type::int64_value:
+                case staj_events::int64_value:
                     visitor.int64_value(int64_value, tag, ser_context());
                     break;
-                case staj_event_type::uint64_value:
+                case staj_events::uint64_value:
                     visitor.uint64_value(uint64_value, tag, ser_context());
                     break;
-                case staj_event_type::double_value:
+                case staj_events::double_value:
                     visitor.double_value(double_value, tag, ser_context());
                     break;
                 default:
@@ -397,7 +397,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag, alloc_);
+                cached_events_[name_index_].emplace_back(staj_events::begin_array, tag, alloc_);
                 
                 ++level2_;
             }
@@ -408,7 +408,7 @@ namespace detail {
         {
             if (level2_ > 0)
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none, alloc_);
+                cached_events_[name_index_].emplace_back(staj_events::end_array, semantic_tag::none, alloc_);
                 ++name_index_;
                 --level2_;
             }
@@ -429,7 +429,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(staj_events::null_value, tag, alloc_);
                 if (level2_ == 0)
                 {
                     ++name_index_;
