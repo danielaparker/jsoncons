@@ -163,9 +163,9 @@ public:
         return parser_.raw_tag();
     }
 
-    bool is_typed_array() const
+    bool is_typed_array() const final
     {
-        return cursor_visitor_.is_typed_array();
+        return parser_.is_typed_array();
     }
 
     const staj_event& current() const override

@@ -98,9 +98,9 @@ public:
         }
     }
 
-    bool is_typed_array() const
+    virtual bool is_typed_array() const
     {
-        return data_.type() != typed_array_element_type();
+        return false;
     }
 
     staj_cursor_state state() const
@@ -695,6 +695,10 @@ public:
 
     virtual std::size_t column() const = 0;
     
+    virtual bool is_typed_array() const
+    {
+        return false;
+    }
 };
 
 template <typename CharT>
