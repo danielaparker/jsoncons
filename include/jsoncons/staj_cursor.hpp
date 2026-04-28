@@ -24,7 +24,7 @@
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/staj_event.hpp>
-#include <jsoncons/typed_array_view.hpp>
+#include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/utility/conversion.hpp>
@@ -100,7 +100,7 @@ public:
 
     bool is_typed_array() const
     {
-        return data_.type() != typed_array_type();
+        return data_.type() != typed_array_element_type();
     }
 
     staj_cursor_state state() const
@@ -116,57 +116,57 @@ public:
             {
                 switch (data_.type())
                 {
-                    case typed_array_type::uint8_value:
+                    case typed_array_element_type::uint8_value:
                     {
                         this->uint64_value(data_.data(uint8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::uint16_value:
+                    case typed_array_element_type::uint16_value:
                     {
                         this->uint64_value(data_.data(uint16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::uint32_value:
+                    case typed_array_element_type::uint32_value:
                     {
                         this->uint64_value(data_.data(uint32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::uint64_value:
+                    case typed_array_element_type::uint64_value:
                     {
                         this->uint64_value(data_.data(uint64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::int8_value:
+                    case typed_array_element_type::int8_value:
                     {
                         this->int64_value(data_.data(int8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::int16_value:
+                    case typed_array_element_type::int16_value:
                     {
                         this->int64_value(data_.data(int16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::int32_value:
+                    case typed_array_element_type::int32_value:
                     {
                         this->int64_value(data_.data(int32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::int64_value:
+                    case typed_array_element_type::int64_value:
                     {
                         this->int64_value(data_.data(int64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::half_value:
+                    case typed_array_element_type::half_value:
                     {
                         this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::float_value:
+                    case typed_array_element_type::float_value:
                     {
                         this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::double_value:
+                    case typed_array_element_type::double_value:
                     {
                         this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
@@ -220,7 +220,7 @@ public:
                 const std::size_t len = data_.size();
                 switch (data_.type())
                 {
-                    case typed_array_type::uint8_value:
+                    case typed_array_element_type::uint8_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -228,7 +228,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::uint16_value:
+                    case typed_array_element_type::uint16_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -236,7 +236,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::uint32_value:
+                    case typed_array_element_type::uint32_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -244,7 +244,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::uint64_value:
+                    case typed_array_element_type::uint64_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -252,7 +252,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::int8_value:
+                    case typed_array_element_type::int8_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -260,7 +260,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::int16_value:
+                    case typed_array_element_type::int16_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -268,7 +268,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::int32_value:
+                    case typed_array_element_type::int32_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -276,7 +276,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::int64_value:
+                    case typed_array_element_type::int64_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -284,7 +284,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::float_value:
+                    case typed_array_element_type::float_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -292,7 +292,7 @@ public:
                         }
                         break;
                     }
-                    case typed_array_type::double_value:
+                    case typed_array_element_type::double_value:
                     {
                         for (auto i = index_; i < len; ++i) 
                         {
@@ -312,52 +312,52 @@ public:
             {
                 switch (data_.type())
                 {
-                    case typed_array_type::uint8_value:
+                    case typed_array_element_type::uint8_value:
                     {
                         visitor.typed_array(data_.data(uint8_array_arg));
                         break;
                     }
-                    case typed_array_type::uint16_value:
+                    case typed_array_element_type::uint16_value:
                     {
                         visitor.typed_array(data_.data(uint16_array_arg));
                         break;
                     }
-                    case typed_array_type::uint32_value:
+                    case typed_array_element_type::uint32_value:
                     {
                         visitor.typed_array(data_.data(uint32_array_arg));
                         break;
                     }
-                    case typed_array_type::uint64_value:
+                    case typed_array_element_type::uint64_value:
                     {
                         visitor.typed_array(data_.data(uint64_array_arg));
                         break;
                     }
-                    case typed_array_type::int8_value:
+                    case typed_array_element_type::int8_value:
                     {
                         visitor.typed_array(data_.data(int8_array_arg));
                         break;
                     }
-                    case typed_array_type::int16_value:
+                    case typed_array_element_type::int16_value:
                     {
                         visitor.typed_array(data_.data(int16_array_arg));
                         break;
                     }
-                    case typed_array_type::int32_value:
+                    case typed_array_element_type::int32_value:
                     {
                         visitor.typed_array(data_.data(int32_array_arg));
                         break;
                     }
-                    case typed_array_type::int64_value:
+                    case typed_array_element_type::int64_value:
                     {
                         visitor.typed_array(data_.data(int64_array_arg));
                         break;
                     }
-                    case typed_array_type::float_value:
+                    case typed_array_element_type::float_value:
                     {
                         visitor.typed_array(data_.data(float_array_arg));
                         break;
                     }
-                    case typed_array_type::double_value:
+                    case typed_array_element_type::double_value:
                     {
                         visitor.typed_array(data_.data(double_array_arg));
                         break;

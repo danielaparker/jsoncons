@@ -19,6 +19,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons/typed_array.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -1644,9 +1645,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size();
-                    visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const uint8_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1659,9 +1658,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size();
-                    visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::clamped, *this, ec);
+                    visitor.typed_array(typed_array_cast<const uint8_t>(typed_array_), semantic_tag::clamped, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1677,19 +1674,15 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    uint16_t* data = reinterpret_cast<uint16_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
-
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<uint16_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<uint16_t>(data[i]);
+                            ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const uint16_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1716,7 +1709,7 @@ private:
                             data[i] = binary::byte_swap<uint32_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const uint32_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1743,7 +1736,7 @@ private:
                             data[i] = binary::byte_swap<uint64_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const uint64_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1756,9 +1749,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    int8_t* data = reinterpret_cast<int8_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size();
-                    visitor.typed_array(jsoncons::span<const int8_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const int8_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1785,7 +1776,7 @@ private:
                             data[i] = binary::byte_swap<int16_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const int16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const int16_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1812,7 +1803,7 @@ private:
                             data[i] = binary::byte_swap<int32_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const int32_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const int32_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1839,7 +1830,7 @@ private:
                             data[i] = binary::byte_swap<int64_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const int64_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const int64_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1866,7 +1857,7 @@ private:
                             data[i] = binary::byte_swap<uint16_t>(data[i]);
                         }
                     }
-                    visitor.typed_array(half_arg, jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(half_arg, typed_array_cast<const uint16_t>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1893,7 +1884,7 @@ private:
                             data[i] = binary::byte_swap<float>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const float>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const float>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -1921,7 +1912,7 @@ private:
                             data[i] = binary::byte_swap<double>(data[i]);
                         }
                     }
-                    visitor.typed_array(jsoncons::span<const double>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(typed_array_cast<const double>(typed_array_), semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
