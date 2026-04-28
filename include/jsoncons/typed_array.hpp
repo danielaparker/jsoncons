@@ -49,9 +49,10 @@ constexpr double_array_arg_t double_array_arg = double_array_arg_t();
 struct float128_array_arg_t {explicit float128_array_arg_t() = default; };
 constexpr float128_array_arg_t float128_array_arg = float128_array_arg_t();
 
-enum class typed_array_element_type{uint8_value=1,uint16_value,uint32_value,uint64_value,
-                            int8_value,int16_value,int32_value,int64_value, 
-                            half_value, float_value,double_value};
+enum class typed_array_element_type{
+    uint8=1,uint16,uint32,uint64,
+    int8,int16,int32,int64, 
+    half_float, float32, float64};
 
 class typed_array_view
 {
@@ -88,67 +89,67 @@ public:
     }
 
     typed_array_view(const uint8_t* data, std::size_t size)
-        : type_(typed_array_element_type::uint8_value), size_(size)
+        : type_(typed_array_element_type::uint8), size_(size)
     {
         data_.uint8_data_ = data;
     }
 
     typed_array_view(const uint16_t* data, std::size_t size)
-        : type_(typed_array_element_type::uint16_value), size_(size)
+        : type_(typed_array_element_type::uint16), size_(size)
     {
         data_.uint16_data_ = data;
     }
 
     typed_array_view(const uint32_t* data, std::size_t size)
-        : type_(typed_array_element_type::uint32_value), size_(size)
+        : type_(typed_array_element_type::uint32), size_(size)
     {
         data_.uint32_data_ = data;
     }
 
     typed_array_view(const uint64_t* data, std::size_t size)
-        : type_(typed_array_element_type::uint64_value), size_(size)
+        : type_(typed_array_element_type::uint64), size_(size)
     {
         data_.uint64_data_ = data;
     }
 
     typed_array_view(const int8_t* data, std::size_t size)
-        : type_(typed_array_element_type::int8_value), size_(size)
+        : type_(typed_array_element_type::int8), size_(size)
     {
         data_.int8_data_ = data;
     }
 
     typed_array_view(const int16_t* data, std::size_t size)
-        : type_(typed_array_element_type::int16_value), size_(size)
+        : type_(typed_array_element_type::int16), size_(size)
     {
         data_.int16_data_ = data;
     }
 
     typed_array_view(const int32_t* data, std::size_t size)
-        : type_(typed_array_element_type::int32_value), size_(size)
+        : type_(typed_array_element_type::int32), size_(size)
     {
         data_.int32_data_ = data;
     }
 
     typed_array_view(const int64_t* data, std::size_t size)
-        : type_(typed_array_element_type::int64_value), size_(size)
+        : type_(typed_array_element_type::int64), size_(size)
     {
         data_.int64_data_ = data;
     }
 
     typed_array_view(half_array_arg_t, const uint16_t* data, std::size_t size)
-        : type_(typed_array_element_type::half_value), size_(size)
+        : type_(typed_array_element_type::half_float), size_(size)
     {
         data_.uint16_data_ = data;
     }
 
     typed_array_view(const float* data, std::size_t size)
-        : type_(typed_array_element_type::float_value), size_(size)
+        : type_(typed_array_element_type::float32), size_(size)
     {
         data_.float_data_ = data;
     }
 
     typed_array_view(const double* data, std::size_t size)
-        : type_(typed_array_element_type::double_value), size_(size)
+        : type_(typed_array_element_type::float64), size_(size)
     {
         data_.double_data_ = data;
     }
@@ -169,67 +170,67 @@ public:
 
     jsoncons::span<const uint8_t> data(uint8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::uint8_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::uint8);
         return jsoncons::span<const uint8_t>(data_.uint8_data_, size_);
     }
 
     jsoncons::span<const uint16_t> data(uint16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::uint16_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::uint16);
         return jsoncons::span<const uint16_t>(data_.uint16_data_, size_);
     }
 
     jsoncons::span<const uint32_t> data(uint32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::uint32_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::uint32);
         return jsoncons::span<const uint32_t>(data_.uint32_data_, size_);
     }
 
     jsoncons::span<const uint64_t> data(uint64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::uint64_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::uint64);
         return jsoncons::span<const uint64_t>(data_.uint64_data_, size_);
     }
 
     jsoncons::span<const int8_t> data(int8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::int8_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::int8);
         return jsoncons::span<const int8_t>(data_.int8_data_, size_);
     }
 
     jsoncons::span<const int16_t> data(int16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::int16_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::int16);
         return jsoncons::span<const int16_t>(data_.int16_data_, size_);
     }
 
     jsoncons::span<const int32_t> data(int32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::int32_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::int32);
         return jsoncons::span<const int32_t>(data_.int32_data_, size_);
     }
 
     jsoncons::span<const int64_t> data(int64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::int64_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::int64);
         return jsoncons::span<const int64_t>(data_.int64_data_, size_);
     }
 
     jsoncons::span<const uint16_t> data(half_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::half_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::half_float);
         return jsoncons::span<const uint16_t>(data_.uint16_data_, size_);
     }
 
     jsoncons::span<const float> data(float_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::float_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::float32);
         return jsoncons::span<const float>(data_.float_data_, size_);
     }
 
     jsoncons::span<const double> data(double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_element_type::double_value);
+        JSONCONS_ASSERT(type_ == typed_array_element_type::float64);
         return jsoncons::span<const double>(data_.double_data_, size_);
     }
 

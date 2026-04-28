@@ -192,8 +192,8 @@ namespace jsoncons {
         float64 = 5,              // 0101
         half_float = 6,           // 0110
         short_str = 7,            // 0111
-        json_const_ref = 8, // 1000    
-        json_ref = 9,       // 1001    
+        json_const_ref = 8,       // 1000    
+        json_ref = 9,             // 1001    
         byte_str = 12,            // 1100  
         object = 13,              // 1101
         array = 14,               // 1110

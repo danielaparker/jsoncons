@@ -141,6 +141,9 @@ class basic_cbor_parser : public ser_context
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    bool is_typed_array_{false};
+    typed_array_element_type element_type_{};
+    std::size_t index_{0};
     byte_string_type typed_array_;
     std::vector<std::size_t> shape_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
@@ -1638,6 +1641,7 @@ private:
                 }
                 case 0x40:
                 {
+                    element_type_ = typed_array_element_type::uint8;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))

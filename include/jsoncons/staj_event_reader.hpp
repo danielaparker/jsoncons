@@ -113,57 +113,57 @@ namespace jsoncons {
                 {
                     switch (data_.type())
                     {
-                        case typed_array_element_type::uint8_value:
+                        case typed_array_element_type::uint8:
                         {
                             this->uint64_value(data_.data(uint8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::uint16_value:
+                        case typed_array_element_type::uint16:
                         {
                             this->uint64_value(data_.data(uint16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::uint32_value:
+                        case typed_array_element_type::uint32:
                         {
                             this->uint64_value(data_.data(uint32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::uint64_value:
+                        case typed_array_element_type::uint64:
                         {
                             this->uint64_value(data_.data(uint64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::int8_value:
+                        case typed_array_element_type::int8:
                         {
                             this->int64_value(data_.data(int8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::int16_value:
+                        case typed_array_element_type::int16:
                         {
                             this->int64_value(data_.data(int16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::int32_value:
+                        case typed_array_element_type::int32:
                         {
                             this->int64_value(data_.data(int32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::int64_value:
+                        case typed_array_element_type::int64:
                         {
                             this->int64_value(data_.data(int64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::half_value:
+                        case typed_array_element_type::half_float:
                         {
                             this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::float_value:
+                        case typed_array_element_type::float32:
                         {
                             this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
                         }
-                        case typed_array_element_type::double_value:
+                        case typed_array_element_type::float64:
                         {
                             this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                             break;
@@ -217,7 +217,7 @@ namespace jsoncons {
                     const std::size_t len = data_.size();
                     switch (data_.type())
                     {
-                        case typed_array_element_type::uint8_value:
+                        case typed_array_element_type::uint8:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -225,7 +225,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::uint16_value:
+                        case typed_array_element_type::uint16:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -233,7 +233,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::uint32_value:
+                        case typed_array_element_type::uint32:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -241,7 +241,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::uint64_value:
+                        case typed_array_element_type::uint64:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -249,7 +249,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::int8_value:
+                        case typed_array_element_type::int8:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -257,7 +257,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::int16_value:
+                        case typed_array_element_type::int16:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -265,7 +265,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::int32_value:
+                        case typed_array_element_type::int32:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -273,7 +273,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::int64_value:
+                        case typed_array_element_type::int64:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -281,7 +281,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::float_value:
+                        case typed_array_element_type::float32:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -289,7 +289,7 @@ namespace jsoncons {
                             }
                             break;
                         }
-                        case typed_array_element_type::double_value:
+                        case typed_array_element_type::float64:
                         {
                             for (auto i = index_; i < len; ++i) 
                             {
@@ -309,52 +309,52 @@ namespace jsoncons {
                 {
                     switch (data_.type())
                     {
-                        case typed_array_element_type::uint8_value:
+                        case typed_array_element_type::uint8:
                         {
                             visitor.typed_array(data_.data(uint8_array_arg));
                             break;
                         }
-                        case typed_array_element_type::uint16_value:
+                        case typed_array_element_type::uint16:
                         {
                             visitor.typed_array(data_.data(uint16_array_arg));
                             break;
                         }
-                        case typed_array_element_type::uint32_value:
+                        case typed_array_element_type::uint32:
                         {
                             visitor.typed_array(data_.data(uint32_array_arg));
                             break;
                         }
-                        case typed_array_element_type::uint64_value:
+                        case typed_array_element_type::uint64:
                         {
                             visitor.typed_array(data_.data(uint64_array_arg));
                             break;
                         }
-                        case typed_array_element_type::int8_value:
+                        case typed_array_element_type::int8:
                         {
                             visitor.typed_array(data_.data(int8_array_arg));
                             break;
                         }
-                        case typed_array_element_type::int16_value:
+                        case typed_array_element_type::int16:
                         {
                             visitor.typed_array(data_.data(int16_array_arg));
                             break;
                         }
-                        case typed_array_element_type::int32_value:
+                        case typed_array_element_type::int32:
                         {
                             visitor.typed_array(data_.data(int32_array_arg));
                             break;
                         }
-                        case typed_array_element_type::int64_value:
+                        case typed_array_element_type::int64:
                         {
                             visitor.typed_array(data_.data(int64_array_arg));
                             break;
                         }
-                        case typed_array_element_type::float_value:
+                        case typed_array_element_type::float32:
                         {
                             visitor.typed_array(data_.data(float_array_arg));
                             break;
                         }
-                        case typed_array_element_type::double_value:
+                        case typed_array_element_type::float64:
                         {
                             visitor.typed_array(data_.data(double_array_arg));
                             break;
