@@ -143,6 +143,7 @@ class basic_cbor_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
     typed_array_element_type element_type_{};
+    semantic_tag typed_array_tag_{};
     std::size_t index_{0};
     byte_string_type typed_array_;
     std::vector<std::size_t> shape_;
@@ -1641,6 +1642,7 @@ private:
                 }
                 case 0x40:
                 {
+                    is_typed_array_ = true;
                     element_type_ = typed_array_element_type::uint8;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1655,6 +1657,9 @@ private:
                 }
                 case 0x44:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::uint8;
+                    typed_array_tag_ = semantic_tag::clamped;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1669,6 +1674,8 @@ private:
                 case 0x41:
                 case 0x45:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::uint16;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1693,6 +1700,8 @@ private:
                 case 0x42:
                 case 0x46:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::uint32;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1717,6 +1726,8 @@ private:
                 case 0x43:
                 case 0x47:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::uint64;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1740,6 +1751,8 @@ private:
                 }
                 case 0x48:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::int8;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1754,6 +1767,8 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::int16;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1778,6 +1793,8 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::int32;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1802,6 +1819,8 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::int64;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1826,6 +1845,8 @@ private:
                 case 0x50:
                 case 0x54:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::half_float;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1850,6 +1871,8 @@ private:
                 case 0x51:
                 case 0x55:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::float32;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1874,6 +1897,8 @@ private:
                 case 0x52:
                 case 0x56:
                 {
+                    is_typed_array_ = true;
+                    element_type_ = typed_array_element_type::float64;
                     typed_array_.clear();
                     read(typed_array_,ec);
                     if (JSONCONS_UNLIKELY(ec))
