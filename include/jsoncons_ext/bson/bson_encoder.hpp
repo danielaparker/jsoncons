@@ -42,7 +42,6 @@ class basic_bson_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     static constexpr int64_t nanos_in_milli = 1000000;
-    static constexpr int64_t nanos_in_second = 1000000000;
     static constexpr int64_t millis_in_second = 1000;
 public:
     using allocator_type = Allocator;
@@ -523,7 +522,7 @@ private:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
                 {
-                    val /= nanos_in_second;
+                    val /= nanos_in_milli;
                 }
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 break;
