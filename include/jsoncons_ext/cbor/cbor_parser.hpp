@@ -1698,15 +1698,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag);
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    uint32_t* data = reinterpret_cast<uint32_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<uint32_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<uint32_t>(data[i]);
+                            ta[i] = binary::byte_swap<uint32_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const uint32_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1725,15 +1722,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    uint64_t* data = reinterpret_cast<uint64_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<uint64_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<uint64_t>(data[i]);
+                            ta[i] = binary::byte_swap<uint64_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const uint64_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1765,15 +1759,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    int16_t* data = reinterpret_cast<int16_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<int16_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<int16_t>(data[i]);
+                            ta[i] = binary::byte_swap<int16_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const int16_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1792,15 +1783,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    int32_t* data = reinterpret_cast<int32_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<int32_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<int32_t>(data[i]);
+                            ta[i] = binary::byte_swap<int32_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const int32_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1819,15 +1807,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    int64_t* data = reinterpret_cast<int64_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<int64_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<int64_t>(data[i]);
+                            ta[i] = binary::byte_swap<int64_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const int64_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1846,15 +1831,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    uint16_t* data = reinterpret_cast<uint16_t*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<uint16_t>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<uint16_t>(data[i]);
+                            ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
                     visitor.typed_array(half_arg, typed_array_cast<const uint16_t>(typed_array_), semantic_tag::none, *this, ec);
@@ -1873,15 +1855,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    float* data = reinterpret_cast<float*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<float>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<float>(data[i]);
+                            ta[i] = binary::byte_swap<float>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const float>(typed_array_), semantic_tag::none, *this, ec);
@@ -1900,16 +1879,12 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    double* data = reinterpret_cast<double*>(typed_array_.data());
-                    std::size_t size = typed_array_.size()/bytes_per_elem;
-
                     if (e != jsoncons::endian::native)
                     {
-                        for (std::size_t i = 0; i < size; ++i)
+                        auto ta = typed_array_cast<double>(typed_array_);
+                        for (std::size_t i = 0; i < ta.size(); ++i)
                         {
-                            data[i] = binary::byte_swap<double>(data[i]);
+                            ta[i] = binary::byte_swap<double>(ta[i]);
                         }
                     }
                     visitor.typed_array(typed_array_cast<const double>(typed_array_), semantic_tag::none, *this, ec);
