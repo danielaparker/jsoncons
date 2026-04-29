@@ -173,9 +173,14 @@ public:
         return parser_.element_type();
     }
 
-    jsoncons::span<uint8_t> typed_array() final
+    jsoncons::span<uint8_t> typed_array() const final
     {
         return parser_.typed_array();
+    }
+
+    void clear_typed_array() final
+    {
+        parser_.clear_typed_array();
     }
 
     const staj_event& current() const override

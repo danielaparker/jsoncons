@@ -289,11 +289,15 @@ public:
         return element_type_;
     }
 
-    jsoncons::span<uint8_t> typed_array()
+    jsoncons::span<uint8_t> typed_array() const
+    {
+        return typed_array_;
+    }
+
+    void clear_typed_array()
     {
         is_typed_array_ = false;
         state_stack_.pop_back();
-        return typed_array_;
     }
 
     void parse(item_event_visitor& visitor, std::error_code& ec)

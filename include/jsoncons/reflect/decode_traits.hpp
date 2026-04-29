@@ -422,6 +422,7 @@ struct decode_traits<T,
                 if (cursor.is_typed_array())
                 {
                     read_typed_array(cursor.typed_array(), cursor.element_type(), v);
+                    cursor.clear_typed_array();
                 }
                 else
                 {
@@ -484,20 +485,16 @@ struct decode_traits<T,
     {
         std::error_code ec;
 
-        cursor.array_expected(ec);
-        if (JSONCONS_UNLIKELY(ec))
+        if (cursor.current().event_type() == staj_events::begin_array)
         {
-            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
-        }
-        if (cursor.is_typed_array())
-        {
-            std::cout << "IS TYPED ARRAY 3\n";
-        }
-        switch (cursor.current().event_type())
-        {
-            case staj_events::begin_array:
+            T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+            if (cursor.is_typed_array())
             {
-                T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+                read_typed_array(cursor.typed_array(), cursor.element_type(), v);
+                cursor.clear_typed_array();
+            }
+            else
+            {
                 if (cursor.current().size() > 0)
                 {
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
@@ -518,12 +515,12 @@ struct decode_traits<T,
                 {
                     return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
                 }
-                return result_type{std::move(v)};
             }
-            default:
-            {
-                return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
-            }
+            return result_type{std::move(v)};
+        }
+        else
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
     }
 

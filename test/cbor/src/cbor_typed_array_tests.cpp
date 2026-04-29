@@ -58,7 +58,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 };
-#if 0
+
 TEST_CASE("cbor multi dim row major cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -104,10 +104,9 @@ TEST_CASE("cbor typed array cursor tests")
         //}
     }
 }
-#endif
+
 TEST_CASE("cbor typed array tests")
 {
-#if 0
     SECTION("Tag 64 (uint8 Typed Array)")
     {
         //std::cout << "CBOR typed array Tag 64 (uint8 Typed Array)" << '\n';
@@ -319,7 +318,7 @@ TEST_CASE("cbor typed array tests")
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
-#endif
+
     SECTION("Tag 71 (uint64,little endian)")
     {
         //std::cout << "CBOR typed array Tag 71 (uint64,little endian)" << '\n';
