@@ -168,6 +168,16 @@ public:
         return parser_.is_typed_array();
     }
 
+    typed_array_element_type element_type() const final
+    {
+        return parser_.element_type();
+    }
+
+    jsoncons::span<uint8_t> typed_array() final
+    {
+        return parser_.typed_array();
+    }
+
     const staj_event& current() const override
     {
         return cursor_visitor_.event();
