@@ -241,6 +241,10 @@ struct decode_traits<T,
         {
             return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
+        if (cursor.is_typed_array())
+        {
+            std::cout << "IS TYPED ARRAY 1\n";
+        }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         while (cursor.current().event_type() != staj_events::end_array && !ec)
@@ -281,10 +285,18 @@ struct decode_traits<T,
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
+        if (cursor.is_typed_array())
+        {
+            std::cout << "IS TYPED ARRAY 2\n";
+        }
         switch (cursor.current().event_type())
         {
             case staj_events::byte_string_value:
             {
+                if (cursor.is_typed_array())
+                {
+                    std::cout << "BYTE STRING\n";
+                }
                 auto bytes = cursor.current().template get<byte_string_view>(ec);
                 if (!ec) 
                 {
@@ -370,6 +382,10 @@ struct decode_traits<T,
         if (JSONCONS_UNLIKELY(ec))
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+        }
+        if (cursor.is_typed_array())
+        {
+            std::cout << "IS TYPED ARRAY 3\n";
         }
         switch (cursor.current().event_type())
         {
