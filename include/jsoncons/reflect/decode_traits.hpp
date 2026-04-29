@@ -30,10 +30,123 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/staj_event.hpp>
+#include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {
+
+template <typename T>
+typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
+read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type element_type, T& v)
+{
+    using value_type = typename T::value_type;
+
+    switch (element_type)
+    {
+        case typed_array_element_type::uint8:
+        {
+            auto ta = typed_array_cast<const uint8_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::uint16:
+        {
+            auto ta = typed_array_cast<const uint16_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::uint32:
+        {
+            auto ta = typed_array_cast<const uint32_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::uint64:
+        {
+            auto ta = typed_array_cast<const uint64_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::int8:
+        {
+            auto ta = typed_array_cast<const int8_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::int16:
+        {
+            auto ta = typed_array_cast<const int16_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::int32:
+        {
+            auto ta = typed_array_cast<const int32_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::int64:
+        {
+            auto ta = typed_array_cast<const int64_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::half_float:
+        {
+            auto ta = typed_array_cast<const int16_t>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::float32:
+        {
+            auto ta = typed_array_cast<const float>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        case typed_array_element_type::float64:
+        {
+            auto ta = typed_array_cast<const double>(typed_array);
+            for (auto item : ta)
+            {
+                v.push_back(static_cast<value_type>(item));
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 // decode_traits
 
@@ -308,25 +421,33 @@ struct decode_traits<T,
             case staj_events::begin_array:
             {
                 T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
-                if (cursor.current().size() > 0)
+                if (cursor.is_typed_array())
                 {
-                    reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                    read_typed_array(cursor.typed_array(), cursor.element_type(), v);
+                    cursor.clear_typed_array();
                 }
-                cursor.next(ec);
-                while (cursor.current().event_type() != staj_events::end_array && !ec)
+                else
                 {
-                    auto r = decode_traits<element_type>::try_decode(aset, cursor);
-                    if (!r)
+                    if (cursor.current().size() > 0)
                     {
-                        return result_type(jsoncons::unexpect, r.error());
+                        reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                     }
-                    v.push_back(*r);
-                    //v[i] = std::move(*r);
                     cursor.next(ec);
-                }
-                if (JSONCONS_UNLIKELY(ec)) 
-                {
-                    return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
+                    while (cursor.current().event_type() != staj_events::end_array && !ec)
+                    {
+                        auto r = decode_traits<element_type>::try_decode(aset, cursor);
+                        if (!r)
+                        {
+                            return result_type(jsoncons::unexpect, r.error());
+                        }
+                        v.push_back(*r);
+                        //v[i] = std::move(*r);
+                        cursor.next(ec);
+                    }
+                    if (JSONCONS_UNLIKELY(ec)) 
+                    {
+                        return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
+                    }
                 }
 
                 return result_type{std::move(v)};
@@ -366,16 +487,16 @@ struct decode_traits<T,
     {
         std::error_code ec;
 
-        cursor.array_expected(ec);
-        if (JSONCONS_UNLIKELY(ec))
+        if (cursor.current().event_type() == staj_events::begin_array)
         {
-            return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
-        }
-        switch (cursor.current().event_type())
-        {
-            case staj_events::begin_array:
+            T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+            if (cursor.is_typed_array())
             {
-                T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
+                read_typed_array(cursor.typed_array(), cursor.element_type(), v);
+                cursor.clear_typed_array();
+            }
+            else
+            {
                 if (cursor.current().size() > 0)
                 {
                     reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
@@ -396,12 +517,12 @@ struct decode_traits<T,
                 {
                     return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
                 }
-                return result_type{std::move(v)};
             }
-            default:
-            {
-                return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
-            }
+            return result_type{std::move(v)};
+        }
+        else
+        {
+            return result_type(jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()); 
         }
     }
 

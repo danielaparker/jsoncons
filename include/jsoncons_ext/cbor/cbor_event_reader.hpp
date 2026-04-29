@@ -150,11 +150,6 @@ public:
         return read_done();
     }
 
-    bool is_typed_array() const
-    {
-        return cursor_visitor_.is_typed_array();
-    }
-
     const basic_staj_event<char_type>& current() const override
     {
         return cursor_visitor_.event();
@@ -173,11 +168,7 @@ public:
     void read_to(basic_item_event_visitor<char_type>& visitor, 
         std::error_code& ec) override
     {
-        if (is_typed_array())
-        {
-            cursor_visitor_.dump(visitor, *this, ec);
-        }
-        else if (is_begin_container(current().event_type()))
+        if (is_begin_container(current().event_type()))
         {
             parser_.cursor_mode(false);
             parser_.mark_level(parser_.level());

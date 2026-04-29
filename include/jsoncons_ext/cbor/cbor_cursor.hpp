@@ -163,9 +163,24 @@ public:
         return parser_.raw_tag();
     }
 
-    bool is_typed_array() const
+    bool is_typed_array() const final
     {
-        return cursor_visitor_.is_typed_array();
+        return parser_.is_typed_array();
+    }
+
+    typed_array_element_type element_type() const final
+    {
+        return parser_.element_type();
+    }
+
+    jsoncons::span<uint8_t> typed_array() final
+    {
+        return parser_.typed_array();
+    }
+
+    void clear_typed_array() final
+    {
+        parser_.clear_typed_array();
     }
 
     const staj_event& current() const override
