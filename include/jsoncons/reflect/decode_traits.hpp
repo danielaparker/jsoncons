@@ -40,6 +40,8 @@ template <typename T>
 typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
 read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type element_type, T& v)
 {
+    using value_type = typename T::value_type;
+
     switch (element_type)
     {
         case typed_array_element_type::uint8:
@@ -47,7 +49,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const uint8_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -56,7 +58,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const uint16_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -65,7 +67,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const uint32_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -74,7 +76,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const uint64_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -83,7 +85,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const int8_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -92,7 +94,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const int16_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -101,7 +103,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const int32_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -110,7 +112,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const int64_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -119,7 +121,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const int16_t>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -128,7 +130,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const float>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }
@@ -137,7 +139,7 @@ read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type e
             auto ta = typed_array_cast<const double>(typed_array);
             for (auto item : ta)
             {
-                v.push_back(item);
+                v.push_back(static_cast<value_type>(item));
             }
             break;
         }

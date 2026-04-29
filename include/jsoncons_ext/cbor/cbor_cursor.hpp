@@ -173,7 +173,7 @@ public:
         return parser_.element_type();
     }
 
-    jsoncons::span<uint8_t> typed_array() const final
+    jsoncons::span<uint8_t> typed_array() final
     {
         return parser_.typed_array();
     }

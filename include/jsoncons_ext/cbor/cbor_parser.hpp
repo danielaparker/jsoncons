@@ -289,7 +289,7 @@ public:
         return element_type_;
     }
 
-    jsoncons::span<uint8_t> typed_array() const
+    jsoncons::span<uint8_t> typed_array()
     {
         return typed_array_;
     }

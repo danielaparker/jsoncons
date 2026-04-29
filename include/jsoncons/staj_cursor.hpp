@@ -315,7 +315,7 @@ public:
         return typed_array_element_type{};
     }
 
-    virtual jsoncons::span<uint8_t> typed_array() const 
+    virtual jsoncons::span<uint8_t> typed_array() 
     {
         return jsoncons::span<uint8_t>{};
     }
