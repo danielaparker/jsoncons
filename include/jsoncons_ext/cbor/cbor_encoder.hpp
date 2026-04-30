@@ -1158,8 +1158,7 @@ private:
         {
             case semantic_tag::epoch_milli:
             case semantic_tag::epoch_nano:
-                visit_double(static_cast<double>(value), tag, context, ec);
-                break;
+                return visit_double(static_cast<double>(value), tag, context, ec);
             case semantic_tag::epoch_second:
                 write_tag(1);
                 break;
@@ -1180,8 +1179,7 @@ private:
         {
             case semantic_tag::epoch_milli:
             case semantic_tag::epoch_nano:
-                visit_double(static_cast<double>(value), tag, context, ec);
-                break;
+                return visit_double(static_cast<double>(value), tag, context, ec);
             case semantic_tag::epoch_second:
                 write_tag(1);
                 break;
