@@ -168,7 +168,7 @@ public:
         return parser_.is_typed_array();
     }
 
-    typed_array_element_type element_type() const final
+    typed_array_values element_type() const final
     {
         return parser_.element_type();
     }
@@ -178,9 +178,9 @@ public:
         return parser_.typed_array();
     }
 
-    void clear_typed_array() final
+    void to_end_array() final
     {
-        parser_.clear_typed_array();
+        parser_.to_end_array();
     }
 
     const staj_event& current() const override

@@ -310,9 +310,9 @@ public:
         return false;
     }
 
-    virtual typed_array_element_type element_type() const 
+    virtual typed_array_values element_type() const 
     {
-        return typed_array_element_type{};
+        return typed_array_values{};
     }
 
     virtual jsoncons::span<uint8_t> typed_array() 
@@ -320,7 +320,7 @@ public:
         return jsoncons::span<uint8_t>{};
     }
 
-    virtual void clear_typed_array() 
+    virtual void to_end_array() 
     {
     }
 };

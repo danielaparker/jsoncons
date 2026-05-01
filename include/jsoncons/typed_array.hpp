@@ -24,11 +24,19 @@
 
 namespace jsoncons {
 
-enum class typed_array_element_type
+enum class typed_array_values
 {
-    uint8=1,uint16,uint32,uint64,
-    int8,int16,int32,int64, 
-    half_float, float32, float64
+    uint8_value = 1,
+    uint16_value = 2,
+    uint32_value = 4,
+    uint64_value = 8,
+    int8_value = 16,
+    int16_value = 32,
+    int32_value = 64,
+    int64_value = 128, 
+    half_value = 256, 
+    float_value = 512, 
+    double_value = 1024
 };
 
 template <typename T>
@@ -153,6 +161,121 @@ jsoncons::span<const double> typed_array_cast<const double>(jsoncons::span<uint8
 {
     return jsoncons::span<const double>{reinterpret_cast<const double*>(bytes.data()), bytes.size()/sizeof(double)};
 }
+
+class slice
+{
+    static constexpr size_t npos = size_t(-1);
+
+    size_t start_;
+    size_t stop_;
+    size_t step_;
+public:
+    constexpr explicit slice(size_t start = npos, size_t stop = npos, size_t step=1)
+        : start_(start), stop_(stop), step_(step)
+    {
+    }
+
+    slice(const slice& other) = default;
+    slice(slice&& other) = default;
+
+    slice& operator=(const slice& other) = default;
+    slice& operator=(slice&& other) = default;
+
+    size_t start(size_t origin) const
+    {
+        return start_ == npos ? origin : start_;
+    }
+
+    size_t stop(size_t origin, size_t n) const
+    {
+        return stop_ == npos ? (origin+n) : stop_;
+    }
+    size_t step() const
+    {
+        return step_;
+    }
+
+    size_t length(size_t origin, size_t n) const
+    {
+        size_t y = stop(origin, n);
+        size_t x = start(origin);
+
+        assert(y >= x);
+        size_t w = y - x;
+        return w/step_ + (w % step_ != 0);
+    }
+};
+
+#if 0
+struct row_major
+{
+    static void calculate_strides(jsoncons::span<const std::size_t> extents, 
+        std::vector<std::size_t>& strides, size_t& size)
+    {
+        size = 1;
+        const size_t num_extents = extents.size();
+        for (size_t i = 0; i < num_extents; ++i)
+        {
+            strides[num_extents-i-1] = size;
+            size *= extents[num_extents-i-1];
+        }
+    }
+/*
+    template <size_t N>
+    static void update_offsets(size_t rel, indices_t<N>& offsets)
+    {
+        offsets[N-1] += rel;
+    }
+*/
+    template <size_t N>
+    static std::vector<std::size_t> calculate_offsets(size_t rel,
+        jsoncons::span<const std::size_t> strides, 
+        jsoncons::span<const std::size_t> slices)
+    {
+        indices_t<N> offsets;
+        offsets[N-1] = rel + slices[N-1].start(Base::origin()) * strides[N-1];
+        for (size_t i = 0; i+1 < N; ++i)
+        {
+            offsets[i] = slices[i].start(Base::origin()) * strides[i]; 
+        }
+        return offsets;
+    }
+};
+
+struct column_major
+{
+    template <size_t N>
+    static void calculate_strides(const extents_t<N>& extents, indices_t<N>& strides, size_t& size)
+    {
+        size = 1;
+        for (size_t i = 0; i < N; ++i)
+        {
+            strides[i] = size;
+            size *= extents[i];
+        }
+    }
+/*
+    template <size_t N>
+    static void update_offsets(size_t rel, indices_t<N>& offsets)
+    {
+        offsets[0] += rel;
+    }
+*/
+    template <size_t N, typename Base>
+    static indices_t<N> calculate_offsets(size_t rel,
+        const indices_t<N>& strides, 
+        const std::array<slice,N>& slices)
+    {
+        indices_t<N> offsets;
+        offsets[0] = rel + Base::rebase_to_zero(slices[0].start(Base::origin())) * strides[0];
+        for (size_t i = 1; i < N; ++i)
+        {
+            offsets[i] = Base::rebase_to_zero(slices[i].start(Base::origin())) * strides[i]; 
+        }
+        return offsets;
+    }
+};
+#endif
 
 } // namespace jsoncons
 

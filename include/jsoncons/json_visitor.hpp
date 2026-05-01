@@ -714,14 +714,14 @@ namespace jsoncons {
             JSONCONS_VISITOR_RETURN;
         }
 
-        virtual JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& extents,
             semantic_tag tag,
             const ser_context& context, 
             std::error_code& ec) 
         {
             visit_begin_array(2, tag, context, ec);
-            visit_begin_array(shape.size(), tag, context, ec);
-            for (auto it = shape.begin(); it != shape.end(); ++it)
+            visit_begin_array(extents.size(), tag, context, ec);
+            for (auto it = extents.begin(); it != extents.end(); ++it)
             {
                 visit_uint64(*it, semantic_tag::none, context, ec);
             }
