@@ -16,21 +16,24 @@ void func(const std::vector<int>& data,
     {
         std::size_t offset = jsoncons::get_offset(strides, indices);
         std::cout << "[";
-        for (std::size_t i = 0; i < extents[index]; ++i)
+        const std::size_t extent = extents[index];
+        const std::size_t stride = strides[index];
+        for (std::size_t i = 0; i < extent; ++i)
         {
             if (i > 0)
             {
                 std::cout << ",";
             }
             std::cout << data[offset];
-            offset += strides[index];
+            offset += stride;
         }
         std::cout << "]";
     }
     else
     {
         std::cout << "[";
-        for (std::size_t i = 0; i < extents[index]; ++i)
+        const std::size_t extent = extents[index];
+        for (std::size_t i = 0; i < extent; ++i)
         {
             if (i > 0)
             {
