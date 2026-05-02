@@ -310,9 +310,9 @@ public:
         return false;
     }
 
-    virtual typed_array_values element_type() const 
+    virtual typed_array_element_type element_type() const 
     {
-        return typed_array_values{};
+        return typed_array_element_type{};
     }
 
     virtual jsoncons::span<uint8_t> typed_array() 
@@ -334,7 +334,7 @@ public:
         {
             switch (element_type())
             {
-                case typed_array_values::uint8_value:
+                case typed_array_element_type::uint8:
                 {
                     auto ta = typed_array_cast<const uint8_t>(typed_array());
                     for (auto item : ta)
@@ -343,7 +343,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::uint16_value:
+                case typed_array_element_type::uint16:
                 {
                     auto ta = typed_array_cast<const uint16_t>(typed_array());
                     for (auto item : ta)
@@ -352,7 +352,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::uint32_value:
+                case typed_array_element_type::uint32:
                 {
                     auto ta = typed_array_cast<const uint32_t>(typed_array());
                     for (auto item : ta)
@@ -361,7 +361,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::uint64_value:
+                case typed_array_element_type::uint64:
                 {
                     auto ta = typed_array_cast<const uint64_t>(typed_array());
                     for (auto item : ta)
@@ -370,7 +370,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::int8_value:
+                case typed_array_element_type::int8:
                 {
                     auto ta = typed_array_cast<const int8_t>(typed_array());
                     for (auto item : ta)
@@ -379,7 +379,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::int16_value:
+                case typed_array_element_type::int16:
                 {
                     auto ta = typed_array_cast<const int16_t>(typed_array());
                     for (auto item : ta)
@@ -388,7 +388,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::int32_value:
+                case typed_array_element_type::int32:
                 {
                     auto ta = typed_array_cast<const int32_t>(typed_array());
                     for (auto item : ta)
@@ -397,7 +397,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::int64_value:
+                case typed_array_element_type::int64:
                 {
                     auto ta = typed_array_cast<const int64_t>(typed_array());
                     for (auto item : ta)
@@ -406,7 +406,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::half_value:
+                case typed_array_element_type::half_float:
                 {
                     auto ta = typed_array_cast<const int16_t>(typed_array());
                     for (auto item : ta)
@@ -415,7 +415,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::float_value:
+                case typed_array_element_type::float32:
                 {
                     auto ta = typed_array_cast<const float>(typed_array());
                     for (auto item : ta)
@@ -424,7 +424,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_values::double_value:
+                case typed_array_element_type::float64 :
                 {
                     auto ta = typed_array_cast<const double>(typed_array());
                     for (auto item : ta)

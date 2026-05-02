@@ -142,7 +142,7 @@ class basic_cbor_parser : public ser_context
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
-    typed_array_values element_type_{};
+    typed_array_element_type element_type_{};
     semantic_tag typed_array_tag_{};
     std::size_t element_index_{0};
     byte_string_type typed_array_;
@@ -284,7 +284,7 @@ public:
         return raw_tag_;
     }
 
-    typed_array_values element_type() const
+    typed_array_element_type element_type() const
     {
         return element_type_;
     }
@@ -429,7 +429,7 @@ private:
         {
             switch (element_type_)
             {
-                case typed_array_values::uint8_value:
+                case typed_array_element_type::uint8:
                 {
                     auto ta = typed_array_cast<const uint8_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -445,7 +445,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::uint16_value:
+                case typed_array_element_type::uint16:
                 {
                     auto ta = typed_array_cast<const uint16_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -461,7 +461,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::uint32_value:
+                case typed_array_element_type::uint32:
                 {
                     auto ta = typed_array_cast<const uint32_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -477,7 +477,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::uint64_value:
+                case typed_array_element_type::uint64:
                 {
                     auto ta = typed_array_cast<const uint64_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -493,7 +493,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::int8_value:
+                case typed_array_element_type::int8:
                 {
                     auto ta = typed_array_cast<const int8_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -509,7 +509,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::int16_value:
+                case typed_array_element_type::int16:
                 {
                     auto ta = typed_array_cast<const int16_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -525,7 +525,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::int32_value:
+                case typed_array_element_type::int32:
                 {
                     auto ta = typed_array_cast<const int32_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -541,7 +541,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::int64_value:
+                case typed_array_element_type::int64:
                 {
                     auto ta = typed_array_cast<const int64_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -557,7 +557,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::half_value:
+                case typed_array_element_type::half_float:
                 {
                     auto ta = typed_array_cast<const int16_t>(typed_array_);
                     if (element_index_ < ta.size())
@@ -573,7 +573,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::float_value:
+                case typed_array_element_type::float32:
                 {
                     auto ta = typed_array_cast<const float>(typed_array_);
                     if (element_index_ < ta.size())
@@ -589,7 +589,7 @@ private:
                     }
                     break;
                 }
-                case typed_array_values::double_value:
+                case typed_array_element_type::float64 :
                 {
                     auto ta = typed_array_cast<const double>(typed_array_);
                     if (element_index_ < ta.size())
@@ -1855,7 +1855,7 @@ private:
                 case 0x40:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::uint8_value;
+                    element_type_ = typed_array_element_type::uint8;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1873,7 +1873,7 @@ private:
                 case 0x44:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::uint8_value;
+                    element_type_ = typed_array_element_type::uint8;
                     element_index_ = 0;
                     typed_array_tag_ = semantic_tag::clamped;
                     element_index_ = 0;
@@ -1894,7 +1894,7 @@ private:
                 case 0x45:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::uint16_value;
+                    element_type_ = typed_array_element_type::uint16;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1922,7 +1922,7 @@ private:
                 case 0x46:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::uint32_value;
+                    element_type_ = typed_array_element_type::uint32;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1950,7 +1950,7 @@ private:
                 case 0x47:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::uint64_value;
+                    element_type_ = typed_array_element_type::uint64;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1977,7 +1977,7 @@ private:
                 case 0x48:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::int8_value;
+                    element_type_ = typed_array_element_type::int8;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -1996,7 +1996,7 @@ private:
                 case 0x4d:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::int16_value;
+                    element_type_ = typed_array_element_type::int16;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -2024,7 +2024,7 @@ private:
                 case 0x4e:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::int32_value;
+                    element_type_ = typed_array_element_type::int32;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -2052,7 +2052,7 @@ private:
                 case 0x4f:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::int64_value;
+                    element_type_ = typed_array_element_type::int64;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -2080,7 +2080,7 @@ private:
                 case 0x54:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::half_value;
+                    element_type_ = typed_array_element_type::half_float;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -2108,7 +2108,7 @@ private:
                 case 0x55:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::float_value;
+                    element_type_ = typed_array_element_type::float32;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);
@@ -2136,7 +2136,7 @@ private:
                 case 0x56:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_values::double_value;
+                    element_type_ = typed_array_element_type::float64 ;
                     element_index_ = 0;
                     typed_array_.clear();
                     read(typed_array_,ec);

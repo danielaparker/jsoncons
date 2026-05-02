@@ -24,19 +24,19 @@
 
 namespace jsoncons {
 
-enum class typed_array_values
+enum class typed_array_element_type
 {
-    uint8_value = 1,
-    uint16_value = 2,
-    uint32_value = 4,
-    uint64_value = 8,
-    int8_value = 16,
-    int16_value = 32,
-    int32_value = 64,
-    int64_value = 128, 
-    half_value = 256, 
-    float_value = 512, 
-    double_value = 1024
+    uint8 = 1,
+    uint16 = 2,
+    uint32 = 4,
+    uint64 = 8,
+    int8 = 16,
+    int16 = 32,
+    int32 = 64,
+    int64 = 128, 
+    half_float = 256, 
+    float32 = 512, 
+    float64 = 1024
 };
 
 template <typename T>
