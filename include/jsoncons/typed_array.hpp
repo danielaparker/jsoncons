@@ -262,64 +262,90 @@ std::size_t get_offset(const std::vector<std::size_t>& strides,
     return offset;
 }
 
-template <typename ValueType>
+template <typename ValueType,typename CharT>
+typename std::enable_if<ext_traits::is_integer<ValueType>::value,void>::type
+visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
+    const ser_context& context)
+{
+    visitor.uint64_value(val, semantic_tag::none, context);
+}
+
+template <typename ValueType,typename CharT>
+typename std::enable_if<std::is_floating_point<ValueType>::value,void>::type
+visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
+    const ser_context& context)
+{
+    visitor.double_value(val, semantic_tag::none, context);
+}
+
+template <typename ValueType,typename CharT>
 void traverse(jsoncons::span<const ValueType> data, 
     const std::vector<std::size_t>& extents, 
     const std::vector<std::size_t>& strides, 
     jsoncons::span<const std::size_t> indices,
-    std::size_t index)
+    std::size_t index,
+    basic_json_visitor<CharT>& visitor,
+    const ser_context& context)
 {
     if (index+1 == extents.size())
     {
         std::size_t offset = jsoncons::get_offset(strides, indices);
-        std::cout << "[";
         const std::size_t extent = extents[index];
         const std::size_t stride = strides[index];
+        visitor.begin_array(extent, semantic_tag::none, context);
         for (std::size_t i = 0; i < extent; ++i)
         {
-            if (i > 0)
-            {
-                std::cout << ",";
-            }
-            std::cout << data[offset];
+            visit_element(data[offset], visitor, context);
             offset += stride;
         }
-        std::cout << "]";
+        visitor.end_array();
     }
     else
     {
-        std::cout << "[";
         const std::size_t extent = extents[index];
         std::vector<std::size_t> new_indices(indices.begin(), indices.end());
+        visitor.begin_array(extent, semantic_tag::none, context);
         for (std::size_t i = 0; i < extent; ++i)
         {
-            if (i > 0)
-            {
-                std::cout << ",";
-            }
-            traverse(data, extents, strides, new_indices, index + 1);
+            traverse(data, extents, strides, new_indices, index + 1, visitor, context);
             new_indices[i] = new_indices[i] + 1;
         }
-        std::cout << "]";
+        visitor.end_array();
     }
 }
 
-template <typename ValueType>
+template <typename ValueType,typename CharT>
 void traverse(jsoncons::span<const ValueType> data, 
     const std::vector<std::size_t>& extents, 
-    typed_array_layout_kind layout_kind)
+    typed_array_layout_kind layout_kind,
+    basic_json_visitor<CharT>& visitor,
+    const ser_context& context)
 {
+    if (extents.empty())
+    {
+        return;
+    }
+    std::size_t product = extents[0];
+    for (std::size_t i = 1; i < extents.size(); ++i)
+    {
+        product *= extents[i];
+    }
+    if (product != data.size())
+    {
+        return;
+    }
+
     if (layout_kind == typed_array_layout_kind::row_major)
     {
         std::vector<std::size_t> strides = row_major_layout::calculate_strides(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
-        traverse(data, extents, strides, indices, 0);
+        traverse(data, extents, strides, indices, 0, visitor, context);
     }
     else if (layout_kind == typed_array_layout_kind::column_major)
     {
         std::vector<std::size_t> strides = column_major_layout::calculate_strides(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
-        traverse(data, extents, strides, indices, 0);
+        traverse(data, extents, strides, indices, 0, visitor, context);
     }
 }
 
