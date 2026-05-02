@@ -246,7 +246,7 @@ struct column_major_layout
 
 inline
 std::size_t get_offset(const std::vector<std::size_t>& strides, 
-    const std::vector<std::size_t>& indices)
+    jsoncons::span<const std::size_t> indices)
 {
     size_t offset = 0;
 
@@ -266,7 +266,7 @@ template <typename ValueType>
 void traverse(jsoncons::span<const ValueType> data, 
     const std::vector<std::size_t>& extents, 
     const std::vector<std::size_t>& strides, 
-    std::vector<std::size_t> indices,
+    jsoncons::span<const std::size_t> indices,
     std::size_t index)
 {
     if (index+1 == extents.size())
@@ -290,14 +290,15 @@ void traverse(jsoncons::span<const ValueType> data,
     {
         std::cout << "[";
         const std::size_t extent = extents[index];
+        std::vector<std::size_t> new_indices(indices.begin(), indices.end());
         for (std::size_t i = 0; i < extent; ++i)
         {
             if (i > 0)
             {
                 std::cout << ",";
             }
-            traverse(data, extents, strides, indices, index + 1);
-            indices[i] = indices[i] + 1;
+            traverse(data, extents, strides, new_indices, index + 1);
+            new_indices[i] = new_indices[i] + 1;
         }
         std::cout << "]";
     }

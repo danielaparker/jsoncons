@@ -17,12 +17,12 @@ TEST_CASE("typed_array mdarray tests")
         CHECK(strides[0] == 6);
         CHECK(strides[1] == 1);
 
-        CHECK(0 == jsoncons::get_offset(strides, {0, 0}));
-        CHECK(1 == jsoncons::get_offset(strides, {0, 1}));
-        CHECK(2 == jsoncons::get_offset(strides, {0, 2}));
-        CHECK(6 == jsoncons::get_offset(strides, {1, 0}));
-        CHECK(7 == jsoncons::get_offset(strides, {1, 1}));
-        CHECK(8 == jsoncons::get_offset(strides, {1, 2}));
+        CHECK(0 == jsoncons::get_offset(strides, std::vector<size_t>{0, 0}));
+        CHECK(1 == jsoncons::get_offset(strides, std::vector<size_t>{0, 1}));
+        CHECK(2 == jsoncons::get_offset(strides, std::vector<size_t>{0, 2}));
+        CHECK(6 == jsoncons::get_offset(strides, std::vector<size_t>{1, 0}));
+        CHECK(7 == jsoncons::get_offset(strides, std::vector<size_t>{1, 1}));
+        CHECK(8 == jsoncons::get_offset(strides, std::vector<size_t>{1, 2}));
     }
     SECTION("column major strides")
     {
@@ -34,12 +34,12 @@ TEST_CASE("typed_array mdarray tests")
         CHECK(strides[0] == 1);
         CHECK(strides[1] == 2);
 
-        CHECK(0 == jsoncons::get_offset(strides, {0, 0}));
-        CHECK(1 == jsoncons::get_offset(strides, {1, 0}));
-        CHECK(2 == jsoncons::get_offset(strides, {0, 1}));
-        CHECK(3 == jsoncons::get_offset(strides, {1, 1}));
-        CHECK(4 == jsoncons::get_offset(strides, {0, 2}));
-        CHECK(5 == jsoncons::get_offset(strides, {1, 2}));
+        CHECK(0 == jsoncons::get_offset(strides, std::vector<size_t>{0, 0}));
+        CHECK(1 == jsoncons::get_offset(strides, std::vector<size_t>{1, 0}));
+        CHECK(2 == jsoncons::get_offset(strides, std::vector<size_t>{0, 1}));
+        CHECK(3 == jsoncons::get_offset(strides, std::vector<size_t>{1, 1}));
+        CHECK(4 == jsoncons::get_offset(strides, std::vector<size_t>{0, 2}));
+        CHECK(5 == jsoncons::get_offset(strides, std::vector<size_t>{1, 2}));
     }
     SECTION("print")
     {
