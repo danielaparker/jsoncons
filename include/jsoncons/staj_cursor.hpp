@@ -269,7 +269,6 @@ private:
     }
 };
 
-
 // basic_staj_cursor
 
 template <typename CharT>

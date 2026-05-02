@@ -279,13 +279,14 @@ visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
 }
 
 template <typename ValueType,typename CharT>
-void traverse(jsoncons::span<const ValueType> data, 
+void to_json(jsoncons::span<const ValueType> data, 
     jsoncons::span<const std::size_t> extents, 
     jsoncons::span<const std::size_t> strides, 
     jsoncons::span<const std::size_t> indices,
     std::size_t index,
     basic_json_visitor<CharT>& visitor,
-    const ser_context& context)
+    const ser_context& context,
+    std::error_code& ec)
 {
     if (index+1 == extents.size())
     {
@@ -307,7 +308,7 @@ void traverse(jsoncons::span<const ValueType> data,
         visitor.begin_array(extent, semantic_tag::none, context);
         for (std::size_t i = 0; i < extent; ++i)
         {
-            traverse(data, extents, strides, new_indices, index + 1, visitor, context);
+            to_json(data, extents, strides, new_indices, index + 1, visitor, context, ec);
             new_indices[i] = new_indices[i] + 1;
         }
         visitor.end_array();
@@ -315,11 +316,12 @@ void traverse(jsoncons::span<const ValueType> data,
 }
 
 template <typename ValueType,typename CharT>
-void traverse(jsoncons::span<const ValueType> data, 
+void to_json(jsoncons::span<const ValueType> data, 
     jsoncons::span<const std::size_t> extents, 
     typed_array_layout_kind layout_kind,
     basic_json_visitor<CharT>& visitor,
-    const ser_context& context)
+    const ser_context& context,
+    std::error_code& ec)
 {
     if (extents.empty())
     {
@@ -332,6 +334,7 @@ void traverse(jsoncons::span<const ValueType> data,
     }
     if (product != data.size())
     {
+        ec = conv_errc::invalid_mdarray;
         return;
     }
 
@@ -339,13 +342,13 @@ void traverse(jsoncons::span<const ValueType> data,
     {
         std::vector<std::size_t> strides = row_major_layout::calculate_strides(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
-        traverse(data, extents, strides, indices, 0, visitor, context);
+        to_json(data, extents, strides, indices, 0, visitor, context, ec);
     }
     else if (layout_kind == typed_array_layout_kind::column_major)
     {
         std::vector<std::size_t> strides = column_major_layout::calculate_strides(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
-        traverse(data, extents, strides, indices, 0, visitor, context);
+        to_json(data, extents, strides, indices, 0, visitor, context, ec);
     }
 }
 
