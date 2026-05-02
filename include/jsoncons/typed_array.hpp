@@ -245,7 +245,7 @@ struct column_major_layout
 };
 
 inline
-std::size_t get_offset(const std::vector<std::size_t>& strides, 
+std::size_t get_offset(jsoncons::span<const std::size_t> strides, 
     jsoncons::span<const std::size_t> indices)
 {
     size_t offset = 0;
@@ -280,8 +280,8 @@ visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
 
 template <typename ValueType,typename CharT>
 void traverse(jsoncons::span<const ValueType> data, 
-    const std::vector<std::size_t>& extents, 
-    const std::vector<std::size_t>& strides, 
+    jsoncons::span<const std::size_t> extents, 
+    jsoncons::span<const std::size_t> strides, 
     jsoncons::span<const std::size_t> indices,
     std::size_t index,
     basic_json_visitor<CharT>& visitor,
@@ -316,7 +316,7 @@ void traverse(jsoncons::span<const ValueType> data,
 
 template <typename ValueType,typename CharT>
 void traverse(jsoncons::span<const ValueType> data, 
-    const std::vector<std::size_t>& extents, 
+    jsoncons::span<const std::size_t> extents, 
     typed_array_layout_kind layout_kind,
     basic_json_visitor<CharT>& visitor,
     const ser_context& context)
