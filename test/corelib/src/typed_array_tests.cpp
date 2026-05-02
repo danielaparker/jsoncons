@@ -6,52 +6,12 @@
 #include <iostream>
 #include <catch/catch.hpp>
 
-void func(const std::vector<int>& data, 
-    const std::vector<std::size_t>& extents, 
-    const std::vector<std::size_t>& strides, 
-    std::vector<std::size_t> indices,
-    std::size_t index)
-{
-    if (index+1 == extents.size())
-    {
-        std::size_t offset = jsoncons::get_offset(strides, indices);
-        std::cout << "[";
-        const std::size_t extent = extents[index];
-        const std::size_t stride = strides[index];
-        for (std::size_t i = 0; i < extent; ++i)
-        {
-            if (i > 0)
-            {
-                std::cout << ",";
-            }
-            std::cout << data[offset];
-            offset += stride;
-        }
-        std::cout << "]";
-    }
-    else
-    {
-        std::cout << "[";
-        const std::size_t extent = extents[index];
-        for (std::size_t i = 0; i < extent; ++i)
-        {
-            if (i > 0)
-            {
-                std::cout << ",";
-            }
-            func(data, extents, strides, indices, index + 1);
-            indices[i] = indices[i] + 1;
-        }
-        std::cout << "]";
-    }
-}
-
 TEST_CASE("typed_array mdarray tests")
 {
     SECTION("row major strides")
     {
         std::vector<std::size_t> extents = { 2,6 };
-        std::vector<std::size_t> strides = jsoncons::row_major::calculate_strides(extents);
+        std::vector<std::size_t> strides = jsoncons::row_major_layout::calculate_strides(extents);
 
         REQUIRE(extents.size() == strides.size());
         CHECK(strides[0] == 6);
@@ -68,7 +28,7 @@ TEST_CASE("typed_array mdarray tests")
     {
         std::vector<std::size_t> extents = { 2,6 };
 
-        std::vector<std::size_t> strides = jsoncons::column_major::calculate_strides(extents);
+        std::vector<std::size_t> strides = jsoncons::column_major_layout::calculate_strides(extents);
 
         REQUIRE(extents.size() == strides.size());
         CHECK(strides[0] == 1);
@@ -86,10 +46,9 @@ TEST_CASE("typed_array mdarray tests")
         std::vector<int> v = {1,2,3,4,5,6,7,8,9,10,11,12};
 
         std::vector<std::size_t> extents = { 2,6 };
-        std::vector<std::size_t> strides = jsoncons::row_major::calculate_strides(extents);
-
-        std::vector<std::size_t> indices = {0,0};
-        func(v, extents, strides, indices, 0);
+        jsoncons::traverse(v, extents, jsoncons::typed_array_layout_kind::row_major);
+        std::cout << "\n\n";
+        jsoncons::traverse(v, extents, jsoncons::typed_array_layout_kind::column_major);
     }
 }
 

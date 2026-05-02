@@ -206,7 +206,9 @@ public:
     }
 };
 
-struct row_major
+enum class typed_array_layout_kind {row_major, column_major};
+
+struct row_major_layout
 {
     static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
     {
@@ -224,7 +226,7 @@ struct row_major
     }
 };
 
-struct column_major
+struct column_major_layout
 {
     static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
     {
@@ -241,77 +243,6 @@ struct column_major
         return strides;
     }
 };
-
-#if 0
-struct row_major
-{
-    static void calculate_strides(jsoncons::span<const std::size_t> extents, 
-        std::vector<std::size_t>& strides, size_t& size)
-    {
-        size = 1;
-        const size_t num_extents = extents.size();
-        for (size_t i = 0; i < num_extents; ++i)
-        {
-            strides[num_extents-i-1] = size;
-            size *= extents[num_extents-i-1];
-        }
-    }
-/*
-    template <size_t N>
-    static void update_offsets(size_t rel, indices_t<N>& offsets)
-    {
-        offsets[N-1] += rel;
-    }
-*/
-    template <size_t N>
-    static std::vector<std::size_t> calculate_offsets(size_t rel,
-        jsoncons::span<const std::size_t> strides, 
-        jsoncons::span<const std::size_t> slices)
-    {
-        indices_t<N> offsets;
-        offsets[N-1] = rel + slices[N-1].start(Base::origin()) * strides[N-1];
-        for (size_t i = 0; i+1 < N; ++i)
-        {
-            offsets[i] = slices[i].start(Base::origin()) * strides[i]; 
-        }
-        return offsets;
-    }
-};
-
-struct column_major
-{
-    template <size_t N>
-    static void calculate_strides(const extents_t<N>& extents, indices_t<N>& strides, size_t& size)
-    {
-        size = 1;
-        for (size_t i = 0; i < N; ++i)
-        {
-            strides[i] = size;
-            size *= extents[i];
-        }
-    }
-/*
-    template <size_t N>
-    static void update_offsets(size_t rel, indices_t<N>& offsets)
-    {
-        offsets[0] += rel;
-    }
-*/
-    template <size_t N, typename Base>
-    static indices_t<N> calculate_offsets(size_t rel,
-        const indices_t<N>& strides, 
-        const std::array<slice,N>& slices)
-    {
-        indices_t<N> offsets;
-        offsets[0] = rel + Base::rebase_to_zero(slices[0].start(Base::origin())) * strides[0];
-        for (size_t i = 1; i < N; ++i)
-        {
-            offsets[i] = Base::rebase_to_zero(slices[i].start(Base::origin())) * strides[i]; 
-        }
-        return offsets;
-    }
-};
-#endif
 
 inline
 std::size_t get_offset(const std::vector<std::size_t>& strides, 
@@ -329,6 +260,66 @@ std::size_t get_offset(const std::vector<std::size_t>& strides,
     }
 
     return offset;
+}
+
+inline
+void traverse(const std::vector<int>& data, 
+    const std::vector<std::size_t>& extents, 
+    const std::vector<std::size_t>& strides, 
+    std::vector<std::size_t> indices,
+    std::size_t index)
+{
+    if (index+1 == extents.size())
+    {
+        std::size_t offset = jsoncons::get_offset(strides, indices);
+        std::cout << "[";
+        const std::size_t extent = extents[index];
+        const std::size_t stride = strides[index];
+        for (std::size_t i = 0; i < extent; ++i)
+        {
+            if (i > 0)
+            {
+                std::cout << ",";
+            }
+            std::cout << data[offset];
+            offset += stride;
+        }
+        std::cout << "]";
+    }
+    else
+    {
+        std::cout << "[";
+        const std::size_t extent = extents[index];
+        for (std::size_t i = 0; i < extent; ++i)
+        {
+            if (i > 0)
+            {
+                std::cout << ",";
+            }
+            traverse(data, extents, strides, indices, index + 1);
+            indices[i] = indices[i] + 1;
+        }
+        std::cout << "]";
+    }
+}
+
+inline
+void traverse(const std::vector<int>& data, 
+    const std::vector<std::size_t>& extents, 
+    typed_array_layout_kind layout_kind)
+{
+    if (layout_kind == typed_array_layout_kind::row_major)
+    {
+        std::vector<std::size_t> strides = row_major_layout::calculate_strides(extents);
+        std::vector<std::size_t> indices(extents.size(), 0);
+        traverse(data, extents, strides, indices, 0);
+    }
+    else if (layout_kind == typed_array_layout_kind::column_major)
+    {
+        std::vector<std::size_t> strides = column_major_layout::calculate_strides(extents);
+        std::vector<std::size_t> indices(extents.size(), 0);
+        traverse(data, extents, strides, indices, 0);
+    }
 }
 
 } // namespace jsoncons
