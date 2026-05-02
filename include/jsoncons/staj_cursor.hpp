@@ -315,7 +315,7 @@ public:
         return typed_array_element_type{};
     }
 
-    virtual jsoncons::span<uint8_t> typed_array() 
+    virtual jsoncons::span<uint8_t> array_buffer() 
     {
         return jsoncons::span<uint8_t>{};
     }
@@ -336,7 +336,7 @@ public:
             {
                 case typed_array_element_type::uint8:
                 {
-                    auto ta = typed_array_cast<const uint8_t>(typed_array());
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -345,7 +345,7 @@ public:
                 }
                 case typed_array_element_type::uint16:
                 {
-                    auto ta = typed_array_cast<const uint16_t>(typed_array());
+                    auto ta = typed_array_cast<const uint16_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -354,7 +354,7 @@ public:
                 }
                 case typed_array_element_type::uint32:
                 {
-                    auto ta = typed_array_cast<const uint32_t>(typed_array());
+                    auto ta = typed_array_cast<const uint32_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -363,7 +363,7 @@ public:
                 }
                 case typed_array_element_type::uint64:
                 {
-                    auto ta = typed_array_cast<const uint64_t>(typed_array());
+                    auto ta = typed_array_cast<const uint64_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -372,7 +372,7 @@ public:
                 }
                 case typed_array_element_type::int8:
                 {
-                    auto ta = typed_array_cast<const int8_t>(typed_array());
+                    auto ta = typed_array_cast<const int8_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -381,7 +381,7 @@ public:
                 }
                 case typed_array_element_type::int16:
                 {
-                    auto ta = typed_array_cast<const int16_t>(typed_array());
+                    auto ta = typed_array_cast<const int16_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -390,7 +390,7 @@ public:
                 }
                 case typed_array_element_type::int32:
                 {
-                    auto ta = typed_array_cast<const int32_t>(typed_array());
+                    auto ta = typed_array_cast<const int32_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -399,7 +399,7 @@ public:
                 }
                 case typed_array_element_type::int64:
                 {
-                    auto ta = typed_array_cast<const int64_t>(typed_array());
+                    auto ta = typed_array_cast<const int64_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -408,7 +408,7 @@ public:
                 }
                 case typed_array_element_type::half_float:
                 {
-                    auto ta = typed_array_cast<const int16_t>(typed_array());
+                    auto ta = typed_array_cast<const int16_t>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -417,7 +417,7 @@ public:
                 }
                 case typed_array_element_type::float32:
                 {
-                    auto ta = typed_array_cast<const float>(typed_array());
+                    auto ta = typed_array_cast<const float>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));
@@ -426,7 +426,7 @@ public:
                 }
                 case typed_array_element_type::float64 :
                 {
-                    auto ta = typed_array_cast<const double>(typed_array());
+                    auto ta = typed_array_cast<const double>(array_buffer());
                     for (auto item : ta)
                     {
                         v.push_back(static_cast<value_type>(item));

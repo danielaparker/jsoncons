@@ -173,9 +173,9 @@ public:
         return parser_.element_type();
     }
 
-    jsoncons::span<uint8_t> typed_array() final
+    jsoncons::span<uint8_t> array_buffer() final
     {
-        return parser_.typed_array();
+        return parser_.array_buffer();
     }
 
     void to_end_array() final

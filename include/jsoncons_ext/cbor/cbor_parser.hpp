@@ -145,7 +145,7 @@ class basic_cbor_parser : public ser_context
     typed_array_element_type element_type_{};
     semantic_tag typed_array_tag_{};
     std::size_t element_index_{0};
-    byte_string_type typed_array_;
+    byte_string_type array_buffer_;
     std::vector<std::size_t> extents_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
 
@@ -195,7 +195,7 @@ public:
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
-         typed_array_(alloc),
+         array_buffer_(alloc),
          stringref_map_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
@@ -222,7 +222,7 @@ public:
         raw_tag_ = 0;
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
-        typed_array_.clear();
+        array_buffer_.clear();
         stringref_map_stack_.clear();
         nesting_depth_ = 0;
     }
@@ -289,9 +289,9 @@ public:
         return element_type_;
     }
 
-    jsoncons::span<uint8_t> typed_array()
+    jsoncons::span<uint8_t> array_buffer()
     {
-        return typed_array_;
+        return array_buffer_;
     }
 
     void to_end_array()
@@ -431,7 +431,7 @@ private:
             {
                 case typed_array_element_type::uint8:
                 {
-                    auto ta = typed_array_cast<const uint8_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -447,7 +447,7 @@ private:
                 }
                 case typed_array_element_type::uint16:
                 {
-                    auto ta = typed_array_cast<const uint16_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint16_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -463,7 +463,7 @@ private:
                 }
                 case typed_array_element_type::uint32:
                 {
-                    auto ta = typed_array_cast<const uint32_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint32_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -479,7 +479,7 @@ private:
                 }
                 case typed_array_element_type::uint64:
                 {
-                    auto ta = typed_array_cast<const uint64_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint64_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -495,7 +495,7 @@ private:
                 }
                 case typed_array_element_type::int8:
                 {
-                    auto ta = typed_array_cast<const int8_t>(typed_array_);
+                    auto ta = typed_array_cast<const int8_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -511,7 +511,7 @@ private:
                 }
                 case typed_array_element_type::int16:
                 {
-                    auto ta = typed_array_cast<const int16_t>(typed_array_);
+                    auto ta = typed_array_cast<const int16_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -527,7 +527,7 @@ private:
                 }
                 case typed_array_element_type::int32:
                 {
-                    auto ta = typed_array_cast<const int32_t>(typed_array_);
+                    auto ta = typed_array_cast<const int32_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -543,7 +543,7 @@ private:
                 }
                 case typed_array_element_type::int64:
                 {
-                    auto ta = typed_array_cast<const int64_t>(typed_array_);
+                    auto ta = typed_array_cast<const int64_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -559,7 +559,7 @@ private:
                 }
                 case typed_array_element_type::half_float:
                 {
-                    auto ta = typed_array_cast<const int16_t>(typed_array_);
+                    auto ta = typed_array_cast<const int16_t>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.half_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -575,7 +575,7 @@ private:
                 }
                 case typed_array_element_type::float32:
                 {
-                    auto ta = typed_array_cast<const float>(typed_array_);
+                    auto ta = typed_array_cast<const float>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.double_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -591,7 +591,7 @@ private:
                 }
                 case typed_array_element_type::float64 :
                 {
-                    auto ta = typed_array_cast<const double>(typed_array_);
+                    auto ta = typed_array_cast<const double>(array_buffer_);
                     if (element_index_ < ta.size())
                     {
                         visitor.double_value(ta[element_index_],semantic_tag::none,*this, ec);
@@ -1857,14 +1857,14 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::uint8;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<const uint8_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1877,14 +1877,14 @@ private:
                     element_index_ = 0;
                     typed_array_tag_ = semantic_tag::clamped;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<const uint8_t>(typed_array_);
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     visitor.begin_array(ta.size(), semantic_tag::clamped, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1896,8 +1896,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::uint16;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -1905,7 +1905,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint16_t>(typed_array_);
+                    auto ta = typed_array_cast<uint16_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -1924,8 +1924,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::uint32;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -1933,7 +1933,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag);
-                    auto ta = typed_array_cast<uint32_t>(typed_array_);
+                    auto ta = typed_array_cast<uint32_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -1952,8 +1952,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::uint64;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -1961,7 +1961,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint64_t>(typed_array_);
+                    auto ta = typed_array_cast<uint64_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -1979,14 +1979,14 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::int8;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<int8_t>(typed_array_);
+                    auto ta = typed_array_cast<int8_t>(array_buffer_);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1998,8 +1998,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::int16;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2007,7 +2007,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int16_t>(typed_array_);
+                    auto ta = typed_array_cast<int16_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2026,8 +2026,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::int32;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2035,7 +2035,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int32_t>(typed_array_);
+                    auto ta = typed_array_cast<int32_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2054,8 +2054,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::int64;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2063,7 +2063,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int64_t>(typed_array_);
+                    auto ta = typed_array_cast<int64_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2082,8 +2082,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::half_float;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2091,7 +2091,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint16_t>(typed_array_);
+                    auto ta = typed_array_cast<uint16_t>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2110,8 +2110,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::float32;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2119,7 +2119,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<float>(typed_array_);
+                    auto ta = typed_array_cast<float>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2138,8 +2138,8 @@ private:
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_type::float64 ;
                     element_index_ = 0;
-                    typed_array_.clear();
-                    read(typed_array_,ec);
+                    array_buffer_.clear();
+                    read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2147,7 +2147,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<double>(typed_array_);
+                    auto ta = typed_array_cast<double>(array_buffer_);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
