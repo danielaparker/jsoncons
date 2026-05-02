@@ -323,6 +323,122 @@ public:
     virtual void to_end_array() 
     {
     }
+
+    template <typename T>
+    typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
+    read_typed_array(T& v)
+    {
+        using value_type = typename T::value_type;
+
+        if (is_typed_array())
+        {
+            switch (element_type())
+            {
+                case typed_array_values::uint8_value:
+                {
+                    auto ta = typed_array_cast<const uint8_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::uint16_value:
+                {
+                    auto ta = typed_array_cast<const uint16_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::uint32_value:
+                {
+                    auto ta = typed_array_cast<const uint32_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::uint64_value:
+                {
+                    auto ta = typed_array_cast<const uint64_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::int8_value:
+                {
+                    auto ta = typed_array_cast<const int8_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::int16_value:
+                {
+                    auto ta = typed_array_cast<const int16_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::int32_value:
+                {
+                    auto ta = typed_array_cast<const int32_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::int64_value:
+                {
+                    auto ta = typed_array_cast<const int64_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::half_value:
+                {
+                    auto ta = typed_array_cast<const int16_t>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::float_value:
+                {
+                    auto ta = typed_array_cast<const float>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                case typed_array_values::double_value:
+                {
+                    auto ta = typed_array_cast<const double>(typed_array());
+                    for (auto item : ta)
+                    {
+                        v.push_back(static_cast<value_type>(item));
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            to_end_array();
+        }
+    }
 };
 
 template <typename CharT>
