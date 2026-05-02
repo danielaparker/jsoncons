@@ -206,6 +206,42 @@ public:
     }
 };
 
+struct row_major
+{
+    static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
+    {
+        std::vector<std::size_t> strides(extents.size(), 0);
+
+        std::size_t size = 1;
+        const size_t num_extents = extents.size();
+        for (size_t i = 0; i < num_extents; ++i)
+        {
+            strides[num_extents-i-1] = size;
+            size *= extents[num_extents-i-1];
+        }
+
+        return strides;
+    }
+};
+
+struct column_major
+{
+    static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
+    {
+        std::vector<std::size_t> strides(extents.size(), 0);
+
+        std::size_t size = 1;
+        const size_t num_extents = extents.size();
+        for (size_t i = 0; i < num_extents; ++i)
+        {
+            strides[i] = size;
+            size *= extents[i];
+        }
+
+        return strides;
+    }
+};
+
 #if 0
 struct row_major
 {
@@ -276,6 +312,24 @@ struct column_major
     }
 };
 #endif
+
+inline
+std::size_t get_offset(const std::vector<std::size_t>& strides, 
+    const std::vector<std::size_t>& indices)
+{
+    size_t offset = 0;
+
+    const std::size_t num_strides = strides.size(); 
+    const std::size_t num_indices = indices.size(); 
+    JSONCONS_ASSERT(num_indices <= num_strides);
+
+    for (size_t i = 0; i < num_indices; ++i)
+    {
+        offset += indices[i]*strides[i];
+    }
+
+    return offset;
+}
 
 } // namespace jsoncons
 
