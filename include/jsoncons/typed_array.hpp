@@ -262,8 +262,8 @@ std::size_t get_offset(const std::vector<std::size_t>& strides,
     return offset;
 }
 
-inline
-void traverse(const std::vector<int>& data, 
+template <typename ValueType>
+void traverse(jsoncons::span<const ValueType> data, 
     const std::vector<std::size_t>& extents, 
     const std::vector<std::size_t>& strides, 
     std::vector<std::size_t> indices,
@@ -303,8 +303,8 @@ void traverse(const std::vector<int>& data,
     }
 }
 
-inline
-void traverse(const std::vector<int>& data, 
+template <typename ValueType>
+void traverse(jsoncons::span<const ValueType> data, 
     const std::vector<std::size_t>& extents, 
     typed_array_layout_kind layout_kind)
 {

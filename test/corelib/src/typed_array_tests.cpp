@@ -46,9 +46,11 @@ TEST_CASE("typed_array mdarray tests")
         std::vector<int> v = {1,2,3,4,5,6,7,8,9,10,11,12};
 
         std::vector<std::size_t> extents = { 2,6 };
-        jsoncons::traverse(v, extents, jsoncons::typed_array_layout_kind::row_major);
+        jsoncons::traverse(jsoncons::span<const int>(v), extents, 
+            jsoncons::typed_array_layout_kind::row_major);
         std::cout << "\n\n";
-        jsoncons::traverse(v, extents, jsoncons::typed_array_layout_kind::column_major);
+        jsoncons::traverse(jsoncons::span<const int>(v), 
+            extents, jsoncons::typed_array_layout_kind::column_major);
     }
 }
 
