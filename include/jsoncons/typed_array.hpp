@@ -386,16 +386,7 @@ public:
 
     void traverse()
     {
-        if (index_+1 < dimensions_.size())
-        {
-            std::cout << "[";
-            ++index_;
-        }
-        else
-        {
-            std::cout << data_[dimensions_[index_].index] << " "; 
-            next();
-        }
+        next();
     }
 
     void next()
@@ -403,6 +394,21 @@ public:
         if (dimensions_.empty())
         {
             return;
+        }
+        if (index_+1 < dimensions_.size())
+        {
+            std::cout << "[";
+            ++index_;
+            return;
+        }
+        if (index_+1 < dimensions_.size())
+        {
+            std::cout << "[";
+            ++index_;
+        }
+        if (dimensions_[index_].index < dimensions_[index_].end)
+        {
+            std::cout << data_[dimensions_[index_].index] << " "; 
         }
         if (dimensions_[index_].index + dimensions_[index_].stride < dimensions_[index_].end)
         {
