@@ -210,7 +210,7 @@ enum class typed_array_layout_kind {row_major, column_major};
 
 struct row_major_layout
 {
-    static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
+    static std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
 
@@ -228,7 +228,7 @@ struct row_major_layout
 
 struct column_major_layout
 {
-    static std::vector<std::size_t> calculate_strides(jsoncons::span<const std::size_t> extents)
+    static std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
 
@@ -340,13 +340,13 @@ void to_json(jsoncons::span<const ValueType> data,
 
     if (layout_kind == typed_array_layout_kind::row_major)
     {
-        std::vector<std::size_t> strides = row_major_layout::calculate_strides(extents);
+        std::vector<std::size_t> strides = row_major_layout{}(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
         to_json(data, extents, strides, indices, 0, visitor, context, ec);
     }
     else if (layout_kind == typed_array_layout_kind::column_major)
     {
-        std::vector<std::size_t> strides = column_major_layout::calculate_strides(extents);
+        std::vector<std::size_t> strides = column_major_layout{}(extents);
         std::vector<std::size_t> indices(extents.size(), 0);
         to_json(data, extents, strides, indices, 0, visitor, context, ec);
     }
