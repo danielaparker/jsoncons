@@ -2022,8 +2022,9 @@ namespace detail {
                     return arg0;
                 }
 
-                auto result = context.create_json(arg0);
-                for (std::size_t i = 1; i < args.size(); ++i)
+                auto result = context.create_json(json_object_arg);
+                result->reserve(arg0.size());
+                for (std::size_t i = 0; i < args.size(); ++i)
                 {
                     reference argi = args[i].value();
                     if (!argi.is_object())

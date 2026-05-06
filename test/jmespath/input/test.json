@@ -1,5 +1,20 @@
 [
   {
+    "given": {
+      "foz": "baz"
+    },
+    "cases": [
+      {
+        "comment": "Multi select hash used in merge function",
+        "expression": "{object:@}.merge(object, {foo:'bar'})",
+        "result": {
+          "foo": "bar",
+          "foz": "baz"
+        }
+      }
+    ]
+  },
+  {
     "given": [
       { "foo": "bar" },
       { "foo": "baz" }
