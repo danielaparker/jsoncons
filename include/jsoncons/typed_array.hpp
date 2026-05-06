@@ -366,7 +366,7 @@ class mdarray_traverser
 {
     jsoncons::span<ValueType> data_;
     std::vector<mdarray_dimension<ValueType>> dimensions_;
-    std::size_t index_{0};
+    std::size_t dim_{0};
 public:
     template <typename Layout= jsoncons::row_major_layout>
     mdarray_traverser(jsoncons::span<ValueType> data, const std::vector<std::size_t>& extents,
@@ -386,7 +386,7 @@ public:
 
     bool done() const
     {
-        return index_ == 0 && dimensions_[index_].index == dimensions_[index_].end;
+        return dim_ == 0 && dimensions_[dim_].index == dimensions_[dim_].end;
     }
 
     void traverse()
@@ -400,40 +400,31 @@ public:
         {
             return;
         }
-        if (done())
-        {
-            return;
-        }
-        if (index_+1 < dimensions_.size())
+        if (dim_+1 < dimensions_.size())
         {
             std::cout << "[";
-            ++index_;
+            ++dim_;
             return;
         }
-        if (index_+1 < dimensions_.size())
+        if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            std::cout << "[";
-            ++index_;
+            std::cout << data_[dimensions_[dim_].index] << " "; 
         }
-        if (dimensions_[index_].index < dimensions_[index_].end)
+        if (dimensions_[dim_].index + dimensions_[dim_].stride < dimensions_[dim_].end)
         {
-            std::cout << data_[dimensions_[index_].index] << " "; 
-        }
-        if (dimensions_[index_].index + dimensions_[index_].stride < dimensions_[index_].end)
-        {
-            dimensions_[index_].index += dimensions_[index_].stride;
+            dimensions_[dim_].index += dimensions_[dim_].stride;
         }
         else 
         {
             std::cout << "]";
             bool done = false;
-            while (index_ > 0 && !done)
+            while (dim_ > 0 && !done)
             {
-                --index_;
-                if (dimensions_[index_].index + dimensions_[index_].stride < dimensions_[index_].end)
+                --dim_;
+                if (dimensions_[dim_].index + dimensions_[dim_].stride < dimensions_[dim_].end)
                 {
-                    dimensions_[index_].index += dimensions_[index_].stride;
-                    for (std::size_t i = index_+1; i < dimensions_.size(); ++i)
+                    dimensions_[dim_].index += dimensions_[dim_].stride;
+                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
                     {
                         dimensions_[i].index = dimensions_[i-1].index;
                         dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
@@ -442,7 +433,7 @@ public:
                 }
                 else
                 {
-                    dimensions_[index_].index += dimensions_[index_].stride;
+                    dimensions_[dim_].index += dimensions_[dim_].stride;
                 }
             }
         }
