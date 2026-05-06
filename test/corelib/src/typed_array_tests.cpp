@@ -107,10 +107,9 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = { 2,6 };
 
         jsoncons::mdarray_traverser<int> iter(v, extents);
-        for (std::size_t i = 0; i < 12; ++i)
+        for (std::size_t i = 0; i < 13; ++i)
         {
-            iter.print();
-            iter.next();
+            iter.traverse();
         }
         std::cout << "\n\n";
     }
@@ -122,10 +121,9 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = { 2,3,2 };
 
         jsoncons::mdarray_traverser<int> iter(v, extents);
-        for (std::size_t i = 0; i < 12; ++i)
+        for (std::size_t i = 0; i < 14; ++i)
         {
-            iter.print();
-            iter.next();
+            iter.traverse();
         }
         std::cout << "\n\n";
     }
@@ -138,10 +136,9 @@ TEST_CASE("typed_array mdarray tests 2")
 
         std::cout << "\nexpected: " << expected << "\n";
         jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
-        for (std::size_t i = 0; i < 12; ++i)
+        for (std::size_t i = 0; i < 13; ++i)
         {
-            iter.print();
-            iter.next();
+            iter.traverse();
         }
         std::cout << "\n\n";
     }
@@ -154,10 +151,9 @@ TEST_CASE("typed_array mdarray tests 2")
 
         std::cout << "\nexpected: " << expected << "\n";
         jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
-        for (std::size_t i = 0; i < 12; ++i)
+        for (std::size_t i = 0; i < 14; ++i)
         {
-            iter.print();
-            iter.next();
+            iter.traverse();
         }
         std::cout << "\n\n";
     }
