@@ -384,6 +384,11 @@ public:
         std::cout << "[";
     }
 
+    bool done() const
+    {
+        return index_ == 0 && dimensions_[index_].index == dimensions_[index_].end;
+    }
+
     void traverse()
     {
         next();
@@ -392,6 +397,10 @@ public:
     void next()
     {
         if (dimensions_.empty())
+        {
+            return;
+        }
+        if (done())
         {
             return;
         }
@@ -430,6 +439,10 @@ public:
                         dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
                     }
                     done = true;
+                }
+                else
+                {
+                    dimensions_[index_].index += dimensions_[index_].stride;
                 }
             }
         }
