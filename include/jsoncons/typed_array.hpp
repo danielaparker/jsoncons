@@ -352,6 +352,75 @@ void to_json(jsoncons::span<const ValueType> data,
     }
 }
 
+template <typename ValueType>
+struct mdarray_dimension
+{
+    std::size_t extent;
+    std::size_t end{0};
+    std::size_t stride{0};
+    std::size_t index{0};
+};
+
+template <typename ValueType>
+class mdarray_traverser
+{
+    jsoncons::span<ValueType> data_;
+    std::vector<mdarray_dimension<ValueType>> dimensions_;
+public:
+    template <typename Layout= jsoncons::row_major_layout>
+    mdarray_traverser(jsoncons::span<ValueType> data, const std::vector<std::size_t>& extents,
+        Layout layout = Layout())
+        : data_{data}, dimensions_(extents.size(), mdarray_dimension<ValueType>{})
+    {
+        std::vector<std::size_t> strides = layout(extents);
+        for (std::size_t i = 0; i < strides.size(); ++i)
+        {
+            dimensions_[i].extent = extents[i];
+            dimensions_[i].stride = strides[i];
+            dimensions_[i].index = 0;
+            dimensions_[i].end = strides[i]*extents[i];
+        }
+        std::cout << "[";
+    }
+
+    void print()
+    {
+        std::cout << data_[dimensions_.back().index] << " "; 
+    }
+
+    void next()
+    {
+        if (dimensions_.empty())
+        {
+            return;
+        }
+        std::size_t index = dimensions_.size() - 1;
+        if (dimensions_[index].index + dimensions_[index].stride < dimensions_[index].end)
+        {
+            dimensions_[index].index += dimensions_[index].stride;
+        }
+        else 
+        {
+            std::cout << "]";
+            bool done = false;
+            while (index > 0 && !done)
+            {
+                --index;
+                if (dimensions_[index].index + dimensions_[index].stride < dimensions_[index].end)
+                {
+                    dimensions_[index].index += dimensions_[index].stride;
+                    for (std::size_t i = index+1; i < dimensions_.size(); ++i)
+                    {
+                        dimensions_[i].index = dimensions_[i-1].index;
+                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
+                    }
+                    done = true;
+                }
+            }
+        }
+    }
+};
+
 } // namespace jsoncons
 
 #endif // JSONCONS_TYPED_ARRAY_HPP

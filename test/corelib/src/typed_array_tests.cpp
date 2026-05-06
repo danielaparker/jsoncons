@@ -65,85 +65,6 @@ TEST_CASE("typed_array mdarray tests")
 }
 #endif
 
-template <typename ValueType>
-struct subarray_iterator
-{
-    std::size_t extent;
-    std::size_t start;
-    std::size_t end{0};
-    std::size_t stride{0};
-    std::size_t index{0};
-};
-
-template <typename ValueType>
-class array_iterator
-{
-    jsoncons::span<ValueType> data_;
-    std::vector<subarray_iterator<ValueType>> iterators_;
-public:
-    template <typename Layout= jsoncons::row_major_layout>
-    array_iterator(jsoncons::span<ValueType> data, const std::vector<std::size_t>& extents,
-        Layout layout = Layout())
-        : data_{data}, iterators_(extents.size(), subarray_iterator<ValueType>{})
-    {
-        std::vector<std::size_t> strides = layout(extents);
-        std::vector<std::size_t> indices(strides.size(), 0);
-        for (std::size_t i = 0; i < strides.size(); ++i)
-        {
-            std::vector<std::size_t> to_indices(strides.size(), 0);
-            for (std::size_t j = 0; j <= i; ++j)
-            {
-                to_indices[j] = extents[j];
-            }
-
-            iterators_[i].extent = extents[i];
-            iterators_[i].stride = strides[i];
-            iterators_[i].start = jsoncons::get_offset(strides, indices);
-            iterators_[i].index = iterators_[i].start;
-            iterators_[i].end = iterators_[i].start + strides[i]*extents[i];
-        }
-        std::cout << "[";
-    }
-
-    void print()
-    {
-        std::cout << data_[iterators_.back().index] << " "; 
-    }
-
-    void next()
-    {
-        if (iterators_.empty())
-        {
-            return;
-        }
-        std::size_t index = iterators_.size() - 1;
-        if (iterators_[index].index + iterators_[index].stride < iterators_[index].end)
-        {
-            iterators_[index].index += iterators_[index].stride;
-        }
-        else 
-        {
-            std::cout << "]";
-            bool done = false;
-            while (index > 0 && !done)
-            {
-                --index;
-                if (iterators_[index].index + iterators_[index].stride < iterators_[index].end)
-                {
-                    iterators_[index].index += iterators_[index].stride;
-                    for (std::size_t i = index+1; i < iterators_.size(); ++i)
-                    {
-                        iterators_[i].start = iterators_[i-1].index;
-                        iterators_[i].index = iterators_[i].start;
-                        iterators_[i].end = iterators_[i].index + iterators_[i].stride*iterators_[i].extent;
-                    }
-                    done = true;
-                }
-            }
-        }
-    }
-};
-
 TEST_CASE("typed_array mdarray tests 2")
 {
     /*SECTION("row major strides")
@@ -185,7 +106,7 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<int> v = {1,2,3,4,5,6,7,8,9,10,11,12};
         std::vector<std::size_t> extents = { 2,6 };
 
-        array_iterator<int> iter(v, extents);
+        jsoncons::mdarray_traverser<int> iter(v, extents);
         for (std::size_t i = 0; i < 12; ++i)
         {
             iter.print();
@@ -200,7 +121,7 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<int> v = {1,2,3,4,5,6,7,8,9,10,11,12};
         std::vector<std::size_t> extents = { 2,3,2 };
 
-        array_iterator<int> iter(v, extents);
+        jsoncons::mdarray_traverser<int> iter(v, extents);
         for (std::size_t i = 0; i < 12; ++i)
         {
             iter.print();
@@ -216,7 +137,7 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = {2, 6};
 
         std::cout << "\nexpected: " << expected << "\n";
-        array_iterator<int> iter(v, extents, jsoncons::column_major_layout{});
+        jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
         for (std::size_t i = 0; i < 12; ++i)
         {
             iter.print();
@@ -232,7 +153,7 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = {2, 3, 2};
 
         std::cout << "\nexpected: " << expected << "\n";
-        array_iterator<int> iter(v, extents, jsoncons::column_major_layout{});
+        jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
         for (std::size_t i = 0; i < 12; ++i)
         {
             iter.print();
