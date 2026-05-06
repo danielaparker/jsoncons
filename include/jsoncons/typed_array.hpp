@@ -404,22 +404,21 @@ public:
         {
             return;
         }
-        std::size_t index = dimensions_.size() - 1;
-        if (dimensions_[index].index + dimensions_[index].stride < dimensions_[index].end)
+        if (dimensions_[index_].index + dimensions_[index_].stride < dimensions_[index_].end)
         {
-            dimensions_[index].index += dimensions_[index].stride;
+            dimensions_[index_].index += dimensions_[index_].stride;
         }
         else 
         {
             std::cout << "]";
             bool done = false;
-            while (index > 0 && !done)
+            while (index_ > 0 && !done)
             {
-                --index;
-                if (dimensions_[index].index + dimensions_[index].stride < dimensions_[index].end)
+                --index_;
+                if (dimensions_[index_].index + dimensions_[index_].stride < dimensions_[index_].end)
                 {
-                    dimensions_[index].index += dimensions_[index].stride;
-                    for (std::size_t i = index+1; i < dimensions_.size(); ++i)
+                    dimensions_[index_].index += dimensions_[index_].stride;
+                    for (std::size_t i = index_+1; i < dimensions_.size(); ++i)
                     {
                         dimensions_[i].index = dimensions_[i-1].index;
                         dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
