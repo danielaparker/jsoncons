@@ -15,7 +15,7 @@
 
 namespace jsoncons { 
 
-enum class json_view_storage_kind : uint8_t {json_ref,json_view,array,object};
+enum class json_view_storage_kind : uint8_t {json_ref,array,object};
 
 template <typename Json>
 class json_view
