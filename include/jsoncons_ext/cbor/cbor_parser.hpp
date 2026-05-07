@@ -142,6 +142,7 @@ class basic_cbor_parser : public ser_context
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
+    std::unique_ptr<typed_array_iterator<char_type>> typed_array_iter_;
     typed_array_element_type element_type_{};
     semantic_tag typed_array_tag_{};
     std::size_t element_index_{0};
@@ -1865,6 +1866,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<const uint8_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1885,6 +1887,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<const uint8_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::clamped, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1913,6 +1916,7 @@ private:
                             ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint16_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1941,6 +1945,7 @@ private:
                             ta[i] = binary::byte_swap<uint32_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint32_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1969,6 +1974,7 @@ private:
                             ta[i] = binary::byte_swap<uint64_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint64_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -1987,6 +1993,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<int8_t>(array_buffer_);
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int8_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2015,6 +2022,7 @@ private:
                             ta[i] = binary::byte_swap<int16_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int16_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2043,6 +2051,7 @@ private:
                             ta[i] = binary::byte_swap<int32_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int32_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2071,6 +2080,7 @@ private:
                             ta[i] = binary::byte_swap<int64_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int64_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2099,6 +2109,7 @@ private:
                             ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint16_t>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2127,6 +2138,7 @@ private:
                             ta[i] = binary::byte_swap<float>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<float>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
@@ -2155,6 +2167,7 @@ private:
                             ta[i] = binary::byte_swap<double>(ta[i]);
                         }
                     }
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<double>>(ta);
                     visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
