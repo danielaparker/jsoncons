@@ -145,7 +145,6 @@ class basic_cbor_parser : public ser_context
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
     typed_array_element_types element_type_{};
     semantic_tag typed_array_tag_{};
-    std::size_t element_index_{0};
     byte_string_type array_buffer_;
     std::vector<std::size_t> extents_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
@@ -1685,7 +1684,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::uint8;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1705,9 +1703,7 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::uint8;
-                    element_index_ = 0;
                     typed_array_tag_ = semantic_tag::clamped;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1727,7 +1723,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::uint16;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1756,7 +1751,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::uint32;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1785,7 +1779,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::uint64;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1813,7 +1806,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::int8;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1833,7 +1825,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::int16;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1862,7 +1853,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::int32;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1891,7 +1881,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::int64;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1920,7 +1909,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::half_float;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1949,7 +1937,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::float32;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))
@@ -1978,7 +1965,6 @@ private:
                 {
                     is_typed_array_ = true;
                     element_type_ = typed_array_element_types::float64 ;
-                    element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
                     if (JSONCONS_UNLIKELY(ec))

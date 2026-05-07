@@ -210,7 +210,7 @@ enum class typed_array_layout_kind {row_major, column_major};
 
 struct row_major_layout
 {
-    static std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents)
+    std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents) const
     {
         std::vector<std::size_t> strides(extents.size(), 0);
 
@@ -228,7 +228,7 @@ struct row_major_layout
 
 struct column_major_layout
 {
-    static std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents)
+    std::vector<std::size_t> operator()(jsoncons::span<const std::size_t> extents) const
     {
         std::vector<std::size_t> strides(extents.size(), 0);
 
