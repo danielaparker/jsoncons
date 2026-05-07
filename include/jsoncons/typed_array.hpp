@@ -262,96 +262,6 @@ std::size_t get_offset(jsoncons::span<const std::size_t> strides,
     return offset;
 }
 
-template <typename ValueType,typename CharT>
-typename std::enable_if<ext_traits::is_integer<ValueType>::value,void>::type
-visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
-    const ser_context& context)
-{
-    visitor.uint64_value(val, semantic_tag::none, context);
-}
-
-template <typename ValueType,typename CharT>
-typename std::enable_if<std::is_floating_point<ValueType>::value,void>::type
-visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
-    const ser_context& context)
-{
-    visitor.double_value(val, semantic_tag::none, context);
-}
-
-template <typename ValueType,typename CharT>
-void to_json(jsoncons::span<const ValueType> data, 
-    jsoncons::span<const std::size_t> extents, 
-    jsoncons::span<const std::size_t> strides, 
-    jsoncons::span<const std::size_t> indices,
-    std::size_t index,
-    basic_json_visitor<CharT>& visitor,
-    const ser_context& context,
-    std::error_code& ec)
-{
-    if (index+1 == extents.size())
-    {
-        std::size_t offset = jsoncons::get_offset(strides, indices);
-        const std::size_t extent = extents[index];
-        const std::size_t stride = strides[index];
-        visitor.begin_array(extent, semantic_tag::none, context);
-        for (std::size_t i = 0; i < extent; ++i)
-        {
-            visit_element(data[offset], visitor, context);
-            offset += stride;
-        }
-        visitor.end_array();
-    }
-    else
-    {
-        const std::size_t extent = extents[index];
-        std::vector<std::size_t> new_indices(indices.begin(), indices.end());
-        visitor.begin_array(extent, semantic_tag::none, context);
-        for (std::size_t i = 0; i < extent; ++i)
-        {
-            to_json(data, extents, strides, new_indices, index + 1, visitor, context, ec);
-            new_indices[i] = new_indices[i] + 1;
-        }
-        visitor.end_array();
-    }
-}
-
-template <typename ValueType,typename CharT>
-void to_json(jsoncons::span<const ValueType> data, 
-    jsoncons::span<const std::size_t> extents, 
-    typed_array_layout_kind layout_kind,
-    basic_json_visitor<CharT>& visitor,
-    const ser_context& context,
-    std::error_code& ec)
-{
-    if (extents.empty())
-    {
-        return;
-    }
-    std::size_t product = extents[0];
-    for (std::size_t i = 1; i < extents.size(); ++i)
-    {
-        product *= extents[i];
-    }
-    if (product != data.size())
-    {
-        ec = conv_errc::invalid_mdarray;
-        return;
-    }
-
-    if (layout_kind == typed_array_layout_kind::row_major)
-    {
-        std::vector<std::size_t> strides = row_major_layout{}(extents);
-        std::vector<std::size_t> indices(extents.size(), 0);
-        to_json(data, extents, strides, indices, 0, visitor, context, ec);
-    }
-    else if (layout_kind == typed_array_layout_kind::column_major)
-    {
-        std::vector<std::size_t> strides = column_major_layout{}(extents);
-        std::vector<std::size_t> indices(extents.size(), 0);
-        to_json(data, extents, strides, indices, 0, visitor, context, ec);
-    }
-}
-
 template <typename ValueType>
 struct mdarray_dimension
 {
@@ -367,6 +277,7 @@ class mdarray_traverser
     jsoncons::span<ValueType> data_;
     std::vector<mdarray_dimension<ValueType>> dimensions_;
     std::size_t dim_{0};
+    bool first_{true};
     bool done_{false};
 public:
     template <typename Layout= jsoncons::row_major_layout>
@@ -382,7 +293,6 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i]*extents[i];
         }
-        std::cout << "[";
     }
 
     bool done() const
@@ -390,38 +300,41 @@ public:
         return done_;
     }
 
-    void traverse()
+    template <typename CharT>
+    void next(basic_json_visitor<CharT>& visitor, const ser_context& context)
     {
-        next();
-    }
+        JSONCONS_ASSERT(!dimensions_.empty());
 
-    void next()
-    {
-        if (dimensions_.empty())
+        if (dim_ == 0)
         {
-            return;
-        }
-        if (dim_ == 0 && dimensions_[dim_].index == dimensions_[dim_].end)
-        {
-            std::cout << "]";
-            done_ = true;
-            return;
+            if (first_)
+            {
+                visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context);
+                first_ = false;
+                return;
+            }
+            if (dimensions_[dim_].index == dimensions_[dim_].end)
+            {
+                visitor.end_array();
+                done_ = true;
+                return;
+            }
         }
         if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            std::cout << "[";
+            visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context);
             ++dim_;
             return;
         }
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            std::cout << data_[dimensions_[dim_].index] << " "; 
+            visit_element(data_[dimensions_[dim_].index], visitor, context);
             dimensions_[dim_].index += dimensions_[dim_].stride;
             return;
         }
         if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
         {
-            std::cout << "]";
+            visitor.end_array();
             if (dim_ > 0)
             {
                 --dim_;
@@ -436,6 +349,22 @@ public:
                 }
             }
         }
+    }
+
+    template <typename ValueType,typename CharT>
+    static typename std::enable_if<ext_traits::is_integer<ValueType>::value,void>::type
+    visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
+        const ser_context& context)
+    {
+        visitor.uint64_value(val, semantic_tag::none, context);
+    }
+
+    template <typename ValueType,typename CharT>
+    static typename std::enable_if<std::is_floating_point<ValueType>::value,void>::type
+    visit_element(ValueType val, basic_json_visitor<CharT>& visitor,
+        const ser_context& context)
+    {
+        visitor.double_value(val, semantic_tag::none, context);
     }
 };
 

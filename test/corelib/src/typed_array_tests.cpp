@@ -107,11 +107,12 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = { 2,6 };
 
         jsoncons::mdarray_traverser<int> iter(v, extents);
+        jsoncons::json_decoder<jsoncons::json> decoder;
         while (!iter.done())
         {
-            iter.traverse();
+            iter.next(decoder, jsoncons::ser_context{});
         }
-        std::cout << "\n\n";
+        std::cout << decoder.get_result() << "\n\n";
     }
     SECTION("row major 3d")
     {
@@ -121,11 +122,12 @@ TEST_CASE("typed_array mdarray tests 2")
         std::vector<std::size_t> extents = { 2,3,2 };
 
         jsoncons::mdarray_traverser<int> iter(v, extents);
+        jsoncons::json_decoder<jsoncons::json> decoder;
         while (!iter.done())
         {
-            iter.traverse();
+            iter.next(decoder, jsoncons::ser_context{});
         }
-        std::cout << "\n\n";
+        std::cout << decoder.get_result() << "\n\n";
     }
     SECTION("column major 2d")
     {
@@ -136,11 +138,12 @@ TEST_CASE("typed_array mdarray tests 2")
 
         std::cout << "\nexpected: " << expected << "\n";
         jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
+        jsoncons::json_decoder<jsoncons::json> decoder;
         while (!iter.done())
         {
-            iter.traverse();
+            iter.next(decoder, jsoncons::ser_context{});
         }
-        std::cout << "\n\n";
+        std::cout << decoder.get_result() << "\n\n";
     }
     SECTION("column major 3d")
     {
@@ -151,25 +154,12 @@ TEST_CASE("typed_array mdarray tests 2")
 
         std::cout << "\nexpected: " << expected << "\n";
         jsoncons::mdarray_traverser<int> iter(v, extents, jsoncons::column_major_layout{});
+        jsoncons::json_decoder<jsoncons::json> decoder;
         while (!iter.done())
         {
-            iter.traverse();
+            iter.next(decoder, jsoncons::ser_context{});
         }
-        std::cout << "\n\n";
-    }
-    SECTION("small row major 2d")
-    {
-        // [[1 2][3 4]]
-
-        std::vector<int> v = {1, 2, 3, 4};
-        std::vector<std::size_t> extents = {2, 2};
-
-        jsoncons::mdarray_traverser<int> iter(v, extents);
-        while (!iter.done())
-        {
-            iter.traverse();
-        }
-        std::cout << "\n\n";
+        std::cout << decoder.get_result() << "\n\n";
     }
 
 }
