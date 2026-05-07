@@ -244,24 +244,6 @@ struct column_major_layout
     }
 };
 
-inline
-std::size_t get_offset(jsoncons::span<const std::size_t> strides, 
-    jsoncons::span<const std::size_t> indices)
-{
-    size_t offset = 0;
-
-    const std::size_t num_strides = strides.size(); 
-    const std::size_t num_indices = indices.size(); 
-    JSONCONS_ASSERT(num_indices <= num_strides);
-
-    for (size_t i = 0; i < num_indices; ++i)
-    {
-        offset += indices[i]*strides[i];
-    }
-
-    return offset;
-}
-
 template <typename ValueType>
 struct mdarray_dimension
 {
