@@ -24,7 +24,7 @@
 
 namespace jsoncons {
 
-enum class typed_array_element_type
+enum class typed_array_element_types
 {
     uint8 = 1,
     uint16 = 2,
@@ -244,7 +244,6 @@ struct column_major_layout
     }
 };
 
-template <typename CharT>
 class typed_array_iterator
 {
 public:
@@ -252,44 +251,47 @@ public:
 
     virtual bool done() const = 0;
 
-    virtual void next(basic_json_visitor<CharT>& visitor, const ser_context& context, 
+    virtual void next(typed_array_visitor& visitor, const ser_context& context, 
         std::error_code& ec) = 0;
 protected:
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_signed_integer<ValueType>::value, void>::type
-        write_value(ValueType val, basic_json_visitor<CharT>& visitor,
+        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
-        visitor.int64_value(val, semantic_tag::none, context, ec);
+        visitor.int64_value(val, tag, context, ec);
     }
 
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_unsigned_integer<ValueType>::value, void>::type
-        write_value(ValueType val, basic_json_visitor<CharT>& visitor,
+        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
-        visitor.uint64_value(val, semantic_tag::none, context, ec);
+        visitor.uint64_value(val, tag, context, ec);
     }
 
     template <typename ValueType>
     static typename std::enable_if<std::is_floating_point<ValueType>::value, void>::type
-        write_value(ValueType val, basic_json_visitor<CharT>& visitor,
+        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
-        visitor.double_value(val, semantic_tag::none, context, ec);
+        visitor.double_value(val, tag, context, ec);
     }
 };
 
-template <typename ValueType, typename CharT = char>
-class typed_array_span_iterator : public typed_array_iterator<CharT>
+template <typename ValueType, typename Func=jsoncons::identity>
+class typed_array_span_iterator : public typed_array_iterator
 {
     jsoncons::span<ValueType> data_;
+    semantic_tag tag_;
+    Func func_;
     bool first_{true};
     bool done_{false};
     std::size_t index_{0};
 public:
-    typed_array_span_iterator(jsoncons::span<ValueType> data)
-        : data_(data)
+    typed_array_span_iterator(jsoncons::span<ValueType> data, 
+        semantic_tag tag = semantic_tag{}, Func func = Func())
+        : data_(data), tag_(tag), func_(func)
     {
     }
     bool done() const final
@@ -297,17 +299,17 @@ public:
         return done_;
     }
 
-    void next(basic_json_visitor<CharT>& visitor, const ser_context& context, 
+    void next(typed_array_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(first_))
         {
-            visitor.begin_array(data_.size(), semantic_tag::none, context, ec);
+            visitor.begin_array(data_.size(), tag_, context, ec);
             first_ = false;
         }
         else if (JSONCONS_LIKELY(index_ < data_.size()))
         {
-            this->write_value(data_[index_], visitor, context, ec);
+            this->write_value(func_(data_[index_]), semantic_tag::none, visitor, context, ec);
             ++index_;
         }
         else if (!done_)
@@ -327,11 +329,12 @@ struct mdarray_dimension
     std::size_t index{0};
 };
 
-template <typename ValueType, typename CharT = char>
-class mdarray_iterator : public typed_array_iterator<CharT>
+template <typename ValueType>
+class mdarray_iterator : public typed_array_iterator
 {
     jsoncons::span<ValueType> data_;
     std::vector<mdarray_dimension<ValueType>> dimensions_;
+    semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
     bool done_{false};
@@ -356,7 +359,7 @@ public:
         return done_;
     }
 
-    void next(basic_json_visitor<CharT>& visitor, const ser_context& context, 
+    void next(typed_array_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         JSONCONS_ASSERT(!dimensions_.empty());
@@ -365,7 +368,7 @@ public:
         {
             if (first_)
             {
-                visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
+                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
                 first_ = false;
                 return;
             }
@@ -384,7 +387,7 @@ public:
         }
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            this->write_value(data_[dimensions_[dim_].index], visitor, context, ec);
+            this->write_value(data_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
             return;
         }

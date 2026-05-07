@@ -142,8 +142,8 @@ class basic_cbor_parser : public ser_context
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
-    std::unique_ptr<typed_array_iterator<char_type>> typed_array_iter_;
-    typed_array_element_type element_type_{};
+    std::unique_ptr<typed_array_iterator> typed_array_iter_;
+    typed_array_element_types element_type_{};
     semantic_tag typed_array_tag_{};
     std::size_t element_index_{0};
     byte_string_type array_buffer_;
@@ -285,7 +285,7 @@ public:
         return raw_tag_;
     }
 
-    typed_array_element_type element_type() const
+    typed_array_element_types element_type() const
     {
         return element_type_;
     }
@@ -428,186 +428,14 @@ private:
     {
         if (is_typed_array_)
         {
-            switch (element_type_)
+            if (!typed_array_iter_->done())
             {
-                case typed_array_element_type::uint8:
-                {
-                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::uint16:
-                {
-                    auto ta = typed_array_cast<const uint16_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::uint32:
-                {
-                    auto ta = typed_array_cast<const uint32_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::uint64:
-                {
-                    auto ta = typed_array_cast<const uint64_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.uint64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::int8:
-                {
-                    auto ta = typed_array_cast<const int8_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::int16:
-                {
-                    auto ta = typed_array_cast<const int16_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::int32:
-                {
-                    auto ta = typed_array_cast<const int32_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::int64:
-                {
-                    auto ta = typed_array_cast<const int64_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.int64_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::half_float:
-                {
-                    auto ta = typed_array_cast<const int16_t>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.half_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::float32:
-                {
-                    auto ta = typed_array_cast<const float>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.double_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                case typed_array_element_type::float64 :
-                {
-                    auto ta = typed_array_cast<const double>(array_buffer_);
-                    if (element_index_ < ta.size())
-                    {
-                        visitor.double_value(ta[element_index_],semantic_tag::none,*this, ec);
-                        ++element_index_;
-                    }
-                    else
-                    {
-                        visitor.end_array(*this, ec);
-                        is_typed_array_ = false;
-                        state_stack_.pop_back();
-                    }
-                    break;
-                }
-                default:
-                    break;
+                typed_array_iter_->next(visitor, *this, ec);
+            }
+            else
+            {
+                is_typed_array_ = false;
+                state_stack_.pop_back();
             }
             more_ = !cursor_mode_;
             return;
@@ -1856,7 +1684,7 @@ private:
                 case 0x40:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::uint8;
+                    element_type_ = typed_array_element_types::uint8;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1867,7 +1695,8 @@ private:
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<const uint8_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    //typed_array_iter_->next(visitor, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -1875,7 +1704,7 @@ private:
                 case 0x44:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::uint8;
+                    element_type_ = typed_array_element_types::uint8;
                     element_index_ = 0;
                     typed_array_tag_ = semantic_tag::clamped;
                     element_index_ = 0;
@@ -1887,8 +1716,8 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
-                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<const uint8_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::clamped, *this, ec);
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<const uint8_t>>(ta, semantic_tag::clamped);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -1897,7 +1726,7 @@ private:
                 case 0x45:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::uint16;
+                    element_type_ = typed_array_element_types::uint16;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1917,7 +1746,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint16_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -1926,7 +1755,7 @@ private:
                 case 0x46:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::uint32;
+                    element_type_ = typed_array_element_types::uint32;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1946,7 +1775,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint32_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -1955,7 +1784,7 @@ private:
                 case 0x47:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::uint64;
+                    element_type_ = typed_array_element_types::uint64;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1975,7 +1804,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint64_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -1983,7 +1812,7 @@ private:
                 case 0x48:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::int8;
+                    element_type_ = typed_array_element_types::int8;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1994,7 +1823,7 @@ private:
                     }
                     auto ta = typed_array_cast<int8_t>(array_buffer_);
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int8_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2003,7 +1832,7 @@ private:
                 case 0x4d:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::int16;
+                    element_type_ = typed_array_element_types::int16;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2023,7 +1852,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int16_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2032,7 +1861,7 @@ private:
                 case 0x4e:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::int32;
+                    element_type_ = typed_array_element_types::int32;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2052,7 +1881,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int32_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2061,7 +1890,7 @@ private:
                 case 0x4f:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::int64;
+                    element_type_ = typed_array_element_types::int64;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2081,7 +1910,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<int64_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2090,7 +1919,7 @@ private:
                 case 0x54:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::half_float;
+                    element_type_ = typed_array_element_types::half_float;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2109,8 +1938,8 @@ private:
                             ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
-                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint16_t>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<uint16_t,decode_half>>(ta);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2119,7 +1948,7 @@ private:
                 case 0x55:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::float32;
+                    element_type_ = typed_array_element_types::float32;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2139,7 +1968,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<float>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
@@ -2148,7 +1977,7 @@ private:
                 case 0x56:
                 {
                     is_typed_array_ = true;
-                    element_type_ = typed_array_element_type::float64 ;
+                    element_type_ = typed_array_element_types::float64 ;
                     element_index_ = 0;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2168,7 +1997,7 @@ private:
                         }
                     }
                     typed_array_iter_ = jsoncons::make_unique<typed_array_span_iterator<double>>(ta);
-                    visitor.begin_array(ta.size(), semantic_tag::none, *this, ec);
+                    typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;

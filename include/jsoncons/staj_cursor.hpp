@@ -309,9 +309,9 @@ public:
         return false;
     }
 
-    virtual typed_array_element_type element_type() const 
+    virtual typed_array_element_types element_type() const 
     {
-        return typed_array_element_type{};
+        return typed_array_element_types{};
     }
 
     virtual jsoncons::span<uint8_t> array_buffer() 
@@ -333,7 +333,7 @@ public:
         {
             switch (element_type())
             {
-                case typed_array_element_type::uint8:
+                case typed_array_element_types::uint8:
                 {
                     auto ta = typed_array_cast<const uint8_t>(array_buffer());
                     for (auto item : ta)
@@ -342,7 +342,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::uint16:
+                case typed_array_element_types::uint16:
                 {
                     auto ta = typed_array_cast<const uint16_t>(array_buffer());
                     for (auto item : ta)
@@ -351,7 +351,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::uint32:
+                case typed_array_element_types::uint32:
                 {
                     auto ta = typed_array_cast<const uint32_t>(array_buffer());
                     for (auto item : ta)
@@ -360,7 +360,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::uint64:
+                case typed_array_element_types::uint64:
                 {
                     auto ta = typed_array_cast<const uint64_t>(array_buffer());
                     for (auto item : ta)
@@ -369,7 +369,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::int8:
+                case typed_array_element_types::int8:
                 {
                     auto ta = typed_array_cast<const int8_t>(array_buffer());
                     for (auto item : ta)
@@ -378,7 +378,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::int16:
+                case typed_array_element_types::int16:
                 {
                     auto ta = typed_array_cast<const int16_t>(array_buffer());
                     for (auto item : ta)
@@ -387,7 +387,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::int32:
+                case typed_array_element_types::int32:
                 {
                     auto ta = typed_array_cast<const int32_t>(array_buffer());
                     for (auto item : ta)
@@ -396,7 +396,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::int64:
+                case typed_array_element_types::int64:
                 {
                     auto ta = typed_array_cast<const int64_t>(array_buffer());
                     for (auto item : ta)
@@ -405,7 +405,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::half_float:
+                case typed_array_element_types::half_float:
                 {
                     auto ta = typed_array_cast<const int16_t>(array_buffer());
                     for (auto item : ta)
@@ -414,7 +414,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::float32:
+                case typed_array_element_types::float32:
                 {
                     auto ta = typed_array_cast<const float>(array_buffer());
                     for (auto item : ta)
@@ -423,7 +423,7 @@ public:
                     }
                     break;
                 }
-                case typed_array_element_type::float64 :
+                case typed_array_element_types::float64 :
                 {
                     auto ta = typed_array_cast<const double>(array_buffer());
                     for (auto item : ta)
