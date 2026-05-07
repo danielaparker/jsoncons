@@ -409,12 +409,10 @@ public:
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
             std::cout << data_[dimensions_[dim_].index] << " "; 
-        }
-        if (dimensions_[dim_].index + dimensions_[dim_].stride < dimensions_[dim_].end)
-        {
             dimensions_[dim_].index += dimensions_[dim_].stride;
+            return;
         }
-        else 
+        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
         {
             std::cout << "]";
             bool done = false;
