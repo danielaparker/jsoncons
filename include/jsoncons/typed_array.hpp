@@ -400,7 +400,7 @@ public:
         {
             return;
         }
-        if (dim_+1 < dimensions_.size())
+        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
         {
             std::cout << "[";
             ++dim_;
@@ -415,23 +415,17 @@ public:
         if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
         {
             std::cout << "]";
-            bool done = false;
-            while (dim_ > 0 && !done)
+            if (dim_ > 0)
             {
                 --dim_;
-                if (dimensions_[dim_].index + dimensions_[dim_].stride < dimensions_[dim_].end)
+                dimensions_[dim_].index += dimensions_[dim_].stride;
+                if (dimensions_[dim_].index < dimensions_[dim_].end)
                 {
-                    dimensions_[dim_].index += dimensions_[dim_].stride;
                     for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
                     {
                         dimensions_[i].index = dimensions_[i-1].index;
                         dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
                     }
-                    done = true;
-                }
-                else
-                {
-                    dimensions_[dim_].index += dimensions_[dim_].stride;
                 }
             }
         }
