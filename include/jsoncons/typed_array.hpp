@@ -367,6 +367,7 @@ class mdarray_traverser
     jsoncons::span<ValueType> data_;
     std::vector<mdarray_dimension<ValueType>> dimensions_;
     std::size_t dim_{0};
+    bool done_{false};
 public:
     template <typename Layout= jsoncons::row_major_layout>
     mdarray_traverser(jsoncons::span<ValueType> data, const std::vector<std::size_t>& extents,
@@ -386,7 +387,7 @@ public:
 
     bool done() const
     {
-        return dim_ == 0 && dimensions_[dim_].index == dimensions_[dim_].end;
+        return done_;
     }
 
     void traverse()
@@ -398,6 +399,12 @@ public:
     {
         if (dimensions_.empty())
         {
+            return;
+        }
+        if (dim_ == 0 && dimensions_[dim_].index == dimensions_[dim_].end)
+        {
+            std::cout << "]";
+            done_ = true;
             return;
         }
         if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)

@@ -157,4 +157,19 @@ TEST_CASE("typed_array mdarray tests 2")
         }
         std::cout << "\n\n";
     }
+    SECTION("small row major 2d")
+    {
+        // [[1 2][3 4]]
+
+        std::vector<int> v = {1, 2, 3, 4};
+        std::vector<std::size_t> extents = {2, 2};
+
+        jsoncons::mdarray_traverser<int> iter(v, extents);
+        while (!iter.done())
+        {
+            iter.traverse();
+        }
+        std::cout << "\n\n";
+    }
+
 }
