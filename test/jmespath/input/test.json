@@ -10,13 +10,13 @@
     "cases": [
       {
         "comment": "Operator in multi-select list second element",
-        "expression": "sum([value, count_children && children.value || `0`])",
-        "result": 3
+        "expression": "[value, count_children && children.value || `0`]",
+        "result": [1, 2]
       },
       {
         "comment": "Operator in multi-select list first element",
-        "expression": "sum([count_children && children.value || `0`, value])",
-        "result": 3
+        "expression": "[count_children && children.value || `0`, value]",
+        "result": [2, 1]
       }
     ]
   },
