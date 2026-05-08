@@ -1,6 +1,27 @@
 [
   {
     "given": {
+      "value": 1,
+      "count_children": true,
+      "children": {
+        "value": 2
+      }
+    },
+    "cases": [
+      {
+        "comment": "Operator in multi-select list second element",
+        "expression": "[value, count_children && children.value || `0`]",
+        "result": [1, 2]
+      },
+      {
+        "comment": "Operator in multi-select list first element",
+        "expression": "[count_children && children.value || `0`, value]",
+        "result": [2, 1]
+      }
+    ]
+  },
+  {
+    "given": {
       "foz": "baz"
     },
     "cases": [
