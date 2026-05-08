@@ -74,24 +74,6 @@ public:
         return event_;
     }
 
-    bool in_available() const
-    {
-        return state_ != staj_cursor_state();
-    }
-
-    void send_available(std::error_code& ec)
-    {
-        switch (state_)
-        {
-            case staj_cursor_state::multi_dim:
-            case staj_cursor_state::shape:
-                advance_multi_dim(ec);
-                break;
-            default:
-                break;
-        }
-    }
-
     staj_cursor_state state() const
     {
         return state_;

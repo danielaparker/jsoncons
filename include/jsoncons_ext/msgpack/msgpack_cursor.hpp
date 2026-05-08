@@ -259,18 +259,11 @@ private:
 
     void read_next(std::error_code& ec)
     {
-        if (cursor_visitor_.in_available())
+        parser_.restart();
+        while (!parser_.stopped())
         {
-            cursor_visitor_.send_available(ec);
-        }
-        else
-        {
-            parser_.restart();
-            while (!parser_.stopped())
-            {
-                parser_.parse(cursor_handler_adaptor_, ec);
-                if (JSONCONS_UNLIKELY(ec)) {return;}
-            }
+            parser_.parse(cursor_handler_adaptor_, ec);
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
 
