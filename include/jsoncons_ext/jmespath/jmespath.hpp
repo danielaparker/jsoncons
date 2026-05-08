@@ -4904,6 +4904,7 @@ namespace detail {
                             case ',':
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                                state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
