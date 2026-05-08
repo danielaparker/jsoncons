@@ -23,16 +23,9 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/utility/function_objects.hpp>
 
 namespace jsoncons {
-
-    struct decode_half
-    {
-        double operator()(uint16_t val) const 
-        {
-            return binary::decode_half(val);
-        }
-    };
 
     class typed_array_visitor
     {

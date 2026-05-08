@@ -21,6 +21,7 @@
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/utility/function_objects.hpp>
 
 #define JSONCONS_RDONLY(X)
 
@@ -28,24 +29,6 @@
 
 namespace jsoncons {
 namespace reflect {
-
-struct always_true
-{
-    template< typename T>
-    constexpr bool operator()(const T&) const noexcept
-    {
-        return true;
-    }
-};
-
-struct identity
-{
-    template< typename T>
-    constexpr T&& operator()(T&& val) const noexcept
-    {
-        return std::forward<T>(val);
-    }
-};
 
 template <typename T>
 struct json_object_name_members
@@ -186,9 +169,6 @@ is_optional_value_set(const T&)
 } 
 
 } // namespace reflect
-
-using always_true = reflect::always_true; 
-using identity = reflect::identity; 
 
 } // namespace jsoncons
 

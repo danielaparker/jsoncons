@@ -21,6 +21,7 @@
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/conversion.hpp>
+#include <jsoncons/utility/function_objects.hpp>
 
 namespace jsoncons {
 
