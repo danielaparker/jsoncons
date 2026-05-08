@@ -142,6 +142,8 @@ class basic_cbor_parser : public ser_context
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
+    bool is_multi_dim_{false};
+    mdarray_order order_{};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
     typed_array_element_types element_type_{};
     semantic_tag typed_array_tag_{};
@@ -232,6 +234,21 @@ public:
         return is_typed_array_;
     }
 
+    bool is_multi_dim() const
+    {
+        return is_multi_dim_;
+    }
+
+    mdarray_order order() const
+    {
+        return order_;
+    }
+
+    jsoncons::span<const std::size_t> extents() const
+    {
+        return jsoncons::span<const std::size_t>(extents_.data(), extents_.size());
+    }
+
     template <typename Sourceable>
     void reset(Sourceable&& source)
     {
@@ -297,6 +314,8 @@ public:
     void to_end_array()
     {
         is_typed_array_ = false;
+        is_multi_dim_ = false;
+        order_ = mdarray_order{};
         state_stack_.pop_back();
     }
 
@@ -672,9 +691,11 @@ private:
                             more_ = !cursor_mode_;
                             break;
                         case 40: // row major storage
+                            order_ = mdarray_order::row_major;
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_row_major, ec);
                             break;
                         case 1040: // column major storage
+                            order_ = mdarray_order::column_major;
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_column_major, ec);
                             break;
                         default:

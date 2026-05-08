@@ -207,7 +207,7 @@ public:
     }
 };
 
-enum class typed_array_layout_kind {row_major, column_major};
+enum class mdarray_order {row_major, column_major};
 
 struct row_major_layout
 {
@@ -341,7 +341,7 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
 public:
     template <typename Layout= jsoncons::row_major_layout>
-    mdarray_iterator(jsoncons::span<ValueType> data, const std::vector<std::size_t>& extents,
+    mdarray_iterator(jsoncons::span<ValueType> data, jsoncons::span<const std::size_t> extents,
         Layout layout = Layout())
         : data_{data}, dimensions_(extents.size(), mdarray_dimension<ValueType>{})
     {
