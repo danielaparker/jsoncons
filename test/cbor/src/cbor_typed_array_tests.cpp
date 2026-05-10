@@ -800,7 +800,7 @@ TEST_CASE("cbor typed array tests")
 
 #endif // TEST_MULTI
 
-TEST_CASE("cbor multi dim row major parse tests")
+/*TEST_CASE("cbor multi dim row major parse tests")
 {
     SECTION("Tag 86, float64, little endian")
     {
@@ -821,7 +821,7 @@ TEST_CASE("cbor multi dim row major parse tests")
         std::cout << result << "\n";
     }
 }
-/*
+
 TEST_CASE("cbor multi dim row major cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -841,3 +841,43 @@ TEST_CASE("cbor multi dim row major cursor tests")
     }
 }
 */
+
+TEST_CASE("cbor typed array multi dim row major parse tests")
+{
+    SECTION("Tag 86, float64, little endian")
+    {
+        //std::cout << "CBOR multi dim typed array Tag 86, float64, little endian" << '\n';
+
+        auto jv = jsoncons::json::parse(R"(
+            [[2, 4, 8], [4, 16, 256]]
+        )");
+
+        std::cout << jv << "\n";
+
+        const std::vector<uint8_t> v = {
+            0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
+            0x82, // Array(2) The outer structure containing [dimensions, data]
+            0x82, // The dimensions array.
+            0x02, // 1st dimension size (Rows).
+            0x03, // 2nd dimension size (Columns).
+            0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian).
+            0x4c, // Byte String(12)	Raw data length (6 elements × 2 bytes each).
+            0x00, 0x02, // First element: 2.
+            0x00, 0x04, // Second element: 4.
+            0x00, 0x08, // Third element: 8.
+            0x00, 0x04, // Fourth element: 4.
+            0x00, 0x10, // Fifth element: 16 (0x10).
+            0x01, 0x00  // Sixth element: 256 (0x0100).
+        };
+
+        std::error_code ec;
+
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(v, decoder);
+        reader.read(ec);
+
+        json result = decoder.get_result();
+
+        std::cout << result << "\n";
+    }
+}
