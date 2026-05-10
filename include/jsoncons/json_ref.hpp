@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_VIEW_HPP
-#define JSONCONS_JSON_VIEW_HPP
+#ifndef JSONCONS_JSON_REF_HPP
+#define JSONCONS_JSON_REF_HPP
 
 #include <functional> // std::reference_wrapper
 #include <type_traits> // std::remove_const
@@ -18,14 +18,14 @@ namespace jsoncons {
 enum class json_view_storage_kind : uint8_t {json_ref,array,object};
 
 template <typename Json,typename Allocator=std::allocator<char>>
-class json_view
+class json_ref
 {
     using allocator_type = Allocator;
     using json_type = typename std::remove_const<Json>::type;
     using key_type = typename json_type::key_type;
     using policy_type = typename json_type::policy_type;
-    using array = typename policy_type::template array<json_view>;
-    using object = typename policy_type::template object<key_type,json_view>;
+    using array = typename policy_type::template array<json_ref>;
+    using object = typename policy_type::template object<key_type,json_ref>;
 
     struct common_storage
     {
@@ -99,13 +99,13 @@ class json_view
         object_storage object_;
     };
 public:
-    json_view(Json& j)
+    json_ref(Json& j)
     {
         common_.storage_kind_ = json_view_storage_kind::json_ref;
         json_ref_ = json_ref_storage{j};
     }
 
-    json_view(const json_view<Json>& jv)
+    json_ref(const json_ref<Json>& jv)
     {
         common_.storage_kind_ = jv.common_.storage_kind_;
         switch (jv.common_.storage_kind_)
@@ -133,4 +133,4 @@ public:
 
 } // namespace jsoncons
 
-#endif // JSONCONS_JSON_VIEW_HPP
+#endif // JSONCONS_JSON_REF_HPP
