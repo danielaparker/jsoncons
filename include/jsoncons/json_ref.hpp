@@ -12,21 +12,41 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_array.hpp>
+#include <jsoncons/json_object.hpp>
+#include <jsoncons/json_type.hpp>
 
 namespace jsoncons { 
+
+struct json_ref_object_t
+{
+    explicit json_ref_object_t() = default; 
+};
+
+JSONCONS_INLINE_CONSTEXPR json_ref_object_t json_ref_object{};
+
+struct json_ref_array_t
+{
+    explicit json_ref_array_t() = default;
+};
+
+JSONCONS_INLINE_CONSTEXPR json_ref_array_t json_ref_array{};
 
 enum class json_ref_storage_kind : uint8_t {json_ref,array,object};
 
 template <typename Json,typename Allocator=std::allocator<char>>
 class json_ref
 {
+public:
     using allocator_type = Allocator;
     using json_type = typename std::remove_const<Json>::type;
     using key_type = typename json_type::key_type;
     using policy_type = typename json_type::policy_type;
     using array = typename policy_type::template array<json_ref>;
     using object = typename policy_type::template object<key_type,json_ref>;
-
+    using char_type = typename Json::char_type;
+    using string_view_type = typename Json::string_view_type;
+private:
     struct common_storage
     {
         json_ref_storage_kind storage_kind_;
@@ -118,6 +138,30 @@ public:
         }
     }
 
+    explicit json_ref(json_ref_object_t) 
+    {
+        auto ptr = create_object(Allocator{});
+        construct<object_storage>(ptr);
+    }
+
+    json_ref(json_ref_object_t, const Allocator& alloc) 
+    {
+        auto ptr = create_object(alloc);
+        construct<object_storage>(ptr);
+    }
+
+    explicit json_ref(json_ref_array_t) 
+    {
+        auto ptr = create_array(Allocator{});
+        construct<array_storage>(ptr);
+    }
+
+    json_ref(json_ref_array_t, const Allocator& alloc) 
+    {
+        auto ptr = create_array(alloc);
+        construct<array_storage>(ptr);
+    }
+
     template <typename T,typename... Args>
     bool is(Args&&... args) const noexcept
     {
@@ -130,6 +174,12 @@ public:
         }
     }
 private:
+
+    template <typename StorageType,typename... Args>
+    void construct(Args&&... args)
+    {
+        ::new (&cast<StorageType>()) StorageType(std::forward<Args>(args)...);
+    }
 
     void destroy()
     {
@@ -205,6 +255,44 @@ private:
     const ref_storage& cast(identity<ref_storage>) const
     {
         return ref_;
+    }
+
+    template <typename... Args>
+    typename array_storage::pointer create_array(const allocator_type& alloc, Args&& ... args)
+    {
+        using stor_allocator_type = typename array_storage::allocator_type;
+        stor_allocator_type stor_alloc(alloc);
+        auto ptr = std::allocator_traits<stor_allocator_type>::allocate(stor_alloc, 1);
+        JSONCONS_TRY
+        {
+            std::allocator_traits<stor_allocator_type>::construct(stor_alloc, ext_traits::to_plain_pointer(ptr), 
+                std::forward<Args>(args)...);
+        }
+        JSONCONS_CATCH(...)
+        {
+            std::allocator_traits<stor_allocator_type>::deallocate(stor_alloc, ptr,1);
+            JSONCONS_RETHROW;
+        }
+        return ptr;
+    }
+
+    template <typename... Args>
+    typename object_storage::pointer create_object(const allocator_type& alloc, Args&& ... args)
+    {
+        using stor_allocator_type = typename object_storage::allocator_type;
+        stor_allocator_type stor_alloc(alloc);
+        auto ptr = std::allocator_traits<stor_allocator_type>::allocate(stor_alloc, 1);
+        JSONCONS_TRY
+        {
+            std::allocator_traits<stor_allocator_type>::construct(stor_alloc, ext_traits::to_plain_pointer(ptr), 
+                std::forward<Args>(args)...);
+        }
+        JSONCONS_CATCH(...)
+        {
+            std::allocator_traits<stor_allocator_type>::deallocate(stor_alloc, ptr,1);
+            JSONCONS_RETHROW;
+        }
+        return ptr;
     }
 };
 
