@@ -691,10 +691,12 @@ private:
                             more_ = !cursor_mode_;
                             break;
                         case 40: // row major storage
+                            is_multi_dim_ = true;
                             order_ = mdarray_order::row_major;
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_row_major, ec);
                             break;
                         case 1040: // column major storage
+                            is_multi_dim_ = true;
                             order_ = mdarray_order::column_major;
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_column_major, ec);
                             break;
@@ -2141,13 +2143,13 @@ private:
         }
 
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
-        visitor.begin_multi_dim(extents_, tag, *this, ec);
+        //visitor.begin_multi_dim(extents_, tag, *this, ec);
         more_ = !cursor_mode_;
     }
 
-    void produce_end_multi_dim(item_event_visitor& visitor, std::error_code& ec)
+    void produce_end_multi_dim(item_event_visitor& visitor, std::error_code&)
     {
-        visitor.end_multi_dim(*this, ec);
+        //visitor.end_multi_dim(*this, ec);
         more_ = !cursor_mode_;
         state_stack_.pop_back();
     }
