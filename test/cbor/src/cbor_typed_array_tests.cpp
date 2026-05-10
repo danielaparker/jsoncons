@@ -59,8 +59,6 @@ private:
     }
 };
 
-#if 0 // TEST_MULTI
-
 TEST_CASE("cbor typed array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -798,8 +796,6 @@ TEST_CASE("cbor typed array tests")
     }
 } 
 
-#endif // TEST_MULTI
-
 /*TEST_CASE("cbor multi dim row major parse tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -842,17 +838,15 @@ TEST_CASE("cbor multi dim row major cursor tests")
 }
 */
 
-TEST_CASE("cbor typed array multi dim row major parse tests")
+TEST_CASE("cbor typed array multi-dim row major parse tests")
 {
     SECTION("Tag 86, float64, little endian")
     {
-        //std::cout << "CBOR multi dim typed array Tag 86, float64, little endian" << '\n';
+        //std::cout << "CBOR multi dim typed array Tag 86, uint16, big endian" << '\n';
 
-        auto jv = jsoncons::json::parse(R"(
+        auto expected = jsoncons::json::parse(R"(
             [[2, 4, 8], [4, 16, 256]]
         )");
-
-        std::cout << jv << "\n";
 
         const std::vector<uint8_t> v = {
             0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
@@ -877,7 +871,36 @@ TEST_CASE("cbor typed array multi dim row major parse tests")
         reader.read(ec);
 
         json result = decoder.get_result();
+        CHECK(expected == result);
+    }
+}
 
-        std::cout << result << "\n";
+TEST_CASE("cbor typed array multi-dim column major parse tests")
+{
+    SECTION("Tag 86, float64, little endian")
+    {
+        //std::cout << "CBOR multi dim typed array Tag 86, uint8" << '\n';
+
+        auto expected = jsoncons::json::parse(R"(
+            [[1, 2, 3], [4, 5, 6]]
+        )");
+
+        const std::vector<uint8_t> v = {
+            0xDA,0x00,0x00,0x04,0x10, // Tag 1040 (Column-major multi-dim array)
+            0x82, // Array of 2 elements
+            0x82,0x02,0x03, // Array [2, 3] Dimensions
+            0xD8,0x40, // Tag 64 (unsigned 8-bit integers) Typed Array Tag
+            0x46, // byte string (6)
+            0x01,0x04,0x02,0x05,0x03,0x06 // 6 bytes of data in column order
+        };
+
+        std::error_code ec;
+
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(v, decoder);
+        reader.read(ec);
+
+        json result = decoder.get_result();
+        CHECK(expected == result);
     }
 }
