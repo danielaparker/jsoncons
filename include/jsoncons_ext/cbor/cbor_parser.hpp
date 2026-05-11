@@ -2142,7 +2142,6 @@ private:
         }
 
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
-        more_ = !cursor_mode_;
     }
 
     void read_extents(uint8_t info, std::error_code& ec)
