@@ -957,7 +957,7 @@ TEST_CASE("cbor multi-dim typed array cursor tests")
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
-            std::cout << event.event_type() << " " << event.tag() << "\n";
+            std::cout << event.event_type() << " " << event.tag() << std::endl;
         }
     }
 }

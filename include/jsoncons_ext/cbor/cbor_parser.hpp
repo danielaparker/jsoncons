@@ -449,13 +449,13 @@ private:
             if (!typed_array_iter_->done())
             {
                 typed_array_iter_->next(visitor, *this, ec);
+                more_ = !cursor_mode_;
             }
             else
             {
                 is_typed_array_ = false;
                 state_stack_.pop_back();
             }
-            more_ = !cursor_mode_;
             return;
         }
         read_tags(ec);
