@@ -396,6 +396,7 @@ namespace jsoncons {
                       "Regular stateful allocators must be wrapped with std::scoped_allocator_adaptor");
 
         using allocator_type = Allocator; 
+        using storage_kind_type = json_storage_kind;
 
         using policy_type = Policy;
         using char_type = CharT;

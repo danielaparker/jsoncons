@@ -300,7 +300,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json>
     struct json_conv_traits<Json,typename Json::object>
     {
-        using json_object = typename Json::object;
+        using object_type = typename Json::object;
 
         static bool is(const Json& j) noexcept
         {
@@ -308,7 +308,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const json_object& o)
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const object_type& o)
         {
             return Json(o,semantic_tag::none);
         }
@@ -317,7 +317,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
     template <typename Json>
     struct json_conv_traits<Json,typename Json::array>
     {
-        using json_array = typename Json::array;
+        using array_type = typename Json::array;
 
         static bool is(const Json& j) noexcept
         {
@@ -325,7 +325,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
         }
 
         template <typename Alloc, typename TempAlloc>
-        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const json_array& a)
+        static Json to_json(const allocator_set<Alloc,TempAlloc>&, const array_type& a)
         {
             return Json(a, semantic_tag::none);
         }

@@ -30,6 +30,7 @@ namespace jsoncons {
     {
     public:
         using allocator_type = typename Json::allocator_type;
+        using storage_kind_type = typename Json::storage_kind_type;
         using value_type = Json;
     private:
         using value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;                   
@@ -250,11 +251,11 @@ namespace jsoncons {
                 elements_.pop_back();
                 switch (current.storage_kind())
                 {
-                    case json_storage_kind::array:
+                    case storage_kind_type::array:
                     {
                         for (auto&& item : current.array_range())
                         {
-                            if ((item.storage_kind() == json_storage_kind::array || item.storage_kind() == json_storage_kind::object)
+                            if ((item.storage_kind() == storage_kind_type::array || item.storage_kind() == storage_kind_type::object)
                                 && !item.empty()) // non-empty object or array
                             {
                                 elements_.push_back(std::move(item));
@@ -263,11 +264,11 @@ namespace jsoncons {
                         current.clear();                           
                         break;
                     }
-                    case json_storage_kind::object:
+                    case storage_kind_type::object:
                     {
                         for (auto&& kv : current.object_range())
                         {
-                            if ((kv.value().storage_kind() == json_storage_kind::array || kv.value().storage_kind() == json_storage_kind::object)
+                            if ((kv.value().storage_kind() == storage_kind_type::array || kv.value().storage_kind() == storage_kind_type::object)
                                 && !kv.value().empty()) // non-empty object or array
                             {
                                 elements_.push_back(std::move(kv.value()));

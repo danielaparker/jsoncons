@@ -309,6 +309,7 @@ namespace jsoncons {
     {
     public:
         using allocator_type = typename Json::allocator_type;
+        using storage_kind_type = typename Json::storage_kind_type;
         using key_type = KeyT;
         using key_value_type = key_value<KeyT,Json>;
         using char_type = typename Json::char_type;
@@ -992,8 +993,8 @@ namespace jsoncons {
                 {
                     switch (kv.value().storage_kind())
                     {
-                        case json_storage_kind::array:
-                        case json_storage_kind::object:
+                        case storage_kind_type::array:
+                        case storage_kind_type::object:
                             if (!kv.value().empty())
                             {
                                 temp.emplace_back(std::move(kv.value()));
@@ -1013,6 +1014,7 @@ namespace jsoncons {
     {
     public:
         using allocator_type = typename Json::allocator_type;
+        using storage_kind_type = typename Json::storage_kind_type;
         using char_type = typename Json::char_type;
         using key_type = KeyT;
         using string_view_type = typename Json::string_view_type;
@@ -1715,8 +1717,8 @@ namespace jsoncons {
                 {
                     switch (kv.value().storage_kind())
                     {
-                        case json_storage_kind::array:
-                        case json_storage_kind::object:
+                        case storage_kind_type::array:
+                        case storage_kind_type::object:
                             if (!kv.value().empty())
                             {
                                 temp.emplace_back(std::move(kv.value()));
