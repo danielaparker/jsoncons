@@ -39,6 +39,7 @@ template <typename Json,typename Allocator=std::allocator<char>>
 class json_view
 {
 public:
+    using json_type = Json
     using allocator_type = Allocator;
     using storage_kind_type = json_view_storage_kind;
     using key_type = typename Json::key_type;
