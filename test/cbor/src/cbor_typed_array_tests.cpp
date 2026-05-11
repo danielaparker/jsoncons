@@ -18,7 +18,6 @@
 
 using namespace jsoncons;
 
-#if 0 // TEST
 static void check_native(std::true_type, 
                          const std::vector<uint8_t>& u,
                          const std::vector<uint8_t>& v)
@@ -851,18 +850,18 @@ TEST_CASE("cbor multi-dim typed array parse tests")
 
         const std::vector<uint8_t> v = {
             0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
-            0x82, // Array(2) The outer structure containing [dimensions, data]
-            0x82, // The dimensions array.
-            0x02, // 1st dimension size (Rows).
-            0x03, // 2nd dimension size (Columns).
-            0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian).
-            0x4c, // Byte String(12) Raw data length (6 elements × 2 bytes each).
-            0x00, 0x02, // First element: 2.
-            0x00, 0x04, // Second element: 4.
-            0x00, 0x08, // Third element: 8.
-            0x00, 0x04, // Fourth element: 4.
-            0x00, 0x10, // Fifth element: 16 (0x10).
-            0x01, 0x00  // Sixth element: 256 (0x0100).
+            0x82,       // Array(2) The outer structure containing [dimensions, data]
+            0x82,       // The dimensions array
+            0x02,       // 1st dimension size (Rows)
+            0x03,       // 2nd dimension size (Columns)
+            0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian)
+            0x4c,       // Byte String(12) Raw data length (6 elements × 2 bytes each).
+            0x00, 0x02, // First element: 2
+            0x00, 0x04, // Second element: 4
+            0x00, 0x08, // Third element: 8
+            0x00, 0x04, // Fourth element: 4
+            0x00, 0x10, // Fifth element: 16 (0x10)
+            0x01, 0x00  // Sixth element: 256 (0x0100)
         };
 
         std::error_code ec;
@@ -914,12 +913,12 @@ TEST_CASE("cbor multi-dim typed array cursor tests")
 
         const std::vector<uint8_t> v = {
             0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
-            0x82, // Array(2) The outer structure containing [dimensions, data]
-            0x82, // The dimensions array.
-            0x02, // 1st dimension size (Rows).
-            0x03, // 2nd dimension size (Columns).
+            0x82,       // Array(2) The outer structure containing [dimensions, data]
+            0x82,       // The dimensions array.
+            0x02,       // 1st dimension size (Rows).
+            0x03,       // 2nd dimension size (Columns).
             0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian).
-            0x4c, // Byte String(12)	Raw data length (6 elements × 2 bytes each).
+            0x4c,       // Byte String(12)	Raw data length (6 elements × 2 bytes each).
             0x00, 0x02, // First element: 2.
             0x00, 0x04, // Second element: 4.
             0x00, 0x08, // Third element: 8.
@@ -946,11 +945,11 @@ TEST_CASE("cbor multi-dim typed array cursor tests")
 
         const std::vector<uint8_t> v = {
             0xDA, 0x00, 0x00, 0x04, 0x10, // Tag 1040 (Column-major multi-dim array)
-            0x82, // Array of 2 elements
-            0x82, 0x02, 0x03, // Array [2, 3] Dimensions
-            0xD8, 0x40, // Tag 64 (unsigned 8-bit integers) Typed Array Tag
-            0x46, // byte string (6)
-            0x01, 0x04, 0x02, 0x05, 0x03, 0x06 // 6 bytes of data in column order
+            0x82,                         // Array of 2 elements
+            0x82, 0x02, 0x03,             // Array [2, 3] Dimensions
+            0xD8, 0x40,                   // Tag 64 (unsigned 8-bit integers) Typed Array Tag
+            0x46,                         // byte string (6)
+            0x01, 0x04, 0x02, 0x05, 0x03, 0x06 
         };
 
         std::cout << "\n\n";
@@ -962,8 +961,8 @@ TEST_CASE("cbor multi-dim typed array cursor tests")
         }
     }
 }
-#endif // TEST
 
+#if 0
 TEST_CASE("cbor multi-dim parse tests")
 {
     SECTION("row major")
@@ -1021,4 +1020,4 @@ TEST_CASE("cbor multi-dim parse tests")
         CHECK(expected == result);
     }*/
 }
-
+#endif
