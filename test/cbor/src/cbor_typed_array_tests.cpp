@@ -855,7 +855,7 @@ TEST_CASE("cbor multi-dim typed array parse tests")
             0x02,       // 1st dimension size (Rows)
             0x03,       // 2nd dimension size (Columns)
             0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian)
-            0x4c,       // Byte String(12) Raw data length (6 elements × 2 bytes each).
+            0x4c,       // Byte String(12) Raw data length (6 elements x 2 bytes each)
             0x00, 0x02, // First element: 2
             0x00, 0x04, // Second element: 4
             0x00, 0x08, // Third element: 8
@@ -918,7 +918,7 @@ TEST_CASE("cbor multi-dim typed array cursor tests")
             0x02,       // 1st dimension size (Rows).
             0x03,       // 2nd dimension size (Columns).
             0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian).
-            0x4c,       // Byte String(12)	Raw data length (6 elements × 2 bytes each).
+            0x4c,       // Byte String(12)	Raw data length (6 elements x 2 bytes each).
             0x00, 0x02, // First element: 2.
             0x00, 0x04, // Second element: 4.
             0x00, 0x08, // Third element: 8.
