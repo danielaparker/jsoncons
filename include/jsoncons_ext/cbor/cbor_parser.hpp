@@ -334,7 +334,6 @@ public:
                     }
                     else
                     {
-                        more_ = !cursor_mode_;
                         state_stack_.pop_back();
                     }
                     break;
