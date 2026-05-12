@@ -2022,8 +2022,9 @@ namespace detail {
                     return arg0;
                 }
 
-                auto result = context.create_json(arg0);
-                for (std::size_t i = 1; i < args.size(); ++i)
+                auto result = context.create_json(json_object_arg);
+                result->reserve(arg0.size());
+                for (std::size_t i = 0; i < args.size(); ++i)
                 {
                     reference argi = args[i].value();
                     if (!argi.is_object())
@@ -2120,6 +2121,9 @@ namespace detail {
                     return context.null_value();
                 }
 
+                auto result = context.create_json(json_array_arg);
+                result->reserve(arg0.size());
+                result->push_back(arg0.at(0));
                 for (std::size_t i = 1; i < arg0.size(); ++i)
                 {
                     if (arg0.at(i).is_number() != is_number || arg0.at(i).is_string() != is_string)
@@ -2127,11 +2131,11 @@ namespace detail {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
                     }
+                    result->push_back(arg0.at(i));
                 }
 
-                auto v = context.create_json(arg0);
-                std::stable_sort((v->array_range()).begin(), (v->array_range()).end());
-                return *v;
+                std::stable_sort((result->array_range()).begin(), (result->array_range()).end());
+                return *result;
             }
         };
 
@@ -2166,8 +2170,14 @@ namespace detail {
 
                 const auto& expr = args[1].expression();
 
-                auto v = context.create_json(arg0);
-                std::stable_sort((v->array_range()).begin(), (v->array_range()).end(),
+                auto result = context.create_json(json_array_arg);
+                result->reserve(arg0.size());
+                for (std::size_t i = 0; i < arg0.size(); ++i)
+                {
+                    result->push_back(arg0.at(i));
+                }
+
+                std::stable_sort((result->array_range()).begin(), (result->array_range()).end(),
                     [&expr,&context,&ec](reference lhs, reference rhs) -> bool
                 {
                     std::error_code ec2;
@@ -2187,7 +2197,7 @@ namespace detail {
                     
                     return key1 < key2;
                 });
-                return ec ? context.null_value() : *v;
+                return ec ? context.null_value() : *result;
             }
         };
 
@@ -4903,6 +4913,7 @@ namespace detail {
                             case ',':
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                                state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;

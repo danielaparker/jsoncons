@@ -36,118 +36,6 @@
 namespace jsoncons {
 namespace reflect {
 
-template <typename T>
-typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
-read_typed_array(jsoncons::span<uint8_t> typed_array, typed_array_element_type element_type, T& v)
-{
-    using value_type = typename T::value_type;
-
-    switch (element_type)
-    {
-        case typed_array_element_type::uint8:
-        {
-            auto ta = typed_array_cast<const uint8_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::uint16:
-        {
-            auto ta = typed_array_cast<const uint16_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::uint32:
-        {
-            auto ta = typed_array_cast<const uint32_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::uint64:
-        {
-            auto ta = typed_array_cast<const uint64_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::int8:
-        {
-            auto ta = typed_array_cast<const int8_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::int16:
-        {
-            auto ta = typed_array_cast<const int16_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::int32:
-        {
-            auto ta = typed_array_cast<const int32_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::int64:
-        {
-            auto ta = typed_array_cast<const int64_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::half_float:
-        {
-            auto ta = typed_array_cast<const int16_t>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::float32:
-        {
-            auto ta = typed_array_cast<const float>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        case typed_array_element_type::float64:
-        {
-            auto ta = typed_array_cast<const double>(typed_array);
-            for (auto item : ta)
-            {
-                v.push_back(static_cast<value_type>(item));
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
-
 // decode_traits
 
 template <typename T,typename Enable = void>
@@ -423,8 +311,7 @@ struct decode_traits<T,
                 T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
                 if (cursor.is_typed_array())
                 {
-                    read_typed_array(cursor.typed_array(), cursor.element_type(), v);
-                    cursor.clear_typed_array();
+                    cursor.read_typed_array(v);
                 }
                 else
                 {
@@ -492,8 +379,7 @@ struct decode_traits<T,
             T v = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
             if (cursor.is_typed_array())
             {
-                read_typed_array(cursor.typed_array(), cursor.element_type(), v);
-                cursor.clear_typed_array();
+                cursor.read_typed_array(v);
             }
             else
             {

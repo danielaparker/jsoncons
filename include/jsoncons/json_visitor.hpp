@@ -23,11 +23,76 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/utility/function_objects.hpp>
 
 namespace jsoncons {
 
+    class typed_array_visitor
+    {
+    public:
+        virtual ~typed_array_visitor() = default;
+
+        JSONCONS_VISITOR_RETURN_TYPE begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
+        {
+            visit_begin_array(length, tag, context, ec);
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE end_array(const ser_context& context, std::error_code& ec)
+        {
+            visit_end_array(context, ec);
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE uint64_value(uint64_t value, 
+            semantic_tag tag, 
+            const ser_context& context,
+            std::error_code& ec)
+        {
+            visit_uint64(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE int64_value(int64_t value, 
+            semantic_tag tag, 
+            const ser_context& context,
+            std::error_code& ec)
+        {
+            visit_int64(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE double_value(double value, 
+            semantic_tag tag, 
+            const ser_context& context,
+            std::error_code& ec)
+        {
+            visit_double(value, tag, context, ec);
+            JSONCONS_VISITOR_RETURN;
+        }
+    private:
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) = 0;
+
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) = 0;
+
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
+            semantic_tag tag, 
+            const ser_context& context,
+            std::error_code& ec) = 0;
+
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
+            semantic_tag tag,
+            const ser_context& context,
+            std::error_code& ec) = 0;
+
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
+            semantic_tag tag,
+            const ser_context& context,
+            std::error_code& ec) = 0;
+    };
+
     template <typename CharT>
-    class basic_json_visitor
+    class basic_json_visitor : public typed_array_visitor
     {
     public:
         using char_type = CharT;
@@ -714,14 +779,14 @@ namespace jsoncons {
             JSONCONS_VISITOR_RETURN;
         }
 
-        virtual JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
+        virtual JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& extents,
             semantic_tag tag,
             const ser_context& context, 
             std::error_code& ec) 
         {
             visit_begin_array(2, tag, context, ec);
-            visit_begin_array(shape.size(), tag, context, ec);
-            for (auto it = shape.begin(); it != shape.end(); ++it)
+            visit_begin_array(extents.size(), tag, context, ec);
+            for (auto it = extents.begin(); it != extents.end(); ++it)
             {
                 visit_uint64(*it, semantic_tag::none, context, ec);
             }

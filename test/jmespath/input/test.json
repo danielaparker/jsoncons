@@ -1,6 +1,60 @@
 [
   {
     "given": [
+      [ 2, 1 ],
+      [ "foo", "bar" ]
+    ],
+    "cases": [
+      {
+        "comment": "Json const ref argument used in sort function",
+        "expression": "sort([*]|[0])",
+        "result": [ 1, 2 ]
+      },
+      {
+        "comment": "Json const ref argument used in sort_by function",
+        "expression": "sort_by([*]|[0],&@)",
+        "result": [ 1, 2 ]
+      }
+    ]
+  },
+  {
+    "given": {
+      "value": 1,
+      "count_children": true,
+      "children": {
+        "value": 2
+      }
+    },
+    "cases": [
+      {
+        "comment": "Operator in multi-select list second element",
+        "expression": "[value, count_children && children.value || `0`]",
+        "result": [ 1, 2 ]
+      },
+      {
+        "comment": "Operator in multi-select list first element",
+        "expression": "[count_children && children.value || `0`, value]",
+        "result": [ 2, 1 ]
+      }
+    ]
+  },
+  {
+    "given": {
+      "foz": "baz"
+    },
+    "cases": [
+      {
+        "comment": "Json const ref argument used in merge function",
+        "expression": "{object:@}.merge(object, {foo:'bar'})",
+        "result": {
+          "foo": "bar",
+          "foz": "baz"
+        }
+      }
+    ]
+  },
+  {
+    "given": [
       { "foo": "bar" },
       { "foo": "baz" }
     ],

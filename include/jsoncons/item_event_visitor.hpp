@@ -34,7 +34,7 @@ namespace jsoncons {
     class basic_item_event_visitor_to_json_visitor;
 
     template <typename CharT>
-    class basic_item_event_visitor 
+    class basic_item_event_visitor : public typed_array_visitor
     {
         template <typename Ch,typename Allocator>
         friend class basic_item_event_visitor_to_json_visitor;

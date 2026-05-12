@@ -72,24 +72,6 @@ namespace jsoncons {
             return event_;
         }
 
-        bool in_available() const
-        {
-            return state_ != item_event_reader_state();
-        }
-
-        void send_available(std::error_code& ec)
-        {
-            switch (state_)
-            {
-                case item_event_reader_state::multi_dim:
-                case item_event_reader_state::shape:
-                    advance_multi_dim(ec);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         item_event_reader_state state() const
         {
             return state_;

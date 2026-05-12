@@ -168,19 +168,19 @@ public:
         return parser_.is_typed_array();
     }
 
-    typed_array_element_type element_type() const final
+    typed_array_element_types element_type() const final
     {
         return parser_.element_type();
     }
 
-    jsoncons::span<uint8_t> typed_array() final
+    jsoncons::span<uint8_t> array_buffer() final
     {
-        return parser_.typed_array();
+        return parser_.array_buffer();
     }
 
-    void clear_typed_array() final
+    void to_end_array() final
     {
-        parser_.clear_typed_array();
+        parser_.to_end_array();
     }
 
     const staj_event& current() const override
@@ -288,18 +288,11 @@ private:
 
     void read_next(std::error_code& ec)
     {
-        if (cursor_visitor_.in_available())
+        parser_.restart();
+        while (!parser_.stopped())
         {
-            cursor_visitor_.send_available(ec);
-        }
-        else
-        {
-            parser_.restart();
-            while (!parser_.stopped())
-            {
-                parser_.parse(cursor_handler_adaptor_, ec);
-                if (JSONCONS_UNLIKELY(ec)) {return;}
-            }
+            parser_.parse(cursor_handler_adaptor_, ec);
+            if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
 

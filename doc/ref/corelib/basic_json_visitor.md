@@ -178,7 +178,7 @@ Member type                         |Definition
         semantic_tag tag = semantic_tag::none,
         const ser_context& context = ser_context()); (35)
 
-    bool begin_multi_dim(const span<const size_t>& shape,
+    bool begin_multi_dim(const span<const size_t>& extents,
                          semantic_tag tag,
                          const ser_context& context); (36) 
 
