@@ -1399,16 +1399,6 @@ namespace jsoncons {
 
     public:
 
-        basic_json& evaluate() 
-        {
-            return *this;
-        }
-
-        const basic_json& evaluate() const
-        {
-            return *this;
-        }
-
         basic_json& operator=(const basic_json& other)
         {
             if (this != &other)
@@ -3081,21 +3071,6 @@ namespace jsoncons {
             return r;
         }
 
-        bool is_null() const noexcept
-        {
-            switch (storage_kind())
-            {
-                case json_storage_kind::null:
-                    return true;
-                case json_storage_kind::json_const_ref:
-                    return cast<const_ref_storage>().value().is_null();
-                case json_storage_kind::json_ref:
-                    return cast<ref_storage>().value().is_null();
-                default:
-                    return false;
-            }
-        }
-
         allocator_type get_default_allocator(std::false_type) const
         {
             JSONCONS_THROW(json_runtime_error<std::domain_error>("No default allocator if allocator is not default constructible."));
@@ -3530,6 +3505,21 @@ namespace jsoncons {
             return reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
         }
 
+        bool is_null() const noexcept
+        {
+            switch (storage_kind())
+            {
+                case json_storage_kind::null:
+                    return true;
+                case json_storage_kind::json_const_ref:
+                    return cast<const_ref_storage>().value().is_null();
+                case json_storage_kind::json_ref:
+                    return cast<ref_storage>().value().is_null();
+                default:
+                    return false;
+            }
+        }
+
         template <typename T, typename Alloc, typename TempAlloc>
         typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
         try_as(const allocator_set<Alloc,TempAlloc>& aset) const
@@ -3613,7 +3603,7 @@ namespace jsoncons {
         conversion_result<T> try_as_integer() const
         {
             using result_type = conversion_result<T>;
-            
+
             switch (storage_kind())
             {
                 case json_storage_kind::short_str:
