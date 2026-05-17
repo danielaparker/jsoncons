@@ -825,11 +825,11 @@ private:
     {
         --nesting_depth_;
         visitor.end_object(*this, ec);
+        more_ = !cursor_mode_;
         if (level() == mark_level_)
         {
             more_ = false;
         }
-        more_ = !cursor_mode_;
         if (state_stack_.back().pop_stringref_map_stack)
         {
             stringref_map_stack_.pop_back();
