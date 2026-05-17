@@ -162,7 +162,7 @@ public:
     template <typename T>
     bool is_integer() const noexcept
     {
-        return ptr_->is_integer<T>();
+        return ptr_->template is_integer<T>();
     }
 
     bool is_int64() const noexcept
