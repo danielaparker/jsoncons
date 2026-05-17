@@ -1628,7 +1628,7 @@ private:
         {
             this->begin_array(data.size(), semantic_tag::none,context, ec);
             if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN;}
-            for (auto it = data.cbegin(); it != data.cend(); ++it)
+            for (auto it = data.begin(); it != data.end(); ++it)
             {
                 this->double_value(*it,semantic_tag::none,context, ec);
                 if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN;}
