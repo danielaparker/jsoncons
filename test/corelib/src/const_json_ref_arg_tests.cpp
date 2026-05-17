@@ -35,8 +35,6 @@ TEST_CASE("const_json_ref sort test")
             if (*it > *first)
             {
                 std::cout << "greater \n";
-                //it->swap(*first);
-                auto x = std::move(*it);
             }
         }
     }
