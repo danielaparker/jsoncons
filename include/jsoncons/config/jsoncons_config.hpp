@@ -91,15 +91,15 @@ using std::wstring_view;
 }
 #endif
 
-#if !defined(JSONCONS_HAS_STD_SPAN)
-#include <jsoncons/detail/span.hpp>
-namespace jsoncons {
-using jsoncons::detail::span;
-}
-#else 
+#if defined(__cplusplus) && __cplusplus == 202002L && __has_include(<span>)
 #include <span>
 namespace jsoncons {
 using std::span;
+}
+#else
+#include <jsoncons/detail/span.hpp>
+namespace jsoncons {
+using jsoncons::detail::span;
 }
 #endif
 
