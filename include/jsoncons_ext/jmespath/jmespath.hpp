@@ -3083,7 +3083,7 @@ namespace detail {
                         reference jj = this->apply_expressions(item, context, ec);
                         if (!jj.is_null())
                         {
-                            result->emplace_back(json_const_pointer_arg, std::addressof(jj));
+                            result->emplace_back(const_json_ref_arg, jj);
                         }
                     }
                 }

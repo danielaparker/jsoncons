@@ -102,7 +102,7 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
         CHECK(root == original);
     }
 
-    SECTION("with json_const_pointer_arg")
+    SECTION("with const_json_ref_arg")
     {
         auto root = jsoncons::json::parse(input);
         auto nested_json = jsoncons::json::parse(R"(
@@ -114,7 +114,7 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 }
         )");
 
-        root["books"].emplace_back(jsoncons::json_const_pointer_arg, &nested_json);    
+        root["books"].emplace_back(jsoncons::const_json_ref_arg, nested_json);    
 
         std::error_code ec;
         auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]", ec);
