@@ -92,7 +92,7 @@ add_executable(unit_tests
                corelib/src/json_bitset_traits_tests.cpp
                corelib/src/json_checker_tests.cpp
                corelib/src/json_compare_tests.cpp
-               corelib/src/json_const_pointer_arg_tests.cpp
+               corelib/src/const_json_ref_arg_tests.cpp
                corelib/src/json_constructor_tests.cpp
                corelib/src/json_cursor_tests.cpp
                corelib/src/json_encoder_tests.cpp
@@ -109,7 +109,7 @@ add_executable(unit_tests
                corelib/src/json_parser_position_tests.cpp
                corelib/src/json_parser_recovery_tests.cpp
                corelib/src/json_parser_tests.cpp
-               corelib/src/json_pointer_arg_tests.cpp
+               corelib/src/json_ref_arg_tests.cpp
                corelib/src/json_push_back_tests.cpp
                corelib/src/json_reader_exception_tests.cpp
                corelib/src/json_reader_tests.cpp

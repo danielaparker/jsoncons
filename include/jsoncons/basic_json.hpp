@@ -827,7 +827,7 @@ namespace jsoncons {
             const basic_json* ptr_;
 
             const_ref_storage(const basic_json& ref)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::json_const_ref)), short_str_length_(0), tag_(ref.tag()),
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::const_json_ref)), short_str_length_(0), tag_(ref.tag()),
                   ptr_(std::addressof(ref))
             {
             }
@@ -1169,7 +1169,7 @@ namespace jsoncons {
                 case json_storage_kind::byte_str  : swap_l_r<TypeL, byte_string_storage>(other); break;
                 case json_storage_kind::array        : swap_l_r<TypeL, array_storage>(other); break;
                 case json_storage_kind::object       : swap_l_r<TypeL, object_storage>(other); break;
-                case json_storage_kind::json_const_ref : swap_l_r<TypeL, const_ref_storage>(other); break;
+                case json_storage_kind::const_json_ref : swap_l_r<TypeL, const_ref_storage>(other); break;
                 case json_storage_kind::json_ref : swap_l_r<TypeL, ref_storage>(other); break;
                 default:
                     JSONCONS_UNREACHABLE();
@@ -1452,7 +1452,7 @@ namespace jsoncons {
                 case json_storage_kind::empty_object:
                 case json_storage_kind::object:
                     return json_type::object;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().type();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().type();
@@ -1470,7 +1470,7 @@ namespace jsoncons {
             // as defined in 11.4-25 of the Standard.
             switch(storage_kind())
             {
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().tag();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().tag();
@@ -1489,7 +1489,7 @@ namespace jsoncons {
                     return 0;
                 case json_storage_kind::object:
                     return cast<object_storage>().value().size();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().size();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().size();
@@ -1518,7 +1518,7 @@ namespace jsoncons {
                     return result_type(in_place, cast<short_string_storage>().data(),cast<short_string_storage>().length());
                 case json_storage_kind::long_str:
                     return result_type(in_place, cast<long_string_storage>().data(),cast<long_string_storage>().length());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return result_type(cast<const_ref_storage>().value().as_string_view());
                 case json_storage_kind::json_ref:
                     return result_type(cast<ref_storage>().value().as_string_view());
@@ -1565,7 +1565,7 @@ namespace jsoncons {
                         bs.data(), bs.length());
                     return result_type(std::move(val));
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template try_as_byte_string<T>(aset);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template try_as_byte_string<T>(aset);
@@ -1593,7 +1593,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::byte_str:
                     return result_type(in_place, cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().try_as_byte_string_view();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().try_as_byte_string_view();
@@ -1620,10 +1620,10 @@ namespace jsoncons {
             }
             switch (storage_kind())
             {
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     switch (rhs.storage_kind())
                     {
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return cast<const_ref_storage>().value().compare(rhs.cast<const_ref_storage>().value());
                         default:
                             return cast<const_ref_storage>().value().compare(rhs);
@@ -1647,7 +1647,7 @@ namespace jsoncons {
                             return 0;
                         case json_storage_kind::object:
                             return rhs.empty() ? 0 : -1;
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1660,7 +1660,7 @@ namespace jsoncons {
                     {
                         case json_storage_kind::boolean:
                             return static_cast<int>(cast<bool_storage>().value()) - static_cast<int>(rhs.cast<bool_storage>().value());
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1689,7 +1689,7 @@ namespace jsoncons {
                             double r = static_cast<double>(cast<int64_storage>().value()) - rhs.cast<double_storage>().value();
                             return r == 0.0 ? 0 : (r < 0.0 ? -1 : 1);
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1717,7 +1717,7 @@ namespace jsoncons {
                             auto r = static_cast<double>(cast<uint64_storage>().value()) - rhs.cast<double_storage>().value();
                             return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1743,7 +1743,7 @@ namespace jsoncons {
                             auto r = cast<double_storage>().value() - rhs.cast<double_storage>().value();
                             return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1791,7 +1791,7 @@ namespace jsoncons {
                                 auto r = val1 - rhs.cast<double_storage>().value();
                                 return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                             }
-                            case json_storage_kind::json_const_ref:
+                            case json_storage_kind::const_json_ref:
                                 return compare(rhs.cast<const_ref_storage>().value());
                             case json_storage_kind::json_ref:
                                 return compare(rhs.cast<ref_storage>().value());
@@ -1821,7 +1821,7 @@ namespace jsoncons {
                                 return as_string_view().compare(rhs.as_string_view());
                             case json_storage_kind::long_str:
                                 return as_string_view().compare(rhs.as_string_view());
-                            case json_storage_kind::json_const_ref:
+                            case json_storage_kind::const_json_ref:
                                 return compare(rhs.cast<const_ref_storage>().value());
                             case json_storage_kind::json_ref:
                                 return compare(rhs.cast<ref_storage>().value());
@@ -1837,7 +1837,7 @@ namespace jsoncons {
                         {
                             return as_byte_string_view().compare(rhs.as_byte_string_view());
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1855,7 +1855,7 @@ namespace jsoncons {
                             else 
                                 return cast<array_storage>().value() < rhs.cast<array_storage>().value() ? -1 : 1;
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1875,7 +1875,7 @@ namespace jsoncons {
                             else 
                                 return cast<object_storage>().value() < rhs.cast<object_storage>().value() ? -1 : 1;
                         }
-                        case json_storage_kind::json_const_ref:
+                        case json_storage_kind::const_json_ref:
                             return compare(rhs.cast<const_ref_storage>().value());
                         case json_storage_kind::json_ref:
                             return compare(rhs.cast<ref_storage>().value());
@@ -1918,7 +1918,7 @@ namespace jsoncons {
                     case json_storage_kind::byte_str: swap_l<byte_string_storage>(other); break;
                     case json_storage_kind::array: swap_l<array_storage>(other); break;
                     case json_storage_kind::object: swap_l<object_storage>(other); break;
-                    case json_storage_kind::json_const_ref: swap_l<const_ref_storage>(other); break;
+                    case json_storage_kind::const_json_ref: swap_l<const_ref_storage>(other); break;
                     case json_storage_kind::json_ref: swap_l<ref_storage>(other); break;
                     default:
                         JSONCONS_UNREACHABLE();
@@ -2406,6 +2406,7 @@ namespace jsoncons {
             construct<array_storage>(ptr, tag);
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
         basic_json(json_const_pointer_arg_t, const basic_json* ptr) noexcept 
         {
             if (ptr == nullptr)
@@ -2428,6 +2429,16 @@ namespace jsoncons {
             {
                 construct<ref_storage>(*ptr);
             }
+        }
+#endif
+        basic_json(const_json_ref_arg_t, const basic_json& ref) noexcept 
+        {
+            construct<const_ref_storage>(ref);
+        }
+
+        basic_json(json_ref_arg_t, basic_json& ref) noexcept 
+        {
+            construct<ref_storage>(ref);
         }
 
         basic_json(const array& val, semantic_tag tag = semantic_tag::none)
@@ -2805,7 +2816,7 @@ namespace jsoncons {
                     }
                     break;
                 }
-                case json_storage_kind::json_const_ref: 
+                case json_storage_kind::const_json_ref: 
                     return cast<const_ref_storage>().value().at(key);
                 case json_storage_kind::json_ref: 
                     return cast<ref_storage>().value()[key];
@@ -3109,7 +3120,7 @@ namespace jsoncons {
                 {
                     return cast<byte_string_storage>().ext_tag();
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().ext_tag();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().ext_tag();
@@ -3127,7 +3138,7 @@ namespace jsoncons {
                     auto it = cast<object_storage>().value().find(key);
                     return it != cast<object_storage>().value().end();
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().contains(key);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().contains(key);
@@ -3155,7 +3166,7 @@ namespace jsoncons {
                     }
                     return count;
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().count(key);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().count(key);
@@ -3176,7 +3187,7 @@ namespace jsoncons {
             {
                 return true;
             }
-            if (storage_kind() == json_storage_kind::json_const_ref)
+            if (storage_kind() == json_storage_kind::const_json_ref)
             {
                 return cast<const_ref_storage>().value().is_string();
             }
@@ -3198,7 +3209,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::byte_str:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_byte_string();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_byte_string();
@@ -3219,7 +3230,7 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                     return is_number_tag(tag());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_bignum();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_bignum();
@@ -3234,7 +3245,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::boolean:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_bool();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_bool();
@@ -3250,7 +3261,7 @@ namespace jsoncons {
                 case json_storage_kind::empty_object:
                 case json_storage_kind::object:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_object();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_object();
@@ -3265,7 +3276,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::array:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_array();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_array();
@@ -3282,7 +3293,7 @@ namespace jsoncons {
                     return true;
                 case json_storage_kind::uint64:
                     return as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_int64();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_int64();
@@ -3299,7 +3310,7 @@ namespace jsoncons {
                     return true;
                 case json_storage_kind::int64:
                     return as_integer<int64_t>() >= 0;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_uint64();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_uint64();
@@ -3314,7 +3325,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::half_float:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_half();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_half();
@@ -3329,7 +3340,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::float64:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_double();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_double();
@@ -3350,7 +3361,7 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                     return is_number_tag(tag());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_number();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_number();
@@ -3376,7 +3387,7 @@ namespace jsoncons {
                     return true;
                 case json_storage_kind::object:
                     return cast<object_storage>().value().empty();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().empty();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().empty();
@@ -3393,7 +3404,7 @@ namespace jsoncons {
                     return cast<array_storage>().value().capacity();
                 case json_storage_kind::object:
                     return cast<object_storage>().value().capacity();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().capacity();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().capacity();
@@ -3511,7 +3522,7 @@ namespace jsoncons {
             {
                 case json_storage_kind::null:
                     return true;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().is_null();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().is_null();
@@ -3571,7 +3582,7 @@ namespace jsoncons {
                 }
                 case json_storage_kind::byte_str:
                     return T(as_byte_string_view().begin(), as_byte_string_view().end());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template as<T>(byte_string_arg, hint);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template as<T>(byte_string_arg, hint);
@@ -3590,7 +3601,7 @@ namespace jsoncons {
                     return cast<int64_storage>().value() != 0;
                 case json_storage_kind::uint64:
                     return cast<uint64_storage>().value() != 0;
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().as_bool();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().as_bool();
@@ -3627,7 +3638,7 @@ namespace jsoncons {
                     return result_type(static_cast<T>(cast<uint64_storage>().value()));
                 case json_storage_kind::boolean:
                     return result_type(static_cast<T>(cast<bool_storage>().value() ? 1 : 0));
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template try_as_integer<T>();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template try_as_integer<T>();
@@ -3657,7 +3668,7 @@ namespace jsoncons {
                     return (as_integer<int64_t>() >= (ext_traits::integer_limits<T>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::uint64:
                     return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<T>::max)());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template is_integer<T>();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template is_integer<T>();
@@ -3683,7 +3694,7 @@ namespace jsoncons {
                     return (as_integer<int64_t>() >= (ext_traits::integer_limits<T>::lowest)()) && (as_integer<int64_t>() <= (ext_traits::integer_limits<T>::max)());
                 case json_storage_kind::uint64:
                     return as_integer<uint64_t>() <= static_cast<uint64_t>((ext_traits::integer_limits<T>::max)());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template is_integer<T>();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template is_integer<T>();
@@ -3702,7 +3713,7 @@ namespace jsoncons {
                     return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (ext_traits::integer_limits<IntegerType>::max)();
                 case json_storage_kind::uint64:
                     return as_integer<uint64_t>() <= (ext_traits::integer_limits<IntegerType>::max)();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template is_integer<IntegerType>();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template is_integer<IntegerType>();
@@ -3728,7 +3739,7 @@ namespace jsoncons {
                     return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (ext_traits::integer_limits<IntegerType>::max)();
                 case json_storage_kind::uint64:
                     return as_integer<uint64_t>() <= (ext_traits::integer_limits<IntegerType>::max)();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template is_integer<IntegerType>();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template is_integer<IntegerType>();
@@ -3784,7 +3795,7 @@ namespace jsoncons {
                     return result_type(static_cast<double>(cast<int64_storage>().value()));
                 case json_storage_kind::uint64:
                     return result_type(static_cast<double>(cast<uint64_storage>().value()));
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().try_as_double();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().try_as_double();
@@ -3830,7 +3841,7 @@ namespace jsoncons {
                     bytes_to_string(stor.data(), stor.data()+stor.length(), tag(), s);
                     return result_type(std::move(s));
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template try_as_string<T>(aset);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template try_as_string<T>(aset);
@@ -3880,7 +3891,7 @@ namespace jsoncons {
                     return cast<short_string_storage>().c_str();
                 case json_storage_kind::long_str:
                     return cast<long_string_storage>().c_str();
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().as_cstring();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().as_cstring();
@@ -3926,7 +3937,7 @@ namespace jsoncons {
                     }
                     return (*it).value();
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().at(key);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().at(key);
@@ -3966,7 +3977,7 @@ namespace jsoncons {
                     return cast<array_storage>().value().operator[](i);
                 case json_storage_kind::object:
                     return cast<object_storage>().value().at(i);
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().at(i);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().at(i);
@@ -3998,7 +4009,7 @@ namespace jsoncons {
                     return object_range().end();
                 case json_storage_kind::object:
                     return const_object_iterator(cast<object_storage>().value().find(key));
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().find(key);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().find(key);
@@ -4028,7 +4039,7 @@ namespace jsoncons {
                         return null();
                     }
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().at_or_null(key);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().at_or_null(key);
@@ -4061,7 +4072,7 @@ namespace jsoncons {
                         return static_cast<T>(std::forward<U>(default_value));
                     }
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().template get_value_or<T,U>(key,std::forward<U>(default_value));
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().template get_value_or<T,U>(key,std::forward<U>(default_value));
@@ -4685,7 +4696,7 @@ namespace jsoncons {
                 case json_storage_kind::object:
                     return const_object_range_type(const_object_iterator(cast<object_storage>().value().begin()),
                                                         const_object_iterator(cast<object_storage>().value().end()));
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().object_range();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().object_range();
@@ -4715,7 +4726,7 @@ namespace jsoncons {
                 case json_storage_kind::array:
                     return const_array_range_type(cast<array_storage>().value().begin(),
                         cast<array_storage>().value().end());
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().array_range();
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().array_range();
@@ -4791,7 +4802,7 @@ namespace jsoncons {
                     visitor.end_array(context, ec);
                     break;
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().dump_noflush(visitor, ec);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().dump_noflush(visitor, ec);
@@ -4882,7 +4893,7 @@ namespace jsoncons {
                     }
                     return write_result{};
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return cast<const_ref_storage>().value().try_dump_noflush(visitor);
                 case json_storage_kind::json_ref:
                     return cast<ref_storage>().value().try_dump_noflush(visitor);
@@ -4938,7 +4949,7 @@ namespace jsoncons {
                     }
                     return j;
                 }
-                case json_storage_kind::json_const_ref:
+                case json_storage_kind::const_json_ref:
                     return deep_copy(other.cast<const_ref_storage>().value());
                 case json_storage_kind::json_ref:
                     return deep_copy(other.cast<ref_storage>().value());
