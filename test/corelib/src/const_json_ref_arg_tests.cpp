@@ -9,36 +9,9 @@
 #include <ctime>
 #include <map>
 #include <iterator>
-#include <jsoncons/json_view.hpp>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-
-TEST_CASE("const_json_ref sort test")
-{
-    SECTION("ref")
-    {
-        const json j1{10};
-        const json j2{20};
-
-        json v(json_array_arg);
-        v.emplace_back(json(const_json_ref_arg, j1));
-        v.emplace_back(json(const_json_ref_arg, j2));
-
-        json_view<json> u(v);
-        auto first = u.array_range().begin();
-        auto last = u.array_range().end();
-
-        for (auto it = first; it != last; ++it)
-        {
-            std::cout << *it << "\n";
-            if (*it > *first)
-            {
-                std::cout << "greater \n";
-            }
-        }
-    }
-}
 
 TEST_CASE("const_json_ref array tests")
 {
