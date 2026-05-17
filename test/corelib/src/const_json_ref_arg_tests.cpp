@@ -25,7 +25,7 @@ TEST_CASE("const_json_ref sort test")
         v.emplace_back(json(const_json_ref_arg, j1));
         v.emplace_back(json(const_json_ref_arg, j2));
 
-        json_view u(v);
+        json_view<json> u(v);
         auto first = u.array_range().begin();
         auto last = u.array_range().end();
 
