@@ -155,12 +155,13 @@ namespace jsoncons {
     };
     
     JSONCONS_INLINE_CONSTEXPR byte_string_arg_t byte_string_arg{};
-    
+
+#if !defined(JSONCONS_NO_DEPRECATED)  
     struct json_const_pointer_arg_t
     {
         explicit json_const_pointer_arg_t() = default; 
     };
-    
+
     JSONCONS_INLINE_CONSTEXPR json_const_pointer_arg_t json_const_pointer_arg{};
     
     struct json_pointer_arg_t
@@ -169,6 +170,20 @@ namespace jsoncons {
     };
     
     JSONCONS_INLINE_CONSTEXPR json_pointer_arg_t json_pointer_arg{};
+#endif
+    struct const_json_ref_arg_t
+    {
+        explicit const_json_ref_arg_t() = default; 
+    };
+
+    JSONCONS_INLINE_CONSTEXPR const_json_ref_arg_t const_json_ref_arg{};
+
+    struct json_ref_arg_t
+    {
+        explicit json_ref_arg_t() = default; 
+    };
+
+    JSONCONS_INLINE_CONSTEXPR json_ref_arg_t json_ref_arg{};
 
     struct raw_json_arg_t
     {
@@ -192,7 +207,7 @@ namespace jsoncons {
         float64 = 5,              // 0101
         half_float = 6,           // 0110
         short_str = 7,            // 0111
-        json_const_ref = 8,       // 1000    
+        const_json_ref = 8,       // 1000    
         json_ref = 9,             // 1001    
         byte_str = 12,            // 1100  
         object = 13,              // 1101
@@ -228,7 +243,7 @@ namespace jsoncons {
         static constexpr const CharT* array_value = JSONCONS_CSTRING_CONSTANT(CharT, "array");
         static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty_object");
         static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
-        static constexpr const CharT* json_const_ref = JSONCONS_CSTRING_CONSTANT(CharT, "json_const_ref");
+        static constexpr const CharT* const_json_ref = JSONCONS_CSTRING_CONSTANT(CharT, "const_json_ref");
         static constexpr const CharT* json_ref = JSONCONS_CSTRING_CONSTANT(CharT, "json_ref");
 
         switch (storage)
@@ -293,9 +308,9 @@ namespace jsoncons {
                 os << object_value;
                 break;
             }
-            case json_storage_kind::json_const_ref:
+            case json_storage_kind::const_json_ref:
             {
-                os << json_const_ref;
+                os << const_json_ref;
                 break;
             }
             case json_storage_kind::json_ref:

@@ -75,7 +75,7 @@ void constructor_examples()
     std::cout << pretty_print(arr) << "\n\n";
 }
 
-void json_const_pointer_arg_example()
+void const_json_ref_arg_example()
 {
     std::string input = R"(
     {
@@ -94,7 +94,8 @@ void json_const_pointer_arg_example()
     {
         if (item.at("state").as<std::string>() == "running")
         {
-            j_v.emplace_back(json_const_pointer_arg, &item);
+            //j_v.emplace_back(json_const_pointer_arg, &item);  // deprecated in 1.8.0
+            j_v.emplace_back(const_json_ref_arg, item);         // since 1.8.0
         }
     }
 
@@ -118,6 +119,6 @@ void json_const_pointer_arg_example()
 int main()
 {   
     constructor_examples();
-    json_const_pointer_arg_example();
+    const_json_ref_arg_example();
 }
 
