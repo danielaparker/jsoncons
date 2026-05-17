@@ -286,15 +286,21 @@ public:
 };
 
 inline
-std::size_t calculate_number_of_elements(jsoncons::span<const std::size_t> extents)
+jsoncons::expected<std::size_t,std::errc> calculate_mdarray_size(jsoncons::span<const std::size_t> extents)
 {
+    using result_type = jsoncons::expected<std::size_t,std::errc>;
+
     if (extents.empty())
     {
-        return 0;
+        return result_type(0);
     }
     std::size_t n = extents[0];
     for (std::size_t i = 1; i < extents.size(); ++i)
     {
+        if (JSONCONS_UNLIKELY(n > (std::numeric_limits<std::size_t>::max)()/extents[i]))
+        {
+            return result_type(jsoncons::unexpect, std::errc::value_too_large);
+        }
         n *= extents[i];
     }
     return n;

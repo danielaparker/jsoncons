@@ -149,6 +149,7 @@ class basic_cbor_parser : public ser_context
     semantic_tag typed_array_tag_{};
     byte_string_type array_buffer_;
     std::vector<std::size_t> extents_;
+    std::size_t mdarray_size_{0};
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
 
     struct read_byte_string_from_buffer
@@ -1717,7 +1718,7 @@ private:
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1749,7 +1750,7 @@ private:
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1790,7 +1791,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1831,7 +1832,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1872,7 +1873,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1903,7 +1904,7 @@ private:
                     auto ta = typed_array_cast<int8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1944,7 +1945,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -1985,7 +1986,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -2026,7 +2027,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -2067,7 +2068,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -2108,7 +2109,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -2149,7 +2150,7 @@ private:
                     }
                     if (is_multi_dim_)
                     {
-                        if (calculate_number_of_elements(extents_) != ta.size())
+                        if (mdarray_size_ != ta.size())
                         {
                             ec = cbor_errc::invalid_multi_dim;
                             more_ = false;
@@ -2237,12 +2238,12 @@ private:
                     }
                     else
                     {
-                        std::size_t extent_size = read_size(ec);
+                        std::size_t extent = read_size(ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
-                        extents_.push_back(extent_size);
+                        extents_.push_back(extent);
                     }
                 }
                 break;
@@ -2256,16 +2257,24 @@ private:
                 }
                 for (std::size_t i = 0; more_ && i < size; ++i)
                 {
-                    std::size_t extent_size = read_size(ec);
+                    std::size_t extent = read_size(ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
                     }
-                    extents_.push_back(extent_size);
+                    extents_.push_back(extent);
                 }
                 break;
             }
         }
+        auto r = calculate_mdarray_size(extents_);
+        if (!r)
+        {
+            ec = cbor_errc::invalid_extents;
+            more_ = false;
+            return;
+        }
+        mdarray_size_ = *r;
     }
 };
 

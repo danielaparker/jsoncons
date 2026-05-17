@@ -31,7 +31,8 @@ enum class cbor_errc
     max_nesting_depth_exceeded,
     unknown_type,
     illegal_chunked_string,
-    invalid_multi_dim
+    invalid_multi_dim,
+    invalid_extents
 };
 
 class cbor_error_category_impl
@@ -72,6 +73,8 @@ public:
                 return "An illegal type was found while parsing an indefinite length string";
             case cbor_errc::invalid_multi_dim:
                 return "Product of extents does not match number of elements.";
+            case cbor_errc::invalid_extents:
+                return "Product of extents is too large.";
             default:
                 return "Unknown CBOR parser error";
         }
