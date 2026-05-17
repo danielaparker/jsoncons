@@ -53,20 +53,20 @@ using jsoncons::detail::in_place_t;
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 } // namespace jsoncons
 
-#if !defined(JSONCONS_HAS_STD_EXPECTED)
-  #include <jsoncons/detail/expected.hpp>
-  namespace jsoncons {
-  using jsoncons::detail::expected;
-  using jsoncons::detail::unexpect_t;
-  using jsoncons::detail::unexpect;
-  } // namespace jsoncons
-#else
+#if defined(__cplusplus) && __cplusplus >= 202302L && __has_include(<expected>)
   #include <expected>
   namespace jsoncons {
   template <typename R,typename E>
   using expected = std::expected<R,E>;
   using unexpect_t = std::unexpect_t;
   JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
+  } // namespace jsoncons
+#else
+  #include <jsoncons/detail/expected.hpp>
+  namespace jsoncons {
+  using jsoncons::detail::expected;
+  using jsoncons::detail::unexpect_t;
+  using jsoncons::detail::unexpect;
   } // namespace jsoncons
 #endif
         
@@ -91,7 +91,7 @@ using std::wstring_view;
 }
 #endif
 
-#if defined(__cplusplus) && __cplusplus == 202002L && __has_include(<span>)
+#if defined(__cplusplus) && __cplusplus >= 202002L && __has_include(<span>)
 #include <span>
 namespace jsoncons {
 using std::span;
