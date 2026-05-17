@@ -3181,7 +3181,7 @@ namespace detail {
                 pointer root_ptr = std::addressof(val);
 
                 eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                auto ref = evaluate_tokens(val, tokens_, new_context, ec);
+                auto& ref = evaluate_tokens(val, tokens_, new_context, ec);
                 context.set_variable(variable_.key_, ref);
 
                 return *root_ptr;
