@@ -1720,7 +1720,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1752,7 +1752,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1793,7 +1793,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1834,7 +1834,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1875,7 +1875,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1906,7 +1906,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1947,7 +1947,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -1988,7 +1988,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -2029,7 +2029,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -2070,7 +2070,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -2111,7 +2111,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -2152,7 +2152,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::invalid_multi_dim;
+                            ec = cbor_errc::bad_mdarray;
                             more_ = false;
                             return;
                         }
@@ -2241,6 +2241,7 @@ private:
                         std::size_t extent = read_size(ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
+                            more_ = false;
                             return;
                         }
                         extents_.push_back(extent);
@@ -2253,6 +2254,7 @@ private:
                 std::size_t size = read_size(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
+                    more_ = false;
                     return;
                 }
                 for (std::size_t i = 0; more_ && i < size; ++i)
@@ -2260,6 +2262,7 @@ private:
                     std::size_t extent = read_size(ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
+                        more_ = false;
                         return;
                     }
                     extents_.push_back(extent);
@@ -2270,7 +2273,7 @@ private:
         auto r = calculate_mdarray_size(extents_);
         if (!r)
         {
-            ec = cbor_errc::invalid_extents;
+            ec = cbor_errc::bad_extents;
             more_ = false;
             return;
         }

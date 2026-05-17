@@ -877,15 +877,8 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         cbor::cbor_stream_reader reader(is,visitor,options);
 
         std::error_code ec;
-        try
-        {
-            reader.read(ec);
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << "\n";
-        }
-        std::cout << ec.message() << "\n";
+        reader.read(ec);
+        CHECK(ec == cbor::cbor_errc::bad_extents);
     }
 }
 
