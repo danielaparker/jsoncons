@@ -285,6 +285,21 @@ public:
     }
 };
 
+inline
+std::size_t calculate_number_of_elements(jsoncons::span<const std::size_t> extents)
+{
+    if (extents.empty())
+    {
+        return 0;
+    }
+    std::size_t n = extents[0];
+    for (std::size_t i = 1; i < extents.size(); ++i)
+    {
+        n *= extents[i];
+    }
+    return n;
+}
+
 template <typename ValueType>
 struct mdarray_dimension
 {

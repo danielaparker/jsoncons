@@ -1717,6 +1717,12 @@ private:
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(ta, extents_, order_);
                     }
                     else
@@ -1743,6 +1749,12 @@ private:
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(ta, extents_, order_);
                     }
                     else
@@ -1778,6 +1790,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(ta, extents_, order_);
                     }
                     else
@@ -1813,6 +1831,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(ta, extents_, order_);
                     }
                     else
@@ -1848,6 +1872,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(ta, extents_, order_);
                     }
                     else
@@ -1873,6 +1903,12 @@ private:
                     auto ta = typed_array_cast<int8_t>(array_buffer_);
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(ta, extents_, order_);
                     }
                     else
@@ -1908,6 +1944,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(ta, extents_, order_);
                     }
                     else
@@ -1943,6 +1985,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(ta, extents_, order_);
                     }
                     else
@@ -1978,6 +2026,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(ta, extents_, order_);
                     }
                     else
@@ -2013,6 +2067,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(ta, extents_, order_);
                     }
                     else
@@ -2048,6 +2108,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(ta, extents_, order_);
                     }
                     else
@@ -2083,6 +2149,12 @@ private:
                     }
                     if (is_multi_dim_)
                     {
+                        if (calculate_number_of_elements(extents_) != ta.size())
+                        {
+                            ec = cbor_errc::invalid_multi_dim;
+                            more_ = false;
+                            return;
+                        }
                         typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(ta, extents_, order_);
                     }
                     else
