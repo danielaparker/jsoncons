@@ -2536,7 +2536,7 @@ namespace detail {
             }
         };
 
-        static pointer evaluate_tokens(reference doc, 
+        static reference evaluate_tokens(reference doc, 
             const std::vector<token<Json>>& output_stack, 
             eval_context<Json>& context, 
             std::error_code& ec)
@@ -2590,7 +2590,7 @@ namespace detail {
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             ec = jmespath_errc::undefined_variable;
-                            return std::addressof(context.null_value());
+                            return context.null_value();
                         }
                         stack.push_back(j);
                         break;
@@ -2616,7 +2616,7 @@ namespace detail {
                         if (t.function_->arity() && *(t.function_->arity()) != arg_stack.size())
                         {
                             ec = jmespath_errc::invalid_arity;
-                            return std::addressof(context.null_value());
+                            return context.null_value();
                         }
                         
                         std::vector<expr_wrapper<Json>> expr_wrappers;
@@ -2639,7 +2639,7 @@ namespace detail {
                         reference r = t.function_->evaluate(arg_stack, context, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
-                            return std::addressof(context.null_value());
+                            return context.null_value();
                         }
                         arg_stack.clear();
                         stack.emplace_back(r);
@@ -2650,7 +2650,7 @@ namespace detail {
                 }
             }
             JSONCONS_ASSERT(stack.size() == 1);
-            return std::addressof(stack.back().value());
+            return stack.back().value();
         }
 
         // Implementations
@@ -3061,7 +3061,7 @@ namespace detail {
                 if (!val.is_array())
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ref_arg, *evaluate_tokens(val, token_list_, new_context, ec));
+                    Json j(const_json_ref_arg, evaluate_tokens(val, token_list_, new_context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(val, context, ec);
@@ -3077,7 +3077,7 @@ namespace detail {
                 for (auto& item : val.array_range())
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ref_arg, *evaluate_tokens(item, token_list_, new_context, ec));
+                    Json j(const_json_ref_arg, evaluate_tokens(item, token_list_, new_context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(item, context, ec);
@@ -3160,7 +3160,7 @@ namespace detail {
                 for (auto& list : token_lists_)
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    result->emplace_back(const_json_ref_arg, *evaluate_tokens(val, list, new_context, ec));
+                    result->emplace_back(const_json_ref_arg, evaluate_tokens(val, list, new_context, ec));
                 }
                 return *result;
             }
@@ -3181,8 +3181,8 @@ namespace detail {
                 pointer root_ptr = std::addressof(val);
 
                 eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                auto ptr = evaluate_tokens(val, tokens_, new_context, ec);
-                context.set_variable(variable_.key_, *ptr);
+                auto ref = evaluate_tokens(val, tokens_, new_context, ec);
+                context.set_variable(variable_.key_, ref);
 
                 return *root_ptr;
             }
@@ -3220,7 +3220,7 @@ namespace detail {
                 for (auto& item : key_toks_)
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    resultp->try_emplace(item.key, const_json_ref_arg, *evaluate_tokens(val, item.tokens, new_context, ec));
+                    resultp->try_emplace(item.key, const_json_ref_arg, evaluate_tokens(val, item.tokens, new_context, ec));
                 }
 
                 return *resultp;
@@ -3240,7 +3240,7 @@ namespace detail {
             reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
             {
                 eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                return *evaluate_tokens(val, toks_, new_context, ec);
+                return evaluate_tokens(val, toks_, new_context, ec);
             }
         };
 
@@ -3554,7 +3554,7 @@ namespace detail {
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
                 eval_context<Json> context{temp_storage};
-                return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
+                return deep_copy(evaluate_tokens(doc, output_stack_, context, ec));
             }
 
             Json evaluate(reference doc, 
@@ -3572,7 +3572,7 @@ namespace detail {
                     context.set_variable(param.first, param.second);
                 }
 
-                return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
+                return deep_copy(evaluate_tokens(doc, output_stack_, context, ec));
             }
         };
     public:
