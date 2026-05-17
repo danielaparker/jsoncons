@@ -1,3 +1,27 @@
+master
+------
+
+- Changes
+
+    - The types `json_pointer_arg_t` and `json_const_pointer_arg_t` and the
+    constants `json_pointer_arg` and `json_const_pointer_arg` have been 
+    deprecated and will be removed in a future version. These have been
+    replaced by the types `json_ref_arg_t` and `const_json_ref_arg_t` and the
+    constants `json_ref_arg` and `const_json_ref_arg`.
+    
+    - The basic_json constructors
+
+        `basic_json(json_const_pointer_arg_t, const basic_json* ptr) noexcept;` 
+
+        `basic_json(json_pointer_arg_t, basic_json* ptr) noexcept;` 
+    
+    have been deprecated and will be removed in a future version. These
+    have been replaced by    
+    
+        `basic_json(const_json_ref_arg_t, const basic_json& ref) noexcept;`
+
+        `basic_json(json_ref_arg_t, basic_json& ref) noexcept;`
+ 
 Release 1.7.0
 -------------
 
