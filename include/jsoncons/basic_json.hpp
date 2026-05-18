@@ -1197,7 +1197,15 @@ namespace jsoncons {
 
         void uninitialized_copy(const basic_json& other)
         {
-            if (is_trivial_storage(other.storage_kind()))
+            if (other.storage_kind() == json_storage_kind::const_json_ref)
+            {
+                uninitialized_copy(other.cast<const_json_ref_storage>().value());
+            }
+            else if (other.storage_kind() == json_storage_kind::json_ref)
+            {
+                uninitialized_copy(other.cast<json_ref_storage>().value());
+            }
+            else if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -1246,7 +1254,15 @@ namespace jsoncons {
 
         void uninitialized_copy_a(const basic_json& other, const Allocator& alloc)
         {
-            if (is_trivial_storage(other.storage_kind()))
+            if (other.storage_kind() == json_storage_kind::const_json_ref)
+            {
+                uninitialized_copy_a(other.cast<const_json_ref_storage>().value(), alloc);
+            }
+            else if (other.storage_kind() == json_storage_kind::json_ref)
+            {
+                uninitialized_copy_a(other.cast<json_ref_storage>().value(), alloc);
+            }
+            else if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -1341,7 +1357,19 @@ namespace jsoncons {
 
         void copy_assignment(const basic_json& other)
         {
-            if (is_trivial_storage(other.storage_kind()))
+            if (other.storage_kind() == json_storage_kind::const_json_ref)
+            {
+                auto alloc = cast<long_string_storage>().get_allocator();
+                destroy();
+                uninitialized_copy_a(other.cast<const_json_ref_storage>().value(), alloc);
+            }
+            else if (other.storage_kind() == json_storage_kind::json_ref)
+            {
+                auto alloc = cast<long_string_storage>().get_allocator();
+                destroy();
+                uninitialized_copy_a(other.cast<json_ref_storage>().value(), alloc);
+            }
+            else if (is_trivial_storage(other.storage_kind()))
             {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
@@ -4941,6 +4969,7 @@ namespace jsoncons {
             return is;
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
         friend basic_json deep_copy(const basic_json& other)
         {
             switch (other.storage_kind())
@@ -4976,6 +5005,7 @@ namespace jsoncons {
             }
         }
     };
+#endif
 
     // operator==
 

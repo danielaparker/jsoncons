@@ -296,7 +296,7 @@ TEST_CASE("const_json_ref identifier tests")
             const json v3(const_json_ref_arg, j2);
             flatten(v3, "bar", j3);
 
-            target = deep_copy(j3);
+            target = json(j3);
         }
         CHECK(expected == target);
         CHECK(target.storage_kind() == json_storage_kind::array);

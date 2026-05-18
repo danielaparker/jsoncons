@@ -262,7 +262,7 @@ namespace jmespath {
 
         reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const final
         {
-            return *context.create_json(deep_copy(expr_->evaluate(val, context, ec)));
+            return *context.create_json(Json(expr_->evaluate(val, context, ec)));
         }
     };
 
@@ -3554,7 +3554,7 @@ namespace detail {
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
                 eval_context<Json> context{temp_storage};
-                return deep_copy(evaluate_tokens(doc, output_stack_, context, ec));
+                return Json(evaluate_tokens(doc, output_stack_, context, ec));
             }
 
             Json evaluate(reference doc, 
@@ -3572,7 +3572,7 @@ namespace detail {
                     context.set_variable(param.first, param.second);
                 }
 
-                return deep_copy(evaluate_tokens(doc, output_stack_, context, ec));
+                return Json(evaluate_tokens(doc, output_stack_, context, ec));
             }
         };
     public:
