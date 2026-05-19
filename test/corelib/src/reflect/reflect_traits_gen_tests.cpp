@@ -21,6 +21,15 @@ using namespace jsoncons;
 namespace {
 namespace ns {
 
+    struct Item {
+       std::string name;                         // mandatory
+       jsoncons::optional<std::string> label;    // optional
+    };
+
+    struct Container {
+       jsoncons::optional<std::vector<Item>> items;  // optional
+    };
+
     template <typename T1,typename T2>
     struct struct_t2_all_m
     {
@@ -489,6 +498,9 @@ namespace ns {
 
 } // namespace ns
 } // namespace 
+
+JSONCONS_N_MEMBER_TRAITS(ns::Item, 1, name, label)
+JSONCONS_N_MEMBER_TRAITS(ns::Container, 0, items)
  
 JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS(ns::book_all_m,author,title,price)
@@ -1596,5 +1608,21 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS with constants tests")
         CHECK(dynamic_cast<ns::Baz*>(v[0].get()) == nullptr);
         CHECK(dynamic_cast<ns::Baz*>(v[1].get()) != nullptr);
         CHECK(dynamic_cast<ns::Bar*>(v[1].get()) == nullptr);
+    }
+}
+
+TEST_CASE("JSONCONS_N_MEMBER_TRAITS with mandatory-field errors when nested inside an optional parent member tests")
+{
+    SECTION("direct decode detects missing mandatory 'name'")
+    {
+        auto dom = jsoncons::json::parse(R"({"label":"x"})");
+        auto r = dom.try_as<ns::Item>();
+        CHECK_FALSE(r);
+    }
+    SECTION("direct decode detects missing mandatory 'name' when Item is nested inside Container's optional 'items' member")
+    {
+        auto dom = jsoncons::json::parse(R"({"items":[{"label":"x"}]})");
+        auto r = dom.try_as<ns::Container>();
+        CHECK_FALSE(r);
     }
 }
