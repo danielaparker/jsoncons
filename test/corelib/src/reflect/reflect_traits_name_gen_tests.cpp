@@ -19,6 +19,15 @@ using namespace jsoncons;
 namespace {
 namespace ns {
 
+    struct Item {
+       std::string name;                         // mandatory
+       jsoncons::optional<std::string> label;    // optional
+    };
+
+    struct Container {
+       jsoncons::optional<std::vector<Item>> items;  // optional
+    };
+
     struct book_all_m
     {
         std::string author;
@@ -300,6 +309,8 @@ namespace ns {
 } // ns
 } // namespace 
 
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Item, 1, (name,"Name"), (label,"Label"))
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Container, 0, (items,"Items"))
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book_all_m,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bool_all_m_a,(author,"Author"),(title,"Title"),(price,"Price"))
@@ -961,3 +972,19 @@ TEST_CASE("JSONCONS_All_MEMBER_NAME_TRAITS variant tests")
 }
 
 #endif
+
+TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS with mandatory-field errors when nested inside an optional parent member tests")
+{
+    SECTION("direct decode detects missing mandatory 'name'")
+    {
+        auto dom = jsoncons::json::parse(R"({"Label":"x"})");
+        auto r = dom.try_as<ns::Item>();
+        CHECK_FALSE(r);
+    }
+    SECTION("direct decode detects missing mandatory 'name' when Item is nested inside Container's optional 'items' member")
+    {
+        auto dom = jsoncons::json::parse(R"({"Items":[{"Label":"x"}]})");
+        auto r = dom.try_as<ns::Container>();
+        CHECK_FALSE(r);
+    }
+}
