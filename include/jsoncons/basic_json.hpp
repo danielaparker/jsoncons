@@ -1205,7 +1205,7 @@ namespace jsoncons {
             {
                 uninitialized_copy(other.cast<json_ref_storage>().value());
             }
-            else if (is_trivial_storage(other.storage_kind()))
+            else if (is_primitive_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -1262,7 +1262,7 @@ namespace jsoncons {
             {
                 uninitialized_copy_a(other.cast<json_ref_storage>().value(), alloc);
             }
-            else if (is_trivial_storage(other.storage_kind()))
+            else if (is_primitive_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -1369,7 +1369,7 @@ namespace jsoncons {
                 destroy();
                 uninitialized_copy_a(other.cast<json_ref_storage>().value(), alloc);
             }
-            else if (is_trivial_storage(other.storage_kind()))
+            else if (is_primitive_storage(other.storage_kind()))
             {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));

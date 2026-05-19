@@ -40,6 +40,38 @@ enum class typed_array_element_types
     float64 = 1024
 };
 
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr typed_array_element_types
+operator|(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
+{ return (typed_array_element_types)((uint64_t)lhs | (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr typed_array_element_types
+operator&(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
+{ return (typed_array_element_types)((uint64_t)lhs & (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr typed_array_element_types
+operator^(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
+{ return (typed_array_element_types)((uint64_t)lhs ^ (uint64_t)rhs); }
+
+JSONCONS_ATTRIBUTE_NODISCARD
+constexpr typed_array_element_types
+operator~(typed_array_element_types types) noexcept
+{ return (typed_array_element_types)~(uint64_t)types; }
+
+constexpr typed_array_element_types&
+operator|=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+{ return lhs = lhs | rhs; }
+
+constexpr typed_array_element_types&
+operator&=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+{ return lhs = lhs & rhs; }
+
+constexpr typed_array_element_types&
+operator^=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+{ return lhs = lhs ^ rhs; }
+
 template <typename T>
 jsoncons::span<T> typed_array_cast(jsoncons::span<uint8_t> bytes);
 

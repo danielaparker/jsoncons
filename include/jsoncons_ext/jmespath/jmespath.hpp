@@ -2034,7 +2034,14 @@ namespace detail {
                     }
                     for (auto& item : argi.object_range())
                     {
-                        result->insert_or_assign(item.key(),item.value());
+                        if (is_primitive_storage(item.value().storage_kind()))
+                        {
+                            result->insert_or_assign(item.key(), item.value());
+                        }
+                        else // shallow copy of non-primitive elements avoids allocations
+                        {
+                            result->try_emplace(item.key(), const_json_ref_arg, item.value());
+                        }
                     }
                 }
 
@@ -2113,29 +2120,40 @@ namespace detail {
                     return arg0;
                 }
 
-                bool is_number = arg0.at(0).is_number();
-                bool is_string = arg0.at(0).is_string();
-                if (!is_number && !is_string)
+                bool is_number_element = arg0.at(0).is_number();
+                bool is_string_element = arg0.at(0).is_string();
+                if (!is_number_element && !is_string_element)
                 {
                     ec = jmespath_errc::invalid_type;
                     return context.null_value();
                 }
-
-                auto result = context.create_json(json_array_arg);
-                result->reserve(arg0.size());
-                result->push_back(arg0.at(0));
-                for (std::size_t i = 1; i < arg0.size(); ++i)
+                for (const auto& item : arg0.array_range())
                 {
-                    if (arg0.at(i).is_number() != is_number || arg0.at(i).is_string() != is_string)
+                    if (item.is_number() != is_number_element || item.is_string() != is_string_element)
                     {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
                     }
-                    result->push_back(arg0.at(i));
                 }
 
-                std::stable_sort((result->array_range()).begin(), (result->array_range()).end());
-                return *result;
+                if (is_number_element) // shallow copy has no advantage if ints or doubles
+                {
+                    auto result = context.create_json(arg0);
+                    std::stable_sort((result->array_range()).begin(), (result->array_range()).end());
+                    return *result;
+                }
+                else // shallow copy of string elements avoids allocations
+                {
+                    auto result = context.create_json(json_array_arg);
+                    result->reserve(arg0.size());
+                    result->push_back(arg0.at(0));
+                    for (std::size_t i = 1; i < arg0.size(); ++i)
+                    {
+                        result->emplace_back(const_json_ref_arg, arg0.at(i));
+                    }
+                    std::stable_sort((result->array_range()).begin(), (result->array_range()).end());
+                    return *result;
+                }
             }
         };
 
@@ -2174,7 +2192,7 @@ namespace detail {
                 result->reserve(arg0.size());
                 for (std::size_t i = 0; i < arg0.size(); ++i)
                 {
-                    result->push_back(arg0.at(i));
+                    result->emplace_back(const_json_ref_arg, arg0.at(i));
                 }
 
                 std::stable_sort((result->array_range()).begin(), (result->array_range()).end(),
