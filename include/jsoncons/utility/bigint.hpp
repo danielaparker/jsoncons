@@ -268,8 +268,12 @@ public:
         }
 
         // Find suitable new block size
-        constexpr size_type round_up(size_type i) const noexcept
+        size_type round_up(size_type i) const noexcept
         {
+            //if (i == (std::numeric_limits<size_type>::max)())
+            //{
+            //    return i;
+            //}
             return ((i + 1/3) / mem_unit + 1) * mem_unit;
         }
     };

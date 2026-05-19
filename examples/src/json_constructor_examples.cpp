@@ -106,7 +106,8 @@ void const_json_ref_arg_example()
         std::cout << "json type: " << item.type() << ", storage kind: " << item.storage_kind() << "\n";
     }
 
-    json j2 = deep_copy(j_v);
+    //json j2 = deep_copy(j_v); // (deprecated in 1.8.0)
+    json j2 = json(j_v);        // (since 1.8.0)
 
     std::cout << "\n(2)\n" << pretty_print(j2) << "\n\n";
 
