@@ -117,7 +117,7 @@ TEST_CASE("json_ref array tests")
         CHECK(v.storage_kind() == json_storage_kind::json_ref);
 
         json j2(v);
-        CHECK(j2.storage_kind() == json_storage_kind::json_ref);
+        CHECK(j2.storage_kind() == json_storage_kind::array);
     }
     SECTION("assignment")
     {
@@ -126,7 +126,7 @@ TEST_CASE("json_ref array tests")
 
         json j2;
         j2 = v;
-        CHECK(j2.storage_kind() == json_storage_kind::json_ref);
+        CHECK(j2.storage_kind() == json_storage_kind::array);
     }
     SECTION("push_back")
     {
