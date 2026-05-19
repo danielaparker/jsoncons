@@ -382,10 +382,11 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_ALL_MEMBER_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Count) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Member)>::type>(aset, ajson, json_object_name_members<value_type>::Member(char_type{})); \
-  if (result) { \
-    set_member(std::move(*result), class_instance.Member); \
-  } \
+  auto it = ajson.find(json_object_name_members<value_type>::Member(char_type{})); \
+  if (it == ajson.object_range().end()) \
+    {return result_type(unexpect, conv_errc::missing_required_member, json_object_name_members<value_type>::Member(unexpect));} \
+  auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Member)>::type>(aset, it->value()); \
+  if (result) {set_member(std::move(*result), class_instance.Member);} \
   else {return result_type(jsoncons::unexpect, result.error().code(), json_object_name_members<value_type>::Member(unexpect));} \
 }
 
@@ -550,14 +551,13 @@ namespace reflect { \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
     if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
-    Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
+    Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }}
 #define JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
     if (result) { \
       set_member(From(std::move(*result)), class_instance.Member); \
     } \
-    else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} \
-  }
-
+    else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
+  
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
@@ -566,7 +566,10 @@ namespace reflect { \
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into,)
 #define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, Into, From) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From)
 #define JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, ajson, Name); \
+  auto it = ajson.find(Name); \
+  if (it == ajson.object_range().end()) \
+    {return result_type(unexpect, conv_errc::missing_required_member, class_name);} \
+  auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
   if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
   Mode(JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 #define JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
