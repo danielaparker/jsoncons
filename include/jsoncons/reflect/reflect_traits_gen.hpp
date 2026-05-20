@@ -793,7 +793,7 @@ namespace reflect { \
     {if ((num_params-Count) < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
   else \
   { \
-    _r ## Getter = json_traits_helper<Json>::template try_as_value<decltype(_r ## Getter)::value_type>(aset, it->value()); \
+    _r ## Getter = json_traits_helper<Json>::template try_as_value<typename decltype(_r ## Getter)::value_type>(aset, it->value()); \
     if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter());} \
   }} 
 
@@ -971,7 +971,7 @@ namespace reflect { \
     {if (index < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, class_name);}} \
   else \
   { \
-    _r ## Getter = json_traits_helper<Json>::template try_as_value<decltype(_r ## Getter)::value_type>(aset, it->value()); \
+    _r ## Getter = json_traits_helper<Json>::template try_as_value<typename decltype(_r ## Getter)::value_type>(aset, it->value()); \
     if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), class_name);} \
     if (!Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
   }} 
@@ -1544,10 +1544,15 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_N_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count)  
 #define JSONCONS_N_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) { \
-  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
-  if (result) {class_instance.Setter(std::move(* result));} \
-  else if ((num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix);} \
-  else if (result.error().code() != conv_errc::missing_required_member){return result_type(jsoncons::unexpect, result.error().code(), # Prefix);} \
+  auto it = ajson.find(object_names<value_type,char_type>::Property()); \
+  if (it == ajson.object_range().end()) \
+    {if ((num_params-Count) < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, # Prefix);}} \
+  else \
+  { \
+    auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, it->value()); \
+    if (result) {class_instance.Setter(std::move(* result));} \
+    else {return result_type(jsoncons::unexpect, result.error().code(), # Prefix);} \
+  } \
 }
 
 #define JSONCONS_ALL_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
