@@ -335,6 +335,7 @@ public:
                     }
                     else
                     {
+                        is_multi_dim_ = false;
                         state_stack_.pop_back();
                     }
                     break;
