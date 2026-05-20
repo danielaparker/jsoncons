@@ -365,7 +365,6 @@ is_optional_value_set(const T&)
 #define JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) \
     static inline const string_view& Member(char) {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
     static inline const wstring_view& Member(wchar_t) {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
-    static inline const string_view& Member(unexpect_t) {static const string_view sv = # Prefix "::" # Member; return sv;} \
     /**/
 
 #define JSONCONS_GENERATE_ERROR_NAME_STR(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_ERROR_NAME_STR_LAST(Prefix, P2, P3, Member, Count) 
@@ -779,7 +778,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_GET(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Count)
 #define JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Count) \
   auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type>(aset, ajson, object_names<value_type>::Getter(char_type{})); \
-  if (!_r ## Getter && (num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), object_names<value_type>::Getter(unexpect));}
+  if (!_r ## Getter && (num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter);}
 
 #define JSONCONS_CTOR_GETTER_AS(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count),
 #define JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count) \
