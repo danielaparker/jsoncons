@@ -364,17 +364,17 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_GENERATE_NAME(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_NAME_LAST(Prefix, P2, P3, Member, Count) 
 #define JSONCONS_GENERATE_NAME_LAST(Prefix, P2, P3, Member, Count) \
-    static inline string_view Member() {static string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
+    static inline const string_view& Member() {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
     /**/
 
 #define JSONCONS_GENERATE_WNAME(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_WNAME_LAST(Prefix, P2, P3, Member, Count) 
 #define JSONCONS_GENERATE_WNAME_LAST(Prefix, P2, P3, Member, Count) \
-    static inline wstring_view Member() {static wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
+    static inline const wstring_view& Member() {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
     /**/
 
 #define JSONCONS_GENERATE_ERROR_CONTEXT(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Count) 
 #define JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Count) \
-    static inline string_view Member() {static string_view sv = # Prefix "::" # Member; return sv;} \
+    static inline const string_view& Member() {static const string_view sv = # Prefix "::" # Member; return sv;} \
     /**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Count) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Count)
