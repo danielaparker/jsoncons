@@ -793,7 +793,7 @@ namespace reflect { \
     {if ((num_params-Count) < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
   else \
   { \
-    _r ## Getter = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type>(aset, it->value()); \
+    _r ## Getter = json_traits_helper<Json>::template try_as_value<decltype(_r ## Getter)::value_type>(aset, it->value()); \
     if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter());} \
   }} 
 
@@ -965,9 +965,16 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_GET_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into,))
 #define JSONCONS_CTOR_GETTER_NAME_GET_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From))
 #define JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From) \
-  auto _r ## Getter = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
-  if (!_r ## Getter && index < num_mandatory_params2) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), class_name);} \
-  if (_r ## Getter && !Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} 
+  conversion_result<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type> _r ## Getter{unexpect, conv_errc::missing_required_member}; \
+  {auto it = ajson.find(Name); \
+  if (it == ajson.object_range().end()) \
+    {if (index < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, class_name);}} \
+  else \
+  { \
+    _r ## Getter = json_traits_helper<Json>::template try_as_value<decltype(_r ## Getter)::value_type>(aset, it->value()); \
+    if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), class_name);} \
+    if (!Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+  }} 
 
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_AS_LAST_7(Getter, Name,,,, ) JSONCONS_COMMA
