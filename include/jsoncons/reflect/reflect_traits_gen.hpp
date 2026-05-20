@@ -58,7 +58,7 @@ struct json_traits_helper
     using string_view_type = typename Json::string_view_type;
 
     template <typename T,typename Alloc,typename TempAlloc> 
-    static conversion_result<T> try_get_member(const allocator_set<Alloc,TempAlloc>& aset, 
+    static conversion_result<T> try_get_value(const allocator_set<Alloc,TempAlloc>& aset, 
         const Json& j, string_view_type key) 
     { 
         auto it = j.find(key);
@@ -787,8 +787,15 @@ namespace reflect { \
 
 #define JSONCONS_CTOR_GETTER_GET(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Count)
 #define JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Count) \
-  auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Getter()); \
-  if (!_r ## Getter && (num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter());}
+  conversion_result<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type> _r ## Getter{unexpect, conv_errc::missing_required_member}; \
+  {auto it = ajson.find(object_names<value_type,char_type>::Getter()); \
+  if (it == ajson.object_range().end()) \
+    {if ((num_params-Count) < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
+  else \
+  { \
+    _r ## Getter = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type>(aset, it->value()); \
+    if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter());} \
+  }} 
 
 #define JSONCONS_CTOR_GETTER_AS(Prefix, P2, P3, Getter, Count) JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count),
 #define JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Count) \
@@ -944,7 +951,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, , )
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
+  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
   if (result && !Match(* result)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
 }
 
@@ -958,7 +965,7 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_GET_5(Getter, Name, Mode, Match, Into) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into,))
 #define JSONCONS_CTOR_GETTER_NAME_GET_6(Getter, Name, Mode, Match, Into, From) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From))
 #define JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match, Into, From) \
-  auto _r ## Getter = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
+  auto _r ## Getter = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
   if (!_r ## Getter && index < num_mandatory_params2) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), class_name);} \
   if (_r ## Getter && !Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} 
 
@@ -1530,7 +1537,7 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_N_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_N_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count)  
 #define JSONCONS_N_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
+  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
   if (result) {class_instance.Setter(std::move(* result));} \
   else if ((num_params-Count) < num_mandatory_params2) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix);} \
   else if (result.error().code() != conv_errc::missing_required_member){return result_type(jsoncons::unexpect, result.error().code(), # Prefix);} \
@@ -1539,7 +1546,7 @@ namespace reflect { \
 #define JSONCONS_ALL_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
+  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
   if (!result) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix "::" # Property);} \
   class_instance.Setter(std::move(* result)); \
 }
@@ -1706,7 +1713,7 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, ajson, Name); \
+  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, ajson, Name); \
   if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
   Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) \
 }
@@ -1733,7 +1740,7 @@ namespace reflect { \
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match,,)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into,)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_member<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, ajson, Name); \
+  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, ajson, Name); \
   if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
   Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) \
 }
