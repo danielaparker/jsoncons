@@ -44,15 +44,20 @@ master
 Enhancements:
 
   - The following functions have been added to `basic_staj_cursor` to support
+  multi-dimensional array input:
+
+        bool is_mult_dim() const;
+        virtual bool rank() const;
+        virtual jsoncons::span<const std::size_t> extents() const;
+        virtual mdarray_order order() const;
+
+  - The following functions have been added to `basic_staj_cursor` to support
   typed array input:
 
         virtual bool is_typed_array() const;
         virtual typed_array_tags array_tag() const; 
         virtual jsoncons::span<uint8_t> array_buffer(); 
         virtual void to_end_array(); 
-        virtual bool is_multi_dim() const;
-        virtual mdarray_order order() const;
-        virtual jsoncons::span<const std::size_t> extents() const;
         template <typename T>
         void read_typed_array(T& v);
 

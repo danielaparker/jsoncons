@@ -305,7 +305,12 @@ public:
     {
     }
 
-    virtual bool is_multi_dim() const
+    bool is_multi_dim() const
+    {
+        return rank() >= 2;
+    }
+
+    virtual std::size_t rank() const
     {
         return false;
     }

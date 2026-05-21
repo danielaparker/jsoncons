@@ -142,7 +142,7 @@ class basic_cbor_parser : public ser_context
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool is_typed_array_{false};
-    bool is_multi_dim_{false};
+    std::size_t rank_{0};
     mdarray_order order_{};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
     typed_array_tags element_type_{};
@@ -240,9 +240,9 @@ public:
         return order_;
     }
 
-    bool is_multi_dim() const
+    std::size_t rank() const
     {
-        return is_multi_dim_;
+        return rank_;
     }
 
     jsoncons::span<const std::size_t> extents() const 
@@ -315,7 +315,7 @@ public:
     void to_end_array()
     {
         is_typed_array_ = false;
-        is_multi_dim_ = false;
+        rank_ = 0;
         order_ = mdarray_order{};
         state_stack_.pop_back();
     }
@@ -335,7 +335,7 @@ public:
                     }
                     else
                     {
-                        is_multi_dim_ = false;
+                        rank_ = 0;
                         state_stack_.pop_back();
                     }
                     break;
@@ -693,12 +693,10 @@ private:
                             more_ = !cursor_mode_;
                             break;
                         case 40: // row major storage
-                            is_multi_dim_ = true;
                             order_ = mdarray_order::row_major;
                             produce_begin_multi_dim(ec);
                             break;
                         case 1040: // column major storage
-                            is_multi_dim_ = true;
                             order_ = mdarray_order::column_major;
                             produce_begin_multi_dim(ec);
                             break;
@@ -1717,7 +1715,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1749,7 +1747,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<const uint8_t>(array_buffer_);
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1790,7 +1788,7 @@ private:
                             ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1831,7 +1829,7 @@ private:
                             ta[i] = binary::byte_swap<uint32_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1872,7 +1870,7 @@ private:
                             ta[i] = binary::byte_swap<uint64_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1903,7 +1901,7 @@ private:
                         return;
                     }
                     auto ta = typed_array_cast<int8_t>(array_buffer_);
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1944,7 +1942,7 @@ private:
                             ta[i] = binary::byte_swap<int16_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -1985,7 +1983,7 @@ private:
                             ta[i] = binary::byte_swap<int32_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -2026,7 +2024,7 @@ private:
                             ta[i] = binary::byte_swap<int64_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -2067,7 +2065,7 @@ private:
                             ta[i] = binary::byte_swap<uint16_t>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -2108,7 +2106,7 @@ private:
                             ta[i] = binary::byte_swap<float>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -2149,7 +2147,7 @@ private:
                             ta[i] = binary::byte_swap<double>(ta[i]);
                         }
                     }
-                    if (is_multi_dim_)
+                    if (rank_ > 1) // multi-dim array
                     {
                         if (mdarray_size_ != ta.size())
                         {
@@ -2213,6 +2211,7 @@ private:
         {
             return;
         }
+        rank_ = extents_.size();
 
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
     }

@@ -183,9 +183,9 @@ public:
         parser_.to_end_array();
     }
 
-    bool is_multi_dim() const final
+    std::size_t rank() const final
     {
-        return parser_.is_multi_dim();
+        return parser_.rank();
     }
 
     jsoncons::span<const std::size_t> extents() const final
