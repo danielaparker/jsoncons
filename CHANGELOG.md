@@ -46,8 +46,7 @@ Enhancements:
   - The following functions have been added to `basic_staj_cursor` to support
   multi-dimensional array input:
 
-        bool is_mult_dim() const;
-        virtual bool rank() const;
+        virtual bool is_mult_dim() const;
         virtual jsoncons::span<const std::size_t> extents() const;
         virtual mdarray_order order() const;
 

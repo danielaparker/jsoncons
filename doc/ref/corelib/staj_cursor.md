@@ -51,15 +51,13 @@ Returns the current [context](ser_context.md)
 
 #### Multi-dimensional array input
 
-    bool is_multi_dim() const;             (since 1.8.0)
+    virtual bool is_multi_dim() const;                           (since 1.8.0)
 Indicates whether an array is a multi-dimensional array.
 
-    virtual std::size_t rank() const;      (since 1.8.0)
-The number of dimensions of an array.
+    virtual jsoncons::span<const std::size_t> extents() const;   (since 1.8.0)
+Indicates the number of elements along each dimension of the array.
 
-    virtual jsoncons::span<const std::size_t> extents() const;
-
-    virtual mdarray_order order() const;   (since 1.8.0)
+    virtual mdarray_order order() const;                         (since 1.8.0)
 Indicates whether the elements of a multi-dimensional array are
 arranged in row-major or column-major order. Returns a [mdarray_order](mdarray_order.md).
 

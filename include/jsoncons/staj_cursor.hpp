@@ -285,6 +285,21 @@ public:
     virtual std::size_t line() const = 0;
 
     virtual std::size_t column() const = 0;
+
+    virtual bool is_multi_dim() const
+    {
+        return false;
+    }
+
+    virtual jsoncons::span<const std::size_t> extents() const
+    {
+        return jsoncons::span<const std::size_t>{};
+    }
+
+    virtual mdarray_order order() const
+    {
+        return mdarray_order{};
+    }
     
     virtual bool is_typed_array() const
     {
@@ -303,26 +318,6 @@ public:
 
     virtual void to_end_array() 
     {
-    }
-
-    bool is_multi_dim() const
-    {
-        return rank() >= 2;
-    }
-
-    virtual std::size_t rank() const
-    {
-        return false;
-    }
-
-    virtual jsoncons::span<const std::size_t> extents() const
-    {
-        return jsoncons::span<const std::size_t>{};
-    }
-
-    virtual mdarray_order order() const
-    {
-        return mdarray_order{};
     }
 
     template <typename T>

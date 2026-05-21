@@ -163,6 +163,21 @@ public:
         return parser_.raw_tag();
     }
 
+    bool is_multi_dim() const final
+    {
+        return parser_.is_multi_dim();
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return parser_.extents();
+    }
+
+    mdarray_order order() const final
+    {
+        return parser_.order();
+    }
+
     bool is_typed_array() const final
     {
         return parser_.is_typed_array();
@@ -181,21 +196,6 @@ public:
     void to_end_array() final
     {
         parser_.to_end_array();
-    }
-
-    std::size_t rank() const final
-    {
-        return parser_.rank();
-    }
-
-    jsoncons::span<const std::size_t> extents() const final
-    {
-        return parser_.extents();
-    }
-
-    mdarray_order order() const final
-    {
-        return parser_.order();
     }
 
     const staj_event& current() const override
