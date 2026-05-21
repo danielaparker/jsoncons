@@ -1728,10 +1728,15 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, ajson, Name); \
-  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
-  Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) \
-}
+  auto it = ajson.find(Name); \
+  if (it == ajson.object_range().end()) \
+    {if (index < num_mandatory_params2){return result_type(unexpect, conv_errc::missing_required_member, class_name);}} \
+  else \
+  { \
+    auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, it->value()); \
+    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+    Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) }}
+
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From) \
   if (result) { \
     class_instance.Setter(From(std::move(* result))); \
