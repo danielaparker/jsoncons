@@ -41,6 +41,21 @@ master
     - Since 1.8.0, the `basic_json` copy constructor makes a deep copy of any `const_json_ref`
     and `json_ref` pointers it may hold. Until 1.8.0, it made a shallow copy. 
 
+Enhancements:
+
+  - The following functions have been added to `basic_staj_cursor` to support
+  typed array input:
+
+        virtual bool is_typed_array() const;
+        virtual typed_array_tags array_tag() const; 
+        virtual jsoncons::span<uint8_t> array_buffer(); 
+        virtual void to_end_array(); 
+        virtual bool is_multi_dim() const;
+        virtual mdarray_order order() const;
+        virtual jsoncons::span<const std::size_t> extents() const;
+        template <typename T>
+        void read_typed_array(T& v);
+
 Release 1.7.0
 -------------
 

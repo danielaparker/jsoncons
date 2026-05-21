@@ -305,6 +305,21 @@ public:
     {
     }
 
+    virtual bool is_multi_dim() const
+    {
+        return false;
+    }
+
+    virtual jsoncons::span<const std::size_t> extents() const
+    {
+        return jsoncons::span<const std::size_t>{};
+    }
+
+    virtual mdarray_order order() const
+    {
+        return mdarray_order{};
+    }
+
     template <typename T>
     typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
     read_typed_array(T& v)

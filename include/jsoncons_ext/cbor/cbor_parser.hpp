@@ -235,17 +235,17 @@ public:
         return is_typed_array_;
     }
 
-    bool is_multi_dim() const
-    {
-        return is_multi_dim_;
-    }
-
     mdarray_order order() const
     {
         return order_;
     }
 
-    jsoncons::span<const std::size_t> extents() const
+    bool is_multi_dim() const
+    {
+        return is_multi_dim_;
+    }
+
+    jsoncons::span<const std::size_t> extents() const 
     {
         return jsoncons::span<const std::size_t>(extents_.data(), extents_.size());
     }

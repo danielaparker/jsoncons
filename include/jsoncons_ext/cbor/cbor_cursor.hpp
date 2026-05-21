@@ -183,6 +183,21 @@ public:
         parser_.to_end_array();
     }
 
+    bool is_multi_dim() const final
+    {
+        return parser_.is_multi_dim();
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return parser_.extents();
+    }
+
+    mdarray_order order() const final
+    {
+        return parser_.order();
+    }
+
     const staj_event& current() const override
     {
         return cursor_visitor_.event();
