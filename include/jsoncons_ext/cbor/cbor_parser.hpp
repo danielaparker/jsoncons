@@ -145,7 +145,7 @@ class basic_cbor_parser : public ser_context
     std::size_t rank_{0};
     mdarray_order order_{};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
-    typed_array_tags element_type_{};
+    typed_array_tags array_tag_{};
     semantic_tag typed_array_tag_{};
     byte_string_type array_buffer_;
     std::vector<std::size_t> extents_;
