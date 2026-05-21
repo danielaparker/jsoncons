@@ -39,7 +39,9 @@ master
         `basic_json(json_ref_arg_t, basic_json& ref) noexcept;`
 
     - Since 1.8.0, the `basic_json` copy constructor makes a deep copy of any `const_json_ref`
-    and `json_ref` pointers it may hold. Until 1.8.0, it made a shallow copy. 
+    and `json_ref` pointers it may hold. Until 1.8.0, it made a shallow copy. With
+    this change, the `basic_json::deep_copy()` function is no longer needed, and has been
+    deprecated.
 
 Enhancements:
 
