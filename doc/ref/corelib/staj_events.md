@@ -28,9 +28,10 @@ allows us to write e.g.
 
 ```cpp
 constexpr auto mask = staj_events::begin_array | staj_events::begin_object;
-if ((event_type & mask) != staj_events{}) 
+
+if ((event & mask) != staj_events{}) 
 {
-    /*...*/
+    // Process begin_array and begin_object_events
 }
 ```  
 
