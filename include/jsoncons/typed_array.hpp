@@ -25,7 +25,7 @@
 
 namespace jsoncons {
 
-enum class typed_array_element_types
+enum class typed_array_tags
 {
     uint8 = 1,
     uint16 = 2,
@@ -41,35 +41,35 @@ enum class typed_array_element_types
 };
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr typed_array_element_types
-operator|(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
-{ return (typed_array_element_types)((uint64_t)lhs | (uint64_t)rhs); }
+constexpr typed_array_tags
+operator|(typed_array_tags lhs, typed_array_tags rhs) noexcept
+{ return (typed_array_tags)((uint64_t)lhs | (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr typed_array_element_types
-operator&(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
-{ return (typed_array_element_types)((uint64_t)lhs & (uint64_t)rhs); }
+constexpr typed_array_tags
+operator&(typed_array_tags lhs, typed_array_tags rhs) noexcept
+{ return (typed_array_tags)((uint64_t)lhs & (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr typed_array_element_types
-operator^(typed_array_element_types lhs, typed_array_element_types rhs) noexcept
-{ return (typed_array_element_types)((uint64_t)lhs ^ (uint64_t)rhs); }
+constexpr typed_array_tags
+operator^(typed_array_tags lhs, typed_array_tags rhs) noexcept
+{ return (typed_array_tags)((uint64_t)lhs ^ (uint64_t)rhs); }
 
 JSONCONS_ATTRIBUTE_NODISCARD
-constexpr typed_array_element_types
-operator~(typed_array_element_types types) noexcept
-{ return (typed_array_element_types)~(uint64_t)types; }
+constexpr typed_array_tags
+operator~(typed_array_tags types) noexcept
+{ return (typed_array_tags)~(uint64_t)types; }
 
-constexpr typed_array_element_types&
-operator|=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+constexpr typed_array_tags&
+operator|=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr typed_array_element_types&
-operator&=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+constexpr typed_array_tags&
+operator&=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr typed_array_element_types&
-operator^=(typed_array_element_types& lhs, typed_array_element_types rhs) noexcept
+constexpr typed_array_tags&
+operator^=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs ^ rhs; }
 
 template <typename T>

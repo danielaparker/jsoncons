@@ -168,9 +168,9 @@ public:
         return parser_.is_typed_array();
     }
 
-    typed_array_element_types element_type() const final
+    typed_array_tags array_tag() const final
     {
-        return parser_.element_type();
+        return parser_.array_tag();
     }
 
     jsoncons::span<uint8_t> array_buffer() final
