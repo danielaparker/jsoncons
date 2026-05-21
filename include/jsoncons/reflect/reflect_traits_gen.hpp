@@ -1558,7 +1558,10 @@ namespace reflect { \
 #define JSONCONS_ALL_GETTER_SETTER_AS(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Count) { \
-  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, ajson, object_names<value_type,char_type>::Property()); \
+  auto it = ajson.find(object_names<value_type,char_type>::Property()); \
+  if (it == ajson.object_range().end()) \
+    {return result_type(unexpect, conv_errc::missing_required_member, # Prefix "::" # Property);} \
+  auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, it->value()); \
   if (!result) {return result_type(jsoncons::unexpect, result.error().code(), # Prefix "::" # Property);} \
   class_instance.Setter(std::move(* result)); \
 }
