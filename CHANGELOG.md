@@ -37,7 +37,7 @@ master
         `basic_json(const_json_ref_arg_t, const basic_json& ref) noexcept;`
 
         `basic_json(json_ref_arg_t, basic_json& ref) noexcept;`
- 
+
 Release 1.7.0
 -------------
 
