@@ -300,7 +300,7 @@ void read_to_cbor_visitor()
 
 int main()
 {
-    std::cout << "\ncbor typed array examples\n\n";
+    std::cout << "\ncbor Typed Array examples\n\n";
     decode_float64_big_endian_array();
     decode_mult_dim_row_major();
     encode_mult_dim_array();

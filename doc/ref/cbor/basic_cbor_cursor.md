@@ -284,7 +284,7 @@ Graham Greene
 
 ### Typed Array examples
 
-#### Read a typed array
+#### Read a Typed Array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -354,7 +354,7 @@ d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e
 40
 ```
 
-#### Navigating Typed Arrays with cursor - multi-dimensional row major with typed array
+#### Navigating Typed Arrays with cursor - multi-dimensional row major with Typed Array
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 

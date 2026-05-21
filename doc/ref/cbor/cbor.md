@@ -105,7 +105,7 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 ## Examples
 
 [Working with CBOR data](#A1)  
-[Encode and decode of a large typed array](#A2)  
+[Encode and decode of a large Typed Array](#A2)  
 [CBOR and basic_json](#A3)  
 [Byte string with unknown CBOR tag (unknown to jsoncons)](#A4)  
 [Query CBOR with JSONPath](#A5)  
@@ -357,7 +357,7 @@ string_value: 1.23456789012345678901234567890 (bigdec)
 
 <div id="A2"/> 
 
-### Encode and decode of a large typed array
+### Encode and decode of a large Typed Array
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
