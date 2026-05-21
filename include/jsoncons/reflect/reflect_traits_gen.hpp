@@ -58,23 +58,6 @@ struct json_traits_helper
     using string_view_type = typename Json::string_view_type;
 
     template <typename T,typename Alloc,typename TempAlloc> 
-    static conversion_result<T> try_get_value(const allocator_set<Alloc,TempAlloc>& aset, 
-        const Json& j, string_view_type key) 
-    { 
-        auto it = j.find(key);
-        if (it == j.object_range().end())
-        {
-            return conversion_result<T>(unexpect, conv_errc::missing_required_member);
-        }
-        auto result = it->value().template try_as<T>(aset); 
-        if (!result)
-        {
-            return conversion_result<T>(unexpect, result.error());
-        }
-        return conversion_result<T>(std::move(*result));
-    } 
-
-    template <typename T,typename Alloc,typename TempAlloc> 
     static conversion_result<T> try_as_value(const allocator_set<Alloc,TempAlloc>& aset, 
         const Json& j) 
     { 
@@ -952,8 +935,12 @@ namespace reflect { \
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, , )
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_MATCH_6(Getter, Name, Mode, Match, Into, From) { \
-  auto result = json_traits_helper<Json>::template try_get_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, ajson, Name); \
-  if (result && !Match(* result)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+  auto it = ajson.find(Name); \
+  if (it != ajson.object_range().end()) \
+  { \
+    auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, it->value()); \
+    if (result && !Match(* result)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+  } \
 }
 
 #define JSONCONS_COMMA ,

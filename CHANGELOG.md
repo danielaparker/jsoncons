@@ -1,7 +1,23 @@
 master
 ------
 
-- Changes
+- Fixed bugs:
+
+  - Git Issue #709: JSONCONS_N_MEMBER_TRAITS silently swallows mandatory-field errors when nested inside an optional parent member
+
+  - Git Issue #702/ PR #703: JMESPath - Merge function can't merge when receiving a json_const_ref
+
+  - Git PR #707: Nested CBOR Parser Fix
+
+  - Git PR #705: JMESPath - Sort and sort_by functions can't sort when receiving a json_const_ref
+
+  - Git PR #704: JMESPath Support rhs expression in multi_select_list
+
+  - Git PR #701: Don't write extra value after some CBOR epoch timestamps
+
+  - Git PR #700: Fix bad multiplier when writing some BSON datetimes
+
+- Changes:
 
     - The types `json_pointer_arg_t` and `json_const_pointer_arg_t` and the
     constants `json_pointer_arg` and `json_const_pointer_arg` have been 
