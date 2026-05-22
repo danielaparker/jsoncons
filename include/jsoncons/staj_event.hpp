@@ -493,7 +493,11 @@ private:
             case staj_events::string_value:
             {
                 double val{0};
-                jsoncons::decstr_to_double(value_.string_data_, length_, val);
+                auto result = jsoncons::decstr_to_double(value_.string_data_, length_, val);
+                if (!result)
+                {
+                    ec = conv_errc::not_double;
+                }
                 return val;
             }
             case staj_events::double_value:
