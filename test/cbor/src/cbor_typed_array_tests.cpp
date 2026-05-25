@@ -962,7 +962,7 @@ TEST_CASE("cbor multi-dim Typed Array cursor tests")
     }
 }
 
-TEST_CASE("cbor multi-dim parse tests")
+TEST_CASE("cbor multi-dim regular array tests")
 {
     SECTION("row major")
     {
@@ -1073,5 +1073,44 @@ TEST_CASE("cbor multi-dim cursor tests")
             const auto& event = cursor.current();
             std::cout << event.event_type() << " " << event.tag() << std::endl;
         }
+    }
+}
+
+TEST_CASE("multi-dim regular array and typed array")
+{
+    SECTION("test 1")
+    {
+        auto expected = jsoncons::json::parse(R"(
+[[40000.0,40000.0,40000.0,40000.0],[50000.0]]
+        )");
+
+        std::vector<uint8_t> data = {
+            0x9f, // array open
+
+            // 2x2 matrix (values as floats):
+            0xd8, 0x28, 0x82, 0x82, 0x02, 0x02, 0x84, // header
+            0xfa, 0x47, 0x1c, 0x40, 0x00,
+            0xfa, 0x47, 0x1c, 0x40, 0x00,
+            0xfa, 0x47, 0x1c, 0x40, 0x00,
+            0xfa, 0x47, 0x1c, 0x40, 0x00,
+
+            // double tagged array [50000.0]:
+            0xd8, 0x56, 0x58, 0x08, // Header
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x6a, 0xe8, 0x40,
+
+            0xff, // array close
+        };
+        std::error_code ec;
+
+        std::cout << "\n\n";
+        jsoncons::json_decoder<json> decoder;
+
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        REQUIRE(decoder.is_valid());
+        json result = decoder.get_result();
+
+        REQUIRE(expected == result);
     }
 }
