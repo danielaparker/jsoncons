@@ -141,7 +141,6 @@ class basic_cbor_parser : public ser_context
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    bool is_typed_array_{false};
     mdarray_order order_{};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
     typed_array_tags array_tag_{};
@@ -231,7 +230,7 @@ public:
 
     bool is_typed_array() const
     {
-        return is_typed_array_;
+        return state_stack_.back().mode == parse_mode::typed_array;
     }
 
     mdarray_order order() const
@@ -313,7 +312,6 @@ public:
 
     void to_end_array()
     {
-        is_typed_array_ = false;
         order_ = mdarray_order{};
         state_stack_.pop_back();
     }
@@ -443,7 +441,7 @@ public:
 private:
     void read_item(item_event_visitor& visitor, std::error_code& ec)
     {
-        if (is_typed_array_)
+        if (is_typed_array())
         {
             if (!typed_array_iter_->done())
             {
@@ -452,7 +450,6 @@ private:
 
                 if (typed_array_iter_->done())
                 {
-                    is_typed_array_ = false;
                     state_stack_.pop_back();
                 }
             }
@@ -1703,7 +1700,6 @@ private:
                 }
                 case 0x40:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::uint8;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1734,7 +1730,6 @@ private:
                 }
                 case 0x44:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::uint8;
                     typed_array_tag_ = semantic_tag::clamped;
                     array_buffer_.clear();
@@ -1767,7 +1762,6 @@ private:
                 case 0x41:
                 case 0x45:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::uint16;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1808,7 +1802,6 @@ private:
                 case 0x42:
                 case 0x46:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::uint32;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1849,7 +1842,6 @@ private:
                 case 0x43:
                 case 0x47:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::uint64;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1889,7 +1881,6 @@ private:
                 }
                 case 0x48:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::int8;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1921,7 +1912,6 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::int16;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -1962,7 +1952,6 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::int32;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2003,7 +1992,6 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::int64;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2044,7 +2032,6 @@ private:
                 case 0x50:
                 case 0x54:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::half_float;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2085,7 +2072,6 @@ private:
                 case 0x51:
                 case 0x55:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::float32;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
@@ -2126,7 +2112,6 @@ private:
                 case 0x52:
                 case 0x56:
                 {
-                    is_typed_array_ = true;
                     array_tag_ = typed_array_tags::float64 ;
                     array_buffer_.clear();
                     read(array_buffer_,ec);
