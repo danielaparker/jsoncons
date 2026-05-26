@@ -689,11 +689,11 @@ private:
                             break;
                         case 40: // row major storage
                             order_ = mdarray_order::row_major;
-                            produce_begin_multi_dim(ec);
+                            read_mdarray_header(ec);
                             break;
                         case 1040: // column major storage
                             order_ = mdarray_order::column_major;
-                            produce_begin_multi_dim(ec);
+                            read_mdarray_header(ec);
                             break;
                         default:
                             begin_array(visitor, info, ec);
@@ -2176,7 +2176,7 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(std::error_code& ec)
+    void read_mdarray_header(std::error_code& ec)
     {
         uint8_t b;
         if (source_.read(&b, 1) == 0)
@@ -2194,6 +2194,8 @@ private:
         {
             return;
         }
+
+
 
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
     }
