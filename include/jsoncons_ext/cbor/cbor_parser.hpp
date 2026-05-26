@@ -36,6 +36,95 @@ namespace cbor {
 
 enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
+template <typename CharT>
+class row_major_reader 
+{
+public:
+    using json_visitor_type = basic_json_visitor<CharT>;
+private:
+
+    std::vector<mdarray_dimension> dimensions_;
+    semantic_tag tag_{};
+    std::size_t dim_{0};
+    bool first_{true};
+    bool done_{false};
+public:
+    row_major_reader(jsoncons::span<const std::size_t> extents)
+        : dimensions_(extents.size(), mdarray_dimension{})
+    {
+        std::vector<std::size_t> strides(extents.size(), 0);
+        std::size_t stride = 1;
+        const size_t num_extents = extents.size();
+        for (size_t i = 0; i < num_extents; ++i)
+        {
+            strides[num_extents - i - 1] = stride;
+            stride *= extents[num_extents - i - 1];
+        }
+        for (std::size_t i = 0; i < strides.size(); ++i)
+        {
+            dimensions_[i].extent = extents[i];
+            dimensions_[i].stride = strides[i];
+            dimensions_[i].index = 0;
+            dimensions_[i].end = strides[i] * extents[i];
+        }
+    }
+
+    bool done() const 
+    {
+        return done_;
+    }
+
+    void next(json_visitor_type& visitor, const ser_context& context, 
+        std::error_code& ec) 
+    {
+        JSONCONS_ASSERT(!dimensions_.empty());
+
+        if (dim_ == 0)
+        {
+            if (first_)
+            {
+                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
+                first_ = false;
+                return;
+            }
+            if (dimensions_[dim_].index == dimensions_[dim_].end)
+            {
+                visitor.end_array(context, ec);
+                done_ = true;
+                return;
+            }
+        }
+        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
+        {
+            visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
+            ++dim_;
+            return;
+        }
+        if (dimensions_[dim_].index < dimensions_[dim_].end)
+        {
+            dimensions_[dim_].index += dimensions_[dim_].stride;
+            return;
+        }
+        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
+        {
+            visitor.end_array(context, ec);
+            if (dim_ > 0)
+            {
+                --dim_;
+                dimensions_[dim_].index += dimensions_[dim_].stride;
+                if (dimensions_[dim_].index < dimensions_[dim_].end)
+                {
+                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
+                    {
+                        dimensions_[i].index = dimensions_[i-1].index;
+                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
+                    }
+                }
+            }
+        }
+    }
+};
+
 struct parse_state 
 {
     parse_mode mode; 
@@ -329,14 +418,29 @@ public:
                 }
                 case parse_mode::array:
                 {
-                    if (state_stack_.back().index < state_stack_.back().length)
+                    if (is_multi_dim() && order_ == mdarray_order::row_major)
                     {
-                        ++state_stack_.back().index;
-                        read_item(visitor, ec);
+                        if (state_stack_.back().index < state_stack_.back().length)
+                        {
+                            ++state_stack_.back().index;
+                            read_item(visitor, ec);
+                        }
+                        else
+                        {
+                            end_array(visitor, ec);
+                        }
                     }
                     else
                     {
-                        end_array(visitor, ec);
+                        if (state_stack_.back().index < state_stack_.back().length)
+                        {
+                            ++state_stack_.back().index;
+                            read_item(visitor, ec);
+                        }
+                        else
+                        {
+                            end_array(visitor, ec);
+                        }
                     }
                     break;
                 }
@@ -756,6 +860,22 @@ private:
         --nesting_depth_;
 
         visitor.end_array(*this, ec);
+        more_ = !cursor_mode_;
+        if (level() == mark_level_)
+        {
+            more_ = false;
+        }
+        if (state_stack_.back().pop_stringref_map_stack)
+        {
+            stringref_map_stack_.pop_back();
+        }
+        state_stack_.pop_back();
+    }
+
+    void end_row_major_storage(std::error_code& ec)
+    {
+        --nesting_depth_;
+
         more_ = !cursor_mode_;
         if (level() == mark_level_)
         {
