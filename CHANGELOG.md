@@ -3,6 +3,10 @@ master
 
 - Fixed bugs:
 
+  - Git Issue #712/PR #713: quieten GCC 16 (spurious?) array-out-of-bounds warning
+
+  - Git PR #711: Fix staj_event::as_double silently returning 0 for non-numeric strings
+
   - Git Issue #709: JSONCONS_N_MEMBER_TRAITS silently swallows mandatory-field errors when nested inside an optional parent member
 
   - Git Issue #702/ PR #703: JMESPath - Merge function can't merge when receiving a json_const_ref
@@ -43,16 +47,21 @@ master
     this change, the `basic_json::deep_copy()` function is no longer needed, and has been
     deprecated.
 
+    - The (undocumented but sometimes useful) class `basic_json_diagnostics_visitor` has
+    been renamed to `basic_diagnostics_json_visitor`, and its header `diagnostics_visitor.hpp`
+    to `diagnostics_json_visitor.hpp`. Rationale: naming consistency.
+
 Enhancements:
 
-  - The following functions have been added to `basic_staj_cursor` to support
-  multi-dimensional array input:
+  - The following virtual functions have been added to `basic_staj_cursor`,
+  with specializations provided by `basic_cbor_cursor`,  to support multi-dimensional array input:
 
         virtual bool is_mult_dim() const;
         virtual jsoncons::span<const std::size_t> extents() const;
         virtual mdarray_order order() const;
 
-  - The following functions have been added to `basic_staj_cursor` to support
+  - The following virtual functions have been added to `basic_staj_cursor`,
+  with specializations provided by `basic_cbor_cursor`, to support
   typed array input:
 
         virtual bool is_typed_array() const;
@@ -60,6 +69,10 @@ Enhancements:
         virtual jsoncons::span<uint8_t> array_buffer(); 
         virtual void to_end_array(); 
         template <typename T>
+
+  - The following function has been added to `basic_staj_cursor` to support
+  typed array input:
+
         void read_typed_array(T& v);
 
 Release 1.7.0
