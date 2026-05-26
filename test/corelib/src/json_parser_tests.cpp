@@ -287,7 +287,7 @@ TEST_CASE("test_diagnostics_visitor", "")
     SECTION("narrow char")
     {
         std::ostringstream os;
-        json_diagnostics_visitor visitor(os, "  ");
+        diagnostics_json_visitor visitor(os, "  ");
         json_parser parser;
         std::string input(R"({"foo":[42,null]})");
         parser.update(input.data(), input.size());
@@ -306,7 +306,7 @@ TEST_CASE("test_diagnostics_visitor", "")
     SECTION("wide char")
     {
         std::wostringstream os;
-        wjson_diagnostics_visitor visitor(os, L"  ");
+        wdiagnostics_json_visitor visitor(os, L"  ");
         wjson_parser parser;
         std::wstring input(LR"({"foo":[42,null]})");
         parser.update(input.data(), input.size());

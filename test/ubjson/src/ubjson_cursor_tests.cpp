@@ -268,10 +268,10 @@ TEST_CASE("ubjson_parser reset", "")
     }
 }
 
-TEST_CASE("ubjson_parser with json_diagnostics_visitor", "")
+TEST_CASE("ubjson_parser with diagnostics_json_visitor", "")
 {
     std::ostringstream os;
-    json_diagnostics_visitor visitor(os, "  ");
+    diagnostics_json_visitor visitor(os, "  ");
     std::vector<uint8_t> input{
         '{',
             'U',3,'f','o','o',

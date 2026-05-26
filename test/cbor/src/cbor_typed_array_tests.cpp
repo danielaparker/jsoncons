@@ -1081,7 +1081,7 @@ TEST_CASE("multi-dim regular array and typed array")
     SECTION("test 1")
     {
         auto expected = jsoncons::json::parse(R"(
-[[40000.0,40000.0,40000.0,40000.0],[50000.0]]
+[[[40000.0,40000.0],[40000.0,40000.0]],[50000.0]]
         )");
 
         std::vector<uint8_t> data = {

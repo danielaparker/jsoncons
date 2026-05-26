@@ -36,11 +36,14 @@ namespace cbor {
 
 enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
-template <typename CharT>
-class row_major_reader 
+template <typename Source,typename Allocator>
+class basic_cbor_parser;
+
+template <typename Source, typename Allocator>
+class mdarray_row_major_reader 
 {
 public:
-    using json_visitor_type = basic_json_visitor<CharT>;
+    using json_visitor_type = item_event_visitor;
 private:
 
     std::vector<mdarray_dimension> dimensions_;
@@ -48,9 +51,16 @@ private:
     std::size_t dim_{0};
     bool first_{true};
     bool done_{false};
+    basic_cbor_parser<Source,Allocator>* parser_;
 public:
-    row_major_reader(jsoncons::span<const std::size_t> extents)
-        : dimensions_(extents.size(), mdarray_dimension{})
+    mdarray_row_major_reader()
+        : done_(true), parser_(nullptr)
+    {
+    }
+    mdarray_row_major_reader(jsoncons::span<const std::size_t> extents,
+        basic_cbor_parser<Source,Allocator>* parser)
+        : dimensions_(extents.size(), mdarray_dimension{}),
+          parser_(parser)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         std::size_t stride = 1;
@@ -102,6 +112,7 @@ public:
         }
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
+            parser_->read_item(visitor, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
             return;
         }
@@ -238,6 +249,7 @@ class basic_cbor_parser : public ser_context
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
+    mdarray_row_major_reader<Source,Allocator> row_major_reader_;
 
     struct read_byte_string_from_buffer
     {
@@ -420,14 +432,19 @@ public:
                 {
                     if (is_multi_dim() && order_ == mdarray_order::row_major)
                     {
-                        if (state_stack_.back().index < state_stack_.back().length)
+                        if (!row_major_reader_.done())
                         {
-                            ++state_stack_.back().index;
-                            read_item(visitor, ec);
+                            row_major_reader_.next(visitor, *this, ec);
                         }
                         else
                         {
-                            end_array(visitor, ec);
+                            if (state_stack_.back().index != state_stack_.back().length)
+                            {
+                                std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
+                                //ec = cbor_errc::bad_mdarray;
+                                //return;
+                            }
+                            end_row_major_storage(ec);
                         }
                     }
                     else
@@ -442,11 +459,6 @@ public:
                             end_array(visitor, ec);
                         }
                     }
-                    break;
-                }
-                case parse_mode::typed_array:
-                {
-                    read_item(visitor, ec);
                     break;
                 }
                 case parse_mode::indefinite_array:
@@ -467,6 +479,11 @@ public:
                     {
                         read_item(visitor, ec);
                     }
+                    break;
+                }
+                case parse_mode::typed_array:
+                {
+                    read_typed_array_item(visitor, ec);
                     break;
                 }
                 case parse_mode::map_key:
@@ -534,23 +551,23 @@ public:
             }
         }
     }
-private:
+
+    void read_typed_array_item(item_event_visitor& visitor, std::error_code& ec)
+    {
+        if (!typed_array_iter_->done())
+        {
+            typed_array_iter_->next(visitor, *this, ec);
+            more_ = !cursor_mode_;
+
+            if (typed_array_iter_->done())
+            {
+                state_stack_.pop_back();
+            }
+        }
+    }
+
     void read_item(item_event_visitor& visitor, std::error_code& ec)
     {
-        if (is_typed_array())
-        {
-            if (!typed_array_iter_->done())
-            {
-                typed_array_iter_->next(visitor, *this, ec);
-                more_ = !cursor_mode_;
-
-                if (typed_array_iter_->done())
-                {
-                    state_stack_.pop_back();
-                }
-            }
-            return;
-        }
         read_tags(ec);
         if (JSONCONS_UNLIKELY(ec))
         {
@@ -813,6 +830,7 @@ private:
         }
         other_tags_[item_tag] = false;
     }
+private:
 
     void begin_array(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
     {
@@ -872,7 +890,45 @@ private:
         state_stack_.pop_back();
     }
 
-    void end_row_major_storage(std::error_code& ec)
+    void begin_row_major_storage(uint8_t info, std::error_code& ec)
+    {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        {
+            ec = cbor_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        }
+        bool pop_stringref_map_stack = false;
+        if (other_tags_[stringref_namespace_tag])
+        {
+            stringref_map_stack_.emplace_back();
+            other_tags_[stringref_namespace_tag] = false;
+            pop_stringref_map_stack = true;
+        }
+        switch (info)
+        {
+            case jsoncons::cbor::detail::additional_info::indefinite_length:
+            {
+                state_stack_.emplace_back(parse_mode::indefinite_array, 0, pop_stringref_map_stack);
+                more_ = !cursor_mode_;
+                source_.ignore(1);
+                break;
+            }
+            default: // definite length
+            {
+                std::size_t len = read_size(ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                state_stack_.emplace_back(parse_mode::array, len, pop_stringref_map_stack);
+                more_ = !cursor_mode_;
+                break;
+            }
+        }
+    }
+
+    void end_row_major_storage(std::error_code&)
     {
         --nesting_depth_;
 
@@ -2324,7 +2380,11 @@ private:
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
         ++state_stack_.back().index;
 
-        if (major_type == jsoncons::cbor::detail::cbor_major_type::array)
+        if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::row_major)
+        {
+            begin_row_major_storage(info, ec);
+        }
+        else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major)
         {
             begin_array(visitor, info, ec);
         }
@@ -2342,6 +2402,7 @@ private:
             ec = cbor_errc::bad_mdarray;
             return;
         }
+        row_major_reader_ = mdarray_row_major_reader<Source,Allocator>(extents_, this);
     }
 
     void read_extents(uint8_t info, std::error_code& ec)
