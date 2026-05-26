@@ -152,6 +152,35 @@ TEST_CASE("encode decode csv source")
     }
 }
 
+TEST_CASE("decode_csv non-numeric string into double reports error")
+{
+    // Regression test for staj_event::as_double silently returning 0.0
+    // when a string_value event is decoded into a floating-point type.
+    // Introduced in caacd258a ("Remove chars_to, replace with to_double"):
+    // the new to_double API's return code was not propagated to ec, so
+    // non-numeric and empty cells were coerced to 0.0 without error.
+    using cpp_type = std::vector<std::vector<double>>;
+    auto options = csv::csv_options{}
+        .mapping_kind(csv::csv_mapping_kind::n_rows)
+        .assume_header(false);
+
+    SECTION("non-numeric token")
+    {
+        std::string s = "hey\n";
+        auto result = csv::try_decode_csv<cpp_type>(s, options);
+        REQUIRE(!result); //-V521
+        REQUIRE_THROWS(csv::decode_csv<cpp_type>(s, options));
+    }
+
+    SECTION("empty trailing field")
+    {
+        std::string s = "0,\n";
+        auto result = csv::try_decode_csv<cpp_type>(s, options);
+        REQUIRE(!result); //-V521
+        REQUIRE_THROWS(csv::decode_csv<cpp_type>(s, options));
+    }
+}
+
 
 namespace
 {
