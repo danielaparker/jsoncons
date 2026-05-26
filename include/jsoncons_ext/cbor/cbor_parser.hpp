@@ -51,6 +51,7 @@ private:
     std::size_t dim_{0};
     bool first_{true};
     bool done_{false};
+    std::size_t count_{0};
     basic_cbor_parser<Source,Allocator>* parser_;
 public:
     mdarray_row_major_reader()
@@ -84,6 +85,11 @@ public:
         return done_;
     }
 
+    std::size_t count() const
+    {
+        return count_;
+    }
+
     void next(json_visitor_type& visitor, const ser_context& context, 
         std::error_code& ec) 
     {
@@ -114,6 +120,7 @@ public:
         {
             parser_->read_item(visitor, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
+            ++count_;
             return;
         }
         if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
@@ -438,11 +445,11 @@ public:
                         }
                         else
                         {
-                            if (state_stack_.back().index != state_stack_.back().length)
+                            if (row_major_reader_.count() != state_stack_.back().length)
                             {
-                                std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
-                                //ec = cbor_errc::bad_mdarray;
-                                //return;
+                                //std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
+                                ec = cbor_errc::bad_mdarray;
+                                return;
                             }
                             end_row_major_storage(ec);
                         }
@@ -463,21 +470,51 @@ public:
                 }
                 case parse_mode::indefinite_array:
                 {
-                    auto c = source_.peek();
-                    if (JSONCONS_UNLIKELY(c.eof))
+                    if (is_multi_dim() && order_ == mdarray_order::row_major)
                     {
-                        ec = cbor_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-                    if (c.value == 0xff)
-                    {
-                        source_.ignore(1);
-                        end_array(visitor, ec);
+                        if (!row_major_reader_.done())
+                        {
+                            row_major_reader_.next(visitor, *this, ec);
+                        }
+                        else
+                        {
+                            auto c = source_.peek();
+                            if (JSONCONS_UNLIKELY(c.eof))
+                            {
+                                ec = cbor_errc::unexpected_eof;
+                                more_ = false;
+                                return;
+                            }
+                            if (c.value == 0xff)
+                            {
+                                source_.ignore(1);
+                            }
+                            else
+                            {
+                                ec = cbor_errc::bad_mdarray;
+                                return;
+                            }
+                            end_row_major_storage(ec);
+                        }
                     }
                     else
                     {
-                        read_item(visitor, ec);
+                        auto c = source_.peek();
+                        if (JSONCONS_UNLIKELY(c.eof))
+                        {
+                            ec = cbor_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
+                        if (c.value == 0xff)
+                        {
+                            source_.ignore(1);
+                            end_array(visitor, ec);
+                        }
+                        else
+                        {
+                            read_item(visitor, ec);
+                        }
                     }
                     break;
                 }
@@ -2357,7 +2394,7 @@ private:
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
         uint8_t info = get_additional_information_value(b);
        
-        read_extents(info, ec);   
+        read_extents(ec);   
         if (JSONCONS_UNLIKELY(ec))
         {
             return;
@@ -2405,9 +2442,19 @@ private:
         row_major_reader_ = mdarray_row_major_reader<Source,Allocator>(extents_, this);
     }
 
-    void read_extents(uint8_t info, std::error_code& ec)
+    void read_extents(std::error_code& ec)
     {
         extents_.clear();
+
+        auto b = source_.peek();
+        if (JSONCONS_UNLIKELY(b.eof))
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        uint8_t info = get_additional_information_value(b.value);
+
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
@@ -2424,6 +2471,7 @@ private:
                     if (c.value == 0xff)
                     {
                         source_.ignore(1);
+                        return;
                     }
                     else
                     {
