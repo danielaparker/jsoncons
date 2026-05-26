@@ -72,9 +72,9 @@ public:
             case cbor_errc::illegal_chunked_string:
                 return "An illegal type was found while parsing an indefinite length string";
             case cbor_errc::bad_mdarray:
-                return "Product of extents does not match number of elements.";
+                return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
-                return "Extent is zero or product of extents is too large.";
+                return "Product of extents does not match number of elements.";
             default:
                 return "Unknown CBOR parser error";
         }

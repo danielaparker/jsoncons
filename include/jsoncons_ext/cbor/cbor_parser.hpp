@@ -324,15 +324,7 @@ public:
             {
                 case parse_mode::multi_dim:
                 {
-                    if (state_stack_.back().index == 0)
-                    {
-                        ++state_stack_.back().index;
-                        read_item(visitor, ec);
-                    }
-                    else
-                    {
-                        state_stack_.pop_back();
-                    }
+                    state_stack_.pop_back();
                     break;
                 }
                 case parse_mode::array:
@@ -689,11 +681,11 @@ private:
                             break;
                         case 40: // row major storage
                             order_ = mdarray_order::row_major;
-                            read_mdarray_header(ec);
+                            read_mdarray_header(visitor, ec);
                             break;
                         case 1040: // column major storage
                             order_ = mdarray_order::column_major;
-                            read_mdarray_header(ec);
+                            read_mdarray_header(visitor, ec);
                             break;
                         default:
                             begin_array(visitor, info, ec);
@@ -1713,7 +1705,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1744,7 +1736,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1784,7 +1776,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1824,7 +1816,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1864,7 +1856,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1894,7 +1886,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1934,7 +1926,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -1974,7 +1966,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -2014,7 +2006,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -2054,7 +2046,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -2094,7 +2086,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -2134,7 +2126,7 @@ private:
                     {
                         if (mdarray_size_ != ta.size())
                         {
-                            ec = cbor_errc::bad_mdarray;
+                            ec = cbor_errc::bad_extents;
                             more_ = false;
                             return;
                         }
@@ -2176,7 +2168,7 @@ private:
         }
     }
 
-    void read_mdarray_header(std::error_code& ec)
+    void read_mdarray_header(item_event_visitor& visitor, std::error_code& ec)
     {
         uint8_t b;
         if (source_.read(&b, 1) == 0)
@@ -2195,9 +2187,41 @@ private:
             return;
         }
 
-
-
+        read_tags(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return;
+        }
+        auto c = source_.peek();
+        if (JSONCONS_UNLIKELY(c.eof))
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        major_type = get_major_type(c.value);
+        info = get_additional_information_value(c.value);
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
+        ++state_stack_.back().index;
+
+        if (major_type == jsoncons::cbor::detail::cbor_major_type::array)
+        {
+            begin_array(visitor, info, ec);
+        }
+        else if (major_type == jsoncons::cbor::detail::cbor_major_type::byte_string)
+        {
+            read_byte_string_from_source read(this);
+            read_byte_string(read, visitor, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+        }
+        else
+        {
+            ec = cbor_errc::bad_mdarray;
+            return;
+        }
     }
 
     void read_extents(uint8_t info, std::error_code& ec)
