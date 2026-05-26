@@ -10,7 +10,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/diagnostics_visitor.hpp>
+#include <jsoncons/diagnostics_json_visitor.hpp>
 
 #include <catch/catch.hpp>
 #include <sstream>

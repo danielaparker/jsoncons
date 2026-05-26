@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DIAGNOSTICS_VISITOR_HPP
-#define JSONCONS_DIAGNOSTICS_VISITOR_HPP
+#ifndef JSONCONS_DIAGNOSTICS_JSON_VISITOR_HPP
+#define JSONCONS_DIAGNOSTICS_JSON_VISITOR_HPP
 
 #include <cstddef>
 #include <cstdint>

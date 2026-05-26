@@ -7,7 +7,7 @@
 
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/diagnostics_visitor.hpp>
+#include <jsoncons/diagnostics_json_visitor.hpp>
 
 #include <sstream>
 #include <vector>

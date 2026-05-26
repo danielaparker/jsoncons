@@ -5,7 +5,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons/diagnostics_visitor.hpp>
+#include <jsoncons/diagnostics_json_visitor.hpp>
 #include <sstream>
 #include <iostream>
 #include <vector>
