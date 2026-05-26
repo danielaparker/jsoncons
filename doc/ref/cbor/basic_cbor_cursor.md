@@ -29,31 +29,30 @@ cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
 
-[staj_cursor](staj_cursor.md)
+[basic_staj_cursor](../corelib/staj_cursor.md)
 
 #### Constructors
 
     basic_cbor_cursor(Sourceable&& source,
-                      const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator& alloc = Allocator()); (1)
+        const cbor_decode_options& options = cbor_decode_options(),   (1)
+        const Allocator& alloc = Allocator()); 
 
     template <typename Sourceable>
-    basic_cbor_cursor(Sourceable&& source, 
-                      std::error_code& ec); (2)
+    basic_cbor_cursor(Sourceable&& source, std::error_code& ec);      (2)
 
     template <typename Sourceable>
-    basic_cbor_cursor(Sourceable&& source, 
-                      const cbor_decode_options& options,
-                      std::error_code& ec); (3)
+    basic_cbor_cursor(Sourceable&& source,                            (3)
+        const cbor_decode_options& options,                          
+        std::error_code& ec); 
 
     template <typename Sourceable>
     basic_cbor_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Sourceable&& source,
-                      const cbor_decode_options& options,
-                      std::error_code& ec); (4)
+        Sourceable&& source,                                          (4)
+        const cbor_decode_options& options,
+        std::error_code& ec); 
 
 Constructors (1) reads from a buffer or stream source and throws a 
-[ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
+[ser_error](../corelib/ser_error.md) if a parsing error is encountered while processing the initial event.
 
 Constructors (2)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
@@ -70,38 +69,64 @@ as `basic_cbor_cursor` holds a pointer to but does not own this object.
     uint64_t raw_tag() const;      // (since 1.2.0)
 Returns the CBOR tag associated with the current value
 
-    bool done() const override;
-Checks if there are no more events.
+    void read_to(json_visitor& visitor) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
-    const staj_event& current() const override;
-Returns the current [staj_event](basic_staj_event.md).
+    void read_to(json_visitor& visitor, std::error_code& ec) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, sets `ec`.
 
-    void read_to(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
-[visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
+#### staj_event input
 
-    void read_to(json_visitor& visitor, std::error_code& ec) override
-Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
-[visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, sets `ec`.
+    bool done() const final;
+Check if there are no more events.
 
-    void next() override;
-Advances to the next event. If a parsing error is encountered, throws a 
-[ser_error](ser_error.md).
+    void next() final;
+Get the next event. If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
-    void next(std::error_code& ec) override;
-Advances to the next event. If a parsing error is encountered, sets `ec`.
+    void next(std::error_code& ec) final;
+Get the next event. If a parsing error is encountered, sets `ec`.
 
-    const ser_context& context() const override;
-Returns the current [context](ser_context.md)
+    const staj_event& current() const final;
+Returns the current [staj_event](../corelib/basic_staj_event.md).
 
-    void reset();
-Reset cursor to read another value from the same source
+    const ser_context& context() const final;
+Returns the current [context](../corelib/ser_context.md)
 
-    template <typename Sourceable>
-    reset(Sourceable&& source)
-Reset cursor to read new value from a new sources
+#### Multi-dimensional array input
+
+    bool is_multi_dim() const final;                           (since 1.8.0)
+Indicates whether an array is a multi-dimensional array.
+
+    jsoncons::span<const std::size_t> extents() const final;   (since 1.8.0)
+Indicates the number of elements along each dimension of the array.
+
+    mdarray_order order() const final;                         (since 1.8.0)
+Indicates whether the elements of a multi-dimensional array are
+arranged in row-major or column-major order. Returns a [mdarray_order](../corelib/mdarray_order.md).
+
+#### Typed Array input
+
+    bool is_typed_array() const final;                         (since 1.8.0)
+
+    typed_array_tags array_tag() const final;                  (since 1.8.0)
+Returns a [tag](../corelib/typed_array_tags.md) that indicates the element type of the typed array.
+
+    jsoncons::span<uint8_t> array_buffer() final;              (since 1.8.0)
+
+    void to_end_array() final;                                 (since 1.8.0)
+
+#### Inherited from [jsoncons::basic_staj_cursor](../corelib/staj_cursor.md)
+
+    template <typename T>                                      (since 1.8.0)
+    void read_typed_array(T& v);
 
 #### Non-member functions
 
