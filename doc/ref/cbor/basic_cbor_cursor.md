@@ -69,20 +69,6 @@ as `basic_cbor_cursor` holds a pointer to but does not own this object.
     uint64_t raw_tag() const;      // (since 1.2.0)
 Returns the CBOR tag associated with the current value
 
-    void read_to(json_visitor& visitor) final;
-Sends the parse events from the current event to the
-matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
-E.g., if the current event is `begin_object`, sends the `begin_object`
-event and all inbetween events until the matching `end_object` event.
-If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
-
-    void read_to(json_visitor& visitor, std::error_code& ec) final;
-Sends the parse events from the current event to the
-matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
-E.g., if the current event is `begin_object`, sends the `begin_object`
-event and all inbetween events until the matching `end_object` event.
-If a parsing error is encountered, sets `ec`.
-
 #### staj_event input
 
     bool done() const final;
@@ -100,17 +86,21 @@ Returns the current [staj_event](../corelib/basic_staj_event.md).
     const ser_context& context() const final;
 Returns the current [context](../corelib/ser_context.md)
 
-#### Multi-dimensional array input
+#### Input to visitor
 
-    bool is_multi_dim() const final;                           (since 1.8.0)
-Indicates whether an array is a multi-dimensional array.
+    void read_to(json_visitor& visitor) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
-    jsoncons::span<const std::size_t> extents() const final;   (since 1.8.0)
-Indicates the number of elements along each dimension of the array.
-
-    mdarray_order order() const final;                         (since 1.8.0)
-Indicates whether the elements of a multi-dimensional array are
-arranged in row-major or column-major order. Returns a [mdarray_order](../corelib/mdarray_order.md).
+    void read_to(json_visitor& visitor, std::error_code& ec) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, sets `ec`.
 
 #### Typed Array input
 
@@ -122,6 +112,18 @@ Returns a [tag](../corelib/typed_array_tags.md) that indicates the element type 
     jsoncons::span<uint8_t> array_buffer() final;              (since 1.8.0)
 
     void to_end_array() final;                                 (since 1.8.0)
+
+#### Multi-dimensional array input
+
+    bool is_multi_dim() const final;                           (since 1.8.0)
+Indicates whether an array is a multi-dimensional array.
+
+    jsoncons::span<const std::size_t> extents() const final;   (since 1.8.0)
+Indicates the number of elements along each dimension of the array.
+
+    mdarray_order order() const final;                         (since 1.8.0)
+Indicates whether the elements of a multi-dimensional array are
+arranged in row-major or column-major order. Returns a [mdarray_order](../corelib/mdarray_order.md).
 
 #### Inherited from [jsoncons::basic_staj_cursor](../corelib/staj_cursor.md)
 
