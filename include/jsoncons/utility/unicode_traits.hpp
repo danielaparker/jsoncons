@@ -148,9 +148,11 @@ namespace unicode_traits {
      * Magic values subtracted from a buffer value during UTF8 conversion.
      * This table contains as many values as there might be trailing bytes
      * in a UTF-8 sequence. Source: ConvertUTF.c
+     *
+     * Seventh element added to satisfy GCC 16; see issue #712
      */
-    const uint32_t offsets_from_utf8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL, 
-                  0x03C82080UL, 0xFA082080UL, 0x82082080UL };
+    const uint32_t offsets_from_utf8[7] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL,
+                  0x03C82080UL, 0xFA082080UL, 0x82082080UL, 0x00000000UL };
 
     /*
      * Once the bits are split out into bytes of UTF-8, this is a mask OR-ed
