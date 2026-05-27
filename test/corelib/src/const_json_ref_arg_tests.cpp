@@ -19,38 +19,38 @@ TEST_CASE("const_json_ref array tests")
 
     SECTION("size()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_array());
         CHECK(3 == v.size());
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_array());
         REQUIRE_THROWS(v.at(1));
     }
     SECTION("at() const")
     {
-        const json v(const_json_ref_arg, j);
+        const json v(const_json_ref_arg, &j);
         REQUIRE(v.is_array());
         CHECK(v.at(1) == std::string("two"));
     }
     SECTION("operator[]()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_array());
         REQUIRE_THROWS(v[1]);
     }
     SECTION("operator[]() const")
     {
-        const json v(const_json_ref_arg, j);
+        const json v(const_json_ref_arg, &j);
         REQUIRE(v.is_array());
         CHECK(v[1] == std::string("two"));
     }
     SECTION("copy")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         CHECK(v.storage_kind() == json_storage_kind::const_json_ref);
 
         json j2(v);
@@ -58,7 +58,7 @@ TEST_CASE("const_json_ref array tests")
     }
     SECTION("assignment")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         CHECK(v.storage_kind() == json_storage_kind::const_json_ref);
 
         json j2;
@@ -73,14 +73,14 @@ TEST_CASE("const_json_ref object tests")
 
     SECTION("size()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_object());
         CHECK(3 == v.size());
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_object());
         REQUIRE_THROWS(v.at("two"));
         CHECK(v.contains("two"));
@@ -91,7 +91,7 @@ TEST_CASE("const_json_ref object tests")
     }
     SECTION("at() const")
     {
-        const json v(const_json_ref_arg, j);
+        const json v(const_json_ref_arg, &j);
         REQUIRE(v.is_object());
         CHECK(2 == v.at("two"));
         CHECK(v.contains("two"));
@@ -108,7 +108,7 @@ TEST_CASE("const_json_ref string tests")
 
     SECTION("is_string()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_string());
         REQUIRE(v.is_string_view());
 
@@ -123,7 +123,7 @@ TEST_CASE("const_json_ref byte_string tests")
 
     SECTION("is_byte_string()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_byte_string());
         REQUIRE(v.is_byte_string_view());
     }
@@ -136,13 +136,13 @@ TEST_CASE("const_json_ref bool tests")
 
     SECTION("true")
     {
-        json v(const_json_ref_arg, tru);
+        json v(const_json_ref_arg, &tru);
         REQUIRE(v.is_bool());
         CHECK(v.as_bool());
     }
     SECTION("false")
     {
-        json v(const_json_ref_arg, fal);
+        json v(const_json_ref_arg, &fal);
         REQUIRE(v.is_bool());
         CHECK_FALSE(v.as_bool());
     }
@@ -154,7 +154,7 @@ TEST_CASE("const_json_ref int64 tests")
 
     SECTION("is_int64()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_int64());
         CHECK(v.as<int64_t>() == -100);
     }
@@ -166,7 +166,7 @@ TEST_CASE("const_json_ref uint64 tests")
 
     SECTION("is_uint64()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_uint64());
         CHECK(v.as<uint64_t>() == 100);
     }
@@ -178,7 +178,7 @@ TEST_CASE("const_json_ref half tests")
 
     SECTION("is_half()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_half());
         CHECK(v.as<uint16_t>() == 100);
     }
@@ -190,7 +190,7 @@ TEST_CASE("const_json_ref double tests")
 
     SECTION("is_double()")
     {
-        json v(const_json_ref_arg, j);
+        json v(const_json_ref_arg, &j);
         REQUIRE(v.is_double());
 
         CHECK(v.as_double() == 123.456);
@@ -210,12 +210,12 @@ namespace {
             {
                 for (auto& item_of_item : item.array_range())
                 {
-                    temp.emplace_back(const_json_ref_arg, item_of_item);
+                    temp.emplace_back(const_json_ref_arg, &item_of_item);
                 }
             }
             else
             {
-                temp.emplace_back(const_json_ref_arg, item);
+                temp.emplace_back(const_json_ref_arg, &item);
             }
         }
         for (const auto& item : temp.array_range())
@@ -225,7 +225,7 @@ namespace {
                 const auto& j = item.contains(identifier) ? item.at(identifier) : json::null();
                 if (!j.is_null())
                 {
-                    result.emplace_back(const_json_ref_arg, j);
+                    result.emplace_back(const_json_ref_arg, &j);
                 }
             }
         }
@@ -266,13 +266,13 @@ TEST_CASE("const_json_ref identifier tests")
         json j2(json_array_arg);
         json j3(json_array_arg);
         json expected = json::parse("[1,2,4,5,6,8]");
-        const json v1(const_json_ref_arg, source.at("reservations"));
+        const json v1(const_json_ref_arg, &source.at("reservations"));
         flatten(v1, "instances", j1);
 
-        const json v2(const_json_ref_arg, j1);
+        const json v2(const_json_ref_arg, &j1);
         flatten(v2, "foo", j2);
 
-        const json v3(const_json_ref_arg, j2);
+        const json v3(const_json_ref_arg, &j2);
         flatten(v3, "bar", j3);
 
         target = j3;
@@ -287,13 +287,13 @@ TEST_CASE("const_json_ref identifier tests")
             json j1(json_array_arg);
             json j2(json_array_arg);
             json j3(json_array_arg);
-            const json v1(const_json_ref_arg, source.at("reservations"));
+            const json v1(const_json_ref_arg, &source.at("reservations"));
             flatten(v1, "instances", j1);
 
-            const json v2(const_json_ref_arg, j1);
+            const json v2(const_json_ref_arg, &j1);
             flatten(v2, "foo", j2);
 
-            const json v3(const_json_ref_arg, j2);
+            const json v3(const_json_ref_arg, &j2);
             flatten(v3, "bar", j3);
 
             target = json(j3);

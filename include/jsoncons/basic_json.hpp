@@ -2452,8 +2452,7 @@ namespace jsoncons {
             construct<array_storage>(ptr, tag);
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        basic_json(json_const_pointer_arg_t, const basic_json* ptr) noexcept 
+        basic_json(const_json_ref_arg_t, const basic_json* ptr) noexcept 
         {
             if (ptr == nullptr)
             {
@@ -2465,7 +2464,7 @@ namespace jsoncons {
             }
         }
 
-        basic_json(json_pointer_arg_t, basic_json* ptr) noexcept 
+        basic_json(json_ref_arg_t, basic_json* ptr) noexcept 
         {
             if (ptr == nullptr)
             {
@@ -2476,17 +2475,6 @@ namespace jsoncons {
                 construct<json_ref_storage>(*ptr);
             }
         }
-#endif
-        basic_json(const_json_ref_arg_t, const basic_json& ref) noexcept 
-        {
-            construct<const_json_ref_storage>(ref);
-        }
-
-        basic_json(json_ref_arg_t, basic_json& ref) noexcept 
-        {
-            construct<json_ref_storage>(ref);
-        }
-
         basic_json(const array& val, semantic_tag tag = semantic_tag::none)
         {
             auto ptr = create_array(

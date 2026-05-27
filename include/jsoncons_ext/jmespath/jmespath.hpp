@@ -1862,7 +1862,7 @@ namespace detail {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
                     }
-                    result->emplace_back(const_json_ref_arg, j);
+                    result->emplace_back(const_json_ref_arg, &j);
                 }
 
                 return *result;
@@ -2040,7 +2040,7 @@ namespace detail {
                         }
                         else // shallow copy of non-primitive elements avoids allocations
                         {
-                            result->try_emplace(item.key(), const_json_ref_arg, item.value());
+                            result->try_emplace(item.key(), const_json_ref_arg, &item.value());
                         }
                     }
                 }
@@ -2149,7 +2149,7 @@ namespace detail {
                     result->push_back(arg0.at(0));
                     for (std::size_t i = 1; i < arg0.size(); ++i)
                     {
-                        result->emplace_back(const_json_ref_arg, arg0.at(i));
+                        result->emplace_back(const_json_ref_arg, &arg0.at(i));
                     }
                     std::stable_sort((result->array_range()).begin(), (result->array_range()).end());
                     return *result;
@@ -2192,7 +2192,7 @@ namespace detail {
                 result->reserve(arg0.size());
                 for (std::size_t i = 0; i < arg0.size(); ++i)
                 {
-                    result->emplace_back(const_json_ref_arg, arg0.at(i));
+                    result->emplace_back(const_json_ref_arg, &arg0.at(i));
                 }
 
                 std::stable_sort((result->array_range()).begin(), (result->array_range()).end(),
@@ -2956,7 +2956,7 @@ namespace detail {
                         reference j = this->apply_expressions(item.value(), context, ec);
                         if (!j.is_null())
                         {
-                            result->emplace_back(const_json_ref_arg, j);
+                            result->emplace_back(const_json_ref_arg, &j);
                         }
                     }
                 }
@@ -2987,7 +2987,7 @@ namespace detail {
                         reference j = this->apply_expressions(item, context, ec);
                         if (!j.is_null())
                         {
-                            result->emplace_back(const_json_ref_arg, j);
+                            result->emplace_back(const_json_ref_arg, &j);
                         }
                     }
                 }
@@ -3037,7 +3037,7 @@ namespace detail {
                         reference j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), context, ec);
                         if (!j.is_null())
                         {
-                            result->emplace_back(const_json_ref_arg, j);
+                            result->emplace_back(const_json_ref_arg, &j);
                         }
                     }
                 }
@@ -3056,7 +3056,7 @@ namespace detail {
                         reference j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), context, ec);
                         if (!j.is_null())
                         {
-                            result->emplace_back(const_json_ref_arg, j);
+                            result->emplace_back(const_json_ref_arg, &j);
                         }
                     }
                 }
@@ -3079,7 +3079,7 @@ namespace detail {
                 if (!val.is_array())
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ref_arg, evaluate_tokens(val, token_list_, new_context, ec));
+                    Json j(const_json_ref_arg, &evaluate_tokens(val, token_list_, new_context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(val, context, ec);
@@ -3095,13 +3095,13 @@ namespace detail {
                 for (auto& item : val.array_range())
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ref_arg, evaluate_tokens(item, token_list_, new_context, ec));
+                    Json j(const_json_ref_arg, &evaluate_tokens(item, token_list_, new_context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(item, context, ec);
                         if (!jj.is_null())
                         {
-                            result->emplace_back(const_json_ref_arg, jj);
+                            result->emplace_back(const_json_ref_arg, &jj);
                         }
                     }
                 }
@@ -3136,7 +3136,7 @@ namespace detail {
                                 reference j = this->apply_expressions(elem, context, ec);
                                 if (!j.is_null())
                                 {
-                                    result->emplace_back(const_json_ref_arg, j);
+                                    result->emplace_back(const_json_ref_arg, &j);
                                 }
                             }
                         }
@@ -3148,7 +3148,7 @@ namespace detail {
                             reference j = this->apply_expressions(current_elem, context, ec);
                             if (!j.is_null())
                             {
-                                result->emplace_back(const_json_ref_arg, j);
+                                result->emplace_back(const_json_ref_arg, &j);
                             }
                         }
                     }
@@ -3178,7 +3178,7 @@ namespace detail {
                 for (auto& list : token_lists_)
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    result->emplace_back(const_json_ref_arg, evaluate_tokens(val, list, new_context, ec));
+                    result->emplace_back(const_json_ref_arg, &evaluate_tokens(val, list, new_context, ec));
                 }
                 return *result;
             }
@@ -3238,7 +3238,7 @@ namespace detail {
                 for (auto& item : key_toks_)
                 {
                     eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    resultp->try_emplace(item.key, const_json_ref_arg, evaluate_tokens(val, item.tokens, new_context, ec));
+                    resultp->try_emplace(item.key, const_json_ref_arg, &evaluate_tokens(val, item.tokens, new_context, ec));
                 }
 
                 return *resultp;

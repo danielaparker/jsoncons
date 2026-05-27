@@ -23,24 +23,12 @@ master
 
 - Changes:
 
-    - The types `json_pointer_arg_t` and `json_const_pointer_arg_t` and the
+    - The types `json_pointer_arg_t` and `json_const_pointer_arg_t` have been
+    renamed to `json_ref_arg_t` and `const_json_ref_arg_t`, and the
     constants `json_pointer_arg` and `json_const_pointer_arg` have been 
-    deprecated and will be removed in a future version. These have been
-    replaced by the types `json_ref_arg_t` and `const_json_ref_arg_t` and the
-    constants `json_ref_arg` and `const_json_ref_arg`.
-    
-    - The basic_json constructors
-
-        `basic_json(json_const_pointer_arg_t, const basic_json* ptr) noexcept;` 
-
-        `basic_json(json_pointer_arg_t, basic_json* ptr) noexcept;` 
-    
-    have been deprecated and will be removed in a future version. These
-    have been replaced by    
-    
-        `basic_json(const_json_ref_arg_t, const basic_json& ref) noexcept;`
-
-        `basic_json(json_ref_arg_t, basic_json& ref) noexcept;`
+    renamed to `json_ref_arg` and `const_json_ref_arg`. The old names have been
+    deprecated and will be removed in a future version. For now they are
+    aliased to the new names. 
 
     - Since 1.8.0, the `basic_json` copy constructor makes a deep copy of any `const_json_ref`
     and `json_ref` pointers it may hold. Until 1.8.0, it made a shallow copy. With
@@ -183,7 +171,7 @@ Release 1.7.0
       argument have been deprecated and will be removed in a future release. Use the 
       `allow_trailing_comma` and `allow_comments` options instead.
 
-    - The functors `strict_json_parsing` and `allow_trailing_commas` have been deprecated and 
+    - The functors `strict_json_parsing` and `allow_trailing_commas` have been renamed and 
       will be removed in a future release. Use the `allow_trailing_comma` and `allow_comments` 
       options instead.
 

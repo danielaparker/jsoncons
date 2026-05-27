@@ -156,21 +156,6 @@ namespace jsoncons {
     
     JSONCONS_INLINE_CONSTEXPR byte_string_arg_t byte_string_arg{};
 
-#if !defined(JSONCONS_NO_DEPRECATED)  
-    struct json_const_pointer_arg_t
-    {
-        explicit json_const_pointer_arg_t() = default; 
-    };
-
-    JSONCONS_INLINE_CONSTEXPR json_const_pointer_arg_t json_const_pointer_arg{};
-    
-    struct json_pointer_arg_t
-    {
-        explicit json_pointer_arg_t() = default; 
-    };
-    
-    JSONCONS_INLINE_CONSTEXPR json_pointer_arg_t json_pointer_arg{};
-#endif
     struct const_json_ref_arg_t
     {
         explicit const_json_ref_arg_t() = default; 
@@ -189,6 +174,16 @@ namespace jsoncons {
     {
         explicit raw_json_arg_t() = default; 
     };
+
+#if !defined(JSONCONS_NO_DEPRECATED)  
+    using json_const_pointer_arg_t = const_json_ref_arg_t;
+
+    JSONCONS_INLINE_CONSTEXPR json_const_pointer_arg_t json_const_pointer_arg{};
+    
+    using json_pointer_arg_t = json_ref_arg_t;
+    
+    JSONCONS_INLINE_CONSTEXPR json_pointer_arg_t json_pointer_arg{};
+#endif
     
     JSONCONS_INLINE_CONSTEXPR raw_json_arg_t raw_json_arg{};
     

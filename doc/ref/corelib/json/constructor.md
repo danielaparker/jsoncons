@@ -92,9 +92,9 @@ basic_json(json_const_pointer_arg, const basic_json* ptr);         (25) (since 0
 basic_json(json_pointer_arg, basic_json* ptr);                     (26) (since 1.0.0)
                                                                         (deprecated since 1.8.0)
 
-basic_json(const_json_ref_arg, const basic_json& ref);             (27) (since 1.8.0)
+basic_json(const_json_ref_arg, const basic_json* ptr);             (27) (since 1.8.0)
 
-basic_json(json_ref_arg, basic_json& ref);                         (28) (since 1.8.0)
+basic_json(json_ref_arg, basic_json* ptr);                         (28) (since 1.8.0)
 ```
 
 (1) Constructs an empty json object. 
@@ -284,7 +284,7 @@ int main()
         if (item.at("state").as<std::string>() == "running")
         {
             //j_v.emplace_back(json_const_pointer_arg, &item);  // deprecated in 1.8.0
-            j_v.emplace_back(const_json_ref_arg, item);         // since 1.8.0
+            j_v.emplace_back(const_json_ref_arg, &item);         // since 1.8.0
         }
     }
 
