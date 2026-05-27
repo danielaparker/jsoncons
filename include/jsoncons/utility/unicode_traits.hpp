@@ -151,7 +151,7 @@ namespace unicode_traits {
      *
      * Seventh element added to satisfy GCC 16; see issue #712
      */
-    const uint32_t offsets_from_utf8[7] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL,
+    JSONCONS_INLINE_CONSTEXPR uint32_t offsets_from_utf8[7] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL,
                   0x03C82080UL, 0xFA082080UL, 0x82082080UL, 0x00000000UL };
 
     /*
@@ -161,7 +161,7 @@ namespace unicode_traits {
      * (I.e., one byte sequence, two byte... etc.). Remember that sequencs
      * for *legal* UTF-8 will be 4 or fewer bytes total. Source: ConvertUTF.c
      */
-    const uint8_t first_byte_mark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+    JSONCONS_INLINE_CONSTEXPR uint8_t first_byte_mark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
 
     /*
      * Index into the table below with the first byte of a UTF-8 sequence to
@@ -170,7 +170,7 @@ namespace unicode_traits {
      * left as-is for anyone who may want to do such conversion, which was
      * allowed in earlier algorithms. Source: ConvertUTF.c
      */
-    const uint8_t trailing_bytes_for_utf8[256] = {
+    JSONCONS_INLINE_CONSTEXPR uint8_t trailing_bytes_for_utf8[256] = {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -182,20 +182,20 @@ namespace unicode_traits {
     };
 
     // Some fundamental constants.  Source: ConvertUTF.h 
-    const uint32_t replacement_char = 0x0000FFFD;
-    const uint32_t max_bmp = 0x0000FFFF;
-    const uint32_t max_utf16 = 0x0010FFFF;
-    const uint32_t max_utf32 = 0x7FFFFFFF;
-    const uint32_t max_legal_utf32 = 0x0010FFFF;
+    JSONCONS_INLINE_CONSTEXPR uint32_t replacement_char = 0x0000FFFD;
+    JSONCONS_INLINE_CONSTEXPR uint32_t max_bmp = 0x0000FFFF;
+    JSONCONS_INLINE_CONSTEXPR uint32_t max_utf16 = 0x0010FFFF;
+    JSONCONS_INLINE_CONSTEXPR uint32_t max_utf32 = 0x7FFFFFFF;
+    JSONCONS_INLINE_CONSTEXPR uint32_t max_legal_utf32 = 0x0010FFFF;
 
-    const int half_shift  = 10; // used for shifting by 10 bits
-    const uint32_t half_base = 0x0010000UL;
-    const uint32_t half_mask = 0x3FFUL;
+    JSONCONS_INLINE_CONSTEXPR int half_shift  = 10; // used for shifting by 10 bits
+    JSONCONS_INLINE_CONSTEXPR uint32_t half_base = 0x0010000UL;
+    JSONCONS_INLINE_CONSTEXPR uint32_t half_mask = 0x3FFUL;
 
-    const uint16_t sur_high_start = 0xD800;
-    const uint16_t sur_high_end = 0xDBFF;
-    const uint16_t sur_low_start = 0xDC00;
-    const uint16_t sur_low_end = 0xDFFF;
+    JSONCONS_INLINE_CONSTEXPR uint16_t sur_high_start = 0xD800;
+    JSONCONS_INLINE_CONSTEXPR uint16_t sur_high_end = 0xDBFF;
+    JSONCONS_INLINE_CONSTEXPR uint16_t sur_low_start = 0xDC00;
+    JSONCONS_INLINE_CONSTEXPR uint16_t sur_low_end = 0xDFFF;
 
     inline
     static bool is_continuation_byte(unsigned char ch)

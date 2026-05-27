@@ -1,4 +1,3 @@
-
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
