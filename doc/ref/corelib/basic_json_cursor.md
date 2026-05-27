@@ -133,9 +133,9 @@ Reset cursor to read new value from a new source
 
 #### Non-member functions
 
-   template <typename CharT,typename Source,typename Allocator>
-   basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Source,Allocator>& cursor, 
-       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
+    template <typename CharT,typename Source,typename Allocator>
+    basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Source,Allocator>& cursor, 
+        std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples
 

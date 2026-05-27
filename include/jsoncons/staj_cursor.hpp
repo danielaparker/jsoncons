@@ -14,6 +14,7 @@
 #include <ios>
 #include <memory> // std::allocator
 #include <system_error>
+#include <type_traits>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/allocator_set.hpp>
@@ -27,6 +28,7 @@
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 
 namespace jsoncons {
@@ -330,102 +332,190 @@ public:
         {
             switch (array_tag())
             {
-                case typed_array_tags::uint8:
-                {
-                    auto ta = typed_array_cast<const uint8_t>(array_buffer());
-                    for (auto item : ta)
-                    {
-                        v.push_back(static_cast<value_type>(item));
-                    }
-                    break;
-                }
-                case typed_array_tags::uint16:
-                {
-                    auto ta = typed_array_cast<const uint16_t>(array_buffer());
-                    for (auto item : ta)
-                    {
-                        v.push_back(static_cast<value_type>(item));
-                    }
-                    break;
-                }
-                case typed_array_tags::uint32:
-                {
-                    auto ta = typed_array_cast<const uint32_t>(array_buffer());
-                    for (auto item : ta)
-                    {
-                        v.push_back(static_cast<value_type>(item));
-                    }
-                    break;
-                }
-                case typed_array_tags::uint64:
-                {
-                    auto ta = typed_array_cast<const uint64_t>(array_buffer());
-                    for (auto item : ta)
-                    {
-                        v.push_back(static_cast<value_type>(item));
-                    }
-                    break;
-                }
                 case typed_array_tags::int8:
                 {
                     auto ta = typed_array_cast<const int8_t>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, int8_t>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::int16:
                 {
                     auto ta = typed_array_cast<const int16_t>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, int16_t>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::int32:
                 {
                     auto ta = typed_array_cast<const int32_t>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, int32_t>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::int64:
                 {
                     auto ta = typed_array_cast<const int64_t>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, int64_t>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
+                    }
+                    break;
+                }
+                case typed_array_tags::uint8:
+                {
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer());
+                    if (std::is_same<value_type, uint8_t>::value)
+                    {
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
+                    }
+                    break;
+                }
+                case typed_array_tags::uint16:
+                {
+                    auto ta = typed_array_cast<const uint16_t>(array_buffer());
+                    if (std::is_same<value_type, uint16_t>::value)
+                    {
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
+                    }
+                    break;
+                }
+                case typed_array_tags::uint32:
+                {
+                    auto ta = typed_array_cast<const uint32_t>(array_buffer());
+                    if (std::is_same<value_type, uint32_t>::value)
+                    {
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
+                    }
+                    break;
+                }
+                case typed_array_tags::uint64:
+                {
+                    auto ta = typed_array_cast<const uint64_t>(array_buffer());
+                    if (std::is_same<value_type, uint64_t>::value)
+                    {
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::half_float:
                 {
                     auto ta = typed_array_cast<const int16_t>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, int16_t>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::float32:
                 {
                     auto ta = typed_array_cast<const float>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, float>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }
                 case typed_array_tags::float64 :
                 {
                     auto ta = typed_array_cast<const double>(array_buffer());
-                    for (auto item : ta)
+                    if (std::is_same<value_type, double>::value)
                     {
-                        v.push_back(static_cast<value_type>(item));
+                        v.resize(ta.size());
+                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+                    }
+                    else
+                    {
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(item));
+                        }
                     }
                     break;
                 }

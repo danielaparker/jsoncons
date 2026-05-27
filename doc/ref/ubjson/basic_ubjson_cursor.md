@@ -110,9 +110,9 @@ Reset cursor to read new value from a new source
 
 #### Non-member functions
 
-   template <typename Source,typename Allocator>
-   staj_filter_view operator|(basic_ubjson_cursor<Source,Allocator>& cursor, 
-                              std::function<bool(const staj_event&, const ser_context&)> pred);
+    template <typename Source,typename Allocator>
+    staj_filter_view operator|(basic_ubjson_cursor<Source,Allocator>& cursor, 
+                               std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### See also
 

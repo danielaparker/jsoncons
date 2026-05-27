@@ -139,9 +139,9 @@ Returns the CBOR tag associated with the current value
 
 ##### Non-member functions
 
-   template <typename Source,typename Allocator>
-   staj_filter_view operator|(basic_cbor_cursor<Source,Allocator>& cursor, 
-                              std::function<bool(const staj_event&, const ser_context&)> pred);
+    template <typename Source,typename Allocator>
+    staj_filter_view operator|(basic_cbor_cursor<Source,Allocator>& cursor, 
+                               std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### Examples
 

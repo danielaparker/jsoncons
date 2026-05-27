@@ -85,6 +85,28 @@ TEST_CASE("cbor Typed Array cursor tests")
         //    std::cout << item << "\n";
         //}
     }
+    SECTION("Tag 86, float64, little endian, read_typed_array")
+    {
+        //std::cout << "CBOR cursor Typed Array Tag 86, float64, little endian" << '\n';
+
+        const std::vector<uint8_t> input = {
+            0xd8, // Tag
+                0x56, // Tag 86, float64, little endian, Typed Array
+            0x50, // Byte string value of length 16
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+        };
+
+        cbor::cbor_bytes_cursor cursor(input);
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_typed_array());
+
+        std::vector<double> v1;
+        cursor.read_typed_array(v1);
+        REQUIRE(2 == v1.size());
+        CHECK( -1.79769e+308 == Approx(v1[0]));
+        CHECK(1.79769e+308 == Approx(v1[1]));
+    }
 }
 
 TEST_CASE("cbor Typed Array tests")
