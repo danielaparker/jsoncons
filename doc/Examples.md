@@ -3273,7 +3273,7 @@ int main()
         if (item.at("state").as<std::string>() == "running")
         {
             //j_v.emplace_back(json_const_pointer_arg, &item);  // deprecated in 1.8.0
-            j_v.emplace_back(const_json_ref_arg, &item);         // since 1.8.0
+            j_v.emplace_back(const_json_ptr_arg, &item);         // since 1.8.0
         }
     }
 

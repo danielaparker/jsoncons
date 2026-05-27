@@ -2452,7 +2452,7 @@ namespace jsoncons {
             construct<array_storage>(ptr, tag);
         }
 
-        basic_json(const_json_ref_arg_t, const basic_json* ptr) noexcept 
+        basic_json(const_json_ptr_arg_t, const basic_json* ptr) noexcept 
         {
             if (ptr == nullptr)
             {
@@ -2464,7 +2464,7 @@ namespace jsoncons {
             }
         }
 
-        basic_json(json_ref_arg_t, basic_json* ptr) noexcept 
+        basic_json(json_ptr_arg_t, basic_json* ptr) noexcept 
         {
             if (ptr == nullptr)
             {

@@ -24,9 +24,9 @@ master
 - Changes:
 
     - The types `json_pointer_arg_t` and `json_const_pointer_arg_t` have been
-    renamed to `json_ref_arg_t` and `const_json_ref_arg_t`, and the
+    renamed to `json_ptr_arg_t` and `const_json_ptr_arg_t`, and the
     constants `json_pointer_arg` and `json_const_pointer_arg` have been 
-    renamed to `json_ref_arg` and `const_json_ref_arg`. The old names have been
+    renamed to `json_ptr_arg` and `const_json_ptr_arg`. The old names have been
     deprecated and will be removed in a future version. For now they are
     aliased to the new names. 
 
