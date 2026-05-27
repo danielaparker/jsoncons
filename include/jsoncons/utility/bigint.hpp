@@ -268,12 +268,13 @@ public:
         }
 
         // Find suitable new block size
-        size_type round_up(size_type i) const noexcept
+        size_type round_up(size_type i) const 
         {
             //if (i == (std::numeric_limits<size_type>::max)())
             //{
             //    return i;
             //}
+            JSONCONS_ASSERT(i < (std::numeric_limits<size_type>::max)())
             return ((i + 1/3) / mem_unit + 1) * mem_unit;
         }
     };
