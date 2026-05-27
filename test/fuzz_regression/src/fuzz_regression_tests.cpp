@@ -857,7 +857,6 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         }
         catch (const std::runtime_error&) {}
     }
-#endif
 
     // Fuzz target: fuzz_cbor
     // Issue: Timeout in fuzz_cbor
@@ -866,6 +865,29 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
     SECTION("issue 21619")
     {
         std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5384892606382080";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        auto options = cbor::cbor_options{};
+
+        default_json_visitor visitor;
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == cbor::cbor_errc::bad_extents);
+    }
+#endif
+
+    // Fuzz target: fuzz_cbor
+    // Issue: Timeout in fuzz_cbor
+    // Diagnosis: 
+    // Resolution: 
+    SECTION("issue 21619")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5561410242543616";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521

@@ -126,6 +126,10 @@ public:
         if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
         {
             visitor.end_array(context, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
             if (dim_ > 0)
             {
                 --dim_;
@@ -442,6 +446,10 @@ public:
                         if (!row_major_reader_.done())
                         {
                             row_major_reader_.next(visitor, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                         else
                         {
@@ -452,6 +460,10 @@ public:
                                 return;
                             }
                             end_row_major_storage(ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                     }
                     else
@@ -460,10 +472,18 @@ public:
                         {
                             ++state_stack_.back().index;
                             read_item(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                         else
                         {
                             end_array(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                     }
                     break;
@@ -475,6 +495,10 @@ public:
                         if (!row_major_reader_.done())
                         {
                             row_major_reader_.next(visitor, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                         else
                         {
@@ -495,6 +519,10 @@ public:
                                 return;
                             }
                             end_row_major_storage(ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                     }
                     else
@@ -510,10 +538,18 @@ public:
                         {
                             source_.ignore(1);
                             end_array(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                         else
                         {
                             read_item(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                         }
                     }
                     break;
@@ -530,10 +566,18 @@ public:
                         ++state_stack_.back().index;
                         state_stack_.back().mode = parse_mode::map_value;
                         read_item(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     else
                     {
                         end_object(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     break;
                 }
@@ -541,6 +585,10 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
                     read_item(visitor, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     break;
                 }
                 case parse_mode::indefinite_map_key:
@@ -556,11 +604,19 @@ public:
                     {
                         source_.ignore(1);
                         end_object(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     else
                     {
                         state_stack_.back().mode = parse_mode::indefinite_map_value;
                         read_item(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     break;
                 }
@@ -568,12 +624,20 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::indefinite_map_key;
                     read_item(visitor, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     break;
                 }
                 case parse_mode::root:
                 {
                     state_stack_.back().mode = parse_mode::accept;
                     read_item(visitor, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     break;
                 }
                 case parse_mode::accept:
@@ -594,6 +658,10 @@ public:
         if (!typed_array_iter_->done())
         {
             typed_array_iter_->next(visitor, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
             more_ = !cursor_mode_;
 
             if (typed_array_iter_->done())
@@ -684,6 +752,10 @@ public:
                         other_tags_[item_tag] = false;
                     }
                     visitor.uint64_value(val, tag, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     more_ = !cursor_mode_;
                 }
                 break;
@@ -705,6 +777,10 @@ public:
                     other_tags_[item_tag] = false;
                 }
                 visitor.int64_value(val, tag, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 more_ = !cursor_mode_;
                 break;
             }
@@ -752,21 +828,37 @@ public:
                 {
                     case 0x14:
                         visitor.bool_value(false, semantic_tag::none, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x15:
                         visitor.bool_value(true, semantic_tag::none, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x16:
                         visitor.null_value(semantic_tag::none, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x17:
                         visitor.null_value(semantic_tag::undefined, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
@@ -778,6 +870,10 @@ public:
                             return;
                         }
                         visitor.half_value(static_cast<uint16_t>(val), semantic_tag::none, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         break;
                     }
@@ -799,6 +895,10 @@ public:
                             other_tags_[item_tag] = false;
                         }
                         visitor.double_value(val, tag, *this, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         more_ = !cursor_mode_;
                         break;
                     }
@@ -825,6 +925,10 @@ public:
                                 return;
                             }
                             visitor.string_value(text_buffer_, semantic_tag::bigdec, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                             more_ = !cursor_mode_;
                             break;
                         case 0x05:
@@ -835,18 +939,34 @@ public:
                                 return;
                             }
                             visitor.string_value(text_buffer_, semantic_tag::bigfloat, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                             more_ = !cursor_mode_;
                             break;
                         case 40: // row major storage
                             order_ = mdarray_order::row_major;
                             read_mdarray_header(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                             break;
                         case 1040: // column major storage
                             order_ = mdarray_order::column_major;
                             read_mdarray_header(visitor, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                             break;
                         default:
                             begin_array(visitor, info, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
                             break;
                     }
                     other_tags_[item_tag] = false;
@@ -854,12 +974,20 @@ public:
                 else
                 {
                     begin_array(visitor, info, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                 }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::map:
             {
                 begin_object(visitor, info, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 break;
             }
             default:
@@ -891,6 +1019,10 @@ private:
             {
                 state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
                 visitor.begin_array(tag, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 more_ = !cursor_mode_;
                 source_.ignore(1);
                 break;
@@ -904,6 +1036,10 @@ private:
                 }
                 state_stack_.emplace_back(parse_mode::array,len,pop_stringref_map_stack);
                 visitor.begin_array(len, tag, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 more_ = !cursor_mode_;
                 break;
             }
@@ -915,6 +1051,10 @@ private:
         --nesting_depth_;
 
         visitor.end_array(*this, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return;
+        }
         more_ = !cursor_mode_;
         if (level() == mark_level_)
         {
@@ -1002,6 +1142,10 @@ private:
             {
                 state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
                 visitor.begin_object(semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 more_ = !cursor_mode_;
                 source_.ignore(1);
                 break;
@@ -1015,6 +1159,10 @@ private:
                 }
                 state_stack_.emplace_back(parse_mode::map_key,len,pop_stringref_map_stack);
                 visitor.begin_object(len, semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 more_ = !cursor_mode_;
                 break;
             }
@@ -1025,6 +1173,10 @@ private:
     {
         --nesting_depth_;
         visitor.end_object(*this, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return;
+        }
         more_ = !cursor_mode_;
         if (level() == mark_level_)
         {
@@ -1060,6 +1212,10 @@ private:
             return true;
         };
         iterate_string_chunks(func, major_type, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return;
+        }
 
         if (!stringref_map_stack_.empty() && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
@@ -1114,6 +1270,10 @@ private:
                     return true;
                 };
                 iterate_string_chunks(func, major_type, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 break;
             }
             default:
@@ -2420,10 +2580,18 @@ private:
         if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::row_major)
         {
             begin_row_major_storage(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major)
         {
             begin_array(visitor, info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::byte_string)
         {
@@ -2508,7 +2676,7 @@ private:
             }
         }
         auto r = calculate_mdarray_size(extents_);
-        if (!r)
+        if (!r || *r == 0)
         {
             ec = cbor_errc::bad_extents;
             more_ = false;
