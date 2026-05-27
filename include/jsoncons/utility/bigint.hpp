@@ -20,6 +20,7 @@
 #include <system_error>
 #include <type_traits> // std::enable_if
 #include <vector> // std::vector
+#include <limits> // std::numeric_limits
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
