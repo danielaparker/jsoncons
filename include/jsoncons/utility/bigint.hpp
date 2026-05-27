@@ -207,9 +207,9 @@ public:
         allocated_storage(const allocated_storage& stor, const real_allocator_type& a)
             : is_allocated_(true),
               is_negative_(stor.is_negative_),
-              size_(stor.size_),
-              capacity_(stor.capacity_)
+              size_(stor.size_)
         {
+            capacity_ = round_up(size_);
             real_allocator_type alloc(a);
 
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
