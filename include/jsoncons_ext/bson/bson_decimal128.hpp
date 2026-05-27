@@ -333,8 +333,8 @@ namespace bson {
     inline
     decimal128_to_chars_result decimal128_to_chars(char* first, char* last, const decimal128_t& dec)
     {
-        static constexpr std::string bson_decimal128_inf = "Infinity";
-        static constexpr std::string bson_decimal128_nan = "NaN";
+        static const std::string bson_decimal128_inf = "Infinity";
+        static const std::string bson_decimal128_nan = "NaN";
 
         static constexpr uint32_t combination_mask = 0x1f;   /* Extract least significant 5 bits */
         static constexpr uint32_t exponent_mask = 0x3fff;    /* Extract least significant 14 bits */
