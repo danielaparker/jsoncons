@@ -147,7 +147,7 @@ namespace detail {
         inline
         const uint16_t* get_hex_char_pairs(std::true_type) // big endian
         {
-            static const uint16_t hex_char_pairs[] = {
+            static constexpr uint16_t hex_char_pairs[] = {
                12336, 12337, 12338, 12339, 12340, 12341, 12342, 12343, 12344, 12345, 12385,
                12386, 12387, 12388, 12389, 12390, 12592, 12593, 12594, 12595, 12596, 12597,
                12598, 12599, 12600, 12601, 12641, 12642, 12643, 12644, 12645, 12646, 12848,

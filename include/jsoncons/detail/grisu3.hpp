@@ -248,7 +248,7 @@ inline
 bool digit_gen(diy_fp_t Wm, diy_fp_t W, diy_fp_t Wp,
                char *buffer, int *len, int *K)
 {
-    const uint32_t TEN2 = 100;
+    static constexpr uint32_t TEN2 = 100;
 
     uint32_t div, p1; uint64_t p2, tmp, unit = 1;
     int d, kappa;

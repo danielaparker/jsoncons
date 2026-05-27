@@ -1821,8 +1821,8 @@ private:
 
     static std::size_t get_typed_array_bytes_per_element(const uint8_t tag)
     {
-        const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
-        const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+        static constexpr uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+        static constexpr uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
         return std::size_t(1) << (f + ll); 
     }

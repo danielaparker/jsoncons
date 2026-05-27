@@ -176,7 +176,7 @@ namespace bson {
                                      bson_uint128_t *quotient, /* OUT */
                                      uint32_t *rem)             /* OUT */
         {
-            const uint32_t DIVISOR = 1000 * 1000 * 1000;
+            static constexpr uint32_t DIVISOR = 1000 * 1000 * 1000;
             uint64_t _rem = 0;
             int i = 0;
             
@@ -333,14 +333,14 @@ namespace bson {
     inline
     decimal128_to_chars_result decimal128_to_chars(char* first, char* last, const decimal128_t& dec)
     {
-        const std::string bson_decimal128_inf = "Infinity";
-        const std::string bson_decimal128_nan = "NaN";
+        static constexpr std::string bson_decimal128_inf = "Infinity";
+        static constexpr std::string bson_decimal128_nan = "NaN";
 
-        const uint32_t combination_mask = 0x1f;   /* Extract least significant 5 bits */
-        const uint32_t exponent_mask = 0x3fff;    /* Extract least significant 14 bits */
-        const uint32_t combination_infinity = 30; /* Value of combination field for Inf */
-        const uint32_t combination_nan = 31;      /* Value of combination field for NaN */
-        const uint32_t exponent_bias = 6176;      /* decimal128 exponent bias */
+        static constexpr uint32_t combination_mask = 0x1f;   /* Extract least significant 5 bits */
+        static constexpr uint32_t exponent_mask = 0x3fff;    /* Extract least significant 14 bits */
+        static constexpr uint32_t combination_infinity = 30; /* Value of combination field for Inf */
+        static constexpr uint32_t combination_nan = 31;      /* Value of combination field for NaN */
+        static constexpr uint32_t exponent_bias = 6176;      /* decimal128 exponent bias */
 
         char* str_out = first;      /* output pointer in string */
         char significand_str[35]; /* decoded significand digits */
@@ -570,9 +570,9 @@ namespace bson {
     inline
     decimal128_from_chars_result decimal128_from_chars(const char* first, const char* last, decimal128_t& dec) 
     {
-        const string_view inf_str = "inf";
-        const string_view infinity_str = "infinity";
-        const string_view nan_str = "nan";
+        static constexpr string_view inf_str = "inf";
+        static constexpr string_view infinity_str = "infinity";
+        static constexpr string_view nan_str = "nan";
 
         ptrdiff_t len = last - first;
 

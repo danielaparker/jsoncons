@@ -63,11 +63,11 @@ namespace unicode_traits {
     typename std::enable_if<ext_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
     detect_encoding_from_bom(const CharT* data, std::size_t length)
     {
-        const uint8_t bom_utf8[] = {0xef,0xbb,0xbf}; 
-        const uint8_t bom_utf16le[] = {0xff,0xfe}; 
-        const uint8_t bom_utf16be[] = {0xfe,0xff}; 
-        const uint8_t bom_utf32le[] = {0xff,0xfe,0x00,0x00}; 
-        const uint8_t bom_utf32be[] = {0x00,0x00,0xfe,0xff}; 
+        static constexpr uint8_t bom_utf8[] = {0xef,0xbb,0xbf}; 
+        static constexpr uint8_t bom_utf16le[] = {0xff,0xfe}; 
+        static constexpr uint8_t bom_utf16be[] = {0xfe,0xff}; 
+        static constexpr uint8_t bom_utf32le[] = {0xff,0xfe,0x00,0x00}; 
+        static constexpr uint8_t bom_utf32be[] = {0x00,0x00,0xfe,0xff}; 
 
         if (length >= 4 && !memcmp(data,bom_utf32le,4))
         {
@@ -761,8 +761,8 @@ namespace unicode_traits {
         const CharT* last = data + length;
         while (data < last) {
             unsigned short bytes_to_write = 0;
-            const uint32_t byteMask = 0xBF;
-            const uint32_t byteMark = 0x80; 
+            static constexpr uint32_t byteMask = 0xBF;
+            static constexpr uint32_t byteMark = 0x80; 
             uint32_t ch = *data++;
             /* If we have a surrogate pair, convert to uint32_t data. */
             if (is_high_surrogate(ch)) 
@@ -972,8 +972,8 @@ namespace unicode_traits {
         while (data < last) 
         {
             unsigned short bytes_to_write = 0;
-            const uint32_t byteMask = 0xBF;
-            const uint32_t byteMark = 0x80; 
+            static constexpr uint32_t byteMask = 0xBF;
+            static constexpr uint32_t byteMark = 0x80; 
             uint32_t ch = *data++;
             if (flags == conv_flags::strict ) 
             {

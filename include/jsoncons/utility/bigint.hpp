@@ -208,7 +208,7 @@ public:
             : is_allocated_(true),
               is_negative_(stor.is_negative_),
               size_(stor.size_),
-              capacity_(round_up(stor.size_))
+              capacity_(stor.capacity_)
         {
             real_allocator_type alloc(a);
 
@@ -273,11 +273,11 @@ public:
         {
             std::size_t remainder = i % mem_unit;
 
-            //std::size_t x = (std::numeric_limits<size_type>::max)() - (mem_unit - remainder);
-            //if (i >= x)
-            //{
-            //    return (std::numeric_limits<size_type>::max)();
-            //}
+            std::size_t x = (std::numeric_limits<size_type>::max)() - (mem_unit - remainder);
+            if (i > x)
+            {
+                return (std::numeric_limits<size_type>::max)();
+            }
 
             return i + (mem_unit - remainder);
         }
