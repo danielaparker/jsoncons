@@ -153,7 +153,7 @@ public:
         }
     }
 
-    bool done() const override
+    bool done() const final
     {
         return parser_.done();
     }
@@ -198,12 +198,12 @@ public:
         parser_.to_end_array();
     }
 
-    const staj_event& current() const override
+    const staj_event& current() const final
     {
         return cursor_visitor_.event();
     }
 
-    void read_to(basic_json_visitor<char_type>& visitor) override
+    void read_to(basic_json_visitor<char_type>& visitor) final
     {
         std::error_code ec;
         read_to(visitor, ec);
@@ -214,7 +214,7 @@ public:
     }
 
     void read_to(basic_json_visitor<char_type>& visitor,
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (is_typed_array())
         {
@@ -247,17 +247,17 @@ public:
         }
     }
 
-    void next() override
+    void next() final
     {
         read_next();
     }
 
-    void next(std::error_code& ec) override
+    void next(std::error_code& ec) final
     {
         read_next(ec);
     }
 
-    const ser_context& context() const override
+    const ser_context& context() const final
     {
         return *this;
     }
@@ -267,12 +267,12 @@ public:
         return eof_;
     }
 
-    std::size_t line() const override
+    std::size_t line() const final
     {
         return parser_.line();
     }
 
-    std::size_t column() const override
+    std::size_t column() const final
     {
         return parser_.column();
     }

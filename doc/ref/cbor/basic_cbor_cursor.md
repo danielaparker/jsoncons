@@ -66,10 +66,7 @@ as `basic_cbor_cursor` holds a pointer to but does not own this object.
 
 #### Member functions
 
-    uint64_t raw_tag() const;      // (since 1.2.0)
-Returns the CBOR tag associated with the current value
-
-#### staj_event input
+##### staj_event input
 
     bool done() const final;
 Check if there are no more events.
@@ -82,11 +79,6 @@ Get the next event. If a parsing error is encountered, sets `ec`.
 
     const staj_event& current() const final;
 Returns the current [staj_event](../corelib/basic_staj_event.md).
-
-    const ser_context& context() const final;
-Returns the current [context](../corelib/ser_context.md)
-
-#### Input to visitor
 
     void read_to(json_visitor& visitor) final;
 Sends the parse events from the current event to the
@@ -102,7 +94,7 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.
 
-#### Typed Array input
+##### Typed Array input
 
     bool is_typed_array() const final;                         (since 1.8.0)
 
@@ -113,7 +105,7 @@ Returns a [tag](../corelib/typed_array_tags.md) that indicates the element type 
 
     void to_end_array() final;                                 (since 1.8.0)
 
-#### Multi-dimensional array input
+##### Multi-dimensional array input
 
     bool is_multi_dim() const final;                           (since 1.8.0)
 Indicates whether an array is a multi-dimensional array.
@@ -125,12 +117,27 @@ Indicates the number of elements along each dimension of the array.
 Indicates whether the elements of a multi-dimensional array are
 arranged in row-major or column-major order. Returns a [mdarray_order](../corelib/mdarray_order.md).
 
-#### Inherited from [jsoncons::basic_staj_cursor](../corelib/staj_cursor.md)
+##### Miscellaneous
+
+    const ser_context& context() const final;
+Returns the current [context](../corelib/ser_context.md)
+
+    void reset();
+Reset cursor to read another value from the same source
+
+    template <typename Sourceable>
+    reset(Sourceable&& source)
+Reset cursor to read new value from a new source
+
+    uint64_t raw_tag() const;                                  (since 1.2.0)
+Returns the CBOR tag associated with the current value
+
+##### Inherited from [jsoncons::basic_staj_cursor](../corelib/staj_cursor.md)
 
     template <typename T>                                      (since 1.8.0)
     void read_typed_array(T& v);
 
-#### Non-member functions
+##### Non-member functions
 
    template <typename Source,typename Allocator>
    staj_filter_view operator|(basic_cbor_cursor<Source,Allocator>& cursor, 

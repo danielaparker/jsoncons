@@ -19,7 +19,7 @@ interface. When `next()` is called, copies of data previously accessed may be in
 
 #### Member functions
 
-#### staj_event input
+##### staj_event input
 
     virtual bool done() const = 0;
 Check if there are no more events.
@@ -36,8 +36,6 @@ Returns the current [staj_event](basic_staj_event.md).
     virtual const ser_context& context() const = 0;
 Returns the current [context](ser_context.md)
 
-#### Input to visitor
-
     virtual void read_to(json_visitor& visitor) = 0;
 Sends the parse events from the current event to the
 matching completion event to the supplied [visitor](basic_json_visitor.md)
@@ -52,21 +50,21 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.
 
-#### Typed Array input
+##### Typed Array input
 
-    virtual bool is_typed_array() const;               (since 1.8.0)
+    virtual bool is_typed_array() const;                         (since 1.8.0)
 
-    virtual typed_array_tags array_tag() const;        (since 1.8.0)
+    virtual typed_array_tags array_tag() const;                  (since 1.8.0)
 Returns a [tag](typed_array_tags.md) that indicates the element type of the typed array.
 
-    virtual jsoncons::span<uint8_t> array_buffer();    (since 1.8.0)
+    virtual jsoncons::span<uint8_t> array_buffer();              (since 1.8.0)
 
-    virtual void to_end_array();                       (since 1.8.0)
+    virtual void to_end_array();                                 (since 1.8.0)
 
-    template <typename T>                              (since 1.8.0)
+    template <typename T>                                        (since 1.8.0)
     void read_typed_array(T& v);
 
-#### Multi-dimensional array input
+##### Multi-dimensional array input
 
     virtual bool is_multi_dim() const;                           (since 1.8.0)
 Indicates whether an array is a multi-dimensional array.

@@ -92,31 +92,37 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 
 #### Member functions
 
-    bool done() const override;
-Checks if there are no more events.
+##### staj_event input
 
-    const basic_staj_event& current() const override;
-Returns the current [basic_staj_event](../corelib/staj_event.md).
+    bool done() const final;
+Check if there are no more events.
 
-    void read_to(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
-[visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
+    void next() final;
+Get the next event. If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
-    void read_to(basic_json_visitor<char_type>& visitor,
-                std::error_code& ec) override
-Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
-[visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, sets `ec`.
+    void next(std::error_code& ec) final;
+Get the next event. If a parsing error is encountered, sets `ec`.
 
-    void next() override;
-Advances to the next event. If a parsing error is encountered, throws a 
-[ser_error](../corelib/ser_error.md).
+    const staj_event& current() const final;
+Returns the current [staj_event](../corelib/basic_staj_event.md).
 
-    void next(std::error_code& ec) override;
-Advances to the next event. If a parsing error is encountered, sets `ec`.
+    void read_to(json_visitor& visitor) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, throws a [ser_error](../corelib/ser_error.md).
 
-    const ser_context& context() const override;
+    void read_to(json_visitor& visitor, std::error_code& ec) final;
+Sends the parse events from the current event to the
+matching completion event to the supplied [visitor](../corelib/basic_json_visitor.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, sets `ec`.
+
+##### Miscellaneous
+
+    const ser_context& context() const final;
 Returns the current [context](../corelib/ser_context.md)
 
     void reset();
@@ -124,7 +130,7 @@ Reset cursor to read another value from the same source
 
     template <typename Sourceable>
     reset(Sourceable&& source)
-Reset cursor to read new value from a new sources
+Reset cursor to read new value from a new source
 
 #### Non-member functions
 
