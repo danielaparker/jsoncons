@@ -210,7 +210,6 @@ public:
               size_(stor.size_),
               capacity_(stor.capacity_)
         {
-            capacity_ = round_up(size_);
             real_allocator_type alloc(a);
 
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
