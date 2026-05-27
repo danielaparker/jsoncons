@@ -570,9 +570,9 @@ namespace bson {
     inline
     decimal128_from_chars_result decimal128_from_chars(const char* first, const char* last, decimal128_t& dec) 
     {
-        static constexpr string_view inf_str = "inf";
-        static constexpr string_view infinity_str = "infinity";
-        static constexpr string_view nan_str = "nan";
+        static const string_view inf_str = "inf";
+        static const string_view infinity_str = "infinity";
+        static const string_view nan_str = "nan";
 
         ptrdiff_t len = last - first;
 
