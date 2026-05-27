@@ -388,6 +388,7 @@ public:
         if (state_ == parse_state::object)
         {
             visitor.end_object(*this, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;};
         }
         else if (state_ == parse_state::array)
         {
@@ -435,6 +436,7 @@ public:
         push_state(parse_state::array);
         state_ = parse_state::expect_value_or_end;
         visitor.begin_array(semantic_tag::none, *this, ec);
+        if (JSONCONS_UNLIKELY(ec)){return;};
 
         more_ = !cursor_mode_;
     }
@@ -452,6 +454,7 @@ public:
         if (state_ == parse_state::array)
         {
             visitor.end_array(*this, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;};
         }
         else if (state_ == parse_state::object)
         {
@@ -589,6 +592,7 @@ public:
         while (!finished())
         {
             parse_some(visitor, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;};
         }
     }
 
@@ -635,7 +639,7 @@ public:
                 case parse_state::start:
                     more_ = false;
                     ec = json_errc::unexpected_eof;
-                    break;                
+                    return;                
                 case parse_state::done:
                     more_ = false;
                     break;
@@ -1358,6 +1362,7 @@ public:
                             ++input_ptr_;
                             ++position_;
                             visitor.bool_value(true,  semantic_tag::none, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec)){return;}
                             if (level_ == 0)
                             {
                                 state_ = parse_state::accept;
@@ -1427,6 +1432,7 @@ public:
                             ++input_ptr_;
                             ++position_;
                             visitor.bool_value(false, semantic_tag::none, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec)){return;}
                             if (level_ == 0)
                             {
                                 state_ = parse_state::accept;
@@ -1480,6 +1486,7 @@ public:
                     {
                         case 'l':
                             visitor.null_value(semantic_tag::none, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec)){return;}
                             if (level_ == 0)
                             {
                                 state_ = parse_state::accept;
@@ -1617,6 +1624,7 @@ public:
                 cur += 4;
                 position_ += 4;
                 visitor.bool_value(true, semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return cur;}
                 if (level_ == 0)
                 {
                     state_ = parse_state::accept;
@@ -1654,6 +1662,7 @@ public:
                 input_ptr_ += 4;
                 position_ += 4;
                 visitor.null_value(semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return;}
                 more_ = !cursor_mode_;
                 if (level_ == 0)
                 {
@@ -1690,6 +1699,7 @@ public:
                 cur += 5;
                 position_ += 5;
                 visitor.bool_value(false, semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return cur;}
                 more_ = !cursor_mode_;
                 if (level_ == 0)
                 {
@@ -2462,12 +2472,14 @@ private:
         if (result)
         {
             visitor.int64_value(val, semantic_tag::none, *this, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;}
         }
         else // Must be overflow
         {
             if (lossless_bignum_)
             {
                 visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return;}
             }
             else
             {
@@ -2476,10 +2488,12 @@ private:
                 if (JSONCONS_LIKELY(result))
                 {
                     visitor.double_value(d, semantic_tag::none, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
                 else if (result.ec == std::errc::result_out_of_range)
                 {
                     visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
                 else
                 {
@@ -2488,7 +2502,6 @@ private:
                     return;
                 }
             }
-
         }
         more_ = !cursor_mode_;
         after_value(ec);
@@ -2501,12 +2514,14 @@ private:
         if (result)
         {
             visitor.uint64_value(val, semantic_tag::none, *this, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;}
         }
         else // Must be overflow
         {
             if (lossless_bignum_)
             {
                 visitor.string_value(buffer_, semantic_tag::bigint, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return;}
             }
             else
             {
@@ -2515,10 +2530,12 @@ private:
                 if (JSONCONS_LIKELY(result))
                 {
                     visitor.double_value(d, semantic_tag::none, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
                 else if (result.ec == std::errc::result_out_of_range)
                 {
                     visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
                 else
                 {
@@ -2537,6 +2554,7 @@ private:
         if (lossless_number_)
         {
             visitor.string_value(buffer_, semantic_tag::bigdec, *this, ec);
+            if (JSONCONS_UNLIKELY(ec)){return;}
         }
         else
         {
@@ -2545,16 +2563,19 @@ private:
             if (JSONCONS_LIKELY(result))
             {
                 visitor.double_value(d, semantic_tag::none, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return;}
             }
             else if (result.ec == std::errc::result_out_of_range)
             {
                 if (lossless_bignum_)
                 {
                     visitor.string_value(buffer_, semantic_tag::bigdec, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
                 else
                 {
                     visitor.double_value(d, semantic_tag{}, *this, ec); // REVISIT
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                 }
             }
             else
@@ -2583,6 +2604,7 @@ private:
         {
             case parse_state::member_name:
                 visitor.key(sv, *this, ec);
+                if (JSONCONS_UNLIKELY(ec)){return;}
                 more_ = !cursor_mode_;
                 pop_state();
                 state_ = parse_state::expect_colon;
@@ -2594,11 +2616,13 @@ private:
                 if (it != string_double_map_.end())
                 {
                     visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                     more_ = !cursor_mode_;
                 }
                 else
                 {
                     visitor.string_value(sv, escape_tag_, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                     more_ = !cursor_mode_;
                 }
                 state_ = parse_state::expect_comma_or_end;
@@ -2610,11 +2634,13 @@ private:
                 if (it != string_double_map_.end())
                 {
                     visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                     more_ = !cursor_mode_;
                 }
                 else
                 {
                     visitor.string_value(sv, escape_tag_, *this, ec);
+                    if (JSONCONS_UNLIKELY(ec)){return;}
                     more_ = !cursor_mode_;
                 }
                 state_ = parse_state::accept;
