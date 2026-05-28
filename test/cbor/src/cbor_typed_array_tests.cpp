@@ -92,7 +92,7 @@ TEST_CASE("cbor Typed Array cursor tests")
             std::cout << item << "\n";
         }
     }
-#if 0 // test
+//#if 0 // test
     SECTION("Tag 86, float64, little endian, read_typed_array")
     {
         //std::cout << "CBOR cursor Typed Array Tag 86, float64, little endian" << '\n';
@@ -115,10 +115,10 @@ TEST_CASE("cbor Typed Array cursor tests")
         CHECK( -1.79769e+308 == Approx(v1[0]));
         CHECK(1.79769e+308 == Approx(v1[1]));
     }
-#endif // test
+//#endif // test
 }
 
-#if 0
+//#if 0 // test
 
 TEST_CASE("cbor Typed Array tests")
 {
@@ -1176,4 +1176,4 @@ TEST_CASE("multi-dim regular array and typed array")
     }
 }
 
-#endif // test
+//#endif // test
