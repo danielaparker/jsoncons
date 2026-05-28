@@ -45,21 +45,6 @@ static void check_native(std::false_type,
 {
 }
 
-struct my_cbor_visitor : public default_json_visitor
-{
-    std::vector<double> v;
-private:
-    JSONCONS_VISITOR_RET_TYP visit_typed_array(const span<const double>& data,  
-        semantic_tag,
-        const ser_context&,
-        std::error_code&) override
-    {
-        //std::cout << "visit_typed_array size: " << data.size() << "\n";
-        v = std::vector<double>(data.begin(),data.end());
-        JSONCONS_VISITOR_RET_VAL
-    }
-};
-
 TEST_CASE("cbor Typed Array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -80,19 +65,10 @@ TEST_CASE("cbor Typed Array cursor tests")
 
         std::vector<double> v;
         cursor.read_typed_array(v);
-        for (auto item : v)
-        {
-            std::cout << item << "\n";
-        }
-
-        my_cbor_visitor visitor;
-        cursor.read_to(visitor);
-        for (auto item : visitor.v)
-        {
-            std::cout << item << "\n";
-        }
+        REQUIRE(2 == v.size());
+        CHECK( -1.79769e+308 == Approx(v[0]));
+        CHECK(1.79769e+308 == Approx(v[1]));
     }
-//#if 0 // test
     SECTION("Tag 86, float64, little endian, read_typed_array")
     {
         //std::cout << "CBOR cursor Typed Array Tag 86, float64, little endian" << '\n';
@@ -115,7 +91,6 @@ TEST_CASE("cbor Typed Array cursor tests")
         CHECK( -1.79769e+308 == Approx(v1[0]));
         CHECK(1.79769e+308 == Approx(v1[1]));
     }
-//#endif // test
 }
 
 //#if 0 // test

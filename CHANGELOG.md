@@ -81,11 +81,11 @@ Enhancements:
         virtual typed_array_tags array_tag() const; 
         virtual jsoncons::span<uint8_t> array_buffer(); 
         virtual void to_end_array(); 
-        template <typename T>
 
   - The following function has been added to `basic_staj_cursor` to support
   typed array input:
 
+        template <typename T>
         void read_typed_array(T& v);
 
 Release 1.7.0
