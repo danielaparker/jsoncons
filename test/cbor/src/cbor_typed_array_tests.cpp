@@ -804,47 +804,69 @@ TEST_CASE("cbor Typed Array tests")
         //REQUIRE(2 == j.size());
     }
 } 
-/*TEST_CASE("cbor multi dim row major parse tests")
-{
-    SECTION("Tag 86, float64, little endian")
-    {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, float64, little endian" << '\n';
 
-        const std::vector<uint8_t> v = {
-            0xd8,0x28,0x82,0x82,0x02,0x03,0x86,0x02,0x04,0x08,0x04,0x10,0x19,0x01,0x00
-        };
+TEST_CASE("cbor multi dim, row major, uint64, regular array tests")
+{
+    const std::vector<uint8_t> data = {
+        0xd8,0x28, // semantic tag 40, row major storage
+        0x82,  // array(2)
+        0x82,0x02,0x03, // array(2) -> [2,3]
+        0x86,  // array(6)
+        0x02,  // 2
+        0x04,  // 4
+        0x08,  // 8 
+        0x04,  // 4
+        0x10,  // 16
+        0x19,0x01,0x00  // 256
+    };
+
+    SECTION("parser test")
+    {
+        jsoncons::json expected = jsoncons::json::parse(R"(
+[[2,4,8],[4,16,256]]
+        )");
 
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor::cbor_bytes_reader reader(v, decoder);
+        cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
         json result = decoder.get_result();
-
-        std::cout << result << "\n";
+        CHECK(expected == result);
     }
-}
-
-TEST_CASE("cbor multi dim row major cursor tests")
-{
-    SECTION("Tag 86, float64, little endian")
+    SECTION("cursor test")
     {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, float64, little endian" << '\n';
-
-        const std::vector<uint8_t> input = {
-            0xd8, 0x28, 0x82, 0x82, 0x02, 0x03, 0x86, 0x02, 0x04, 0x08, 0x04, 0x10, 0x19, 0x01, 0x00
-        };
-
-        cbor::cbor_bytes_cursor cursor(input);
-        for (; !cursor.done(); cursor.next())
-        {
-            const auto& event = cursor.current();
-            std::cout << event.event_type() << " " << event.tag() << "\n";
-        }
+        cbor::cbor_bytes_cursor cursor(data);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        CHECK_FALSE(cursor.is_typed_array());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
     }
 }
-*/
 
 TEST_CASE("cbor multi-dim Typed Array parse tests")
 {
@@ -908,7 +930,7 @@ TEST_CASE("cbor multi-dim Typed Array parse tests")
         CHECK(expected == result);
     }
 }
-
+ 
 TEST_CASE("cbor multi-dim Typed Array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
