@@ -36,8 +36,8 @@ master
     deprecated.
 
     - The (undocumented but sometimes useful) class `basic_json_diagnostics_visitor` has
-    been renamed to `basic_diagnostics_json_visitor`, and its header `diagnostics_visitor.hpp`
-    to `diagnostics_json_visitor.hpp`. Rationale: naming consistency.
+    been renamed to `basic_trace_json_visitor`, and its header `diagnostics_visitor.hpp`
+    to `trace_json_visitor.hpp`. Rationale: naming consistency.
 
     - Until 1.8.0, when using the cursor api, it was necessary to supply a custom visitor 
       to read a CBOR typed array, like this,  

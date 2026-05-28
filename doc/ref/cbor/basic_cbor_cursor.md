@@ -318,58 +318,50 @@ Graham Greene
 
 ### Typed Array examples
 
-#### Read a Typed Array
+#### Read a typed array (until 1.8.0)
 
 ```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
-#include <iomanip>
 #include <cassert>
 
-struct my_cbor_visitor : public default_json_visitor
+namespace cbor = jsoncons::cbor;
+
+struct my_cbor_visitor : public jsoncons::default_json_visitor
 {
     std::vector<double> v;
 private:
-    bool visit_typed_array(const span<const double>& data,  
-                        semantic_tag,
-                        const ser_context&,
-                        std::error_code&) override
+    bool visit_typed_array(const jsoncons::span<const double>&data,
+        jsoncons::semantic_tag,
+        const jsoncons::ser_context&,
+        std::error_code&) override
     {
-        v = std::vector<double>(data.begin(),data.end());
+        v = std::vector<double>(data.begin(), data.end());
         return false;
     }
 };
 
 int main()
 {
-    std::vector<double> v{10.0,20.0,30.0,40.0};
-
-    std::vector<uint8_t> buffer;
-    auto options = cbor::cbor_options{}
-        .use_typed_arrays(true);
-    cbor::encode_cbor(v, buffer, options);
-
-    std::cout << "(1)\n";
-    std::cout << byte_string_view(buffer) << "\n\n";
-/*
-    0xd8, // Tag
+    std::vector<uint8_t> data = {
+        0xd8, // Tag
         0x56, // Tag 86, float64, little endian, Typed Array
-    0x58,0x20, // Byte string value of length 32 
-        0x00,0x00,0x00,0x00,0x00,0x00,0x24,0x40,
-        0x00,0x00,0x00,0x00,0x00,0x00,0x34,0x40, 
-        0x00,0x00,0x00,0x00,0x00,0x00,0x3e,0x40, 
-        0x00,0x00,0x00,0x00,0x00,0x00,0x44,0x40
-*/
+        0x58, 0x20, // Byte string value of length 32
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
+    };
 
-    cbor::cbor_bytes_cursor cursor(buffer);
-    assert(cursor.current().event_type() == staj_event_type::begin_array);
+    cbor::cbor_bytes_cursor cursor(data);
+    //assert(jsoncons::staj_event_type::begin_array == cursor.current().event_type()); 
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type());       // (since 1.7.0)
     assert(cursor.is_typed_array());
 
     my_cbor_visitor visitor;
     cursor.read_to(visitor);
-    std::cout << "(2)\n";
-    for (auto item : handler.v)
+    for (auto item : visitor.v)
     {
         std::cout << item << "\n";
     }
@@ -378,10 +370,49 @@ int main()
 ```
 Output:
 ```
-(1)
-d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e 40 00 00 00 00 00 00 44 40
+10
+20
+30
+40
+```
 
-(2)
+#### Read a typed array (since 1.8.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <cassert>
+
+namespace cbor = jsoncons::cbor;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0xd8, // Tag
+        0x56, // Tag 86, float64, little endian, Typed Array
+        0x58, 0x20, // Byte string value of length 32
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
+    };
+
+    cbor::cbor_bytes_cursor cursor(data);
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type()); 
+    assert(cursor.is_typed_array());
+
+    std::vector<double> v;
+    cursor.read_typed_array(v);
+    for (auto item : v)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+}
+```
+Output:
+```
 10
 20
 30
