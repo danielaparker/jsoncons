@@ -2584,6 +2584,11 @@ private:
             {
                 return;
             }
+            row_major_reader_ = mdarray_row_major_reader<Source,Allocator>(extents_, this);
+            if (!row_major_reader_.done())
+            {
+                row_major_reader_.next(visitor, *this, ec);
+            }
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major)
         {
@@ -2607,7 +2612,6 @@ private:
             ec = cbor_errc::bad_mdarray;
             return;
         }
-        row_major_reader_ = mdarray_row_major_reader<Source,Allocator>(extents_, this);
     }
 
     void read_extents(std::error_code& ec)
