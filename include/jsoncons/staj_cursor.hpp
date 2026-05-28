@@ -116,121 +116,121 @@ private:
         return true;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::begin_object, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::begin_object, length, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_end_object(const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::end_object);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::begin_array, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::begin_array, length, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_end_array(const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::end_array);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_events::key);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_events::null_value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RET_TYP visit_string(const string_view_type& s, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_events::string_value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& s, 
+    JSONCONS_VISITOR_RET_TYP visit_byte_string(const byte_string_view& s, 
         semantic_tag tag,
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_events::byte_string_value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& s, 
+    JSONCONS_VISITOR_RET_TYP visit_byte_string(const byte_string_view& s, 
         uint64_t ext_tag,
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_events::byte_string_value, ext_tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
+    JSONCONS_VISITOR_RET_TYP visit_uint64(uint64_t value, 
         semantic_tag tag, 
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
+    JSONCONS_VISITOR_RET_TYP visit_int64(int64_t value, 
         semantic_tag tag,
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
+    JSONCONS_VISITOR_RET_TYP visit_half(uint16_t value, 
         semantic_tag tag,
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(half_arg, value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
+    JSONCONS_VISITOR_RET_TYP visit_double(double value, 
         semantic_tag tag, 
         const ser_context&,
         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
+    JSONCONS_VISITOR_RET_TYP visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
         semantic_tag tag,
         const ser_context& context, 
         std::error_code& ec) override
@@ -238,14 +238,14 @@ private:
         state_ = staj_cursor_state::multi_dim;
         shape_ = shape;
         this->begin_array(2, tag, context, ec);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
+    JSONCONS_VISITOR_RET_TYP visit_end_multi_dim(const ser_context& context,
         std::error_code& ec) override
     {
         this->end_array(context, ec);
-        JSONCONS_VISITOR_RETURN;
+        JSONCONS_VISITOR_RET_VAL
     }
 
     void visit_flush() override
@@ -342,6 +342,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -359,6 +360,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -376,6 +378,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -393,6 +396,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -410,6 +414,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -427,6 +432,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -444,6 +450,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -461,6 +468,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -476,8 +484,17 @@ public:
                         v.resize(ta.size());
                         std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
                     }
+                    else if (std::is_floating_point<value_type>::value)
+                    {
+                        v.reserve(ta.size());
+                        for (auto item : ta)
+                        {
+                            v.push_back(static_cast<value_type>(binary::decode_half(item)));
+                        }
+                    }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -495,6 +512,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));
@@ -512,6 +530,7 @@ public:
                     }
                     else
                     {
+                        v.reserve(ta.size());
                         for (auto item : ta)
                         {
                             v.push_back(static_cast<value_type>(item));

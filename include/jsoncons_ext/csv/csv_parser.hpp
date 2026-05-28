@@ -381,19 +381,19 @@ namespace detail {
         {
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) override
+        JSONCONS_VISITOR_RET_TYP visit_end_object(const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -401,10 +401,10 @@ namespace detail {
                 
                 ++level2_;
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_end_array(const ser_context&, std::error_code&) override
         {
             if (level2_ > 0)
             {
@@ -416,16 +416,16 @@ namespace detail {
             {
                 name_index_ = 0;
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type&, const ser_context&, std::error_code& ec) override
+        JSONCONS_VISITOR_RET_TYP visit_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -435,10 +435,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -449,10 +449,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value,
+        JSONCONS_VISITOR_RET_TYP visit_byte_string(const byte_string_view& value,
                                   semantic_tag tag,
                                   const ser_context&,
                                   std::error_code&) override
@@ -465,10 +465,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value,
+        JSONCONS_VISITOR_RET_TYP visit_double(double value,
                              semantic_tag tag, 
                              const ser_context&,
                              std::error_code&) override
@@ -481,10 +481,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value,
+        JSONCONS_VISITOR_RET_TYP visit_int64(int64_t value,
                             semantic_tag tag,
                             const ser_context&,
                             std::error_code&) override
@@ -497,10 +497,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value,
+        JSONCONS_VISITOR_RET_TYP visit_uint64(uint64_t value,
                              semantic_tag tag,
                              const ser_context&,
                              std::error_code&) override
@@ -513,10 +513,10 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -526,7 +526,7 @@ namespace detail {
                     ++name_index_;
                 }
             }
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
     };
 

@@ -87,95 +87,95 @@ namespace jsoncons {
                 output_ << indentation_;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_begin_object_name << '\n';
             ++level_;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_begin_object_name << separator_ << length << '\n';
             ++level_;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_end_object(const ser_context&, std::error_code&) override
         {
             --level_;
             indent();
             output_ << visit_end_object_name << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_begin_array_name << '\n';
             ++level_;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_begin_array_name << separator_  << length << '\n';
             ++level_;
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_end_array(const ser_context&, std::error_code&) override
         {
             --level_;
             indent();
             output_ << visit_end_array_name << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_key_name << separator_  << s << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_string_name << separator_  << s << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_int64_name << separator_  << val << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_uint64_name << separator_ << val << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_double(double val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_double_name << separator_ << val << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_bool_name << separator_ << val << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RET_TYP visit_null(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
             output_ << visit_null_name << '\n';
-            JSONCONS_VISITOR_RETURN;
+            JSONCONS_VISITOR_RET_VAL
         }
     };
 #if __cplusplus >= 201703L
