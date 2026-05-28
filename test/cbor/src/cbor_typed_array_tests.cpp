@@ -805,7 +805,7 @@ TEST_CASE("cbor Typed Array tests")
     }
 } 
 
-TEST_CASE("cbor multi dim, row major, uint64, regular array tests")
+TEST_CASE("cbor multi dim, row major, uint64, classical array tests")
 {
     const std::vector<uint8_t> data = {
         0xd8,0x28, // semantic tag 40, row major storage
@@ -996,7 +996,7 @@ TEST_CASE("cbor multi-dim Typed Array cursor tests")
     }
 }
 
-TEST_CASE("cbor multi-dim regular array tests")
+TEST_CASE("cbor multi-dim classical array tests")
 {
     SECTION("row major")
     {
@@ -1138,7 +1138,7 @@ TEST_CASE("cbor multi-dim cursor tests")
     }
 }
 
-TEST_CASE("multi-dim regular array and typed array")
+TEST_CASE("multi-dim classical array and typed array")
 {
     SECTION("test 1")
     {

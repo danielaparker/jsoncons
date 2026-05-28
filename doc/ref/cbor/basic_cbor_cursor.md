@@ -316,9 +316,9 @@ Haruki Murakami
 Graham Greene
 ```
 
-### Typed Array examples
+### Typed Array examples (until 1.8.0)
 
-#### Read a typed array (until 1.8.0)
+#### Read a typed array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -376,50 +376,7 @@ Output:
 40
 ```
 
-#### Read a typed array (since 1.8.0)
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
-#include <iostream>
-#include <cassert>
-
-namespace cbor = jsoncons::cbor;
-
-int main()
-{
-    std::vector<uint8_t> data = {
-        0xd8, // Tag
-        0x56, // Tag 86, float64, little endian, Typed Array
-        0x58, 0x20, // Byte string value of length 32
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x40,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
-    };
-
-    cbor::cbor_bytes_cursor cursor(data);
-    assert(jsoncons::staj_events::begin_array == cursor.current().event_type()); 
-    assert(cursor.is_typed_array());
-
-    std::vector<double> v;
-    cursor.read_typed_array(v);
-    for (auto item : v)
-    {
-        std::cout << item << "\n";
-    }
-    std::cout << "\n";
-}
-```
-Output:
-```
-10
-20
-30
-40
-```
-
-#### Navigating Typed Arrays with cursor - multi-dimensional row major with Typed Array
+#### Navigating typed arrays with cursor - multi-dimensional row major with Typed Array 
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
@@ -488,7 +445,7 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-#### Navigating Typed Arrays with cursor - multi-dimensional column major with classical CBOR array
+#### Navigating typed arrays with cursor - multi-dimensional column major with classical CBOR array
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
@@ -554,6 +511,51 @@ uint64_value: 10 (n/a)
 uint64_value: 100 (n/a)
 end_array (n/a)
 end_array (n/a)
+```
+
+### Typed Array examples (since 1.8.0)
+
+#### Read a typed array
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <cassert>
+
+namespace cbor = jsoncons::cbor;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0xd8, // Tag
+        0x56, // Tag 86, float64, little endian, Typed Array
+        0x58, 0x20, // Byte string value of length 32
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x40,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
+    };
+
+    cbor::cbor_bytes_cursor cursor(data);
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type()); 
+    assert(cursor.is_typed_array());
+
+    std::vector<double> v;
+    cursor.read_typed_array(v);
+    for (auto item : v)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+}
+```
+Output:
+```
+10
+20
+30
+40
 ```
 
 ### See also
