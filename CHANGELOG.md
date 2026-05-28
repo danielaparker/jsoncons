@@ -39,6 +39,31 @@ master
     been renamed to `basic_diagnostics_json_visitor`, and its header `diagnostics_visitor.hpp`
     to `diagnostics_json_visitor.hpp`. Rationale: naming consistency.
 
+    - Until 1.8.0, when using the cursor api, it was necessary to supply a custom visitor 
+      to read a CBOR typed array, like this,  
+    ```
+    struct my_cbor_visitor : public default_json_visitor
+    {
+        std::vector<double> v;
+    private:
+        bool visit_typed_array(const span<const double>& data,  
+            semantic_tag, const ser_context&, std::error_code&) override
+        {
+            v = std::vector<double>(data.begin(),data.end());
+            return true;
+        }
+    };
+
+    my_cbor_visitor visitor;
+    cursor.read_to(visitor);
+    ```
+    Since 1.8.0, this will not work, `read_to(visitor)` will not result in a call to `visit_typed_array`.
+    Instead, you can simply write,
+    ```
+    std::vector<double> v;
+    cursor.read_typed_array(v);
+    ```
+
 Enhancements:
 
   - The following virtual functions have been added to `basic_staj_cursor`,
