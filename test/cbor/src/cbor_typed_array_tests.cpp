@@ -93,8 +93,6 @@ TEST_CASE("cbor Typed Array cursor tests")
     }
 }
 
-//#if 0 // test
-
 TEST_CASE("cbor Typed Array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
@@ -1007,11 +1005,11 @@ TEST_CASE("cbor multi-dim typed array row major, uint64, little endian")
         CHECK(staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
-        for (; !cursor.done(); cursor.next())
+        /*for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
             std::cout << event.event_type() << " " << event.tag() << "\n";
-        }
+        }*/
     }
 }
  
@@ -1036,11 +1034,48 @@ TEST_CASE("cbor multi-dim Typed Array column major, cursor tests 2")
 
         std::cout << "\n\n";
         cbor::cbor_bytes_cursor cursor(v);
-        for (; !cursor.done(); cursor.next())
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        cursor.next();
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        cursor.next();
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
+        /*for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
             std::cout << event.event_type() << " " << event.tag() << std::endl;
-        }
+        }*/
     }
 }
 
@@ -1132,7 +1167,8 @@ TEST_CASE("cbor multi-dim classical array tests")
         //CHECK(expected == result);
     }
 }
-TEST_CASE("cbor multi-dim cursor tests")
+
+TEST_CASE("cbor multi-dim classical array cursor tests")
 {
     SECTION("row major")
     {
@@ -1142,7 +1178,7 @@ TEST_CASE("cbor multi-dim cursor tests")
             [[1, 2, 3], [4, 5, 6]]
         )");
 
-        const std::vector<uint8_t> v = {
+        const std::vector<uint8_t> data = {
             0xD8, 0x28, // Tag 40 Multi-dimensional array (Row-Major)
             0x82,       // Wrapper for dimensions and data
             0x82,       // The dimensions: [Rows, Columns]
@@ -1152,13 +1188,34 @@ TEST_CASE("cbor multi-dim cursor tests")
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06
         };
 
-        std::cout << "\n\n";
-        cbor::cbor_bytes_cursor cursor(v);
-        for (; !cursor.done(); cursor.next())
-        {
-            const auto& event = cursor.current();
-            std::cout << event.event_type() << " " << event.tag() << std::endl;
-        }
+        cbor::cbor_bytes_cursor cursor(data);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        CHECK_FALSE(cursor.is_typed_array());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
     }
     SECTION("column major")
     {
@@ -1166,7 +1223,7 @@ TEST_CASE("cbor multi-dim cursor tests")
             [[1, 2, 3], [4, 5, 6]]
         )");
 
-        const std::vector<uint8_t> v = {
+        const std::vector<uint8_t> data = {
             0xD9, 0x04, 0x10, // Tag 1040 Multi-dim Array (Column-Major)
             0x82,             // Outer container for [dimensions, data]
             0x82,             // The dimensions array
@@ -1177,12 +1234,34 @@ TEST_CASE("cbor multi-dim cursor tests")
         };
 
         std::cout << "\n\n";
-        cbor::cbor_bytes_cursor cursor(v);
-        for (; !cursor.done(); cursor.next())
-        {
-            const auto& event = cursor.current();
-            std::cout << event.event_type() << " " << event.tag() << std::endl;
-        }
+        cbor::cbor_bytes_cursor cursor(data);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        CHECK_FALSE(cursor.is_typed_array());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
     }
 }
 
@@ -1225,4 +1304,3 @@ TEST_CASE("multi-dim classical array and typed array")
     }
 }
 
-//#endif // test
