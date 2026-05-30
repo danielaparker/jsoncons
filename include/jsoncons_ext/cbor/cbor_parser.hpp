@@ -103,6 +103,10 @@ public:
                 if (first_)
                 {
                     visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     first_ = false;
                     more = false;
                     continue;
@@ -110,6 +114,10 @@ public:
                 if (dimensions_[dim_].index == dimensions_[dim_].end)
                 {
                     visitor.end_array(context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     done_ = true;
                     more = false;
                     continue;
@@ -118,6 +126,10 @@ public:
             if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
             {
                 visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
                 ++dim_;
                 continue;
             }

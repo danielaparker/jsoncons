@@ -3,6 +3,8 @@ master
 
 - Fixed bugs:
 
+  - Git Issue #714: json_parser does not stop calling the visitor after visit_* signals an error via std::error_code
+
   - Git Issue #712/PR #713: quieten GCC 16 (spurious?) array-out-of-bounds warning
 
   - Git PR #711: Fix staj_event::as_double silently returning 0 for non-numeric strings

@@ -400,46 +400,53 @@ public:
     {
         JSONCONS_ASSERT(!dimensions_.empty());
 
-        if (dim_ == 0)
+        bool more = true;
+        while (more)
         {
-            if (first_)
+            if (dim_ == 0)
             {
-                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
-                first_ = false;
-                return;
+                if (first_)
+                {
+                    visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
+                    first_ = false;
+                    more = false;
+                    continue;
+                }
+                if (dimensions_[dim_].index == dimensions_[dim_].end)
+                {
+                    visitor.end_array(context, ec);
+                    done_ = true;
+                    more = false;
+                    continue;
+                }
             }
-            if (dimensions_[dim_].index == dimensions_[dim_].end)
+            if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
+            {
+                visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
+                ++dim_;
+                continue;
+            }
+            if (dimensions_[dim_].index < dimensions_[dim_].end)
+            {
+                this->write_value(data_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
+                dimensions_[dim_].index += dimensions_[dim_].stride;
+                more = false;
+                continue;
+            }
+            if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
             {
                 visitor.end_array(context, ec);
-                done_ = true;
-                return;
-            }
-        }
-        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
-            ++dim_;
-            return;
-        }
-        if (dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            this->write_value(data_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
-            dimensions_[dim_].index += dimensions_[dim_].stride;
-            return;
-        }
-        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
-        {
-            visitor.end_array(context, ec);
-            if (dim_ > 0)
-            {
-                --dim_;
-                dimensions_[dim_].index += dimensions_[dim_].stride;
-                if (dimensions_[dim_].index < dimensions_[dim_].end)
+                if (dim_ > 0)
                 {
-                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
+                    --dim_;
+                    dimensions_[dim_].index += dimensions_[dim_].stride;
+                    if (dimensions_[dim_].index < dimensions_[dim_].end)
                     {
-                        dimensions_[i].index = dimensions_[i-1].index;
-                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
+                        for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
+                        {
+                            dimensions_[i].index = dimensions_[i-1].index;
+                            dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
+                        }
                     }
                 }
             }
