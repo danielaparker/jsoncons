@@ -1074,24 +1074,28 @@ TEST_CASE("cbor multi-dim Typed Array column major, cursor tests 2")
 
 TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
 {
+    const std::vector<uint8_t> data = {
+        0xD8, 0x28,        // CBOR Tag 40 (Hex 28 is decimal 40).
+        0x9F,              // Starts the outer indefinite-length wrapper array.
+        0x82,              // The dimensions array. It is a definite-length array of 2 elements
+        0x02, 0x02,        // The dimensions
+        0x9F,              // Starts the flat data contents indefinite-length array.
+        0x01, 0x02, 0x03, 0x04, // The raw flattened numbers 1, 2, 3, 4 poured into a single linear stream.
+        0xFF,  // The break byte terminating the flat contents array. 
+        0xFF   // The break byte terminating the outer wrapper array. 
+    };
+
+    auto parse_expected  = jsoncons::json::parse(R"(
+        [[1, 2], [3, 4]]
+    )");
+
+    auto cursor_expected  = jsoncons::json::parse(R"(
+        [1, 2, 3, 4]
+    )");
+
     SECTION("parse test")
     {
         //std::cout << "CBOR multi-dim Typed Array Tag 86, uint16, big endian" << '\n';
-
-        auto expected = jsoncons::json::parse(R"(
-            [[1, 2], [3, 4]]
-        )");
-
-        const std::vector<uint8_t> data = {
-            0xD8, 0x28,        // CBOR Tag 40 (Hex 28 is decimal 40).
-            0x9F,              // Starts the outer indefinite-length wrapper array.
-            0x82,              // The dimensions array. It is a definite-length array of 2 elements
-            0x02, 0x02,        // The dimensions
-            0x9F,              // Starts the flat data contents indefinite-length array.
-            0x01, 0x02, 0x03, 0x04, // The raw flattened numbers 1, 2, 3, 4 poured into a single linear stream.
-            0xFF,  // The break byte terminating the flat contents array. 
-            0xFF   // The break byte terminating the outer wrapper array. 
-        };
 
         jsoncons::json_decoder<json> decoder;
 
@@ -1100,7 +1104,24 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
         reader.read(ec);
         REQUIRE(!ec);
         REQUIRE(decoder.is_valid());
-        CHECK(expected == decoder.get_result());
+        CHECK(parse_expected  == decoder.get_result());
+    }
+    SECTION("cursor read_to test")
+    {
+        jsoncons::json_decoder<jsoncons::json> decoder;
+
+        cbor::cbor_bytes_cursor cursor(data);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        CHECK_FALSE(cursor.is_typed_array());
+        cursor.read_to(decoder);
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
+        REQUIRE(decoder.is_valid());
+
+        CHECK(cursor_expected == decoder.get_result());
     }
 }
 
