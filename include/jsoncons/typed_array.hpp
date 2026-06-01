@@ -17,6 +17,7 @@
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/json_error.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
@@ -398,7 +399,11 @@ public:
     void next(typed_array_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!dimensions_.empty());
+        if (JSONCONS_UNLIKELY(dimensions_.empty()))
+        {
+            ec = json_errc::invalid_value;
+            return;
+        }
 
         if (dim_ == 0)
         {
