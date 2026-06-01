@@ -399,11 +399,7 @@ public:
     void next(typed_array_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(dimensions_.empty()))
-        {
-            ec = json_errc::invalid_value;
-            return;
-        }
+        JSONCONS_ASSERT(!dimensions_.empty());
 
         if (dim_ == 0)
         {

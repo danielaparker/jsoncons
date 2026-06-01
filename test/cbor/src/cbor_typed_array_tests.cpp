@@ -803,7 +803,7 @@ TEST_CASE("cbor Typed Array tests")
     }
 } 
 
-TEST_CASE("cbor multi dim, row major, uint64, classical array tests")
+TEST_CASE("cbor multi-dim, row major, uint64, classical array tests")
 {
     const std::vector<uint8_t> data = {
         0xd8,0x28, // semantic tag 40, row major storage
@@ -818,10 +818,13 @@ TEST_CASE("cbor multi dim, row major, uint64, classical array tests")
         0x19,0x01,0x00  // 256
     };
 
-    auto expected = jsoncons::json::parse(R"(
+    auto parser_expected = jsoncons::json::parse(R"(
 [[2,4,8],[4,16,256]]
     )");
 
+    auto cursor_expected = jsoncons::json::parse(R"(
+[2,4,8,4,16,256]
+    )");
 
     SECTION("parser test")
     {
@@ -832,7 +835,7 @@ TEST_CASE("cbor multi dim, row major, uint64, classical array tests")
         reader.read(ec);
 
         json result = decoder.get_result();
-        CHECK(expected == result);
+        CHECK(parser_expected == result);
     }
     SECTION("cursor test")
     {
@@ -864,6 +867,23 @@ TEST_CASE("cbor multi dim, row major, uint64, classical array tests")
         CHECK(staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
+    }
+    SECTION("cursor read_to test")
+    {
+        jsoncons::json_decoder<jsoncons::json> decoder;
+
+        cbor::cbor_bytes_cursor cursor(data);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(cursor.is_multi_dim());
+        CHECK_FALSE(cursor.is_typed_array());
+        cursor.read_to(decoder);
+        CHECK(staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(cursor.done());
+        REQUIRE(decoder.is_valid());
+
+        CHECK(cursor_expected == decoder.get_result());
     }
 }
 
@@ -1004,7 +1024,7 @@ TEST_CASE("cbor multi-dim Typed Array column major, cursor tests 2")
 {
     SECTION("Tag 86, float64, little endian")
     {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, uint8" << '\n';
+        //std::cout << "CBOR multi-dim Typed Array Tag 86, uint8" << '\n';
 
         auto expected = jsoncons::json::parse(R"(
             [[1, 2, 3], [4, 5, 6]]
@@ -1052,40 +1072,11 @@ TEST_CASE("cbor multi-dim Typed Array column major, cursor tests 2")
     }
 }
 
-TEST_CASE("cbor multi-dim classical array tests")
+TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
 {
-    SECTION("row major")
+    SECTION("parse test")
     {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, uint16, big endian" << '\n';
-
-        auto expected = jsoncons::json::parse(R"(
-            [[1, 2, 3], [4, 5, 6]]
-        )");
-
-        const std::vector<uint8_t> v = {
-            0xD8, 0x28, // Tag 40 Multi-dimensional array (Row-Major)
-            0x82,       // Wrapper for dimensions and data
-            0x82,       // The dimensions: [Rows, Columns]
-            0x02,       // Number of rows
-            0x03,       // Number of columns
-            0x86,       // Array (6 elements)
-            0x01,0x02,0x03,0x04,0x05,0x06
-        };
-
-        std::error_code ec;
-
-        jsoncons::json_decoder<json> decoder;
-
-        cbor::cbor_bytes_reader reader(v, decoder);
-        reader.read(ec);
-
-        REQUIRE(decoder.is_valid());
-        json result = decoder.get_result();
-        CHECK(expected == result);
-    }
-    SECTION("row major, indefinite array")
-    {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, uint16, big endian" << '\n';
+        //std::cout << "CBOR multi-dim Typed Array Tag 86, uint16, big endian" << '\n';
 
         auto expected = jsoncons::json::parse(R"(
             [[1, 2], [3, 4]]
@@ -1111,26 +1102,26 @@ TEST_CASE("cbor multi-dim classical array tests")
         REQUIRE(decoder.is_valid());
         CHECK(expected == decoder.get_result());
     }
-    SECTION("column major")
+}
+
+TEST_CASE("cbor multi-dim, column-major, classical indefinite array tests")
+{
+    auto expected = jsoncons::json::parse(R"(
+         [1,4,2,5,3,6]
+    )");
+
+    const std::vector<uint8_t> v = {
+        0xD9, 0x04, 0x10, // Tag 1040 Multi-dim Array (Column-Major)
+        0x82,             // Outer container for [dimensions, data]
+        0x82,             // The dimensions array
+        0x02,             // 2 Rows
+        0x03,             // 3 Columns
+        0x86,             // Array (6 items)
+        0x01, 0x04, 0x02, 0x05, 0x03, 0x06
+    };
+
+    SECTION("parse test")
     {
-        /*auto expected = jsoncons::json::parse(R"(
-            [[1, 2, 3], [4, 5, 6]]
-        )");*/
-
-        auto expected = jsoncons::json::parse(R"(
-             [1,4,2,5,3,6]
-        )");
-
-        const std::vector<uint8_t> v = {
-            0xD9, 0x04, 0x10, // Tag 1040 Multi-dim Array (Column-Major)
-            0x82,             // Outer container for [dimensions, data]
-            0x82,             // The dimensions array
-            0x02,             // 2 Rows
-            0x03,             // 3 Columns
-            0x86,             // Array (6 items)
-            0x01, 0x04, 0x02, 0x05, 0x03, 0x06
-        };
-
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
@@ -1146,7 +1137,7 @@ TEST_CASE("cbor multi-dim classical array cursor tests")
 {
     SECTION("row major")
     {
-        //std::cout << "CBOR multi dim Typed Array Tag 86, uint16, big endian" << '\n';
+        //std::cout << "CBOR multi-dim Typed Array Tag 86, uint16, big endian" << '\n';
 
         auto expected = jsoncons::json::parse(R"(
             [[1, 2, 3], [4, 5, 6]]
