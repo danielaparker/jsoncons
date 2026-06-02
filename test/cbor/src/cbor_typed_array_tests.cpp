@@ -1128,7 +1128,7 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
 TEST_CASE("cbor multi-dim, column-major, classical indefinite array tests")
 {
     auto expected = jsoncons::json::parse(R"(
-         [1,4,2,5,3,6]
+         [[2,3],[1,4,2,5,3,6]]
     )");
 
     const std::vector<uint8_t> v = {

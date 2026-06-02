@@ -158,6 +158,127 @@ public:
     }
 };
 
+template <typename Source, typename Allocator>
+class cbor_mdarray_column_major_iterator 
+{
+public:
+    using json_visitor_type = item_event_visitor;
+private:
+
+    std::vector<mdarray_dimension> dimensions_;
+    semantic_tag tag_{};
+    std::size_t dim_{0};
+    bool first_{true};
+    bool done_{false};
+    std::size_t count_{0};
+    basic_cbor_parser<Source,Allocator>* parser_;
+    bool cursor_mode_;
+public:
+    cbor_mdarray_column_major_iterator(jsoncons::span<const std::size_t> extents,
+        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
+        : dimensions_(extents.size(), mdarray_dimension{}),
+          parser_(parser), cursor_mode_(cursor_mode)
+    {
+        std::vector<std::size_t> strides(extents.size(), 0);
+        std::size_t stride = 1;
+        const size_t num_extents = extents.size();
+        for (size_t i = 0; i < num_extents; ++i)
+        {
+            strides[num_extents - i - 1] = stride;
+            stride *= extents[num_extents - i - 1];
+        }
+        for (std::size_t i = 0; i < strides.size(); ++i)
+        {
+            dimensions_[i].extent = extents[i];
+            dimensions_[i].stride = strides[i];
+            dimensions_[i].index = 0;
+            dimensions_[i].end = strides[i] * extents[i];
+        }
+    }
+
+    bool done() const 
+    {
+        return done_;
+    }
+
+    std::size_t count() const
+    {
+        return count_;
+    }
+
+    void next(json_visitor_type& visitor, const ser_context& context, 
+        std::error_code& ec) 
+    {
+        JSONCONS_ASSERT(!dimensions_.empty());
+
+        if (dim_ == 0)
+        {
+            if (first_)
+            {
+                if (!cursor_mode_)
+                {
+                    visitor.begin_array(dimensions_[dim_].extent, semantic_tag::multi_dim_column_major, context, ec);
+                    visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
+                    for (auto item : dimensions_)
+                    {
+                        visitor.uint64_value(item.extent, semantic_tag::none, context, ec);
+                    }
+                    visitor.end_array(context, ec);
+                }
+                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                first_ = false;
+                return;
+            }
+            if (dimensions_[dim_].index == dimensions_[dim_].end)
+            {
+                visitor.end_array(context, ec);
+                if (!cursor_mode_)
+                {
+                    visitor.end_array(context, ec);
+                }
+                done_ = true;
+                return;
+            }
+        }
+        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
+        {
+            ++dim_;
+            return;
+        }
+        if (dimensions_[dim_].index < dimensions_[dim_].end)
+        {
+            parser_->read_item(visitor, ec);
+            dimensions_[dim_].index += dimensions_[dim_].stride;
+            ++count_;
+            return;
+        }
+        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
+        {
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            if (dim_ > 0)
+            {
+                --dim_;
+                dimensions_[dim_].index += dimensions_[dim_].stride;
+                if (dimensions_[dim_].index < dimensions_[dim_].end)
+                {
+                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
+                    {
+                        dimensions_[i].index = dimensions_[i-1].index;
+                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
+                    }
+                }
+            }
+        }
+    }
+};
+
 struct parse_state 
 {
     parse_mode mode; 
@@ -271,7 +392,8 @@ class basic_cbor_parser : public ser_context
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
-    std::unique_ptr<cbor_mdarray_row_major_iterator<Source,Allocator>> row_major_reader_;
+    std::unique_ptr<cbor_mdarray_row_major_iterator<Source,Allocator>> row_major_iterator_;
+    std::unique_ptr<cbor_mdarray_column_major_iterator<Source,Allocator>> column_major_iterator_;
 
     struct read_byte_string_from_buffer
     {
@@ -454,9 +576,9 @@ public:
                 {
                     if (is_multi_dim() && order_ == mdarray_order::row_major) // multi
                     {
-                        if (!row_major_reader_->done())
+                        if (!row_major_iterator_->done())
                         {
-                            row_major_reader_->next(visitor, *this, ec);
+                            row_major_iterator_->next(visitor, *this, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -464,7 +586,32 @@ public:
                         }
                         else
                         {
-                            if (row_major_reader_->count() != state_stack_.back().length)
+                            if (row_major_iterator_->count() != state_stack_.back().length)
+                            {
+                                //std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
+                                ec = cbor_errc::bad_mdarray;
+                                return;
+                            }
+                            end_row_major_storage(ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    else if (is_multi_dim() && order_ == mdarray_order::column_major) // multi
+                    {
+                        if (!column_major_iterator_->done())
+                        {
+                            column_major_iterator_->next(visitor, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (column_major_iterator_->count() != state_stack_.back().length)
                             {
                                 //std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
                                 ec = cbor_errc::bad_mdarray;
@@ -503,9 +650,44 @@ public:
                 {
                     if (is_multi_dim() && order_ == mdarray_order::row_major) // multi
                     {
-                        if (!row_major_reader_->done())
+                        if (!row_major_iterator_->done())
                         {
-                            row_major_reader_->next(visitor, *this, ec);
+                            row_major_iterator_->next(visitor, *this, ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            auto c = source_.peek();
+                            if (JSONCONS_UNLIKELY(c.eof))
+                            {
+                                ec = cbor_errc::unexpected_eof;
+                                more_ = false;
+                                return;
+                            }
+                            if (c.value == 0xff)
+                            {
+                                source_.ignore(1);
+                            }
+                            else
+                            {
+                                ec = cbor_errc::bad_mdarray;
+                                return;
+                            }
+                            end_row_major_storage(ec);
+                            if (JSONCONS_UNLIKELY(ec))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    else if (is_multi_dim() && order_ == mdarray_order::column_major) // multi
+                    {
+                        if (!column_major_iterator_->done())
+                        {
+                            column_major_iterator_->next(visitor, *this, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -2595,19 +2777,29 @@ private:
             {
                 return;
             }
-            row_major_reader_ = jsoncons::make_unique<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
-            if (!row_major_reader_->done())
+            row_major_iterator_ = jsoncons::make_unique<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
+            if (!row_major_iterator_->done())
             {
-                row_major_reader_->next(visitor, *this, ec);
+                row_major_iterator_->next(visitor, *this, ec);
             }
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major) // multi
         {
-            begin_array(visitor, info, ec);
+            begin_row_major_storage(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
+            column_major_iterator_ = jsoncons::make_unique<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
+            if (!column_major_iterator_->done())
+            {
+                column_major_iterator_->next(visitor, *this, ec);
+            }
+            //begin_array(visitor, info, ec);
+            //if (JSONCONS_UNLIKELY(ec))
+            //{
+            //   return;
+            //}
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::byte_string)
         {
