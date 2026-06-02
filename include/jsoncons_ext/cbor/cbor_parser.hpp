@@ -601,7 +601,7 @@ public:
                                 ec = cbor_errc::bad_mdarray;
                                 return;
                             }
-                            end_row_major_storage(ec);
+                            end_classical_array_storage(ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -626,7 +626,7 @@ public:
                                 ec = cbor_errc::bad_mdarray;
                                 return;
                             }
-                            end_row_major_storage(ec);
+                            end_classical_array_storage(ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -685,7 +685,7 @@ public:
                                 ec = cbor_errc::bad_mdarray;
                                 return;
                             }
-                            end_row_major_storage(ec);
+                            end_classical_array_storage(ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -720,7 +720,7 @@ public:
                                 ec = cbor_errc::bad_mdarray;
                                 return;
                             }
-                            end_row_major_storage(ec);
+                            end_classical_array_storage(ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -1269,7 +1269,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_row_major_storage(uint8_t info, std::error_code& ec)
+    void begin_classical_array_storage(uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -1307,7 +1307,7 @@ private:
         }
     }
 
-    void end_row_major_storage(std::error_code&)
+    void end_classical_array_storage(std::error_code&)
     {
         --nesting_depth_;
 
@@ -2781,7 +2781,7 @@ private:
 
         if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::row_major) // multi
         {
-            begin_row_major_storage(info, ec);
+            begin_classical_array_storage(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -2794,7 +2794,7 @@ private:
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major) // multi
         {
-            begin_row_major_storage(info, ec);
+            begin_classical_array_storage(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
