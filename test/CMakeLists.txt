@@ -160,7 +160,7 @@ add_executable(unit_tests
                csv/src/csv_subfield_tests.cpp
                csv/src/csv_tests.cpp
                csv/src/encode_decode_csv_tests.cpp
-               fuzz_regression/src/fuzz_regression_tests.cpp
+               clusterfuzz/src/fuzz_regression_tests.cpp
                jmespath/src/jmespath_custom_function_tests.cpp
                jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_let_tests.cpp
