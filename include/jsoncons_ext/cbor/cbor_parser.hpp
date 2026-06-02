@@ -39,11 +39,23 @@ enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,ma
 template <typename Source,typename Allocator>
 class basic_cbor_parser;
 
-template <typename Source, typename Allocator>
-class cbor_mdarray_row_major_iterator 
+class cbor_mdarray_iterator
 {
 public:
-    using json_visitor_type = item_event_visitor;
+    virtual ~cbor_mdarray_iterator() = default;
+
+    virtual std::size_t count() const = 0;
+
+    virtual bool done() const = 0;
+
+    virtual void next(item_event_visitor& visitor, const ser_context& context, 
+        std::error_code& ec) = 0;
+
+};
+
+template <typename Source, typename Allocator>
+class cbor_mdarray_row_major_iterator : public cbor_mdarray_iterator
+{
 private:
 
     std::vector<mdarray_dimension> dimensions_;
@@ -77,18 +89,18 @@ public:
         }
     }
 
-    bool done() const 
+    bool done() const final
     {
         return done_;
     }
 
-    std::size_t count() const
+    std::size_t count() const final 
     {
         return count_;
     }
 
-    void next(json_visitor_type& visitor, const ser_context& context, 
-        std::error_code& ec) 
+    void next(item_event_visitor& visitor, const ser_context& context, 
+        std::error_code& ec) final
     {
         JSONCONS_ASSERT(!dimensions_.empty());
 
@@ -159,10 +171,8 @@ public:
 };
 
 template <typename Source, typename Allocator>
-class cbor_mdarray_column_major_iterator 
+class cbor_mdarray_column_major_iterator  : public cbor_mdarray_iterator
 {
-public:
-    using json_visitor_type = item_event_visitor;
 private:
 
     std::vector<mdarray_dimension> dimensions_;
@@ -196,18 +206,18 @@ public:
         }
     }
 
-    bool done() const 
+    bool done() const final
     {
         return done_;
     }
 
-    std::size_t count() const
+    std::size_t count() const final
     {
         return count_;
     }
 
-    void next(json_visitor_type& visitor, const ser_context& context, 
-        std::error_code& ec) 
+    void next(item_event_visitor& visitor, const ser_context& context, 
+        std::error_code& ec) final 
     {
         JSONCONS_ASSERT(!dimensions_.empty());
 
@@ -392,8 +402,8 @@ class basic_cbor_parser : public ser_context
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
-    std::unique_ptr<cbor_mdarray_row_major_iterator<Source,Allocator>> row_major_iterator_;
-    std::unique_ptr<cbor_mdarray_column_major_iterator<Source,Allocator>> column_major_iterator_;
+    std::unique_ptr<cbor_mdarray_iterator> row_major_iterator_;
+    std::unique_ptr<cbor_mdarray_iterator> column_major_iterator_;
 
     struct read_byte_string_from_buffer
     {
