@@ -196,6 +196,7 @@ public:
     void to_end_array() final
     {
         parser_.to_end_array();
+        cursor_visitor_.end_array(*this);
     }
 
     const staj_event& current() const final
