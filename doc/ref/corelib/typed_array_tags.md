@@ -18,7 +18,7 @@ enum class typed_array_tags
     float64 = 1024
 };
 ```
-Represents Typed Array element types.
+Represents typed array element types.
 
 `typed_array_tags` satisfies the requirements of a
 [BitMaskType](https://en.cppreference.com/w/cpp/named_req/BitmaskType.html). This 

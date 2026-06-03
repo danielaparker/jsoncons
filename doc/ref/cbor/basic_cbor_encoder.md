@@ -326,8 +326,8 @@ Throws a [ser_error](ser_error.md) on parse errors.
 [Encode to CBOR buffer](#eg1)  
 [Encode to CBOR stream](#eg2)  
 [Encode with raw CBOR tags (since 1.2.0)](#eg3)  
-[Encode Typed Array tags - array of half precision floating-point](#eg4)  
-[Encode Typed Array tags - multi-dimensional column major tag](#eg5)  
+[Encode typed array tags - array of half precision floating-point](#eg4)  
+[Encode typed array tags - multi-dimensional column major tag](#eg5)  
 
  <div id="eg1"/>
 
@@ -452,7 +452,7 @@ int main()
 
  <div id="eg4"/>
 
-#### Encode Typed Array tags - array of half precision floating-point
+#### Encode typed array tags - array of half precision floating-point
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -470,7 +470,7 @@ int main()
     std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};
     encoder.typed_array(half_arg, values);
 
-    // buffer contains a half precision floating-point, native endian, Typed Array 
+    // buffer contains a half precision floating-point, native endian, typed array 
     std::cout << "(1)\n" << byte_string_view(buffer) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(buffer);
@@ -509,7 +509,7 @@ true 3555 0.333252
 
  <div id="eg5"/>
 
-#### Encode Typed Array tags - multi-dimensional column major tag 
+#### Encode typed array tags - multi-dimensional column major tag 
 
 ```cpp
 #include <jsoncons/json.hpp>

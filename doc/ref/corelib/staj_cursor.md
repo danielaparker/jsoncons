@@ -50,7 +50,7 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.
 
-##### Typed Array input
+##### Typed array input
 
     virtual bool is_typed_array() const;                         (since 1.8.0)
 

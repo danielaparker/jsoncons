@@ -94,7 +94,7 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.
 
-##### Typed Array input
+##### Typed array input
 
     bool is_typed_array() const final;                         (since 1.8.0)
 
@@ -316,7 +316,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-### Typed Array examples (until 1.8.0)
+### Typed array examples (until 1.8.0)
 
 #### Read a typed array
 
@@ -346,7 +346,7 @@ int main()
 {
     std::vector<uint8_t> data = {
         0xd8, // Tag
-        0x56, // Tag 86, float64, little endian, Typed Array
+        0x56, // Tag 86, float64, little endian, typed array
         0x58, 0x20, // Byte string value of length 32
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
@@ -376,7 +376,7 @@ Output:
 40
 ```
 
-#### Navigating typed arrays with cursor - multi-dimensional row major with Typed Array 
+#### Navigating typed arrays with cursor - multi-dimensional row major with typed array 
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
@@ -391,7 +391,7 @@ int main()
           0x82,   // array(2)
             0x02,    // unsigned(2) 1st Dimension
             0x03,    // unsigned(3) 2nd Dimension
-        0xd8,0x41,     // Tag 65 (uint16 big endian Typed Array)
+        0xd8,0x41,     // Tag 65 (uint16 big endian typed array)
           0x4c,        // byte string(12)
             0x00,0x02, // unsigned(2)
             0x00,0x04, // unsigned(4)
@@ -513,9 +513,9 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-### Typed Array examples (since 1.8.0)
+### Typed array examples (since 1.8.0)
 
-#### Read a typed array
+#### Read a CBOR typed array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -528,8 +528,8 @@ namespace cbor = jsoncons::cbor;
 int main()
 {
     std::vector<uint8_t> data = {
-        0xd8, // Tag
-        0x56, // Tag 86, float64, little endian, Typed Array
+        0xd8,       // Tag
+        0x56,       // Tag 86, float64, little endian, Typed Array
         0x58, 0x20, // Byte string value of length 32
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40,
@@ -537,28 +537,55 @@ int main()
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
     };
 
+    // Read typed array using a reader
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    cbor::cbor_bytes_reader reader(data, decoder);
+    std::error_code ec;
+    reader.read(ec);
+    auto jval = decoder.get_result();
+    std::cout << "(1) " << jval << "\n\n";
+
+    // Decode typed array
+    auto u = cbor::decode_cbor<std::vector<double>>(data);
+    std::cout << "(2) [";
+    for (std::size_t i = 0; i < u.size(); ++i)
+    {
+        if (i > 0) std::cout << ',';
+        std::cout << u[i];
+    }
+    std::cout << "]\n\n";
+
+    // Read typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
-    assert(jsoncons::staj_events::begin_array == cursor.current().event_type()); 
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
     assert(cursor.is_typed_array());
 
     std::vector<double> v;
     cursor.read_typed_array(v);
-    for (auto item : v)
+    assert(jsoncons::staj_events::end_array == cursor.current().event_type());
+
+    std::cout << "(3) [";
+    for (std::size_t i = 0; i < v.size(); ++i)
     {
-        std::cout << item << "\n";
+        if (i > 0) std::cout << ',';
+        std::cout << v[i];
     }
-    std::cout << "\n";
+    std::cout << "]\n\n";
+
+    cursor.next();
+    assert(cursor.done());
 }
 ```
 Output:
 ```
-10
-20
-30
-40
+(1) [10.0,20.0,30.0,40.0]
+
+(2) [10,20,30,40]
+
+(3) [10,20,30,40]
 ```
 
-#### A CBOR 3D typed array with row-major storage
+#### Read a CBOR 3D typed array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -582,7 +609,7 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR data to a json value
+    // Read CBOR 3D typed array using a reader
     jsoncons::json_decoder<jsoncons::json> decoder;
     cbor::cbor_bytes_reader reader(data, decoder);
     std::error_code ec;
@@ -590,7 +617,7 @@ int main()
     jsoncons::json result = decoder.get_result();
     std::cout << "(1) " << result << "\n\n";
 
-    // Access CBOR data using a cursor
+    // Read CBOR 3D typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
@@ -634,7 +661,7 @@ Output:
 (3) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### A CBOR 3D typed array with column-major storage
+#### Read a CBOR 3D typed array with column-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -658,7 +685,7 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR data to a json value
+    // Read CBOR 3D typed array using a reader
     jsoncons::json_decoder<jsoncons::json> decoder;
     cbor::cbor_bytes_reader reader(data, decoder);
     std::error_code ec;
@@ -666,7 +693,7 @@ int main()
     jsoncons::json result = decoder.get_result();
     std::cout << "(1) " << result << "\n\n";
 
-    // Access CBOR data using a cursor
+    // Read CBOR 3D typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
@@ -710,7 +737,7 @@ Output:
 (3) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### A CBOR 3D classical array with row-major storage
+#### Read a CBOR 3D classical array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -733,7 +760,7 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR data to a json value
+    // Read CBOR 3D classical array using a reader
     jsoncons::json_decoder<jsoncons::json> decoder;
     cbor::cbor_bytes_reader reader(data, decoder);
     std::error_code ec;
@@ -741,7 +768,7 @@ int main()
     jsoncons::json result = decoder.get_result();
     std::cout << "(1) " << result << "\n\n";
 
-    // Access CBOR data using a cursor
+    // Read CBOR 3D classical array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());

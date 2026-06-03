@@ -294,7 +294,7 @@ Output:
 ]
 ```
 
-#### Decode Typed Array tags
+#### Decode typed array tags
 
 jsoncons implements [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 Tags 64-82 and Tags 84-86 are automatically decoded when detected.
@@ -307,7 +307,7 @@ Tags 64-82 and Tags 84-86 are automatically decoded when detected.
 int main()
 {
     const std::vector<uint8_t> input = {
-      0xd8,0x52, // Tag 82 (float64 big endian Typed Array)
+      0xd8,0x52, // Tag 82 (float64 big endian typed array)
         0x50,    // Byte string value of length 16
             0xff, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
             0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
@@ -335,7 +335,7 @@ int main()
         .use_typed_arrays(true);
     cbor::encode_cbor(v, output2, options);
 
-    // output2 contains a float64, native endian, Typed Array 
+    // output2 contains a float64, native endian, typed array 
     std::cout << "(4)\n" << byte_string_view(output2) << "\n\n";
 }
 ```
@@ -359,7 +359,7 @@ Output:
 d8 56 50 ff ff ff ff ff ff ef ff ff ff ff ff ff ff ef 7f
 ```
 
-#### Decode Typed Array tags - multi-dimensional row major tag 
+#### Decode typed array tags - multi-dimensional row major tag 
 
 jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 
@@ -375,7 +375,7 @@ int main()
           0x82,      // array(2)
             0x02,    // unsigned(2) 1st Dimension
             0x03,    // unsigned(3) 2nd Dimension
-          0xd8,0x41,     // Tag 65 (uint16 big endian Typed Array)
+          0xd8,0x41,     // Tag 65 (uint16 big endian typed array)
             0x4c,        // byte string(12)
               0x00,0x02, // unsigned(2)
               0x00,0x04, // unsigned(4)

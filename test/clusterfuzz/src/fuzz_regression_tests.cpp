@@ -117,7 +117,7 @@ TEST_CASE("oss-fuzz issues")
 
     // Fuzz target: fuzz_ubjson
     // Issue: Out-of-memory
-    // Diagnosis:  Issue with huge length for a strongly Typed Array of no-op, null, false, or true,
+    // Diagnosis:  Issue with huge length for a strongly typed array of no-op, null, false, or true,
     // e.g. [[][$][T][#][I][9223372036854775807]
     // Resolution: limit number of items to max_items set in options
     SECTION("issue 21667")

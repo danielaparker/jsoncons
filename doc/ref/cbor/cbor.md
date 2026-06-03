@@ -105,7 +105,7 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 ## Examples
 
 [Working with CBOR data](#A1)  
-[Encode and decode of a large Typed Array](#A2)  
+[Encode and decode of a large typed array](#A2)  
 [CBOR and basic_json](#A3)  
 [Byte string with unknown CBOR tag (unknown to jsoncons)](#A4)  
 [Query CBOR with JSONPath](#A5)  
@@ -357,7 +357,7 @@ string_value: 1.23456789012345678901234567890 (bigdec)
 
 <div id="A2"/> 
 
-### Encode and decode of a large Typed Array
+### Encode and decode of a large typed array
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -382,7 +382,7 @@ int main()
     std::cout << "first 19 bytes:\n\n";
     std::cout << byte_string_view(buf).substr(0, 19) << "\n\n";
 /*
-    0xd8,0x55 -- Tag 85 (float32 little endian Typed Array)
+    0xd8,0x55 -- Tag 85 (float32 little endian typed array)
     0x5a - byte string (four-byte uint32_t for n, and then  n bytes follow)
       03 93 87 00 -- 60000000
         00 00 00 00 -- 0.0f
