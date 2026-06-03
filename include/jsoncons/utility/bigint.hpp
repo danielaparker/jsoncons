@@ -797,7 +797,7 @@ public:
         return v;
     }
 
-    static basic_bigint from_bytes_be(int signum, const uint8_t* str, size_type n)
+    static basic_bigint from_bytes_be(int signum, const uint8_t* bytes, size_type n)
     {
         static const double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
@@ -808,12 +808,10 @@ public:
         basic_bigint<Allocator> v = 0;
         v.reserve(static_cast<size_type>(big_digits));
 
-        if (n > 0)
+        for (size_type i = 0; i < n; i++)
         {
-            for (size_type i = 0; i < n; i++)
-            {
-                v = (v * 256) + (word_type)(str[i]);
-            }
+            v *= 256;
+            v += (word_type)(bytes[i]);
         }
         //std::cout << "ACTUAL: " << v.size() << "\n";
 
@@ -957,7 +955,7 @@ public:
         reduce();
         return *this;
     }
-
+ 
     basic_bigint& operator*=(basic_bigint y) 
     {
         auto this_view = get_storage_view();
