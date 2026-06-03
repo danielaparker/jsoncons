@@ -558,7 +558,7 @@ Output:
 40
 ```
 
-#### Read a CBOR 3D Typed Array
+#### A CBOR 3D typed array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -570,14 +570,15 @@ namespace cbor = jsoncons::cbor;
 
 int main() 
 {
-    // A 2 x 3 x 2 3D array
-    std::vector<uint8_t> data = {0xD8, 0x28,  // tag(40) row major storage 
-        0x82,                                 // array(2)
-        0x83,                                 // dimensions array(3)
-        0x02, 0x03, 0x02,                     // [2, 3, 2]
-        0xD8, 0x40,                           // tag(64) uint8 typed array
-        0x4C,                                 // bytes(12)
-        0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+    // A 3D typed array 2 x 3 x 2 with row-major storage
+    std::vector<uint8_t> data = {
+        0xD8, 0x28,                         // tag(40) row major storage 
+        0x82,                               // array(2)
+        0x83,                               // shape array(3)
+        0x02, 0x03, 0x02,                   // [2, 3, 2]
+        0xD8, 0x40,                         // tag(64) uint8 typed array
+        0x4C,                               // bytes(12)
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
@@ -616,7 +617,163 @@ int main()
         std::cout << v[i];
     }
     std::cout << "]\n\n";
+
     assert(jsoncons::staj_events::end_array == cursor.current().event_type());
+    cursor.next();
+    assert(cursor.done());
+}
+```
+
+Output:
+
+```
+(1) [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
+
+(2) 2 x 3 x 2
+
+(3) [1,2,3,4,5,6,7,8,9,10,11,12]
+```
+
+#### A CBOR 3D typed array with column-major storage
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <cassert>
+
+namespace cbor = jsoncons::cbor;
+
+int main() 
+{
+    // A 3D typed array 2 x 3 x 2 with column-major storage
+    std::vector<uint8_t> data = {
+        0xD9, 0x04, 0x10,                   // tag(1040) column-major storage 
+        0x82,                               // array(2)
+        0x83,                               // shape array(3)
+        0x02, 0x03, 0x02,                   // [2, 3, 2]
+        0xD8, 0x40,                         // tag(64) uint8 typed array
+        0x4C,                               // bytes(12)
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+        0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
+    };
+
+    // Read CBOR data to a json value
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    cbor::cbor_bytes_reader reader(data, decoder);
+    std::error_code ec;
+    reader.read(ec);
+    jsoncons::json result = decoder.get_result();
+    std::cout << "(1) " << result << "\n\n";
+
+    // Access CBOR data using a cursor
+    cbor::cbor_bytes_cursor cursor(data);
+
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
+    assert(true == cursor.is_multi_dim());
+    assert(jsoncons::mdarray_order::column_major == cursor.order());
+    assert(true == cursor.is_typed_array());
+    assert(jsoncons::typed_array_tags::uint8 == cursor.array_tag());
+
+    auto extents = cursor.extents();
+    std::cout << "(2) ";
+    for (std::size_t i = 0; i < extents.size(); ++i)
+    {
+        if (i > 0) std::cout << " x ";
+        std::cout << extents[i];
+    }
+    std::cout << "\n\n";
+
+    std::vector<int> v;
+    cursor.read_typed_array(v);
+    std::cout << "(3) [";
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
+        if (i > 0) std::cout << ',';
+        std::cout << v[i];
+    }
+    std::cout << "]\n\n";
+
+    assert(jsoncons::staj_events::end_array == cursor.current().event_type());
+    cursor.next();
+    assert(cursor.done());
+}
+```
+
+Output:
+
+```
+(1) [[[1,7],[3,9],[5,11]],[[2,8],[4,10],[6,12]]]
+
+(2) 2 x 3 x 2
+
+(3) [1,2,3,4,5,6,7,8,9,10,11,12]
+```
+
+#### A CBOR 3D classical array with row-major storage
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <cassert>
+
+namespace cbor = jsoncons::cbor;
+
+int main() 
+{
+    // A 3D classical array 2 x 3 x 2 with row-major storage
+    std::vector<uint8_t> data = {
+        0xD8, 0x28,                         // tag(40) row major storage 
+        0x82,                               // array(2)
+        0x83,                               // shape array(3)
+        0x02, 0x03, 0x02,                   // [2, 3, 2]
+        0x8C,                               // data array(12)
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+        0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
+    };
+
+    // Read CBOR data to a json value
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    cbor::cbor_bytes_reader reader(data, decoder);
+    std::error_code ec;
+    reader.read(ec);
+    jsoncons::json result = decoder.get_result();
+    std::cout << "(1) " << result << "\n\n";
+
+    // Access CBOR data using a cursor
+    cbor::cbor_bytes_cursor cursor(data);
+
+    assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
+    assert(true == cursor.is_multi_dim());
+    assert(jsoncons::mdarray_order::row_major == cursor.order());
+    assert(false == cursor.is_typed_array());
+
+    auto extents = cursor.extents();
+    std::cout << "(2) ";
+    for (std::size_t i = 0; i < extents.size(); ++i)
+    {
+        if (i > 0) std::cout << " x ";
+        std::cout << extents[i];
+    }
+    std::cout << "\n\n";
+
+    jsoncons::json_decoder<jsoncons::json> sub_decoder;
+    cursor.read_to(sub_decoder);
+    assert(sub_decoder.is_valid());
+    auto jval = sub_decoder.get_result();
+    assert(jval.is_array());
+    std::cout << "(3) [";
+    for (std::size_t i = 0; i < jval.size(); ++i)
+    {
+        if (i > 0) std::cout << ',';
+        std::cout << jval[i];
+    }
+    std::cout << "]\n\n";
+
+    assert(jsoncons::staj_events::end_array == cursor.current().event_type());
+    cursor.next();
+    assert(cursor.done());
 }
 ```
 
@@ -633,8 +790,5 @@ Output:
 ### See also
 
 [staj_event](../corelib/basic_staj_event.md)  
-
-[staj_array_iterator](../corelib/staj_array_iterator.md)  
-
-[staj_object_iterator](../corelib/staj_object_iterator.md)  
+[staj_events](../corelib/basic_staj_events.md)  
 

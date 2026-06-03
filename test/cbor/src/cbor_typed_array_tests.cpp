@@ -892,7 +892,7 @@ TEST_CASE("cbor multi-dim Typed Array parse tests")
     const std::vector<uint8_t> v = {
         0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
         0x82,       // Array(2) The outer structure containing [dimensions, data]
-        0x82,       // The dimensions array
+        0x82,       // The shape array
         0x02,       // 1st dimension size (Rows)
         0x03,       // 2nd dimension size (Columns)
         0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian)
@@ -955,7 +955,7 @@ TEST_CASE("cbor multi-dim typed array row major, uint64, little endian")
     const std::vector<uint8_t> data = {
         0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
         0x82,       // Array(2) The outer structure containing [dimensions, data]
-        0x82,       // The dimensions array.
+        0x82,       // The shape array.
         0x02,       // 1st dimension size (Rows).
         0x03,       // 2nd dimension size (Columns).
         0xd8, 0x41, // Tag 65 Typed array tag for uint16 (Big-Endian).
@@ -1077,7 +1077,7 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
     const std::vector<uint8_t> data = {
         0xD8, 0x28,        // CBOR Tag 40 (Hex 28 is decimal 40).
         0x9F,              // Starts the outer indefinite-length wrapper array.
-        0x82,              // The dimensions array. It is a definite-length array of 2 elements
+        0x82,              // The shape array. It is a definite-length array of 2 elements
         0x02, 0x02,        // The dimensions
         0x9F,              // Starts the flat data contents indefinite-length array.
         0x01, 0x02, 0x03, 0x04, // The raw flattened numbers 1, 2, 3, 4 poured into a single linear stream.
@@ -1134,7 +1134,7 @@ TEST_CASE("cbor multi-dim, column-major, classical indefinite array tests")
     const std::vector<uint8_t> v = {
         0xD9, 0x04, 0x10, // Tag 1040 Multi-dim Array (Column-Major)
         0x82,             // Outer container for [dimensions, data]
-        0x82,             // The dimensions array
+        0x82,             // The shape array
         0x02,             // 2 Rows
         0x03,             // 3 Columns
         0x86,             // Array (6 items)
@@ -1212,7 +1212,7 @@ TEST_CASE("cbor multi-dim classical array cursor tests")
         const std::vector<uint8_t> data = {
             0xD9, 0x04, 0x10, // Tag 1040 Multi-dim Array (Column-Major)
             0x82,             // Outer container for [dimensions, data]
-            0x82,             // The dimensions array
+            0x82,             // The shape array
             0x02,             // 2 Rows
             0x03,             // 3 Columns
             0x86,             // Array (6 items)
