@@ -799,7 +799,7 @@ public:
 
     static basic_bigint from_bytes_be(int signum, const uint8_t* str, size_type n)
     {
-        static const double radix_log2 = std::log2(next_power_of_two(256));
+        static constexpr double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
         double bits = radix_log2 * n;
         double big_digits = std::ceil(bits / 64.0);

@@ -212,7 +212,7 @@ namespace jsoncons {
 
     inline bool is_primitive_storage(json_storage_kind storage_kind) noexcept
     {
-        static const uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
+        static constexpr uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
             & uint8_t(json_storage_kind::array) & uint8_t(json_storage_kind::object)
             & uint8_t(json_storage_kind::const_json_ref) & uint8_t(json_storage_kind::json_ref)};
         return (uint8_t(storage_kind) & mask) != mask;
@@ -220,14 +220,14 @@ namespace jsoncons {
 
     inline bool is_trivial_storage(json_storage_kind storage_kind) noexcept
     {
-        static const uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
+        static constexpr uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
             & uint8_t(json_storage_kind::array) & uint8_t(json_storage_kind::object) };
         return (uint8_t(storage_kind) & mask) != mask;
     }
 
     inline bool is_string_storage(json_storage_kind storage_kind) noexcept
     {
-        static const uint8_t mask{ uint8_t(json_storage_kind::short_str) & uint8_t(json_storage_kind::long_str) };
+        static constexpr uint8_t mask{ uint8_t(json_storage_kind::short_str) & uint8_t(json_storage_kind::long_str) };
         return (uint8_t(storage_kind) & mask) == mask;
     }
 

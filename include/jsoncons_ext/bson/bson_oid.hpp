@@ -179,7 +179,7 @@ namespace detail {
         inline
         const uint16_t* get_hex_char_pairs(std::false_type) // little endian
         {
-            static const uint16_t hex_char_pairs[] = {
+            static constexpr uint16_t hex_char_pairs[] = {
                 12336, 12592, 12848, 13104, 13360, 13616, 13872, 14128, 14384, 14640, 24880,
                 25136, 25392, 25648, 25904, 26160, 12337, 12593, 12849, 13105, 13361, 13617,
                 13873, 14129, 14385, 14641, 24881, 25137, 25393, 25649, 25905, 26161, 12338,

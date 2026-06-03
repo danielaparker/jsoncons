@@ -88,13 +88,13 @@ operator^=(staj_events& lhs, staj_events rhs) noexcept
 
 inline bool is_begin_container(staj_events types) noexcept
 {
-    static const staj_events mask{ staj_events::begin_object | staj_events::begin_array };
+    static constexpr staj_events mask{ staj_events::begin_object | staj_events::begin_array };
     return (types & mask) != staj_events{};
 }
 
 inline bool is_end_container(staj_events types) noexcept
 {
-    static const staj_events mask{ staj_events::end_object | staj_events::end_array };
+    static constexpr staj_events mask{ staj_events::end_object | staj_events::end_array };
     return (types & mask) != staj_events{};
 }
 
