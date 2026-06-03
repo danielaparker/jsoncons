@@ -300,7 +300,7 @@ void read_to_cbor_visitor()
 
 void cbor_3d_typed_array_example() // (since 1.8.0)
 {
-    // A 2 x 3 x 2 3D typed array
+    // A 2 x 3 x 2 3D array
     std::vector<uint8_t> data = {0xD8, 0x28,  // tag(40) row major storage 
         0x82,                                 // array(2)
         0x83,                                 // dimensions array(3)
@@ -321,7 +321,11 @@ void cbor_3d_typed_array_example() // (since 1.8.0)
 
     // Access CBOR data using a cursor
     cbor::cbor_bytes_cursor cursor(data);
+
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
+    assert(true == cursor.is_multi_dim());
+    assert(true == cursor.is_typed_array());
+
     auto extents = cursor.extents();
     std::cout << "(2) ";
     for (std::size_t i = 0; i < extents.size(); ++i)

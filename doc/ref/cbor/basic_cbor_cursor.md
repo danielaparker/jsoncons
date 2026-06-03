@@ -581,7 +581,7 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read 3D array to a json value
+    // Read CBOR data to a json value
     jsoncons::json_decoder<jsoncons::json> decoder;
     cbor::cbor_bytes_reader reader(data, decoder);
     std::error_code ec;
@@ -589,9 +589,13 @@ int main()
     jsoncons::json result = decoder.get_result();
     std::cout << "(1) " << result << "\n\n";
 
-    // Access 3D array through a cursor
+    // Access CBOR data using a cursor
     cbor::cbor_bytes_cursor cursor(data);
+
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
+    assert(true == cursor.is_multi_dim());
+    assert(true == cursor.is_typed_array());
+
     auto extents = cursor.extents();
     std::cout << "(2) ";
     for (std::size_t i = 0; i < extents.size(); ++i)
