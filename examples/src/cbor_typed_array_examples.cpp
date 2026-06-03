@@ -324,7 +324,9 @@ void cbor_3d_typed_array_example() // (since 1.8.0)
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
     assert(true == cursor.is_multi_dim());
+    assert(jsoncons::mdarray_order::row_major == cursor.order());
     assert(true == cursor.is_typed_array());
+    assert(jsoncons::typed_array_tags::uint8 == cursor.array_tag());
 
     auto extents = cursor.extents();
     std::cout << "(2) ";
