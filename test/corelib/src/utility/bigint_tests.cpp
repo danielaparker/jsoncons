@@ -604,6 +604,75 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }
+    SECTION("compare")
+    {
+        CHECK((a > b));
+        CHECK_FALSE((b > a));
+        CHECK((a >= b));
+        CHECK_FALSE((b >= a));
+        CHECK((b < a));
+        CHECK_FALSE((a < b));
+        CHECK((b <= a));
+        CHECK_FALSE((a <= b));
+        CHECK((a != b));
+        CHECK_FALSE((a == b));
+    }
+    SECTION("babs")
+    {
+        bigint c = jsoncons::babs(b);
+        CHECK(bigint("60820564691661355463515465564664568") == c);
+    }
+    SECTION("bpow")
+    {
+        bigint c = jsoncons::bpow(a, 2u);
+        CHECK(bigint("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
+    }
+    SECTION("bsqrt")
+    {
+        bigint c = jsoncons::bsqrt(a);
+        CHECK(bigint("7526901790514881921") == c);
+    }
+}
+
+TEST_CASE("bigint operator+= tests")
+{
+    bigint a("56654250564056135415631554531554513813"); 
+    bigint b("60820564691661355463515465564664568");
+
+    SECTION("a += b")
+    {
+        a += b;
+        bigint expected("56715071128747796771095069997119178381");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += 56242")
+    {
+        a += 56242;
+        auto expected = bigint("56654250564056135415631554531554570055");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += 56242u")
+    {
+        a += 56242u;
+        auto expected = bigint("56654250564056135415631554531554570055");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += -b")
+    {
+        a += -b;
+        bigint expected("56593429999364474060168039065989849245");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += -56242")
+    {
+        a += -56242;
+        auto expected = bigint("56654250564056135415631554531554457571");
+        CHECK(expected == a);
+    }
 
     SECTION("pos number += 5")
     {
@@ -666,34 +735,6 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }    
-    SECTION("compare")
-    {
-        CHECK((a > b));
-        CHECK_FALSE((b > a));
-        CHECK((a >= b));
-        CHECK_FALSE((b >= a));
-        CHECK((b < a));
-        CHECK_FALSE((a < b));
-        CHECK((b <= a));
-        CHECK_FALSE((a <= b));
-        CHECK((a != b));
-        CHECK_FALSE((a == b));
-    }
-    SECTION("babs")
-    {
-        bigint c = jsoncons::babs(b);
-        CHECK(bigint("60820564691661355463515465564664568") == c);
-    }
-    SECTION("bpow")
-    {
-        bigint c = jsoncons::bpow(a, 2u);
-        CHECK(bigint("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
-    }
-    SECTION("bsqrt")
-    {
-        bigint c = jsoncons::bsqrt(a);
-        CHECK(bigint("7526901790514881921") == c);
-    }
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
