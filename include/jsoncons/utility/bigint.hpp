@@ -1636,14 +1636,14 @@ public:
         auto this_view = get_storage_view();
         auto y_view = y.get_storage_view();
 
-        if ( this_view.size() == 0 && y_view.size() == 0 )
+        if ( this_view.size() == 0 && y_size == 0 )
             return 0;
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
         int code = 0;
-        if ( this_view.size() < y_view.size())
+        if ( this_view.size() < y_size)
             code = -1;
-        else if ( this_view.size() > y_view.size())
+        else if ( this_view.size() > y_size)
             code = +1;
         else
         {
