@@ -191,6 +191,7 @@ public:
     {
         using real_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<word_type>;
         using pointer = typename std::allocator_traits<real_allocator_type>::pointer;
+        static const size_type max_size = (std::numeric_limits<size_type>::max)()/sizeof(word_type);
 
         uint8_t is_allocated_ : 1;
         uint8_t is_negative_ : 1;
@@ -252,6 +253,7 @@ public:
 
         void reserve(size_type n, const real_allocator_type& a)
         {
+            JSONCONS_ASSERT(n < max_size);
             size_type capacity_new = round_up(n);
 
             real_allocator_type alloc(a);
@@ -269,17 +271,14 @@ public:
         }
 
         // Find suitable new block size
-        static size_type round_up(size_type i) noexcept 
+        static size_type round_up(size_type i) 
         {
-            std::size_t remainder = i % mem_unit;
+            size_type remainder = i % mem_unit;
+            size_type off = mem_unit - remainder;
+            bool testoff = i < max_size - off;
+            JSONCONS_ASSERT(testoff);
 
-            std::size_t x = (std::numeric_limits<size_type>::max)() - (mem_unit - remainder);
-            if (i > x)
-            {
-                return (std::numeric_limits<size_type>::max)();
-            }
-
-            return i + (mem_unit - remainder);
+            return i + off;
         }
     };
 
@@ -891,8 +890,8 @@ public:
         resize(this_view.size() + 1);
 
         this_view = get_storage_view();
-        const std::size_t this_size = this_view.size();
-        std::size_t y_size = 1;
+        const size_type this_size = this_view.size();
+        size_type y_size = 1;
 
         d = this_view[0] + carry;
         carry = d < carry;
@@ -955,8 +954,8 @@ public:
         word_type borrow = 0;
         word_type d;
         auto this_view = get_storage_view();
-        const std::size_t this_size = this_view.size();
-        const std::size_t y_size = y_view.size();
+        const size_type this_size = this_view.size();
+        const size_type y_size = y_view.size();
 
         for (size_type i = 0; i < y_size; i++ )
         {
@@ -1024,7 +1023,7 @@ public:
         }
 
         bool difSigns = is_negative() != y.is_negative();
-        const std::size_t y_size = y_view.size();
+        const size_type y_size = y_view.size();
         if ( this_view.size() + y_size == 2 ) // size() = y.size() = 1
         {
             word_type a = this_view[0], b = y_view[0];
@@ -1636,7 +1635,7 @@ public:
         auto this_view = get_storage_view();
         auto y_view = y.get_storage_view();
 
-        const std::size_t y_size = y_view.size();
+        const size_type y_size = y_view.size();
         if ( this_view.size() == 0 && y_size == 0 )
             return 0;
         if ( is_negative() != y.is_negative())
