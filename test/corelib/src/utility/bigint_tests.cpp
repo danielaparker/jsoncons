@@ -634,6 +634,109 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
 }
 
+TEST_CASE("bigint operator+= tests")
+{
+    bigint a("56654250564056135415631554531554513813"); 
+    bigint b("60820564691661355463515465564664568");
+
+    SECTION("a += b")
+    {
+        a += b;
+        bigint expected("56715071128747796771095069997119178381");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += 56242")
+    {
+        a += 56242;
+        auto expected = bigint("56654250564056135415631554531554570055");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += 56242u")
+    {
+        a += 56242u;
+        auto expected = bigint("56654250564056135415631554531554570055");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += -b")
+    {
+        a += -b;
+        bigint expected("56593429999364474060168039065989849245");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += -56242")
+    {
+        a += -56242;
+        auto expected = bigint("56654250564056135415631554531554457571");
+        CHECK(expected == a);
+    }
+
+    SECTION("pos number += 5")
+    {
+        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667520");
+        c += 5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+    SECTION("pos number += -5")
+    {
+        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
+        c += -5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+    SECTION("pos number += -5")
+    {
+        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
+        c += -5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+
+    SECTION("neg number += 5")
+    {
+        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        c += 5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+    SECTION("neg number += -5")
+    {
+        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        c += -5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }    
+    SECTION("neg number += -5")
+    {
+        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        c += bigint(-5);
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }    
+}
+
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <common/mock_stateful_allocator.hpp>
@@ -654,5 +757,4 @@ TEST_CASE("bigint with stateful allocator")
         //cust_bigint a("56654250564056135415631554531554513813", alloc); 
     }
 }
-
 #endif

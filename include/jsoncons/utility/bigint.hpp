@@ -797,7 +797,7 @@ public:
         return v;
     }
 
-    static basic_bigint from_bytes_be(int signum, const uint8_t* str, size_type n)
+    static basic_bigint from_bytes_be(int signum, const uint8_t* bytes, size_type n)
     {
         static const double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
@@ -808,12 +808,10 @@ public:
         basic_bigint<Allocator> v = 0;
         v.reserve(static_cast<size_type>(big_digits));
 
-        if (n > 0)
+        for (size_type i = 0; i < n; i++)
         {
-            for (size_type i = 0; i < n; i++)
-            {
-                v = (v * 256) + (word_type)(str[i]);
-            }
+            v *= 256;
+            v += (word_type)(bytes[i]);
         }
         //std::cout << "ACTUAL: " << v.size() << "\n";
 
@@ -855,12 +853,87 @@ public:
         return *this;
     }
 
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+        operator+=(IntegerType y)
+    {
+        if ( is_negative() != (y < 0))
+            return *this -= -y;
+
+        if (y < 0)
+        {
+            y = -y;
+        }
+
+        word_type d;
+        word_type carry = 0;
+
+        auto this_view = get_storage_view();
+        resize(this_view.size() + 1);
+        this_view = get_storage_view();
+
+        const size_t this_size = this_view.size();
+        const size_t y_size = 1;
+        for (size_type i = 0; i < y_size; i++ )
+        {
+            d = this_view[i] + carry;
+            carry = d < carry;
+            this_view[i] = d + y;
+            if (this_view[i] < d)
+                carry = 1;
+        }
+        for (size_type i = y_size; i < this_size; i++ )
+        {
+            if (carry == 0)
+                break;
+            d = this_view[i] + carry;
+            carry = d < carry;
+            this_view[i] = d;
+        }
+        reduce();
+        return *this;
+    }
+
+    template <typename IntegerType>
+    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+        operator+=(IntegerType y)
+    {
+        if ( is_negative())
+            return *this -= -basic_bigint<Allocator>(y);
+
+        word_type d;
+        word_type carry = 0;
+
+        auto this_view = get_storage_view();
+        resize(this_view.size() + 1);
+
+        this_view = get_storage_view();
+        const std::size_t this_size = this_view.size();
+        std::size_t y_size = 1;
+
+        d = this_view[0] + carry;
+        carry = d < carry;
+        this_view[0] = d + y;
+        if (this_view[0] < d)
+            carry = 1;
+
+        for (size_type i = y_size; i < this_size && carry != 0; ++i)
+        {
+            d = this_view[i] + carry;
+            carry = d < carry;
+            this_view[i] = d;
+        }
+        reduce();
+        return *this;
+    }
+
     basic_bigint& operator+=( const basic_bigint& y )
     {
-        auto y_view = y.get_storage_view();
-        
         if ( is_negative() != y.is_negative())
             return *this -= -y;
+
+        auto y_view = y.get_storage_view();
+        
         word_type d;
         word_type carry = 0;
 
@@ -868,22 +941,23 @@ public:
         resize( (std::max)(y_view.size(), this_view.size()) + 1 );
         this_view = get_storage_view();
 
-        for (size_type i = 0; i < this_view.size(); i++ )
+        const size_t this_size = this_view.size();
+        const size_t y_size = y_view.size();
+        for (size_type i = 0; i < y_size; i++ )
         {
-            if ( i >= y_view.size() && carry == 0 )
+            d = this_view[i] + carry;
+            carry = d < carry;
+            this_view[i] = d + y_view[i];
+            if (this_view[i] < d)
+                carry = 1;
+        }
+        for (size_type i = y_size; i < this_size; i++ )
+        {
+            if (carry == 0)
                 break;
             d = this_view[i] + carry;
             carry = d < carry;
-            if ( i < y_view.size())
-            {
-                this_view[i] = d + y_view[i];
-                if (this_view[i] < d)
-                    carry = 1;
-            }
-            else
-            {
-                this_view[i] = d;
-            }
+            this_view[i] = d;
         }
         reduce();
         return *this;
@@ -957,7 +1031,7 @@ public:
         reduce();
         return *this;
     }
-
+ 
     basic_bigint& operator*=(basic_bigint y) 
     {
         auto this_view = get_storage_view();
