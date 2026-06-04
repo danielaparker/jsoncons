@@ -907,7 +907,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
     // Issue: Timeout in fuzz_cbor_encoder, bignum too big
     // Resolution: 
 
-    /*SECTION("issue 518168535")
+    SECTION("issue 518168535")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-6480448351174656";
 
@@ -923,7 +923,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         (reader.read(ec));
         //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
         std::cout << ec.message() << "\n";
-    }*/
+    }
 }
 
 
