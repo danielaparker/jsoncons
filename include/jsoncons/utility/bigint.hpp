@@ -729,22 +729,6 @@ public:
     }
 
     template <typename CharT>
-    static to_bigint_result<CharT> parse(const std::basic_string<CharT>& s, basic_bigint<Allocator>& value)
-    {
-        return parse<CharT>(s.data(), s.size(), value);
-    }
-
-    template <typename CharT>
-    static to_bigint_result<CharT> parse(const CharT* s, basic_bigint<Allocator>& value)
-    {
-        auto r = parse(s, std::char_traits<CharT>::length(s), value);
-        if (r.ec != std::errc{})
-        {
-            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
-        }
-    }
-
-    template <typename CharT>
     static basic_bigint<Allocator> parse_radix(const CharT* data, size_type length, uint8_t radix)
     {
         if (!(radix >= 2 && radix <= 16u))
@@ -787,7 +771,8 @@ public:
             {
                 JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in radix ") + std::to_string(radix) + ": \'" + (char)c + "\'"));
             }
-            v = (v * radix) + d;
+            v *= radix;
+            v += d;
         }
 
         if ( neg )
@@ -1990,7 +1975,8 @@ private:
             {
                 return to_bigint_result<CharT>(cur, std::errc::invalid_argument);
             }
-            val = (val * radix) + d;
+            val *= radix;
+            val += d;
             ++cur;
         }
 
