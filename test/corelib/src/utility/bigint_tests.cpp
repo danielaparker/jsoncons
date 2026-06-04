@@ -608,7 +608,7 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     SECTION("pos number += 5")
     {
         bigint expected = bigint("4253529586511730793019062996110615940069384017080242667525");
-        bigint c = bigint("4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667520");
         c += 5;
 
         CHECK(expected == c);
@@ -618,7 +618,17 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     SECTION("pos number += -5")
     {
         bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
-        bigint c = bigint("4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
+        c += -5;
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }
+    SECTION("pos number += -5")
+    {
+        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
         c += -5;
 
         CHECK(expected == c);
@@ -629,7 +639,7 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     SECTION("neg number += 5")
     {
         bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667520");
-        bigint c = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667525");
         c += 5;
 
         CHECK(expected == c);
@@ -639,13 +649,24 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     SECTION("neg number += -5")
     {
         bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
-        bigint c = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
         c += -5;
 
         CHECK(expected == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
-    }    SECTION("compare")
+    }    
+    SECTION("neg number += -5")
+    {
+        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        c += bigint(-5);
+
+        CHECK(expected == c);
+        //std::cout << expected << "\n";
+        //std::cout << c << "\n";
+    }    
+    SECTION("compare")
     {
         CHECK((a > b));
         CHECK_FALSE((b > a));
@@ -695,5 +716,4 @@ TEST_CASE("bigint with stateful allocator")
         //cust_bigint a("56654250564056135415631554531554513813", alloc); 
     }
 }
-
 #endif
