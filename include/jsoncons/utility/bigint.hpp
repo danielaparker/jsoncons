@@ -2078,13 +2078,14 @@ to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     for (std::size_t i = 0; i < length; i++)
     {
         CharT c = data[i];
-        switch (c)
+        if (JSONCONS_LIKELY(c >= '0' && c <= '9'))
         {
-            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                v = (v * 10u) + (word_type)(c - '0');
-                break;
-            default:
-                return to_bigint_result<CharT>(data + i, std::errc::invalid_argument);
+            v *= 10u;
+            v += (word_type)(c - '0');
+        }
+        else
+        {
+            return to_bigint_result<CharT>(data + i, std::errc::invalid_argument);
         }
     }
 
