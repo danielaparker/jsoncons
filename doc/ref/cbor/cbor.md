@@ -14,6 +14,8 @@ data structures, using [json_type_traits](../corelib/json_type_traits/json_type_
 
 [cbor_options](cbor_options.md)
 
+[Typed Arrays](typed_arrays.md)
+
 ### Tag handling and extensions
 
 All tags not explicitly mentioned below are ignored.

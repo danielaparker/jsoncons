@@ -515,7 +515,7 @@ end_array (n/a)
 
 ### Typed array examples (since 1.8.0)
 
-#### Read a CBOR typed array
+#### Read a typed array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -537,25 +537,6 @@ int main()
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, 0x40
     };
 
-    // Read typed array using a reader
-    jsoncons::json_decoder<jsoncons::json> decoder;
-    cbor::cbor_bytes_reader reader(data, decoder);
-    std::error_code ec;
-    reader.read(ec);
-    auto jval = decoder.get_result();
-    std::cout << "(1) " << jval << "\n\n";
-
-    // Decode typed array
-    auto u = cbor::decode_cbor<std::vector<double>>(data);
-    std::cout << "(2) [";
-    for (std::size_t i = 0; i < u.size(); ++i)
-    {
-        if (i > 0) std::cout << ',';
-        std::cout << u[i];
-    }
-    std::cout << "]\n\n";
-
-    // Read typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
     assert(cursor.is_typed_array());
@@ -564,7 +545,7 @@ int main()
     cursor.read_typed_array(v);
     assert(jsoncons::staj_events::end_array == cursor.current().event_type());
 
-    std::cout << "(3) [";
+    std::cout << "[";
     for (std::size_t i = 0; i < v.size(); ++i)
     {
         if (i > 0) std::cout << ',';
@@ -578,14 +559,10 @@ int main()
 ```
 Output:
 ```
-(1) [10.0,20.0,30.0,40.0]
-
-(2) [10,20,30,40]
-
-(3) [10,20,30,40]
+[10,20,30,40]
 ```
 
-#### Read a CBOR 3D typed array with row-major storage
+#### Read a 3D typed array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -609,15 +586,6 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR 3D typed array using a reader
-    jsoncons::json_decoder<jsoncons::json> decoder;
-    cbor::cbor_bytes_reader reader(data, decoder);
-    std::error_code ec;
-    reader.read(ec);
-    jsoncons::json result = decoder.get_result();
-    std::cout << "(1) " << result << "\n\n";
-
-    // Read CBOR 3D typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
@@ -627,7 +595,7 @@ int main()
     assert(jsoncons::typed_array_tags::uint8 == cursor.array_tag());
 
     auto extents = cursor.extents();
-    std::cout << "(2) ";
+    std::cout << "(1) ";
     for (std::size_t i = 0; i < extents.size(); ++i)
     {
         if (i > 0) std::cout << " x ";
@@ -637,7 +605,7 @@ int main()
 
     std::vector<int> v;
     cursor.read_typed_array(v);
-    std::cout << "(3) [";
+    std::cout << "(2) [";
     for (std::size_t i = 0; i < v.size(); ++i)
     {
         if (i > 0) std::cout << ',';
@@ -654,14 +622,12 @@ int main()
 Output:
 
 ```
-(1) [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
+(1) 2 x 3 x 2
 
-(2) 2 x 3 x 2
-
-(3) [1,2,3,4,5,6,7,8,9,10,11,12]
+(2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### Read a CBOR 3D typed array with column-major storage
+#### Read a 3D typed array with column-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -685,15 +651,6 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR 3D typed array using a reader
-    jsoncons::json_decoder<jsoncons::json> decoder;
-    cbor::cbor_bytes_reader reader(data, decoder);
-    std::error_code ec;
-    reader.read(ec);
-    jsoncons::json result = decoder.get_result();
-    std::cout << "(1) " << result << "\n\n";
-
-    // Read CBOR 3D typed array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
@@ -703,7 +660,7 @@ int main()
     assert(jsoncons::typed_array_tags::uint8 == cursor.array_tag());
 
     auto extents = cursor.extents();
-    std::cout << "(2) ";
+    std::cout << "(1) ";
     for (std::size_t i = 0; i < extents.size(); ++i)
     {
         if (i > 0) std::cout << " x ";
@@ -713,7 +670,7 @@ int main()
 
     std::vector<int> v;
     cursor.read_typed_array(v);
-    std::cout << "(3) [";
+    std::cout << "(2) [";
     for (std::size_t i = 0; i < v.size(); ++i)
     {
         if (i > 0) std::cout << ',';
@@ -730,14 +687,12 @@ int main()
 Output:
 
 ```
-(1) [[[1,7],[3,9],[5,11]],[[2,8],[4,10],[6,12]]]
+(1) 2 x 3 x 2
 
-(2) 2 x 3 x 2
-
-(3) [1,2,3,4,5,6,7,8,9,10,11,12]
+(2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### Read a CBOR 3D classical array with row-major storage
+#### Read a 3D classical array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -760,15 +715,6 @@ int main()
         0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
     };
 
-    // Read CBOR 3D classical array using a reader
-    jsoncons::json_decoder<jsoncons::json> decoder;
-    cbor::cbor_bytes_reader reader(data, decoder);
-    std::error_code ec;
-    reader.read(ec);
-    jsoncons::json result = decoder.get_result();
-    std::cout << "(1) " << result << "\n\n";
-
-    // Read CBOR 3D classical array using a cursor
     cbor::cbor_bytes_cursor cursor(data);
 
     assert(jsoncons::staj_events::begin_array == cursor.current().event_type());
@@ -777,7 +723,7 @@ int main()
     assert(false == cursor.is_typed_array());
 
     auto extents = cursor.extents();
-    std::cout << "(2) ";
+    std::cout << "(1) ";
     for (std::size_t i = 0; i < extents.size(); ++i)
     {
         if (i > 0) std::cout << " x ";
@@ -790,7 +736,7 @@ int main()
     assert(sub_decoder.is_valid());
     auto jval = sub_decoder.get_result();
     assert(jval.is_array());
-    std::cout << "(3) [";
+    std::cout << "(2) [";
     for (std::size_t i = 0; i < jval.size(); ++i)
     {
         if (i > 0) std::cout << ',';
@@ -807,11 +753,9 @@ int main()
 Output:
 
 ```
-(1) [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
+(1) 2 x 3 x 2
 
-(2) 2 x 3 x 2
-
-(3) [1,2,3,4,5,6,7,8,9,10,11,12]
+(2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
 ### See also

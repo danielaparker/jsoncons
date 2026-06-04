@@ -1636,6 +1636,7 @@ public:
         auto this_view = get_storage_view();
         auto y_view = y.get_storage_view();
 
+        const std::size_t y_size = y_view.size();
         if ( this_view.size() == 0 && y_size == 0 )
             return 0;
         if ( is_negative() != y.is_negative())
