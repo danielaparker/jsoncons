@@ -612,6 +612,12 @@ private:
                             s.push_back(c);
                             state = decimal_parse_state::integer;
                             break;
+                        case '+':
+                            state = decimal_parse_state::integer;
+                            break;
+                        case '.':
+                            state = decimal_parse_state::fraction1;
+                            break;
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
@@ -684,6 +690,9 @@ private:
                             s.push_back(c);
                             --scale;
                             break;
+                        case 'e': case 'E':
+                            state = decimal_parse_state::exp1;
+                            break;
                         default:
                         {
                             ec = cbor_errc::invalid_decimal_fraction;
@@ -701,7 +710,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{};
-            auto r = jsoncons::to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::dec_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -713,7 +722,7 @@ private:
         if (JSONCONS_UNLIKELY(ec)) {return;}
 
         int64_t val{ 0 };
-        auto r = jsoncons::to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::dec_to_integer(s.data(),s.length(), val);
         if (r)
         {
             visit_int64(val, semantic_tag::none, context, ec);
