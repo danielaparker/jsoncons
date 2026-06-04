@@ -867,10 +867,8 @@ public:
             if (this_view[i] < d)
                 carry = 1;
         }
-        for (size_type i = y_size; i < this_size; i++ )
+        for (size_type i = y_size; i < this_size && carry != 0; i++ )
         {
-            if (carry == 0)
-                break;
             d = this_view[i] + carry;
             carry = d < carry;
             this_view[i] = d;
@@ -936,10 +934,8 @@ public:
             if (this_view[i] < d)
                 carry = 1;
         }
-        for (size_type i = y_size; i < this_size; i++ )
+        for (size_type i = y_size; i < this_size && carry != 0; i++ )
         {
-            if (carry == 0)
-                break;
             d = this_view[i] + carry;
             carry = d < carry;
             this_view[i] = d;
@@ -959,22 +955,22 @@ public:
         word_type borrow = 0;
         word_type d;
         auto this_view = get_storage_view();
-        for (size_type i = 0; i < this_view.size(); i++ )
+        const std::size_t this_size = this_view.size();
+        const std::size_t y_size = y_view.size();
+
+        for (size_type i = 0; i < y_size; i++ )
         {
-            if ( i >= y_view.size() && borrow == 0 )
-                break;
             d = this_view[i] - borrow;
             borrow = d > this_view[i];
-            if ( i < y_view.size())
-            {
-                this_view[i] = d - y_view[i];
-                if ( this_view[i] > d )
-                    borrow = 1;
-            }
-            else 
-            {
-                this_view[i] = d;
-            }
+            this_view[i] = d - y_view[i];
+            if ( this_view[i] > d )
+                borrow = 1;
+        }
+        for (size_type i = y_size; i < this_size && borrow != 0; i++ )
+        {
+            d = this_view[i] - borrow;
+            borrow = d > this_view[i];
+            this_view[i] = d;
         }
         reduce();
         return *this;
@@ -1028,7 +1024,8 @@ public:
         }
 
         bool difSigns = is_negative() != y.is_negative();
-        if ( this_view.size() + y_view.size() == 2 ) // size() = y.size() = 1
+        const std::size_t y_size = y_view.size();
+        if ( this_view.size() + y_size == 2 ) // size() = y.size() = 1
         {
             word_type a = this_view[0], b = y_view[0];
             this_view[0] = a * b;
@@ -2088,12 +2085,6 @@ to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
             return to_bigint_result<CharT>(data + i, std::errc::invalid_argument);
         }
     }
-
-    //auto view = v.get_storage_view();
-    //if (num_words != view.size())
-    //{
-    //    std::cout << "Unexpected num_words! num_words: " << num_words << ", " << num_words << ", size: " << view.size() << "\n";
-    //}
 
     if (neg)
     {
