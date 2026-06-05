@@ -317,10 +317,9 @@ int main()
 {
     std::vector<uint8_t> buffer;
 
-    auto encode_options = cbor::cbor_options{}
-        .use_typed_arrays(true);
+    auto encode_options = cbor::cbor_options{}.
+        use_typed_arrays(true);
     cbor::cbor_bytes_encoder encoder(buffer, encode_options);
-
     std::vector<uint16_t> values = {0x3bff, 0x3c00, 0x3c01, 0x3555};
     encoder.typed_array(jsoncons::half_arg, values);
 
@@ -329,18 +328,50 @@ int main()
     jsoncons::print_bytes(buffer, std::cout);   // (since 1.8.0)
     std::cout << "\n\n";
 
-    auto j = cbor::decode_cbor<jsoncons::json>(buffer);
+    // Read from cursor as array of uint16_t
+    cbor::cbor_bytes_cursor cursor1(buffer);
+    assert(true == cursor1.is_typed_array());  
+    assert(jsoncons::typed_array_tags::half_float == cursor1.array_tag());
+    std::vector<uint16_t> v1;
+    cursor1.read_typed_array(v1);
+    std::cout << "(2) ";
+    for (std::size_t i = 0; i < v1.size(); ++i)
+    {
+        if (i > 0) std::cout << ' ';
+        std::cout << std::hex << v1[i];
+    }
+    std::cout << "\n\n";
 
+    // Read from cursor as array of double (half float converted to double)
+    std::cout << "(3) ";
+    cbor::cbor_bytes_cursor cursor2(buffer);
+    assert(true == cursor2.is_typed_array());
+    assert(jsoncons::typed_array_tags::half_float == cursor2.array_tag());
+    std::vector<double> v2;
+    cursor2.read_typed_array(v2);
+    for (std::size_t i = 0; i < v2.size(); ++i)
+    {
+        if (i > 0) std::cout << ' ';
+        std::cout << v2[i];
+    }
+    std::cout << "\n\n";
+
+    // Decode to json
+    auto j = cbor::decode_cbor<jsoncons::json>(buffer);
     auto format_options = jsoncons::json_options{}.line_splits(jsoncons::line_split_kind::same_line).
         spaces_around_comma(jsoncons::spaces_option::space_after);
-    std::cout << "(2) " << pretty_print(j, format_options) << "\n\n";
+    std::cout << "(4) " << pretty_print(j, format_options) << "\n\n";
 }
 ```
 Output
 ```
 (1) d8 54 48 ff 3b 00 3c 01 3c 55 35
 
-(2) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
+(2) 3bff 3c00 3c01 3555
+
+(3) 0.999512 1 1.00098 0.333252
+
+(4) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
 ```
 
 #### Write a 3D 2 x 3 array with typed array storage (since 1.8.0)
