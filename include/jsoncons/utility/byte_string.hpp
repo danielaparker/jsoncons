@@ -488,6 +488,30 @@ namespace detail {
         }
     };
 
+    template <typename BytesViewLike, typename CharT>
+    typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,void>::type
+    print_bytes(const BytesViewLike& bytes, std::basic_ostream<CharT>& os)
+    {
+        std::basic_ostringstream<CharT> ss;
+        ss.flags(std::ios::hex);
+        ss.fill('0');
+
+        bool first = true;
+        for (auto b : bytes)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else 
+            {
+                ss << ' ';
+            }
+            ss << std::setw(2) << static_cast<int>(b);
+        }
+        os << ss.str();
+    }
+
     // basic_byte_string
     template <typename Allocator = std::allocator<uint8_t>>
     class basic_byte_string

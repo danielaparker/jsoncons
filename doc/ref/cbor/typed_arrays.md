@@ -305,3 +305,56 @@ Output:
 (3) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
+#### Write a typed array of half precision floating-point
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    std::vector<uint8_t> buffer;
+
+    auto encode_options = cbor::cbor_options{}
+        .use_typed_arrays(true);
+    cbor::cbor_bytes_encoder encoder(buffer, encode_options);
+
+    std::vector<uint16_t> values = {0x3bff, 0x3c00, 0x3c01, 0x3555};
+    encoder.typed_array(jsoncons::half_arg, values);
+
+    // buffer contains a half precision floating-point, native endian, typed array 
+    std::cout << "(1) ";
+    jsoncons::print_bytes(buffer, std::cout);   // (since 1.8.0)
+    std::cout << "\n\n";
+
+    auto j = cbor::decode_cbor<jsoncons::json>(buffer);
+
+    std::cout << "(2) ";
+    for (const auto& item : j.array_range())
+    {
+        std::cout << std::boolalpha << item.is_half()
+            << " " << std::hex << (int)item.as<uint16_t>()
+            << " " << std::defaultfloat << item.as<double>() 
+            << "\n    ";
+    }
+    std::cout << "\n";
+
+    auto format_options = jsoncons::json_options{}.line_splits(jsoncons::line_split_kind::same_line).
+        spaces_around_comma(jsoncons::spaces_option::space_after);
+    std::cout << "(3) " << pretty_print(j, format_options) << "\n\n";
+}
+```
+Output
+```
+(1) d8 54 48 ff 3b 00 3c 01 3c 55 35
+
+(2) false 0 0.999512
+    false 1 1
+    false 1 1.00098
+    false 0 0.333252
+
+(3) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
+```
+

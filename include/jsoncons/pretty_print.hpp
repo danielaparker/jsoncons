@@ -61,7 +61,7 @@ json_printable<Json> print(const Json& j)
 
 template <typename Json>
 json_printable<Json> print(const Json& j,
-                           const basic_json_encode_options<typename Json::char_type>& options)
+    const basic_json_encode_options<typename Json::char_type>& options)
 {
     return json_printable<Json>(j, options, indenting::no_indent);
 }
@@ -74,7 +74,7 @@ json_printable<Json> pretty_print(const Json& j)
 
 template <typename Json>
 json_printable<Json> pretty_print(const Json& j,
-                                  const basic_json_encode_options<typename Json::char_type>& options)
+    const basic_json_encode_options<typename Json::char_type>& options)
 {
     return json_printable<Json>(j, options, indenting::indent);
 }
