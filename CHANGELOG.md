@@ -3,6 +3,8 @@ master
 
 - Fixed bugs:
 
+  - Git PR #716: fix bigdec mantissa and exponent parsing
+
   - Git Issue #714: json_parser does not stop calling the visitor after visit_* signals an error via std::error_code
 
   - Git Issue #712/PR #713: quieten GCC 16 (spurious?) array-out-of-bounds warning
