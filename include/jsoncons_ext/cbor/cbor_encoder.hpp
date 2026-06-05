@@ -1354,7 +1354,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& v, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& data, 
         semantic_tag tag,
         const ser_context& context, 
         std::error_code& ec) override
@@ -1370,15 +1370,15 @@ private:
                     write_tag(0x40);
                     break;
             }
-            write_byte_string(byte_string_view(v));
+            write_byte_string(byte_string_view(data));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
         else
         {
-            this->begin_array(v.size(), semantic_tag::none, context, ec);
+            this->begin_array(data.size(), semantic_tag::none, context, ec);
             if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN;}
-            for (auto p = v.begin(); p != v.end(); ++p)
+            for (auto p = data.begin(); p != data.end(); ++p)
             {
                 this->uint64_value(*p, tag, context, ec);
                 if (JSONCONS_UNLIKELY(ec)) {JSONCONS_VISITOR_RETURN;}
@@ -1398,9 +1398,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint16_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
-            std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size()*sizeof(uint16_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1428,9 +1427,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint32_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(uint32_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1458,9 +1456,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint64_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(uint64_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1486,9 +1483,8 @@ private:
         if (use_typed_arrays_)
         {
             write_tag(0x48);
-            std::vector<uint8_t> v(data.size()*sizeof(int8_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(int8_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1516,9 +1512,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int16_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(int16_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(int16_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1546,9 +1541,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int32_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(int32_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(int32_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1576,9 +1570,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int64_t(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(int64_t));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(int64_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1607,9 +1600,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   half_arg, 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
-            std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(uint16_t));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1637,9 +1629,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   float(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(float));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(float));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(float));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
@@ -1667,9 +1658,8 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   double(), 
                                   tag);
-            std::vector<uint8_t> v(data.size()*sizeof(double));
-            std::memcpy(v.data(), data.data(), data.size()*sizeof(double));
-            write_byte_string(byte_string_view(v));
+            jsoncons::span<const uint8_t> s((const uint8_t*)(data.data()), data.size() * sizeof(double));
+            write_byte_string(byte_string_view(s));
             end_value();
             JSONCONS_VISITOR_RETURN;
         }
