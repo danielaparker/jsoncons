@@ -331,30 +331,15 @@ int main()
 
     auto j = cbor::decode_cbor<jsoncons::json>(buffer);
 
-    std::cout << "(2) ";
-    for (const auto& item : j.array_range())
-    {
-        std::cout << std::boolalpha << item.is_half()
-            << " " << std::hex << (int)item.as<uint16_t>()
-            << " " << std::defaultfloat << item.as<double>() 
-            << "\n    ";
-    }
-    std::cout << "\n";
-
     auto format_options = jsoncons::json_options{}.line_splits(jsoncons::line_split_kind::same_line).
         spaces_around_comma(jsoncons::spaces_option::space_after);
-    std::cout << "(3) " << pretty_print(j, format_options) << "\n\n";
+    std::cout << "(2) " << pretty_print(j, format_options) << "\n\n";
 }
 ```
 Output
 ```
 (1) d8 54 48 ff 3b 00 3c 01 3c 55 35
 
-(2) false 0 0.999512
-    false 1 1
-    false 1 1.00098
-    false 0 0.333252
-
-(3) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
+(2) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
 ```
 
