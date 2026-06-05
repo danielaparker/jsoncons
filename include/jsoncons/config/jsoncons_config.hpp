@@ -262,18 +262,14 @@ namespace jsoncons {
 
 #if defined(JSONCONS_VISITOR_VOID_RETURN) 
 #define JSONCONS_VISITOR_RETURN_TYPE void 
-#define JSONCONS_VISITOR_RET_TYP void 
 #else 
 #define JSONCONS_VISITOR_RETURN_TYPE bool  
-#define JSONCONS_VISITOR_RET_TYP bool  
 #endif
 
 #if defined(JSONCONS_VISITOR_VOID_RETURN) 
 #define JSONCONS_VISITOR_RETURN return
-#define JSONCONS_VISITOR_RET_VAL return;
 #else 
 #define JSONCONS_VISITOR_RETURN return true 
-#define JSONCONS_VISITOR_RET_VAL return true; 
 #endif
 
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP

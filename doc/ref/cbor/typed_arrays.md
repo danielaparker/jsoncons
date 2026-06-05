@@ -343,3 +343,72 @@ Output
 (2) [0.99951171875, 1.0, 1.0009765625, 0.333251953125]
 ```
 
+#### Write a 3D 2 x 3 array with typed array storage (since 1.8.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    std::vector<std::size_t> extents = {2, 3};
+    std::vector<uint8_t> data = {1, 2, 3, 4, 5, 6};
+
+    std::vector<uint8_t> buffer;
+    auto encode_options = cbor::cbor_options{}
+        .use_typed_arrays(true);
+    cbor::cbor_bytes_encoder encoder(buffer, encode_options);
+    encoder.begin_multi_dim(extents, jsoncons::semantic_tag::multi_dim_row_major);
+    encoder.typed_array(jsoncons::span<const uint8_t>(data.data(),data.size()));
+    encoder.end_multi_dim();
+
+    std::cout << "(1) ";
+    jsoncons::print_bytes(buffer, std::cout);   // (since 1.8.0)
+    std::cout << "\n\n";
+
+    auto j = cbor::decode_cbor<jsoncons::json>(buffer);
+    auto format_options = jsoncons::json_options{}.line_splits(jsoncons::line_split_kind::same_line).
+        spaces_around_comma(jsoncons::spaces_option::space_after);
+    std::cout << "(2) " << pretty_print(j, format_options) << "\n\n";
+}
+```
+Output
+```
+(1) d8 28 82 82 02 03 d8 40 46 01 02 03 04 05 06
+
+(2) [[1, 2, 3], [4, 5, 6]]
+```
+
+#### Write a 3D 2 x 3 array with classical array storage 
+
+```cpp
+    std::vector<std::size_t> extents = {2, 3};
+    std::vector<uint8_t> data = {1, 2, 3, 4, 5, 6};
+
+    std::vector<uint8_t> buffer;
+    auto encode_options = cbor::cbor_options{}.
+        use_typed_arrays(false);
+    cbor::cbor_bytes_encoder encoder(buffer, encode_options);
+    encoder.begin_multi_dim(extents, jsoncons::semantic_tag::multi_dim_row_major);
+    encoder.typed_array(jsoncons::span<const uint8_t>(data.data(), data.size()));
+    encoder.end_multi_dim();
+
+    std::cout << "(1) ";
+    jsoncons::print_bytes(buffer, std::cout);   // (since 1.8.0)
+    std::cout << "\n\n";
+
+    auto j = cbor::decode_cbor<jsoncons::json>(buffer);
+    auto format_options = jsoncons::json_options{}.line_splits(jsoncons::line_split_kind::same_line).
+        spaces_around_comma(jsoncons::spaces_option::space_after);
+    std::cout << "(2) " << pretty_print(j, format_options) << "\n\n";
+}
+```
+Output
+```
+(1) d8 28 82 82 02 03 86 01 02 03 04 05 06
+
+(2) [[1, 2, 3], [4, 5, 6]]
+```
+

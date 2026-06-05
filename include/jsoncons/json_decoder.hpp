@@ -122,7 +122,7 @@ private:
     {
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (structure_stack_.back().type_ == structure_type::root_t)
         {
@@ -132,10 +132,10 @@ private:
         }
         item_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_end_object(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
@@ -157,12 +157,12 @@ private:
             result_.swap(item_stack_.front().value);
             item_stack_.pop_back();
             is_valid_ = true;
-            JSONCONS_VISITOR_RET_VAL
+            JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (structure_stack_.back().type_ == structure_type::root_t)
         {
@@ -172,10 +172,10 @@ private:
         }
         item_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_end_array(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(structure_stack_.size() > 1);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
@@ -205,18 +205,18 @@ private:
             result_.swap(item_stack_.front().value);
             item_stack_.pop_back();
             is_valid_ = true;
-            JSONCONS_VISITOR_RET_VAL
+            JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         name_ = key_type(name.data(),name.length(),allocator_);
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -227,12 +227,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(sv, tag, allocator_);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_byte_string(const byte_string_view& b, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                            semantic_tag tag, 
                            const ser_context&,
                            std::error_code&) override
@@ -246,12 +246,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, tag, allocator_);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_byte_string(const byte_string_view& b, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
         uint64_t ext_tag, 
         const ser_context&,
         std::error_code&) override
@@ -265,12 +265,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, ext_tag, allocator_);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_int64(int64_t value, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
         semantic_tag tag, 
         const ser_context&,
         std::error_code&) override
@@ -284,12 +284,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_uint64(uint64_t value, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
         semantic_tag tag, 
         const ser_context&,
         std::error_code&) override
@@ -303,12 +303,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_half(uint16_t value, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
         semantic_tag tag,   
         const ser_context&,
         std::error_code&) override
@@ -322,12 +322,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(half_arg, value, tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_double(double value, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
         semantic_tag tag,   
         const ser_context&,
         std::error_code&) override
@@ -341,12 +341,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(value, tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -357,12 +357,12 @@ private:
             case structure_type::root_t:
                 result_ = Json(value, tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RET_TYP visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -373,9 +373,9 @@ private:
             case structure_type::root_t:
                 result_ = Json(null_type(), tag);
                 is_valid_ = true;
-                JSONCONS_VISITOR_RET_VAL
+                JSONCONS_VISITOR_RETURN;
         }
-        JSONCONS_VISITOR_RET_VAL
+        JSONCONS_VISITOR_RETURN;
     }
 };
 

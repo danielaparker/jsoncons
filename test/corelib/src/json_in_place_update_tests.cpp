@@ -22,7 +22,7 @@ namespace {
               from_(from), to_(to)
         {
         }
-        JSONCONS_VISITOR_RET_TYP visit_string(const string_view_type& value,
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
             jsoncons::semantic_tag,
             const jsoncons::ser_context& context,
             std::error_code&) override
@@ -36,7 +36,7 @@ namespace {
                     *p++ = *it;
                 }
             }
-            JSONCONS_VISITOR_RET_VAL
+            JSONCONS_VISITOR_RETURN;
         }
     };
 
