@@ -10,7 +10,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/trace_json_visitor.hpp>
+#include <jsoncons/tracing_json_visitor.hpp>
 
 #include <catch/catch.hpp>
 #include <sstream>
@@ -268,10 +268,10 @@ TEST_CASE("ubjson_parser reset", "")
     }
 }
 
-TEST_CASE("ubjson_parser with trace_json_visitor", "")
+TEST_CASE("ubjson_parser with tracing_json_visitor", "")
 {
     std::ostringstream os;
-    trace_json_visitor visitor(os, "  ");
+    tracing_json_visitor visitor(os, "  ");
     std::vector<uint8_t> input{
         '{',
             'U',3,'f','o','o',
