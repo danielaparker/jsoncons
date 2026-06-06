@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DIAGNOSTICS_JSON_VISITOR_HPP
-#define JSONCONS_DIAGNOSTICS_JSON_VISITOR_HPP
+#ifndef JSONCONS_TRACING_JSON_VISITOR_HPP
+#define JSONCONS_TRACING_JSON_VISITOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -196,14 +196,14 @@ namespace jsoncons {
     template <typename C> constexpr C basic_trace_json_visitor<C>::visit_double_name[];
 #endif // C++17 check
 
-    using trace_json_visitor = basic_trace_json_visitor<char>;
+    using tracing_json_visitor = basic_trace_json_visitor<char>;
     using wtrace_json_visitor = basic_trace_json_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     template <typename CharT>
     using basic_json_diagnostics_visitor = basic_trace_json_visitor<CharT>;
-    using json_diagnostics_visitor = trace_json_visitor;
+    using json_diagnostics_visitor = tracing_json_visitor;
     using json_wdiagnostics_visitor = basic_trace_json_visitor<wchar_t>;
 
 #endif

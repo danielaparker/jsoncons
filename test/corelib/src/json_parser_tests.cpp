@@ -5,7 +5,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons/trace_json_visitor.hpp>
+#include <jsoncons/tracing_json_visitor.hpp>
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -287,7 +287,7 @@ TEST_CASE("test_diagnostics_visitor", "")
     SECTION("narrow char")
     {
         std::ostringstream os;
-        trace_json_visitor visitor(os, "  ");
+        tracing_json_visitor visitor(os, "  ");
         json_parser parser;
         std::string input(R"({"foo":[42,null]})");
         parser.update(input.data(), input.size());
