@@ -21,7 +21,7 @@
 namespace jsoncons {
 
     template <typename CharT>
-    class basic_trace_json_visitor : public basic_default_json_visitor<CharT>
+    class basic_tracing_json_visitor : public basic_default_json_visitor<CharT>
     {
     public:
         using stream_type = std::basic_ostream<CharT>;
@@ -57,22 +57,22 @@ namespace jsoncons {
         // If CharT is char, then enable the default constructor which binds to
         // std::cout.
         template <typename U = enabler>
-        basic_trace_json_visitor(
+        basic_tracing_json_visitor(
             typename std::enable_if<std::is_same<CharT, char>::value, U>::type = enabler{})
-            : basic_trace_json_visitor(std::cout)
+            : basic_tracing_json_visitor(std::cout)
         {
         }
 
         // If CharT is wchar_t, then enable the default constructor which binds
         // to std::wcout.
         template <typename U = enabler>
-        basic_trace_json_visitor(
+        basic_tracing_json_visitor(
             typename std::enable_if<std::is_same<CharT, wchar_t>::value, U>::type = enabler{})
-            : basic_trace_json_visitor(std::wcout)
+            : basic_tracing_json_visitor(std::wcout)
         {
         }
 
-        explicit basic_trace_json_visitor(
+        explicit basic_tracing_json_visitor(
             stream_type& output,
             string_type indentation = string_type())
             : output_(output),
@@ -181,30 +181,30 @@ namespace jsoncons {
 #if __cplusplus >= 201703L
 // not needed for C++17
 #else
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_begin_array_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_end_array_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_begin_object_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_end_object_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_key_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_string_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_byte_string_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_null_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_bool_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_uint64_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_int64_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_half_name[];
-    template <typename C> constexpr C basic_trace_json_visitor<C>::visit_double_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_begin_array_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_end_array_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_begin_object_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_end_object_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_key_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_string_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_byte_string_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_null_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_bool_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_uint64_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_int64_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_half_name[];
+    template <typename C> constexpr C basic_tracing_json_visitor<C>::visit_double_name[];
 #endif // C++17 check
 
-    using tracing_json_visitor = basic_trace_json_visitor<char>;
-    using wtrace_json_visitor = basic_trace_json_visitor<wchar_t>;
+    using tracing_json_visitor = basic_tracing_json_visitor<char>;
+    using tracing_wjson_visitor = basic_tracing_json_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     template <typename CharT>
-    using basic_json_diagnostics_visitor = basic_trace_json_visitor<CharT>;
+    using basic_json_diagnostics_visitor = basic_tracing_json_visitor<CharT>;
     using json_diagnostics_visitor = tracing_json_visitor;
-    using json_wdiagnostics_visitor = basic_trace_json_visitor<wchar_t>;
+    using json_wdiagnostics_visitor = basic_tracing_json_visitor<wchar_t>;
 
 #endif
 
