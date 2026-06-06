@@ -30,6 +30,7 @@
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
+#include <jsoncons_ext/cbor/cbor_typed_array_iterator.hpp>
 
 namespace jsoncons { 
 namespace cbor {
@@ -38,256 +39,6 @@ enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,ma
 
 template <typename Source,typename Allocator>
 class basic_cbor_parser;
-
-class cbor_mdarray_iterator
-{
-public:
-    virtual ~cbor_mdarray_iterator() = default;
-
-    virtual std::size_t count() const = 0;
-
-    virtual bool done() const = 0;
-
-    virtual void next(item_event_visitor& visitor, const ser_context& context, 
-        std::error_code& ec) = 0;
-
-};
-
-template <typename Source, typename Allocator>
-class cbor_mdarray_row_major_iterator : public cbor_mdarray_iterator
-{
-private:
-
-    std::vector<mdarray_dimension> dimensions_;
-    semantic_tag tag_{};
-    std::size_t dim_{0};
-    bool first_{true};
-    bool done_{false};
-    std::size_t count_{0};
-    basic_cbor_parser<Source,Allocator>* parser_;
-    bool cursor_mode_;
-public:
-    cbor_mdarray_row_major_iterator(jsoncons::span<const std::size_t> extents,
-        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : dimensions_(extents.size(), mdarray_dimension{}),
-          parser_(parser), cursor_mode_(cursor_mode)
-    {
-        std::vector<std::size_t> strides(extents.size(), 0);
-        std::size_t stride = 1;
-        const size_t num_extents = extents.size();
-        for (size_t i = 0; i < num_extents; ++i)
-        {
-            strides[num_extents - i - 1] = stride;
-            stride *= extents[num_extents - i - 1];
-        }
-        for (std::size_t i = 0; i < strides.size(); ++i)
-        {
-            dimensions_[i].extent = extents[i];
-            dimensions_[i].stride = strides[i];
-            dimensions_[i].index = 0;
-            dimensions_[i].end = strides[i] * extents[i];
-        }
-    }
-
-    bool done() const final
-    {
-        return done_;
-    }
-
-    std::size_t count() const final 
-    {
-        return count_;
-    }
-
-    void next(item_event_visitor& visitor, const ser_context& context, 
-        std::error_code& ec) final
-    {
-        JSONCONS_ASSERT(!dimensions_.empty());
-
-        if (dim_ == 0)
-        {
-            if (first_)
-            {
-                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
-                first_ = false;
-                return;
-            }
-            if (dimensions_[dim_].index == dimensions_[dim_].end)
-            {
-                visitor.end_array(context, ec);
-                done_ = true;
-                return;
-            }
-        }
-        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            if (!cursor_mode_)
-            {
-                visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-            }
-            ++dim_;
-            return;
-        }
-        if (dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            parser_->read_item(visitor, ec);
-            dimensions_[dim_].index += dimensions_[dim_].stride;
-            ++count_;
-            return;
-        }
-        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
-        {
-            if (!cursor_mode_)
-            {
-                visitor.end_array(context, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-            }
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                return;
-            }
-            if (dim_ > 0)
-            {
-                --dim_;
-                dimensions_[dim_].index += dimensions_[dim_].stride;
-                if (dimensions_[dim_].index < dimensions_[dim_].end)
-                {
-                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
-                    {
-                        dimensions_[i].index = dimensions_[i-1].index;
-                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
-                    }
-                }
-            }
-        }
-    }
-};
-
-template <typename Source, typename Allocator>
-class cbor_mdarray_column_major_iterator  : public cbor_mdarray_iterator
-{
-private:
-
-    std::vector<mdarray_dimension> dimensions_;
-    semantic_tag tag_{};
-    std::size_t dim_{0};
-    bool first_{true};
-    bool done_{false};
-    std::size_t count_{0};
-    basic_cbor_parser<Source,Allocator>* parser_;
-    bool cursor_mode_;
-public:
-    cbor_mdarray_column_major_iterator(jsoncons::span<const std::size_t> extents,
-        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : dimensions_(extents.size(), mdarray_dimension{}),
-          parser_(parser), cursor_mode_(cursor_mode)
-    {
-        std::vector<std::size_t> strides(extents.size(), 0);
-        std::size_t stride = 1;
-        const size_t num_extents = extents.size();
-        for (size_t i = 0; i < num_extents; ++i)
-        {
-            strides[num_extents - i - 1] = stride;
-            stride *= extents[num_extents - i - 1];
-        }
-        for (std::size_t i = 0; i < strides.size(); ++i)
-        {
-            dimensions_[i].extent = extents[i];
-            dimensions_[i].stride = strides[i];
-            dimensions_[i].index = 0;
-            dimensions_[i].end = strides[i] * extents[i];
-        }
-    }
-
-    bool done() const final
-    {
-        return done_;
-    }
-
-    std::size_t count() const final
-    {
-        return count_;
-    }
-
-    void next(item_event_visitor& visitor, const ser_context& context, 
-        std::error_code& ec) final 
-    {
-        JSONCONS_ASSERT(!dimensions_.empty());
-
-        if (dim_ == 0)
-        {
-            if (first_)
-            {
-                if (!cursor_mode_)
-                {
-                    visitor.begin_array(dimensions_[dim_].extent, semantic_tag::multi_dim_column_major, context, ec);
-                    visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
-                    for (auto item : dimensions_)
-                    {
-                        visitor.uint64_value(item.extent, semantic_tag::none, context, ec);
-                    }
-                    visitor.end_array(context, ec);
-                }
-                visitor.begin_array(dimensions_[dim_].extent, tag_, context, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                first_ = false;
-                return;
-            }
-            if (dimensions_[dim_].index == dimensions_[dim_].end)
-            {
-                visitor.end_array(context, ec);
-                if (!cursor_mode_)
-                {
-                    visitor.end_array(context, ec);
-                }
-                done_ = true;
-                return;
-            }
-        }
-        if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            ++dim_;
-            return;
-        }
-        if (dimensions_[dim_].index < dimensions_[dim_].end)
-        {
-            parser_->read_item(visitor, ec);
-            dimensions_[dim_].index += dimensions_[dim_].stride;
-            ++count_;
-            return;
-        }
-        if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
-        {
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                return;
-            }
-            if (dim_ > 0)
-            {
-                --dim_;
-                dimensions_[dim_].index += dimensions_[dim_].stride;
-                if (dimensions_[dim_].index < dimensions_[dim_].end)
-                {
-                    for (std::size_t i = dim_+1; i < dimensions_.size(); ++i)
-                    {
-                        dimensions_[i].index = dimensions_[i-1].index;
-                        dimensions_[i].end = dimensions_[i].index + dimensions_[i].stride*dimensions_[i].extent;
-                    }
-                }
-            }
-        }
-    }
-};
 
 struct parse_state 
 {
@@ -394,6 +145,7 @@ class basic_cbor_parser : public ser_context
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
     mdarray_order order_{};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
     typed_array_tags array_tag_{};
@@ -401,7 +153,6 @@ class basic_cbor_parser : public ser_context
     byte_string_type array_buffer_;
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
-    std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
     std::unique_ptr<cbor_mdarray_iterator> classical_array_iter_;
 
     struct read_byte_string_from_buffer

@@ -924,6 +924,28 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
         std::cout << ec.message() << "\n";
     }*/
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue:  Bad-cast to jsoncons::cbor::cbor_mdarray_row_major_iterator
+    // Resolution: 
+
+    SECTION("issue 4549385555083264")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-4549385555083264";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        //REQUIRE_NOTHROW
+        (reader.read(ec));
+        //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
+        std::cout << ec.message() << "\n";
+    }
 }
 
 
