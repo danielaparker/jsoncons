@@ -87,8 +87,8 @@ protected:
 template <typename ValueType, typename Func=jsoncons::identity>
 class oned_typed_array_iterator : public typed_array_iterator
 {
-    std::vector<uint8_t> buffer_;
-    jsoncons::span<ValueType> data_;
+    std::vector<uint8_t> data_;
+    jsoncons::span<ValueType> span_;
     typed_array_tags array_tag_;
     std::size_t extent_;
     semantic_tag tag_;
@@ -97,13 +97,13 @@ class oned_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    oned_typed_array_iterator(const std::vector<uint8_t>& buffer, 
+    oned_typed_array_iterator(const std::vector<uint8_t>& data, 
         typed_array_tags array_tag,
         semantic_tag tag = semantic_tag{}, Func func = Func())
-        : buffer_(buffer), 
-          data_(typed_array_cast<ValueType>(buffer_)), 
+        : data_(data), 
+          span_(typed_array_cast<ValueType>(data_)), 
           array_tag_(array_tag), 
-          extent_(buffer.size()), 
+          extent_(span_.size()), 
           tag_(tag), 
           func_(func)
     {
@@ -116,7 +116,7 @@ public:
 
     jsoncons::span<uint8_t> array_buffer() final
     {
-        return buffer_;
+        return data_;
     }
 
     typed_array_tags array_tag() const final
@@ -149,12 +149,12 @@ public:
     {
         if (JSONCONS_UNLIKELY(first_))
         {
-            visitor.begin_array(data_.size(), tag_, context, ec);
+            visitor.begin_array(span_.size(), tag_, context, ec);
             first_ = false;
         }
-        else if (JSONCONS_LIKELY(index_ < data_.size()))
+        else if (JSONCONS_LIKELY(index_ < span_.size()))
         {
-            this->write_value(func_(data_[index_]), semantic_tag::none, visitor, context, ec);
+            this->write_value(func_(span_[index_]), semantic_tag::none, visitor, context, ec);
             ++index_;
         }
         else if (!done_)
@@ -176,8 +176,8 @@ struct mdarray_dimension
 template <typename ValueType>
 class mdarray_iterator : public typed_array_iterator
 {
-    std::vector<uint8_t> buffer_;
-    jsoncons::span<ValueType> data_;
+    std::vector<uint8_t> data_;
+    jsoncons::span<ValueType> span_;
     typed_array_tags array_tag_;
     jsoncons::span<const std::size_t> extents_;
     mdarray_order order_;
@@ -188,10 +188,10 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(const std::vector<uint8_t>& buffer, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
+    mdarray_iterator(const std::vector<uint8_t>& data, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
         mdarray_order order = mdarray_order::row_major)
-        : buffer_(buffer), 
-          data_(typed_array_cast<ValueType>(buffer_)), 
+        : data_(data), 
+          span_(typed_array_cast<ValueType>(data_)), 
           array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -231,7 +231,7 @@ public:
 
     jsoncons::span<uint8_t> array_buffer() final
     {
-        return buffer_;
+        return data_;
     }
 
     typed_array_tags array_tag() const final
@@ -287,7 +287,7 @@ public:
         }
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            this->write_value(data_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
+            this->write_value(span_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
             ++count_;
             return;
