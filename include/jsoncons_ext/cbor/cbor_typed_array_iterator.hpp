@@ -46,7 +46,7 @@ public:
 
     virtual typed_array_tags array_tag() const = 0;
 
-    //virtual jsoncons::span<uint8_t> array_buffer() = 0; 
+    virtual jsoncons::span<uint8_t> array_buffer() = 0; 
 
     virtual mdarray_order order() const = 0;
 
@@ -87,9 +87,7 @@ protected:
 template <typename ValueType, typename Func=jsoncons::identity>
 class oned_typed_array_iterator : public typed_array_iterator
 {
-    //using allocator_type = Allocator;
-    //using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
-
+    std::vector<uint8_t> buffer_;
     jsoncons::span<ValueType> data_;
     typed_array_tags array_tag_;
     std::size_t extent_;
@@ -99,16 +97,26 @@ class oned_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    oned_typed_array_iterator(jsoncons::span<ValueType> data, 
+    oned_typed_array_iterator(const std::vector<uint8_t>& buffer, 
         typed_array_tags array_tag,
         semantic_tag tag = semantic_tag{}, Func func = Func())
-        : data_(data), array_tag_(array_tag), extent_(data.size()), tag_(tag), func_(func)
+        : buffer_(buffer), 
+          data_(typed_array_cast<ValueType>(buffer_)), 
+          array_tag_(array_tag), 
+          extent_(buffer.size()), 
+          tag_(tag), 
+          func_(func)
     {
     }
 
     bool is_typed_array() const final
     {
         return true;
+    }
+
+    jsoncons::span<uint8_t> array_buffer() final
+    {
+        return buffer_;
     }
 
     typed_array_tags array_tag() const final
@@ -168,6 +176,7 @@ struct mdarray_dimension
 template <typename ValueType>
 class mdarray_iterator : public typed_array_iterator
 {
+    std::vector<uint8_t> buffer_;
     jsoncons::span<ValueType> data_;
     typed_array_tags array_tag_;
     jsoncons::span<const std::size_t> extents_;
@@ -179,9 +188,11 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(jsoncons::span<ValueType> data, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
+    mdarray_iterator(const std::vector<uint8_t>& buffer, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
         mdarray_order order = mdarray_order::row_major)
-        : data_{data}, array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
+        : buffer_(buffer), 
+          data_(typed_array_cast<ValueType>(buffer_)), 
+          array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         if (order == mdarray_order::column_major)
@@ -216,6 +227,11 @@ public:
     bool is_typed_array() const final
     {
         return true;
+    }
+
+    jsoncons::span<uint8_t> array_buffer() final
+    {
+        return buffer_;
     }
 
     typed_array_tags array_tag() const final
@@ -341,6 +357,11 @@ public:
     typed_array_tags array_tag() const final
     {
         return typed_array_tags{};
+    }
+
+    jsoncons::span<uint8_t> array_buffer() final
+    {
+        return jsoncons::span<uint8_t>{};
     }
 
     mdarray_order order() const final
@@ -479,6 +500,11 @@ public:
     typed_array_tags array_tag() const final
     {
         return typed_array_tags{};
+    }
+
+    jsoncons::span<uint8_t> array_buffer() final
+    {
+        return jsoncons::span<uint8_t>{};
     }
 
     mdarray_order order() const final

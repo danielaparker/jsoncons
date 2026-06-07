@@ -149,7 +149,7 @@ class basic_cbor_parser : public ser_context
     mdarray_order order_{};
     typed_array_tags array_tag_{};
     semantic_tag typed_array_tag_{};
-    byte_string_type array_buffer_;
+    std::vector<uint8_t> array_buffer_;
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
@@ -200,7 +200,7 @@ public:
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
-         array_buffer_(alloc),
+         array_buffer_(),
          stringref_map_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
@@ -1974,12 +1974,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(array_buffer_, 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(array_buffer_, 
                             typed_array_tags::uint8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2007,12 +2007,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(array_buffer_, 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(array_buffer_, 
                             typed_array_tags::uint8, semantic_tag::clamped);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2049,12 +2049,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer_, 
                             typed_array_tags::uint16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t>>(array_buffer_,
                             typed_array_tags::uint16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2091,12 +2091,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(array_buffer_, 
                             typed_array_tags::uint32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint32_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint32_t>>(array_buffer_,
                             typed_array_tags::uint32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2133,12 +2133,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(array_buffer_, 
                             typed_array_tags::uint64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint64_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint64_t>>(array_buffer_,
                             typed_array_tags::uint64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2165,12 +2165,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(array_buffer_, 
                             typed_array_tags::int8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int8_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int8_t>>(array_buffer_,
                             typed_array_tags::int8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2207,12 +2207,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(array_buffer_, 
                             typed_array_tags::int16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int16_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int16_t>>(array_buffer_,
                             typed_array_tags::int16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2249,12 +2249,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(array_buffer_, 
                             typed_array_tags::int32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int32_t>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int32_t>>(array_buffer_,
                             typed_array_tags::int32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2291,12 +2291,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(array_buffer_, 
                             typed_array_tags::int64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int64_t>>(ta, typed_array_tags::int64);
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int64_t>>(array_buffer_, typed_array_tags::int64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
@@ -2332,12 +2332,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer_, 
                             typed_array_tags::half_float, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t,decode_half>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t,decode_half>>(array_buffer_,
                             typed_array_tags::half_float);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2374,12 +2374,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(array_buffer_, 
                             typed_array_tags::float32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<float>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<float>>(array_buffer_,
                             typed_array_tags::float32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2416,12 +2416,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(ta, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(array_buffer_, 
                             typed_array_tags::float64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<double>>(ta,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<double>>(array_buffer_,
                             typed_array_tags::float64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
