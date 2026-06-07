@@ -234,19 +234,28 @@ public:
         return state_stack_.back().mode == parse_mode::typed_array;
     }
 
-    mdarray_order order() const
-    {
-        return order_;
-    }
-
     bool is_multi_dim() const
     {
         return state_stack_.size() >=2 && state_stack_[state_stack_.size()-2].mode == parse_mode::multi_dim;
     }
+    mdarray_order order() const
+    {
+        return typed_array_iter_->order();
+    }
+
+    typed_array_tags array_tag() const
+    {
+        return typed_array_iter_->array_tag();
+    }
+
+    jsoncons::span<uint8_t> array_buffer()
+    {
+        return typed_array_iter_->array_buffer();
+    }
 
     jsoncons::span<const std::size_t> extents() const 
     {
-        return jsoncons::span<const std::size_t>(extents_.data(), extents_.size());
+        return typed_array_iter_->extents();
     }
 
     template <typename Sourceable>
@@ -299,16 +308,6 @@ public:
     uint64_t raw_tag() const
     {
         return raw_tag_;
-    }
-
-    typed_array_tags array_tag() const
-    {
-        return array_tag_;
-    }
-
-    jsoncons::span<uint8_t> array_buffer()
-    {
-        return typed_array_iter_->array_buffer();
     }
 
     void to_end_array()
