@@ -42,14 +42,16 @@ class typed_array_iterator
 public:
     virtual ~typed_array_iterator() = default;
 
+    virtual std::size_t count() const = 0; 
+
     virtual bool done() const = 0;
 
-    virtual void next(typed_array_visitor& visitor, const ser_context& context, 
+    virtual void next(item_event_visitor& visitor, const ser_context& context, 
         std::error_code& ec) = 0;
 protected:
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_signed_integer<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.int64_value(val, tag, context, ec);
@@ -57,7 +59,7 @@ protected:
 
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_unsigned_integer<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.uint64_value(val, tag, context, ec);
@@ -65,7 +67,7 @@ protected:
 
     template <typename ValueType>
     static typename std::enable_if<std::is_floating_point<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, typed_array_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.double_value(val, tag, context, ec);
@@ -73,7 +75,7 @@ protected:
 };
 
 template <typename ValueType, typename Func=jsoncons::identity>
-class sequential_typed_array_iterator : public typed_array_iterator
+class oned_typed_array_iterator : public typed_array_iterator
 {
     jsoncons::span<ValueType> data_;
     semantic_tag tag_;
@@ -82,7 +84,7 @@ class sequential_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    sequential_typed_array_iterator(jsoncons::span<ValueType> data, 
+    oned_typed_array_iterator(jsoncons::span<ValueType> data, 
         semantic_tag tag = semantic_tag{}, Func func = Func())
         : data_(data), tag_(tag), func_(func)
     {
@@ -92,7 +94,7 @@ public:
         return done_;
     }
 
-    void next(typed_array_visitor& visitor, const ser_context& context, 
+    void next(item_event_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(first_))
@@ -111,28 +113,12 @@ public:
             done_ = true;
         }
     }
+
+    std::size_t count() const final 
+    {
+        return index_;
+    }
 };
-
-inline
-jsoncons::expected<std::size_t,std::errc> calculate_mdarray_size(jsoncons::span<const std::size_t> extents)
-{
-    using result_type = jsoncons::expected<std::size_t,std::errc>;
-
-    if (extents.empty())
-    {
-        return result_type(0);
-    }
-    std::size_t n = extents[0];
-    for (std::size_t i = 1; i < extents.size(); ++i)
-    {
-        if (extents[i] == 0 || JSONCONS_UNLIKELY(n > (std::numeric_limits<std::size_t>::max)()/extents[i]))
-        {
-            return result_type(jsoncons::unexpect, std::errc::value_too_large);
-        }
-        n *= extents[i];
-    }
-    return n;
-}
 
 struct mdarray_dimension
 {
@@ -151,6 +137,7 @@ class mdarray_iterator : public typed_array_iterator
     std::size_t dim_{0};
     bool first_{true};
     bool done_{false};
+    std::size_t count_{0};
 public:
     mdarray_iterator(jsoncons::span<ValueType> data, jsoncons::span<const std::size_t> extents,
         mdarray_order order = mdarray_order::row_major)
@@ -186,12 +173,17 @@ public:
         }
     }
 
+    std::size_t count() const final 
+    {
+        return count_;
+    }
+
     bool done() const final
     {
         return done_;
     }
 
-    void next(typed_array_visitor& visitor, const ser_context& context, 
+    void next(item_event_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         JSONCONS_ASSERT(!dimensions_.empty());
@@ -221,6 +213,7 @@ public:
         {
             this->write_value(data_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
+            ++count_;
             return;
         }
         if (dimensions_[dim_].index + dimensions_[dim_].stride >= dimensions_[dim_].end)
@@ -243,22 +236,8 @@ public:
     }
 };
 
-class cbor_mdarray_iterator
-{
-public:
-    virtual ~cbor_mdarray_iterator() = default;
-
-    virtual std::size_t count() const = 0;
-
-    virtual bool done() const = 0;
-
-    virtual void next(item_event_visitor& visitor, const ser_context& context, 
-        std::error_code& ec) = 0;
-
-};
-
 template <typename Source, typename Allocator>
-class cbor_mdarray_row_major_iterator : public cbor_mdarray_iterator
+class cbor_mdarray_row_major_iterator : public typed_array_iterator
 {
 private:
 
@@ -375,7 +354,7 @@ public:
 };
 
 template <typename Source, typename Allocator>
-class cbor_mdarray_column_major_iterator  : public cbor_mdarray_iterator
+class cbor_mdarray_column_major_iterator  : public typed_array_iterator
 {
 private:
 

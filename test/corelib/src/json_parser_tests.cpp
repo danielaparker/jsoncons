@@ -306,7 +306,7 @@ TEST_CASE("test_diagnostics_visitor", "")
     SECTION("wide char")
     {
         std::wostringstream os;
-        tracing_wjson_visitor visitor(os, L"  ");
+        wtracing_json_visitor visitor(os, L"  ");
         wjson_parser parser;
         std::wstring input(LR"({"foo":[42,null]})");
         parser.update(input.data(), input.size());

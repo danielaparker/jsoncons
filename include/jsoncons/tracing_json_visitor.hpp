@@ -197,7 +197,7 @@ namespace jsoncons {
 #endif // C++17 check
 
     using tracing_json_visitor = basic_tracing_json_visitor<char>;
-    using tracing_wjson_visitor = basic_tracing_json_visitor<wchar_t>;
+    using wtracing_json_visitor = basic_tracing_json_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
