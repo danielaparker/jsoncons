@@ -97,10 +97,10 @@ class oned_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    oned_typed_array_iterator(const std::vector<uint8_t>& data, 
+    oned_typed_array_iterator(std::vector<uint8_t>&& data, 
         typed_array_tags array_tag,
         semantic_tag tag = semantic_tag{}, Func func = Func())
-        : data_(data), 
+        : data_(std::move(data)), 
           span_(typed_array_cast<ValueType>(data_)), 
           array_tag_(array_tag), 
           extent_(span_.size()), 
@@ -188,9 +188,9 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(const std::vector<uint8_t>& data, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
+    mdarray_iterator(std::vector<uint8_t>&& data, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
         mdarray_order order = mdarray_order::row_major)
-        : data_(data), 
+        : data_(std::move(data)), 
           span_(typed_array_cast<ValueType>(data_)), 
           array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
     {
