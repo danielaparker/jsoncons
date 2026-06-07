@@ -88,7 +88,7 @@ template <typename ValueType, typename Func=jsoncons::identity>
 class oned_typed_array_iterator : public typed_array_iterator
 {
     std::vector<uint8_t> data_;
-    jsoncons::span<ValueType> span_;
+    jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
     std::size_t extent_;
     semantic_tag tag_;
@@ -177,7 +177,7 @@ template <typename ValueType>
 class mdarray_iterator : public typed_array_iterator
 {
     std::vector<uint8_t> data_;
-    jsoncons::span<ValueType> span_;
+    jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
     jsoncons::span<const std::size_t> extents_;
     mdarray_order order_;

@@ -149,7 +149,6 @@ class basic_cbor_parser : public ser_context
     mdarray_order order_{};
     typed_array_tags array_tag_{};
     semantic_tag typed_array_tag_{};
-    std::vector<uint8_t> array_buffer_;
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
     std::unique_ptr<typed_array_iterator> typed_array_iter_;
@@ -200,7 +199,6 @@ public:
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
-         array_buffer_(),
          stringref_map_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
@@ -227,7 +225,6 @@ public:
         raw_tag_ = 0;
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
-        array_buffer_.clear();
         stringref_map_stack_.clear();
         nesting_depth_ = 0;
     }
@@ -311,7 +308,7 @@ public:
 
     jsoncons::span<uint8_t> array_buffer()
     {
-        return array_buffer_;
+        return typed_array_iter_->array_buffer();
     }
 
     void to_end_array()
@@ -1958,14 +1955,14 @@ private:
                 case 0x40:
                 {
                     array_tag_ = typed_array_tags::uint8;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer);
                     if (!cursor_mode_ && state_stack_.back().mode == parse_mode::multi_dim) 
                     {
                         if (mdarray_size_ != ta.size())
@@ -1974,12 +1971,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint8_t>>(array_buffer, 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint8_t>>(array_buffer, 
                             typed_array_tags::uint8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -1991,14 +1988,14 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint8;
                     typed_array_tag_ = semantic_tag::clamped;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<const uint8_t>(array_buffer_);
+                    auto ta = typed_array_cast<const uint8_t>(array_buffer);
                     if (!cursor_mode_ && state_stack_.back().mode == parse_mode::multi_dim) 
                     {
                         if (mdarray_size_ != ta.size())
@@ -2007,12 +2004,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<const uint8_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint8_t>>(array_buffer, 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<const uint8_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint8_t>>(array_buffer, 
                             typed_array_tags::uint8, semantic_tag::clamped);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2024,8 +2021,8 @@ private:
                 case 0x45:
                 {
                     array_tag_ = typed_array_tags::uint16;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2033,7 +2030,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint16_t>(array_buffer_);
+                    auto ta = typed_array_cast<uint16_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2049,12 +2046,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer, 
                             typed_array_tags::uint16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t>>(array_buffer,
                             typed_array_tags::uint16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2066,8 +2063,8 @@ private:
                 case 0x46:
                 {
                     array_tag_ = typed_array_tags::uint32;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2075,7 +2072,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag);
-                    auto ta = typed_array_cast<uint32_t>(array_buffer_);
+                    auto ta = typed_array_cast<uint32_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2091,12 +2088,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(array_buffer, 
                             typed_array_tags::uint32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint32_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint32_t>>(array_buffer,
                             typed_array_tags::uint32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2108,8 +2105,8 @@ private:
                 case 0x47:
                 {
                     array_tag_ = typed_array_tags::uint64;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2117,7 +2114,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint64_t>(array_buffer_);
+                    auto ta = typed_array_cast<uint64_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2133,12 +2130,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(array_buffer, 
                             typed_array_tags::uint64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint64_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint64_t>>(array_buffer,
                             typed_array_tags::uint64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2149,14 +2146,14 @@ private:
                 case 0x48:
                 {
                     array_tag_ = typed_array_tags::int8;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
                         return;
                     }
-                    auto ta = typed_array_cast<int8_t>(array_buffer_);
+                    auto ta = typed_array_cast<int8_t>(array_buffer);
                     if (!cursor_mode_ && state_stack_.back().mode == parse_mode::multi_dim) 
                     {
                         if (mdarray_size_ != ta.size())
@@ -2165,12 +2162,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(array_buffer, 
                             typed_array_tags::int8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int8_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int8_t>>(array_buffer,
                             typed_array_tags::int8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2182,8 +2179,8 @@ private:
                 case 0x4d:
                 {
                     array_tag_ = typed_array_tags::int16;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2191,7 +2188,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int16_t>(array_buffer_);
+                    auto ta = typed_array_cast<int16_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2207,12 +2204,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(array_buffer, 
                             typed_array_tags::int16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int16_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int16_t>>(array_buffer,
                             typed_array_tags::int16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2224,8 +2221,8 @@ private:
                 case 0x4e:
                 {
                     array_tag_ = typed_array_tags::int32;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2233,7 +2230,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int32_t>(array_buffer_);
+                    auto ta = typed_array_cast<int32_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2249,12 +2246,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(array_buffer, 
                             typed_array_tags::int32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int32_t>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int32_t>>(array_buffer,
                             typed_array_tags::int32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2266,8 +2263,8 @@ private:
                 case 0x4f:
                 {
                     array_tag_ = typed_array_tags::int64;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2275,7 +2272,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<int64_t>(array_buffer_);
+                    auto ta = typed_array_cast<int64_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2291,12 +2288,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(array_buffer, 
                             typed_array_tags::int64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int64_t>>(array_buffer_, typed_array_tags::int64);
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int64_t>>(array_buffer, typed_array_tags::int64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
@@ -2307,8 +2304,8 @@ private:
                 case 0x54:
                 {
                     array_tag_ = typed_array_tags::half_float;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2316,7 +2313,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<uint16_t>(array_buffer_);
+                    auto ta = typed_array_cast<uint16_t>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2332,12 +2329,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(array_buffer, 
                             typed_array_tags::half_float, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t,decode_half>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t,decode_half>>(array_buffer,
                             typed_array_tags::half_float);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2349,8 +2346,8 @@ private:
                 case 0x55:
                 {
                     array_tag_ = typed_array_tags::float32;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2358,7 +2355,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<float>(array_buffer_);
+                    auto ta = typed_array_cast<float>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2374,12 +2371,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(array_buffer, 
                             typed_array_tags::float32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<float>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<float>>(array_buffer,
                             typed_array_tags::float32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2391,8 +2388,8 @@ private:
                 case 0x56:
                 {
                     array_tag_ = typed_array_tags::float64;
-                    array_buffer_.clear();
-                    read(array_buffer_,ec);
+                    std::vector<uint8_t> array_buffer;
+                    read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2400,7 +2397,7 @@ private:
                     }
                     const uint8_t tag = (uint8_t)raw_tag_;
                     jsoncons::endian e = get_typed_array_endianness(tag); 
-                    auto ta = typed_array_cast<double>(array_buffer_);
+                    auto ta = typed_array_cast<double>(array_buffer);
                     if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < ta.size(); ++i)
@@ -2416,12 +2413,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(array_buffer_, 
+                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(array_buffer, 
                             typed_array_tags::float64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<double>>(array_buffer_,
+                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<double>>(array_buffer,
                             typed_array_tags::float64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
