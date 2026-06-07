@@ -42,6 +42,16 @@ class typed_array_iterator
 public:
     virtual ~typed_array_iterator() = default;
 
+    virtual bool is_typed_array() const = 0;
+
+    virtual typed_array_tags array_tag() const = 0;
+
+    //virtual jsoncons::span<uint8_t> array_buffer() = 0; 
+
+    virtual mdarray_order order() const = 0;
+
+    virtual jsoncons::span<const std::size_t> extents() const = 0;
+
     virtual std::size_t count() const = 0; 
 
     virtual bool done() const = 0;
@@ -77,7 +87,12 @@ protected:
 template <typename ValueType, typename Func=jsoncons::identity>
 class oned_typed_array_iterator : public typed_array_iterator
 {
+    //using allocator_type = Allocator;
+    //using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
+
     jsoncons::span<ValueType> data_;
+    typed_array_tags array_tag_;
+    std::size_t extent_;
     semantic_tag tag_;
     Func func_;
     bool first_{true};
@@ -85,10 +100,37 @@ class oned_typed_array_iterator : public typed_array_iterator
     std::size_t index_{0};
 public:
     oned_typed_array_iterator(jsoncons::span<ValueType> data, 
+        typed_array_tags array_tag,
         semantic_tag tag = semantic_tag{}, Func func = Func())
-        : data_(data), tag_(tag), func_(func)
+        : data_(data), array_tag_(array_tag), extent_(data.size()), tag_(tag), func_(func)
     {
     }
+
+    bool is_typed_array() const final
+    {
+        return true;
+    }
+
+    typed_array_tags array_tag() const final
+    {
+        return array_tag_;
+    }
+
+    mdarray_order order() const final
+    {
+        return mdarray_order::row_major;
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return jsoncons::span<const std::size_t>(&extent_, 1);
+    }
+
+    std::size_t count() const final 
+    {
+        return index_;
+    }
+
     bool done() const final
     {
         return done_;
@@ -113,11 +155,6 @@ public:
             done_ = true;
         }
     }
-
-    std::size_t count() const final 
-    {
-        return index_;
-    }
 };
 
 struct mdarray_dimension
@@ -132,6 +169,9 @@ template <typename ValueType>
 class mdarray_iterator : public typed_array_iterator
 {
     jsoncons::span<ValueType> data_;
+    typed_array_tags array_tag_;
+    jsoncons::span<const std::size_t> extents_;
+    mdarray_order order_;
     std::vector<mdarray_dimension> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
@@ -139,9 +179,9 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(jsoncons::span<ValueType> data, jsoncons::span<const std::size_t> extents,
+    mdarray_iterator(jsoncons::span<ValueType> data, typed_array_tags array_tag, jsoncons::span<const std::size_t> extents,
         mdarray_order order = mdarray_order::row_major)
-        : data_{data}, dimensions_(extents.size(), mdarray_dimension{})
+        : data_{data}, array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         if (order == mdarray_order::column_major)
@@ -171,6 +211,26 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i]*extents[i];
         }
+    }
+
+    bool is_typed_array() const final
+    {
+        return true;
+    }
+
+    typed_array_tags array_tag() const final
+    {
+        return array_tag_;
+    }
+
+    mdarray_order order() const final
+    {
+        return order_;
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return extents_;
     }
 
     std::size_t count() const final 
@@ -242,6 +302,7 @@ class cbor_mdarray_row_major_iterator : public typed_array_iterator
 private:
 
     std::vector<mdarray_dimension> dimensions_;
+    jsoncons::span<const std::size_t> extents_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -252,7 +313,7 @@ private:
 public:
     cbor_mdarray_row_major_iterator(jsoncons::span<const std::size_t> extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : dimensions_(extents.size(), mdarray_dimension{}),
+        : extents_(extents), dimensions_(extents.size(), mdarray_dimension{}),
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -270,6 +331,26 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i] * extents[i];
         }
+    }
+
+    bool is_typed_array() const final
+    {
+        return false;
+    }
+
+    typed_array_tags array_tag() const final
+    {
+        return typed_array_tags{};
+    }
+
+    mdarray_order order() const final
+    {
+        return mdarray_order::row_major;
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return extents_;
     }
 
     bool done() const final
@@ -359,6 +440,7 @@ class cbor_mdarray_column_major_iterator  : public typed_array_iterator
 private:
 
     std::vector<mdarray_dimension> dimensions_;
+    jsoncons::span<const std::size_t> extents_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -369,7 +451,7 @@ private:
 public:
     cbor_mdarray_column_major_iterator(jsoncons::span<const std::size_t> extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : dimensions_(extents.size(), mdarray_dimension{}),
+        : extents_(extents), dimensions_(extents.size(), mdarray_dimension{}),
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -387,6 +469,26 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i] * extents[i];
         }
+    }
+
+    bool is_typed_array() const final
+    {
+        return false;
+    }
+
+    typed_array_tags array_tag() const final
+    {
+        return typed_array_tags{};
+    }
+
+    mdarray_order order() const final
+    {
+        return mdarray_order::column_major;
+    }
+
+    jsoncons::span<const std::size_t> extents() const final
+    {
+        return extents_;
     }
 
     bool done() const final
