@@ -145,13 +145,14 @@ class basic_cbor_parser : public ser_context
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    std::vector<std::shared_ptr<typed_array_iterator>> multi_dim_stack_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
     mdarray_order order_{};
     typed_array_tags array_tag_{};
     semantic_tag typed_array_tag_{};
     std::vector<std::size_t> extents_;
     std::size_t mdarray_size_{0};
-    std::unique_ptr<typed_array_iterator> typed_array_iter_;
+    std::shared_ptr<typed_array_iterator> typed_array_iter_;
 
     struct read_byte_string_from_buffer
     {
@@ -312,7 +313,6 @@ public:
 
     void to_end_array()
     {
-        order_ = mdarray_order{};
         state_stack_.pop_back();
     }
 
@@ -324,6 +324,8 @@ public:
             {
                 case parse_mode::multi_dim:
                 {
+                    typed_array_iter_ = multi_dim_stack_.back();
+                    multi_dim_stack_.pop_back();
                     state_stack_.pop_back();
                     break;
                 }
@@ -1970,12 +1972,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint8_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint8_t>>(std::move(array_buffer), 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint8_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint8_t>>(std::move(array_buffer), 
                             typed_array_tags::uint8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2003,12 +2005,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint8_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint8_t>>(std::move(array_buffer), 
                             typed_array_tags::uint8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint8_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint8_t>>(std::move(array_buffer), 
                             typed_array_tags::uint8, semantic_tag::clamped);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2045,12 +2047,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint16_t>>(std::move(array_buffer), 
                             typed_array_tags::uint16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint16_t>>(std::move(array_buffer),
                             typed_array_tags::uint16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2087,12 +2089,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint32_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint32_t>>(std::move(array_buffer), 
                             typed_array_tags::uint32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint32_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint32_t>>(std::move(array_buffer),
                             typed_array_tags::uint32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2129,12 +2131,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint64_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint64_t>>(std::move(array_buffer), 
                             typed_array_tags::uint64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint64_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint64_t>>(std::move(array_buffer),
                             typed_array_tags::uint64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2161,12 +2163,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int8_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<int8_t>>(std::move(array_buffer), 
                             typed_array_tags::int8, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int8_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<int8_t>>(std::move(array_buffer),
                             typed_array_tags::int8);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2203,12 +2205,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int16_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<int16_t>>(std::move(array_buffer), 
                             typed_array_tags::int16, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int16_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<int16_t>>(std::move(array_buffer),
                             typed_array_tags::int16);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2245,12 +2247,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int32_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<int32_t>>(std::move(array_buffer), 
                             typed_array_tags::int32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int32_t>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<int32_t>>(std::move(array_buffer),
                             typed_array_tags::int32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2287,12 +2289,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<int64_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<int64_t>>(std::move(array_buffer), 
                             typed_array_tags::int64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<int64_t>>(std::move(array_buffer), typed_array_tags::int64);
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<int64_t>>(std::move(array_buffer), typed_array_tags::int64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
@@ -2328,12 +2330,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<uint16_t>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<uint16_t>>(std::move(array_buffer), 
                             typed_array_tags::half_float, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<uint16_t,decode_half>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<uint16_t,decode_half>>(std::move(array_buffer),
                             typed_array_tags::half_float);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2370,12 +2372,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<float>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<float>>(std::move(array_buffer), 
                             typed_array_tags::float32, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<float>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<float>>(std::move(array_buffer),
                             typed_array_tags::float32);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2412,12 +2414,12 @@ private:
                             more_ = false;
                             return;
                         }
-                        typed_array_iter_ = jsoncons::make_unique<mdarray_iterator<double>>(std::move(array_buffer), 
+                        typed_array_iter_ = std::make_shared<mdarray_iterator<double>>(std::move(array_buffer), 
                             typed_array_tags::float64, extents_, order_);
                     }
                     else
                     {
-                        typed_array_iter_ = jsoncons::make_unique<oned_typed_array_iterator<double>>(std::move(array_buffer),
+                        typed_array_iter_ = std::make_shared<oned_typed_array_iterator<double>>(std::move(array_buffer),
                             typed_array_tags::float64);
                     }
                     typed_array_iter_->next(visitor, *this, ec);
@@ -2485,6 +2487,7 @@ private:
         }
         major_type = get_major_type(c.value);
         info = get_additional_information_value(c.value);
+        multi_dim_stack_.push_back(typed_array_iter_);
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
         ++state_stack_.back().index;
 
@@ -2495,7 +2498,7 @@ private:
             {
                 return;
             }
-            typed_array_iter_ = jsoncons::make_unique<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
+            typed_array_iter_ = std::make_shared<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
             if (!typed_array_iter_->done())
             {
                 typed_array_iter_->next(visitor, *this, ec);
@@ -2508,7 +2511,7 @@ private:
             {
                 return;
             }
-            typed_array_iter_ = jsoncons::make_unique<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
+            typed_array_iter_ = std::make_shared<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_);
             if (!typed_array_iter_->done())
             {
                 typed_array_iter_->next(visitor, *this, ec);

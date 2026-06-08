@@ -42,8 +42,6 @@ class typed_array_iterator
 public:
     virtual ~typed_array_iterator() = default;
 
-    virtual bool is_typed_array() const = 0;
-
     virtual typed_array_tags array_tag() const = 0;
 
     virtual jsoncons::span<uint8_t> array_buffer() = 0; 
@@ -107,11 +105,6 @@ public:
           tag_(tag), 
           func_(func)
     {
-    }
-
-    bool is_typed_array() const final
-    {
-        return true;
     }
 
     jsoncons::span<uint8_t> array_buffer() final
@@ -222,11 +215,6 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i]*extents[i];
         }
-    }
-
-    bool is_typed_array() const final
-    {
-        return true;
     }
 
     jsoncons::span<uint8_t> array_buffer() final
@@ -347,11 +335,6 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i] * extents[i];
         }
-    }
-
-    bool is_typed_array() const final
-    {
-        return false;
     }
 
     typed_array_tags array_tag() const final
@@ -490,11 +473,6 @@ public:
             dimensions_[i].index = 0;
             dimensions_[i].end = strides[i] * extents[i];
         }
-    }
-
-    bool is_typed_array() const final
-    {
-        return false;
     }
 
     typed_array_tags array_tag() const final
