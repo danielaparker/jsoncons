@@ -443,8 +443,8 @@ class cbor_mdarray_column_major_iterator  : public typed_array_iterator
 {
 private:
 
-    std::vector<mdarray_dimension> dimensions_;
     std::vector<std::size_t> extents_;
+    std::vector<mdarray_dimension> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
