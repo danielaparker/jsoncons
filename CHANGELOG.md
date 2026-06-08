@@ -1,4 +1,4 @@
-master
+master (1.8.0 preview)
 ------
 
 - Fixed bugs:
@@ -71,19 +71,22 @@ master
       ```
 
     - Until 1.8.0, when reading a CBOR multidimensional arrays with typed array or classical array storage,
-    and serializing to JSON, the result would mimic the CBOR storage, e.g.
-    ```
-        [[2,3,2], [1,2,3,4,5,6,7,8,9,10,11 12]]]
-    ```
-        Information about order (row-major or column-major) is lost, and formatting this way
-        isn't compatible with our sample reflect traits for eigen matrices. Since 1.8.0, 
-        CBOR multidimensional arrays with row-major and column-major typed array storage, 
-        and multi-dimensional arrays with row-major classical array storage, become serialized 
-        as nested arrays, e.g.
-    ```
-        [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
-    ```
-        for a 2 x 3 x 2 multi-dimensional array with row-major typed array storage.
+      and serializing to JSON, the result would mimic the CBOR storage, e.g.
+      ```
+          [[2,3,2], [1,2,3,4,5,6,7,8,9,10,11 12]]]
+      ```
+      Information about order (row-major or column-major) is lost, and formatting this way
+      isn't compatible with our sample reflection traits for eigen matrices. Since 1.8.0, 
+      CBOR multidimensional arrays with row-major and column-major typed array storage 
+      and multi-dimensional arrays with row-major classical array storage are serialized 
+      as nested arrays, so the 2 x 3 x 2 3D array above, assuming row-major storage, becomes 
+      ```
+          [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
+      ```
+      and with column-major typed array storage,
+      ```
+           [[[1,7],[3,9],[5,11]],[[2,8],[4,10],[6,12]]]
+      ```
             
 Enhancements:
 
