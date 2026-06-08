@@ -70,6 +70,21 @@ master
           cursor.read_typed_array(v);
       ```
 
+    - Until 1.8.0, when reading a CBOR multidimensional arrays with typed array or classical array storage,
+    and serializing to JSON, the result would mimic the CBOR storage, e.g.
+    ```
+        [[2,3,2], [1,2,3,4,5,6,7,8,9,10,11 12]]]
+    ```
+    Information about order (row-major or column-major) is lost, and formatting this way
+    isn't compatible with our sample reflect traits for eigen matrices. Since 1.8.0, 
+    CBOR multidimensional arrays with row-major and column-major typed array storage, 
+    and multi-dimensional arrays with row-major classical array storage, become serialized 
+    as nested arrays, e.g.
+    ```
+        [[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]]
+    ```
+    for a 2 x 3 x 2 multi-dimensional array with row-major typed array storage.
+            
 Enhancements:
 
   - The following virtual functions have been added to `basic_staj_cursor`,

@@ -145,6 +145,11 @@ Returns the CBOR tag associated with the current value
 
 ### Examples
 
+[Read CBOR parse events](#read-a-typed-array)  
+[Filter CBOR parse events](#filter-cbor-parse-events)  
+[Typed array examples (until 1.8.0)](##typed-array-examples-until-180)  
+[Typed array examples (since 1.8.0)](#typed-array-examples-since-180)  
+
 Input JSON file `book_catalog.json`:
 
 ```json
@@ -316,9 +321,9 @@ Haruki Murakami
 Graham Greene
 ```
 
-### Typed array examples (until 1.8.0)
+#### Typed array examples (until 1.8.0)
 
-#### Read a typed array
+##### Read a typed array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -376,7 +381,7 @@ Output:
 40
 ```
 
-#### Navigating typed arrays with cursor - multi-dimensional row major with typed array 
+##### Navigating typed arrays with cursor - multi-dimensional row-major with typed array 
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
@@ -386,7 +391,7 @@ This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/h
 int main()
 {
     const std::vector<uint8_t> input = {
-      0xd8,0x28,  // Tag 40 (multi-dimensional row major array)
+      0xd8,0x28,  // Tag 40 (multi-dimensional row-major array)
         0x82,     // array(2)
           0x82,   // array(2)
             0x02,    // unsigned(2) 1st Dimension
@@ -445,7 +450,7 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-#### Navigating typed arrays with cursor - multi-dimensional column major with classical CBOR array
+##### Navigating typed arrays with cursor - multi-dimensional column-major with classical CBOR array
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
@@ -455,7 +460,7 @@ This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/h
 int main()
 {
     const std::vector<uint8_t> input = {
-      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column major array)
+      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column-major array)
         0x82,     // array(2)
           0x82,   // array(2)
             0x02,    // unsigned(2) 1st Dimension
@@ -513,9 +518,9 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-### Typed array examples (since 1.8.0)
+#### Typed array examples (since 1.8.0)
 
-#### Read a typed array
+##### Read a typed array
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -562,7 +567,7 @@ Output:
 [10,20,30,40]
 ```
 
-#### Read a 3D typed array with row-major storage
+##### Read a 3D typed array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -576,7 +581,7 @@ int main()
 {
     // A 3D typed array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]
@@ -627,7 +632,7 @@ Output:
 (2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### Read a 3D typed array with column-major storage
+##### Read a 3D typed array with column-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -692,7 +697,7 @@ Output:
 (2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### Read a 3D classical array with row-major storage
+##### Read a 3D classical array with row-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -706,7 +711,7 @@ int main()
 {
     // A 3D classical array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]
@@ -758,7 +763,7 @@ Output:
 (2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
-#### Read a 3D classical array with column-major storage
+##### Read a 3D classical array with column-major storage
 
 ```cpp
 #include <jsoncons/json.hpp>

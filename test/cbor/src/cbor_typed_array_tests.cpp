@@ -804,10 +804,10 @@ TEST_CASE("cbor typed array tests")
     }
 } 
 
-TEST_CASE("cbor multi-dim, row major, uint64, classical array tests")
+TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
 {
     const std::vector<uint8_t> data = {
-        0xd8,0x28, // semantic tag 40, row major storage
+        0xd8,0x28, // semantic tag 40, row-major storage
         0x82,  // array(2)
         0x82,0x02,0x03, // array(2) -> [2,3]
         0x86,  // array(6)
@@ -951,7 +951,7 @@ TEST_CASE("cbor multi-dim typed array parse tests 2")
     }
 }
  
-TEST_CASE("cbor multi-dim typed array row major, uint64, little endian")
+TEST_CASE("cbor multi-dim typed array row-major, uint64, little endian")
 {
     const std::vector<uint8_t> data = {
         0xd8, 0x28, // Tag 40 Indicates a multi-dimensional array (row-major)
@@ -1021,7 +1021,7 @@ TEST_CASE("cbor multi-dim typed array row major, uint64, little endian")
     }
 }
 
-TEST_CASE("cbor multi-dim typed array column major, cursor tests 2")
+TEST_CASE("cbor multi-dim typed array column-major, cursor tests 2")
 {
     SECTION("Tag 86, float64, little endian")
     {
@@ -1157,7 +1157,7 @@ TEST_CASE("cbor multi-dim, column-major, classical indefinite array tests")
 
 TEST_CASE("cbor multi-dim classical array cursor tests")
 {
-    SECTION("row major")
+    SECTION("row-major")
     {
         //std::cout << "CBOR multi-dim typed array Tag 86, uint16, big endian" << '\n';
 
@@ -1204,7 +1204,7 @@ TEST_CASE("cbor multi-dim classical array cursor tests")
         cursor.next();
         REQUIRE(cursor.done());
     }
-    SECTION("column major")
+    SECTION("column-major")
     {
         auto expected = jsoncons::json::parse(R"(
             [[1, 2, 3], [4, 5, 6]]

@@ -359,7 +359,7 @@ Output:
 d8 56 50 ff ff ff ff ff ff ef ff ff ff ff ff ff ff ef 7f
 ```
 
-#### Decode typed array tags - multi-dimensional row major tag 
+#### Decode typed array tags - multi-dimensional row-major tag 
 
 jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 
@@ -370,7 +370,7 @@ jsoncons implements the tags for row-major and column-major order multi-dimensio
 int main()
 {
     const std::vector<uint8_t> input = {
-      0xd8,0x28,     // Tag 40 (multi-dimensional row major array)
+      0xd8,0x28,     // Tag 40 (multi-dimensional row-major array)
         0x82,        // array(2)
           0x82,      // array(2)
             0x02,    // unsigned(2) 1st Dimension

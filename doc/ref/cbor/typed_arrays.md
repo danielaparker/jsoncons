@@ -98,7 +98,7 @@ int main()
 {
     // A 3D typed array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]
@@ -250,7 +250,7 @@ int main()
 {
     // A 3D classical array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]

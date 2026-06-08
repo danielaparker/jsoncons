@@ -53,7 +53,7 @@ void decode_float64_big_endian_array()
 void decode_mult_dim_row_major()
 {
     const std::vector<uint8_t> input = {
-      0xd8,0x28,     // Tag 40 (multi-dimensional row major array)
+      0xd8,0x28,     // Tag 40 (multi-dimensional row-major array)
         0x82,        // array(2)
           0x82,      // array(2)
             0x02,    // unsigned(2) 1st Dimension
@@ -165,7 +165,7 @@ void encode_half_array()
 void cursor_example_multi_dim_row_major_typed_array()
 {
     const std::vector<uint8_t> input = {
-      0xd8,0x28,  // Tag 40 (multi-dimensional row major array)
+      0xd8,0x28,  // Tag 40 (multi-dimensional row-major array)
         0x82,     // array(2)
           0x82,   // array(2)
             0x02,    // unsigned(2) 1st Dimension
@@ -209,7 +209,7 @@ void cursor_example_multi_dim_row_major_typed_array()
 void cursor_example_multi_dim_column_major_classical_cbor_array()
 {
     const std::vector<uint8_t> input = {
-      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column major array)
+      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column-major array)
         0x82,     // array(2)
           0x82,   // array(2)
             0x02,    // unsigned(2) 1st Dimension
@@ -353,7 +353,7 @@ void cbor_3d_typed_array_row_major_example() // (since 1.8.0)
 {
     // A 3D typed array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]
@@ -463,7 +463,7 @@ void cbor_3d_classical_array_row_major_example() // (since 1.8.0)
 {
     // A 3D classical array 2 x 3 x 2 with row-major storage
     std::vector<uint8_t> data = {
-        0xD8, 0x28,                         // tag(40) row major storage 
+        0xD8, 0x28,                         // tag(40) row-major storage 
         0x82,                               // array(2)
         0x83,                               // shape array(3)
         0x02, 0x03, 0x02,                   // [2, 3, 2]

@@ -835,7 +835,7 @@ public:
                             }
                             more_ = !cursor_mode_;
                             break;
-                        case 40: // row major storage
+                        case 40: // row-major storage
                             order_ = mdarray_order::row_major;
                             read_mdarray_header(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec))
@@ -843,7 +843,7 @@ public:
                                 return;
                             }
                             break;
-                        case 1040: // column major storage
+                        case 1040: // column-major storage
                             order_ = mdarray_order::column_major;
                             read_mdarray_header(visitor, ec);
                             if (JSONCONS_UNLIKELY(ec))

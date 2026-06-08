@@ -327,7 +327,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 [Encode to CBOR stream](#eg2)  
 [Encode with raw CBOR tags (since 1.2.0)](#eg3)  
 [Encode typed array tags - array of half precision floating-point](#eg4)  
-[Encode typed array tags - multi-dimensional column major tag](#eg5)  
+[Encode typed array tags - multi-dimensional column-major tag](#eg5)  
 
  <div id="eg1"/>
 
@@ -509,7 +509,7 @@ true 3555 0.333252
 
  <div id="eg5"/>
 
-#### Encode typed array tags - multi-dimensional column major tag 
+#### Encode typed array tags - multi-dimensional column-major tag 
 
 ```cpp
 #include <jsoncons/json.hpp>
