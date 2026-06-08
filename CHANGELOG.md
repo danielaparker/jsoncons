@@ -1,5 +1,5 @@
-master (1.8.0 preview)
-------
+Release 1.8.0
+-------------
 
 - Fixed bugs:
 
