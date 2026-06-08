@@ -5,12 +5,12 @@ jsoncons supports tags for [typed arrays](https://tools.ietf.org/html/rfc8746).
 ### Examples 
 
 [Read a typed array](#read-a-typed-array)  
-[Read a 3D typed array with row-major storage](#read-a-3d-typed-array-with-row-major-storage)
-[Read a 3D typed array with column-major storage](#read-a-3d-typed-array-with-column-major-storage)
-[Read a 3D classical array with row-major storage (since 1.8.0)](#read-a-3d-classical-array-with-row-major-storage-since-180)
-[Write a typed array of half precision floating-point](#write-a-typed-array-of-half-precision-floating-point)
-[Write a 3D 2 x 3 array with typed array storage (since 1.8.0)](#write-a-3d-2-x-3-array-with-typed-array-storage-since-180)
-[Write a 3D 2 x 3 array with classical array storage](#write-a-3d-2-x-3-array-with-classical-array-storage)
+[Read a 3D typed array with row-major storage](#read-a-3d-typed-array-with-row-major-storage)  
+[Read a 3D typed array with column-major storage](#read-a-3d-typed-array-with-column-major-storage)  
+[Read a 3D classical array with row-major storage (since 1.8.0)](#read-a-3d-classical-array-with-row-major-storage-since-180)  
+[Write a typed array of half precision floating-point](#write-a-typed-array-of-half-precision-floating-point)  
+[Write a 3D 2 x 3 array with typed array storage (since 1.8.0)](#write-a-3d-2-x-3-array-with-typed-array-storage-since-180)  
+[Write a 3D 2 x 3 array with classical array storage](#write-a-3d-2-x-3-array-with-classical-array-storage)  
 
 Reading a CBOR multi-dimensional array and reading a typed array using a cursor have changed in version 1.8.0.
 
