@@ -82,10 +82,14 @@ protected:
     }
 };
 
-template <typename ValueType, typename Func=jsoncons::identity>
+template <typename ValueType, typename Func, typename Allocator>
 class oned_typed_array_iterator : public typed_array_iterator
 {
-    std::vector<uint8_t> data_;
+    using allocator_type = Allocator;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using byte_string_type = std::vector<uint8_t,byte_allocator_type>;
+
+    byte_string_type data_;
     jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
     std::size_t extent_;
@@ -95,7 +99,7 @@ class oned_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    oned_typed_array_iterator(std::vector<uint8_t>&& data, 
+    oned_typed_array_iterator(byte_string_type&& data, 
         typed_array_tags array_tag,
         semantic_tag tag = semantic_tag{}, Func func = Func())
         : data_(std::move(data)), 
@@ -166,14 +170,19 @@ struct mdarray_dimension
     std::size_t index{0};
 };
 
-template <typename ValueType>
+template <typename ValueType, typename Func, typename Allocator>
 class mdarray_iterator : public typed_array_iterator
 {
-    std::vector<uint8_t> data_;
+    using allocator_type = Allocator;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using byte_string_type = std::vector<uint8_t,byte_allocator_type>;
+
+    byte_string_type data_;
     jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
     std::vector<std::size_t> extents_;
     mdarray_order order_;
+    Func func_;
     std::vector<mdarray_dimension> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
@@ -181,11 +190,11 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(std::vector<uint8_t>&& data, typed_array_tags array_tag, const std::vector<std::size_t>& extents,
-        mdarray_order order = mdarray_order::row_major)
+    mdarray_iterator(byte_string_type&& data, typed_array_tags array_tag, const std::vector<std::size_t>& extents,
+        mdarray_order order = mdarray_order::row_major, Func func = Func())
         : data_(std::move(data)), 
           span_(typed_array_cast<ValueType>(data_)), 
-          array_tag_(array_tag), extents_(extents), order_(order), dimensions_(extents.size(), mdarray_dimension{})
+          array_tag_(array_tag), extents_(extents), order_(order), func_(func), dimensions_(extents.size(), mdarray_dimension{})
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         if (order == mdarray_order::column_major)
@@ -275,7 +284,7 @@ public:
         }
         if (dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            this->write_value(span_[dimensions_[dim_].index], semantic_tag::none, visitor, context, ec);
+            this->write_value(func_(span_[dimensions_[dim_].index]), semantic_tag::none, visitor, context, ec);
             dimensions_[dim_].index += dimensions_[dim_].stride;
             ++count_;
             return;
