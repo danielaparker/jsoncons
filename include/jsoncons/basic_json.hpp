@@ -4992,8 +4992,8 @@ namespace jsoncons {
                     return other;
             }
         }
-    };
 #endif
+    };
 
     // operator==
 
