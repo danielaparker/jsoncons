@@ -37,19 +37,20 @@ namespace jsoncons {
 
 enum class staj_events : uint64_t
 {
-    string_value      = 0b0000000000000001,
-    byte_string_value = 0b0000000000000010,
-    null_value        = 0b0000000000000100,
-    bool_value        = 0b0000000000001000,
-    int64_value       = 0b0000000000010000,
-    uint64_value      = 0b0000000000100000,
-    half_value        = 0b0000000001000000,
-    double_value      = 0b0000000010000000,
-    begin_object      = 0b0000000100000000,
-    end_object        = 0b0000001000000000,   
-    begin_array       = 0b0000010000000000,
-    end_array         = 0b0000100000000000,
-    key               = 0b0001000000000000
+    string_value      = 1,
+    byte_string_value = 2,
+    null_value        = 4,
+    bool_value        = 8,
+    int64_value       = 16,
+    uint64_value      = 32,
+    half_value        = 64,
+    double_value      = 128,
+    begin_object      = 256,
+    end_object        = 512,   
+    begin_array       = 1024,
+    end_array         = 2048,
+    second            = 4096,
+    key               = second | string_value
 };
 
 using staj_event_type = staj_events; // For backwards compatibility
@@ -101,87 +102,90 @@ inline bool is_end_container(staj_events types) noexcept
 template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_events tag)
 {
-    static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
-    static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
-    static constexpr const CharT* begin_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_object");
-    static constexpr const CharT* end_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_object");
-    static constexpr const CharT* key_name = JSONCONS_CSTRING_CONSTANT(CharT, "key");
-    static constexpr const CharT* string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "string_value");
-    static constexpr const CharT* byte_string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string_value");
-    static constexpr const CharT* null_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "null_value");
-    static constexpr const CharT* bool_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "bool_value");
-    static constexpr const CharT* uint64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "uint64_value");
-    static constexpr const CharT* int64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "int64_value");
-    static constexpr const CharT* half_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
-    static constexpr const CharT* double_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
+    static constexpr const CharT* begin_array_literal = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
+    static constexpr const CharT* end_array_literal = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
+    static constexpr const CharT* begin_object_literal = JSONCONS_CSTRING_CONSTANT(CharT, "begin_object");
+    static constexpr const CharT* end_object_literal = JSONCONS_CSTRING_CONSTANT(CharT, "end_object");
+    static constexpr const CharT* key_literal = JSONCONS_CSTRING_CONSTANT(CharT, "key");
+    static constexpr const CharT* string_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "string_value");
+    static constexpr const CharT* byte_string_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string_value");
+    static constexpr const CharT* null_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "null_value");
+    static constexpr const CharT* bool_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "bool_value");
+    static constexpr const CharT* uint64_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "uint64_value");
+    static constexpr const CharT* int64_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "int64_value");
+    static constexpr const CharT* half_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
+    static constexpr const CharT* double_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
 
-    switch (tag)
+    switch (tag & ~staj_events::second)
     {
         case staj_events::begin_array:
         {
-            os << begin_array_name;
+            os << begin_array_literal;
             break;
         }
         case staj_events::end_array:
         {
-            os << end_array_name;
+            os << end_array_literal;
             break;
         }
         case staj_events::begin_object:
         {
-            os << begin_object_name;
+            os << begin_object_literal;
             break;
         }
         case staj_events::end_object:
         {
-            os << end_object_name;
-            break;
-        }
-        case staj_events::key:
-        {
-            os << key_name;
+            os << end_object_literal;
             break;
         }
         case staj_events::string_value:
         {
-            os << string_value_name;
+            os << string_value_literal;
             break;
         }
         case staj_events::byte_string_value:
         {
-            os << byte_string_value_name;
+            os << byte_string_value_literal;
             break;
         }
         case staj_events::null_value:
         {
-            os << null_value_name;
+            os << null_value_literal;
             break;
         }
         case staj_events::bool_value:
         {
-            os << bool_value_name;
+            os << bool_value_literal;
             break;
         }
         case staj_events::int64_value:
         {
-            os << int64_value_name;
+            os << int64_value_literal;
             break;
         }
         case staj_events::uint64_value:
         {
-            os << uint64_value_name;
+            os << uint64_value_literal;
             break;
         }
         case staj_events::half_value:
         {
-            os << half_value_name;
+            os << half_value_literal;
             break;
         }
         case staj_events::double_value:
         {
-            os << double_value_name;
+            os << double_value_literal;
             break;
         }
+        default:
+        {
+            break;
+        }
+    }
+    if ((tag & staj_events::second) != staj_events{})
+    {
+        os << ' ' << key_literal;
     }
     return os;
 }
