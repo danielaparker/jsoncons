@@ -1,3 +1,10 @@
+Release 1.8.1
+-------------
+
+- Fixed bugs:
+
+  - Git PR #717: fix misplaced #endif
+
 Release 1.8.0
 -------------
 

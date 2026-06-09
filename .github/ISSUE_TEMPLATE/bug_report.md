@@ -24,6 +24,6 @@ assignees: ''
 
 **What jsoncons library version?**
 
- - [ ] Latest release 1.8.0
+ - [ ] Latest release 1.8.1
  - [ ] Other release ______
  - [ ] master
