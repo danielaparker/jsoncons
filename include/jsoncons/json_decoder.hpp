@@ -130,8 +130,8 @@ private:
             object_member_stack_.clear();
             is_valid_ = false;
         }
+        structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
         object_member_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
-        structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size()-1);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -170,8 +170,8 @@ private:
             object_member_stack_.clear();
             is_valid_ = false;
         }
+        structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
         object_member_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
-        structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size()-1);
         JSONCONS_VISITOR_RETURN;
     }
 
