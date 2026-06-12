@@ -64,7 +64,7 @@ private:
 
     std::size_t index_{0};
     key_type name_;
-    std::vector<index_key_value<Json>,object_member_allocator_type> object_member_stack_;
+    std::vector<index_key_value<Json>,object_member_allocator_type> item_stack_;
     std::vector<structure_info,structure_info_allocator_type> structure_stack_;
     bool is_valid_{false};
 
@@ -74,10 +74,10 @@ public:
         : allocator_(alloc),
           result_(),
           name_(alloc),
-          object_member_stack_(alloc),
+          item_stack_(alloc),
           structure_stack_(temp_alloc)
     {
-        object_member_stack_.reserve(1000);
+        item_stack_.reserve(1000);
         structure_stack_.reserve(100);
         structure_stack_.emplace_back(structure_kind::root_kind, 0);
     }
@@ -87,10 +87,10 @@ public:
         : allocator_(),
           result_(),
           name_(),
-          object_member_stack_(),
+          item_stack_(),
           structure_stack_(temp_alloc)
     {
-        object_member_stack_.reserve(1000);
+        item_stack_.reserve(1000);
         structure_stack_.reserve(100);
         structure_stack_.emplace_back(structure_kind::root_kind, 0);
     }
@@ -99,7 +99,7 @@ public:
     {
         is_valid_ = false;
         index_ = 0;
-        object_member_stack_.clear();
+        item_stack_.clear();
         structure_stack_.clear();
         structure_stack_.emplace_back(structure_kind::root_kind, 0);
     }
@@ -127,18 +127,18 @@ private:
         /*if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
             index_ = 0;
-            object_member_stack_.clear();
+            item_stack_.clear();
             is_valid_ = false;
         }*/
         if (structure_stack_.back().type_ == structure_kind::object_kind)
         {
-            structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
-            object_member_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
+            structure_stack_.emplace_back(structure_kind::object_kind, item_stack_.size());
+            item_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
         }
         else
         {
-            structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
-            object_member_stack_.emplace_back(key_type(allocator_), 0, json_object_arg, tag);
+            structure_stack_.emplace_back(structure_kind::object_kind, item_stack_.size());
+            item_stack_.emplace_back(key_type(allocator_), 0, json_object_arg, tag);
         }
         JSONCONS_VISITOR_RETURN;
     }
@@ -148,22 +148,22 @@ private:
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_kind::object_kind);
         const size_t structure_index = structure_stack_.back().container_index_;
-        JSONCONS_ASSERT(object_member_stack_.size() > structure_index);
-        const size_t count = object_member_stack_.size() - (structure_index + 1);
-        auto first = object_member_stack_.begin() + (structure_index+1);
+        JSONCONS_ASSERT(item_stack_.size() > structure_index);
+        const size_t count = item_stack_.size() - (structure_index + 1);
+        auto first = item_stack_.begin() + (structure_index+1);
 
         if (count > 0)
         {
-            object_member_stack_[structure_index].value.template cast<typename Json::object_storage>().value().uninitialized_init(
-                &object_member_stack_[structure_index+1], count);
+            item_stack_[structure_index].value.template cast<typename Json::object_storage>().value().uninitialized_init(
+                &item_stack_[structure_index+1], count);
         }
 
-        object_member_stack_.erase(first, object_member_stack_.end());
+        item_stack_.erase(first, item_stack_.end());
         structure_stack_.pop_back();
         if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
-            result_.swap(object_member_stack_.front().value);
-            object_member_stack_.pop_back();
+            result_.swap(item_stack_.front().value);
+            item_stack_.pop_back();
             is_valid_ = true;
             JSONCONS_VISITOR_RETURN;
         }
@@ -175,18 +175,18 @@ private:
         /*if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
             index_ = 0;
-            object_member_stack_.clear();
+            item_stack_.clear();
             is_valid_ = false;
         }*/
         if (structure_stack_.back().type_ == structure_kind::object_kind)
         {
-            structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
-            object_member_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
+            structure_stack_.emplace_back(structure_kind::array_kind, item_stack_.size());
+            item_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
         }
         else
         {
-            structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
-            object_member_stack_.emplace_back(key_type(allocator_), 0, json_array_arg, tag);
+            structure_stack_.emplace_back(structure_kind::array_kind, item_stack_.size());
+            item_stack_.emplace_back(key_type(allocator_), 0, json_array_arg, tag);
         }
         JSONCONS_VISITOR_RETURN;
     }
@@ -196,30 +196,30 @@ private:
         JSONCONS_ASSERT(structure_stack_.size() > 1);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_kind::array_kind);
         const size_t container_index = structure_stack_.back().container_index_;
-        JSONCONS_ASSERT(object_member_stack_.size() > container_index);
+        JSONCONS_ASSERT(item_stack_.size() > container_index);
 
-        auto& container = object_member_stack_[container_index].value;
+        auto& container = item_stack_[container_index].value;
 
-        const size_t size = object_member_stack_.size() - (container_index + 1);
+        const size_t size = item_stack_.size() - (container_index + 1);
         //std::cout << "size on item stack: " << size << "\n";
 
         if (size > 0)
         {
             container.reserve(size);
-            auto first = object_member_stack_.begin() + (container_index+1);
+            auto first = item_stack_.begin() + (container_index+1);
             auto last = first + size;
             for (auto it = first; it != last; ++it)
             {
                 container.push_back(std::move((*it).value));
             }
-            object_member_stack_.erase(first, object_member_stack_.end());
+            item_stack_.erase(first, item_stack_.end());
         }
 
         structure_stack_.pop_back();
         if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
-            result_.swap(object_member_stack_.front().value);
-            object_member_stack_.pop_back();
+            result_.swap(item_stack_.front().value);
+            item_stack_.pop_back();
             is_valid_ = true;
             JSONCONS_VISITOR_RETURN;
         }
@@ -237,8 +237,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, sv, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, sv, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, sv, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(sv, tag, allocator_);
@@ -256,8 +258,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, byte_string_arg, b, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(byte_string_arg, b, tag, allocator_);
@@ -275,8 +279,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, byte_string_arg, b, ext_tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(byte_string_arg, b, ext_tag, allocator_);
@@ -294,8 +300,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(value,tag);
@@ -313,8 +321,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(value,tag);
@@ -332,8 +342,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, half_arg, value, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, half_arg, value, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, half_arg, value, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(half_arg, value, tag);
@@ -351,8 +363,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(value, tag);
@@ -367,8 +381,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(value, tag);
@@ -383,8 +399,10 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_kind::object_kind:
+                item_stack_.emplace_back(std::move(name_), index_++, null_type(), tag);
+                break;
             case structure_kind::array_kind:
-                object_member_stack_.emplace_back(std::move(name_), index_++, null_type(), tag);
+                item_stack_.emplace_back(key_type(allocator_), 0, null_type(), tag);
                 break;
             case structure_kind::root_kind:
                 result_ = Json(null_type(), tag);
