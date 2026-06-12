@@ -124,14 +124,22 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        if (structure_stack_.back().type_ == structure_kind::root_kind)
+        /*if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
             index_ = 0;
             object_member_stack_.clear();
             is_valid_ = false;
+        }*/
+        if (structure_stack_.back().type_ == structure_kind::object_kind)
+        {
+            structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
+            object_member_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
         }
-        structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
-        object_member_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
+        else
+        {
+            structure_stack_.emplace_back(structure_kind::object_kind, object_member_stack_.size());
+            object_member_stack_.emplace_back(key_type(allocator_), 0, json_object_arg, tag);
+        }
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -164,14 +172,22 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
-        if (structure_stack_.back().type_ == structure_kind::root_kind)
+        /*if (structure_stack_.back().type_ == structure_kind::root_kind)
         {
             index_ = 0;
             object_member_stack_.clear();
             is_valid_ = false;
+        }*/
+        if (structure_stack_.back().type_ == structure_kind::object_kind)
+        {
+            structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
+            object_member_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
         }
-        structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
-        object_member_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
+        else
+        {
+            structure_stack_.emplace_back(structure_kind::array_kind, object_member_stack_.size());
+            object_member_stack_.emplace_back(key_type(allocator_), 0, json_array_arg, tag);
+        }
         JSONCONS_VISITOR_RETURN;
     }
 
