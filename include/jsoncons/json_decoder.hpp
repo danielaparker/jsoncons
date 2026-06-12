@@ -77,8 +77,6 @@ public:
           item_stack_(alloc),
           structure_stack_(temp_alloc)
     {
-        item_stack_.reserve(1000);
-        structure_stack_.reserve(100);
         structure_stack_.emplace_back(structure_kind::root_kind, 0);
     }
 
@@ -90,8 +88,6 @@ public:
           item_stack_(),
           structure_stack_(temp_alloc)
     {
-        item_stack_.reserve(1000);
-        structure_stack_.reserve(100);
         structure_stack_.emplace_back(structure_kind::root_kind, 0);
     }
 
