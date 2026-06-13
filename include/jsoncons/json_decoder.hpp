@@ -20,6 +20,8 @@
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/json_literals.hpp>
+#include <jsoncons/sink.hpp>
+#include <jsoncons/utility/write_number.hpp>
 
 namespace jsoncons {
 
@@ -375,8 +377,17 @@ private:
         switch (structure_stack_.back().structure_kind)
         {
             case json_structure_kind::object_kind:
-                structure_stack_.back().is_key = !structure_stack_.back().is_key;
-                item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
+                {
+                    name_ = key_type{allocator_};
+                    string_sink<key_type> sink(name_);
+                    jsoncons::write_double f{float_chars_format::general,0};
+                    f(value, sink);
+                }
+                else
+                {
+                    item_stack_.emplace_back(std::move(name_), index_++, value, tag);
+                }
                 break;
             case json_structure_kind::array_kind:
                 item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
@@ -401,7 +412,6 @@ private:
                 }
                 else
                 {
-                    structure_stack_.back().is_key = !structure_stack_.back().is_key;
                     item_stack_.emplace_back(std::move(name_), index_++, value, tag);
                 }
                 break;

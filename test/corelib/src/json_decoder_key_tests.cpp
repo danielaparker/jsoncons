@@ -91,5 +91,25 @@ TEST_CASE("json decoder key tests")
         REQUIRE(decoder.is_valid());
         CHECK(expected == decoder.get_result());
     }
+    SECTION("visit_double")
+    {
+        auto expected = jsoncons::json::parse(R"(
+{
+    "10.0" : "string",
+    "20.0" : 10
+}
+        )");
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        decoder.begin_object();
+        decoder.double_value(10.0);
+        decoder.string_value("string");
+        decoder.double_value(20.0);
+        decoder.int64_value(10);
+        decoder.end_object();
+
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+    }
 }
 
