@@ -838,9 +838,9 @@ namespace jsoncons {
         string_type key_buffer_;
         std::vector<level,level_allocator_type> level_stack_;
 
-        const std::basic_string<char> null_constant = {'n','u','l','l'};
-        const std::basic_string<char> true_constant = { 't','r','u','e' };
-        const std::basic_string<char> false_constant = { 'f', 'a', 'l', 's', 'e' };
+        const std::basic_string<char> null_literal = {'n','u','l','l'};
+        const std::basic_string<char> true_literal = { 't','r','u','e' };
+        const std::basic_string<char> false_literal = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
         basic_item_event_visitor_to_json_visitor(const basic_item_event_visitor_to_json_visitor&) = delete;
@@ -1428,11 +1428,11 @@ namespace jsoncons {
                 key_.clear(); 
                 if (value)
                 {
-                    key_.insert(key_.begin(), true_constant.begin(), true_constant.end());
+                    key_.insert(key_.begin(), true_literal.begin(), true_literal.end());
                 }
                 else
                 {
-                    key_.insert(key_.begin(), false_constant.begin(), false_constant.end());
+                    key_.insert(key_.begin(), false_literal.begin(), false_literal.end());
                 }
             }
 
@@ -1479,7 +1479,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear(); 
-                key_.insert(key_.begin(), null_constant.begin(), null_constant.end());
+                key_.insert(key_.begin(), null_literal.begin(), null_literal.end());
             }
 
             if (level_stack_.back().is_key())

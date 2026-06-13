@@ -305,9 +305,9 @@ public:
     typename std::enable_if<ext_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get_(Allocator alloc,std::error_code& ec) const
     {
-        constexpr const char_type* true_constant = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
-        constexpr const char_type* false_constant = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
-        constexpr const char_type* null_constant = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
+        constexpr const char_type* true_literal = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
+        constexpr const char_type* false_literal = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
+        constexpr const char_type* null_literal = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
 
         switch (event_type_)
         {
@@ -351,11 +351,11 @@ public:
             }
             case staj_events::bool_value:
             {
-                return jsoncons::make_obj_using_allocator<T>(alloc, value_.bool_value_ ? true_constant : false_constant);
+                return jsoncons::make_obj_using_allocator<T>(alloc, value_.bool_value_ ? true_literal : false_literal);
             }
             case staj_events::null_value:
             {
-                return jsoncons::make_obj_using_allocator<T>(alloc, null_constant);
+                return jsoncons::make_obj_using_allocator<T>(alloc, null_literal);
             }
             default:
             {

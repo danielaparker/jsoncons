@@ -255,9 +255,9 @@ namespace jsoncons {
 #define JSONCONS_PP_QUOTE(Prefix, A) JSONCONS_PP_EXPAND(Prefix ## #A)
 #define JSONCONS_PP_WIDEN(A) JSONCONS_PP_EXPAND(L ## A)
 
-#define JSONCONS_CSTRING_CONSTANT(CharT, Str) cstring_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
-#define JSONCONS_STRING_CONSTANT(CharT, Str) string_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
-#define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
+#define JSONCONS_CSTRING_CONSTANT(CharT, Str) jsoncons::cstring_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
+#define JSONCONS_STRING_CONSTANT(CharT, Str) jsoncons::string_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
+#define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) jsoncons::string_view_constant_of_type<CharT>(Str, JSONCONS_PP_WIDEN(Str))
 
 
 #if defined(JSONCONS_VISITOR_VOID_RETURN) 
