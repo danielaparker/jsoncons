@@ -143,48 +143,28 @@ private:
         JSONCONS_ASSERT(structure_stack_.back().structure_kind == json_structure_kind::object_kind);
         const size_t structure_index = structure_stack_.back().structure_index;
         JSONCONS_ASSERT(item_stack_.size() > structure_index);
-        const size_t count = item_stack_.size() - (structure_index + 1);
+        const size_t size = item_stack_.size() - (structure_index + 1);
         auto first = item_stack_.begin() + (structure_index+1);
 
         auto& structure = structure_stack_[structure_stack_.size()-2];
         auto& obj = item_stack_[structure_index].value;
-
-        switch (structure.structure_kind)
+        if (size > 0)
         {
-            case json_structure_kind::object_kind:
-                if (structure.is_key)
-                {
-                    name_ = key_type(allocator_);
-                    Json key{json_object_arg, allocator_};
-                    if (count > 0)
-                    {
-                        key.template cast<typename Json::object_storage>().value().uninitialized_init(
-                            &item_stack_[structure_index+1], count);
-                    }
-                    key.dump(name_);
-                    item_stack_.erase(first, item_stack_.end());
-                    item_stack_.pop_back();
-                }
-                else if (count > 0)
-                {
-                    obj.template cast<typename Json::object_storage>().value().uninitialized_init(
-                        &item_stack_[structure_index+1], count);
-                    item_stack_.erase(first, item_stack_.end());
-                }
-                break;
-            case json_structure_kind::array_kind:
-                obj.template cast<typename Json::object_storage>().value().uninitialized_init(
-                    &item_stack_[structure_index+1], count);
-                item_stack_.erase(first, item_stack_.end());
-                break;
-            default:
-                obj.template cast<typename Json::object_storage>().value().uninitialized_init(
-                    &item_stack_[structure_index+1], count);
-                item_stack_.erase(first, item_stack_.end());
-                result_.swap(item_stack_.front().value);
-                item_stack_.pop_back();
-                is_valid_ = true;
-                break;
+            obj.template cast<typename Json::object_storage>().value().uninitialized_init(
+                &item_stack_[structure_index+1], size);
+            item_stack_.erase(first, item_stack_.end());
+        }
+        if (structure.structure_kind == json_structure_kind::object_kind && structure.is_key)
+        {
+            name_ = key_type(allocator_);
+            obj.dump(name_);
+            item_stack_.pop_back();
+        }
+        else if (structure.structure_kind == json_structure_kind::root_kind)
+        {
+            result_ = std::move(item_stack_.front().value);
+            item_stack_.pop_back();
+            is_valid_ = true;
         }
 
         structure_stack_.pop_back();
@@ -218,68 +198,28 @@ private:
         auto& arr = item_stack_[structure_index].value;
         const size_t size = item_stack_.size() - (structure_index + 1);
 
-        switch (structure.structure_kind)
+        if (size > 0)
         {
-            case json_structure_kind::object_kind:
-                if (structure.is_key)
-                {
-                    name_ = key_type(allocator_);
-                    Json key{json_array_arg, allocator_};
-                    if (size > 0)
-                    {
-                        key.reserve(size);
-                        auto first = item_stack_.begin() + (structure_index+1);
-                        auto last = first + size;
-                        for (auto it = first; it != last; ++it)
-                        {
-                            key.push_back(std::move((*it).value));
-                        }
-                        item_stack_.erase(first, item_stack_.end());
-                    }
-                    key.dump(name_);
-                    item_stack_.pop_back();
-                }
-                else if (size > 0)
-                {
-                    arr.reserve(size);
-                    auto first = item_stack_.begin() + (structure_index+1);
-                    auto last = first + size;
-                    for (auto it = first; it != last; ++it)
-                    {
-                        arr.push_back(std::move((*it).value));
-                    }
-                    item_stack_.erase(first, item_stack_.end());
-                }
-                break;
-            case json_structure_kind::array_kind:
-                if (size > 0)
-                {
-                    arr.reserve(size);
-                    auto first = item_stack_.begin() + (structure_index+1);
-                    auto last = first + size;
-                    for (auto it = first; it != last; ++it)
-                    {
-                        arr.push_back(std::move((*it).value));
-                    }
-                    item_stack_.erase(first, item_stack_.end());
-                }
-                break;
-            default:
-                if (size > 0)
-                {
-                    arr.reserve(size);
-                    auto first = item_stack_.begin() + (structure_index+1);
-                    auto last = first + size;
-                    for (auto it = first; it != last; ++it)
-                    {
-                        arr.push_back(std::move((*it).value));
-                    }
-                    item_stack_.erase(first, item_stack_.end());
-                }
-                result_.swap(item_stack_.front().value);
-                item_stack_.pop_back();
-                is_valid_ = true;
-                break;
+            arr.reserve(size);
+            auto first = item_stack_.begin() + (structure_index+1);
+            auto last = first + size;
+            for (auto it = first; it != last; ++it)
+            {
+                arr.push_back(std::move((*it).value));
+            }
+            item_stack_.erase(first, item_stack_.end());
+        }
+        if (structure.structure_kind == json_structure_kind::object_kind && structure.is_key)
+        {
+            name_ = key_type(allocator_);
+            arr.dump(name_);
+            item_stack_.pop_back();
+        }
+        else if (structure.structure_kind == json_structure_kind::root_kind)
+        {
+            result_ = std::move(item_stack_.front().value);
+            item_stack_.pop_back();
+            is_valid_ = true;
         }
 
         structure_stack_.pop_back();
