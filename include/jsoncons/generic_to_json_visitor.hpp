@@ -61,7 +61,7 @@ private:
     using object_member_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<index_key_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_structure>;
  
-    allocator_type allocator_;
+    allocator_type alloc_;
 
     Json result_;
 
@@ -74,7 +74,7 @@ private:
 public:
     json_decoder2(const allocator_type& alloc = allocator_type(), 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : allocator_(alloc),
+        : alloc_(alloc),
           result_(),
           name_(alloc),
           item_stack_(alloc),
@@ -85,7 +85,7 @@ public:
 
     json_decoder2(temp_allocator_arg_t, 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : allocator_(),
+        : alloc_(),
           result_(),
           name_(),
           item_stack_(),
@@ -132,7 +132,7 @@ private:
         else
         {
             structure_stack_.emplace_back(json_structure_kind::object_kind, item_stack_.size());
-            item_stack_.emplace_back(key_type(allocator_), 0, json_object_arg, tag);
+            item_stack_.emplace_back(key_type(alloc_), 0, json_object_arg, tag);
         }
         JSONCONS_VISITOR_RETURN;
     }
@@ -156,7 +156,7 @@ private:
         }
         if (structure.is_key)
         {
-            name_ = key_type(allocator_);
+            name_ = key_type(alloc_);
             obj.dump(name_);
             item_stack_.pop_back();
         }
@@ -182,7 +182,7 @@ private:
         else
         {
             structure_stack_.emplace_back(json_structure_kind::array_kind, item_stack_.size());
-            item_stack_.emplace_back(key_type(allocator_), 0, json_array_arg, tag);
+            item_stack_.emplace_back(key_type(alloc_), 0, json_array_arg, tag);
         }
         JSONCONS_VISITOR_RETURN;
     }
@@ -211,7 +211,7 @@ private:
         }
         if (structure.is_key)
         {
-            name_ = key_type(allocator_);
+            name_ = key_type(alloc_);
             arr.dump(name_);
             item_stack_.pop_back();
         }
@@ -236,7 +236,7 @@ private:
             ec = json_errc::expected_value;
             JSONCONS_VISITOR_RETURN;
         }
-        name_ = key_type(sv.data(),sv.length(),allocator_);
+        name_ = key_type(sv.data(),sv.length(),alloc_);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -248,7 +248,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure.is_key = !structure.is_key))
                 {
-                    name_ = key_type(sv.data(),sv.length(),allocator_);
+                    name_ = key_type(sv.data(),sv.length(),alloc_);
                 }
                 else
                 {
@@ -256,10 +256,10 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, sv, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, sv, tag);
                 break;
             default:
-                result_ = Json(sv, tag, allocator_);
+                result_ = Json(sv, tag, alloc_);
                 is_valid_ = true;
                 break;
         }
@@ -276,7 +276,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type{allocator_};
+                    name_ = key_type{alloc_};
                     switch (tag)
                     {
                         case semantic_tag::base64:
@@ -296,10 +296,10 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, byte_string_arg, value, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, byte_string_arg, value, tag);
                 break;
             default:
-                result_ = Json(byte_string_arg, value, tag, allocator_);
+                result_ = Json(byte_string_arg, value, tag, alloc_);
                 is_valid_ = true;
                 break;
         }
@@ -316,7 +316,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type{allocator_};
+                    name_ = key_type{alloc_};
                     bytes_to_base64url(value.begin(), value.end(), name_);
                 }
                 else
@@ -325,10 +325,10 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, byte_string_arg, value, ext_tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, byte_string_arg, value, ext_tag);
                 break;
             default:
-                result_ = Json(byte_string_arg, value, ext_tag, allocator_);
+                result_ = Json(byte_string_arg, value, ext_tag, alloc_);
                 is_valid_ = true;
                 break;
         }
@@ -345,7 +345,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type{allocator_};
+                    name_ = key_type{alloc_};
                     jsoncons::from_integer(value, name_);
                 }
                 else
@@ -354,7 +354,7 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, value, tag);
                 break;
             default:
                 result_ = Json(value,tag);
@@ -374,7 +374,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type{allocator_};
+                    name_ = key_type{alloc_};
                     jsoncons::from_integer(value, name_);
                 }
                 else
@@ -383,7 +383,7 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, value, tag);
                 break;
             default:
                 result_ = Json(value,tag);
@@ -415,7 +415,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type{allocator_};
+                    name_ = key_type{alloc_};
                     string_sink<key_type> sink(name_);
                     jsoncons::write_double f{float_chars_format::general,0};
                     f(value, sink);
@@ -426,7 +426,7 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, value, tag);
                 break;
             default:
                 result_ = Json(value, tag);
@@ -444,7 +444,7 @@ private:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
                     auto sv = value ? json_literals<char_type>::true_literal : json_literals<char_type>::false_literal;
-                    name_ = key_type(sv.data(), sv.length(),allocator_);
+                    name_ = key_type(sv.data(), sv.length(),alloc_);
                 }
                 else
                 {
@@ -452,7 +452,7 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, value, tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, value, tag);
                 break;
             default:
                 result_ = Json(value, tag);
@@ -469,7 +469,7 @@ private:
             case json_structure_kind::object_kind:
                 if ((structure_stack_.back().is_key = !structure_stack_.back().is_key))
                 {
-                    name_ = key_type(json_literals<char_type>::null_literal.data(),json_literals<char_type>::null_literal.length(),allocator_);
+                    name_ = key_type(json_literals<char_type>::null_literal.data(),json_literals<char_type>::null_literal.length(),alloc_);
                 }
                 else
                 {
@@ -477,7 +477,7 @@ private:
                 }
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(allocator_), 0, null_type(), tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, null_type(), tag);
                 break;
             default:
                 result_ = Json(null_type(), tag);
