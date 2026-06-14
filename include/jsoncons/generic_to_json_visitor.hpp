@@ -26,7 +26,7 @@
 namespace jsoncons {
 
 template <typename Json,typename TempAlloc =std::allocator<char>>
-class json_decoder final : public basic_json_visitor<typename Json::char_type>
+class json_decoder2 final : public basic_json_visitor<typename Json::char_type>
 {
 public:
     using char_type = typename Json::char_type;
@@ -72,7 +72,7 @@ private:
     bool is_valid_{false};
 
 public:
-    json_decoder(const allocator_type& alloc = allocator_type(), 
+    json_decoder2(const allocator_type& alloc = allocator_type(), 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
         : allocator_(alloc),
           result_(),
@@ -83,7 +83,7 @@ public:
         structure_stack_.emplace_back(json_structure_kind::root_kind, 0);
     }
 
-    json_decoder(temp_allocator_arg_t, 
+    json_decoder2(temp_allocator_arg_t, 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
         : allocator_(),
           result_(),

@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/generic_to_json_visitor.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -22,7 +22,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.key("key1");
         decoder.string_value("string");
@@ -42,7 +42,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.string_value("key1");
         decoder.string_value("string");
@@ -62,7 +62,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.string_value("true");
         decoder.string_value("string");
@@ -82,7 +82,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.null_value();
         decoder.string_value("string");
@@ -100,7 +100,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.double_value(10.0);
         decoder.string_value("string");
@@ -120,7 +120,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.int64_value(-20);
         decoder.string_value("string");
@@ -140,7 +140,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.uint64_value(10);
         decoder.string_value("string");
@@ -160,7 +160,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         std::vector<uint8_t> purr = {'p','u','r','r'};
         decoder.byte_string_value(purr);
@@ -184,7 +184,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.uint64_value(10);
         decoder.string_value("string");
@@ -204,7 +204,7 @@
 }
         )");
 
-        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::json_decoder2<jsoncons::json> decoder;
         decoder.begin_object();
         decoder.begin_object();
         decoder.end_object();
