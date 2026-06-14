@@ -58,7 +58,7 @@ private:
     using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<index_key_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_structure>;
  
-    allocator_type allocator_;
+    allocator_type alloc_;
 
     Json result_;
 
@@ -71,27 +71,27 @@ private:
 public:
     json_decoder(const allocator_type& alloc = allocator_type(), 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : allocator_(alloc),
+        : alloc_(alloc),
           result_(),
           name_(alloc),
           item_stack_(alloc),
           structure_stack_(temp_alloc)
     {
-        item_stack_.reserve(1000);
-        structure_stack_.reserve(100);
+        //item_stack_.reserve(1000);
+        //structure_stack_.reserve(100);
         structure_stack_.emplace_back(json_structure_kind::root_kind, 0);
     }
 
     json_decoder(temp_allocator_arg_t, 
         const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : allocator_(),
+        : alloc_(),
           result_(),
           name_(),
           item_stack_(),
           structure_stack_(temp_alloc)
     {
-        item_stack_.reserve(1000);
-        structure_stack_.reserve(100);
+        //item_stack_.reserve(1000);
+        //structure_stack_.reserve(100);
         structure_stack_.emplace_back(json_structure_kind::root_kind, 0);
     }
 
@@ -124,12 +124,6 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) final
     {
-        if (structure_stack_.back().structure_kind == json_structure_kind::root_kind)
-        {
-            index_ = 0;
-            item_stack_.clear();
-            is_valid_ = false;
-        }
         item_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
         structure_stack_.emplace_back(json_structure_kind::object_kind, item_stack_.size()-1);
         JSONCONS_VISITOR_RETURN;
@@ -164,12 +158,6 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) final
     {
-        if (structure_stack_.back().structure_kind == json_structure_kind::root_kind)
-        {
-            index_ = 0;
-            item_stack_.clear();
-            is_valid_ = false;
-        }
         item_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
         structure_stack_.emplace_back(json_structure_kind::array_kind, item_stack_.size()-1);
         JSONCONS_VISITOR_RETURN;
@@ -212,7 +200,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code&) final
     {
-        name_ = key_type(name.data(),name.length(),allocator_);
+        name_ = key_type(name.data(),name.length(),alloc_);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -225,7 +213,7 @@ private:
                 item_stack_.emplace_back(std::move(name_), index_++, sv, tag);
                 break;
             case json_structure_kind::root_kind:
-                result_ = Json(sv, tag, allocator_);
+                result_ = Json(sv, tag, alloc_);
                 is_valid_ = true;
                 JSONCONS_VISITOR_RETURN;
         }
@@ -244,7 +232,7 @@ private:
                 item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, tag);
                 break;
             case json_structure_kind::root_kind:
-                result_ = Json(byte_string_arg, b, tag, allocator_);
+                result_ = Json(byte_string_arg, b, tag, alloc_);
                 is_valid_ = true;
                 JSONCONS_VISITOR_RETURN;
         }
@@ -263,7 +251,7 @@ private:
                 item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag);
                 break;
             case json_structure_kind::root_kind:
-                result_ = Json(byte_string_arg, b, ext_tag, allocator_);
+                result_ = Json(byte_string_arg, b, ext_tag, alloc_);
                 is_valid_ = true;
                 JSONCONS_VISITOR_RETURN;
         }
