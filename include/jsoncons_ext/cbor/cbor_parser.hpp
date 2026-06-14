@@ -17,7 +17,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -316,7 +316,7 @@ public:
         state_stack_.pop_back();
     }
 
-    void parse(item_event_visitor& visitor, std::error_code& ec)
+    void parse(generic_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -543,7 +543,7 @@ public:
         }
     }
 
-    void read_typed_array_item(item_event_visitor& visitor, std::error_code& ec)
+    void read_typed_array_item(generic_visitor& visitor, std::error_code& ec)
     {
         if (!typed_array_iter_->done())
         {
@@ -561,7 +561,7 @@ public:
         }
     }
 
-    void read_item(item_event_visitor& visitor, std::error_code& ec)
+    void read_item(generic_visitor& visitor, std::error_code& ec)
     {
         read_tags(ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -887,7 +887,7 @@ public:
     }
 private:
 
-    void begin_array(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_array(generic_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -936,7 +936,7 @@ private:
         }
     }
 
-    void end_array(item_event_visitor& visitor, std::error_code& ec)
+    void end_array(generic_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -1011,7 +1011,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_object(generic_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -1059,7 +1059,7 @@ private:
         }
     }
 
-    void end_object(item_event_visitor& visitor, std::error_code& ec)
+    void end_object(generic_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         visitor.end_object(*this, ec);
@@ -1836,7 +1836,7 @@ private:
         }
     }
 
-    void handle_string(item_event_visitor& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(generic_visitor& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1878,7 +1878,7 @@ private:
     }
 
     template <typename Read>
-    void read_byte_string(Read read, item_event_visitor& visitor, std::error_code& ec)
+    void read_byte_string(Read read, generic_visitor& visitor, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -2454,7 +2454,7 @@ private:
         }
     }
 
-    void read_mdarray_header(item_event_visitor& visitor, std::error_code& ec)
+    void read_mdarray_header(generic_visitor& visitor, std::error_code& ec)
     {
         uint8_t b;
         if (source_.read(&b, 1) == 0)

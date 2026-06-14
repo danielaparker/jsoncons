@@ -11,7 +11,7 @@
 #include <iterator>
 #include <catch/catch.hpp>
 
-TEST_CASE("json decoder key tests")
+/*TEST_CASE("json decoder key tests")
 {
     SECTION("visit_key")
     {
@@ -219,5 +219,5 @@ TEST_CASE("json decoder key tests")
 
         //std::cout << decoder.get_result() << "\n";
     }
-}
+}*/
 

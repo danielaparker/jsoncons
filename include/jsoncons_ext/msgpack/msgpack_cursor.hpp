@@ -14,7 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -37,7 +37,7 @@ public:
 private:
     basic_msgpack_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
-    basic_item_event_visitor_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
+    basic_generic_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_{false};
 
 public:
@@ -272,10 +272,10 @@ private:
         {
             struct resource_wrapper
             {
-                basic_item_event_visitor_to_json_visitor<char_type,Allocator>& adaptor;
+                basic_generic_to_json_visitor<char_type,Allocator>& adaptor;
                 basic_json_visitor<char_type>& original;
 
-                resource_wrapper(basic_item_event_visitor_to_json_visitor<char_type,Allocator>& adaptor,
+                resource_wrapper(basic_generic_to_json_visitor<char_type,Allocator>& adaptor,
                                  basic_json_visitor<char_type>& visitor)
                     : adaptor(adaptor), original(adaptor.destination())
                 {

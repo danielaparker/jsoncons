@@ -14,7 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
@@ -158,7 +158,7 @@ namespace msgpack {
             return cursor_visitor_.event();
         }
 
-        void read_to(basic_item_event_visitor<char_type>& visitor) override
+        void read_to(basic_generic_visitor<char_type>& visitor) override
         {
             std::error_code ec;
             read_to(visitor, ec);
@@ -168,7 +168,7 @@ namespace msgpack {
             }
         }
 
-        void read_to(basic_item_event_visitor<char_type>& visitor,
+        void read_to(basic_generic_visitor<char_type>& visitor,
             std::error_code& ec) override
         {
             if (is_begin_container(current().event_type()))
@@ -262,7 +262,7 @@ namespace msgpack {
             }
         }
 
-        void read_next(basic_item_event_visitor<char_type>& visitor, std::error_code& ec)
+        void read_next(basic_generic_visitor<char_type>& visitor, std::error_code& ec)
         {
             {
                 parser_.restart();

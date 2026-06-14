@@ -20,7 +20,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/utility/write_number.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
@@ -590,7 +590,7 @@ public:
         }
     }
     
-    void send_value_event(basic_item_event_visitor<CharT>& visitor,
+    void send_value_event(basic_generic_visitor<CharT>& visitor,
         const ser_context& context,
         std::error_code& ec) const
     {

@@ -8,7 +8,7 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons/json.hpp>
 
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -99,7 +99,7 @@ class my_json_visitor : public default_json_visitor
     }
 };
 
-TEST_CASE("item_event_visitor cbor 1")
+TEST_CASE("generic_visitor cbor 1")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa1, // object (1), key
@@ -117,7 +117,7 @@ TEST_CASE("item_event_visitor cbor 1")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -127,7 +127,7 @@ TEST_CASE("item_event_visitor cbor 1")
     }
 }
 
-TEST_CASE("item_event_visitor cbor 2")
+TEST_CASE("generic_visitor cbor 2")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -147,7 +147,7 @@ TEST_CASE("item_event_visitor cbor 2")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -158,7 +158,7 @@ TEST_CASE("item_event_visitor cbor 2")
     }
 }
 
-TEST_CASE("item_event_visitor cbor 3")
+TEST_CASE("generic_visitor cbor 3")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -178,7 +178,7 @@ TEST_CASE("item_event_visitor cbor 3")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -189,7 +189,7 @@ TEST_CASE("item_event_visitor cbor 3")
     }
 }
 
-TEST_CASE("item_event_visitor cbor 4")
+TEST_CASE("generic_visitor cbor 4")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -209,7 +209,7 @@ TEST_CASE("item_event_visitor cbor 4")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -220,7 +220,7 @@ TEST_CASE("item_event_visitor cbor 4")
     }
 }
 
-TEST_CASE("item_event_visitor cbor 5")
+TEST_CASE("generic_visitor cbor 5")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0x84, // array(4), key
@@ -240,7 +240,7 @@ TEST_CASE("item_event_visitor cbor 5")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -251,7 +251,7 @@ TEST_CASE("item_event_visitor cbor 5")
     }
 }
 
-TEST_CASE("item_event_visitor cbor 6")
+TEST_CASE("generic_visitor cbor 6")
 {
     const std::vector<uint8_t> input = {
         0x9f, // Start indefinte length array
@@ -283,7 +283,7 @@ TEST_CASE("item_event_visitor cbor 6")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        item_event_visitor_to_visitor_adaptor visitor{destination};
+        generic_visitor_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -322,7 +322,7 @@ TEST_CASE("cbor_parser reset")
     json expected3 = json::parse(R"({"e":6})");
 
     json_decoder<json> destination;
-    item_event_visitor_to_visitor_adaptor visitor{destination};
+    generic_visitor_to_visitor_adaptor visitor{destination};
     cbor::basic_cbor_parser<bytes_source> parser{ input1 };
     std::error_code ec;
 

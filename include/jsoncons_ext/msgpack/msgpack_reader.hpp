@@ -13,7 +13,7 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
@@ -29,8 +29,8 @@ class basic_msgpack_reader
     using char_type = char;
 
     basic_msgpack_parser<Source,Allocator> parser_;
-    basic_item_event_visitor_to_json_visitor<char_type,Allocator> adaptor_;
-    item_event_visitor& visitor_;
+    basic_generic_to_json_visitor<char_type,Allocator> adaptor_;
+    generic_visitor& visitor_;
 public:
     template <typename Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
@@ -54,7 +54,7 @@ public:
     }
     template <typename Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
-                      item_event_visitor& visitor, 
+                      generic_visitor& visitor, 
                       const Allocator& alloc)
        : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
@@ -65,7 +65,7 @@ public:
 
     template <typename Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
-                      item_event_visitor& visitor, 
+                      generic_visitor& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator& alloc=Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc),

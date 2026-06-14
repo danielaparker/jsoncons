@@ -17,7 +17,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -155,7 +155,7 @@ public:
         return source_.position();
     }
 
-    void parse(item_event_visitor& visitor, std::error_code& ec)
+    void parse(generic_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -230,7 +230,7 @@ public:
     }
 private:
 
-    void read_item(item_event_visitor& visitor, std::error_code& ec)
+    void read_item(generic_visitor& visitor, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -669,7 +669,7 @@ private:
         }
     }
 
-    void begin_array(item_event_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_array(generic_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -687,7 +687,7 @@ private:
         more_ = !cursor_mode_;
     }
 
-    void end_array(item_event_visitor& visitor, std::error_code& ec)
+    void end_array(generic_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -696,7 +696,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(item_event_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_object(generic_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -714,7 +714,7 @@ private:
         more_ = !cursor_mode_;
     }
 
-    void end_object(item_event_visitor& visitor, std::error_code& ec)
+    void end_object(generic_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         visitor.end_object(*this, ec);

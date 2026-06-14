@@ -17,7 +17,7 @@
 
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/utility/write_number.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
@@ -40,9 +40,9 @@ namespace jsoncons {
     };
 
     template <typename CharT>
-    class basic_item_event_receiver : public basic_item_event_visitor<CharT>
+    class basic_item_event_receiver : public basic_generic_visitor<CharT>
     {
-        using super_type = basic_item_event_visitor<CharT>;
+        using super_type = basic_generic_visitor<CharT>;
     public:
         using char_type = CharT;
         using typename super_type::string_view_type;
@@ -101,7 +101,7 @@ namespace jsoncons {
             }
         }
 
-        void dump(basic_item_event_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
+        void dump(basic_generic_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
             event().send_value_event(visitor, context, ec);
         }
@@ -259,9 +259,9 @@ namespace jsoncons {
 
         virtual const basic_staj_event<CharT>& current() const = 0;
 
-        virtual void read_to(basic_item_event_visitor<CharT>& visitor) = 0;
+        virtual void read_to(basic_generic_visitor<CharT>& visitor) = 0;
 
-        virtual void read_to(basic_item_event_visitor<CharT>& visitor,
+        virtual void read_to(basic_generic_visitor<CharT>& visitor,
                              std::error_code& ec) = 0;
 
         virtual void next() = 0;
@@ -297,12 +297,12 @@ namespace jsoncons {
             return cursor_->current();
         }
 
-        void read_to(basic_item_event_visitor<CharT>& visitor) override
+        void read_to(basic_generic_visitor<CharT>& visitor) override
         {
             cursor_->read_to(visitor);
         }
 
-        void read_to(basic_item_event_visitor<CharT>& visitor,
+        void read_to(basic_generic_visitor<CharT>& visitor,
                      std::error_code& ec) override
         {
             cursor_->read_to(visitor, ec);

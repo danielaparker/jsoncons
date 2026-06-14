@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DIAGNOSTICS_VISITOR2_HPP
-#define JSONCONS_DIAGNOSTICS_VISITOR2_HPP
+#ifndef JSONCONS_TRACING_GENERIC_VISITOR_HPP
+#define JSONCONS_TRACING_GENERIC_VISITOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -18,11 +18,11 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 
 namespace jsoncons { 
 
-    class diagnostics_visitor2 : public basic_default_item_event_visitor<char>
+    class tracing_generic_visitor : public basic_default_generic_visitor<char>
     {
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
@@ -117,4 +117,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif // JSONCONS_DIAGNOSTICS_VISITOR2_HPP
+#endif // JSONCONS_TRACING_GENERIC_VISITOR_HPP

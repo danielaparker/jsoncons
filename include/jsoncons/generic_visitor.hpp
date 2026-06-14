@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_ITEM_EVENT_VISITOR_HPP
-#define JSONCONS_ITEM_EVENT_VISITOR_HPP
+#ifndef JSONCONS_GENERIC_VISITOR_HPP
+#define JSONCONS_GENERIC_VISITOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -31,26 +31,26 @@
 namespace jsoncons { 
 
     template <typename CharT,typename Allocator = std::allocator<char>>
-    class basic_item_event_visitor_to_json_visitor;
+    class basic_generic_to_json_visitor;
 
     template <typename CharT>
-    class basic_item_event_visitor : public typed_array_visitor
+    class basic_generic_visitor : public typed_array_visitor
     {
         template <typename Ch,typename Allocator>
-        friend class basic_item_event_visitor_to_json_visitor;
+        friend class basic_generic_to_json_visitor;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
 
         using string_view_type = jsoncons::basic_string_view<char_type,char_traits_type>;
 
-        basic_item_event_visitor(basic_item_event_visitor&&) = default;
+        basic_generic_visitor(basic_generic_visitor&&) = default;
 
-        basic_item_event_visitor& operator=(basic_item_event_visitor&&) = default;
+        basic_generic_visitor& operator=(basic_generic_visitor&&) = default;
 
-        basic_item_event_visitor() = default;
+        basic_generic_visitor() = default;
 
-        virtual ~basic_item_event_visitor() = default;
+        virtual ~basic_generic_visitor() = default;
 
         void flush()
         {
@@ -771,11 +771,11 @@ namespace jsoncons {
     };
 
  template <typename CharT,typename Allocator>
-    class basic_item_event_visitor_to_json_visitor : public basic_item_event_visitor<CharT>
+    class basic_generic_to_json_visitor : public basic_generic_visitor<CharT>
     {
     public:
-        using typename basic_item_event_visitor<CharT>::char_type;
-        using typename basic_item_event_visitor<CharT>::string_view_type;
+        using typename basic_generic_visitor<CharT>::char_type;
+        using typename basic_generic_visitor<CharT>::string_view_type;
     private:
         using char_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type>;
 
@@ -843,17 +843,17 @@ namespace jsoncons {
         const std::basic_string<char> false_literal = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
-        basic_item_event_visitor_to_json_visitor(const basic_item_event_visitor_to_json_visitor&) = delete;
-        basic_item_event_visitor_to_json_visitor& operator=(const basic_item_event_visitor_to_json_visitor&) = delete;
+        basic_generic_to_json_visitor(const basic_generic_to_json_visitor&) = delete;
+        basic_generic_to_json_visitor& operator=(const basic_generic_to_json_visitor&) = delete;
     public:
-        explicit basic_item_event_visitor_to_json_visitor(const Allocator& alloc = Allocator())
+        explicit basic_generic_to_json_visitor(const Allocator& alloc = Allocator())
             : default_visitor_(), destination_(std::addressof(default_visitor_)),
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(target_t::destination,container_t::root); // root
         }
 
-        explicit basic_item_event_visitor_to_json_visitor(basic_json_visitor<char_type>& visitor, 
+        explicit basic_generic_to_json_visitor(basic_json_visitor<char_type>& visitor, 
                                                      const Allocator& alloc = Allocator())
             : destination_(std::addressof(visitor)), 
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
@@ -1530,7 +1530,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1549,7 +1549,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1568,7 +1568,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1587,7 +1587,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1606,7 +1606,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1625,7 +1625,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1644,7 +1644,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1663,7 +1663,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1683,7 +1683,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
             }
             else
             {
@@ -1702,7 +1702,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1721,7 +1721,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == target_t::buffer)
             {
-                basic_item_event_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1732,12 +1732,12 @@ namespace jsoncons {
     };
 
     template <typename CharT>
-    class basic_default_item_event_visitor : public basic_item_event_visitor<CharT>
+    class basic_default_generic_visitor : public basic_generic_visitor<CharT>
     {
     public:
-        using typename basic_item_event_visitor<CharT>::string_view_type;
+        using typename basic_generic_visitor<CharT>::string_view_type;
 
-        basic_default_item_event_visitor() = default;
+        basic_default_generic_visitor() = default;
     private:
         void visit_flush() override
         {
@@ -1814,27 +1814,27 @@ namespace jsoncons {
         }
     };
 
-    // basic_json_visitor_to_item_event_visitor
+    // basic_json_visitor_to_generic_visitor
 
     template <typename CharT>
-    class basic_json_visitor_to_item_event_visitor : public basic_json_visitor<CharT>
+    class basic_json_visitor_to_generic_visitor : public basic_json_visitor<CharT>
     {
     public:
         using typename basic_json_visitor<CharT>::char_type;
         using typename basic_json_visitor<CharT>::string_view_type;
     private:
-        basic_item_event_visitor<char_type>& destination_;
+        basic_generic_visitor<char_type>& destination_;
 
         // noncopyable and nonmoveable
-        basic_json_visitor_to_item_event_visitor(const basic_json_visitor_to_item_event_visitor&) = delete;
-        basic_json_visitor_to_item_event_visitor& operator=(const basic_json_visitor_to_item_event_visitor&) = delete;
+        basic_json_visitor_to_generic_visitor(const basic_json_visitor_to_generic_visitor&) = delete;
+        basic_json_visitor_to_generic_visitor& operator=(const basic_json_visitor_to_generic_visitor&) = delete;
     public:
-        basic_json_visitor_to_item_event_visitor(basic_item_event_visitor<char_type>& visitor)
+        basic_json_visitor_to_generic_visitor(basic_generic_visitor<char_type>& visitor)
             : destination_(visitor)
         {
         }
 
-        basic_item_event_visitor<char_type>& destination()
+        basic_generic_visitor<char_type>& destination()
         {
             destination_;
         }
@@ -1944,10 +1944,10 @@ namespace jsoncons {
         }
     };
 
-    using item_event_visitor = basic_item_event_visitor<char>;
-    using default_item_event_visitor = basic_default_item_event_visitor<char>;
-    using item_event_visitor_to_visitor_adaptor = basic_item_event_visitor_to_json_visitor<char>;
+    using generic_visitor = basic_generic_visitor<char>;
+    using default_generic_visitor = basic_default_generic_visitor<char>;
+    using generic_visitor_to_visitor_adaptor = basic_generic_to_json_visitor<char>;
 
 } // namespace jsoncons
 
-#endif // JSONCONS_ITEM_EVENT_VISITOR_HPP
+#endif // JSONCONS_GENERIC_VISITOR_HPP

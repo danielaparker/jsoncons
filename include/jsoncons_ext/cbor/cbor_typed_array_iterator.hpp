@@ -17,7 +17,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -54,12 +54,12 @@ public:
 
     virtual bool done() const = 0;
 
-    virtual void next(item_event_visitor& visitor, const ser_context& context, 
+    virtual void next(generic_visitor& visitor, const ser_context& context, 
         std::error_code& ec) = 0;
 protected:
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_signed_integer<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, generic_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.int64_value(val, tag, context, ec);
@@ -67,7 +67,7 @@ protected:
 
     template <typename ValueType>
     static typename std::enable_if<ext_traits::is_unsigned_integer<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, generic_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.uint64_value(val, tag, context, ec);
@@ -75,7 +75,7 @@ protected:
 
     template <typename ValueType>
     static typename std::enable_if<std::is_floating_point<ValueType>::value, void>::type
-        write_value(ValueType val, semantic_tag tag, item_event_visitor& visitor,
+        write_value(ValueType val, semantic_tag tag, generic_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
         visitor.double_value(val, tag, context, ec);
@@ -141,7 +141,7 @@ public:
         return done_;
     }
 
-    void next(item_event_visitor& visitor, const ser_context& context, 
+    void next(generic_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(first_))
@@ -256,7 +256,7 @@ public:
         return done_;
     }
 
-    void next(item_event_visitor& visitor, const ser_context& context, 
+    void next(generic_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         JSONCONS_ASSERT(!dimensions_.empty());
@@ -376,7 +376,7 @@ public:
         return count_;
     }
 
-    void next(item_event_visitor& visitor, const ser_context& context, 
+    void next(generic_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final
     {
         JSONCONS_ASSERT(!dimensions_.empty());
@@ -514,7 +514,7 @@ public:
         return count_;
     }
 
-    void next(item_event_visitor& visitor, const ser_context& context, 
+    void next(generic_visitor& visitor, const ser_context& context, 
         std::error_code& ec) final 
     {
         JSONCONS_ASSERT(!dimensions_.empty());
