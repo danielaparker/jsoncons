@@ -154,7 +154,7 @@ private:
                 &item_stack_[structure_index+1], size);
             item_stack_.erase(first, item_stack_.end());
         }
-        if (structure.structure_kind == json_structure_kind::object_kind && structure.is_key)
+        if (structure.is_key)
         {
             name_ = key_type(allocator_);
             obj.dump(name_);
@@ -209,7 +209,7 @@ private:
             }
             item_stack_.erase(first, item_stack_.end());
         }
-        if (structure.structure_kind == json_structure_kind::object_kind && structure.is_key)
+        if (structure.is_key)
         {
             name_ = key_type(allocator_);
             arr.dump(name_);
