@@ -115,9 +115,9 @@ private:
     {
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag /*tag*/, 
-        const ser_context&, 
-        std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, 
+        const ser_context& context, 
+        std::error_code& ec) final
     {
         auto& structure = structure_stack_.back();
         if (structure.structure_kind == json_structure_kind::object_kind)
@@ -132,38 +132,46 @@ private:
         else
         {
             structure_stack_.emplace_back(json_structure_kind::object_kind, key_part_stack_.size());
+            destination_->begin_object(tag, context, ec);
         }
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, 
-        std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, 
+        std::error_code& ec) final
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().structure_kind == json_structure_kind::object_kind);
-        const size_t structure_index = structure_stack_.back().structure_index;
-        JSONCONS_ASSERT(key_part_stack_.size() > structure_index);
+        //JSONCONS_ASSERT(key_part_stack_.size() > structure_index);
         //const size_t size = key_part_stack_.size() - (structure_index + 1);
 
-        auto first = key_part_stack_.begin() + (structure_index+1);
-        auto last = key_part_stack_.end();
         auto& structure = structure_stack_[structure_stack_.size()-2];
         //auto* keys = key_part_stack_.data() + structure_index;
 
-        if (structure.is_key)
+        if (!is_composite_key())
         {
+            destination_->end_object(context, ec);
+        }
+        else
+        {
+            const size_t structure_index = structure_stack_.back().structure_index;
+            JSONCONS_ASSERT(key_part_stack_.size() > structure_index);
+            auto& key = key_part_stack_[structure_index];
+            auto first = key_part_stack_.begin() + (structure_index+1);
+            auto last = key_part_stack_.end();
+
             bool start = true;
             for (auto it = first; it != last; ++it)
             {
                 if (!start)
                 {
-                    key_.push_back(',');
+                    key.push_back(',');
                 }
                 else
                 {
                     start = false;
                 }
-                key_.append(*it);
+                key.append(*it);
             }
             key_part_stack_.erase(first, key_part_stack_.end());
             key_part_stack_.pop_back();

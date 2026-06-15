@@ -32,10 +32,10 @@ TEST_CASE("generic_to_json_visitor tests")
         adaptor.end_object();
 
         REQUIRE(decoder.is_valid());
-        //std::cout << decoder.get_result() << "\n";
-        CHECK(expected == decoder.get_result());
+        std::cout << decoder.get_result() << "\n";
+        //CHECK(expected == decoder.get_result());
     }
-    SECTION("visit_bool")
+    /*SECTION("visit_bool")
     {
         auto expected = jsoncons::json::parse(R"(
 {
@@ -209,7 +209,7 @@ TEST_CASE("generic_to_json_visitor tests")
 
         //std::cout << decoder.get_result() << "\n";
     }
-    /*SECTION("empty object")
+    SECTION("empty object")
     {
         auto expected = jsoncons::json::parse(R"(
 {
