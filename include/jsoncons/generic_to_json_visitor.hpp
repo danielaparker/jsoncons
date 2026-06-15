@@ -152,7 +152,14 @@ private:
         else
         {
             const size_t key_offset = structure_stack_.back().key_offset;
-            key_.push_back('}');
+            if (structure.structure_kind == json_structure_kind::object_kind)
+            {
+                if (structure.is_key)
+                {
+                    key_.push_back('}');
+                    destination_->key(key_, context, ec);
+                }
+            }
         }
 
         structure_stack_.pop_back();

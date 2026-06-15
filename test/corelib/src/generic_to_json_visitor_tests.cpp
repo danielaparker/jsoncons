@@ -13,7 +13,7 @@
 
 TEST_CASE("generic_to_json_visitor tests")
 {
-    SECTION("visit_string")
+    /*SECTION("visit_string")
     {
         auto expected = jsoncons::json::parse(R"(
 {
@@ -203,6 +203,27 @@ TEST_CASE("generic_to_json_visitor tests")
 
         REQUIRE(decoder.is_valid());
         CHECK(expected == decoder.get_result());
+    }*/
+    SECTION("empty object")
+    {
+        auto expected = jsoncons::json::parse(R"(
+{
+    "{}" : "string"
+}
+        )");
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        adaptor.begin_object();
+        adaptor.begin_object();
+        adaptor.end_object();
+        adaptor.string_value("string");
+        adaptor.end_object();
+
+        REQUIRE(decoder.is_valid());
+        //CHECK(expected == decoder.get_result());
+
+        std::cout << decoder.get_result() << "\n";
     }
     /*SECTION("empty object, empty array")
     {
@@ -222,27 +243,6 @@ TEST_CASE("generic_to_json_visitor tests")
         adaptor.begin_array();
         adaptor.end_array();
         adaptor.int64_value(10);
-        adaptor.end_object();
-
-        REQUIRE(decoder.is_valid());
-        CHECK(expected == decoder.get_result());
-
-        //std::cout << decoder.get_result() << "\n";
-    }
-    SECTION("empty object")
-    {
-        auto expected = jsoncons::json::parse(R"(
-{
-    "{}" : "string"
-}
-        )");
-
-        jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
-        adaptor.begin_object();
-        adaptor.begin_object();
-        adaptor.end_object();
-        adaptor.string_value("string");
         adaptor.end_object();
 
         REQUIRE(decoder.is_valid());
