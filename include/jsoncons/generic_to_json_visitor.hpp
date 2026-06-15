@@ -181,9 +181,9 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag /*tag*/, 
-        const ser_context&, 
-        std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, 
+        const ser_context& context, 
+        std::error_code& ec) final
     {
         auto& structure = structure_stack_.back();
         if (structure.structure_kind == json_structure_kind::object_kind)
@@ -198,38 +198,44 @@ private:
         else
         {
             structure_stack_.emplace_back(json_structure_kind::array_kind, key_part_stack_.size());
-            //key_part_stack_.emplace_back(string_type(alloc_), 0, json_array_arg, tag);
+            destination_->begin_array(tag, context, ec);
         }
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, 
-        std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, 
+        std::error_code& ec) final
     {
         JSONCONS_ASSERT(structure_stack_.size() > 1);
         JSONCONS_ASSERT(structure_stack_.back().structure_kind == json_structure_kind::array_kind);
-        const size_t structure_index = structure_stack_.back().structure_index;
-        JSONCONS_ASSERT(key_part_stack_.size() > structure_index);
 
-        auto& structure = structure_stack_[structure_stack_.size()-2];
-        auto& arr = key_part_stack_[structure_index];
-        const size_t size = key_part_stack_.size() - (structure_index + 1);
-
-        if (size > 0)
+        if (!is_composite_key())
         {
-            arr.reserve(size);
-            auto first = key_part_stack_.begin() + (structure_index+1);
-            auto last = first + size;
-            for (auto it = first; it != last; ++it)
-            {
-                //arr.push_back(std::move((*it)));
-            }
-            key_part_stack_.erase(first, key_part_stack_.end());
+            destination_->end_array(context, ec);
         }
-        if (structure.is_key)
+        else
         {
-            key_.clear();
-            key_part_stack_.pop_back();
+            const size_t structure_index = structure_stack_.back().structure_index;
+            JSONCONS_ASSERT(key_part_stack_.size() > structure_index);
+            auto& structure = structure_stack_[structure_stack_.size()-2];
+            auto& arr = key_part_stack_[structure_index];
+            const size_t size = key_part_stack_.size() - (structure_index + 1);
+            if (size > 0)
+            {
+                arr.reserve(size);
+                auto first = key_part_stack_.begin() + (structure_index+1);
+                auto last = first + size;
+                for (auto it = first; it != last; ++it)
+                {
+                    //arr.push_back(std::move((*it)));
+                }
+                key_part_stack_.erase(first, key_part_stack_.end());
+            }
+            if (structure.is_key)
+            {
+                key_.clear();
+                key_part_stack_.pop_back();
+            }
         }
 
         structure_stack_.pop_back();
@@ -245,7 +251,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 destination_->key(sv, context, ec);
             }
@@ -270,7 +276,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 key_.clear();
                 switch (tag)
@@ -321,7 +327,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 key_.clear();
                 bytes_to_base64url(value.begin(), value.end(), key_);
@@ -350,7 +356,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 key_.clear();
                 jsoncons::from_integer(value, key_);
@@ -379,7 +385,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 key_.clear();
                 jsoncons::from_integer(value, key_);
@@ -420,7 +426,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
@@ -453,7 +459,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 auto sv = value ? json_literals<char_type>::true_literal : json_literals<char_type>::false_literal;
                 destination_->key(sv, context, ec);
@@ -479,7 +485,7 @@ private:
 
         if (!is_composite_key())
         {
-            if ((structure.is_key = !structure.is_key))
+            if (structure.structure_kind == json_structure_kind::object_kind && (structure.is_key = !structure.is_key))
             {
                 auto sv = json_literals<char_type>::null_literal;
                 destination_->key(sv, context, ec);
