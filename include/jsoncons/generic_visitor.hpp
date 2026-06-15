@@ -1946,7 +1946,7 @@ template <typename CharT,typename Allocator>
 
     using generic_visitor = basic_generic_visitor<char>;
     using default_generic_visitor = basic_default_generic_visitor<char>;
-    using generic_visitor_to_visitor_adaptor = basic_generic_to_json_visitor<char>;
+    using generic_to_json_visitor = basic_generic_to_json_visitor<char>;
 
 } // namespace jsoncons
 
