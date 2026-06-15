@@ -95,7 +95,7 @@ add_executable(unit_tests
                corelib/src/const_json_ptr_arg_tests.cpp
                corelib/src/json_constructor_tests.cpp
                corelib/src/json_cursor_tests.cpp
-               corelib/src/json_decoder_key_tests.cpp
+               corelib/src/generic_to_json_visitor_tests.cpp
                corelib/src/json_encoder_tests.cpp
                corelib/src/json_exception_tests.cpp
                corelib/src/json_filter_tests.cpp

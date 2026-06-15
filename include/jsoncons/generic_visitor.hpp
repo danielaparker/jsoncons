@@ -770,7 +770,7 @@ namespace jsoncons {
         }
     };
 
- template <typename CharT,typename Allocator>
+template <typename CharT,typename Allocator>
     class basic_generic_to_json_visitor : public basic_generic_visitor<CharT>
     {
     public:
