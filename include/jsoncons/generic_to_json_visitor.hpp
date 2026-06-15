@@ -119,11 +119,15 @@ private:
         const ser_context&, 
         std::error_code&) final
     {
-        if (structure_stack_.back().structure_kind == json_structure_kind::object_kind)
+        auto& structure = structure_stack_.back();
+        if (structure.structure_kind == json_structure_kind::object_kind)
         {
-            structure_stack_.back().is_key = !structure_stack_.back().is_key;
+            structure.is_key = !structure_stack_.back().is_key;
             structure_stack_.emplace_back(json_structure_kind::object_kind, key_part_stack_.size());
-            key_part_stack_.emplace_back('{');
+            if (structure.is_key)
+            {
+                key_part_stack_.emplace_back();
+            }
         }
         else
         {
@@ -173,11 +177,15 @@ private:
         const ser_context&, 
         std::error_code&) final
     {
-        if (structure_stack_.back().structure_kind == json_structure_kind::object_kind)
+        auto& structure = structure_stack_.back();
+        if (structure.structure_kind == json_structure_kind::object_kind)
         {
-            structure_stack_.back().is_key = !structure_stack_.back().is_key;
+            structure.is_key = !structure_stack_.back().is_key;
             structure_stack_.emplace_back(json_structure_kind::array_kind, key_part_stack_.size());
-            key_part_stack_.emplace_back(std::move(key_), index_++, json_array_arg, tag);
+            if (structure.is_key)
+            {
+                key_part_stack_.emplace_back();
+            }
         }
         else
         {
