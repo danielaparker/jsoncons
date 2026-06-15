@@ -20,6 +20,7 @@
 #include <jsoncons/utility/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/json_literals.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
@@ -781,20 +782,20 @@ template <typename CharT,typename Allocator>
 
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
 
-        enum class container_t {root, array, object};
-        enum class target_t {destination, buffer};
+        enum class json_structure_kind {root, array, object};
+        enum class json_target_kind {destination, buffer};
 
-        struct level
+        struct json_structure
         {
         private:
-            target_t state_;
-            container_t type_;
+            json_target_kind target_kind_;
+            json_structure_kind structure_kind_;
             int even_odd_;
             std::size_t count_{0};
         public:
 
-            level(target_t state, container_t type) noexcept
-                : state_(state), type_(type), even_odd_(type == container_t::object ? 0 : 1)
+            json_structure(json_target_kind state, json_structure_kind type) noexcept
+                : target_kind_(state), structure_kind_(type), even_odd_(type == json_structure_kind::object ? 0 : 1)
             {
             }
 
@@ -817,12 +818,12 @@ template <typename CharT,typename Allocator>
 
             bool is_object() const
             {
-                return type_ == container_t::object;
+                return structure_kind_ == json_structure_kind::object;
             }
 
-            target_t target() const
+            json_target_kind target_kind() const
             {
-                return state_;
+                return target_kind_;
             }
 
             std::size_t count() const
@@ -830,17 +831,13 @@ template <typename CharT,typename Allocator>
                 return count_;
             }
         };
-        using level_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<level>;
+        using level_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<json_structure>;
 
         basic_default_json_visitor<char_type> default_visitor_;
         basic_json_visitor<char_type>* destination_;
         string_type key_;
         string_type key_buffer_;
-        std::vector<level,level_allocator_type> level_stack_;
-
-        const std::basic_string<char> null_literal = {'n','u','l','l'};
-        const std::basic_string<char> true_literal = { 't','r','u','e' };
-        const std::basic_string<char> false_literal = { 'f', 'a', 'l', 's', 'e' };
+        std::vector<json_structure,level_allocator_type> level_stack_;
 
         // noncopyable and nonmoveable
         basic_generic_to_json_visitor(const basic_generic_to_json_visitor&) = delete;
@@ -850,7 +847,7 @@ template <typename CharT,typename Allocator>
             : default_visitor_(), destination_(std::addressof(default_visitor_)),
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
-            level_stack_.emplace_back(target_t::destination,container_t::root); // root
+            level_stack_.emplace_back(json_target_kind::destination,json_structure_kind::root); // root
         }
 
         explicit basic_generic_to_json_visitor(basic_json_visitor<char_type>& visitor, 
@@ -858,7 +855,7 @@ template <typename CharT,typename Allocator>
             : destination_(std::addressof(visitor)), 
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
-            level_stack_.emplace_back(target_t::destination,container_t::root); // root
+            level_stack_.emplace_back(json_target_kind::destination,json_structure_kind::root); // root
         }
 
         void reset()
@@ -866,7 +863,7 @@ template <typename CharT,typename Allocator>
             key_.clear();
             key_buffer_.clear();
             level_stack_.clear();
-            level_stack_.emplace_back(target_t::destination,container_t::root); // root
+            level_stack_.emplace_back(json_target_kind::destination,json_structure_kind::root); // root
         }
 
         basic_json_visitor<char_type>& destination()
@@ -880,32 +877,32 @@ template <typename CharT,typename Allocator>
         }
 
     private:
-        void visit_flush() override
+        void visit_flush() final
         {
             destination_->flush();
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().target() == target_t::buffer && level_stack_.back().count() > 0)
+                if (level_stack_.back().target_kind() == json_target_kind::buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(target_t::buffer, container_t::object);
+                level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::object);
                 key_buffer_.push_back('{');
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
-                        level_stack_.emplace_back(target_t::buffer, container_t::object);
+                    case json_target_kind::buffer:
+                        level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::object);
                         key_buffer_.push_back('{');
                         break;
                     default:
-                        level_stack_.emplace_back(target_t::destination, container_t::object);
+                        level_stack_.emplace_back(json_target_kind::destination, json_structure_kind::object);
                         destination_->begin_object(tag, context, ec);
                         break;
                 }
@@ -913,31 +910,31 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().target() == target_t::buffer && level_stack_.back().count() > 0)
+                if (level_stack_.back().target_kind() == json_target_kind::buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(target_t::buffer, container_t::object);
+                level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::object);
                 key_buffer_.push_back('{');
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(target_t::buffer, container_t::object);
+                        level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::object);
                         key_buffer_.push_back('{');
                         break;
                     default:
-                        level_stack_.emplace_back(target_t::destination, container_t::object);
+                        level_stack_.emplace_back(json_target_kind::destination, json_structure_kind::object);
                         destination_->begin_object(length, tag, context, ec);
                         break;
                 }
@@ -945,16 +942,16 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) final
         {
-            switch (level_stack_.back().target())
+            switch (level_stack_.back().target_kind())
             {
-                case target_t::buffer:
+                case json_target_kind::buffer:
                     key_buffer_.push_back('}');
                     JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
                     
-                    if (level_stack_.back().target() == target_t::destination)
+                    if (level_stack_.back().target_kind() == json_target_kind::destination)
                     {
                         destination_->key(key_buffer_,context, ec);
                         key_buffer_.clear();
@@ -975,31 +972,31 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().target() == target_t::buffer && level_stack_.back().count() > 0)
+                if (level_stack_.back().target_kind() == json_target_kind::buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(target_t::buffer, container_t::array);
+                level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::array);
                 key_buffer_.push_back('[');
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(target_t::buffer, container_t::array);
+                        level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::array);
                         key_buffer_.push_back('[');
                         break;
                     default:
-                        level_stack_.emplace_back(target_t::destination, container_t::array);
+                        level_stack_.emplace_back(json_target_kind::destination, json_structure_kind::array);
                         destination_->begin_array(tag, context, ec);
                         break;
                 }
@@ -1007,31 +1004,31 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().target() == target_t::buffer && level_stack_.back().count() > 0)
+                if (level_stack_.back().target_kind() == json_target_kind::buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(target_t::buffer, container_t::array);
+                level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::array);
                 key_buffer_.push_back('[');
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(target_t::buffer, container_t::array);
+                        level_stack_.emplace_back(json_target_kind::buffer, json_structure_kind::array);
                         key_buffer_.push_back('[');
                         break;
                     default:
-                        level_stack_.emplace_back(target_t::destination, container_t::array);
+                        level_stack_.emplace_back(json_target_kind::destination, json_structure_kind::array);
                         destination_->begin_array(length, tag, context, ec);
                         break;
                 }
@@ -1039,15 +1036,15 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) final
         {
-            switch (level_stack_.back().target())
+            switch (level_stack_.back().target_kind())
             {
-                case target_t::buffer:
+                case json_target_kind::buffer:
                     key_buffer_.push_back(']');
                     JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
-                    if (level_stack_.back().target() == target_t::destination)
+                    if (level_stack_.back().target_kind() == json_target_kind::destination)
                     {
                         destination_->key(key_buffer_, context, ec);
                         key_buffer_.clear();
@@ -1071,13 +1068,13 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
             semantic_tag tag,
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1094,9 +1091,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1118,9 +1115,9 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
             semantic_tag tag,
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 switch (tag)
@@ -1139,9 +1136,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1158,9 +1155,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1182,9 +1179,9 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
             uint64_t ext_tag,
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 bytes_to_base64url(value.begin(), value.end(),key_);
@@ -1192,9 +1189,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1211,9 +1208,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1232,9 +1229,9 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 jsoncons::from_integer(value,key_);
@@ -1242,9 +1239,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1259,9 +1256,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1278,9 +1275,9 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 jsoncons::from_integer(value,key_);
@@ -1288,9 +1285,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1305,9 +1302,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1324,9 +1321,9 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
@@ -1337,9 +1334,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1354,9 +1351,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1373,9 +1370,9 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
@@ -1385,9 +1382,9 @@ template <typename CharT,typename Allocator>
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1402,9 +1399,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1421,26 +1418,26 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear(); 
                 if (value)
                 {
-                    key_.insert(key_.begin(), true_literal.begin(), true_literal.end());
+                    key_.insert(key_.begin(), json_literals<char_type>::true_literal.begin(), json_literals<char_type>::true_literal.end());
                 }
                 else
                 {
-                    key_.insert(key_.begin(), false_literal.begin(), false_literal.end());
+                    key_.insert(key_.begin(), json_literals<char_type>::false_literal.begin(), json_literals<char_type>::false_literal.end());
                 }
             }
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1455,9 +1452,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1474,19 +1471,19 @@ template <typename CharT,typename Allocator>
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
-            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear(); 
-                key_.insert(key_.begin(), null_literal.begin(), null_literal.end());
+                key_.insert(key_.begin(), json_literals<char_type>::null_literal.begin(), json_literals<char_type>::null_literal.end());
             }
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1501,9 +1498,9 @@ template <typename CharT,typename Allocator>
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().target_kind())
                 {
-                    case target_t::buffer:
+                    case json_target_kind::buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1523,12 +1520,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override 
+            std::error_code& ec) final 
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1542,12 +1539,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& s, 
             semantic_tag tag, 
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1561,12 +1558,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override 
+            std::error_code& ec) final 
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1580,12 +1577,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override 
+            std::error_code& ec) final 
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1599,12 +1596,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1618,12 +1615,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1637,12 +1634,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1656,12 +1653,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1676,12 +1673,12 @@ template <typename CharT,typename Allocator>
             const jsoncons::span<const uint16_t>& s, 
             semantic_tag tag, 
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
             }
@@ -1695,12 +1692,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1714,12 +1711,12 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& s, 
             semantic_tag tag,
             const ser_context& context, 
-            std::error_code& ec) override  
+            std::error_code& ec) final  
         {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == target_t::buffer)
+            if (is_key || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 basic_generic_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1739,85 +1736,85 @@ template <typename CharT,typename Allocator>
 
         basic_default_generic_visitor() = default;
     private:
-        void visit_flush() override
+        void visit_flush() final
         {
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
-        {
-            JSONCONS_VISITOR_RETURN;
-        }
-
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type&, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view&, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type&, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view&, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool, semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double, semantic_tag, const ser_context&, std::error_code&) final
+        {
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool, semantic_tag, const ser_context&, std::error_code&) final
         {
             JSONCONS_VISITOR_RETURN;
         }
     };
 
-    // basic_json_visitor_to_generic_visitor
+    // basic_json_to_generic_visitor
 
     template <typename CharT>
-    class basic_json_visitor_to_generic_visitor : public basic_json_visitor<CharT>
+    class basic_json_to_generic_visitor : public basic_json_visitor<CharT>
     {
     public:
         using typename basic_json_visitor<CharT>::char_type;
@@ -1826,10 +1823,10 @@ template <typename CharT,typename Allocator>
         basic_generic_visitor<char_type>& destination_;
 
         // noncopyable and nonmoveable
-        basic_json_visitor_to_generic_visitor(const basic_json_visitor_to_generic_visitor&) = delete;
-        basic_json_visitor_to_generic_visitor& operator=(const basic_json_visitor_to_generic_visitor&) = delete;
+        basic_json_to_generic_visitor(const basic_json_to_generic_visitor&) = delete;
+        basic_json_to_generic_visitor& operator=(const basic_json_to_generic_visitor&) = delete;
     public:
-        basic_json_visitor_to_generic_visitor(basic_generic_visitor<char_type>& visitor)
+        basic_json_to_generic_visitor(basic_generic_visitor<char_type>& visitor)
             : destination_(visitor)
         {
         }
@@ -1840,42 +1837,42 @@ template <typename CharT,typename Allocator>
         }
 
     private:
-        void visit_flush() override
+        void visit_flush() final
         {
             destination_.flush();
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.begin_object(tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.begin_object(length, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) final
         {
             destination_.end_object(context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.begin_array(tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.begin_array(length, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) final
         {
             destination_.end_array(context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -1883,7 +1880,7 @@ template <typename CharT,typename Allocator>
 
         JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
                        const ser_context& context,
-                       std::error_code& ec) override
+                       std::error_code& ec) final
         {
             destination_.visit_string(name, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -1892,7 +1889,7 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value,
                           semantic_tag tag,
                           const ser_context& context,
-                          std::error_code& ec) override
+                          std::error_code& ec) final
         {
             destination_.string_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -1901,43 +1898,43 @@ template <typename CharT,typename Allocator>
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                                semantic_tag tag,
                                const ser_context& context,
-                               std::error_code& ec) override
+                               std::error_code& ec) final
         {
             destination_.byte_string_value(b, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.uint64_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.int64_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.half_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.double_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.bool_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             destination_.null_value(tag, context, ec);
             JSONCONS_VISITOR_RETURN;

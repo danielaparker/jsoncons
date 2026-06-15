@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/generic_to_json_visitor.hpp>
+//#include <jsoncons/generic_to_json_visitor.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -13,7 +13,7 @@
 
 TEST_CASE("generic_to_json_visitor tests")
 {
-    /*SECTION("visit_string")
+    SECTION("visit_string")
     {
         auto expected = jsoncons::json::parse(R"(
 {
@@ -23,7 +23,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.string_value("key1");
         adaptor.string_value("string");
@@ -45,7 +45,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_array();
         adaptor.string_value("string");
         adaptor.int64_value(10);
@@ -65,7 +65,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.string_value("true");
         adaptor.string_value("string");
@@ -86,7 +86,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.null_value();
         adaptor.string_value("string");
@@ -105,7 +105,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.double_value(10.0);
         adaptor.string_value("string");
@@ -126,7 +126,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.int64_value(-20);
         adaptor.string_value("string");
@@ -147,7 +147,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.uint64_value(10);
         adaptor.string_value("string");
@@ -168,7 +168,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         std::vector<uint8_t> purr = {'p','u','r','r'};
         adaptor.byte_string_value(purr);
@@ -193,7 +193,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.uint64_value(10);
         adaptor.string_value("string");
@@ -203,7 +203,7 @@ TEST_CASE("generic_to_json_visitor tests")
 
         REQUIRE(decoder.is_valid());
         CHECK(expected == decoder.get_result());
-    }*/
+    }
     SECTION("empty object")
     {
         auto expected = jsoncons::json::parse(R"(
@@ -213,7 +213,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.begin_object();
         adaptor.end_object();
@@ -221,9 +221,33 @@ TEST_CASE("generic_to_json_visitor tests")
         adaptor.end_object();
 
         REQUIRE(decoder.is_valid());
-        //CHECK(expected == decoder.get_result());
+        CHECK(expected == decoder.get_result());
 
-        std::cout << decoder.get_result() << "\n";
+        //std::cout << decoder.get_result() << "\n";
+    }
+    SECTION("object with empty object")
+    {
+        auto expected = jsoncons::json::parse(R"(
+{
+    "{{}:\"string1\"}" : "string2"
+}
+        )");
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        jsoncons::generic_to_json_visitor adaptor(decoder);
+        adaptor.begin_object();
+        adaptor.begin_object();
+        adaptor.begin_object();
+        adaptor.end_object();
+        adaptor.string_value("string1");
+        adaptor.end_object();
+        adaptor.string_value("string2");
+        adaptor.end_object();
+
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+
+        //std::cout << decoder.get_result() << "\n";
     }
     /*SECTION("empty object, empty array")
     {
@@ -235,7 +259,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.begin_object();
         adaptor.end_object();
@@ -259,7 +283,7 @@ TEST_CASE("generic_to_json_visitor tests")
         )");
 
         jsoncons::json_decoder<jsoncons::json> decoder;
-        jsoncons::generic_to_json_visitor2 adaptor(decoder);
+        jsoncons::generic_to_json_visitor adaptor(decoder);
         adaptor.begin_object();
         adaptor.begin_array();
         adaptor.end_array();
