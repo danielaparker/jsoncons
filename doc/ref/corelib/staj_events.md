@@ -3,21 +3,22 @@
 ```cpp
 #include <jsoncons/staj_event.hpp>
 
-enum class staj_events
+enum class staj_events   (since 1.7.0)
 {
-    string_value,             
-    byte_string_value,
-    null_value,
-    bool_value,
-    int64_value,
-    uint64_value,                       (since 1.7.0)
-    half_value,
-    double_value,
-    begin_array,
-    end_array,
-    begin_object,
-    end_object,
-    key
+    string_value      = /*unspecified*/,             
+    byte_string_value = /*unspecified*/,
+    null_value        = /*unspecified*/,
+    bool_value        = /*unspecified*/,
+    int64_value       = /*unspecified*/,
+    uint64_value      = /*unspecified*/,                       
+    half_value        = /*unspecified*/,
+    double_value      = /*unspecified*/,
+    begin_array       = /*unspecified*/,
+    end_array         = /*unspecified*/,
+    begin_object      = /*unspecified*/,
+    end_object        = /*unspecified*/,
+    second            = /*unspecified*/,   (since 1.9.0)
+    key = second | string_value            (since 1.9.0)
 };
 ```
 Represents a classification of streaming events for JSON-like formats.
