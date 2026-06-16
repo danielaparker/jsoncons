@@ -49,8 +49,8 @@ enum class staj_events : uint64_t
     end_object        = 512,   
     begin_array       = 1024,
     end_array         = 2048,
-    keyflag           = 4096,
-    key               = keyflag | string_value
+    key_flag          = 4096,
+    key               = key_flag | string_value
 };
 
 using staj_event_type = staj_events; // For backwards compatibility
@@ -116,7 +116,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_events
     static constexpr const CharT* half_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
     static constexpr const CharT* double_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
 
-    switch (tag & ~staj_events::keyflag)
+    switch (tag & ~staj_events::key_flag)
     {
         case staj_events::begin_array:
         {
@@ -183,7 +183,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_events
             break;
         }
     }
-    if ((tag & staj_events::keyflag) != staj_events{})
+    if ((tag & staj_events::key_flag) != staj_events{})
     {
         os << ' ' << key_literal;
     }

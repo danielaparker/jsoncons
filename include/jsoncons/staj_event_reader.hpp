@@ -77,30 +77,6 @@ namespace jsoncons {
             return state_;
         }
 
-        void advance_multi_dim(std::error_code& ec)
-        {
-            if (shape_.size() != 0)
-            {
-                if (state_ == item_event_reader_state::multi_dim)
-                {
-                    this->begin_array(shape_.size(), semantic_tag::none, ser_context(), ec);
-                    state_ = item_event_reader_state::shape;
-                }
-                else if (index_ < shape_.size())
-                {
-                    this->uint64_value(shape_[index_], semantic_tag::none, ser_context(), ec);
-                    ++index_;
-                }
-                else
-                {
-                    state_ = item_event_reader_state();
-                    this->end_array(ser_context(), ec);
-                    shape_ = jsoncons::span<const size_t>();
-                    index_ = 0;
-                }
-            }
-        }
-
         void dump(basic_generic_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
             event().send_value_event(visitor, context, ec);
