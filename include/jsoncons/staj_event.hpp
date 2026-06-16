@@ -539,7 +539,7 @@ private:
         }
     }
 public:
-    void send_json_event(basic_json_visitor<CharT>& visitor,
+    void send_event(basic_json_visitor<CharT>& visitor,
         const ser_context& context,
         std::error_code& ec) const
     {
@@ -589,7 +589,7 @@ public:
         }
     }
     
-    void send_value_event(basic_generic_visitor<CharT>& visitor,
+    void send_event(basic_generic_visitor<CharT>& visitor,
         const ser_context& context,
         std::error_code& ec) const
     {

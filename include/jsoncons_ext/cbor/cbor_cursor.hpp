@@ -225,7 +225,7 @@ public:
         {
             parser_.cursor_mode(false);
             parser_.mark_level(parser_.level());
-            cursor_visitor_.event().send_json_event(visitor, *this, ec);
+            cursor_visitor_.event().send_event(visitor, *this, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -244,7 +244,7 @@ public:
         }
         else
         {
-            cursor_visitor_.event().send_json_event(visitor, *this, ec);
+            cursor_visitor_.event().send_event(visitor, *this, ec);
         }
     }
 

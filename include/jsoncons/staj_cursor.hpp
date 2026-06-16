@@ -84,7 +84,7 @@ public:
 
     void dump(basic_json_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
     {
-        event().send_json_event(visitor, context, ec);
+        event().send_event(visitor, context, ec);
     }
 
 private:

@@ -80,7 +80,7 @@ namespace jsoncons {
 
         void dump(basic_generic_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
-            event().send_value_event(visitor, context, ec);
+            event().send_event(visitor, context, ec);
         }
 
     private:
