@@ -339,9 +339,6 @@ namespace jsoncons {
         }
     };
 
-    using item_event = basic_staj_event<char>;
-    using witem_event = basic_staj_event<wchar_t>;
-
     using staj_event_reader = basic_staj_event_reader<char>;
     using wstaj_event_reader = basic_staj_event_reader<wchar_t>;
 

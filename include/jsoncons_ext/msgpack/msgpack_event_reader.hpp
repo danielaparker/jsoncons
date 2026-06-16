@@ -230,7 +230,7 @@ namespace msgpack {
 
         friend
         staj2_filter_view operator|(msgpack_event_reader& cursor, 
-            std::function<bool(const item_event&, const ser_context&)> pred)
+            std::function<bool(const staj_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
         }

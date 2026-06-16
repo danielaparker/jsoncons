@@ -646,6 +646,9 @@ public:
 
 };
 
+using staj_event = basic_staj_event<char>;
+using wstaj_event = basic_staj_event<wchar_t>;
+
 } // namespace jsoncons
 
 #endif // JSONCONS_STAJ_EVENT_HPP
