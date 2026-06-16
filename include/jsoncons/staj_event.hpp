@@ -221,11 +221,6 @@ public:
     {
     }
 
-    basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_events::null_value), tag_(tag), value_()
-    {
-    }
-
     basic_staj_event(bool value, semantic_tag tag)
         : event_type_(staj_events::bool_value), tag_(tag)
     {
