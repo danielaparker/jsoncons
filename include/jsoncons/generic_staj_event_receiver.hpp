@@ -93,7 +93,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(staj_events::begin_object | staj_events::key_flag, tag);
+            event_ = staj_event_type(staj_events::begin_object, tag, staj_events::key_flag);
         }
         else 
         {
@@ -111,7 +111,7 @@ private:
         structure_stack_.pop_back();
         if (structure_stack_.back().is_key)
         {
-            event_ = staj_event_type(staj_events::end_object | staj_events::key_flag);
+            event_ = staj_event_type(staj_events::end_object, semantic_tag::none, staj_events::key_flag);
         }
         else 
         {
@@ -130,7 +130,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(staj_events::begin_array | staj_events::key_flag, tag);
+            event_ = staj_event_type(staj_events::begin_array, tag, staj_events::key_flag);
         }
         else
         {
@@ -150,7 +150,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(staj_events::begin_array | staj_events::key_flag, length, tag);
+            event_ = staj_event_type(staj_events::begin_array, length, tag, staj_events::key_flag);
         }
         else
         {
@@ -168,7 +168,7 @@ private:
 
         if (structure_stack_.back().is_key)
         {
-            event_ = staj_event_type(staj_events::end_array | staj_events::key_flag);
+            event_ = staj_event_type(staj_events::end_array, semantic_tag::none, staj_events::key_flag);
         }
         else
         {
@@ -187,7 +187,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(sv, staj_events::string_value, tag);
+            event_ = staj_event_type(sv, staj_events::string_value, tag, staj_events::key_flag);
         }
         else
         {
@@ -208,7 +208,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, staj_events::byte_string_value, tag);
+            event_ = staj_event_type(value, staj_events::byte_string_value, tag, staj_events::key_flag);
         }
         else
         {
@@ -229,7 +229,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, staj_events::byte_string_value, ext_tag);
+            event_ = staj_event_type(value, staj_events::byte_string_value, ext_tag, staj_events::key_flag);
         }
         else
         {
@@ -250,7 +250,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, tag);
+            event_ = staj_event_type(value, tag, staj_events::key_flag);
         }
         else
         {
@@ -271,7 +271,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, tag);
+            event_ = staj_event_type(value, tag, staj_events::key_flag);
         }
         else
         {
@@ -292,7 +292,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(half_arg, value, tag);
+            event_ = staj_event_type(half_arg, value, tag, staj_events::key_flag);
         }
         else
         {
@@ -313,7 +313,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, tag);
+            event_ = staj_event_type(value, tag, staj_events::key_flag);
         }
         else
         {
@@ -331,7 +331,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, tag);
+            event_ = staj_event_type(value, tag, staj_events::key_flag);
         }
         else
         {
@@ -349,7 +349,7 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(staj_events::null_value | staj_events::key_flag, tag);
+            event_ = staj_event_type(staj_events::null_value, tag, staj_events::key_flag);
         }
         else
         {
