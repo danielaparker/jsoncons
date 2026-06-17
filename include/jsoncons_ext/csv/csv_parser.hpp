@@ -377,23 +377,23 @@ namespace detail {
             return more;
         }
 
-        void visit_flush() override
+        void visit_flush() final
         {
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
-        {
-            ec = csv_errc::invalid_parse_state;
-            JSONCONS_VISITOR_RETURN;
-        }
-
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             ec = csv_errc::invalid_parse_state;
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
+        {
+            ec = csv_errc::invalid_parse_state;
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -404,7 +404,7 @@ namespace detail {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) final
         {
             if (level2_ > 0)
             {
@@ -419,13 +419,13 @@ namespace detail {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type&, const ser_context&, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type&, const ser_context&, std::error_code& ec) final
         {
             ec = csv_errc::invalid_parse_state;
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -438,7 +438,7 @@ namespace detail {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -455,7 +455,7 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value,
                                   semantic_tag tag,
                                   const ser_context&,
-                                  std::error_code&) override
+                                  std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -471,7 +471,7 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double value,
                              semantic_tag tag, 
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -487,7 +487,7 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value,
                             semantic_tag tag,
                             const ser_context&,
-                            std::error_code&) override
+                            std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -503,7 +503,7 @@ namespace detail {
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value,
                              semantic_tag tag,
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -516,7 +516,7 @@ namespace detail {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) final
         {
             if (name_index_ < column_names_.size())
             {
@@ -1501,12 +1501,12 @@ public:
         input_ptr_ = begin_input_;
     }
 
-    std::size_t line() const override
+    std::size_t line() const final
     {
         return line_;
     }
 
-    std::size_t column() const override
+    std::size_t column() const final
     {
         return column_;
     }

@@ -197,7 +197,7 @@ namespace draft201909 {
         }
 
         schema_validator_ptr_type make_schema_validator(const compilation_context<Json>& context, 
-            const Json& sch, jsoncons::span<const jsoncons::string_view> keys, anchor_uri_map_type& anchor_dict) override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys, anchor_uri_map_type& anchor_dict) final
         {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_base_uri().string() << ", " << new_context.get_base_uri().string() << "\n\n";
@@ -458,7 +458,7 @@ namespace draft201909 {
     private:
 
         compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent, 
-            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const override
+            const Json& sch, jsoncons::span<const jsoncons::string_view> keys) const final
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<uri_wrapper> new_uris;

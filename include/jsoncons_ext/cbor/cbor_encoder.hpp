@@ -257,12 +257,12 @@ public:
 private:
     // Implementing methods
 
-    void visit_flush() override
+    void visit_flush() final
     {
         sink_.flush();
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -275,7 +275,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -321,7 +321,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -350,7 +350,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -362,7 +362,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -406,7 +406,7 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
     {
         JSONCONS_ASSERT(!stack_.empty());
         --nesting_depth_;
@@ -435,13 +435,13 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) final
     {
         visit_string(name, semantic_tag::none, context, ec);
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context&, std::error_code&) final
     {
         if (tag == semantic_tag::undefined)
         {
@@ -917,7 +917,7 @@ private:
         visit_end_array(context, ec);
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) final
     {
         switch (tag)
         {
@@ -980,7 +980,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                            semantic_tag tag, 
                            const ser_context&,
-                           std::error_code&) override
+                           std::error_code&) final
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
@@ -1039,7 +1039,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
                            uint64_t raw_tag, 
                            const ser_context&,
-                           std::error_code&) override
+                           std::error_code&) final
     {
         if (pack_strings_ && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
@@ -1113,7 +1113,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 
                       semantic_tag tag,
                       const ser_context&,
-                      std::error_code&) override
+                      std::error_code&) final
     {
         switch (tag)
         {
@@ -1161,7 +1161,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context& context,
-                        std::error_code& ec) override
+                        std::error_code& ec) final
     {
         switch (tag)
         {
@@ -1182,7 +1182,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec) override
+                      std::error_code& ec) final
     {
         switch (tag)
         {
@@ -1339,7 +1339,7 @@ private:
         }
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) final
     {
         if (value)
         {
@@ -1357,7 +1357,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint8_t>& data, 
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1391,7 +1391,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1420,7 +1420,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint32_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1449,7 +1449,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint64_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1478,7 +1478,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int8_t>& data,  
         semantic_tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1505,7 +1505,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int16_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1534,7 +1534,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int32_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1563,7 +1563,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const int64_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1593,7 +1593,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, const jsoncons::span<const uint16_t>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1622,7 +1622,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
-                        std::error_code& ec) override
+                        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1651,7 +1651,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const double>& data,  
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         if (use_typed_arrays_)
         {
@@ -1678,7 +1678,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&, 
-                        std::error_code&) override
+                        std::error_code&) final
     {
         JSONCONS_VISITOR_RETURN;
     }
@@ -1686,7 +1686,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
         semantic_tag tag,
         const ser_context& context, 
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         switch (tag)
         {
@@ -1711,7 +1711,7 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_multi_dim(const ser_context& context,
-        std::error_code& ec) override
+        std::error_code& ec) final
     {
         visit_end_array(context, ec);
         JSONCONS_VISITOR_RETURN;

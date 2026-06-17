@@ -59,36 +59,36 @@ namespace jsoncons {
 
     private:
 
-        void visit_flush() override
+        void visit_flush() final
         {
             other_visitor_.flush();
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.begin_object(tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.end_object(context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.begin_array(tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.end_array(context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) final
         {
             std::basic_string<CharT> target;
             auto result = unicode_traits::convert(
@@ -102,7 +102,7 @@ namespace jsoncons {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             std::basic_string<CharT> target;
             auto result = unicode_traits::convert(
@@ -120,7 +120,7 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t value, 
             semantic_tag tag, 
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
             other_visitor_.int64_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -129,7 +129,7 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t value, 
             semantic_tag tag, 
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
             other_visitor_.uint64_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -138,7 +138,7 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE visit_half(uint16_t value, 
             semantic_tag tag,
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
             other_visitor_.half_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -147,19 +147,19 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE visit_double(double value, 
             semantic_tag tag,
             const ser_context& context,
-            std::error_code& ec) override
+            std::error_code& ec) final
         {
             other_visitor_.double_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.bool_value(value, tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             other_visitor_.null_value(tag, context, ec);
             JSONCONS_VISITOR_RETURN;

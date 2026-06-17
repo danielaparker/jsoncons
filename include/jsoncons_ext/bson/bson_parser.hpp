@@ -145,12 +145,12 @@ public:
         return !more_;
     }
 
-    std::size_t line() const override
+    std::size_t line() const final
     {
         return 0;
     }
 
-    std::size_t column() const override
+    std::size_t column() const final
     {
         return source_.position();
     }

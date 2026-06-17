@@ -2377,27 +2377,27 @@ escape_u8:
         }
     }
 
-    std::size_t line() const override
+    std::size_t line() const final
     {
         return line_;
     }
 
-    std::size_t column() const override
+    std::size_t column() const final
     {
         return (position_ - mark_position_) + 1;
     }
 
-    std::size_t begin_position() const override
+    std::size_t begin_position() const final
     {
         return begin_position_;
     }
 
-    std::size_t position() const override
+    std::size_t position() const final
     {
         return begin_position_;
     }
 
-    std::size_t end_position() const override
+    std::size_t end_position() const final
     {
         return position_;
     }
