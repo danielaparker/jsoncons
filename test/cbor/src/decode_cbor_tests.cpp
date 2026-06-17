@@ -781,3 +781,34 @@ TEST_CASE("encode decode cbor source")
     }
 }
 
+TEST_CASE("decode_cbor map with non-string keys")
+{
+    SECTION("uint key")
+    {
+        std::vector<uint8_t> data = {
+            0x82,                               // Array(2)
+            0xA2,                               // Map (2)
+            0x01,                               // Key 1
+            0x63, 0x6F, 0x6E, 0x65,             // Text "one"
+            0x02,                               // Key 2
+            0x63, 0x74, 0x77, 0x6F,             // Text "two"
+            0xA2,                               // Map(2)
+            0x0A,                               // Key 10
+            0x67, 0x68, 0x75, 0x6E,             
+            0x64, 0x72, 0x65, 0x64,             // Value "hundred"
+            0x14,                               // Key 20
+            0x6B, 0x74, 0x77, 0x6F, 0x20, 0x68, 
+            0x75, 0x6E, 0x64, 0x72, 0x65, 0x64  // Value "two hundred" 
+        };
+
+        auto v = cbor::decode_cbor<std::vector<std::map<uint64_t, std::string>>>(data);
+        REQUIRE(2 == v.size());
+        REQUIRE(2 == v[0].size());
+        CHECK("one" == v[0].at(1));
+        CHECK("two" == v[0].at(2));
+        REQUIRE(2 == v[1].size());
+        CHECK("hundred" == v[1].at(10));
+        CHECK("two hundred" == v[1].at(20));
+    }
+}
+
