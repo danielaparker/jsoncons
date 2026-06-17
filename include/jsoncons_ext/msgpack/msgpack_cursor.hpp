@@ -14,6 +14,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/generic_staj_event_receiver.hpp>
 #include <jsoncons/generic_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -36,8 +37,7 @@ public:
     using allocator_type = Allocator;
 private:
     basic_msgpack_parser<Source,Allocator> parser_;
-    basic_staj_visitor<char_type> cursor_visitor_;
-    basic_generic_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
+    basic_generic_staj_event_receiver<char_type,Allocator> cursor_visitor_;
     bool eof_{false};
 
 public:
@@ -52,7 +52,7 @@ public:
         const msgpack_decode_options& options = msgpack_decode_options(),
         const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc),
-          cursor_handler_adaptor_(cursor_visitor_, alloc)
+          cursor_visitor_(alloc)
     {
         parser_.cursor_mode(true);
         if (!parser_.done())
@@ -89,7 +89,7 @@ public:
         const msgpack_decode_options& options,
         std::error_code& ec)
        : parser_(std::forward<Sourceable>(source), options, alloc),
-         cursor_handler_adaptor_(cursor_visitor_, alloc),
+         cursor_visitor_(alloc),
          eof_(false)
     {
         parser_.cursor_mode(true);
@@ -108,7 +108,6 @@ public:
     {
         parser_.reset();
         cursor_visitor_.reset();
-        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!read_done())
         {
@@ -121,7 +120,6 @@ public:
     {
         parser_.reset(std::forward<Sourceable>(source));
         cursor_visitor_.reset();
-        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!read_done())
         {
@@ -133,7 +131,6 @@ public:
     {
         parser_.reset();
         cursor_visitor_.reset();
-        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!read_done())
         {
@@ -146,7 +143,6 @@ public:
     {
         parser_.reset(std::forward<Sourceable>(source));
         cursor_visitor_.reset();
-        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!read_done())
         {
@@ -164,6 +160,7 @@ public:
         return cursor_visitor_.event();
     }
 
+
     void read_to(basic_json_visitor<char_type>& visitor) final
     {
         std::error_code ec;
@@ -177,11 +174,18 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
         std::error_code& ec) final
     {
+        basic_generic_to_json_visitor<char_type> adaptor(visitor);
+        read_to(adaptor, ec);
+    }
+
+    void read_to(basic_generic_visitor<char_type>& visitor,
+        std::error_code& ec) 
+    {
         if (is_begin_container(current().event_type()))
         {
             parser_.cursor_mode(false);
             parser_.mark_level(parser_.level());
-            cursor_visitor_.event().send_event(visitor, *this, ec);
+            cursor_visitor_.dump(visitor, *this, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -200,7 +204,7 @@ public:
         }
         else
         {
-            cursor_visitor_.event().send_event(visitor, *this, ec);
+            cursor_visitor_.dump(visitor, *this, ec);
         }
     }
 
@@ -262,7 +266,7 @@ private:
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(cursor_handler_adaptor_, ec);
+            parser_.parse(cursor_visitor_, ec);
             if (JSONCONS_UNLIKELY(ec)) {return;}
         }
     }
@@ -272,10 +276,10 @@ private:
         {
             struct resource_wrapper
             {
-                basic_generic_to_json_visitor<char_type,Allocator>& adaptor;
+                basic_generic_staj_event_receiver<char_type,Allocator>& adaptor;
                 basic_json_visitor<char_type>& original;
 
-                resource_wrapper(basic_generic_to_json_visitor<char_type,Allocator>& adaptor,
+                resource_wrapper(basic_generic_staj_event_receiver<char_type,Allocator>& adaptor,
                                  basic_json_visitor<char_type>& visitor)
                     : adaptor(adaptor), original(adaptor.destination())
                 {
@@ -286,13 +290,29 @@ private:
                 {
                     adaptor.destination(original);
                 }
-            } wrapper(cursor_handler_adaptor_, visitor);
+            } wrapper(cursor_visitor_, visitor);
 
             parser_.restart();
             while (!parser_.stopped())
             {
-                parser_.parse(cursor_handler_adaptor_, ec);
-                if (JSONCONS_UNLIKELY(ec)) {return;}
+                parser_.parse(cursor_visitor_, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+            }
+        }
+    }
+
+    void read_next(basic_generic_visitor<char_type>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(visitor, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
             }
         }
     }

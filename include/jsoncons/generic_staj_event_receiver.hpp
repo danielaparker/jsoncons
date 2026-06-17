@@ -63,6 +63,7 @@ private:
     using temp_allocator_type = TempAlloc;
     using json_structure_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_structure>;
 
+    staj_event_type event_;
     std::vector<json_structure,json_structure_allocator_type> structure_stack_;
 
 public:
@@ -93,8 +94,6 @@ public:
     }
 
 private:
-    staj_event_type event_;
-
     void visit_flush() final
     {
     }

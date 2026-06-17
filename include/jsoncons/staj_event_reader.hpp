@@ -55,14 +55,14 @@ namespace jsoncons {
         std::size_t index_{0};
     public:
         basic_item_event_receiver()
-            : event_(staj_events::null_value),
+            : event_(staj_events::null_value, semantic_tag::none),
               state_(), shape_()
         {
         }
 
         void reset()
         {
-            event_ = staj_events::null_value;
+            event_ = staj_event_type(staj_events::null_value, semantic_tag::none);
             state_ = {};
             shape_ = {};
             index_ = 0;
@@ -80,7 +80,7 @@ namespace jsoncons {
 
         void dump(basic_generic_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
-            event().send_event(visitor, context, ec);
+            event().send_value_event(visitor, context, ec);
         }
 
     private:
@@ -99,7 +99,7 @@ namespace jsoncons {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
         {
-            event_ = staj_event_type(staj_events::end_object);
+            event_ = staj_event_type(staj_events::end_object, semantic_tag::none);
             JSONCONS_VISITOR_RETURN;
         }
 
@@ -117,7 +117,7 @@ namespace jsoncons {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
         {
-            event_ = staj_event_type(staj_events::end_array);
+            event_ = staj_event_type(staj_events::end_array, semantic_tag::none);
             JSONCONS_VISITOR_RETURN;
         }
 
