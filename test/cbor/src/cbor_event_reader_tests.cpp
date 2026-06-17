@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 
-#include <jsoncons_ext/cbor/cbor_event_reader.hpp>
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
@@ -39,35 +39,35 @@ TEST_CASE("cbor_event_reader reputon test")
 
     SECTION("test 1")
     {
-        cbor::cbor_event_reader<bytes_source> reader(data);
+        cbor::cbor_bytes_cursor reader(data);
 
         CHECK(reader.current().event_type() == staj_events::begin_object);
         CHECK(2 == reader.current().size());
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::begin_array);
         CHECK(1 == reader.current().size());
         reader.next();
         CHECK(reader.current().event_type() == staj_events::begin_object);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::double_value);
         reader.next();
@@ -83,7 +83,7 @@ TEST_CASE("cbor_event_reader reputon test")
 
 struct cbor_bytes_cursor2_reset_test_traits
 {
-    using event_reader_type = cbor::cbor_event_reader<bytes_source>;
+    using event_reader_type = cbor::cbor_bytes_cursor;
     using input_type = std::vector<uint8_t>;
 
     static void set_input(input_type& input, input_type bytes) {input = bytes;}
@@ -91,7 +91,7 @@ struct cbor_bytes_cursor2_reset_test_traits
 
 struct cbor_stream_cursor2_reset_test_traits
 {
-    using event_reader_type = cbor::cbor_event_reader<binary_stream_source>;
+    using event_reader_type = cbor::cbor_stream_cursor;
 
     // binary_stream_source::char_type is actually char, not uint8_t
     using input_type = std::istringstream;

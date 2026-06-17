@@ -77,11 +77,45 @@ public:
         return event_;
     }
 
+    void dump(basic_json_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
+    {
+        event().send_event(visitor, context, ec);
+    }
+
+    void dump(basic_generic_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
+    {
+        event().send_event(visitor, context, ec);
+    }
+
+    void reset()
+    {
+        event_ = staj_events::null_value;
+    }
+
 private:
     staj_event_type event_;
 
     void visit_flush() final
     {
+    }
+
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag tag, const ser_context&, std::error_code&) final
+    {
+        auto& structure = structure_stack_.back();
+        if (structure.structure_kind == json_structure_kind::object_kind)
+        {
+            structure_stack_.back().is_key = !structure_stack_.back().is_key;
+        }
+        if (structure.is_key)
+        {
+            event_ = staj_event_type(staj_events::begin_object, length, tag, staj_events::key_flag);
+        }
+        else 
+        {
+            event_ = staj_event_type(staj_events::begin_object, length, tag);
+        }
+        structure_stack_.emplace_back(json_structure_kind::object_kind);
+        JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) final
@@ -154,7 +188,7 @@ private:
         }
         else
         {
-            event_ = staj_event_type(staj_events::begin_array, tag);
+            event_ = staj_event_type(staj_events::begin_array, length, tag);
         }
         structure_stack_.emplace_back(json_structure_kind::array_kind);
         JSONCONS_VISITOR_RETURN;
