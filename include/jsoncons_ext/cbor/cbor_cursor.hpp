@@ -20,7 +20,6 @@
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/generic_visitor.hpp>
-#include <jsoncons/generic_staj_event_receiver.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
 
