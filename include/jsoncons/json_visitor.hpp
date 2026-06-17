@@ -247,12 +247,12 @@ namespace jsoncons {
 
         template <typename BytesViewLike>
         JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const BytesViewLike& b, 
-            uint64_t ext_tag, 
+            uint64_t raw_tag, 
             const ser_context& context=ser_context(),
             typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
         {
             std::error_code ec;
-            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -398,12 +398,12 @@ namespace jsoncons {
 
         template <typename Source>
         JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const Source& b, 
-            uint64_t ext_tag, 
+            uint64_t raw_tag, 
             const ser_context& context,
             std::error_code& ec,
             typename std::enable_if<ext_traits::is_bytes_view_like<Source>::value,int>::type = 0)
         {
-            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
             JSONCONS_VISITOR_RETURN;
         }
 
@@ -589,7 +589,7 @@ namespace jsoncons {
             std::error_code& ec) = 0;
 
         virtual JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
-            uint64_t /* ext_tag */, 
+            uint64_t /* raw_tag */, 
             const ser_context& context,
             std::error_code& ec) 
         {

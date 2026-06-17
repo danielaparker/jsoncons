@@ -112,11 +112,11 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-        uint64_t ext_tag,
+        uint64_t raw_tag,
         const ser_context& context,
         std::error_code& ec) override
     {
-        destination_->byte_string_value(b, ext_tag, context, ec);
+        destination_->byte_string_value(b, raw_tag, context, ec);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -409,16 +409,16 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-        uint64_t ext_tag,
+        uint64_t raw_tag,
         const ser_context& context,
         std::error_code& ec) override
     {
-        destination1_->byte_string_value(b, ext_tag, context, ec);
+        destination1_->byte_string_value(b, raw_tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_VISITOR_RETURN;
         }
-        destination2_->byte_string_value(b, ext_tag, context, ec);
+        destination2_->byte_string_value(b, raw_tag, context, ec);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -795,11 +795,11 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-        uint64_t ext_tag,
+        uint64_t raw_tag,
         const ser_context& context,
         std::error_code& ec) override
     {
-        destination1_->byte_string_value(b, ext_tag, context, ec);
+        destination1_->byte_string_value(b, raw_tag, context, ec);
         JSONCONS_VISITOR_RETURN;
     }
 

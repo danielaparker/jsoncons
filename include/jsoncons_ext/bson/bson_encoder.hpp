@@ -405,7 +405,7 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-        uint64_t ext_tag, 
+        uint64_t raw_tag, 
         const ser_context&,
         std::error_code& ec) override
     {
@@ -420,7 +420,7 @@ private:
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         std::size_t string_offset = buffer_.size();
 
-        buffer_.push_back(static_cast<uint8_t>(ext_tag)); // default subtype
+        buffer_.push_back(static_cast<uint8_t>(raw_tag)); // default subtype
 
         for (auto c : b)
         {

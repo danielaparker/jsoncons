@@ -196,12 +196,12 @@ public:
 
     template <typename BytesViewLike>
     JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const BytesViewLike& b, 
-        uint64_t ext_tag, 
+        uint64_t raw_tag, 
         const ser_context& context=ser_context(),
         typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
     {
         std::error_code ec;
-        visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+        visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -347,12 +347,12 @@ public:
 
     template <typename Source>
     JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const Source& b, 
-        uint64_t ext_tag, 
+        uint64_t raw_tag, 
         const ser_context& context,
         std::error_code& ec,
         typename std::enable_if<ext_traits::is_bytes_view_like<Source>::value,int>::type = 0)
     {
-        visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+        visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -534,7 +534,7 @@ private:
         std::error_code& ec) = 0;
 
     virtual JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
-        uint64_t /*ext_tag*/, 
+        uint64_t /*raw_tag*/, 
         const ser_context& context,
         std::error_code& ec) 
     {
@@ -1177,7 +1177,7 @@ template <typename CharT,typename Allocator>
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
-            uint64_t ext_tag,
+            uint64_t raw_tag,
             const ser_context& context,
             std::error_code& ec) final
         {
@@ -1220,7 +1220,7 @@ template <typename CharT,typename Allocator>
                         key_buffer_.push_back('\"');
                         break;
                     default:
-                        destination_->byte_string_value(value, ext_tag, context, ec);
+                        destination_->byte_string_value(value, raw_tag, context, ec);
                         break;
                 }
             }

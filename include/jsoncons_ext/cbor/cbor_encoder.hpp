@@ -1037,7 +1037,7 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-                           uint64_t ext_tag, 
+                           uint64_t raw_tag, 
                            const ser_context&,
                            std::error_code&) override
     {
@@ -1048,7 +1048,7 @@ private:
             if (it == bytestringref_map_.end())
             {
                 bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
-                write_tag(ext_tag);
+                write_tag(raw_tag);
                 write_byte_string(bs);
             }
             else
@@ -1059,7 +1059,7 @@ private:
         }
         else
         {
-            write_tag(ext_tag);
+            write_tag(raw_tag);
             write_byte_string(b);
         }
 

@@ -452,7 +452,7 @@ namespace msgpack {
         }
 
         JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-            uint64_t ext_tag, 
+            uint64_t raw_tag, 
             const ser_context&,
             std::error_code&) final
         {
@@ -461,42 +461,42 @@ namespace msgpack {
             {
                 case 1:
                     sink_.push_back(jsoncons::msgpack::msgpack_type::fixext1_type);
-                    sink_.push_back(static_cast<uint8_t>(ext_tag));
+                    sink_.push_back(static_cast<uint8_t>(raw_tag));
                     break;
                 case 2:
                     sink_.push_back(jsoncons::msgpack::msgpack_type::fixext2_type);
-                    sink_.push_back(static_cast<uint8_t>(ext_tag));
+                    sink_.push_back(static_cast<uint8_t>(raw_tag));
                     break;
                 case 4:
                     sink_.push_back(jsoncons::msgpack::msgpack_type::fixext4_type);
-                    sink_.push_back(static_cast<uint8_t>(ext_tag));
+                    sink_.push_back(static_cast<uint8_t>(raw_tag));
                     break;
                 case 8:
                     sink_.push_back(jsoncons::msgpack::msgpack_type::fixext8_type);
-                    sink_.push_back(static_cast<uint8_t>(ext_tag));
+                    sink_.push_back(static_cast<uint8_t>(raw_tag));
                     break;
                 case 16:
                     sink_.push_back(jsoncons::msgpack::msgpack_type::fixext16_type);
-                    sink_.push_back(static_cast<uint8_t>(ext_tag));
+                    sink_.push_back(static_cast<uint8_t>(raw_tag));
                     break;
                 default:
                     if (length <= (std::numeric_limits<uint8_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::msgpack_type::ext8_type);
                         sink_.push_back(static_cast<uint8_t>(length));
-                        sink_.push_back(static_cast<uint8_t>(ext_tag));
+                        sink_.push_back(static_cast<uint8_t>(raw_tag));
                     }
                     else if (length <= (std::numeric_limits<uint16_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::msgpack_type::ext16_type);
                         binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
-                        sink_.push_back(static_cast<uint8_t>(ext_tag));
+                        sink_.push_back(static_cast<uint8_t>(raw_tag));
                     }
                     else if (length <= (std::numeric_limits<uint32_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::msgpack_type::ext32_type);
                         binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
-                        sink_.push_back(static_cast<uint8_t>(ext_tag));
+                        sink_.push_back(static_cast<uint8_t>(raw_tag));
                     }
                     break;
             }

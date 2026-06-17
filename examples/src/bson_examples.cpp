@@ -226,7 +226,7 @@ void binary_example2()
     std::cout << "JSON:\n" << pretty_print(j) << "\n\n";
 
     std::cout << "tag: " << j["pD"].tag() << "\n";
-    std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
+    std::cout << "raw_tag: " << j["pD"].ext_tag() << "\n";
     auto bytes = j["pD"].as<std::vector<uint8_t>>();
     std::cout << "binary data: " << jsoncons::byte_string_view{ bytes } << "\n";
 }

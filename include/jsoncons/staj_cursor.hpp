@@ -247,7 +247,7 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& value, 
-        uint64_t ext_tag, 
+        uint64_t raw_tag, 
         const ser_context&,
         std::error_code&) final
     {
@@ -258,11 +258,11 @@ private:
         }
         if (structure.is_key)
         {
-            event_ = staj_event_type(value, staj_events::byte_string_value, ext_tag, staj_events::key_flag);
+            event_ = staj_event_type(value, staj_events::byte_string_value, raw_tag, staj_events::key_flag);
         }
         else
         {
-            event_ = staj_event_type(value, staj_events::byte_string_value, ext_tag);
+            event_ = staj_event_type(value, staj_events::byte_string_value, raw_tag);
         }
         JSONCONS_VISITOR_RETURN;
     }
@@ -500,11 +500,11 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& s, 
-        uint64_t ext_tag,
+        uint64_t raw_tag,
         const ser_context&,
         std::error_code&) override
     {
-        event_ = staj_event_type(s, staj_events::byte_string_value, ext_tag);
+        event_ = staj_event_type(s, staj_events::byte_string_value, raw_tag);
         JSONCONS_VISITOR_RETURN;
     }
 

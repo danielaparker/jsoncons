@@ -263,20 +263,20 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_byte_string(const byte_string_view& b, 
-        uint64_t ext_tag, 
+        uint64_t raw_tag, 
         const ser_context&,
         std::error_code&) final
     {
         switch (structure_stack_.back().structure_kind)
         {
             case json_structure_kind::object_kind:
-                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag);
+                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, raw_tag);
                 break;
             case json_structure_kind::array_kind:
-                item_stack_.emplace_back(key_type(alloc_), 0, byte_string_arg, b, ext_tag);
+                item_stack_.emplace_back(key_type(alloc_), 0, byte_string_arg, b, raw_tag);
                 break;
             case json_structure_kind::root_kind:
-                result_ = Json(byte_string_arg, b, ext_tag, alloc_);
+                result_ = Json(byte_string_arg, b, raw_tag, alloc_);
                 is_valid_ = true;
                 JSONCONS_VISITOR_RETURN;
         }

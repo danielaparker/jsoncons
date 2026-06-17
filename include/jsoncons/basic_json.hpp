@@ -951,10 +951,10 @@ namespace jsoncons {
         }
 
         typename byte_string_storage::pointer create_byte_string(const allocator_type& alloc, const uint8_t* data, std::size_t length,
-            uint64_t ext_tag)
+            uint64_t raw_tag)
         {
             using heap_string_factory_type = jsoncons::heap::heap_string_factory<uint8_t,uint64_t,Allocator>;
-            return heap_string_factory_type::create(data, length, ext_tag, alloc); 
+            return heap_string_factory_type::create(data, length, raw_tag, alloc); 
         }
         
         template <typename... Args>
@@ -2742,24 +2742,24 @@ namespace jsoncons {
 
         template <typename BytesViewLike>
         basic_json(byte_string_arg_t, const BytesViewLike& source, 
-                   uint64_t ext_tag,
+                   uint64_t raw_tag,
                    typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
 
-            auto ptr = create_byte_string(Allocator(), bytes.data(), bytes.size(), ext_tag);
+            auto ptr = create_byte_string(Allocator(), bytes.data(), bytes.size(), raw_tag);
             construct<byte_string_storage>(ptr, semantic_tag::ext);
         }
 
         template <typename BytesViewLike>
         basic_json(byte_string_arg_t, const BytesViewLike& source, 
-                   uint64_t ext_tag,
+                   uint64_t raw_tag,
                    const Allocator& alloc,
                    typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
 
-            auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), ext_tag);
+            auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), raw_tag);
             construct<byte_string_storage>(ptr, semantic_tag::ext);
         }
 

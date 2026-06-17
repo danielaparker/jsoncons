@@ -83,7 +83,7 @@ basic_json(byte_string_arg_t,
 
 template <typename BytesViewLike>
 basic_json(byte_string_arg_t, 
-    const BytesViewLike& source, uint64_t ext_tag,
+    const BytesViewLike& source, uint64_t raw_tag,
     const Allocator& alloc = Allocator());                         (24) 
 
 basic_json(json_const_pointer_arg, const basic_json* ptr);         (25) (since 0.156.0)

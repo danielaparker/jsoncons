@@ -92,7 +92,7 @@ Reset encoder to write a new value to a new sink
 
     template <typename BytesViewLike>
     bool byte_string_value(const BytesViewLike& souce, 
-                           uint64_t ext_tag, 
+                           uint64_t raw_tag, 
                            const ser_context& context=ser_context()); (13) (since 0.152.0)
 
     bool uint64_value(uint64_t value, 
@@ -166,7 +166,7 @@ Reset encoder to write a new value to a new sink
 
     template <typename BytesViewLike>   
     bool byte_string_value(const BytesViewLike& source, 
-                           uint64_t ext_tag, 
+                           uint64_t raw_tag, 
                            const ser_context& context,
                            std::error_code& ec); (29) (since 0.152.0)
 
@@ -272,7 +272,7 @@ and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns **true** if the consumer wishes to receive more events, **false** otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(13) Writes a byte string value `source` with a format specific tag, `ext_tag`.
+(13) Writes a byte string value `source` with a format specific tag, `raw_tag`.
 Type `BytesViewLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns **true** if the consumer wishes to receive more events, **false** otherwise.

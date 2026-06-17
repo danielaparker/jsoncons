@@ -106,7 +106,7 @@ int main()
     std::cout << "JSON:\n" << pretty_print(j) << "\n\n";
 
     std::cout << "tag: " << j["pD"].tag() << "\n";
-    std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
+    std::cout << "raw_tag: " << j["pD"].ext_tag() << "\n";
     auto bytes = j["pD"].as<std::vector<uint8_t>>();
     std::cout << "binary data: " << byte_string_view{ bytes } << "\n";
 }
@@ -119,7 +119,7 @@ JSON:
 }
 
 tag: ext
-ext_tag: 128
+raw_tag: 128
 binary data: 48,65,6c,6c,6f
 ```
 Note that printing a json value by default encodes byte strings as base64url strings, but the json value holds the actual bytes.
@@ -153,7 +153,7 @@ int main()
     jsoncons::json& j(*result);
     std::cout << pretty_print(j) << "\n\n";
     std::cout << "tag: " << j["pD"].tag() << "\n";
-    std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
+    std::cout << "raw_tag: " << j["pD"].ext_tag() << "\n";
     auto bytes = j["pD"].as<std::vector<uint8_t>>();
     std::cout << "binary data: " << jsoncons::byte_string_view{bytes} << "\n";
 }
@@ -167,7 +167,7 @@ Output:
 }
 
 tag: ext
-ext_tag: 128
+raw_tag: 128
 binary data: 48,65,6c,6c,6f
 ```
 
