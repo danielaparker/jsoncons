@@ -584,7 +584,7 @@ struct decode_traits<std::array<T,N>>
 };
 
 // map like
-
+/*
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
@@ -657,12 +657,12 @@ struct decode_traits<T,
     {
     }
 };
-
+*/
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
-                            ext_traits::is_map_like<T>::value &&
-                            std::is_integral<typename T::key_type>::value
+                            ext_traits::is_map_like<T>::value /*&&
+                            std::is_integral<typename T::key_type>::value*/
 >::type>
 {
     using mapped_type = typename T::mapped_type;
@@ -688,7 +688,7 @@ struct decode_traits<T,
 
         while (cursor.current().event_type() != staj_events::end_object && !ec)
         {
-            if ((cursor.current().event_type() & staj_events::key_flag) == staj_events{})
+            if ((cursor.current().event_type() & staj_events::kflag) == staj_events{})
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }

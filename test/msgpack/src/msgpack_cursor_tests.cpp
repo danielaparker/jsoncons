@@ -415,29 +415,29 @@ TEST_CASE("msgpack_event_reader reputon test")
 
         CHECK(reader.current().event_type() == staj_events::begin_object);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::begin_array);
         reader.next();
         CHECK(reader.current().event_type() == staj_events::begin_object);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::kflag));  // key
         reader.next();
         CHECK(reader.current().event_type() == staj_events::double_value);
         reader.next();

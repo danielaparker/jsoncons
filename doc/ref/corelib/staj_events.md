@@ -17,8 +17,9 @@ enum class staj_events   (since 1.7.0)
     end_array         = /*unspecified*/,
     begin_object      = /*unspecified*/,
     end_object        = /*unspecified*/,
-    key_flag          = /*unspecified*/,         (since 1.9.0)
-    key               = key_flag | string_value   (since 1.9.0)
+    kflag             = /*unspecified*/,       (since 1.9.0)
+    key               = kflag | string_value,
+    id                = kflag | uint64_value   (since 1.9.0)
 };
 ```
 Represents a classification of streaming events for JSON-like formats.
