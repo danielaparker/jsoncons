@@ -12,7 +12,7 @@ master
   For backwards compatibility, `staj_events::key` is now defined as
   `staj_events::string_value | staj_events::key_flag`.
   
-  - For the common case of a cbor or msgpack unsigned integer key,
+  - For the common case of CBOR or MessagePack unsigned integer keys,
   the enum value `id` has been added to `sjaj_events`, 
   defined as `staj_events::uint64_value | staj_events::key_flag`.
     ```cpp
@@ -22,12 +22,20 @@ master
         switch (cursor.current().event_type())
         {
             case staj_events::id:
+                auto id = cursor.current().get<uint64_t>();
                 // handle unsigned integer key event
                 break;
         }
     }
     ```
-
+  
+  - When decoding a CBOR or MessagePack array of maps that have unsigned
+  integer keys, code like
+  ```cpp
+  auto m = cbor::decode_cbor<std::vector<std::map<uint64_t, std::string>>>(data);
+  ```
+  produces the same result as 1.8.0, but no longer results in conversions
+  from integer to string and back to integer.  
 
 Release 1.8.1
 -------------
