@@ -584,85 +584,11 @@ struct decode_traits<std::array<T,N>>
 };
 
 // map like
-/*
+
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
-                            ext_traits::is_map_like<T>::value &&
-                            ext_traits::is_string<typename T::key_type>::value
->::type>
-{
-    using mapped_type = typename T::mapped_type;
-    using value_type = T;
-    using key_type = typename T::key_type;
-    using result_type = read_result<value_type>;
-
-    template <typename CharT,typename Alloc,typename TempAlloc>
-    static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
-    {
-        std::error_code ec;
-
-        auto val = jsoncons::make_obj_using_allocator<T>(aset.get_allocator());
-        if (cursor.current().event_type() != staj_events::begin_object)
-        {
-            return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; 
-        }
-        if (cursor.current().size() > 0)
-        {
-            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
-        }
-        cursor.next(ec);
-
-        while (cursor.current().event_type() != staj_events::end_object && !ec)
-        {
-            if (cursor.current().event_type() != staj_events::key)
-            {
-                return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
-            }
-            auto r1 = decode_traits<key_type>::try_decode(aset, cursor);
-            if (!r1)
-            {
-                return result_type(jsoncons::unexpect, r1.error());
-            }
-            if (JSONCONS_UNLIKELY(ec)) 
-            {
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
-            }
-            cursor.next(ec);
-            if (JSONCONS_UNLIKELY(ec)) 
-            {
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
-            }
-            auto r2 = decode_traits<mapped_type>::try_decode(aset, cursor);
-            if (!r2)
-            {
-                return result_type(jsoncons::unexpect, r2.error());
-            }
-            val.emplace(std::move(*r1), std::move(*r2));
-            cursor.next(ec);
-            if (JSONCONS_UNLIKELY(ec)) 
-            {
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
-            }
-        }
-        return result_type{std::move(val)};
-    }
-
-    static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
-    {
-        v.reserve(new_cap);
-    }
-
-    static void reserve_storage(std::false_type, T&, std::size_t)
-    {
-    }
-};
-*/
-template <typename T>
-struct decode_traits<T,
-    typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
-                            ext_traits::is_map_like<T>::value /*&&
-                            std::is_integral<typename T::key_type>::value*/
+                            ext_traits::is_map_like<T>::value
 >::type>
 {
     using mapped_type = typename T::mapped_type;
@@ -688,7 +614,7 @@ struct decode_traits<T,
 
         while (cursor.current().event_type() != staj_events::end_object && !ec)
         {
-            if ((cursor.current().event_type() & staj_events::kflag) == staj_events{})
+            if ((cursor.current().event_type() & staj_events::key_flag) == staj_events{})
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }

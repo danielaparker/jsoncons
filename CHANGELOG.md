@@ -1,3 +1,34 @@
+master
+------
+
+- Emhancements:
+
+  - Until 1.9.0, cbor and msgpack cursors read key-value pairs
+  and convert the key part into a string before making it
+  avaliable to the cursor as a `staj_events::key` event . 
+  Since 1.9.0, cbor and msgpack cursors read key-value pairs 
+  and make both string and non-string keys available to the cursor
+  as a value event ORed with a key flag (`staj_events::key_flag`).
+  For backwards compatibility, `staj_events::key` is now defined as
+  `staj_events::string_value | staj_events::key_flag`.
+  
+  - For the common case of a cbor or msgpack unsigned integer key,
+  the enum value `id` has been added to `sjaj_events`, 
+  defined as `staj_events::uint64_value | staj_events::key_flag`.
+    ```cpp
+    cbor::cbor_bytes_cursor cursor{data};
+    while (!cursor.done())
+    {
+        switch (cursor.current().event_type())
+        {
+            case staj_events::id:
+                // handle unsigned integer key event
+                break;
+        }
+    }
+    ```
+
+
 Release 1.8.1
 -------------
 

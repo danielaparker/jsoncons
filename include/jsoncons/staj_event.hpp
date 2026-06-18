@@ -49,9 +49,9 @@ enum class staj_events : uint64_t
     end_object        = 512,   
     begin_array       = 1024,
     end_array         = 2048,
-    kflag              = 4096,
-    key               = kflag | string_value,
-    id                = kflag | uint64_value
+    key_flag          = 4096,
+    key               = key_flag | string_value,
+    id                = key_flag | uint64_value
 };
 
 using staj_event_type = staj_events; // For backwards compatibility
@@ -117,7 +117,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_events
     static constexpr const CharT* half_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
     static constexpr const CharT* double_value_literal = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
 
-    switch (tag & ~staj_events::kflag)
+    switch (tag & ~staj_events::key_flag)
     {
         case staj_events::begin_array:
         {
@@ -184,7 +184,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_events
             break;
         }
     }
-    if ((tag & staj_events::kflag) != staj_events{})
+    if ((tag & staj_events::key_flag) != staj_events{})
     {
         os << ' ' << key_literal;
     }
@@ -211,7 +211,7 @@ class basic_staj_event
 
     staj_events storage_tag() const
     {
-        static constexpr staj_events mask = ~staj_events::kflag;
+        static constexpr staj_events mask = ~staj_events::key_flag;
         return event_flags_ & mask;
     }
 public:
@@ -219,49 +219,49 @@ public:
     using string_view_type = jsoncons::basic_string_view<char_type>;
 
     basic_staj_event(staj_events event_type, semantic_tag tag = semantic_tag::none,
-        staj_events kflag = staj_events{})
-        : event_flags_(event_type | kflag), tag_(tag), value_()
+        staj_events key_flag = staj_events{})
+        : event_flags_(event_type | key_flag), tag_(tag), value_()
     {
     }
 
     basic_staj_event(staj_events event_type, std::size_t length, 
         semantic_tag tag = semantic_tag::none,
-        staj_events kflag = staj_events{})
-        : event_flags_(event_type | kflag), tag_(tag), value_(), length_(length)
+        staj_events key_flag = staj_events{})
+        : event_flags_(event_type | key_flag), tag_(tag), value_(), length_(length)
     {
     }
 
     basic_staj_event(bool value, semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(staj_events::bool_value | kflag), tag_(tag)
+        staj_events key_flag = staj_events{})
+        : event_flags_(staj_events::bool_value | key_flag), tag_(tag)
     {
         value_.bool_value_ = value;
     }
 
     basic_staj_event(int64_t value, semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(staj_events::int64_value | kflag), tag_(tag)
+        staj_events key_flag = staj_events{})
+        : event_flags_(staj_events::int64_value | key_flag), tag_(tag)
     {
         value_.int64_value_ = value;
     }
 
     basic_staj_event(uint64_t value, semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(staj_events::uint64_value | kflag), tag_(tag)
+        staj_events key_flag = staj_events{})
+        : event_flags_(staj_events::uint64_value | key_flag), tag_(tag)
     {
         value_.uint64_value_ = value;
     }
 
     basic_staj_event(half_arg_t, uint16_t value, semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(staj_events::half_value | kflag), tag_(tag)
+        staj_events key_flag = staj_events{})
+        : event_flags_(staj_events::half_value | key_flag), tag_(tag)
     {
         value_.half_value_ = value;
     }
 
     basic_staj_event(double value, semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(staj_events::double_value | kflag), tag_(tag)
+        staj_events key_flag = staj_events{})
+        : event_flags_(staj_events::double_value | key_flag), tag_(tag)
     {
         value_.double_value_ = value;
     }
@@ -269,8 +269,8 @@ public:
     basic_staj_event(const string_view_type& s,
         staj_events event_type,
         semantic_tag tag = semantic_tag::none,
-        staj_events kflag = staj_events{})
-        : event_flags_(event_type | kflag), tag_(tag), length_(s.length())
+        staj_events key_flag = staj_events{})
+        : event_flags_(event_type | key_flag), tag_(tag), length_(s.length())
     {
         value_.string_data_ = s.data();
     }
@@ -278,8 +278,8 @@ public:
     basic_staj_event(const byte_string_view& s,
         staj_events event_type,
         semantic_tag tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(event_type | kflag), tag_(tag), length_(s.size())
+        staj_events key_flag = staj_events{})
+        : event_flags_(event_type | key_flag), tag_(tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
     }
@@ -287,8 +287,8 @@ public:
     basic_staj_event(const byte_string_view& s,
         staj_events event_type,
         uint64_t raw_tag,
-        staj_events kflag = staj_events{})
-        : event_flags_(event_type | kflag), tag_(semantic_tag::ext), raw_tag_(raw_tag), length_(s.size())
+        staj_events key_flag = staj_events{})
+        : event_flags_(event_type | key_flag), tag_(semantic_tag::ext), raw_tag_(raw_tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
     }
@@ -573,7 +573,7 @@ public:
                 visitor.end_object(context, ec);
                 break;
             case staj_events::string_value:
-                if ((event_flags_ & staj_events::kflag) != staj_events{})
+                if ((event_flags_ & staj_events::key_flag) != staj_events{})
                 {
                     visitor.key(string_view_type(value_.string_data_,length_), context);
                 }
