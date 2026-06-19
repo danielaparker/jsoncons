@@ -923,7 +923,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         (reader.read(ec));
         //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
         std::cout << ec.message() << "\n";
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor_encoder
     // Issue:  Bad-cast to jsoncons::cbor::cbor_mdarray_row_major_iterator
@@ -945,6 +945,35 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         (reader.read(ec));
         //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
         std::cout << ec.message() << "\n";
+    }*/
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue:  Heap-use-after-free in jsoncons::cbor::cbor_mdarray_row_major_iterator<jsoncons::stream_source<unsigned 
+    // Resolution: 
+
+    SECTION("issue 522297018")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-4834232383111168";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        try
+        {
+            std::vector<uint8_t> buf;
+            cbor::cbor_bytes_encoder encoder(buf);
+            cbor::cbor_stream_reader reader(is, encoder);
+
+            std::error_code ec;
+            //REQUIRE_NOTHROW
+            (reader.read(ec));
+            //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
+            std::cout << ec.message() << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
     }
 }
 
