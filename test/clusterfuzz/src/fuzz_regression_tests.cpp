@@ -941,8 +941,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         cbor::cbor_stream_reader reader(is, encoder);
 
         std::error_code ec;
-        //REQUIRE_NOTHROW
-        (reader.read(ec));
+        REQUIRE_NOTHROW(reader.read(ec));
         //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
         std::cout << ec.message() << "\n";
     }*/
@@ -958,22 +957,14 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        try
-        {
-            std::vector<uint8_t> buf;
-            cbor::cbor_bytes_encoder encoder(buf);
-            cbor::cbor_stream_reader reader(is, encoder);
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
 
-            std::error_code ec;
-            //REQUIRE_NOTHROW
-            (reader.read(ec));
-            //CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
-            std::cout << ec.message() << "\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << "\n";
-        }
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((int)cbor::cbor_errc::unknown_type == ec.value());
+        //std::cout << ec.message() << "\n";
     }
 }
 

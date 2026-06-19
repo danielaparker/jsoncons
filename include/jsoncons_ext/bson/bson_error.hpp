@@ -58,7 +58,7 @@ public:
             case bson_errc::length_is_negative:
                 return "Request for the length of a binary returned a negative result";
             case bson_errc::unknown_type:
-                return "An unknown type was found in the stream";
+                return "Unknown type in input";
             case bson_errc::number_too_large:
                 return "Number too large";
             case bson_errc::invalid_decimal128_string:

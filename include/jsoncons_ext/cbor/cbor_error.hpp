@@ -68,7 +68,7 @@ public:
             case cbor_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
             case cbor_errc::unknown_type:
-                return "An unknown type was found in the stream";
+                return "Unknown type in input";
             case cbor_errc::illegal_chunked_string:
                 return "An illegal type was found while parsing an indefinite length string";
             case cbor_errc::bad_mdarray:

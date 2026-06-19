@@ -63,7 +63,7 @@ public:
             case msgpack_errc::invalid_timestamp:
                 return "Invalid timestamp";
             case msgpack_errc::unknown_type:
-                return "An unknown type was found in the stream";
+                return "Unknown type in input";
             default:
                 return "Unknown MessagePack parser error";
         }
