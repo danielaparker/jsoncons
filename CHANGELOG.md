@@ -1,6 +1,11 @@
 master
 ------
 
+- Fixed bugs:
+
+  - Fixed issue identified by Google fuzz where a CBOR classical multi-dimensional array 
+  contained elements of typed array.
+
 - Emhancements:
 
   - Until 1.9.0, cbor and msgpack cursors read key-value pairs
