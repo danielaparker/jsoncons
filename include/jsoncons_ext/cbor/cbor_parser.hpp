@@ -1117,6 +1117,7 @@ private:
                 }
                 return true;
             };
+            source_.ignore(1);
             iterate_string_chunks(func, major_type, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1187,6 +1188,7 @@ private:
                     }
                     return true;
                 };
+                source_.ignore(1);
                 iterate_string_chunks(func, major_type, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1245,28 +1247,22 @@ private:
                 return;
             }
             uint8_t info = get_additional_information_value(c.value);
-
-            switch (info)
+            if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
             {
-                case jsoncons::cbor::detail::additional_info::indefinite_length:
-                {
-                    source_.ignore(1);
-                    break;
-                }
-                default: // definite length
-                {
-                    std::size_t length = read_size(ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        return;
-                    }
-                    more_ = func(source_, length, ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        return;
-                    }
-                    break;
-                }
+                ec = cbor_errc::illegal_chunked_string;
+                more_ = false;
+                return;
+            }
+
+            std::size_t length = read_size(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            more_ = func(source_, length, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
             }
         } 
     }
