@@ -1108,14 +1108,12 @@ private:
 
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            auto func = [&str](Source& source, std::size_t length, std::error_code& ec) -> bool
+            auto func = [&str](Source& source, std::size_t length, std::error_code& ec)
             {
                 if (source_reader<Source>::read(source, str, length) != length)
                 {
                     ec = cbor_errc::unexpected_eof;
-                    return false;
                 }
-                return true;
             };
             source_.ignore(1);
             iterate_string_chunks(func, major_type, ec);
@@ -1175,47 +1173,39 @@ private:
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
 
-        switch(info)
+        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            case jsoncons::cbor::detail::additional_info::indefinite_length:
+            auto func = [&v](Source& source, std::size_t length, std::error_code& ec)
             {
-                auto func = [&v](Source& source, std::size_t length, std::error_code& ec) -> bool
-                {
-                    if (source_reader<Source>::read(source, v, length) != length)
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        return false;
-                    }
-                    return true;
-                };
-                source_.ignore(1);
-                iterate_string_chunks(func, major_type, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                break;
-            }
-            default:
-            {
-                std::size_t length = read_size(ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                if (source_reader<Source>::read(source_, v, length) != length)
+                if (source_reader<Source>::read(source, v, length) != length)
                 {
                     ec = cbor_errc::unexpected_eof;
-                    return;
                 }
-                if (!stringref_map_stack_.empty() &&
-                    v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
-                {
-                    stringref_map_stack_.back().emplace_back(mapped_string(v, alloc_));
-                }
-                break;
+            };
+            source_.ignore(1);
+            iterate_string_chunks(func, major_type, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
             }
-
+        }
+        else 
+        {
+            std::size_t length = read_size(ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            if (source_reader<Source>::read(source_, v, length) != length)
+            {
+                ec = cbor_errc::unexpected_eof;
+                return;
+            }
+            if (!stringref_map_stack_.empty() &&
+                v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
+            {
+                stringref_map_stack_.back().emplace_back(mapped_string(v, alloc_));
+            }
         }
     }
 
@@ -1259,7 +1249,7 @@ private:
             {
                 return;
             }
-            more_ = func(source_, length, ec);
+            func(source_, length, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
