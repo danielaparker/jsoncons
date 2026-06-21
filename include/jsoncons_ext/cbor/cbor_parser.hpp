@@ -1232,7 +1232,7 @@ private:
                 more_ = false;
                 return;
             }
-            if (nesting_level > 0 && c.value == 0xff)
+            if (c.value == 0xff)
             {
                 --nesting_level;
                 if (nesting_level == 0)
