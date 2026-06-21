@@ -859,14 +859,13 @@ namespace jsoncons {
         {
             std::size_t unread = length;
 
-            std::size_t n = (std::min)(max_buffer_length, unread);
-            while (n > 0 && !source.eof())
+            while (unread > 0 && !source.eof())
             {
+                std::size_t n = (std::min)(max_buffer_length, unread);
                 std::size_t offset = v.size();
                 v.resize(v.size()+n);
                 std::size_t actual = source.read(v.data()+offset, n);
                 unread -= actual;
-                n = (std::min)(max_buffer_length, unread);
             }
 
             return length - unread;
