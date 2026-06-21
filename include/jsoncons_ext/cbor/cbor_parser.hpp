@@ -1220,8 +1220,6 @@ private:
     template <typename Function>
     void iterate_string_chunks(Function& func, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
     {
-        int nesting_level = 0;
-
         bool done = false;
         while (!done)
         {
@@ -1234,11 +1232,7 @@ private:
             }
             if (c.value == 0xff)
             {
-                --nesting_level;
-                if (nesting_level == 0)
-                {
-                    done = true;
-                }
+                done = true;
                 source_.ignore(1);
                 continue;
             }
@@ -1256,7 +1250,6 @@ private:
             {
                 case jsoncons::cbor::detail::additional_info::indefinite_length:
                 {
-                    ++nesting_level;
                     source_.ignore(1);
                     break;
                 }
@@ -1271,10 +1264,6 @@ private:
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
-                    }
-                    if (nesting_level == 0)
-                    {
-                        done = true;
                     }
                     break;
                 }
