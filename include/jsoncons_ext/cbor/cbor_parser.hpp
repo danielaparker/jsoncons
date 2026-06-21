@@ -1108,15 +1108,8 @@ private:
 
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            auto func = [&str](Source& source, std::size_t length, std::error_code& ec)
-            {
-                if (source_reader<Source>::read(source, str, length) != length)
-                {
-                    ec = cbor_errc::unexpected_eof;
-                }
-            };
             source_.ignore(1);
-            iterate_string_chunks(func, major_type, ec);
+            iterate_string_chunks(str, major_type, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1175,15 +1168,8 @@ private:
 
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            auto func = [&v](Source& source, std::size_t length, std::error_code& ec)
-            {
-                if (source_reader<Source>::read(source, v, length) != length)
-                {
-                    ec = cbor_errc::unexpected_eof;
-                }
-            };
             source_.ignore(1);
-            iterate_string_chunks(func, major_type, ec);
+            iterate_string_chunks(v, major_type, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1209,8 +1195,8 @@ private:
         }
     }
 
-    template <typename Function>
-    void iterate_string_chunks(Function& func, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
+    template <typename Container>
+    void iterate_string_chunks(Container& v, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
     {
         bool done = false;
         while (!done)
@@ -1249,7 +1235,10 @@ private:
             {
                 return;
             }
-            func(source_, length, ec);
+            if (source_reader<Source>::read(source_, v, length) != length)
+            {
+                ec = cbor_errc::unexpected_eof;
+            }
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
