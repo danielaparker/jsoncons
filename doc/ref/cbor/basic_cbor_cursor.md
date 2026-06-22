@@ -149,6 +149,7 @@ Returns the CBOR tag associated with the current value
 [Filter CBOR parse events](#filter-cbor-parse-events)  
 [Typed array examples (until 1.8.0)](##typed-array-examples-until-180)  
 [Typed array examples (since 1.8.0)](#typed-array-examples-since-180)  
+[Read non-string keys (since 1.9.0)](#Read-non-string-keys-(since 190))  
 
 Input JSON file `book_catalog.json`:
 
@@ -829,8 +830,91 @@ Output:
 (2) [1,2,3,4,5,6,7,8,9,10,11,12]
 ```
 
+#### Read non-string keys (since 1.9.0)
+
+Since 1.9.0, jsoncons supports reading non-string keys using the cursor API.
+Keys are reported by [staj_events](../corelib/basic_staj_events.md) 
+that are ORed with the flag `staj_events::key_flag`.
+For backwards compatibility, the enum value `staj_events::key` has been redefined as
+```cpp
+    staj_events::string_value | staj_events::key_flag
+```
+In addition, for the common case of CBOR or MessagePack unsigned integer keys,
+the enum value `id` has been added to `sjaj_events` and defined as 
+```cpp
+   staj_events::uint64_value | staj_events::key_flag`
+```
+
+##### Read an unsigned integer key
+
+```cpp
+int main()
+{
+    std::vector<uint8_t> data = {
+        0x82,                               // Array(2)
+        0xA2,                               // Map (2)
+        0x01,                               // Key 1
+        0x63, 0x6F, 0x6E, 0x65,             // Text "one"
+        0x02,                               // Key 2
+        0x63, 0x74, 0x77, 0x6F,             // Text "two"
+        0xA2,                               // Map(2)
+        0x0A,                               // Key 10
+        0x67, 0x68, 0x75, 0x6E,
+        0x64, 0x72, 0x65, 0x64,             // Value "hundred"
+        0x14,                               // Key 20
+        0x6B, 0x74, 0x77, 0x6F, 0x20, 0x68,
+        0x75, 0x6E, 0x64, 0x72, 0x65, 0x64  // Value "two hundred" 
+    };
+
+    cbor::cbor_bytes_cursor cursor{data};
+    while (!cursor.done())
+    {
+        switch (cursor.current().event_type())
+        {
+            case jsoncons::staj_events::begin_array:
+                std::cout << "begin array\n";
+                break;
+            case jsoncons::staj_events::end_array:
+                std::cout << "end array\n";
+                break;
+            case jsoncons::staj_events::begin_object:
+                std::cout << "  begin object\n";
+                break;
+            case jsoncons::staj_events::end_object:
+                std::cout << "  end object\n";
+                break;
+            case jsoncons::staj_events::string_value:
+                std::cout << "    value: " << cursor.current().get<std::string>() << "\n";
+                break;
+            case jsoncons::staj_events::id:
+                std::cout << "    key: " << cursor.current().get<uint64_t>() << "\n";
+                break;
+        }
+        cursor.next();
+    }
+}
+```
+
+Output:
+
+```
+begin array
+  begin object
+    key: 1
+    value: one
+    key: 2
+    value: two
+  end object
+  begin object
+    key: 10
+    value: hundred
+    key: 20
+    value: two hundred
+  end object
+end array
+```
+
 ### See also
 
-[staj_event](../corelib/basic_staj_event.md)  
 [staj_events](../corelib/basic_staj_events.md)  
 
