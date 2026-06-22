@@ -852,6 +852,8 @@ the enum value `id` has been added to `sjaj_events` and defined as
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
 
+namespace cbor = jsoncons::cbor;
+
 int main()
 {
     std::vector<uint8_t> data = {
