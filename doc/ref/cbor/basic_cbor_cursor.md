@@ -848,6 +848,10 @@ the enum value `id` has been added to `sjaj_events` and defined as
 ##### Read an unsigned integer key
 
 ```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+
 int main()
 {
     std::vector<uint8_t> data = {
