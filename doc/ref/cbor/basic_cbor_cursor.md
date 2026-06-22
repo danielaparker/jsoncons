@@ -149,7 +149,7 @@ Returns the CBOR tag associated with the current value
 [Filter CBOR parse events](#filter-cbor-parse-events)  
 [Typed array examples (until 1.8.0)](##typed-array-examples-until-180)  
 [Typed array examples (since 1.8.0)](#typed-array-examples-since-180)  
-[Read non-string keys (since 1.9.0)](#Read-non-string-keys-(since 190))  
+[Read non-string keys (since 1.9.0)](#Read-non-string-keys-since-190)  
 
 Input JSON file `book_catalog.json`:
 
