@@ -63,106 +63,6 @@ namespace jsoncons {
 JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val10{0xAAAAAAAAAAAAAAAA}; ///< `10` bit-pairs.
 JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val01{0x5555555555555555}; ///< `01` bit-pairs.
 
-/**
- * @def A5HASH_ICC_GCC
- * @brief Macro that denotes the use of ICC classic compiler with GCC-style
- * built-in functions.
- */
-
-#if defined( __INTEL_COMPILER ) && __INTEL_COMPILER >= 1300 && \
-	!defined( _MSC_VER )
-
-	#define A5HASH_ICC_GCC
-
-#endif // ICC check
-
-/**
- * @def A5HASH_GCC_BUILTINS
- * @brief Macro that denotes availability of GCC-style built-in functions.
- */
-
-#if defined( __GNUC__ ) || defined( __clang__ ) || \
-	defined( __IBMC__ ) || defined( __IBMCPP__ ) || defined( A5HASH_ICC_GCC )
-
-	#define A5HASH_GCC_BUILTINS
-
-#endif // GCC built-ins check
-
-/**
- * @def A5HASH_BMI2
- * @brief Macro that denotes availability of the `mulx` intrinsic
- * (MSVC-compatible compilers only).
- */
-
-#if defined( _MSC_VER )
-	#if defined( __BMI2__ ) || ( !defined( A5HASH_GCC_BUILTINS ) && \
-		defined( _M_AMD64 ) && defined( __AVX2__ ) && \
-		( defined( __INTEL_COMPILER ) || _MSC_VER >= 1900 ))
-
-		#include <immintrin.h>
-		#define A5HASH_BMI2
-
-	#else // BMI2
-
-		#include <intrin.h>
-
-	#endif // BMI2
-#endif // defined( _MSC_VER )
-
-/**
- * @def A5HASH_STATIC
- * @brief Macro that defines a function as "static".
- */
-
-#if ( defined( __cplusplus ) && __cplusplus >= 201703L ) || \
-	( defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 202311L )
-
-	#define A5HASH_STATIC [[maybe_unused]] static
-
-#elif defined( A5HASH_GCC_BUILTINS )
-
-	#define A5HASH_STATIC static __attribute__((unused))
-
-#else // defined( A5HASH_GCC_BUILTINS )
-
-	#define A5HASH_STATIC static
-
-#endif // defined( A5HASH_GCC_BUILTINS )
-
-/**
- * @def A5HASH_INLINE
- * @brief Macro that defines a function as inlinable at the compiler's
- * discretion.
- */
-
-#define A5HASH_INLINE A5HASH_STATIC inline
-
-/**
- * @def A5HASH_INLINE_F
- * @brief Macro to force code inlining.
- */
-
-#if defined( __LP64__ ) || defined( _LP64 ) || \
-	!( SIZE_MAX <= 0xFFFFFFFFU ) || ( defined( UINTPTR_MAX ) && \
-	!( UINTPTR_MAX <= 0xFFFFFFFFU )) || defined( __x86_64__ ) || \
-	defined( __aarch64__ ) || defined( _M_AMD64 ) || defined( _M_ARM64 )
-
-	#if defined( A5HASH_GCC_BUILTINS )
-
-		#define A5HASH_INLINE_F A5HASH_INLINE __attribute__((always_inline))
-
-	#elif defined( _MSC_VER )
-
-		#define A5HASH_INLINE_F A5HASH_STATIC __forceinline
-
-	#endif // defined( _MSC_VER )
-
-#endif // 64-bit platform check
-
-#if !defined( A5HASH_INLINE_F )
-	#define A5HASH_INLINE_F A5HASH_INLINE
-#endif // !defined( A5HASH_INLINE_F )
-
 using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
 
 /**
@@ -172,7 +72,7 @@ using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
  * @param p Load address.
  */
 
-A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noexcept
+JSONCONS_A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noexcept
 {
 	std::uint32_t v;
 	std::memcpy( &v, p, 4 );
@@ -180,7 +80,7 @@ A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noexcept
 	return( v );
 }
 
-A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noexcept
+JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noexcept
 {
 	std::uint64_t v;
 	std::memcpy( &v, p, 8 );
@@ -199,10 +99,10 @@ A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noexcept
  * @param[out] rh The upper half of the 128-bit result.
  */
 
-A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
+JSONCONS_A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
 	std::uint64_t* const rl, std::uint64_t* const rh ) noexcept
 {
-#if defined( A5HASH_BMI2 )
+#if defined( JSONCONS_A5HASH_BMI2 )
 
 	*rl = _mulx_u64( u, v, rh );
 
@@ -217,7 +117,7 @@ A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t 
 	*rl = _umul128( u, v, rh );
 
 #elif defined( __SIZEOF_INT128__ ) || \
-	( defined( A5HASH_ICC_GCC ) && defined( __x86_64__ ))
+	( defined( JSONCONS_A5HASH_ICC_GCC ) && defined( __x86_64__ ))
 
 	__uint128_t r = u;
 	r *= v;
@@ -267,7 +167,7 @@ A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t 
  * @return 64-bit hash of the input data.
  */
 
-A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
+JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
 	const std::uint64_t UseSeed ) noexcept
 {
 	const uint8_t* Msg = (const uint8_t*) Msg0;
@@ -356,7 +256,7 @@ A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen
  * @param[out] rh The upper half of the 64-bit result.
  */
 
-A5HASH_INLINE_F void a5hash_umul64( const std::uint32_t u, const std::uint32_t v,
+JSONCONS_A5HASH_INLINE_F void a5hash_umul64( const std::uint32_t u, const std::uint32_t v,
 	std::uint32_t* const rl, std::uint32_t* const rh ) noexcept
 {
 	const std::uint64_t r = (std::uint64_t) u * v;
@@ -364,13 +264,6 @@ A5HASH_INLINE_F void a5hash_umul64( const std::uint32_t u, const std::uint32_t v
 	*rl = (std::uint32_t) r;
 	*rh = (std::uint32_t) ( r >> 32 );
 }
-
-#undef A5HASH_ICC_GCC
-#undef A5HASH_GCC_BUILTINS
-#undef A5HASH_BMI2
-#undef A5HASH_STATIC
-#undef A5HASH_INLINE
-#undef A5HASH_INLINE_F
 
 } // namespace jsoncons
 
