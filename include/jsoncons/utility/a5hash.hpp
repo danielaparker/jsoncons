@@ -43,17 +43,11 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <cstring>
-#include <cstdint>
+#include <cstdint> 
+
+namespace jsoncons {
 
 #define A5HASH_VER_STR "5.25" ///< A5HASH source code version string.
-
-/**
- * @def A5HASH_NS_CUSTOM
- * @brief If this macro is defined externally, all symbols will be placed into
- * the C++ namespace specified by this macro and will not be exported to the
- * global namespace. WARNING: if the macro's value is empty, the symbols will
- * be placed into the global namespace anyway.
- */
 
 /**
  * @def A5HASH_U64_C( x )
@@ -62,35 +56,12 @@
  * @param x Value.
  */
 
-/**
- * @def A5HASH_NOEX
- * @brief Macro that defines the "noexcept" function specifier for C++
- * environment.
- */
-
-/**
- * @def A5HASH_NULL
- * @brief Macro that defines "nullptr" value, for C++ guidelines compliance.
- */
-
-/**
- * @def A5HASH_NS
- * @brief Macro that defines the actual implementation namespace in C++
- * environment, with export of relevant symbols to the global namespace
- * (if @ref A5HASH_NS_CUSTOM is undefined).
- */
-
-
-#define A5HASH_U64_C( x ) UINT64_C( x )
-#define A5HASH_NOEX noexcept
-#define A5HASH_NULL nullptr
-
 #if defined( _MSC_VER )
 	#include <intrin.h>
 #endif // defined( _MSC_VER )
 
-#define A5HASH_VAL10 A5HASH_U64_C( 0xAAAAAAAAAAAAAAAA ) ///< `10` bit-pairs.
-#define A5HASH_VAL01 A5HASH_U64_C( 0x5555555555555555 ) ///< `01` bit-pairs.
+JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val10{0xAAAAAAAAAAAAAAAA}; ///< `10` bit-pairs.
+JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val01{0x5555555555555555}; ///< `01` bit-pairs.
 
 /**
  * @def A5HASH_ICC_GCC
@@ -192,11 +163,6 @@
 	#define A5HASH_INLINE_F A5HASH_INLINE
 #endif // !defined( A5HASH_INLINE_F )
 
-using std :: memcpy;
-using std :: size_t;
-
-using std :: uint32_t;
-using std :: uint64_t;
 using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
 
 /**
@@ -206,18 +172,18 @@ using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
  * @param p Load address.
  */
 
-A5HASH_INLINE_F uint32_t a5hash_lu32( const uint8_t* const p ) A5HASH_NOEX
+A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noexcept
 {
-	uint32_t v;
-	memcpy( &v, p, 4 );
+	std::uint32_t v;
+	std::memcpy( &v, p, 4 );
 
 	return( v );
 }
 
-A5HASH_INLINE_F uint64_t a5hash_lu64( const uint8_t* const p ) A5HASH_NOEX
+A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noexcept
 {
-	uint64_t v;
-	memcpy( &v, p, 8 );
+	std::uint64_t v;
+	std::memcpy( &v, p, 8 );
 
 	return( v );
 }
@@ -233,8 +199,8 @@ A5HASH_INLINE_F uint64_t a5hash_lu64( const uint8_t* const p ) A5HASH_NOEX
  * @param[out] rh The upper half of the 128-bit result.
  */
 
-A5HASH_INLINE_F void a5hash_umul128( const uint64_t u, const uint64_t v,
-	uint64_t* const rl, uint64_t* const rh ) A5HASH_NOEX
+A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
+	std::uint64_t* const rl, std::uint64_t* const rh ) noexcept
 {
 #if defined( A5HASH_BMI2 )
 
@@ -256,8 +222,8 @@ A5HASH_INLINE_F void a5hash_umul128( const uint64_t u, const uint64_t v,
 	__uint128_t r = u;
 	r *= v;
 
-	*rl = (uint64_t) r;
-	*rh = (uint64_t) ( r >> 64 );
+	*rl = (std::uint64_t) r;
+	*rh = (std::uint64_t) ( r >> 64 );
 
 #elif ( defined( __IBMC__ ) || defined( __IBMCPP__ )) && defined( __LP64__ )
 
@@ -271,16 +237,16 @@ A5HASH_INLINE_F void a5hash_umul128( const uint64_t u, const uint64_t v,
 
 	*rl = u * v;
 
-	const uint32_t u0 = (uint32_t) u;
-	const uint32_t v0 = (uint32_t) v;
-	const uint64_t w0 = (uint64_t) u0 * v0;
-	const uint32_t u1 = (uint32_t) ( u >> 32 );
-	const uint32_t v1 = (uint32_t) ( v >> 32 );
-	const uint64_t t = (uint64_t) u1 * v0 + (uint32_t) ( w0 >> 32 );
-	const uint64_t w1 = (uint64_t) u0 * v1 + (uint32_t) t;
+	const std::uint32_t u0 = (std::uint32_t) u;
+	const std::uint32_t v0 = (std::uint32_t) v;
+	const std::uint64_t w0 = (std::uint64_t) u0 * v0;
+	const std::uint32_t u1 = (std::uint32_t) ( u >> 32 );
+	const std::uint32_t v1 = (std::uint32_t) ( v >> 32 );
+	const std::uint64_t t = (std::uint64_t) u1 * v0 + (std::uint32_t) ( w0 >> 32 );
+	const std::uint64_t w1 = (std::uint64_t) u0 * v1 + (std::uint32_t) t;
 
-	*rh = (uint64_t) u1 * v1 + (uint32_t) ( w1 >> 32 ) +
-		(uint32_t) ( t >> 32 );
+	*rh = (std::uint64_t) u1 * v1 + (std::uint32_t) ( w1 >> 32 ) +
+		(std::uint32_t) ( t >> 32 );
 
 #endif // defined( __IBMC__ )
 }
@@ -301,18 +267,18 @@ A5HASH_INLINE_F void a5hash_umul128( const uint64_t u, const uint64_t v,
  * @return 64-bit hash of the input data.
  */
 
-A5HASH_INLINE_F uint64_t a5hash( const void* const Msg0, size_t MsgLen,
-	const uint64_t UseSeed ) A5HASH_NOEX
+A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
+	const std::uint64_t UseSeed ) noexcept
 {
 	const uint8_t* Msg = (const uint8_t*) Msg0;
 
-	uint64_t val01 = A5HASH_VAL01;
-	uint64_t val10 = A5HASH_VAL10;
+	std::uint64_t val01 = a5hash_val01;
+	std::uint64_t val10 = a5hash_val10;
 
 	// The seeds are initialized to mantissa bits of PI.
 
-	uint64_t Seed1 = A5HASH_U64_C( 0x243F6A8885A308D3 ) ^ MsgLen;
-	uint64_t Seed2 = A5HASH_U64_C( 0x452821E638D01377 ) ^ MsgLen;
+	std::uint64_t Seed1 = uint64_t{0x243F6A8885A308D3} ^ MsgLen;
+	std::uint64_t Seed2 = uint64_t{0x452821E638D01377} ^ MsgLen;
 
 	a5hash_umul128( Seed2 ^ ( UseSeed & val10 ),
 		Seed1 ^ ( UseSeed & val01 ), &Seed1, &Seed2 );
@@ -324,9 +290,9 @@ A5HASH_INLINE_F uint64_t a5hash( const void* const Msg0, size_t MsgLen,
 
 		do
 		{
-			a5hash_umul128( (uint64_t) a5hash_lu32( Msg ) << 32 ^
+			a5hash_umul128( (std::uint64_t) a5hash_lu32( Msg ) << 32 ^
 				a5hash_lu32( Msg + 4 ) ^ Seed1,
-				(uint64_t) a5hash_lu32( Msg + 8 ) << 32 ^
+				(std::uint64_t) a5hash_lu32( Msg + 8 ) << 32 ^
 				a5hash_lu32( Msg + 12 ) ^ Seed2, &Seed1, &Seed2 );
 
 			MsgLen -= 16;
@@ -346,14 +312,14 @@ A5HASH_INLINE_F uint64_t a5hash( const void* const Msg0, size_t MsgLen,
 	if( MsgLen > 3 )
 	{
 		const uint8_t* Msg4;
-		size_t mo;
+		std::size_t mo;
 
 		Msg4 = Msg + MsgLen - 4;
 		mo = MsgLen >> 3;
 
-		Seed1 ^= (uint64_t) a5hash_lu32( Msg ) << 32 | a5hash_lu32( Msg4 );
+		Seed1 ^= (std::uint64_t) a5hash_lu32( Msg ) << 32 | a5hash_lu32( Msg4 );
 
-		Seed2 ^= (uint64_t) a5hash_lu32( Msg + mo * 4 ) << 32 |
+		Seed2 ^= (std::uint64_t) a5hash_lu32( Msg + mo * 4 ) << 32 |
 			a5hash_lu32( Msg4 - mo * 4 );
 
 	_fin:
@@ -369,11 +335,11 @@ A5HASH_INLINE_F uint64_t a5hash( const void* const Msg0, size_t MsgLen,
 
 		if( --MsgLen != 0 )
 		{
-			Seed1 ^= (uint64_t) Msg[ 1 ] << 8;
+			Seed1 ^= (std::uint64_t) Msg[ 1 ] << 8;
 
 			if( --MsgLen != 0 )
 			{
-				Seed1 ^= (uint64_t) Msg[ 2 ] << 16;
+				Seed1 ^= (std::uint64_t) Msg[ 2 ] << 16;
 			}
 		}
 
@@ -390,26 +356,22 @@ A5HASH_INLINE_F uint64_t a5hash( const void* const Msg0, size_t MsgLen,
  * @param[out] rh The upper half of the 64-bit result.
  */
 
-A5HASH_INLINE_F void a5hash_umul64( const uint32_t u, const uint32_t v,
-	uint32_t* const rl, uint32_t* const rh ) A5HASH_NOEX
+A5HASH_INLINE_F void a5hash_umul64( const std::uint32_t u, const std::uint32_t v,
+	std::uint32_t* const rl, std::uint32_t* const rh ) noexcept
 {
-	const uint64_t r = (uint64_t) u * v;
+	const std::uint64_t r = (std::uint64_t) u * v;
 
-	*rl = (uint32_t) r;
-	*rh = (uint32_t) ( r >> 32 );
+	*rl = (std::uint32_t) r;
+	*rh = (std::uint32_t) ( r >> 32 );
 }
 
-#undef A5HASH_NS_CUSTOM
-#undef A5HASH_U64_C
-#undef A5HASH_NOEX
-#undef A5HASH_NULL
-#undef A5HASH_VAL10
-#undef A5HASH_VAL01
 #undef A5HASH_ICC_GCC
 #undef A5HASH_GCC_BUILTINS
 #undef A5HASH_BMI2
 #undef A5HASH_STATIC
 #undef A5HASH_INLINE
 #undef A5HASH_INLINE_F
+
+} // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_A5HASH_HPP
