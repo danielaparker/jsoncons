@@ -478,7 +478,7 @@ namespace jsoncons {
 namespace jsoncons { 
 namespace binary { 
 
-    static inline bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
+    inline bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
     {
     #if ((defined(__GNUC__) && (__GNUC__ >= 5)) && !defined(__INTEL_COMPILER)) || __has_builtin(__builtin_add_overflow)
         return __builtin_add_overflow(v1, v2, r);
@@ -622,34 +622,6 @@ namespace binary {
 #endif // defined( _MSC_VER )
 
 /**
- * @def JSONCONS_A5HASH_STATIC
- * @brief Macro that defines a function as "static".
- */
-
-#if ( defined( __cplusplus ) && __cplusplus >= 201703L ) || \
-	( defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 202311L )
-
-	#define JSONCONS_A5HASH_STATIC [[maybe_unused]] static
-
-#elif defined( JSONCONS_A5HASH_GCC_BUILTINS )
-
-	#define JSONCONS_A5HASH_STATIC static __attribute__((unused))
-
-#else // defined( JSONCONS_A5HASH_GCC_BUILTINS )
-
-	#define JSONCONS_A5HASH_STATIC static
-
-#endif // defined( JSONCONS_A5HASH_GCC_BUILTINS )
-
-/**
- * @def JSONCONS_A5HASH_INLINE
- * @brief Macro that defines a function as inlinable at the compiler's
- * discretion.
- */
-
-#define JSONCONS_A5HASH_INLINE JSONCONS_A5HASH_STATIC inline
-
-/**
  * @def JSONCONS_A5HASH_INLINE_F
  * @brief Macro to force code inlining.
  */
@@ -661,18 +633,18 @@ namespace binary {
 
 	#if defined( JSONCONS_A5HASH_GCC_BUILTINS )
 
-		#define JSONCONS_A5HASH_INLINE_F JSONCONS_A5HASH_INLINE __attribute__((always_inline))
+		#define JSONCONS_A5HASH_INLINE_F inline __attribute__((always_inline))
 
 	#elif defined( _MSC_VER )
 
-		#define JSONCONS_A5HASH_INLINE_F JSONCONS_A5HASH_STATIC __forceinline
+		#define JSONCONS_A5HASH_INLINE_F inline __forceinline
 
 	#endif // defined( _MSC_VER )
 
 #endif // 64-bit platform check
 
 #if !defined( JSONCONS_A5HASH_INLINE_F )
-	#define JSONCONS_A5HASH_INLINE_F JSONCONS_A5HASH_INLINE
+	#define JSONCONS_A5HASH_INLINE_F inline
 #endif // !defined( JSONCONS_A5HASH_INLINE_F )
 
 #endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
