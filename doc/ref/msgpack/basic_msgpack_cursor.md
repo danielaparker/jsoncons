@@ -113,11 +113,122 @@ Reset cursor to read new value from a new source
     staj_filter_view operator|(basic_msgpack_cursor<Source,Allocator>& cursor, 
                                std::function<bool(const staj_event&, const ser_context&)> pred);
 
+### Examples
+
+#### Read non-string keys (since 1.9.0)
+
+Since 1.9.0, jsoncons supports reading non-string keys using the cursor API.
+Keys are reported by [staj_events](../corelib/basic_staj_events.md) 
+that are ORed with the flag `staj_events::key_flag`.
+For backwards compatibility, the enum value `staj_events::key` has been redefined as
+```cpp
+    staj_events::string_value | staj_events::key_flag
+```
+In addition, for the common case of CBOR or MessagePack unsigned integer keys,
+the enum value `id` has been added to `sjaj_events` and defined as 
+```cpp
+   staj_events::uint64_value | staj_events::key_flag`
+```
+
+##### Read an unsigned integer key
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0x92,                    // fixarray(2)
+        0x82,                    // fixmap(2)
+        0x01,                    // key = 1
+        0xa3, 0x66, 0x6f, 0x6f,  // "foo"
+        0x02,                    // key = 2
+        0xa3, 0x62, 0x61, 0x72,  // "bar"
+        0x81,                    // fixmap(1)
+        0x03,                    // key = 3
+        0xa3, 0x62, 0x61, 0x7a   // "baz"
+    };
+
+    msgpack::msgpack_bytes_cursor cursor{data};
+    while (!cursor.done())
+    {
+        switch (cursor.current().event_type())
+        {
+            case jsoncons::staj_events::begin_array:
+                std::cout << "begin array\n";
+                break;
+            case jsoncons::staj_events::end_array:
+                std::cout << "end array\n";
+                break;
+            case jsoncons::staj_events::begin_object:
+                std::cout << "  begin object\n";
+                break;
+            case jsoncons::staj_events::end_object:
+                std::cout << "  end object\n";
+                break;
+            case jsoncons::staj_events::string_value:
+                std::cout << "    value: " << cursor.current().get<std::string>() << "\n";
+                break;
+            case jsoncons::staj_events::id:
+                std::cout << "    key: " << cursor.current().get<uint64_t>() << "\n";
+                break;
+        }
+        cursor.next();
+    }
+    };
+
+    cbor::cbor_bytes_cursor cursor{data};
+    while (!cursor.done())
+    {
+        switch (cursor.current().event_type())
+        {
+            case jsoncons::staj_events::begin_array:
+                std::cout << "begin array\n";
+                break;
+            case jsoncons::staj_events::end_array:
+                std::cout << "end array\n";
+                break;
+            case jsoncons::staj_events::begin_object:
+                std::cout << "  begin object\n";
+                break;
+            case jsoncons::staj_events::end_object:
+                std::cout << "  end object\n";
+                break;
+            case jsoncons::staj_events::string_value:
+                std::cout << "    value: " << cursor.current().get<std::string>() << "\n";
+                break;
+            case jsoncons::staj_events::id:
+                std::cout << "    key: " << cursor.current().get<uint64_t>() << "\n";
+                break;
+        }
+        cursor.next();
+    }
+}
+```
+
+Output:
+
+```
+begin array
+  begin object
+    key: 1
+    value: foo
+    key: 2
+    value: bar
+  end object
+  begin object
+    key: 3
+    value: baz
+  end object
+end array
+```
+
+
 ### See also
 
-[staj_event](../corelib/basic_staj_event.md)  
-
-[staj_array_iterator](../corelib/staj_array_iterator.md)  
-
-[staj_object_iterator](../corelib/staj_object_iterator.md)  
+[staj_events](../corelib/basic_staj_events.md)  
 
