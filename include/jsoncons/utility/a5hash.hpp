@@ -36,6 +36,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 #ifndef JSONCONS_UTILITY_A5HASH_HPP
 #define JSONCONS_UTILITY_A5HASH_HPP
 
@@ -83,12 +84,6 @@
 #define A5HASH_U64_C( x ) UINT64_C( x )
 #define A5HASH_NOEX noexcept
 #define A5HASH_NULL nullptr
-
-#if defined( A5HASH_NS_CUSTOM )
-	#define A5HASH_NS A5HASH_NS_CUSTOM
-#else // defined( A5HASH_NS_CUSTOM )
-	#define A5HASH_NS a5hash_impl
-#endif // defined( A5HASH_NS_CUSTOM )
 
 #if defined( _MSC_VER )
 	#include <intrin.h>
@@ -197,22 +192,12 @@
 	#define A5HASH_INLINE_F A5HASH_INLINE
 #endif // !defined( A5HASH_INLINE_F )
 
-#if defined( A5HASH_NS )
-
-namespace A5HASH_NS {
-
 using std :: memcpy;
 using std :: size_t;
 
-#if __cplusplus >= 201103L
-
-	using std :: uint32_t;
-	using std :: uint64_t;
-	using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
-
-#endif // __cplusplus >= 201103L
-
-#endif // defined( A5HASH_NS )
+using std :: uint32_t;
+using std :: uint64_t;
+using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
 
 /**
  * @{
@@ -413,171 +398,6 @@ A5HASH_INLINE_F void a5hash_umul64( const uint32_t u, const uint32_t v,
 	*rl = (uint32_t) r;
 	*rh = (uint32_t) ( r >> 32 );
 }
-
-/**
- * @brief A5HASH 32-bit hash function.
- *
- * Produces and returns a 32-bit hash value (digest) of the specified message,
- * string, or binary data block. Designed for string/small key data hash-map
- * and hash-table uses.
- *
- * This function works natively on 32-bit platforms and avoids the performance
- * penalty of 64-bit arithmetic.
- *
- * @param Msg0 The message to produce a hash from. The alignment of this
- * pointer is unimportant. It is valid to pass 0 when `MsgLen` equals 0.
- * @param MsgLen Message length, in bytes, can be zero.
- * @param UseSeed An optional value to use instead of the default seed (0).
- * This value can have any number of significant bits and any statistical
- * quality.
- * @return 32-bit hash of the input data.
- */
-
-/*
-const uint32_t UseSeed ) A5HASH_NOEX
-{
-	const uint8_t* Msg = (const uint8_t*) Msg0;
-
-	uint32_t val01 = (uint32_t) A5HASH_VAL01;
-	uint32_t val10 = (uint32_t) A5HASH_VAL10;
-
-	// The seeds are initialized to mantissa bits of PI.
-
-	uint32_t Seed1 = 0x243F6A88 ^ (uint32_t) MsgLen;
-	uint32_t Seed2 = 0x85A308D3 ^ (uint32_t) MsgLen;
-	uint32_t Seed3, Seed4;
-	uint32_t a, b, c, d;
-
-	#if SIZE_MAX <= 0xFFFFFFFFU
-
-		Seed3 = 0xFB0BD3EA;
-		Seed4 = 0x0F58FD47;
-
-	#else // SIZE_MAX <= 0xFFFFFFFFU
-
-		a5hash_umul64( (uint32_t) ( MsgLen >> 32 ) ^ 0x452821E6,
-			(uint32_t) ( MsgLen >> 32 ) ^ 0x38D01377, &Seed3, &Seed4 );
-
-	#endif // SIZE_MAX <= 0xFFFFFFFFU
-
-	a5hash_umul64( Seed2 ^ ( UseSeed & val10 ),
-		Seed1 ^ ( UseSeed & val01 ), &Seed1, &Seed2 );
-
-	if( MsgLen < 17 )
-	{
-		if( MsgLen > 3 )
-		{
-			const uint8_t* const Msg4 = Msg + MsgLen - 4;
-			size_t mo;
-
-			a = a5hash_lu32( Msg );
-			b = a5hash_lu32( Msg4 );
-
-			if( MsgLen < 9 )
-			{
-				goto _fin;
-			}
-
-			mo = MsgLen >> 3;
-
-			c = a5hash_lu32( Msg + mo * 4 );
-			d = a5hash_lu32( Msg4 - mo * 4 );
-		}
-		else
-		{
-			a = 0;
-			b = 0;
-
-			if( MsgLen != 0 )
-			{
-				a = Msg[ 0 ];
-
-				if( MsgLen != 1 )
-				{
-					a |= (uint32_t) Msg[ 1 ] << 8;
-
-					if( MsgLen != 2 )
-					{
-						a |= (uint32_t) Msg[ 2 ] << 16;
-					}
-				}
-			}
-
-			goto _fin;
-		}
-	}
-	else
-	{
-		val01 ^= Seed1;
-		val10 ^= Seed2;
-
-		do
-		{
-			const uint32_t s1 = Seed1;
-			const uint32_t s4 = Seed4;
-
-			a5hash_umul64( a5hash_lu32( Msg ) + Seed1,
-				a5hash_lu32( Msg + 4 ) + Seed2, &Seed1, &Seed2 );
-
-			a5hash_umul64( a5hash_lu32( Msg + 8 ) + Seed3,
-				a5hash_lu32( Msg + 12 ) + Seed4, &Seed3, &Seed4 );
-
-			MsgLen -= 16;
-			Msg += 16;
-
-			Seed1 += val01;
-			Seed2 += s4;
-			Seed3 += s1;
-			Seed4 += val10;
-
-		} while( MsgLen > 16 );
-
-		a = a5hash_lu32( Msg + MsgLen - 8 );
-		b = a5hash_lu32( Msg + MsgLen - 4 );
-
-		if( MsgLen < 9 )
-		{
-			goto _fin;
-		}
-
-		c = a5hash_lu32( Msg + MsgLen - 16 );
-		d = a5hash_lu32( Msg + MsgLen - 12 );
-	}
-
-	a5hash_umul64( c + Seed3, d + Seed4, &Seed3, &Seed4 );
-
-_fin:
-	Seed1 ^= Seed3;
-	Seed2 ^= Seed4;
-
-	a5hash_umul64( a + Seed1, b + Seed2, &Seed1, &Seed2 );
-
-	a5hash_umul64( val01 ^ Seed1, Seed2, &a, &b );
-
-	return( a ^ b );
-}*/
-
-#if defined( A5HASH_NS )
-
-} // namespace A5HASH_NS
-
-#if !defined( A5HASH_NS_CUSTOM )
-
-namespace {
-
-using A5HASH_NS :: a5hash;
-
-} // namespace
-
-#endif // !defined( A5HASH_NS_CUSTOM )
-
-#endif // defined( A5HASH_NS )
-
-// Defines for Doxygen.
-
-#if !defined( A5HASH_NS_CUSTOM )
-	#define A5HASH_NS_CUSTOM
-#endif // !defined( A5HASH_NS_CUSTOM )
 
 #undef A5HASH_NS_CUSTOM
 #undef A5HASH_U64_C
