@@ -65,6 +65,62 @@ TEST_CASE("ojson parse_duplicate_names")
         CHECK(2 == doc["second"].as<int>());
         CHECK(3 == doc["third"].as<int>());
     }
+
+    SECTION("510 duplicates")
+    {
+        jsoncons::ojson expected{jsoncons::json_object_arg};
+        expected["foo"] = 0;
+        expected["baz"] = 256;
+
+        std::string str = "{";
+        for (std::size_t i = 0; i < 256; ++i)
+        {
+            if (i > 0)
+            {
+                str.push_back(',');
+            }
+            str.append(R"("foo":)");
+            str.append(std::to_string(i));
+        }
+        for (std::size_t i = 256; i < 512; ++i)
+        {
+            str.push_back(',');
+            str.append(R"("baz":)");
+            str.append(std::to_string(i));
+        }
+        str.push_back('}');
+
+        auto j = ojson::parse(str);
+        CHECK(expected == j);
+    }
+
+    SECTION("1022 duplicates")
+    {
+        jsoncons::ojson expected{jsoncons::json_object_arg};
+        expected["foo"] = 0;
+        expected["baz"] = 512;
+
+        std::string str = "{";
+        for (std::size_t i = 0; i < 512; ++i)
+        {
+            if (i > 0)
+            {
+                str.push_back(',');
+            }
+            str.append(R"("foo":)");
+            str.append(std::to_string(i));
+        }
+        for (std::size_t i = 512; i < 1024; ++i)
+        {
+            str.push_back(',');
+            str.append(R"("baz":)");
+            str.append(std::to_string(i));
+        }
+        str.push_back('}');
+
+        auto j = ojson::parse(str);
+        CHECK(expected == j);
+    }
 }
 
 TEST_CASE("ojson object erase with iterator")
