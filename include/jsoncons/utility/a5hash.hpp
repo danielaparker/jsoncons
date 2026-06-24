@@ -49,6 +49,19 @@ namespace jsoncons {
 
 #define A5HASH_VER_STR "5.25" ///< A5HASH source code version string.
 
+#if defined( __LP64__ ) || defined( _LP64 ) || \
+	!( SIZE_MAX <= 0xFFFFFFFFU ) || ( defined( UINTPTR_MAX ) && \
+	!( UINTPTR_MAX <= 0xFFFFFFFFU )) || defined( __x86_64__ ) || \
+	defined( __aarch64__ ) || defined( _M_AMD64 ) || defined( _M_ARM64 )
+
+	#define JSONCONS_A5HASH_FORCE_INLINE JSONCONS_FORCE_INLINE 
+
+#else
+
+	#define JSONCONS_A5HASH_FORCE_INLINE inline    
+
+#endif // 64-bit platform check
+
 /**
  * @def A5HASH_U64_C( x )
  * @brief Macro that defines a numeric value as unsigned 64-bit value.
@@ -63,7 +76,8 @@ namespace jsoncons {
 JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val10{0xAAAAAAAAAAAAAAAA}; ///< `10` bit-pairs.
 JSONCONS_INLINE_CONSTEXPR std::uint64_t a5hash_val01{0x5555555555555555}; ///< `01` bit-pairs.
 
-using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
+JSONCONS_INLINE_CONSTEXPR std::uint32_t a5hash_val10_32{0xAAAAAAAA}; ///< `10` bit-pairs.
+JSONCONS_INLINE_CONSTEXPR std::uint32_t a5hash_val01_32{0x55555555}; ///< `01` bit-pairs.
 
 /**
  * @{
@@ -72,7 +86,7 @@ using uint8_t = unsigned char; ///< For C++ type aliasing compliance.
  * @param p Load address.
  */
 
-JSONCONS_A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noexcept
+JSONCONS_A5HASH_FORCE_INLINE std::uint32_t a5hash_lu32( const unsigned char* const p ) noexcept
 {
 	std::uint32_t v;
 	std::memcpy( &v, p, 4 );
@@ -80,7 +94,7 @@ JSONCONS_A5HASH_INLINE_F std::uint32_t a5hash_lu32( const uint8_t* const p ) noe
 	return( v );
 }
 
-JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noexcept
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash_lu64( const unsigned char* const p ) noexcept
 {
 	std::uint64_t v;
 	std::memcpy( &v, p, 8 );
@@ -99,7 +113,7 @@ JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash_lu64( const uint8_t* const p ) noe
  * @param[out] rh The upper half of the 128-bit result.
  */
 
-JSONCONS_A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
+JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
 	std::uint64_t* const rl, std::uint64_t* const rh ) noexcept
 {
 #if defined( JSONCONS_A5HASH_BMI2 )
@@ -167,10 +181,10 @@ JSONCONS_A5HASH_INLINE_F void a5hash_umul128( const std::uint64_t u, const std::
  * @return 64-bit hash of the input data.
  */
 
-JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
 	const std::uint64_t UseSeed ) noexcept
 {
-	const uint8_t* Msg = (const uint8_t*) Msg0;
+	const unsigned char* Msg = (const unsigned char*) Msg0;
 
 	std::uint64_t val01 = a5hash_val01;
 	std::uint64_t val10 = a5hash_val10;
@@ -211,7 +225,7 @@ JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size
 
 	if( MsgLen > 3 )
 	{
-		const uint8_t* Msg4;
+		const unsigned char* Msg4;
 		std::size_t mo;
 
 		Msg4 = Msg + MsgLen - 4;
@@ -256,13 +270,155 @@ JSONCONS_A5HASH_INLINE_F std::uint64_t a5hash( const void* const Msg0, std::size
  * @param[out] rh The upper half of the 64-bit result.
  */
 
-JSONCONS_A5HASH_INLINE_F void a5hash_umul64( const std::uint32_t u, const std::uint32_t v,
+JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul64( const std::uint32_t u, const std::uint32_t v,
 	std::uint32_t* const rl, std::uint32_t* const rh ) noexcept
 {
 	const std::uint64_t r = (std::uint64_t) u * v;
 
 	*rl = (std::uint32_t) r;
 	*rh = (std::uint32_t) ( r >> 32 );
+}
+/**
+ * @brief A5HASH 32-bit hash function.
+ *
+ * Produces and returns a 32-bit hash value (digest) of the specified message,
+ * string, or binary data block. Designed for string/small key data hash-map
+ * and hash-table uses.
+ *
+ * This function works natively on 32-bit platforms and avoids the performance
+ * penalty of 64-bit arithmetic.
+ *
+ * @param Msg0 The message to produce a hash from. The alignment of this
+ * pointer is unimportant. It is valid to pass 0 when `MsgLen` equals 0.
+ * @param MsgLen Message length, in bytes, can be zero.
+ * @param UseSeed An optional value to use instead of the default seed (0).
+ * This value can have any number of significant bits and any statistical
+ * quality.
+ * @return 32-bit hash of the input data.
+ */
+
+JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const void* const Msg0, size_t MsgLen,
+	const uint32_t UseSeed ) noexcept
+{
+	const unsigned char* Msg = (const unsigned char*) Msg0;
+
+	uint32_t val01 = a5hash_val01_32;
+	uint32_t val10 = a5hash_val10_32;
+
+	// The seeds are initialized to mantissa bits of PI.
+
+	uint32_t Seed1 = 0x243F6A88 ^ (uint32_t) MsgLen;
+	uint32_t Seed2 = 0x85A308D3 ^ (uint32_t) MsgLen;
+	uint32_t Seed3, Seed4;
+	uint32_t a, b, c, d;
+
+	#if SIZE_MAX <= 0xFFFFFFFFU
+
+		Seed3 = 0xFB0BD3EA;
+		Seed4 = 0x0F58FD47;
+
+	#else // SIZE_MAX <= 0xFFFFFFFFU
+
+		a5hash_umul64( (uint32_t) ( MsgLen >> 32 ) ^ 0x452821E6,
+			(uint32_t) ( MsgLen >> 32 ) ^ 0x38D01377, &Seed3, &Seed4 );
+
+	#endif // SIZE_MAX <= 0xFFFFFFFFU
+
+	a5hash_umul64( Seed2 ^ ( UseSeed & val10 ),
+		Seed1 ^ ( UseSeed & val01 ), &Seed1, &Seed2 );
+
+	if( MsgLen < 17 )
+	{
+		if( MsgLen > 3 )
+		{
+			const unsigned char* const Msg4 = Msg + MsgLen - 4;
+			size_t mo;
+
+			a = a5hash_lu32( Msg );
+			b = a5hash_lu32( Msg4 );
+
+			if( MsgLen < 9 )
+			{
+				goto _fin;
+			}
+
+			mo = MsgLen >> 3;
+
+			c = a5hash_lu32( Msg + mo * 4 );
+			d = a5hash_lu32( Msg4 - mo * 4 );
+		}
+		else
+		{
+			a = 0;
+			b = 0;
+
+			if( MsgLen != 0 )
+			{
+				a = Msg[ 0 ];
+
+				if( MsgLen != 1 )
+				{
+					a |= (uint32_t) Msg[ 1 ] << 8;
+
+					if( MsgLen != 2 )
+					{
+						a |= (uint32_t) Msg[ 2 ] << 16;
+					}
+				}
+			}
+
+			goto _fin;
+		}
+	}
+	else
+	{
+		val01 ^= Seed1;
+		val10 ^= Seed2;
+
+		do
+		{
+			const uint32_t s1 = Seed1;
+			const uint32_t s4 = Seed4;
+
+			a5hash_umul64( a5hash_lu32( Msg ) + Seed1,
+				a5hash_lu32( Msg + 4 ) + Seed2, &Seed1, &Seed2 );
+
+			a5hash_umul64( a5hash_lu32( Msg + 8 ) + Seed3,
+				a5hash_lu32( Msg + 12 ) + Seed4, &Seed3, &Seed4 );
+
+			MsgLen -= 16;
+			Msg += 16;
+
+			Seed1 += val01;
+			Seed2 += s4;
+			Seed3 += s1;
+			Seed4 += val10;
+
+		} while( MsgLen > 16 );
+
+		a = a5hash_lu32( Msg + MsgLen - 8 );
+		b = a5hash_lu32( Msg + MsgLen - 4 );
+
+		if( MsgLen < 9 )
+		{
+			goto _fin;
+		}
+
+		c = a5hash_lu32( Msg + MsgLen - 16 );
+		d = a5hash_lu32( Msg + MsgLen - 12 );
+	}
+
+	a5hash_umul64( c + Seed3, d + Seed4, &Seed3, &Seed4 );
+
+_fin:
+	Seed1 ^= Seed3;
+	Seed2 ^= Seed4;
+
+	a5hash_umul64( a + Seed1, b + Seed2, &Seed1, &Seed2 );
+
+	a5hash_umul64( val01 ^ Seed1, Seed2, &a, &b );
+
+	return( a ^ b );
 }
 
 } // namespace jsoncons

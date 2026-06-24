@@ -621,30 +621,4 @@ namespace binary {
 	#endif // BMI2
 #endif // defined( _MSC_VER )
 
-/**
- * @def JSONCONS_A5HASH_INLINE_F
- * @brief Macro to force code inlining.
- */
-
-#if defined( __LP64__ ) || defined( _LP64 ) || \
-	!( SIZE_MAX <= 0xFFFFFFFFU ) || ( defined( UINTPTR_MAX ) && \
-	!( UINTPTR_MAX <= 0xFFFFFFFFU )) || defined( __x86_64__ ) || \
-	defined( __aarch64__ ) || defined( _M_AMD64 ) || defined( _M_ARM64 )
-
-	#if defined( JSONCONS_A5HASH_GCC_BUILTINS )
-
-		#define JSONCONS_A5HASH_INLINE_F inline __attribute__((always_inline))
-
-	#elif defined( _MSC_VER )
-
-		#define JSONCONS_A5HASH_INLINE_F inline __forceinline
-
-	#endif // defined( _MSC_VER )
-
-#endif // 64-bit platform check
-
-#if !defined( JSONCONS_A5HASH_INLINE_F )
-	#define JSONCONS_A5HASH_INLINE_F inline
-#endif // !defined( JSONCONS_A5HASH_INLINE_F )
-
 #endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
