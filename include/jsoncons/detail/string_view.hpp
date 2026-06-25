@@ -544,7 +544,7 @@ namespace std {
     {
         std::size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept
         {
-            return a5hash32(s.data(), s.size(), 0);
+            return jsoncons::detail::a5hash(s.data(), s.size(), 0);
         }
     };
 } // namespace std
