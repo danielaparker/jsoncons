@@ -22,11 +22,11 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/key_value.hpp>
-#include <jsoncons/utility/a5hash.hpp>
 
 namespace jsoncons {
 

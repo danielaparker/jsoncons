@@ -16,8 +16,12 @@
 #include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/detail/a5hash.hpp>
 
 namespace jsoncons {
+
+    using jsoncons::detail::a5hash;
+    using jsoncons::detail::a5hash32;
 
     class assertion_error : public std::runtime_error
     {

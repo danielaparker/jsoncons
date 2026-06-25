@@ -26,7 +26,6 @@
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/key_value.hpp>
-#include <jsoncons/utility/a5hash.hpp>
 
 namespace jsoncons {
 
