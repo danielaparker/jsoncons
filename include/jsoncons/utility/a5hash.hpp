@@ -181,11 +181,9 @@ JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul128( const std::uint64_t u, const s
  * @return 64-bit hash of the input data.
  */
 
-JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const void* const Msg0, std::size_t MsgLen,
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const unsigned char* Msg, std::size_t MsgLen,
 	const std::uint64_t UseSeed ) noexcept
 {
-	const unsigned char* Msg = (const unsigned char*) Msg0;
-
 	std::uint64_t val01 = a5hash_val01;
 	std::uint64_t val10 = a5hash_val10;
 
@@ -297,11 +295,9 @@ JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul64( const std::uint32_t u, const st
  * @return 32-bit hash of the input data.
  */
 
-JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const void* const Msg0, size_t MsgLen,
+JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const unsigned char* Msg, size_t MsgLen,
 	const uint32_t UseSeed ) noexcept
 {
-	const unsigned char* Msg = (const unsigned char*) Msg0;
-
 	uint32_t val01 = a5hash_val01_32;
 	uint32_t val10 = a5hash_val10_32;
 
@@ -419,6 +415,42 @@ _fin:
 	a5hash_umul64( val01 ^ Seed1, Seed2, &a, &b );
 
 	return( a ^ b );
+}
+
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const char* Msg0, std::size_t MsgLen,
+	const std::uint64_t UseSeed ) noexcept
+{
+	return a5hash((const unsigned char*)Msg0, MsgLen, UseSeed);
+}
+
+JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const char* Msg0, size_t MsgLen,
+	const uint32_t UseSeed ) noexcept
+{
+	return a5hash32((const unsigned char*)Msg0, MsgLen, UseSeed);
+}
+
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const signed char* Msg0, std::size_t MsgLen,
+	const std::uint64_t UseSeed ) noexcept
+{
+	return a5hash((const unsigned char*)Msg0, MsgLen, UseSeed);
+}
+
+JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const signed char* Msg0, size_t MsgLen,
+	const uint32_t UseSeed ) noexcept
+{
+	return a5hash32((const unsigned char*)Msg0, MsgLen, UseSeed);
+}
+
+JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash( const wchar_t* Msg0, std::size_t MsgLen,
+	const std::uint64_t UseSeed ) noexcept
+{
+	return a5hash((const unsigned char*)Msg0, MsgLen*sizeof(wchar_t), UseSeed);
+}
+
+JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const wchar_t* Msg0, size_t MsgLen,
+	const uint32_t UseSeed ) noexcept
+{
+	return a5hash32((const unsigned char*)Msg0, MsgLen*sizeof(wchar_t), UseSeed);
 }
 
 } // namespace jsoncons
