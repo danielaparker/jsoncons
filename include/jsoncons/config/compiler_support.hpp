@@ -572,47 +572,27 @@ namespace binary {
 #  define JSONCONS_FALLTHROUGH
 #endif
 
-// a5hash macros
-
-
-/**
- * @def JSONCONS_A5HASH_ICC_GCC
- * @brief Macro that denotes the use of ICC classic compiler with GCC-style
- * built-in functions.
- */
-
 #if defined( __INTEL_COMPILER ) && __INTEL_COMPILER >= 1300 && \
 	!defined( _MSC_VER )
 
-	#define JSONCONS_A5HASH_ICC_GCC
+	#define JSONCONS_ICC_GCC
 
 #endif // ICC check
 
-/**
- * @def JSONCONS_A5HASH_GCC_BUILTINS
- * @brief Macro that denotes availability of GCC-style built-in functions.
- */
-
 #if defined( __GNUC__ ) || defined( __clang__ ) || \
-	defined( __IBMC__ ) || defined( __IBMCPP__ ) || defined( JSONCONS_A5HASH_ICC_GCC )
+	defined( __IBMC__ ) || defined( __IBMCPP__ ) || defined( JSONCONS_ICC_GCC )
 
-	#define JSONCONS_A5HASH_GCC_BUILTINS
+	#define JSONCONS_HAS_GCC_BUILTINS
 
 #endif // GCC built-ins check
 
-/**
- * @def JSONCONS_A5HASH_BMI2
- * @brief Macro that denotes availability of the `mulx` intrinsic
- * (MSVC-compatible compilers only).
- */
-
 #if defined( _MSC_VER )
-	#if defined( __BMI2__ ) || ( !defined( JSONCONS_A5HASH_GCC_BUILTINS ) && \
+	#if defined( __BMI2__ ) || ( !defined( JSONCONS_HAS_GCC_BUILTINS ) && \
 		defined( _M_AMD64 ) && defined( __AVX2__ ) && \
 		( defined( __INTEL_COMPILER ) || _MSC_VER >= 1900 ))
 
 		#include <immintrin.h>
-		#define JSONCONS_A5HASH_BMI2
+		#define JSONCONS_HAS_MULX_INTRINSIC
 
 	#else // BMI2
 

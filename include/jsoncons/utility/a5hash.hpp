@@ -116,7 +116,7 @@ JSONCONS_A5HASH_FORCE_INLINE std::uint64_t a5hash_lu64( const unsigned char* con
 JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul128( const std::uint64_t u, const std::uint64_t v,
 	std::uint64_t* const rl, std::uint64_t* const rh ) noexcept
 {
-#if defined( JSONCONS_A5HASH_BMI2 )
+#if defined( JSONCONS_HAS_MULX_INTRINSIC )
 
 	*rl = _mulx_u64( u, v, rh );
 
@@ -131,7 +131,7 @@ JSONCONS_A5HASH_FORCE_INLINE void a5hash_umul128( const std::uint64_t u, const s
 	*rl = _umul128( u, v, rh );
 
 #elif defined( __SIZEOF_INT128__ ) || \
-	( defined( JSONCONS_A5HASH_ICC_GCC ) && defined( __x86_64__ ))
+	( defined( JSONCONS_ICC_GCC ) && defined( __x86_64__ ))
 
 	__uint128_t r = u;
 	r *= v;
