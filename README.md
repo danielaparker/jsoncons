@@ -778,12 +778,16 @@ The jsoncons platform dependent binary configuration draws on to the excellent M
 
 Thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for raising the quality of JSON libraries across the board, by publishing [the benchmarks](https://github.com/miloyip/nativejson-benchmark), and contacting this project (among others) to share the results.
 
-The jsoncons implementation of the Grisu3 algorithm for printing floating-point numbers follows Florian Loitsch's MIT licensed [grisu3_59_56 implementation](http://florian.loitsch.com/publications), with minor modifications. 
+The library includes a slightly modified version of the [Grisu3 algorithm for printing floating-point numbers](http://florian.loitsch.com/publications) from Florian Loitsch ahich is licensed under the [MIT License](https://opensource.org/license/MIT). Copyright © 2009 Florian Loitsch
+
+Since 1.9.0, the library includes a slightly modified version of the [A5HASH Fast Hash Functions](https://github.com/avaneev/a5hash) from Aleksey Vaneev which is licensed under the [MIT License](https://opensource.org/license/MIT). Copyright (c) 2025 Aleksey Vaneev
 
 The macro `JSONCONS_ALL_MEMBER_TRAITS` follows the approach taken by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
 The jsoncons implementations of BSON decimal128 to and from string,
 and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/master/src/libbson).
+
+
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
  
