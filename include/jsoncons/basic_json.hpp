@@ -36,7 +36,8 @@
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_fwd.hpp>
-#include <jsoncons/json_object.hpp>
+#include <jsoncons/ordered_json_object.hpp>
+#include <jsoncons/sorted_json_object.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
@@ -282,7 +283,7 @@ namespace jsoncons {
     struct order_preserving_policy
     {
         template <typename KeyT,typename Json>
-        using object = order_preserving_json_object<KeyT,Json,std::vector>;
+        using object = ordered_json_object<KeyT,Json,std::vector>;
 
         template <typename Json>
         using array = json_array<Json,std::vector>;
