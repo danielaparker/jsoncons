@@ -60,19 +60,19 @@ namespace jsoncons {
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;
         using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
 
-        key_value_container_type members_;
+        key_value_container_type data_;
 
         struct Comp
         {
-            const key_value_container_type& members_;
+            const key_value_container_type& data_;
 
-            Comp(const key_value_container_type& members_)
-                : members_(members_)
+            Comp(const key_value_container_type& data_)
+                : data_(data_)
             {
             }
 
-            bool operator() (std::size_t i, string_view_type k) const { return members_.at(i).key() < k; }
-            bool operator() (string_view_type k, std::size_t i) const { return k < members_.at(i).key(); }
+            bool operator() (std::size_t i, string_view_type k) const { return data_.at(i).key() < k; }
+            bool operator() (string_view_type k, std::size_t i) const { return k < data_.at(i).key(); }
         };
     public:
         using iterator = typename key_value_container_type::iterator;
@@ -85,31 +85,31 @@ namespace jsoncons {
         }
         ordered_json_object(const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc))
+              data_(key_value_allocator_type(alloc))
         {
         }
 
         ordered_json_object(const ordered_json_object& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
-              members_(val.members_)
+              data_(val.data_)
         {
         }
 
         ordered_json_object(ordered_json_object&& val,const allocator_type& alloc) 
             : allocator_holder<allocator_type>(alloc), 
-              members_(std::move(val.members_),key_value_allocator_type(alloc))
+              data_(std::move(val.data_),key_value_allocator_type(alloc))
         {
         }
 
         ordered_json_object(ordered_json_object&& val) noexcept
             : allocator_holder<allocator_type>(val.get_allocator()), 
-              members_(std::move(val.members_))
+              data_(std::move(val.data_))
         {
         }
 
         ordered_json_object(const ordered_json_object& val, const allocator_type& alloc) 
             : allocator_holder<allocator_type>(alloc), 
-              members_(val.members_,key_value_allocator_type(alloc))
+              data_(val.data_,key_value_allocator_type(alloc))
         {
         }
 
@@ -117,7 +117,7 @@ namespace jsoncons {
         ordered_json_object(InputIt first, InputIt last)
         {
             std::size_t count = std::distance(first,last);
-            members_.reserve(count);
+            data_.reserve(count);
             std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
@@ -125,7 +125,7 @@ namespace jsoncons {
                 if (keys.find(kv.key()) == keys.end())
                 {
                     keys.emplace(kv.key());
-                    members_.emplace_back(std::move(kv));
+                    data_.emplace_back(std::move(kv));
                 }
             }
         }
@@ -133,7 +133,7 @@ namespace jsoncons {
         template <typename InputIt>
         ordered_json_object(InputIt first, InputIt last, const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc))
+              data_(key_value_allocator_type(alloc))
         {
             std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
@@ -142,7 +142,7 @@ namespace jsoncons {
                 if (keys.find(kv.key()) == keys.end())
                 {
                     keys.emplace(kv.key());
-                    members_.emplace_back(std::move(kv));
+                    data_.emplace_back(std::move(kv));
                 }
             }
         }
@@ -150,9 +150,9 @@ namespace jsoncons {
         ordered_json_object(std::initializer_list<std::pair<std::basic_string<char_type>,Json>> init, 
                     const allocator_type& alloc = allocator_type())
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc))
+              data_(key_value_allocator_type(alloc))
         {
-            members_.reserve(init.size());
+            data_.reserve(init.size());
             for (auto& item : init)
             {
                 insert_or_assign(item.first, item.second);
@@ -172,83 +172,83 @@ namespace jsoncons {
 
         ordered_json_object& operator=(const ordered_json_object& val)
         {
-            members_ = val.members_;
+            data_ = val.data_;
             return *this;
         }
 
         void swap(ordered_json_object& other) noexcept
         {
-            members_.swap(other.members_);
+            data_.swap(other.data_);
         }
 
         bool empty() const
         {
-            return members_.empty();
+            return data_.empty();
         }
 
         iterator begin()
         {
-            return members_.begin();
+            return data_.begin();
         }
 
         iterator end()
         {
-            return members_.end();
+            return data_.end();
         }
 
         const_iterator begin() const
         {
-            return members_.begin();
+            return data_.begin();
         }
 
         const_iterator end() const
         {
-            return members_.end();
+            return data_.end();
         }
 
-        std::size_t size() const {return members_.size();}
+        std::size_t size() const {return data_.size();}
 
-        std::size_t capacity() const {return members_.capacity();}
+        std::size_t capacity() const {return data_.capacity();}
 
         void clear() 
         {
-            members_.clear();
+            data_.clear();
         }
 
         void shrink_to_fit() 
         {
-            for (std::size_t i = 0; i < members_.size(); ++i)
+            for (std::size_t i = 0; i < data_.size(); ++i)
             {
-                members_[i].shrink_to_fit();
+                data_[i].shrink_to_fit();
             }
-            members_.shrink_to_fit();
+            data_.shrink_to_fit();
         }
 
-        void reserve(std::size_t n) {members_.reserve(n);}
+        void reserve(std::size_t n) {data_.reserve(n);}
 
         Json& at(std::size_t i) 
         {
-            if (i >= members_.size())
+            if (i >= data_.size())
             {
                 JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
             }
-            return members_[i].value();
+            return data_[i].value();
         }
 
         const Json& at(std::size_t i) const 
         {
-            if (i >= members_.size())
+            if (i >= data_.size())
             {
                 JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
             }
-            return members_[i].value();
+            return data_[i].value();
         }
 
         iterator find(const string_view_type& name) noexcept
         {
             bool found = false;
-            auto it = members_.begin();
-            while (!found && it != members_.end())
+            auto it = data_.begin();
+            while (!found && it != data_.end())
             {
                 if ((*it).key() == name)
                 {
@@ -265,8 +265,8 @@ namespace jsoncons {
         const_iterator find(const string_view_type& name) const noexcept
         {
             bool found = false;
-            auto it = members_.begin();
-            while (!found && it != members_.end())
+            auto it = data_.begin();
+            while (!found && it != data_.end())
             {
                 if ((*it).key() == name)
                 {
@@ -282,38 +282,38 @@ namespace jsoncons {
 
         iterator erase(const_iterator pos) 
         {
-            if (pos != members_.end())
+            if (pos != data_.end())
             {
-                return members_.erase(pos);
+                return data_.erase(pos);
             }
             else
             {
-                return members_.end();
+                return data_.end();
             }
         }
 
         iterator erase(const_iterator first, const_iterator last) 
         {
-            std::size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
-            std::size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
+            std::size_t pos1 = first == data_.end() ? data_.size() : first - data_.begin();
+            std::size_t pos2 = last == data_.end() ? data_.size() : last - data_.begin();
 
-            if (pos1 < members_.size() && pos2 <= members_.size())
+            if (pos1 < data_.size() && pos2 <= data_.size())
             {
 
-                return members_.erase(first,last);
+                return data_.erase(first,last);
             }
             else
             {
-                return members_.end();
+                return data_.end();
             }
         }
 
         void erase(const string_view_type& name) 
         {
             auto pos = find(name);
-            if (pos != members_.end())
+            if (pos != data_.end())
             {
-                members_.erase(pos);
+                data_.erase(pos);
             }
         }
 
@@ -342,7 +342,7 @@ namespace jsoncons {
             {
                 index_key_value<Json>* last = items + size;
 
-                members_.reserve(size);
+                data_.reserve(size);
                 if (size <= bloom_bytes)
                 {
                     std::uint8_t bloom[bloom_bytes];
@@ -352,7 +352,7 @@ namespace jsoncons {
                         uint32_t h = a5hash32(p->name.data(), p->name.size(), 0);
                         if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
                         {
-                            members_.emplace_back(std::move(p->name), std::move(p->value));
+                            data_.emplace_back(std::move(p->name), std::move(p->value));
                             bloom_set(bloom, h);
                         }
                         else
@@ -382,7 +382,7 @@ namespace jsoncons {
                 if (keys.find(key) == keys.end())
                 {
                     keys.emplace(key.c_str(), key.size(), get_allocator());
-                    members_.emplace_back(std::move(key), (*it).second);
+                    data_.emplace_back(std::move(key), (*it).second);
                 }
             }
         }
@@ -392,7 +392,7 @@ namespace jsoncons {
         {
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(make_key_value<KeyT,Json>()(*it));
+                data_.emplace_back(make_key_value<KeyT,Json>()(*it));
             }
         }
    
@@ -401,10 +401,10 @@ namespace jsoncons {
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto it = find(name);
-            if (it == members_.end())
+            if (it == data_.end())
             {
-                members_.emplace_back(key_type(name.begin(), name.end()), std::forward<T>(value));
-                auto pos = members_.begin() + (members_.size() - 1);
+                data_.emplace_back(key_type(name.begin(), name.end()), std::forward<T>(value));
+                auto pos = data_.begin() + (data_.size() - 1);
                 return std::make_pair(pos, true);
             }
             else
@@ -419,10 +419,10 @@ namespace jsoncons {
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto it = find(name);
-            if (it == members_.end())
+            if (it == data_.end())
             {
-                members_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), std::forward<T>(value));
-                auto pos = members_.begin() + (members_.size()-1);
+                data_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), std::forward<T>(value));
+                auto pos = data_.begin() + (data_.size()-1);
                 return std::make_pair(pos,true);
             }
             else
@@ -436,7 +436,7 @@ namespace jsoncons {
         typename std::enable_if<std::allocator_traits<A>::is_always_equal::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
-            if (hint == members_.end())
+            if (hint == data_.end())
             {
                 auto result = insert_or_assign(key, std::forward<T>(value));
                 return result.first;
@@ -444,10 +444,10 @@ namespace jsoncons {
             else
             {
                 auto it = find(hint, key);
-                if (it == members_.end())
+                if (it == data_.end())
                 {
-                    members_.emplace_back(key_type(key.begin(), key.end()), std::forward<T>(value));
-                    auto pos = members_.begin() + (members_.size() - 1);
+                    data_.emplace_back(key_type(key.begin(), key.end()), std::forward<T>(value));
+                    auto pos = data_.begin() + (data_.size() - 1);
                     return pos;
                 }
                 else
@@ -462,7 +462,7 @@ namespace jsoncons {
         typename std::enable_if<!std::allocator_traits<A>::is_always_equal::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
-            if (hint == members_.end())
+            if (hint == data_.end())
             {
                 auto result = insert_or_assign(key, std::forward<T>(value));
                 return result.first;
@@ -470,10 +470,10 @@ namespace jsoncons {
             else
             {
                 auto it = find(hint, key);
-                if (it == members_.end())
+                if (it == data_.end())
                 {
-                    members_.emplace_back(key_type(key.begin(),key.end(),get_allocator()), std::forward<T>(value));
-                    auto pos = members_.begin() + (members_.size()-1);
+                    data_.emplace_back(key_type(key.begin(),key.end(),get_allocator()), std::forward<T>(value));
+                    auto pos = data_.begin() + (data_.size()-1);
                     return pos;
                 }
                 else
@@ -501,7 +501,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = find((*it).key());
-                if (pos == members_.end())
+                if (pos == data_.end())
                 {
                     try_emplace((*it).key(),std::move((*it).value()));
                 }
@@ -510,41 +510,41 @@ namespace jsoncons {
 
         void merge(iterator hint, const ordered_json_object& source)
         {
-            std::size_t pos = hint - members_.begin();
+            std::size_t pos = hint - data_.begin();
             for (auto it = source.begin(); it != source.end(); ++it)
             {
                 hint = try_emplace(hint, (*it).key(),(*it).value());
-                std::size_t newpos = hint - members_.begin();
+                std::size_t newpos = hint - data_.begin();
                 if (newpos == pos)
                 {
                     ++hint;
-                    pos = hint - members_.begin();
+                    pos = hint - data_.begin();
                 }
                 else
                 {
-                    hint = members_.begin() + pos;
+                    hint = data_.begin() + pos;
                 }
             }
         }
 
         void merge(iterator hint, ordered_json_object&& source)
         {
-            std::size_t pos = hint - members_.begin();
+            std::size_t pos = hint - data_.begin();
 
             auto it = std::make_move_iterator(source.begin());
             auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
                 hint = try_emplace(hint, (*it).key(), std::move((*it).value()));
-                std::size_t newpos = hint - members_.begin();
+                std::size_t newpos = hint - data_.begin();
                 if (newpos == pos)
                 {
                     ++hint;
-                    pos = hint - members_.begin();
+                    pos = hint - data_.begin();
                 }
                 else
                 {
-                    hint = members_.begin() + pos;
+                    hint = data_.begin() + pos;
                 }
             }
         }
@@ -566,7 +566,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = find((*it).key());
-                if (pos == members_.end())
+                if (pos == data_.end())
                 {
                     insert_or_assign((*it).key(),std::move((*it).value()));
                 }
@@ -579,40 +579,40 @@ namespace jsoncons {
 
         void merge_or_update(iterator hint, const ordered_json_object& source)
         {
-            std::size_t pos = hint - members_.begin();
+            std::size_t pos = hint - data_.begin();
             for (auto it = source.begin(); it != source.end(); ++it)
             {
                 hint = insert_or_assign(hint, (*it).key(),(*it).value());
-                std::size_t newpos = hint - members_.begin();
+                std::size_t newpos = hint - data_.begin();
                 if (newpos == pos)
                 {
                     ++hint;
-                    pos = hint - members_.begin();
+                    pos = hint - data_.begin();
                 }
                 else
                 {
-                    hint = members_.begin() + pos;
+                    hint = data_.begin() + pos;
                 }
             }
         }
 
         void merge_or_update(iterator hint, ordered_json_object&& source)
         {
-            std::size_t pos = hint - members_.begin();
+            std::size_t pos = hint - data_.begin();
             auto it = std::make_move_iterator(source.begin());
             auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
                 hint = insert_or_assign(hint, (*it).key(), std::move((*it).value()));
-                std::size_t newpos = hint - members_.begin();
+                std::size_t newpos = hint - data_.begin();
                 if (newpos == pos)
                 {
                     ++hint;
-                    pos = hint - members_.begin();
+                    pos = hint - data_.begin();
                 }
                 else
                 {
-                    hint = members_.begin() + pos;
+                    hint = data_.begin() + pos;
                 }
             }
         }
@@ -624,10 +624,10 @@ namespace jsoncons {
         try_emplace(const string_view_type& name, Args&&... args)
         {
             auto it = find(name);
-            if (it == members_.end())
+            if (it == data_.end())
             {
-                members_.emplace_back(key_type(name.begin(), name.end()), std::forward<Args>(args)...);
-                auto pos = members_.begin() + (members_.size()-1);
+                data_.emplace_back(key_type(name.begin(), name.end()), std::forward<Args>(args)...);
+                auto pos = data_.begin() + (data_.size()-1);
                 return std::make_pair(pos,true);
             }
             else
@@ -641,11 +641,11 @@ namespace jsoncons {
         try_emplace(const string_view_type& key, Args&&... args)
         {
             auto it = find(key);
-            if (it == members_.end())
+            if (it == data_.end())
             {
-                members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
+                data_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
                     std::forward<Args>(args)...);
-                auto pos = members_.begin() + members_.size();
+                auto pos = data_.begin() + data_.size();
                 return std::make_pair(pos,true);
             }
             else
@@ -658,7 +658,7 @@ namespace jsoncons {
         typename std::enable_if<std::allocator_traits<A>::is_always_equal::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
-            if (hint == members_.end())
+            if (hint == data_.end())
             {
                 auto result = try_emplace(key, std::forward<Args>(args)...);
                 return result.first;
@@ -666,11 +666,11 @@ namespace jsoncons {
             else
             {
                 auto it = find(hint, key);
-                if (it == members_.end())
+                if (it == data_.end())
                 {
-                    members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
+                    data_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
                         std::forward<Args>(args)...);
-                    auto pos = members_.begin() + members_.size();
+                    auto pos = data_.begin() + data_.size();
                     return pos;
                 }
                 else
@@ -684,7 +684,7 @@ namespace jsoncons {
         typename std::enable_if<!std::allocator_traits<A>::is_always_equal::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
-            if (hint == members_.end())
+            if (hint == data_.end())
             {
                 auto result = try_emplace(key, std::forward<Args>(args)...);
                 return result.first;
@@ -692,11 +692,11 @@ namespace jsoncons {
             else
             {
                 auto it = find(hint, key);
-                if (it == members_.end())
+                if (it == data_.end())
                 {
-                    members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
+                    data_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
                         std::forward<Args>(args)...);
-                    auto pos = members_.begin() + members_.size();
+                    auto pos = data_.begin() + data_.size();
                     return pos;
                 }
                 else
@@ -708,12 +708,12 @@ namespace jsoncons {
 
         bool operator==(const ordered_json_object& rhs) const
         {
-            return members_ == rhs.members_;
+            return data_ == rhs.data_;
         }
      
         bool operator<(const ordered_json_object& rhs) const
         {
-            return members_ < rhs.members_;
+            return data_ < rhs.data_;
         }
     private:
 
@@ -721,7 +721,7 @@ namespace jsoncons {
         {
             bool found = false;
             auto it = hint;
-            while (!found && it != members_.end())
+            while (!found && it != data_.end())
             {
                 if ((*it).key() == name)
                 {
@@ -737,11 +737,11 @@ namespace jsoncons {
 
         void flatten_and_destroy() noexcept
         {
-            if (!members_.empty())
+            if (!data_.empty())
             {
                 json_array<Json> temp(get_allocator());
 
-                for (auto& kv : members_)
+                for (auto& kv : data_)
                 {
                     switch (kv.value().storage_kind())
                     {
