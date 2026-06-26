@@ -207,14 +207,11 @@ namespace jsoncons {
 
             bool operator==(const random_access_iterator_wrapper& rhs) const noexcept
             {
-                if (!has_value_ || !rhs.has_value_)
-                {
-                    return has_value_ == rhs.has_value_ ? true : false;
-                }
-                else
+                if (JSONCONS_LIKELY(has_value_ && rhs.has_value_))
                 {
                     return current_ == rhs.current_;
                 }
+                return !has_value_ && !rhs.has_value_;
             }
 
             bool operator!=(const random_access_iterator_wrapper& rhs) const noexcept
@@ -224,14 +221,11 @@ namespace jsoncons {
 
             bool operator<(const random_access_iterator_wrapper& rhs) const noexcept
             {
-                if (!has_value_ || !rhs.has_value_)
-                {
-                    return has_value_ == rhs.has_value_ ? false :(has_value_ ? false : true);
-                }
-                else
+                if (JSONCONS_LIKELY(has_value_ && rhs.has_value_))
                 {
                     return current_ < rhs.current_;
                 }
+                return has_value_ ? false : (rhs.has_value_ ? true : false);
             }
 
             bool operator>(const random_access_iterator_wrapper& rhs) const noexcept
