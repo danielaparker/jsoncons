@@ -1183,3 +1183,54 @@ TEST_CASE("test_json_merge_or_update_move")
     }
 }
 
+TEST_CASE("json_object_iterator_adaptor tests")
+{
+    SECTION("empty")
+    {
+        json j{};
+
+        auto it1 = j.object_range().begin();
+        auto it2 = it1;
+
+        CHECK((j.object_range().begin() == it1));
+        CHECK((it1 == it1));
+        CHECK_FALSE((it1 != it1));
+        CHECK_FALSE((it1 < it1));
+        CHECK_FALSE((it1 > it1));
+        CHECK_FALSE((it1 < it1));
+        CHECK_FALSE((it1 > it1));
+        CHECK((j.object_range().end() == it1));
+        CHECK((it1 == it2));
+        CHECK_FALSE((it1 != it2));
+        CHECK_FALSE((it1 < it2));
+        CHECK_FALSE((it1 > it2));
+        CHECK_FALSE((it1 < it2));
+        CHECK_FALSE((it1 > it2));
+        CHECK((j.object_range().end() == it2));
+    }
+
+    SECTION("test 1")
+    {
+        auto j = json::parse(R"(
+        {
+            "a" : "1",
+            "b" : [1,2,3]
+        }
+        )");
+
+
+        auto it1 = j.object_range().begin();
+        auto it2 = it1 + 1;
+        auto it3 = it2 + 1;
+
+        CHECK((j.object_range().begin() == it1));
+        CHECK((it1 == it1));
+        CHECK((it1 != it2));
+        CHECK((it1 < it2));
+        CHECK((it2 > it1));
+        CHECK((it2 < it3));
+        CHECK((it3 > it2));
+        CHECK((j.object_range().end() == it3));
+    }
+}
+
