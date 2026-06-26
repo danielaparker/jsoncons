@@ -54,6 +54,7 @@ namespace jsoncons {
         using size_type = typename key_value_container_type::size_type;
         using iterator = typename key_value_container_type::iterator;
         using const_iterator = typename key_value_container_type::const_iterator;
+        using value_type = typename key_value_container_type::value_type;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -186,6 +187,10 @@ namespace jsoncons {
         std::size_t size() const {return data_.size();}
 
         std::size_t capacity() const {return data_.capacity();}
+
+        // Direct access to data
+        value_type* data() noexcept { return data_.data(); }
+        const value_type* data() const noexcept { return data_.data(); }
 
         void clear() {data_.clear();}
 

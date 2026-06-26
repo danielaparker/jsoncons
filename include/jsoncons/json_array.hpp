@@ -43,9 +43,7 @@ namespace jsoncons {
 
         using allocator_holder<allocator_type>::get_allocator;
 
-        json_array()
-        {
-        }
+        json_array() = default;
 
         explicit json_array(const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
@@ -136,6 +134,10 @@ namespace jsoncons {
         std::size_t size() const {return data_.size();}
 
         std::size_t capacity() const {return data_.capacity();}
+
+        // Direct access to data
+        value_type* data() noexcept { return data_.data(); }
+        const value_type* data() const noexcept { return data_.data(); }
 
         void clear() {data_.clear();}
 

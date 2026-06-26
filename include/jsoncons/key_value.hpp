@@ -249,48 +249,48 @@ namespace std
 
 namespace jsoncons {
 
-    template <typename KeyT,typename ValueT>
-    struct make_key_value
+template <typename KeyT,typename ValueT>
+struct make_key_value
+{
+    using key_value_type = key_value<KeyT,ValueT>;
+
+    template <typename T1,typename T2>
+    key_value_type operator()(const std::pair<T1,T2>& p) 
     {
-        using key_value_type = key_value<KeyT,ValueT>;
+        return key_value_type(KeyT(p.first),p.second);
+    }
 
-        template <typename T1,typename T2>
-        key_value_type operator()(const std::pair<T1,T2>& p) 
-        {
-            return key_value_type(KeyT(p.first),p.second);
-        }
+    template <typename T1,typename T2, typename Alloc>
+    key_value_type operator()(const std::pair<T1,T2>& p, const Alloc& alloc) 
+    {
+        return key_value_type(jsoncons::make_obj_using_allocator<KeyT>(alloc, p.first), 
+            p.second, alloc);
+    }
 
-        template <typename T1,typename T2, typename Alloc>
-        key_value_type operator()(const std::pair<T1,T2>& p, const Alloc& alloc) 
-        {
-            return key_value_type(jsoncons::make_obj_using_allocator<KeyT>(alloc, p.first), 
-                p.second, alloc);
-        }
+    template <typename T1,typename T2>
+    key_value_type operator()(std::pair<T1,T2>&& p)
+    {
+        return key_value_type(std::forward<T1>(p.first),std::forward<T2>(p.second));
+    }
 
-        template <typename T1,typename T2>
-        key_value_type operator()(std::pair<T1,T2>&& p)
-        {
-            return key_value_type(std::forward<T1>(p.first),std::forward<T2>(p.second));
-        }
+    template <typename T1,typename T2, typename Alloc>
+    key_value_type operator()(std::pair<T1,T2>&& p, const Alloc& alloc)
+    {
+        return key_value_type(jsoncons::make_obj_using_allocator<KeyT>(alloc, std::forward<T1>(p.first)), 
+            std::forward<T2>(p.second), alloc);
+    }
 
-        template <typename T1,typename T2, typename Alloc>
-        key_value_type operator()(std::pair<T1,T2>&& p, const Alloc& alloc)
-        {
-            return key_value_type(jsoncons::make_obj_using_allocator<KeyT>(alloc, std::forward<T1>(p.first)), 
-                std::forward<T2>(p.second), alloc);
-        }
-
-        template <typename T1,typename T2>
-        const key_value_type& operator()(const key_value<T1,T2>& p)
-        {
-            return p;
-        }
-        template <typename T1,typename T2>
-        key_value_type operator()(key_value<T1,T2>&& p)
-        {
-            return std::move(p);
-        }
-    };
+    template <typename T1,typename T2>
+    const key_value_type& operator()(const key_value<T1,T2>& p)
+    {
+        return p;
+    }
+    template <typename T1,typename T2>
+    key_value_type operator()(key_value<T1,T2>&& p)
+    {
+        return std::move(p);
+    }
+};
 
 } // namespace jsoncons
 

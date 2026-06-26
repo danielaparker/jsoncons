@@ -2785,12 +2785,34 @@ namespace jsoncons {
 
         basic_json& operator[](std::size_t i)
         {
-            return at(i);
+            switch (storage_kind())
+            {
+                case json_storage_kind::array:
+                    return cast<array_storage>().value().data()[i];
+                case json_storage_kind::object:
+                    return cast<object_storage>().value().data()[i].value();
+                case json_storage_kind::json_ref:
+                    return cast<json_ref_storage>().value().operator[](i);
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
+            }
         }
 
         const basic_json& operator[](std::size_t i) const
         {
-            return at(i);
+            switch (storage_kind())
+            {
+                case json_storage_kind::array:
+                    return cast<array_storage>().value().data()[i];
+                case json_storage_kind::object:
+                    return cast<object_storage>().value().data()[i].value();
+                case json_storage_kind::json_ref:
+                    return cast<json_ref_storage>().value().operator[](i);
+                case json_storage_kind::const_json_ref:
+                    return cast<json_ref_storage>().value().operator[](i);
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
+            }
         }
 
         basic_json& operator[](const string_view_type& key)
