@@ -93,34 +93,29 @@ namespace jsoncons {
 
     namespace detail {
 
-        template <typename Iterator,typename Enable = void>
-        class random_access_iterator_wrapper
-        {
-        };
-
         template <typename Iterator>
-        class random_access_iterator_wrapper<Iterator,
-                 typename std::enable_if<std::is_same<typename std::iterator_traits<Iterator>::iterator_category, 
-                                                      std::random_access_iterator_tag>::value>::type> 
+        class random_access_iterator_wrapper
         { 
-            Iterator it_; 
+            Iterator current_; 
+            typedef std::iterator_traits<Iterator> traits_type;
+
             bool has_value_;
 
-            template <typename Iter,typename Enable> 
+            template <typename Iter> 
             friend class random_access_iterator_wrapper;
         public:
             using iterator_category = std::random_access_iterator_tag;
 
-            using value_type = typename std::iterator_traits<Iterator>::value_type;
-            using difference_type = typename std::iterator_traits<Iterator>::difference_type;
-            using pointer = typename std::iterator_traits<Iterator>::pointer;
-            using reference = typename std::iterator_traits<Iterator>::reference;
+            using value_type = typename traits_type::value_type;
+            using difference_type = typename traits_type::difference_type;
+            using reference = typename traits_type::reference;
+            using pointer = typename traits_type::pointer;
         
-            random_access_iterator_wrapper() : it_(), has_value_(false) 
+            random_access_iterator_wrapper() : current_(), has_value_(false) 
             { 
             }
 
-            explicit random_access_iterator_wrapper(Iterator ptr) : it_(ptr), has_value_(true)  
+            explicit random_access_iterator_wrapper(Iterator ptr) : current_(ptr), has_value_(true)  
             {
             }
 
@@ -132,28 +127,28 @@ namespace jsoncons {
             template <typename Iter,
                       typename=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
             random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other)
-                : it_(other.it_), has_value_(other.has_value_)
+                : current_(other.current_), has_value_(other.has_value_)
             {
             }
 
             operator Iterator() const
             { 
-                return it_; 
+                return current_; 
             }
 
             reference operator*() const 
             {
-                return *it_;
+                return *current_;
             }
 
             pointer operator->() const 
             {
-                return &(*it_);
+                return &(*current_);
             }
 
             random_access_iterator_wrapper& operator++() 
             {
-                ++it_;
+                ++current_;
                 return *this;
             }
 
@@ -166,7 +161,7 @@ namespace jsoncons {
 
             random_access_iterator_wrapper& operator--() 
             {
-                --it_;
+                --current_;
                 return *this;
             }
 
@@ -179,7 +174,7 @@ namespace jsoncons {
 
             random_access_iterator_wrapper& operator+=(const difference_type offset) 
             {
-                it_ += offset;
+                current_ += offset;
                 return *this;
             }
 
@@ -202,7 +197,7 @@ namespace jsoncons {
 
             difference_type operator-(const random_access_iterator_wrapper& rhs) const noexcept
             {
-                return it_ - rhs.it_;
+                return current_ - rhs.current_;
             }
 
             reference operator[](const difference_type offset) const noexcept
@@ -218,7 +213,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    return it_ == rhs.it_;
+                    return current_ == rhs.current_;
                 }
             }
 
@@ -235,7 +230,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    return it_ < rhs.it_;
+                    return current_ < rhs.current_;
                 }
             }
 
