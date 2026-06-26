@@ -108,8 +108,7 @@ namespace jsoncons {
             data_.reserve(count);
             for (auto it = first; it != last; ++it)
             {
-                auto kv = make_key_value<KeyT,Json>()(*it);
-                data_.emplace_back(std::move(kv));
+                data_.emplace_back(make_key_value<KeyT,Json>()(*it));
             }
             std::stable_sort(data_.begin(),data_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
@@ -127,8 +126,7 @@ namespace jsoncons {
             data_.reserve(count);
             for (auto it = first; it != last; ++it)
             {
-                auto kv = make_key_value<KeyT,Json>()(*it, alloc);
-                data_.emplace_back(std::move(kv));
+                data_.emplace_back(make_key_value<KeyT,Json>()(*it, alloc));
             }
             std::stable_sort(data_.begin(), data_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});

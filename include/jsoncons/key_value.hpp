@@ -292,6 +292,30 @@ struct make_key_value
     }
 };
 
+template <typename T1,typename T2>
+const T1& get_key(const std::pair<T1,T2>& p) 
+{
+    return p.first;
+}
+
+template <typename T1,typename T2>
+const T1& get_key(const key_value<T1,T2>& p)
+{
+    return p.key();
+}
+
+template <typename T1,typename T2>
+const T2& get_value(const std::pair<T1,T2>& p) 
+{
+    return p.second;
+}
+
+template <typename T1,typename T2>
+const T2& get_value(const key_value<T1,T2>& p)
+{
+    return p.value();
+}
+
 } // namespace jsoncons
 
 #endif // JSONCONS_KEY_VALUE_HPP

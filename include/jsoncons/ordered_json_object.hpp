@@ -112,16 +112,16 @@ namespace jsoncons {
                     std::memset(bloom, 0, bloom_bytes);
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        uint32_t h = a5hash32(kv.key().data(), kv.key().size(), 0);
+                        const auto& key = get_key(*it);
+                        uint32_t h = a5hash32(key.data(), key.size(), 0);
                         if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
                         {
-                            data_.emplace_back(std::move(kv));
+                            data_.emplace_back(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                             bloom_set(bloom, h);
                         }
                         else
                         {
-                            try_emplace(kv.key(), kv.value());
+                            try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                         }
                     }
 
@@ -130,8 +130,8 @@ namespace jsoncons {
                 {
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        try_emplace(kv.key(), kv.value());
+                        const auto& key = get_key(*it);
+                        try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                     }
                 }
             }
@@ -152,16 +152,16 @@ namespace jsoncons {
                     std::memset(bloom, 0, bloom_bytes);
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        uint32_t h = a5hash32(kv.key().data(), kv.key().size(), 0);
+                        const auto& key = get_key(*it);
+                        uint32_t h = a5hash32(key.data(), key.size(), 0);
                         if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
                         {
-                            data_.emplace_back(std::move(kv));
+                            data_.emplace_back(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                             bloom_set(bloom, h);
                         }
                         else
                         {
-                            try_emplace(kv.key(), kv.value());
+                            try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                         }
                     }
 
@@ -170,8 +170,8 @@ namespace jsoncons {
                 {
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        try_emplace(kv.key(), kv.value());
+                        const auto& key = get_key(*it);
+                        try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                     }
                 }
             }
@@ -405,6 +405,7 @@ namespace jsoncons {
             if (count > 0)
             {
                 const size_type old_size = size();
+                data_.reserve(count);
                 data_.reserve(old_size+count);
                 if (old_size+count <= bloom_bytes)
                 {
@@ -417,25 +418,26 @@ namespace jsoncons {
                     }
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        uint32_t h = a5hash32(kv.key().data(), kv.key().size(), 0);
+                        const auto& key = get_key(*it);
+                        uint32_t h = a5hash32(key.data(), key.size(), 0);
                         if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
                         {
-                            data_.emplace_back(std::move(kv));
+                            data_.emplace_back(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                             bloom_set(bloom, h);
                         }
                         else
                         {
-                            try_emplace(kv.key(), kv.value());
+                            try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                         }
                     }
+
                 }
                 else
                 {
                     for (auto it = first; it != last; ++it)
                     {
-                        auto kv = make_key_value<KeyT,Json>()(*it);
-                        try_emplace(kv.key(), kv.value());
+                        const auto& key = get_key(*it);
+                        try_emplace(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
                     }
                 }
             }
@@ -446,7 +448,8 @@ namespace jsoncons {
         {
             for (auto it = first; it != last; ++it)
             {
-                data_.emplace_back(make_key_value<KeyT,Json>()(*it));
+                const auto& key = get_key(*it);
+                data_.emplace_back(key_type(key.begin(), key.end(),get_allocator()), get_value(*it));
             }
         }
    
