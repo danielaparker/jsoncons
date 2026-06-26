@@ -41,21 +41,6 @@ namespace jsoncons {
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
     private:
-        struct MyHash
-        {
-            std::uintmax_t operator()(const key_type& s) const noexcept
-            {
-                const int p = 31;
-                const int m = static_cast<int>(1e9) + 9;
-                std::uintmax_t hash_value = 0;
-                std::uintmax_t p_pow = 1;
-                for (char_type c : s) {
-                    hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
-                    p_pow = (p_pow * p) % m;
-                }
-                return hash_value;   
-            }
-        };
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;
         using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
@@ -81,9 +66,8 @@ namespace jsoncons {
 
         using allocator_holder<allocator_type>::get_allocator;
 
-        ordered_json_object()
-        {
-        }
+        ordered_json_object() = default;
+
         ordered_json_object(const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
               data_(key_value_allocator_type(alloc))
@@ -118,15 +102,34 @@ namespace jsoncons {
         ordered_json_object(InputIt first, InputIt last)
         {
             std::size_t count = std::distance(first,last);
-            data_.reserve(count);
-            std::unordered_set<key_type,MyHash> keys;
-            for (auto it = first; it != last; ++it)
+            if (count > 0)
             {
-                auto kv = make_key_value<KeyT,Json>()(*it);
-                if (keys.find(kv.key()) == keys.end())
+                data_.reserve(count);
+                if (count <= bloom_bytes)
                 {
-                    keys.emplace(kv.key());
-                    data_.emplace_back(std::move(kv));
+                    std::uint8_t bloom[bloom_bytes];
+                    std::memset(bloom, 0, bloom_bytes);
+                    for (auto it = first; it != last; ++it)
+                    {
+                        uint32_t h = a5hash32((*it).key().data(), (*it).key().size(), 0);
+                        if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
+                        {
+                            data_.emplace_back((*it).key(), (*it).value());
+                            bloom_set(bloom, h);
+                        }
+                        else
+                        {
+                            try_emplace((*it).key(), (*it).value());
+                        }
+                    }
+
+                }
+                else
+                {
+                    for (auto it = first; it != last; ++it)
+                    {
+                        try_emplace((*it).key(), (*it).value());
+                    }
                 }
             }
         }
@@ -136,14 +139,35 @@ namespace jsoncons {
             : allocator_holder<allocator_type>(alloc), 
               data_(key_value_allocator_type(alloc))
         {
-            std::unordered_set<key_type,MyHash> keys;
-            for (auto it = first; it != last; ++it)
+            std::size_t size = std::distance(first,last);
+            if (size > 0)
             {
-                auto kv = make_key_value<KeyT,Json>()(*it, alloc);
-                if (keys.find(kv.key()) == keys.end())
+                data_.reserve(size);
+                if (size <= bloom_bytes)
                 {
-                    keys.emplace(kv.key());
-                    data_.emplace_back(std::move(kv));
+                    std::uint8_t bloom[bloom_bytes];
+                    std::memset(bloom, 0, bloom_bytes);
+                    for (auto it = first; it != last; ++it)
+                    {
+                        uint32_t h = a5hash32((*it).key().data(), (*it).key().size(), 0);
+                        if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
+                        {
+                            data_.emplace_back((*it).key(), (*it).value());
+                            bloom_set(bloom, h);
+                        }
+                        else
+                        {
+                            try_emplace((*it).key(), (*it).value());
+                        }
+                    }
+
+                }
+                else
+                {
+                    for (auto it = first; it != last; ++it)
+                    {
+                        try_emplace((*it).key(), (*it).value());
+                    }
                 }
             }
         }
@@ -368,14 +392,40 @@ namespace jsoncons {
         template <typename InputIt>
         void insert(InputIt first, InputIt last)
         {
-            std::unordered_set<key_type,MyHash> keys;
-            for (auto it = first; it != last; ++it)
+            std::size_t count = std::distance(first,last);
+            if (count > 0)
             {
-                key_type key{(*it).first.c_str(), (*it).first.size(), get_allocator()};
-                if (keys.find(key) == keys.end())
+                const size_type old_size = size();
+                data_.reserve(old_size+count);
+                if (old_size+count <= bloom_bytes)
                 {
-                    keys.emplace(key.c_str(), key.size(), get_allocator());
-                    data_.emplace_back(std::move(key), (*it).second);
+                    std::uint8_t bloom[bloom_bytes];
+                    std::memset(bloom, 0, bloom_bytes);
+                    for (std::size_t i = 0; i < old_size; ++i)
+                    {
+                        uint32_t h = a5hash32(data_[i].key().data(), data_[i].key().size(), 0);
+                        bloom_set(bloom, h);
+                    }
+                    for (auto it = first; it != last; ++it)
+                    {
+                        uint32_t h = a5hash32((*it).first.data(), (*it).first.size(), 0);
+                        if (JSONCONS_LIKELY(!bloom_may_contain(bloom, h)))
+                        {                          
+                            data_.emplace_back(key_type{(*it).first.c_str(), (*it).first.size(), get_allocator()}, (*it).second);
+                            bloom_set(bloom, h);
+                        }
+                        else
+                        {
+                            try_emplace(key_type{(*it).first.c_str(), (*it).first.size(), get_allocator()}, (*it).second);
+                        }
+                    }
+                }
+                else
+                {
+                    for (auto it = first; it != last; ++it)
+                    {
+                        try_emplace(key_type{(*it).first.c_str(), (*it).first.size(), get_allocator()}, (*it).second);
+                    }
                 }
             }
         }

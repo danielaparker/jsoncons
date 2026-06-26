@@ -4201,15 +4201,14 @@ namespace jsoncons {
 
         // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-        void erase(const string_view_type& key)
+        typename object::size_type erase(string_view_type key)
         {
             switch (storage_kind())
             {
                 case json_storage_kind::empty_object:
-                    break;
+                    return 0;
                 case json_storage_kind::object:
-                    cast<object_storage>().value().erase(key);
-                    break;
+                    return cast<object_storage>().value().erase(key);
                 case json_storage_kind::json_ref:
                     return cast<json_ref_storage>().value().erase(key);
                 default:
