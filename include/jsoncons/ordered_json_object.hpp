@@ -75,6 +75,7 @@ namespace jsoncons {
             bool operator() (string_view_type k, std::size_t i) const { return k < data_.at(i).key(); }
         };
     public:
+        using size_type = typename key_value_container_type::size_type;
         using iterator = typename key_value_container_type::iterator;
         using const_iterator = typename key_value_container_type::const_iterator;
 
@@ -244,40 +245,30 @@ namespace jsoncons {
             return data_[i].value();
         }
 
-        iterator find(const string_view_type& name) noexcept
+        iterator find(string_view_type key) noexcept
         {
-            bool found = false;
-            auto it = data_.begin();
-            while (!found && it != data_.end())
+            const size_type length = size();
+            for (size_type i = 0; i < length; ++i) 
             {
-                if ((*it).key() == name)
-                {
-                    found = true;
-                }
-                else
-                {
-                    ++it;
-                }
+               if (data_[i].key() == key) 
+               {
+                   return data_.begin() + i;
+               }
             }
-            return it;
+            return data_.end();
         }
 
-        const_iterator find(const string_view_type& name) const noexcept
+        const_iterator find(string_view_type key) const noexcept
         {
-            bool found = false;
-            auto it = data_.begin();
-            while (!found && it != data_.end())
+            const size_type length = size();
+            for (size_type i = 0; i < length; ++i) 
             {
-                if ((*it).key() == name)
-                {
-                    found = true;
-                }
-                else
-                {
-                    ++it;
-                }
+               if (data_[i].key() == key) 
+               {
+                   return data_.begin() + i;
+               }
             }
-            return it;
+            return data_.end();
         }
 
         iterator erase(const_iterator pos) 
@@ -308,13 +299,15 @@ namespace jsoncons {
             }
         }
 
-        void erase(const string_view_type& name) 
+        size_type erase(string_view_type key) 
         {
-            auto pos = find(name);
+            auto pos = find(key);
             if (pos != data_.end())
             {
                 data_.erase(pos);
+                return 1;
             }
+            return 0;
         }
 
         static constexpr size_t bloom_bytes = 512;

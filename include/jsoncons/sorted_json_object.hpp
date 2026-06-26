@@ -51,14 +51,13 @@ namespace jsoncons {
 
         key_value_container_type data_;
     public:
+        using size_type = typename key_value_container_type::size_type;
         using iterator = typename key_value_container_type::iterator;
         using const_iterator = typename key_value_container_type::const_iterator;
 
         using allocator_holder<allocator_type>::get_allocator;
 
-        sorted_json_object()
-        {
-        }
+        sorted_json_object() = default;
 
         explicit sorted_json_object(const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
@@ -219,20 +218,20 @@ namespace jsoncons {
             return data_[i].value();
         }
 
-        iterator find(const string_view_type& key) noexcept
+        iterator find(string_view_type key) noexcept
         {
             auto it = std::lower_bound(data_.begin(), data_.end(), key, Comp{});
-            if (it != data_.end() && key == it->name()) 
+            if (it != data_.end() && key == it->key()) 
             {
                 return it;
             }
             return data_.end();
         }
 
-        const_iterator find(const string_view_type& key) const noexcept
+        const_iterator find(string_view_type key) const noexcept
         {
             auto it = std::lower_bound(data_.begin(), data_.end(), key, Comp{});
-            if (it != data_.end() && key == it->name()) 
+            if (it != data_.end() && key == it->key()) 
             {
                 return it;
             }
@@ -249,13 +248,15 @@ namespace jsoncons {
             return data_.erase(first,last);
         }
 
-        void erase(const string_view_type& name) 
+        size_type erase(string_view_type key) 
         {
-            auto it = find(name);
+            auto it = find(key);
             if (it != data_.end())
             {
                 data_.erase(it);
+                return 1;
             }
+            return 0;
         }
 
         static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
