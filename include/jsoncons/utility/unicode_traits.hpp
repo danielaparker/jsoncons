@@ -1171,6 +1171,11 @@ namespace unicode_traits {
         }
         while (it != end) 
         {
+            if (*it & 0x80)
+            {
+                ++it;
+                continue;
+            }
             std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
             {
