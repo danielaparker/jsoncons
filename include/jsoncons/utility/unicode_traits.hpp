@@ -1150,17 +1150,27 @@ namespace unicode_traits {
         static constexpr uint64_t mask = 0x8080808080808080ull;
 
         conv_errc  result{};
+        while ((end - it) >= 8) 
+        {
+            uint64_t chunk;
+            std::memcpy(&chunk, it, 8);
+            if ((chunk & mask) == 0) {
+               it += 8;
+               continue;
+            }
+            std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
+            if (len > (std::size_t)(end - it))
+            {
+                return convert_result<CharT>{reinterpret_cast<const CharT*>(it), conv_errc::source_exhausted};
+            }
+            if ((result=is_legal_utf8(it, len)) != conv_errc())
+            {
+                return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+            }
+            it += len;
+        }
         while (it != end) 
         {
-            if ((end - it) >= 8) // fast check for ascii
-            {
-                uint64_t chunk;
-                std::memcpy(&chunk, it, 8);
-                if ((chunk & mask) == 0) {
-                   it += 8;
-                   continue;
-                }
-            }
             std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
             {
