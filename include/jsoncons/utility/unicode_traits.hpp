@@ -394,7 +394,7 @@ namespace unicode_traits {
         }
         conv_errc  result = conv_errc();
 
-        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*first];
+        uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*first];
         if (extra_bytes_to_read >= last - first) 
         {
             result = conv_errc::source_exhausted; 
@@ -566,7 +566,6 @@ namespace unicode_traits {
         const uint8_t* last = data + length;
 
         conv_errc  result = conv_errc();
-        //const CharT* last = data + length;
         while (data != last) 
         {
             std::size_t len = trailing_bytes_for_utf8[*data] + 1;
@@ -606,10 +605,9 @@ namespace unicode_traits {
 
         conv_errc  result = conv_errc();
 
-        //const CharT* last = data + length;
         while (data != last) 
         {
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*data];
+            uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*data];
             if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
@@ -686,11 +684,10 @@ namespace unicode_traits {
 
         conv_errc  result = conv_errc();
 
-        const CharT* last = data + length;
         while (data < last) 
         {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*data];
+            uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*data];
             if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
@@ -771,7 +768,7 @@ namespace unicode_traits {
 
         const CharT* last = data + length;
         while (data < last) {
-            unsigned short bytes_to_write = 0;
+            uint16_t bytes_to_write = 0;
             static constexpr uint32_t byteMask = 0xBF;
             static constexpr uint32_t byteMark = 0x80; 
             uint32_t ch = *data++;
@@ -982,7 +979,7 @@ namespace unicode_traits {
         const CharT* last = data + length;
         while (data < last) 
         {
-            unsigned short bytes_to_write = 0;
+            uint16_t bytes_to_write = 0;
             static constexpr uint32_t byteMask = 0xBF;
             static constexpr uint32_t byteMark = 0x80; 
             uint32_t ch = *data++;
