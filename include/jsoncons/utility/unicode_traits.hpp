@@ -299,36 +299,34 @@ namespace unicode_traits {
 
     // utf8
 
-    template <typename CharT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value, conv_errc>::type
-    is_legal_utf8(const CharT* bytes, std::size_t length) 
+    inline conv_errc is_legal_utf8(const uint8_t* first, std::size_t length) noexcept 
     {
-        uint8_t a;
-        const uint8_t* first = reinterpret_cast<const uint8_t*>(bytes);
         const uint8_t* last = first+length;
+        uint8_t byte;
+
         switch (length) {
         default:
             return conv_errc::over_long_utf8_sequence;
         case 4:
-            if (((a = (*--last))& 0xC0) != 0x80)
+            if (((byte = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 3:
-            if (((a = (*--last))& 0xC0) != 0x80)
+            if (((byte = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 2:
-            if (((a = (*--last))& 0xC0) != 0x80)
+            if (((byte = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
 
             switch (static_cast<uint8_t>(*first)) 
             {
                 // no fall-through in this inner switch
-                case 0xE0: if (a < 0xA0) return conv_errc::source_illegal; break;
-                case 0xED: if (a > 0x9F) return conv_errc::source_illegal; break;
-                case 0xF0: if (a < 0x90) return conv_errc::source_illegal; break;
-                case 0xF4: if (a > 0x8F) return conv_errc::source_illegal; break;
-                default:   if (a < 0x80) return conv_errc::source_illegal;
+                case 0xE0: if (byte < 0xA0) return conv_errc::source_illegal; break;
+                case 0xED: if (byte > 0x9F) return conv_errc::source_illegal; break;
+                case 0xF0: if (byte < 0x90) return conv_errc::source_illegal; break;
+                case 0xF4: if (byte > 0x8F) return conv_errc::source_illegal; break;
+                default:   if (byte < 0x80) return conv_errc::source_illegal;
             }
 
             JSONCONS_FALLTHROUGH;
@@ -382,53 +380,56 @@ namespace unicode_traits {
     template <typename CharT,typename CodepointT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value && ext_traits::is_char32<CodepointT>::value,
                             convert_result<CharT>>::type 
-    to_codepoint(const CharT* first, const CharT* last, 
+    to_codepoint(const CharT* begin, const CharT* end, 
                  CodepointT& ch, 
                  conv_flags flags = conv_flags::strict) noexcept
     {
+        const uint8_t* first = reinterpret_cast<const uint8_t*>(begin);
+        const uint8_t* last = reinterpret_cast<const uint8_t*>(end);
+
         ch = 0;
         if (first >= last)
         {
-            return convert_result<CharT>{first, conv_errc::source_exhausted};
+            return convert_result<CharT>{begin, conv_errc::source_exhausted};
         }
         conv_errc  result = conv_errc();
 
-        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
+        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*first];
         if (extra_bytes_to_read >= last - first) 
         {
             result = conv_errc::source_exhausted; 
-            return convert_result<CharT>{first, result};
+            return convert_result<CharT>{begin, result};
         }
         // Do this check whether lenient or strict 
         if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc()) 
         {
-            return convert_result<CharT>{first, result};
+            return convert_result<CharT>{begin, result};
         }
         // The cases all fall through. See "Note A" below.
         switch (extra_bytes_to_read) 
         {
             case 5: 
-                ch += static_cast<uint8_t>(*first++); 
+                ch += (*first++); 
                 ch <<= 6;
                 JSONCONS_FALLTHROUGH;
             case 4: 
-                ch += static_cast<uint8_t>(*first++); 
+                ch += (*first++); 
                 ch <<= 6;
                 JSONCONS_FALLTHROUGH;
             case 3: 
-                ch += static_cast<uint8_t>(*first++); 
+                ch += (*first++); 
                 ch <<= 6;
                 JSONCONS_FALLTHROUGH;
             case 2: 
-                ch += static_cast<uint8_t>(*first++); 
+                ch += (*first++); 
                 ch <<= 6;
                 JSONCONS_FALLTHROUGH;
             case 1: 
-                ch += static_cast<uint8_t>(*first++); 
+                ch += (*first++); 
                 ch <<= 6;
                 JSONCONS_FALLTHROUGH;
             case 0: 
-                ch += static_cast<uint8_t>(*first++);
+                ch += (*first++);
                 break;
         }
         ch -= offsets_from_utf8[extra_bytes_to_read];
@@ -444,7 +445,7 @@ namespace unicode_traits {
                 {
                     first -= (extra_bytes_to_read+1); // return to the illegal value itself
                     result = conv_errc::source_illegal;
-                    return convert_result<CharT>{first, result};
+                    return convert_result<CharT>{begin, result};
                 } 
                 else
                 {
@@ -458,7 +459,7 @@ namespace unicode_traits {
             ch = replacement_char;
         }
 
-        return convert_result<CharT>{first,result} ;
+        return convert_result<CharT>{begin,result} ;
     }
 
     template <typename CharT,typename CodepointT>
@@ -557,15 +558,18 @@ namespace unicode_traits {
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char8<typename Container::value_type>::value,
                             convert_result<CharT>>::type 
-    convert(const CharT* data, std::size_t length, Container& target, conv_flags flags=conv_flags::strict) 
+    convert(const CharT* bytes, std::size_t length, Container& target, conv_flags flags=conv_flags::strict) 
     {
         (void)flags;
 
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(bytes);
+        const uint8_t* last = data + length;
+
         conv_errc  result = conv_errc();
-        const CharT* last = data + length;
+        //const CharT* last = data + length;
         while (data != last) 
         {
-            std::size_t len = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)] + 1;
+            std::size_t len = trailing_bytes_for_utf8[*data] + 1;
             if (len > (std::size_t)(last - data))
             {
                 return convert_result<CharT>{data, conv_errc::source_exhausted};
@@ -576,13 +580,13 @@ namespace unicode_traits {
             }
 
             switch (len) {
-                case 4: target.push_back(static_cast<uint8_t>(*data++));
+                case 4: target.push_back(*data++);
                     JSONCONS_FALLTHROUGH;
-                case 3: target.push_back(static_cast<uint8_t>(*data++));
+                case 3: target.push_back(*data++);
                     JSONCONS_FALLTHROUGH;
-                case 2: target.push_back(static_cast<uint8_t>(*data++));
+                case 2: target.push_back(*data++);
                     JSONCONS_FALLTHROUGH;
-                case 1: target.push_back(static_cast<uint8_t>(*data++));
+                case 1: target.push_back(*data++);
             }
         }
         return convert_result<CharT>{data,result} ;
@@ -593,16 +597,19 @@ namespace unicode_traits {
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char16<typename Container::value_type>::value,
                             convert_result<CharT>>::type 
-    convert(const CharT* data, std::size_t length, 
+    convert(const CharT* bytes, std::size_t length, 
             Container& target, 
             conv_flags flags = conv_flags::strict) 
     {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(bytes);
+        const uint8_t* last = data + length;
+
         conv_errc  result = conv_errc();
 
-        const CharT* last = data + length;
+        //const CharT* last = data + length;
         while (data != last) 
         {
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)];
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*data];
             if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
@@ -618,17 +625,17 @@ namespace unicode_traits {
              */
             uint32_t ch = 0;
             switch (extra_bytes_to_read) {
-                case 5: ch += static_cast<uint8_t>(*data++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 5: ch += *data++; ch <<= 6; /* remember, illegal UTF-8 */
                     JSONCONS_FALLTHROUGH;
-                case 4: ch += static_cast<uint8_t>(*data++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 4: ch += *data++; ch <<= 6; /* remember, illegal UTF-8 */
                     JSONCONS_FALLTHROUGH;
-                case 3: ch += static_cast<uint8_t>(*data++); ch <<= 6;
+                case 3: ch += *data++; ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 2: ch += static_cast<uint8_t>(*data++); ch <<= 6;
+                case 2: ch += *data++; ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 1: ch += static_cast<uint8_t>(*data++); ch <<= 6;
+                case 1: ch += *data++; ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 0: ch += static_cast<uint8_t>(*data++);
+                case 0: ch += *data++;
                     break;
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
@@ -670,17 +677,20 @@ namespace unicode_traits {
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char32<typename Container::value_type>::value,
                             convert_result<CharT>>::type 
-    convert(const CharT* data, std::size_t length, 
+    convert(const CharT* bytes, std::size_t length, 
             Container& target, 
             conv_flags flags = conv_flags::strict) 
     {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(bytes);
+        const uint8_t* last = data + length;
+
         conv_errc  result = conv_errc();
 
         const CharT* last = data + length;
         while (data < last) 
         {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)];
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*data];
             if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
@@ -697,27 +707,27 @@ namespace unicode_traits {
             switch (extra_bytes_to_read) 
             {
                 case 5: 
-                    ch += static_cast<uint8_t>(*data++); 
+                    ch += *data++; 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 4: 
-                    ch += static_cast<uint8_t>(*data++); 
+                    ch += *data++; 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 3: 
-                    ch += static_cast<uint8_t>(*data++); 
+                    ch += *data++; 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 2: 
-                    ch += static_cast<uint8_t>(*data++); 
+                    ch += *data++; 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 1: 
-                    ch += static_cast<uint8_t>(*data++); 
+                    ch += *data++; 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 0: 
-                    ch += static_cast<uint8_t>(*data++);
+                    ch += *data++;
                     break;
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
@@ -1133,24 +1143,26 @@ namespace unicode_traits {
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value,
                             convert_result<CharT>>::type 
-    validate(const CharT* data, std::size_t length) noexcept
+    validate(const CharT* bytes, std::size_t length) noexcept
     {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(bytes);
+        const uint8_t* last = data + length;
+
         conv_errc  result = conv_errc();
-        const CharT* last = data + length;
         while (data != last) 
         {
-            std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*data)]) + 1;
+            std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*data]) + 1;
             if (len > (std::size_t)(last - data))
             {
-                return convert_result<CharT>{data, conv_errc::source_exhausted};
+                return convert_result<CharT>{bytes, conv_errc::source_exhausted};
             }
             if ((result=is_legal_utf8(data, len)) != conv_errc())
             {
-                return convert_result<CharT>{data,result} ;
+                return convert_result<CharT>{bytes,result} ;
             }
             data += len;
         }
-        return convert_result<CharT>{data,result} ;
+        return convert_result<CharT>{bytes,result} ;
     }
 
     // utf16
