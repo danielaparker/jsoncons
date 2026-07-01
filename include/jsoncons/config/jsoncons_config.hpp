@@ -276,6 +276,10 @@ namespace jsoncons {
 #define JSONCONS_VISITOR_RETURN return true 
 #endif
 
+// Loop unrolling
+
+#define JSONCONS_REPEAT8(x)  { x x x x x x x x }
+
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 

@@ -1336,7 +1336,7 @@ namespace unicode_traits {
                 ec = r.ec;
                 break;
             }
-            it = r.it;
+            it = r.ptr;
         }
         return ec == conv_errc() && it == end ? count : 0;
     }
