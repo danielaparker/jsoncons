@@ -568,7 +568,6 @@ namespace unicode_traits {
         const uint8_t* end = it + length;
 
         conv_errc  result{};
-        const CharT* end = it + length;
         while (it != end) 
         {
             std::size_t len = trailing_bytes_for_utf8[*it] + 1;
