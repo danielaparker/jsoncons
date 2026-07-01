@@ -301,23 +301,24 @@ namespace unicode_traits {
 
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value, conv_errc>::type
-    is_legal_utf8(const CharT* first, std::size_t length) 
+    is_legal_utf8(const CharT* bytes, std::size_t length) 
     {
         uint8_t a;
-        const CharT* srcptr = first+length;
+        const uint8_t* first = reinterpret_cast<const uint8_t*>(bytes);
+        const uint8_t* last = first+length;
         switch (length) {
         default:
             return conv_errc::over_long_utf8_sequence;
         case 4:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 3:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 2:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = (*--last))& 0xC0) != 0x80)
                 return conv_errc::expected_continuation_byte;
 
             switch (static_cast<uint8_t>(*first)) 
