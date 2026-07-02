@@ -55,6 +55,25 @@ TEST_CASE("unicode_traits tests")
 
 TEST_CASE("unicode_traits utf8 tests")
 {
+    SECTION("Valid isolated bytes")
+    {
+        for (uint8_t c = 0; c <= 0x7F; ++c)
+        {
+            std::vector<uint8_t> seq1 = {c};
+            auto result1 = unicode_traits::validate(seq1.data(), seq1.size());
+            CHECK(unicode_traits::conv_errc::success == result1.ec);
+        }
+    }
+    SECTION("Valid isolated byte repeat")
+    {
+        std::vector<uint8_t> seq;
+        for (uint8_t c = 0; c <= 0x7F; ++c)
+        {
+            seq.push_back(c);
+        }
+        auto result = unicode_traits::validate(seq.data(), seq.size());
+        CHECK(unicode_traits::conv_errc::success == result.ec);
+    }
     SECTION("Valid continuation bytes")
     {
         std::vector<uint8_t> seq1 = {0xC2, 0x80};
@@ -62,28 +81,40 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::success == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xC2, 0xBF};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::success == result2.ec);
 
         std::vector<uint8_t> seq3 = {0xDF, 0xBF};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::success == result3.ec);
 
         std::vector<uint8_t> seq4 = {0xE0, 0xA0, 0x80};
-        auto result4 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
         CHECK(unicode_traits::conv_errc::success == result4.ec);
 
         std::vector<uint8_t> seq5 = {0xEF, 0xBF, 0xBF};
-        auto result5 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result5 = unicode_traits::validate(seq5.data(), seq5.size());
         CHECK(unicode_traits::conv_errc::success == result5.ec);
 
         std::vector<uint8_t> seq6 = {0xF0, 0x90, 0x80, 0x80};
-        auto result6 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result6 = unicode_traits::validate(seq6.data(), seq6.size());
         CHECK(unicode_traits::conv_errc::success == result6.ec);
 
         std::vector<uint8_t> seq7 = {0xF4, 0x8F, 0xBF, 0xBF};
-        auto result7 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result7 = unicode_traits::validate(seq7.data(), seq7.size());
         CHECK(unicode_traits::conv_errc::success == result7.ec);
+    }
+    SECTION("Valid continuation bytes repeat")
+    {
+        std::vector<uint8_t> seq;
+        for (uint8_t c = 0; c < 7u; ++c)
+        {
+            seq.push_back(c);
+        }
+        seq.push_back(0xC2);
+        seq.push_back(0x80);
+        auto result = unicode_traits::validate(seq.data(), seq.size());
+        CHECK(unicode_traits::conv_errc::success == result.ec);
     }
     SECTION("Boundary tests")
     {
@@ -92,23 +123,23 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::success == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xC2, 0xBF};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::success == result2.ec);
 
         std::vector<uint8_t> seq3 = {0xE0, 0xA0, 0x80};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::success == result3.ec);
 
         std::vector<uint8_t> seq4 = {0xED, 0x9F, 0xBF};
-        auto result4 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
         CHECK(unicode_traits::conv_errc::success == result4.ec);
 
         std::vector<uint8_t> seq5 = {0xF0, 0x90, 0x80, 0x80};
-        auto result5 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result5 = unicode_traits::validate(seq5.data(), seq5.size());
         CHECK(unicode_traits::conv_errc::success == result5.ec);
 
         std::vector<uint8_t> seq6 = {0xF4, 0x8F, 0xBF, 0xBF};
-        auto result6 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result6 = unicode_traits::validate(seq6.data(), seq6.size());
         CHECK(unicode_traits::conv_errc::success == result6.ec);
     }
     SECTION("Invalid isolated bytes")
@@ -118,34 +149,34 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::source_illegal == result1.ec);
 
         std::vector<uint8_t> seq2 = {0x81};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result2.ec);
 
         std::vector<uint8_t> seq3 = {0x90};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result3.ec);
 
         std::vector<uint8_t> seq4 = {0xA0};
-        auto result4 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result4.ec);
 
         std::vector<uint8_t> seq5 = {0xBF};
-        auto result5 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result5 = unicode_traits::validate(seq5.data(), seq5.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result5.ec);
 
         std::vector<uint8_t> seq6 = {0xC0};
-        auto result6 = unicode_traits::validate(seq1.data(), seq1.size());
-        CHECK(unicode_traits::conv_errc::source_illegal == result6.ec);
+        auto result6 = unicode_traits::validate(seq6.data(), seq6.size());
+        CHECK(unicode_traits::conv_errc::source_exhausted == result6.ec);
 
         std::vector<uint8_t> seq7 = {0xC1};
-        auto result7 = unicode_traits::validate(seq1.data(), seq1.size());
-        CHECK(unicode_traits::conv_errc::source_illegal == result7.ec);  
+        auto result7 = unicode_traits::validate(seq7.data(), seq7.size());
+        CHECK(unicode_traits::conv_errc::source_exhausted == result7.ec);  
 
         for (int c = 0xF5; c <= int(0xFF); ++c)
         {
             std::vector<uint8_t> seq = {uint8_t(c)};
-            auto result = unicode_traits::validate(seq1.data(), seq1.size());
-            CHECK(unicode_traits::conv_errc::source_illegal == result.ec);  
+            auto result = unicode_traits::validate(seq.data(), seq.size());
+            CHECK(unicode_traits::conv_errc::source_exhausted == result.ec);  
         }
     }
     SECTION("Invalid multiple continuation bytes without a starter")
@@ -155,15 +186,15 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::source_illegal == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xBF, 0xBF};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result2.ec);
 
         std::vector<uint8_t> seq3 = {0x80, 0xBF, 0x80};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result3.ec);
 
         std::vector<uint8_t> seq4 = {0x80, 0x81, 0x82, 0x83};
-        auto result4 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result4.ec);
     }
     SECTION("Invalid continuation after ASCII")
@@ -173,11 +204,11 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::source_illegal == result1.ec);
 
         std::vector<uint8_t> seq2 = {0x7F, 0xBF};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result2.ec);
 
         std::vector<uint8_t> seq3 = {0x20, 0x80};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result3.ec);
     }
     SECTION("Invalid too few continuation bytes")
@@ -187,11 +218,11 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::source_exhausted == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xE2, 0x82};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::source_exhausted == result2.ec);
 
         std::vector<uint8_t> seq3 = {0xF0, 0x90, 0x80};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::source_exhausted == result3.ec);
     }
     SECTION("Invalid: wrong continuation byte")
@@ -201,23 +232,23 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xC2, 0xC0};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result2.ec);
 
         std::vector<uint8_t> seq3 = {0xE2, 0x28, 0xA1};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result3.ec);
 
         std::vector<uint8_t> seq4 = {0xE2, 0xC0, 0x80};
-        auto result4 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result4.ec);
 
         std::vector<uint8_t> seq5 = {0xF0, 0x90, 0x41, 0x80};
-        auto result5 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result5 = unicode_traits::validate(seq5.data(), seq5.size());
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result5.ec);
 
         std::vector<uint8_t> seq6 = {0xF0, 0x7F, 0x80, 0x80};
-        auto result6 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result6 = unicode_traits::validate(seq6.data(), seq6.size());
         CHECK(unicode_traits::conv_errc::bad_continuation_byte == result6.ec);
     }
     SECTION("Invalid: extra continuation byte")
@@ -227,12 +258,16 @@ TEST_CASE("unicode_traits utf8 tests")
         CHECK(unicode_traits::conv_errc::source_illegal == result1.ec);
 
         std::vector<uint8_t> seq2 = {0xE2, 0x82, 0xAC, 0x80};
-        auto result2 = unicode_traits::validate(seq1.data(), seq1.size());
+        auto result2 = unicode_traits::validate(seq2.data(), seq2.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result2.ec);
 
-        std::vector<uint8_t> seq3 = {0xF0, 0x90, 0x80, 0x80};
-        auto result3 = unicode_traits::validate(seq1.data(), seq1.size());
+        std::vector<uint8_t> seq3 = {0xE2, 0x82, 0xAC, 0xBF};
+        auto result3 = unicode_traits::validate(seq3.data(), seq3.size());
         CHECK(unicode_traits::conv_errc::source_illegal == result3.ec);
+
+        std::vector<uint8_t> seq4 = {0xC3, 0xA9, 0x80};
+        auto result4 = unicode_traits::validate(seq4.data(), seq4.size());
+        CHECK(unicode_traits::conv_errc::source_illegal == result4.ec);
     }
 }
 

@@ -233,7 +233,7 @@ namespace unicode_traits {
     {
         success = 0,
         over_long_utf8_sequence = 1, // over long utf8 sequence
-        bad_continuation_byte,  // expected continuation byte    
+        bad_continuation_byte,       // expected continuation byte    
         unpaired_high_surrogate,     // unpaired high surrogate UTF-16
         illegal_surrogate_value,     // UTF-16 surrogate values are illegal in UTF-32
         source_exhausted,            // partial character in source, but hit end
@@ -1150,10 +1150,12 @@ namespace unicode_traits {
         conv_errc  result{};
         while (it != end) 
         {
-            /*if ((end - it) >= 8)
+            if ((end - it) >= 8)
             {
-                while (true) JSONCONS_REPEAT8({if (JSONCONS_LIKELY((trailing_bytes_for_utf8[*it] == 0) && !(*it >= 0x80 && *it < 0xC2))) ++it; else break;})
-            }*/
+                JSONCONS_REPEAT8({if (JSONCONS_LIKELY((*it & 0x80) == 0)) ++it; else goto non_ascii;})
+                continue;
+            }
+    non_ascii:
             const std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
             {
