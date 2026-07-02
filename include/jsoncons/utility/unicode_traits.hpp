@@ -1150,10 +1150,10 @@ namespace unicode_traits {
         conv_errc  result{};
         while (it != end) 
         {
-            if ((end - it) >= 8)
+            /*if ((end - it) >= 8)
             {
-                while (true) JSONCONS_REPEAT8({if (JSONCONS_LIKELY((trailing_bytes_for_utf8[*it] == 0) && (*it >= 0x80 && *it < 0xC2))) ++it; else break;})
-            }
+                while (true) JSONCONS_REPEAT8({if (JSONCONS_LIKELY((trailing_bytes_for_utf8[*it] == 0) && !(*it >= 0x80 && *it < 0xC2))) ++it; else break;})
+            }*/
             const std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
             {
