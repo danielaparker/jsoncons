@@ -1171,7 +1171,7 @@ namespace unicode_traits {
         }
         while (it != end) 
         {
-            if (*it & 0x80)
+            if ((*it & 0x80) == 0)
             {
                 ++it;
                 continue;
