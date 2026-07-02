@@ -151,7 +151,7 @@ add_executable(unit_tests
                corelib/src/utility/heap_string_tests.cpp
                corelib/src/utility/read_number_tests.cpp
                corelib/src/utility/string_utils_tests.cpp
-               corelib/src/utility/unicode_conv_tests.cpp
+               corelib/src/utility/unicode_traits_tests.cpp
                corelib/src/utility/uri_tests.cpp
                corelib/src/wjson_tests.cpp
                csv/src/csv_cursor_tests.cpp

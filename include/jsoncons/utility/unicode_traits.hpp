@@ -233,7 +233,7 @@ namespace unicode_traits {
     {
         success = 0,
         over_long_utf8_sequence = 1, // over long utf8 sequence
-        expected_continuation_byte,  // expected continuation byte    
+        bad_continuation_byte,  // expected continuation byte    
         unpaired_high_surrogate,     // unpaired high surrogate UTF-16
         illegal_surrogate_value,     // UTF-16 surrogate values are illegal in UTF-32
         source_exhausted,            // partial character in source, but hit end
@@ -254,7 +254,7 @@ namespace unicode_traits {
             {
             case conv_errc::over_long_utf8_sequence:
                 return "Over long utf8 sequence";
-            case conv_errc::expected_continuation_byte:
+            case conv_errc::bad_continuation_byte:
                 return "Expected continuation byte";
             case conv_errc::unpaired_high_surrogate:
                 return "Unpaired high surrogate UTF-16";
@@ -311,15 +311,15 @@ namespace unicode_traits {
             return conv_errc::over_long_utf8_sequence;
         case 4:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::expected_continuation_byte;
+                return conv_errc::bad_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 3:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::expected_continuation_byte;
+                return conv_errc::bad_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 2:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::expected_continuation_byte;
+                return conv_errc::bad_continuation_byte;
 
             switch (*it) 
             {

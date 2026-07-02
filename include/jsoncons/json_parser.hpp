@@ -2350,11 +2350,11 @@ escape_u8:
                 return;
             }
             break;
-        case unicode_traits::conv_errc::expected_continuation_byte:
-            more_ = err_handler_(json_errc::expected_continuation_byte, *this);
+        case unicode_traits::conv_errc::bad_continuation_byte:
+            more_ = err_handler_(json_errc::bad_continuation_byte, *this);
             if (!more_)
             {
-                ec = json_errc::expected_continuation_byte;
+                ec = json_errc::bad_continuation_byte;
                 return;
             }
             break;
