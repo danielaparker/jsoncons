@@ -358,7 +358,7 @@ private:
                 buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
                 std::size_t string_offset = buffer_.size();
                 auto sink = unicode_traits::validate(sv.data(), sv.size());
-                if (sink.ec != unicode_traits::conv_errc())
+                if (sink.ec != unicode_traits::unicode_errc())
                 {
                     ec = bson_errc::invalid_utf8_text_string;
                     JSONCONS_VISITOR_RETURN;

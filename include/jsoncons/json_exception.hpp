@@ -72,7 +72,7 @@ namespace jsoncons {
             JSONCONS_TRY
             {
                 unicode_traits::convert(key, length, name_,
-                                 unicode_traits::conv_flags::strict);
+                                 unicode_traits::strict_flag::strict);
             }
             JSONCONS_CATCH(...)
             {
@@ -119,7 +119,7 @@ namespace jsoncons {
             JSONCONS_TRY
             {
                 unicode_traits::convert(key, length, name_,
-                                 unicode_traits::conv_flags::strict);
+                                 unicode_traits::strict_flag::strict);
             }
             JSONCONS_CATCH(...)
             {

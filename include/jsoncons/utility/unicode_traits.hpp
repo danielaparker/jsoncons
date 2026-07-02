@@ -222,15 +222,15 @@ namespace unicode_traits {
         return (ch >= sur_high_start && ch <= sur_low_end);
     }
 
-    enum class conv_flags 
+    enum class strict_flag 
     {
         strict = 0,
         lenient
     };
 
-    // conv_errc
+    // unicode_errc
 
-    enum class conv_errc 
+    enum class unicode_errc 
     {
         success = 0,
         over_long_utf8_sequence = 1, // over long utf8 sequence
@@ -251,19 +251,19 @@ namespace unicode_traits {
         }
         virtual std::string message(int ev) const
         {
-            switch (static_cast<conv_errc>(ev))
+            switch (static_cast<unicode_errc>(ev))
             {
-            case conv_errc::over_long_utf8_sequence:
+            case unicode_errc::over_long_utf8_sequence:
                 return "Over long utf8 sequence";
-            case conv_errc::bad_continuation_byte:
+            case unicode_errc::bad_continuation_byte:
                 return "Expected continuation byte";
-            case conv_errc::unpaired_high_surrogate:
+            case unicode_errc::unpaired_high_surrogate:
                 return "Unpaired high surrogate UTF-16";
-            case conv_errc::illegal_surrogate_value:
+            case unicode_errc::illegal_surrogate_value:
                 return "UTF-16 surrogate values are illegal in UTF-32";
-            case conv_errc::source_exhausted:
+            case unicode_errc::source_exhausted:
                 return "Partial character in source, but hit end";
-            case conv_errc::source_illegal:
+            case unicode_errc::source_illegal:
                 return "Source sequence is illegal/malformed";
             default:
                 return "";
@@ -280,7 +280,7 @@ namespace unicode_traits {
     }
 
     inline 
-    std::error_code make_error_code(conv_errc result) noexcept
+    std::error_code make_error_code(unicode_errc result) noexcept
     {
         return std::error_code(static_cast<int>(result),unicode_traits_error_category());
     }
@@ -290,7 +290,7 @@ namespace unicode_traits {
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::unicode_traits::conv_errc> : public true_type
+    struct is_error_code_enum<jsoncons::unicode_traits::unicode_errc> : public true_type
     {
     };
 } // namespace std
@@ -301,7 +301,7 @@ namespace unicode_traits {
     // utf8
 
     inline
-    conv_errc is_legal_utf8(const uint8_t* bytes, std::size_t length) noexcept
+    unicode_errc is_legal_utf8(const uint8_t* bytes, std::size_t length) noexcept
     {
         const uint8_t* it = reinterpret_cast<const uint8_t*>(bytes);
         const uint8_t* end = it+length;
@@ -309,39 +309,39 @@ namespace unicode_traits {
         uint8_t byte;
         switch (length) {
         default:
-            return conv_errc::over_long_utf8_sequence;
+            return unicode_errc::over_long_utf8_sequence;
         case 4:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::bad_continuation_byte;
+                return unicode_errc::bad_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 3:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::bad_continuation_byte;
+                return unicode_errc::bad_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 2:
             if (((byte = (*--end))& 0xC0) != 0x80)
-                return conv_errc::bad_continuation_byte;
+                return unicode_errc::bad_continuation_byte;
 
             switch (*it) 
             {
                 // no fall-through in this inner switch
-                case 0xE0: if (byte < 0xA0) return conv_errc::source_illegal; break;
-                case 0xED: if (byte > 0x9F) return conv_errc::source_illegal; break;
-                case 0xF0: if (byte < 0x90) return conv_errc::source_illegal; break;
-                case 0xF4: if (byte > 0x8F) return conv_errc::source_illegal; break;
-                default:   if (byte < 0x80) return conv_errc::source_illegal;
+                case 0xE0: if (byte < 0xA0) return unicode_errc::source_illegal; break;
+                case 0xED: if (byte > 0x9F) return unicode_errc::source_illegal; break;
+                case 0xF0: if (byte < 0x90) return unicode_errc::source_illegal; break;
+                case 0xF4: if (byte > 0x8F) return unicode_errc::source_illegal; break;
+                default:   if (byte < 0x80) return unicode_errc::source_illegal;
             }
 
             JSONCONS_FALLTHROUGH;
         case 1:
             if (*it >= 0x80 && *it < 0xC2)
-                return conv_errc::source_illegal;
+                return unicode_errc::source_illegal;
             break;
         }
         if (*it > 0xF4) 
-            return conv_errc::source_illegal;
+            return unicode_errc::source_illegal;
 
-        return conv_errc();
+        return unicode_errc();
     }
 
     template <typename...> using void_t = void;
@@ -372,20 +372,20 @@ namespace unicode_traits {
     // convert
 
     template <typename CharT>
-    struct convert_result
+    struct unicode_result
     {
         const CharT* ptr;
-        conv_errc ec;
+        unicode_errc ec;
     };
 
     // to_codepoint
 
     template <typename CharT,typename CodepointT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value && ext_traits::is_char32<CodepointT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) noexcept
+                 strict_flag flags = strict_flag::strict) noexcept
     {
         const uint8_t* it = reinterpret_cast<const uint8_t*>(first);
         const uint8_t* end = reinterpret_cast<const uint8_t*>(last);
@@ -393,20 +393,20 @@ namespace unicode_traits {
         ch = 0;
         if (it >= end)
         {
-            return convert_result<CharT>{reinterpret_cast<const CharT*>(it), conv_errc::source_exhausted};
+            return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), unicode_errc::source_exhausted};
         }
-        conv_errc  result{};
+        unicode_errc  result{};
 
         uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*it];
         if (extra_bytes_to_read >= end - it) 
         {
-            result = conv_errc::source_exhausted; 
-            return convert_result<CharT>{reinterpret_cast<const CharT*>(it), result};
+            result = unicode_errc::source_exhausted; 
+            return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), result};
         }
         // Do this check whether lenient or strict 
-        if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != conv_errc()) 
+        if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != unicode_errc()) 
         {
-            return convert_result<CharT>{reinterpret_cast<const CharT*>(it), result};
+            return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), result};
         }
         // The cases all fall through. See "Note A" below.
         switch (extra_bytes_to_read) 
@@ -444,11 +444,11 @@ namespace unicode_traits {
              */
             if (is_surrogate(ch) ) 
             {
-                if (flags == conv_flags::strict) 
+                if (flags == strict_flag::strict) 
                 {
                     it -= (extra_bytes_to_read+1); // return to the illegal value itself
-                    result = conv_errc::source_illegal;
-                    return convert_result<CharT>{reinterpret_cast<const CharT*>(it), result};
+                    result = unicode_errc::source_illegal;
+                    return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), result};
                 } 
                 else
                 {
@@ -458,26 +458,26 @@ namespace unicode_traits {
         } 
         else // i.e., ch > max_legal_utf32
         { 
-            result = conv_errc::source_illegal;
+            result = unicode_errc::source_illegal;
             ch = replacement_char;
         }
 
-        return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+        return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
     }
 
     template <typename CharT,typename CodepointT>
     typename std::enable_if<ext_traits::is_char16<CharT>::value && ext_traits::is_char32<CodepointT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) noexcept
+                 strict_flag flags = strict_flag::strict) noexcept
     {
         ch = 0;
         if (first >= last)
         {
-            return convert_result<CharT>{first, conv_errc::source_exhausted};
+            return unicode_result<CharT>{first, unicode_errc::source_exhausted};
         }
-        conv_errc  result{};
+        unicode_errc  result{};
 
         ch = *first++;
         // If we have a surrogate pair, convert to UTF32 first. 
@@ -494,64 +494,64 @@ namespace unicode_traits {
                         + (ch2 - sur_low_start) + half_base;
                     ++first;
                 } 
-                else if (flags == conv_flags::strict) // ptr's an unpaired high surrogate 
+                else if (flags == strict_flag::strict) // ptr's an unpaired high surrogate 
                 { 
                     --first; /* return to the illegal value itself */
-                    result = conv_errc::source_illegal;
-                    return convert_result<CharT>{first, result};
+                    result = unicode_errc::source_illegal;
+                    return unicode_result<CharT>{first, result};
                 }
             } 
             else 
             { /* We don't have the 16 bits following the high surrogate. */
                 --first; /* return to the high surrogate */
-                result = conv_errc::source_exhausted;
-                return convert_result<CharT>{first, result};
+                result = unicode_errc::source_exhausted;
+                return unicode_result<CharT>{first, result};
             }
-        } else if (flags == conv_flags::strict) {
+        } else if (flags == strict_flag::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_low_surrogate(ch) ) 
             {
                 --first; /* return to the illegal value itself */
-                result = conv_errc::source_illegal;
-                return convert_result<CharT>{first, result};
+                result = unicode_errc::source_illegal;
+                return unicode_result<CharT>{first, result};
             }
         }
         
-        return convert_result<CharT>{first,result} ;
+        return unicode_result<CharT>{first,result} ;
     }
 
     template <typename CharT,typename CodepointT>
     typename std::enable_if<ext_traits::is_char32<CharT>::value && ext_traits::is_char32<CodepointT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) noexcept
+                 strict_flag flags = strict_flag::strict) noexcept
     {
         ch = 0;
         if (first >= last)
         {
-            return convert_result<CharT>{first, conv_errc::source_exhausted};
+            return unicode_result<CharT>{first, unicode_errc::source_exhausted};
         }
-        conv_errc  result{};
+        unicode_errc  result{};
 
         ch = *first++;
-        if (flags == conv_flags::strict ) 
+        if (flags == strict_flag::strict ) 
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_surrogate(ch)) 
             {
                 --first; /* return to the illegal value itself */
-                result = conv_errc::illegal_surrogate_value;
-                return convert_result<CharT>{first,result} ;
+                result = unicode_errc::illegal_surrogate_value;
+                return unicode_result<CharT>{first,result} ;
             }
         }
         if (!(ch <= max_legal_utf32))
         {
             ch = replacement_char;
-            result = conv_errc::source_illegal;
+            result = unicode_errc::source_illegal;
         }
 
-        return convert_result<CharT>{first,result} ;
+        return unicode_result<CharT>{first,result} ;
     }
 
     // convert
@@ -560,25 +560,25 @@ namespace unicode_traits {
     typename std::enable_if<ext_traits::is_char8<CharT>::value
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char8<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
-    convert(const CharT* data, std::size_t length, Container& target, conv_flags flags=conv_flags::strict) 
+                            unicode_result<CharT>>::type 
+    convert(const CharT* data, std::size_t length, Container& target, strict_flag flags=strict_flag::strict) 
     {
         (void)flags;
 
         const uint8_t* it = reinterpret_cast<const uint8_t*>(data);
         const uint8_t* end = it + length;
 
-        conv_errc  result{};
+        unicode_errc  result{};
         while (it != end) 
         {
             std::size_t len = trailing_bytes_for_utf8[*it] + 1;
             if (len > (std::size_t)(end - it))
             {
-                return convert_result<CharT>{reinterpret_cast<const CharT*>(it), conv_errc::source_exhausted};
+                return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), unicode_errc::source_exhausted};
             }
-            if ((result=is_legal_utf8(it, len)) != conv_errc())
+            if ((result=is_legal_utf8(it, len)) != unicode_errc())
             {
-                return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result};
+                return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result};
             }
 
             switch (len) {
@@ -591,19 +591,19 @@ namespace unicode_traits {
                 case 1: target.push_back(*it++);
             }
         }
-        return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result};
+        return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result};
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char8<CharT>::value
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char16<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const uint8_t* it = reinterpret_cast<const uint8_t*>(data);
         const uint8_t* end = it + length;
@@ -613,11 +613,11 @@ namespace unicode_traits {
             uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*it];
             if (extra_bytes_to_read >= end - it) 
             {
-                result = conv_errc::source_exhausted; 
+                result = unicode_errc::source_exhausted; 
                 break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != conv_errc())
+            if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != unicode_errc())
             {
                 break;
             }
@@ -645,9 +645,9 @@ namespace unicode_traits {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch) ) 
                 {
-                    if (flags == conv_flags::strict) {
+                    if (flags == strict_flag::strict) {
                         it -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        result = unicode_errc::source_illegal;
                         break;
                     } else {
                         target.push_back(replacement_char);
@@ -656,8 +656,8 @@ namespace unicode_traits {
                     target.push_back((uint16_t)ch); /* normal case */
                 }
             } else if (ch > max_utf16) {
-                if (flags == conv_flags::strict) {
-                    result = conv_errc::source_illegal;
+                if (flags == strict_flag::strict) {
+                    result = unicode_errc::source_illegal;
                     it -= (extra_bytes_to_read+1); /* return to the start */
                     break; /* Bail out; shouldn't continue */
                 } else {
@@ -670,22 +670,22 @@ namespace unicode_traits {
                 target.push_back((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
-        return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+        return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char8<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char32<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
         const uint8_t* it = reinterpret_cast<const uint8_t*>(data);
         const uint8_t* end = it + length;
 
-        conv_errc  result{};
+        unicode_errc  result{};
 
         while (it < end) 
         {
@@ -693,11 +693,11 @@ namespace unicode_traits {
             uint16_t extra_bytes_to_read = trailing_bytes_for_utf8[*it];
             if (extra_bytes_to_read >= end - it) 
             {
-                result = conv_errc::source_exhausted; 
+                result = unicode_errc::source_exhausted; 
                 break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != conv_errc()) 
+            if ((result=is_legal_utf8(it, extra_bytes_to_read+1)) != unicode_errc()) 
             {
                 break;
             }
@@ -739,9 +739,9 @@ namespace unicode_traits {
                  */
                 if (is_surrogate(ch) ) 
                 {
-                    if (flags == conv_flags::strict) {
+                    if (flags == strict_flag::strict) {
                         it -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        result = unicode_errc::source_illegal;
                         break;
                     } else {
                         target.push_back(replacement_char);
@@ -750,11 +750,11 @@ namespace unicode_traits {
                     target.push_back(ch);
                 }
             } else { /* i.e., ch > max_legal_utf32 */
-                result = conv_errc::source_illegal;
+                result = unicode_errc::source_illegal;
                 target.push_back(replacement_char);
             }
         }
-        return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+        return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
     }
 
     // utf16
@@ -763,11 +763,11 @@ namespace unicode_traits {
     typename std::enable_if<ext_traits::is_char16<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char8<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
                      Container& target, 
-                     conv_flags flags = conv_flags::strict) {
-        conv_errc  result{};
+                     strict_flag flags = strict_flag::strict) {
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data < last) {
@@ -786,22 +786,22 @@ namespace unicode_traits {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
+                    } else if (flags == strict_flag::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
-                        result = conv_errc::unpaired_high_surrogate;
+                        result = unicode_errc::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
                     --data; /* return to the high surrogate */
-                    result = conv_errc::source_exhausted;
+                    result = unicode_errc::source_exhausted;
                     break;
                 }
-            } else if (flags == conv_flags::strict) {
+            } else if (flags == strict_flag::strict) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_low_surrogate(ch)) 
                 {
                     --data; /* return to the illegal value itself */
-                    result = conv_errc::source_illegal;
+                    result = unicode_errc::source_illegal;
                     break;
                 }
             }
@@ -856,19 +856,19 @@ namespace unicode_traits {
                 break;
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char16<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char16<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
@@ -885,22 +885,22 @@ namespace unicode_traits {
                         target.push_back((uint16_t)ch);
                         target.push_back((uint16_t)ch2);
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
+                    } else if (flags == strict_flag::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
-                        result = conv_errc::unpaired_high_surrogate;
+                        result = unicode_errc::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
                     --data; /* return to the high surrogate */
-                    result = conv_errc::source_exhausted;
+                    result = unicode_errc::source_exhausted;
                     break;
                 }
             } else if (is_low_surrogate(ch)) 
             {
                 // illegal leading low surrogate
-                if (flags == conv_flags::strict) {
+                if (flags == strict_flag::strict) {
                     --data; /* return to the illegal value itself */
-                    result = conv_errc::source_illegal;
+                    result = unicode_errc::source_illegal;
                     break;
                 }
                 else
@@ -913,19 +913,19 @@ namespace unicode_traits {
                 target.push_back((uint16_t)ch);
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char16<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char32<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
@@ -943,28 +943,28 @@ namespace unicode_traits {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
+                    } else if (flags == strict_flag::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        result = unicode_errc::source_illegal;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
                     --data; /* return to the high surrogate */
-                    result = conv_errc::source_exhausted;
+                    result = unicode_errc::source_exhausted;
                     break;
                 }
-            } else if (flags == conv_flags::strict) {
+            } else if (flags == strict_flag::strict) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_low_surrogate(ch) ) 
                 {
                     --data; /* return to the illegal value itself */
-                    result = conv_errc::source_illegal;
+                    result = unicode_errc::source_illegal;
                     break;
                 }
             }
             target.push_back(ch);
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     // utf32
@@ -973,12 +973,12 @@ namespace unicode_traits {
     typename std::enable_if<ext_traits::is_char32<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char8<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
         const CharT* last = data + length;
         while (data < last) 
         {
@@ -986,13 +986,13 @@ namespace unicode_traits {
             static constexpr uint32_t byteMask = 0xBF;
             static constexpr uint32_t byteMark = 0x80; 
             uint32_t ch = *data++;
-            if (flags == conv_flags::strict ) 
+            if (flags == strict_flag::strict ) 
             {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch)) 
                 {
                     --data; /* return to the illegal value itself */
-                    result = conv_errc::illegal_surrogate_value;
+                    result = unicode_errc::illegal_surrogate_value;
                     break;
                 }
             }
@@ -1007,7 +1007,7 @@ namespace unicode_traits {
             } else {                            
                 bytes_to_write = 3;
                 ch = replacement_char;
-                result = conv_errc::source_illegal;
+                result = unicode_errc::source_illegal;
             }
 
             uint8_t byte1 = 0;
@@ -1052,19 +1052,19 @@ namespace unicode_traits {
                 break;
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char32<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char16<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
@@ -1074,9 +1074,9 @@ namespace unicode_traits {
                 /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
                 if (is_surrogate(ch) ) 
                 {
-                    if (flags == conv_flags::strict) {
+                    if (flags == strict_flag::strict) {
                         --data; /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        result = unicode_errc::source_illegal;
                         break;
                     } else {
                         target.push_back(replacement_char);
@@ -1085,8 +1085,8 @@ namespace unicode_traits {
                     target.push_back((uint16_t)ch); /* normal case */
                 }
             } else if (ch > max_legal_utf32) {
-                if (flags == conv_flags::strict) {
-                    result = conv_errc::source_illegal;
+                if (flags == strict_flag::strict) {
+                    result = unicode_errc::source_illegal;
                 } else {
                     target.push_back(replacement_char);
                 }
@@ -1097,31 +1097,31 @@ namespace unicode_traits {
                 target.push_back((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     template <typename CharT,typename Container>
     typename std::enable_if<ext_traits::is_char32<CharT>::value                            
                             && ext_traits::is_back_insertable<Container>::value
                             && ext_traits::is_char32<typename Container::value_type>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
-            conv_flags flags = conv_flags::strict) 
+            strict_flag flags = strict_flag::strict) 
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
-            if (flags == conv_flags::strict ) 
+            if (flags == strict_flag::strict ) 
             {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch)) 
                 {
                     --data; /* return to the illegal value itself */
-                    result = conv_errc::illegal_surrogate_value;
+                    result = unicode_errc::illegal_surrogate_value;
                     break;
                 }
             }
@@ -1132,23 +1132,23 @@ namespace unicode_traits {
             else
             {
                 target.push_back(replacement_char);
-                result = conv_errc::source_illegal;
+                result = unicode_errc::source_illegal;
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     // validate
 
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length) noexcept
     {
         const uint8_t* it = reinterpret_cast<const uint8_t*>(data);
         const uint8_t* end = it + length;
 
-        conv_errc  result{};
+        unicode_errc  result{};
         while (it != end) 
         {
             if ((end - it) >= 8)
@@ -1160,25 +1160,25 @@ namespace unicode_traits {
             const std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
             {
-                return convert_result<CharT>{reinterpret_cast<const CharT*>(it), conv_errc::source_exhausted};
+                return unicode_result<CharT>{reinterpret_cast<const CharT*>(it), unicode_errc::source_exhausted};
             }
-            if ((result=is_legal_utf8(it, len)) != conv_errc())
+            if ((result=is_legal_utf8(it, len)) != unicode_errc())
             {
-                return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+                return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
             }
             it += len;
         }
-        return convert_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
+        return unicode_result<CharT>{reinterpret_cast<const CharT*>(it),result} ;
     }
 
     // utf16
 
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char16<CharT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length)  noexcept
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
@@ -1195,14 +1195,14 @@ namespace unicode_traits {
                         ++data;
                     } else {
                         --data; /* return to the illegal value itself */
-                        result = conv_errc::unpaired_high_surrogate;
+                        result = unicode_errc::unpaired_high_surrogate;
                         break;
                     }
                 } 
                 else // We don't have the 16 bits following the high surrogate.  
                 { 
                     --data; /* return to the high surrogate */
-                    result = conv_errc::source_exhausted;
+                    result = unicode_errc::source_exhausted;
                     break;
                 }
             } 
@@ -1210,21 +1210,21 @@ namespace unicode_traits {
             {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 --data; /* return to the illegal value itself */
-                result = conv_errc::source_illegal;
+                result = unicode_errc::source_illegal;
                 break;
             }
         }
-        return convert_result<CharT>{data,result} ;
+        return unicode_result<CharT>{data,result} ;
     }
 
     // utf32
 
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char32<CharT>::value,
-                            convert_result<CharT>>::type 
+                            unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length) noexcept
     {
-        conv_errc  result{};
+        unicode_errc  result{};
 
         const CharT* last = data + length;
         while (data != last) 
@@ -1234,15 +1234,15 @@ namespace unicode_traits {
             if (is_surrogate(ch)) 
             {
                 --data; /* return to the illegal value itself */
-                result = conv_errc::illegal_surrogate_value;
+                result = unicode_errc::illegal_surrogate_value;
                 break;
             }
             if (!(ch <= max_legal_utf32))
             {
-                result = conv_errc::source_illegal;
+                result = unicode_errc::source_illegal;
             }
         }
-        return convert_result<CharT>{data, result} ;
+        return unicode_result<CharT>{data, result} ;
     }
 
     enum class encoding {u8,u16le,u16be,u32le,u32be,undetected};
@@ -1326,9 +1326,9 @@ namespace unicode_traits {
     template <typename CharT>
     typename std::enable_if<ext_traits::is_char8<CharT>::value || ext_traits::is_char16<CharT>::value || ext_traits::is_char32<CharT>::value, std::size_t>::type 
     count_codepoints(const CharT* data, std::size_t length, 
-                     conv_flags flags = conv_flags::strict) noexcept
+                     strict_flag flags = strict_flag::strict) noexcept
     {
-        conv_errc ec = conv_errc();
+        unicode_errc ec = unicode_errc();
 
         std::size_t count = 0;
         const CharT* it = data;
@@ -1338,14 +1338,14 @@ namespace unicode_traits {
         {
             uint32_t cp = 0;
             auto r = to_codepoint(it, end, cp, flags);
-            if (r.ec != conv_errc())
+            if (r.ec != unicode_errc())
             {
                 ec = r.ec;
                 break;
             }
             it = r.ptr;
         }
-        return ec == conv_errc() && it == end ? count : 0;
+        return ec == unicode_errc() && it == end ? count : 0;
     }
 
 } // unicode_traits

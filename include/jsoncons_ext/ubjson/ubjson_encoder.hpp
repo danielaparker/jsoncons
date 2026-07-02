@@ -256,7 +256,7 @@ private:
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name, const ser_context&, std::error_code& ec) final
     {
         auto sink = unicode_traits::validate(name.data(), name.size());
-        if (sink.ec != unicode_traits::conv_errc())
+        if (sink.ec != unicode_traits::unicode_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             JSONCONS_VISITOR_RETURN;
@@ -297,7 +297,7 @@ private:
         }
 
         auto sink = unicode_traits::validate(sv.data(), sv.size());
-        if (sink.ec != unicode_traits::conv_errc())
+        if (sink.ec != unicode_traits::unicode_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             JSONCONS_VISITOR_RETURN;

@@ -87,8 +87,8 @@ std::size_t escape_string(const CharT* s, std::size_t length,
                 {
                     // convert to codepoint
                     uint32_t cp;
-                    auto r = unicode_traits::to_codepoint(it, end, cp, unicode_traits::conv_flags::strict);
-                    if (r.ec != unicode_traits::conv_errc())
+                    auto r = unicode_traits::to_codepoint(it, end, cp, unicode_traits::strict_flag::strict);
+                    if (r.ec != unicode_traits::unicode_errc())
                     {
                         JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
                     }

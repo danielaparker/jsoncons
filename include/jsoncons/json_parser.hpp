@@ -2328,13 +2328,13 @@ escape_u8:
         JSONCONS_UNREACHABLE();               
     }
 
-    void translate_conv_errc(unicode_traits::conv_errc result, std::error_code& ec)
+    void translate_conv_errc(unicode_traits::unicode_errc result, std::error_code& ec)
     {
         switch (result)
         {
-        case unicode_traits::conv_errc():
+        case unicode_traits::unicode_errc():
             break;
-        case unicode_traits::conv_errc::over_long_utf8_sequence:
+        case unicode_traits::unicode_errc::over_long_utf8_sequence:
             more_ = err_handler_(json_errc::over_long_utf8_sequence, *this);
             if (!more_)
             {
@@ -2342,7 +2342,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicode_traits::conv_errc::unpaired_high_surrogate:
+        case unicode_traits::unicode_errc::unpaired_high_surrogate:
             more_ = err_handler_(json_errc::unpaired_high_surrogate, *this);
             if (!more_)
             {
@@ -2350,7 +2350,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicode_traits::conv_errc::bad_continuation_byte:
+        case unicode_traits::unicode_errc::bad_continuation_byte:
             more_ = err_handler_(json_errc::bad_continuation_byte, *this);
             if (!more_)
             {
@@ -2358,7 +2358,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicode_traits::conv_errc::illegal_surrogate_value:
+        case unicode_traits::unicode_errc::illegal_surrogate_value:
             more_ = err_handler_(json_errc::illegal_surrogate_value, *this);
             if (!more_)
             {
@@ -2594,7 +2594,7 @@ private:
     {
         string_view_type sv(s, length);
         auto result = unicode_traits::validate(s, length);
-        if (result.ec != unicode_traits::conv_errc())
+        if (result.ec != unicode_traits::unicode_errc())
         {
             translate_conv_errc(result.ec,ec);
             position_ += (result.ptr - s);

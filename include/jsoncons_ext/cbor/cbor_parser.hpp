@@ -708,7 +708,7 @@ public:
                     return;
                 }
                 auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
-                if (result.ec != unicode_traits::conv_errc())
+                if (result.ec != unicode_traits::unicode_errc())
                 {
                     ec = cbor_errc::invalid_utf8_text_string;
                     more_ = false;

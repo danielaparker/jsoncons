@@ -93,8 +93,8 @@ namespace jsoncons {
             std::basic_string<CharT> target;
             auto result = unicode_traits::convert(
                 name.data(), name.size(), target, 
-                unicode_traits::conv_flags::strict);
-            if (result.ec != unicode_traits::conv_errc())
+                unicode_traits::strict_flag::strict);
+            if (result.ec != unicode_traits::unicode_errc())
             {
                 JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
             }
@@ -107,8 +107,8 @@ namespace jsoncons {
             std::basic_string<CharT> target;
             auto result = unicode_traits::convert(
                 value.data(), value.size(), target, 
-                unicode_traits::conv_flags::strict);
-            if (result.ec != unicode_traits::conv_errc())
+                unicode_traits::strict_flag::strict);
+            if (result.ec != unicode_traits::unicode_errc())
             {
                 ec = result.ec;
                 JSONCONS_VISITOR_RETURN;
