@@ -1154,12 +1154,7 @@ namespace unicode_traits {
         {
             if ((end - it) >= 8)
             {
-                uint64_t chunk;
-                std::memcpy(&chunk, it, 8);
-                if ((chunk & mask) == 0) {
-                   it += 8;
-                   continue;
-                }
+                while (true) JSONCONS_REPEAT8({if (JSONCONS_LIKELY((trailing_bytes_for_utf8[*it] == 0) && (*it >= 0x80 && *it < 0xC2))) ++it; else break;})
             }
             const std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[*it]) + 1;
             if (len > (std::size_t)(end - it))
