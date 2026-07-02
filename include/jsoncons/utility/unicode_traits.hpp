@@ -1147,8 +1147,6 @@ namespace unicode_traits {
         const uint8_t* it = reinterpret_cast<const uint8_t*>(data);
         const uint8_t* end = it + length;
 
-        static constexpr uint64_t mask = 0x8080808080808080ull;
-
         conv_errc  result{};
         while (it != end) 
         {
