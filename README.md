@@ -78,9 +78,9 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 - [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
 
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/big.text.integer.md)
 
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
+- [Performance benchmarks with text and floating point numbers](https://github.com/danielaparker/json_benchmarks/blob/master/report/big.text.floating_point.md)
 
 The benchmark code is available [here](https://github.com/danielaparker/json_benchmarks).
 
