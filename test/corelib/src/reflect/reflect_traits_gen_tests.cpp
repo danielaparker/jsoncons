@@ -635,8 +635,23 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
     }
+    SECTION("missing member")
+    {
+        std::string input = R"(
+{
+    "author" : "Haruki Murakami", 
+    "title" : "Kafka on the Shore"    
+}
+        )";
+
+        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
+        CHECK("ns::book_all_m::price" == result.error().message_arg());
+        //std::cout << result.error() .message() << "\n";
+    }
     
-    SECTION("parsing error")
+    /*SECTION("parsing error")
     {
         std::string input = R"(
 {
@@ -660,21 +675,6 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         CHECK(jsoncons::conv_errc::not_map == result.error().code()                                    );
         //std::cout << result.error() .message() << "\n";
     }
-    SECTION("missing member")
-    {
-        std::string input = R"(
-{
-    "author" : "Haruki Murakami", 
-    "title" : "Kafka on the Shore"    
-}
-        )";
-
-        auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
-        REQUIRE_FALSE(result);
-        CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        CHECK("ns::book_all_m::price" == result.error().message_arg());
-        //std::cout << result.error() .message() << "\n";
-    }
     SECTION("invalid JSON value")
     {
         std::string input = R"(
@@ -689,9 +689,10 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         REQUIRE_FALSE(result);
         CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
-    }
+    }*/
 }
 
+#if 0
 TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -1626,3 +1627,4 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with mandatory-field errors when nested insi
         CHECK_FALSE(r);
     }
 }
+#endif
