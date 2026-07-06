@@ -640,7 +640,6 @@ namespace reflect { \
             { \
                 JSONCONS_VARIADIC_FOR_EACH(Decode, ,,, __VA_ARGS__) \
             } \
-            return result_type(); \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
