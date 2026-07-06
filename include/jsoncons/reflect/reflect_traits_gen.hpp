@@ -46,22 +46,14 @@ basic_string_view<CharT> get_key(basic_staj_cursor<CharT>& cursor, std::error_co
 }
 
 template <typename CharT>
-expected<bool,std::error_code> read_next_or_end(basic_staj_cursor<CharT>& cursor)
+bool read_next_or_end(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
 { 
-    using char_type = CharT; 
-    using result_type = expected<bool, std::error_code>;
- 
-    std::error_code ec;
     cursor.next(ec); 
     if (ec) 
     { 
-        return result_type{jsoncons::unexpect, ec}; 
+        true; 
     } 
-    if (cursor.current().event_type() == staj_events::end_object) 
-    { 
-        return result_type{true}; 
-    } 
-    return result_type{false}; 
+    return (cursor.current().event_type() == staj_events::end_object) ? true : false; 
 }
 
 template <typename T,typename CharT>
@@ -541,12 +533,12 @@ namespace reflect { \
             { \
                 return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; \
             } \
-            auto r = read_next_or_end(cursor); \
-            if (JSONCONS_UNLIKELY(!r)) \
+            bool is_end = read_next_or_end(cursor, ec); \
+            if (ec) \
             { \
-                return result_type{jsoncons::unexpect, r.error(), cursor.line(), cursor.column()}; \
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
             } \
-            if (*r) \
+            if (is_end) \
             { \
                 return result_type{std::move(val)}; \
             } \
