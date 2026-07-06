@@ -43,7 +43,7 @@ basic_string_view<CharT> get_key(basic_staj_cursor<CharT>& cursor, std::error_co
         return string_view_type{};
     }
  
-    return cursor.current().get<string_view_type>(); 
+    return cursor.current().template get<string_view_type>(); 
 }
 
 template <typename CharT>
