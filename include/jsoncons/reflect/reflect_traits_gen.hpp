@@ -541,7 +541,7 @@ else \
     } \
 } 
 
-#define JSONCONS_MEMBER_TRAITS_BASE(ToJson,Decode,Encode,NumTemplateParams,TypeName,NumMandatoryParams1, ...)  \
+#define JSONCONS_MEMBER_TRAITS_BASE(ToJson,Decode,Encode,NumTemplateParams,TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -567,7 +567,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -603,7 +603,7 @@ namespace reflect { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = read_result<value_type>; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
         { \
@@ -645,7 +645,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
@@ -826,7 +826,7 @@ else \
     } \
 }    
 
-#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Encode, NumTemplateParams, TypeName,NumMandatoryParams1, ...)  \
+#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Encode, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -837,7 +837,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -875,7 +875,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
@@ -974,7 +974,7 @@ else \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
-#define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, TypeName,NumMandatoryParams1, ...)  \
+#define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -1000,7 +1000,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -1027,7 +1027,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
@@ -1205,7 +1205,7 @@ else \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
-#define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, TypeName,NumMandatoryParams1, ...)  \
+#define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -1216,7 +1216,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -1246,7 +1246,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
@@ -1744,7 +1744,7 @@ else \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
-#define JSONCONS_GETTER_SETTER_TRAITS_BASE(ToJson,NumTemplateParams, TypeName,GetPrefix,SetPrefix,NumMandatoryParams1, ...)  \
+#define JSONCONS_GETTER_SETTER_TRAITS_BASE(ToJson,NumTemplateParams, TypeName,GetPrefix,SetPrefix,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -1770,7 +1770,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -1805,7 +1805,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
@@ -1974,7 +1974,7 @@ else \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
-#define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, TypeName,NumMandatoryParams1, ...)  \
+#define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(ToJson, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -1985,7 +1985,7 @@ namespace reflect { \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -2023,7 +2023,7 @@ namespace reflect { \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-        constexpr static size_t num_mandatory_params = NumMandatoryParams1; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
