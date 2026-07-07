@@ -58,14 +58,27 @@ bool read_next_or_end(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
 }
 
 template <std::size_t N>
-std::size_t get_what_arg_index(const std::bitset<N>& indices)
+std::size_t find_first_not_set(const std::bitset<N>& indices)
 {
-    for (std::size_t i = 0; i < indices.size(); ++i) {
+    for (std::size_t i = indices.size(); i-- > 0;) {
         if (!indices[i]) {
             return i;
         }
     }
     return indices.size();
+}
+
+template <std::size_t N>
+std::size_t find_first_not_set(const std::bitset<N>& indices, 
+    std::size_t num_mandatory_params)
+{
+    std::size_t end = indices.size() - num_mandatory_params;
+    for (std::size_t i = indices.size(); i-- > end;) {
+        if (!indices[i]) {
+            return i;
+        }
+    }
+    return num_mandatory_params;
 }
 
 template <typename T,typename CharT>
@@ -465,7 +478,7 @@ is_optional_value_set(const T&)
         if (is_end) \
         { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(find_first_not_set(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -500,8 +513,9 @@ is_optional_value_set(const T&)
         indices[Index] = true; \
         if (is_end) \
         { \
-            if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
+            std::size_t index = find_first_not_set(indices, num_mandatory_params); \
+            if (index != num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(index), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -569,7 +583,7 @@ namespace reflect { \
             static std::array<std::string,num_params> what_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[num_params - (index+1)]; \
+            return what_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -638,7 +652,7 @@ namespace reflect { \
             if (is_end) \
             { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(find_first_not_set(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
