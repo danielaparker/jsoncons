@@ -583,7 +583,7 @@ namespace reflect { \
             static std::array<std::string,num_params> what_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return what_args[num_params - (index+1)]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
