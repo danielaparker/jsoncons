@@ -442,6 +442,10 @@ namespace jsoncons {
         {
             if (length > buffer_size_)
             {
+                if (length > default_max_buffer_size)
+                {
+                    return;
+                }
                 reserve_buffer(length);
             }
             else if (length_ > 0 && data_ != buffer_)

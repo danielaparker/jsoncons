@@ -347,7 +347,6 @@ namespace jsoncons {
         static auto append_impl(C& c, const uint8_t* s, std::size_t length, long)
             -> decltype(c.insert(c.end(), s, s + length), void())
         {
-            reserve(c, length, 0);
             c.insert(c.end(), s, s + length);
         }
 

@@ -485,44 +485,46 @@ private:
         }
     }
 
-    void write_utf8_string(const string_view& sv)
+    void write_type_and_length(uint8_t major_type, std::size_t length)
     {
-        const size_t length = sv.size();
-
         if (length <= 0x17)
         {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            binary::native_to_big(static_cast<uint8_t>(0x60 + length), 
+            binary::native_to_big(static_cast<uint8_t>(major_type + length),
                                             std::back_inserter(sink_));
         }
         else if (length <= 0xff)
         {
-            binary::native_to_big(static_cast<uint8_t>(0x78), 
+            binary::native_to_big(static_cast<uint8_t>(major_type + 0x18),
                                             std::back_inserter(sink_));
             binary::native_to_big(static_cast<uint8_t>(length), 
                                             std::back_inserter(sink_));
         }
         else if (length <= 0xffff)
         {
-            binary::native_to_big(static_cast<uint8_t>(0x79), 
+            binary::native_to_big(static_cast<uint8_t>(major_type + 0x19),
                                             std::back_inserter(sink_));
             binary::native_to_big(static_cast<uint16_t>(length), 
                                             std::back_inserter(sink_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::native_to_big(static_cast<uint8_t>(0x7a), 
+            binary::native_to_big(static_cast<uint8_t>(major_type + 0x1a),
                                             std::back_inserter(sink_));
             binary::native_to_big(static_cast<uint32_t>(length), 
                                             std::back_inserter(sink_));
         }
         else if (uint64_t(length) <= (std::numeric_limits<std::uint64_t>::max)())
         {
-            binary::native_to_big(static_cast<uint8_t>(0x7b), 
+            binary::native_to_big(static_cast<uint8_t>(major_type + 0x1b),
                                             std::back_inserter(sink_));
             binary::native_to_big(static_cast<uint64_t>(length), 
                                             std::back_inserter(sink_));
         }
+    }
+
+    void write_utf8_string(const string_view& sv)
+    {
+        write_type_and_length(0x60, sv.size());
 
         sink_.append(reinterpret_cast<const uint8_t*>(sv.data()), sv.size());
     }
@@ -1066,40 +1068,7 @@ private:
 
     void write_byte_string(const byte_string_view& b) 
     {
-        if (b.size() <= 0x17)
-        {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            binary::native_to_big(static_cast<uint8_t>(0x40 + b.size()), 
-                                            std::back_inserter(sink_));
-        }
-        else if (b.size() <= 0xff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x58), 
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint8_t>(b.size()), 
-                                            std::back_inserter(sink_));
-        }
-        else if (b.size() <= 0xffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x59), 
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint16_t>(b.size()), 
-                                            std::back_inserter(sink_));
-        }
-        else if (b.size() <= 0xffffffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x5a), 
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint32_t>(b.size()), 
-                                            std::back_inserter(sink_));
-        }
-        else // if (b.size() <= 0xffffffffffffffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x5b), 
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint64_t>(b.size()), 
-                                            std::back_inserter(sink_));
-        }
+        write_type_and_length(0x40, b.size());
 
         sink_.append(b.data(), b.size());
     }

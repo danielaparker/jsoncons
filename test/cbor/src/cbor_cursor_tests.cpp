@@ -62,6 +62,16 @@ TEST_CASE("cbor stream source spans straddled strings")
     CHECK(cursor.current().get<std::string>() == "hello");
 }
 
+TEST_CASE("cbor stream rejects truncated huge byte string length")
+{
+    std::string data;
+    data.push_back('\x5b');
+    data.push_back('\xf6');
+    std::istringstream is(data);
+
+    CHECK_THROWS_AS(cbor::decode_cbor<json>(is), ser_error);
+}
+
 TEST_CASE("cbor raw view utilities")
 {
     SECTION("item span reads one item")
