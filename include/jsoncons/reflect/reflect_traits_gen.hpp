@@ -57,6 +57,17 @@ bool read_next_or_end(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
     return (cursor.current().event_type() == staj_events::end_object) ? true : false; 
 }
 
+template <std::size_t N>
+std::size_t get_what_arg_index(const std::bitset<N>& indices)
+{
+    for (std::size_t i = 0; i < indices.size(); ++i) {
+        if (!indices[i]) {
+            return i;
+        }
+    }
+    return indices.size();
+}
+
 template <typename T,typename CharT>
 struct object_names
 {};
@@ -387,6 +398,11 @@ is_optional_value_set(const T&)
     static inline const string_view& Member() {static const string_view sv = # Prefix "::" # Member; return sv;} \
     /**/
 
+#define JSONCONS_GENERATE_WHAT_ARG(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) 
+#define JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) \
+    # Prefix "::" # Member, \
+    /**/
+
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Index) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index) if ((num_params-Index+1) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Member())) return false;
 
@@ -444,7 +460,7 @@ is_optional_value_set(const T&)
         if (is_end) \
         { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -479,7 +495,7 @@ is_optional_value_set(const T&)
             if (is_end) \
             { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -498,7 +514,7 @@ is_optional_value_set(const T&)
         if (is_end) \
         { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -558,6 +574,14 @@ namespace reflect { \
     struct error_context<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_ERROR_CONTEXT,TypeName,,, __VA_ARGS__)\
+        static std::string what_arg(std::size_t index) \
+        { \
+            static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+            static std::array<std::string,num_params> what_args = { \
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+            }; \
+            return what_args[num_params - (index+1)]; \
+        } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
@@ -625,7 +649,7 @@ namespace reflect { \
             if (is_end) \
             { \
             if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
