@@ -440,7 +440,8 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_ALL_MEMBER_DECODE(Prefix, P2,P3,Member, Index) JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index)
 #define JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index) \
-    if (key == object_names<value_type,char_type>::Member()) { \
+    if (++count >= num_params) {return result_type{std::move(val)};} \
+    else if (key == object_names<value_type,char_type>::Member()) { \
         cursor.next(ec); \
         if (JSONCONS_UNLIKELY(ec)) \
         { \
@@ -475,42 +476,24 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_N_MEMBER_DECODE(Prefix, P2,P3,Member, Index) JSONCONS_N_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index)
 #define JSONCONS_N_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index) \
-    if (++count < num_params) { \
-        if (key == object_names<value_type,char_type>::Member()) { \
-            cursor.next(ec); \
-            if (JSONCONS_UNLIKELY(ec)) \
-            { \
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
-            } \
-            auto r1 = decode_traits<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
-            if (!r1) { \
-                return result_type{jsoncons::unexpect, r1.error()}; \
-            } \
-            set_member(std::move(*r1), val.Member); \
-            is_end = read_next_or_end(cursor, ec); \
-            if (ec) \
-            { \
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
-            } \
-            if (is_end) \
-            { \
-            if (!indices.all()) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(get_what_arg_index(indices)), \
-                    cursor.line(), cursor.column()); \
-            } \
-            return result_type{std::move(val)}; \
-            } \
-            key = get_key(cursor, ec); \
-            if (ec) { \
-                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
-            } \
+    if (++count >= num_params) {return result_type{std::move(val)};} \
+    else if (key == object_names<value_type,char_type>::Member()) { \
+        cursor.next(ec); \
+        if (JSONCONS_UNLIKELY(ec)) \
+        { \
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-    } else { \
+        auto r1 = decode_traits<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
+        if (!r1) { \
+            return result_type{jsoncons::unexpect, r1.error()}; \
+        } \
+        set_member(std::move(*r1), val.Member); \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
+        indices[Index] = true; \
         if (is_end) \
         { \
             if (!indices.all()) { \
@@ -523,7 +506,9 @@ is_optional_value_set(const T&)
         if (ec) { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-    }
+        count = 0; \
+    } \
+/**/
 
 #define JSONCONS_N_MEMBER_ENCODE(Prefix, P2, P3, Member, Index) JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Index) \
