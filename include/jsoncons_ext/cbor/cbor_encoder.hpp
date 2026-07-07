@@ -524,10 +524,7 @@ private:
                                             std::back_inserter(sink_));
         }
 
-        for (auto c : sv)
-        {
-            sink_.push_back(c);
-        }
+        sink_.append(reinterpret_cast<const uint8_t*>(sv.data()), sv.size());
     }
 
     void write_bignum(bigint& n)
@@ -1104,10 +1101,7 @@ private:
                                             std::back_inserter(sink_));
         }
 
-        for (auto c : b)
-        {
-            sink_.push_back(c);
-        }
+        sink_.append(b.data(), b.size());
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_double(double val, 

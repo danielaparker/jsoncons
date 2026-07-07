@@ -101,6 +101,37 @@ TEST_CASE("cbor raw view utilities")
         CHECK_FALSE(ec);
     }
 
+    SECTION("map entries expose key and value spans")
+    {
+        std::vector<uint8_t> data = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
+        std::vector<cbor::view::map_entry_view> entries;
+        std::error_code ec;
+        REQUIRE(cbor::view::map_entries(jsoncons::span<const uint8_t>(data), entries, ec));
+        REQUIRE_FALSE(ec);
+        REQUIRE(entries.size() == 2);
+        CHECK(entries[0].key.data() == data.data() + 1);
+        CHECK(entries[0].key.size() == 1);
+        CHECK(entries[0].value.data() == data.data() + 2);
+        CHECK(entries[0].value.size() == 2);
+        CHECK(entries[1].key.data() == data.data() + 4);
+        CHECK(entries[1].key.size() == 2);
+        CHECK(entries[1].value.data() == data.data() + 6);
+        CHECK(entries[1].value.size() == 1);
+    }
+
+    SECTION("indefinite strings compare semantically")
+    {
+        std::vector<uint8_t> definite_text = {0x65,'h','e','l','l','o'};
+        std::vector<uint8_t> chunked_text = {0x7f,0x61,'h',0x64,'e','l','l','o',0xff};
+        std::vector<uint8_t> definite_bytes = {0x42,0x01,0x02};
+        std::vector<uint8_t> chunked_bytes = {0x5f,0x41,0x01,0x41,0x02,0xff};
+        std::error_code ec;
+        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(definite_text), jsoncons::span<const uint8_t>(chunked_text), ec) == 0);
+        REQUIRE_FALSE(ec);
+        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(definite_bytes), jsoncons::span<const uint8_t>(chunked_bytes), ec) == 0);
+        REQUIRE_FALSE(ec);
+    }
+
     SECTION("invalid indefinite integer is rejected")
     {
         std::vector<uint8_t> data = {0x1f};

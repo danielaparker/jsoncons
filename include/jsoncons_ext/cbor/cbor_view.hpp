@@ -53,6 +53,12 @@ namespace view {
         }
     };
 
+    struct map_entry_view
+    {
+        span<const uint8_t> key;
+        span<const uint8_t> value;
+    };
+
     namespace detail_view {
 
         inline int sign(int value) noexcept
@@ -426,27 +432,156 @@ namespace view {
             return av < bv ? -1 : (av > bv ? 1 : 0);
         }
 
-        inline bool definite_payload(span<const uint8_t> item, span<const uint8_t>& payload, std::error_code& ec)
+        class string_chunk_reader
         {
-            const uint8_t* p = item.data();
-            const uint8_t* end = p + item.size();
-            item_head head;
-            if (!read_head(p, end, head, ec))
+            cbor::detail::cbor_major_type major_type_{};
+            const uint8_t* p_{nullptr};
+            const uint8_t* end_{nullptr};
+            span<const uint8_t> payload_;
+            bool indefinite_{false};
+            bool done_{false};
+
+        public:
+            string_chunk_reader(span<const uint8_t> item, std::error_code& ec)
             {
-                return false;
+                p_ = item.data();
+                end_ = p_ + item.size();
+                item_head head;
+                if (!read_head(p_, end_, head, ec))
+                {
+                    done_ = true;
+                    return;
+                }
+                major_type_ = head.major_type;
+                if (major_type_ != cbor::detail::cbor_major_type::byte_string &&
+                    major_type_ != cbor::detail::cbor_major_type::text_string)
+                {
+                    ec = cbor_errc::unknown_type;
+                    done_ = true;
+                    return;
+                }
+                indefinite_ = head.indefinite();
+                if (!indefinite_)
+                {
+                    if (static_cast<uint64_t>(end_ - p_) < head.value)
+                    {
+                        ec = cbor_errc::unexpected_eof;
+                        done_ = true;
+                        return;
+                    }
+                    payload_ = span<const uint8_t>(p_, static_cast<std::size_t>(head.value));
+                    p_ += static_cast<std::size_t>(head.value);
+                }
             }
-            if (head.indefinite())
+
+            bool next(span<const uint8_t>& chunk, std::error_code& ec)
             {
-                payload = item;
-                return false;
+                chunk = span<const uint8_t>();
+                if (done_)
+                {
+                    return false;
+                }
+                if (!indefinite_)
+                {
+                    done_ = true;
+                    chunk = payload_;
+                    return true;
+                }
+
+                for (;;)
+                {
+                    if (p_ >= end_)
+                    {
+                        ec = cbor_errc::unexpected_eof;
+                        done_ = true;
+                        return false;
+                    }
+                    if (*p_ == 0xff)
+                    {
+                        ++p_;
+                        done_ = true;
+                        return false;
+                    }
+
+                    item_head head;
+                    if (!read_head(p_, end_, head, ec))
+                    {
+                        done_ = true;
+                        return false;
+                    }
+                    if (head.major_type != major_type_ || head.indefinite())
+                    {
+                        ec = cbor_errc::illegal_chunked_string;
+                        done_ = true;
+                        return false;
+                    }
+                    if (static_cast<uint64_t>(end_ - p_) < head.value)
+                    {
+                        ec = cbor_errc::unexpected_eof;
+                        done_ = true;
+                        return false;
+                    }
+                    chunk = span<const uint8_t>(p_, static_cast<std::size_t>(head.value));
+                    p_ += static_cast<std::size_t>(head.value);
+                    return true;
+                }
             }
-            if (static_cast<uint64_t>(end - p) < head.value)
+        };
+
+        inline int compare_string_items(span<const uint8_t> a, span<const uint8_t> b, std::error_code& ec)
+        {
+            string_chunk_reader ar(a, ec);
+            if (ec) { return 0; }
+            string_chunk_reader br(b, ec);
+            if (ec) { return 0; }
+
+            span<const uint8_t> ac;
+            span<const uint8_t> bc;
+            std::size_t ai = 0;
+            std::size_t bi = 0;
+            bool ahas = false;
+            bool bhas = false;
+
+            for (;;)
             {
-                ec = cbor_errc::unexpected_eof;
-                return false;
+                while (!ahas || ai == ac.size())
+                {
+                    ahas = ar.next(ac, ec);
+                    if (ec) { return 0; }
+                    ai = 0;
+                    if (!ahas || ac.size() != 0)
+                    {
+                        break;
+                    }
+                }
+                while (!bhas || bi == bc.size())
+                {
+                    bhas = br.next(bc, ec);
+                    if (ec) { return 0; }
+                    bi = 0;
+                    if (!bhas || bc.size() != 0)
+                    {
+                        break;
+                    }
+                }
+
+                if (!ahas || !bhas)
+                {
+                    return ahas == bhas ? 0 : (ahas ? 1 : -1);
+                }
+
+                const std::size_t n = (std::min)(ac.size() - ai, bc.size() - bi);
+                if (n != 0)
+                {
+                    int r = std::memcmp(ac.data() + ai, bc.data() + bi, n);
+                    if (r != 0)
+                    {
+                        return sign(r);
+                    }
+                    ai += n;
+                    bi += n;
+                }
             }
-            payload = span<const uint8_t>(p, static_cast<std::size_t>(head.value));
-            return true;
         }
 
         inline int compare_items(span<const uint8_t> a, span<const uint8_t> b, std::error_code& ec);
@@ -500,13 +635,7 @@ namespace view {
             }
         }
 
-        struct map_entry
-        {
-            span<const uint8_t> key;
-            span<const uint8_t> value;
-        };
-
-        inline bool read_map_entries(span<const uint8_t> item, std::vector<map_entry>& entries, std::error_code& ec)
+        inline bool read_map_entries(span<const uint8_t> item, std::vector<map_entry_view>& entries, std::error_code& ec)
         {
             const uint8_t* p = item.data();
             const uint8_t* end = p + item.size();
@@ -535,7 +664,7 @@ namespace view {
                     if (ec) { return false; }
                     auto value = read_item_span(p, end, ec);
                     if (ec) { return false; }
-                    entries.push_back(map_entry{key, value});
+                    entries.push_back(map_entry_view{key, value});
                 }
                 return true;
             }
@@ -556,20 +685,20 @@ namespace view {
                 if (ec) { return false; }
                 auto value = read_item_span(p, end, ec);
                 if (ec) { return false; }
-                entries.push_back(map_entry{key, value});
+                entries.push_back(map_entry_view{key, value});
             }
         }
 
         inline int compare_maps(span<const uint8_t> a, span<const uint8_t> b, std::error_code& ec)
         {
-            std::vector<map_entry> ae;
-            std::vector<map_entry> be;
+            std::vector<map_entry_view> ae;
+            std::vector<map_entry_view> be;
             if (!read_map_entries(a, ae, ec) || !read_map_entries(b, be, ec))
             {
                 return 0;
             }
 
-            auto less = [&ec](const map_entry& x, const map_entry& y)
+            auto less = [&ec](const map_entry_view& x, const map_entry_view& y)
             {
                 int ck = compare_items(x.key, y.key, ec);
                 if (ec || ck != 0)
@@ -664,25 +793,7 @@ namespace view {
 
                 case type_rank::text_string:
                 case type_rank::byte_string:
-                {
-                    span<const uint8_t> av;
-                    span<const uint8_t> bv;
-                    const bool a_definite = definite_payload(a, av, ec);
-                    if (ec)
-                    {
-                        return 0;
-                    }
-                    const bool b_definite = definite_payload(b, bv, ec);
-                    if (ec)
-                    {
-                        return 0;
-                    }
-                    if (a_definite && b_definite)
-                    {
-                        return compare_bytes(av, bv);
-                    }
-                    return compare_bytes(a, b);
-                }
+                    return compare_string_items(a, b, ec);
 
                 case type_rank::array:
                     return compare_arrays(a, b, ec);
@@ -707,6 +818,12 @@ namespace view {
     {
         const uint8_t* p = input.data();
         return detail_view::read_item_span(p, p + input.size(), ec);
+    }
+
+    inline bool map_entries(span<const uint8_t> input, std::vector<map_entry_view>& entries, std::error_code& ec)
+    {
+        entries.clear();
+        return detail_view::read_map_entries(input, entries, ec);
     }
 
     inline int compare(span<const uint8_t> a, span<const uint8_t> b, std::error_code& ec)
