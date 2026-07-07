@@ -386,22 +386,22 @@ is_optional_value_set(const T&)
 #define JSONCONS_GENERATE_NAME(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_NAME_LAST(Prefix, P2, P3, Member, Index) 
 #define JSONCONS_GENERATE_NAME_LAST(Prefix, P2, P3, Member, Index) \
     static inline const string_view& Member() {static const string_view sv = JSONCONS_PP_QUOTE(,Member); return sv;} \
-    /**/
+/**/
 
 #define JSONCONS_GENERATE_WNAME(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_WNAME_LAST(Prefix, P2, P3, Member, Index) 
 #define JSONCONS_GENERATE_WNAME_LAST(Prefix, P2, P3, Member, Index) \
     static inline const wstring_view& Member() {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
-    /**/
+/**/
 
 #define JSONCONS_GENERATE_ERROR_CONTEXT(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Index) 
 #define JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Index) \
     static inline const string_view& Member() {static const string_view sv = # Prefix "::" # Member; return sv;} \
-    /**/
+/**/
 
 #define JSONCONS_GENERATE_WHAT_ARG(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) 
 #define JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) \
     # Prefix "::" # Member, \
-    /**/
+/**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Index) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index) if ((num_params-Index+1) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Member())) return false;
@@ -417,7 +417,8 @@ is_optional_value_set(const T&)
       if (result) {set_member(std::move(*result), class_instance.Member);} \
       else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::Member());} \
   } \
-}
+} \
+/**/
 
 #define JSONCONS_ALL_MEMBER_AS(Prefix, P2,P3,Member, Index) JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index) { \
@@ -427,16 +428,19 @@ is_optional_value_set(const T&)
   auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Member)>::type>(aset, it->value()); \
   if (result) {set_member(std::move(*result), class_instance.Member);} \
   else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::Member());} \
-}
+} \
+/**/
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Index) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Index) if ((num_params-Index+1) < num_mandatory_params) \
     {ajson.try_emplace(object_names<value_type,char_type>::Member(),class_instance.Member);} \
-    else {json_traits_helper<Json>::set_optional_json_member(object_names<value_type,char_type>::Member(),class_instance.Member, ajson);}
+    else {json_traits_helper<Json>::set_optional_json_member(object_names<value_type,char_type>::Member(),class_instance.Member, ajson);} \
+/**/
 
 #define JSONCONS_ALL_TO_JSON(Prefix, P2, P3, Member, Index) JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Index) \
-    ajson.try_emplace(object_names<value_type,char_type>::Member(),class_instance.Member);
+    ajson.try_emplace(object_names<value_type,char_type>::Member(),class_instance.Member); \
+/**/
 
 #define JSONCONS_ALL_MEMBER_DECODE(Prefix, P2,P3,Member, Index) JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index)
 #define JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index) \
