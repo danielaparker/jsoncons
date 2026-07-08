@@ -53,6 +53,7 @@ namespace jsoncons {
         not_array,
         invalid_mdarray,
         not_map,
+        not_key,
         not_pair,
         not_string,
         not_string_view,
@@ -114,6 +115,8 @@ namespace detail {
                     return "Invalid multi-dimensional array";
                 case conv_errc::not_map:
                     return "Cannot convert to map";
+                case conv_errc::not_key:
+                    return "Not a key";
                 case conv_errc::not_pair:
                     return "Cannot convert to std::pair";
                 case conv_errc::not_string:

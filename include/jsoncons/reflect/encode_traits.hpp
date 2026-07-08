@@ -53,7 +53,7 @@ struct encode_traits<T,
     typename std::enable_if<ext_traits::is_bool<T>::value 
 >::type>
 {
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -157,7 +157,7 @@ struct encode_traits<std::pair<T1, T2>>
 {
     using value_type = std::pair<T1, T2>;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -184,7 +184,7 @@ namespace detail
         using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
         using next = json_serialize_tuple_helper<Pos-1, Size, Tuple>;
 
-        template <typename CharT,typename Alloc,typename TempAlloc>
+        template <typename Alloc,typename TempAlloc,typename CharT>
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const Tuple& tuple,
             basic_json_visitor<CharT>& encoder)
         {
@@ -199,7 +199,7 @@ namespace detail
     template<size_t Size,typename Tuple>
     struct json_serialize_tuple_helper<0, Size, Tuple>
     {
-        template <typename CharT,typename Alloc,typename TempAlloc>
+        template <typename Alloc,typename TempAlloc,typename CharT>
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const Tuple&,
             basic_json_visitor<CharT>&)
         {
@@ -215,7 +215,7 @@ struct encode_traits<std::tuple<E...>>
     using value_type = std::tuple<E...>;
     static constexpr std::size_t size = sizeof...(E);
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -242,7 +242,7 @@ struct encode_traits<T,
 {
     using value_type = typename T::value_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -270,7 +270,7 @@ struct encode_traits<T,
 {
     using value_type = typename T::value_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -297,7 +297,7 @@ struct encode_traits<T,
 {
     using value_type = typename T::value_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -315,7 +315,7 @@ struct encode_traits<std::array<T,N>>
 {
     using value_type = typename std::array<T,N>::value_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const std::array<T, N>& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -346,7 +346,7 @@ struct encode_traits<T,
     using value_type = typename T::value_type;
     using key_type = typename T::key_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -376,7 +376,7 @@ struct encode_traits<T,
     using value_type = typename T::value_type;
     using key_type = typename T::key_type;
 
-    template <typename CharT,typename Alloc,typename TempAlloc>
+    template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {

@@ -298,6 +298,10 @@ public:
     bigint_storage(const bigint_storage& other)
         : word_allocator_type(other.get_allocator())
     {
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         if (!other.is_allocated())
         {
             ::new (&inlined_) inlined_storage(other.inlined_);
@@ -306,6 +310,9 @@ public:
         {
             ::new (&allocated_) allocated_storage(other.allocated_, get_allocator());
         }
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
+# pragma GCC diagnostic pop
+#endif
     }
 
     bigint_storage(const bigint_storage& other, const Allocator& alloc)
