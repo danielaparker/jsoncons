@@ -459,7 +459,7 @@ is_optional_value_set(const T&)
             return result_type{std::move(val)}; \
         } \
     } \
-    else if (key == object_names<value_type,char_type>::Member()) { \
+    else if (!indices[num_params-(Index+1)] && key == object_names<value_type,char_type>::Member()) { \
         cursor.next(ec); \
         if (JSONCONS_UNLIKELY(ec)) \
         { \
@@ -510,7 +510,7 @@ is_optional_value_set(const T&)
             return result_type{std::move(val)}; \
         } \
     } \
-    else if (key == object_names<value_type,char_type>::Member()) { \
+    else if (!indices[num_params-(Index+1)] && key == object_names<value_type,char_type>::Member()) { \
         cursor.next(ec); \
         if (JSONCONS_UNLIKELY(ec)) \
         { \
