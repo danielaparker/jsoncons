@@ -443,7 +443,7 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_ALL_MEMBER_DECODE(Prefix, P2,P3,Member, Index) JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index)
 #define JSONCONS_ALL_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index) \
-    if (++count >= num_params) { \
+    if (count++ >= num_params) { \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
         { \
@@ -493,7 +493,7 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_N_MEMBER_DECODE(Prefix, P2,P3,Member, Index) JSONCONS_N_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index)
 #define JSONCONS_N_MEMBER_DECODE_LAST(Prefix, P2,P3,Member, Index) \
-    if (++count >= num_params) { \
+    if (count++ >= num_params) { \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
         { \
