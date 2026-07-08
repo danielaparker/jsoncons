@@ -11,6 +11,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 
+#include <list>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -84,31 +85,47 @@ TEST_CASE("cbor raw view utilities")
         CHECK(item[0] == 0x01);
     }
 
-    SECTION("numbers share one collation rank")
+    SECTION("trailing bytes after the first item are ignored")
     {
-        std::vector<uint8_t> one = {0x01};
-        std::vector<uint8_t> one_double = {0xfb,0x3f,0xf0,0x00,0x00,0x00,0x00,0x00,0x00};
+        std::vector<uint8_t> a = {0x01,0x63,'a','b','c'};
+        std::vector<uint8_t> b = {0x01};
         std::error_code ec;
-        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(one), jsoncons::span<const uint8_t>(one_double), ec) == 0);
+        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(a), jsoncons::span<const uint8_t>(b), ec) == 0);
         CHECK_FALSE(ec);
     }
 
-    SECTION("arrays compare lexicographically")
+    SECTION("deeply nested items are bounded")
     {
-        std::vector<uint8_t> a = {0x81,0x01};
-        std::vector<uint8_t> b = {0x82,0x01,0x00};
+        std::vector<uint8_t> data(2000, 0x81);
+        data.push_back(0x01);
         std::error_code ec;
-        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(a), jsoncons::span<const uint8_t>(b), ec) < 0);
-        CHECK_FALSE(ec);
+        auto item = cbor::view::item_span(jsoncons::span<const uint8_t>(data), ec);
+        CHECK(item.empty());
+        CHECK(ec == cbor::cbor_errc::max_nesting_depth_exceeded);
+
+        ec.clear();
+        item = cbor::view::item_span(jsoncons::span<const uint8_t>(data), ec, 4000);
+        REQUIRE_FALSE(ec);
+        CHECK(item.size() == data.size());
     }
 
-    SECTION("maps are key-order independent")
+    SECTION("tag chains do not consume nesting depth or stack")
     {
-        std::vector<uint8_t> m1 = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
-        std::vector<uint8_t> m2 = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
+        std::vector<uint8_t> data(1000000, 0xc0);
+        data.push_back(0x01);
         std::error_code ec;
-        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(m1), jsoncons::span<const uint8_t>(m2), ec) == 0);
-        CHECK_FALSE(ec);
+        auto item = cbor::view::item_span(jsoncons::span<const uint8_t>(data), ec);
+        REQUIRE_FALSE(ec);
+        CHECK(item.size() == data.size());
+    }
+
+    SECTION("map claiming a huge entry count is rejected")
+    {
+        std::vector<uint8_t> data = {0xba,0xff,0xff,0xff,0xff};
+        std::vector<cbor::view::map_entry_view> entries;
+        std::error_code ec;
+        CHECK_FALSE(cbor::view::map_entries(jsoncons::span<const uint8_t>(data), entries, ec));
+        CHECK(ec == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("map entries expose key and value spans")
@@ -129,19 +146,6 @@ TEST_CASE("cbor raw view utilities")
         CHECK(entries[1].value.size() == 1);
     }
 
-    SECTION("indefinite strings compare semantically")
-    {
-        std::vector<uint8_t> definite_text = {0x65,'h','e','l','l','o'};
-        std::vector<uint8_t> chunked_text = {0x7f,0x61,'h',0x64,'e','l','l','o',0xff};
-        std::vector<uint8_t> definite_bytes = {0x42,0x01,0x02};
-        std::vector<uint8_t> chunked_bytes = {0x5f,0x41,0x01,0x41,0x02,0xff};
-        std::error_code ec;
-        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(definite_text), jsoncons::span<const uint8_t>(chunked_text), ec) == 0);
-        REQUIRE_FALSE(ec);
-        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(definite_bytes), jsoncons::span<const uint8_t>(chunked_bytes), ec) == 0);
-        REQUIRE_FALSE(ec);
-    }
-
     SECTION("invalid indefinite integer is rejected")
     {
         std::vector<uint8_t> data = {0x1f};
@@ -150,6 +154,146 @@ TEST_CASE("cbor raw view utilities")
         CHECK(item.empty());
         CHECK(ec == cbor::cbor_errc::unknown_type);
     }
+}
+
+TEST_CASE("cbor view items compare in deterministic encoding key orders")
+{
+    const std::vector<std::vector<uint8_t>> bytewise_sorted = {
+        {0x0a},
+        {0x18,0x64},
+        {0x20},
+        {0x61,0x7a},
+        {0x62,0x61,0x61},
+        {0x81,0x18,0x64},
+        {0x81,0x20},
+        {0xf4}
+    };
+
+    const std::vector<std::vector<uint8_t>> length_first_sorted = {
+        {0x0a},
+        {0x20},
+        {0xf4},
+        {0x18,0x64},
+        {0x61,0x7a},
+        {0x81,0x20},
+        {0x62,0x61,0x61},
+        {0x81,0x18,0x64}
+    };
+
+    SECTION("bytewise order matches the RFC 8949 4.2.1 example")
+    {
+        for (std::size_t i = 0; i < bytewise_sorted.size(); ++i)
+        {
+            for (std::size_t j = 0; j < bytewise_sorted.size(); ++j)
+            {
+                std::error_code ec;
+                const int r = cbor::view::compare(jsoncons::span<const uint8_t>(bytewise_sorted[i]),
+                    jsoncons::span<const uint8_t>(bytewise_sorted[j]), ec);
+                REQUIRE_FALSE(ec);
+                CHECK((i < j ? r < 0 : (i > j ? r > 0 : r == 0)));
+            }
+        }
+    }
+
+    SECTION("length-first order matches the RFC 8949 4.2.3 example")
+    {
+        for (std::size_t i = 0; i < length_first_sorted.size(); ++i)
+        {
+            for (std::size_t j = 0; j < length_first_sorted.size(); ++j)
+            {
+                std::error_code ec;
+                const int r = cbor::view::compare(jsoncons::span<const uint8_t>(length_first_sorted[i]),
+                    jsoncons::span<const uint8_t>(length_first_sorted[j]), ec, cbor::view::length_first_order());
+                REQUIRE_FALSE(ec);
+                CHECK((i < j ? r < 0 : (i > j ? r > 0 : r == 0)));
+            }
+        }
+    }
+
+    SECTION("other orderings can be plugged in")
+    {
+        struct reverse_bytewise_order
+        {
+            int operator()(jsoncons::span<const uint8_t> a, jsoncons::span<const uint8_t> b) const noexcept
+            {
+                return -cbor::view::bytewise_order()(a, b);
+            }
+        };
+
+        std::vector<uint8_t> ten = {0x0a};
+        std::vector<uint8_t> hundred = {0x18,0x64};
+        std::error_code ec;
+        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred), ec) < 0);
+        REQUIRE_FALSE(ec);
+        CHECK(cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred), ec, reverse_bytewise_order()) > 0);
+        REQUIRE_FALSE(ec);
+    }
+}
+
+TEST_CASE("cbor view map_keys_sorted")
+{
+    SECTION("detects deterministically ordered keys")
+    {
+        std::vector<uint8_t> sorted_map = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
+        std::vector<uint8_t> unsorted_map = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
+        std::error_code ec;
+        CHECK(cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(sorted_map), ec));
+        CHECK_FALSE(ec);
+        CHECK_FALSE(cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(unsorted_map), ec));
+        CHECK_FALSE(ec);
+    }
+
+    SECTION("duplicate keys are not sorted")
+    {
+        std::vector<uint8_t> dup_map = {0xa2,0x01,0x00,0x01,0x01};
+        std::error_code ec;
+        CHECK_FALSE(cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(dup_map), ec));
+        CHECK_FALSE(ec);
+    }
+
+    SECTION("bytewise and length-first orders can disagree")
+    {
+        std::vector<uint8_t> m = {0xa2,0x18,0x64,0x00,0x20,0x00};
+        std::error_code ec;
+        CHECK(cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(m), ec));
+        CHECK_FALSE(ec);
+        CHECK_FALSE(cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(m), ec, cbor::view::length_first_order()));
+        CHECK_FALSE(ec);
+    }
+}
+
+TEST_CASE("cbor stream source spans consecutive straddled strings")
+{
+    std::string data;
+    data.push_back('\x82');
+    data.push_back('\x65');
+    data.append("abcde");
+    data.push_back('\x65');
+    data.append("fghij");
+    std::istringstream is(data);
+    jsoncons::binary_stream_source source(is, 3);
+    std::error_code ec;
+    cbor::cbor_stream_cursor cursor(std::move(source), ec);
+
+    REQUIRE_FALSE(ec);
+    REQUIRE(staj_events::begin_array == cursor.current().event_type());
+    cursor.next(ec);
+    REQUIRE_FALSE(ec);
+    REQUIRE(staj_events::string_value == cursor.current().event_type());
+    CHECK(cursor.current().get<std::string>() == "abcde");
+    cursor.next(ec);
+    REQUIRE_FALSE(ec);
+    REQUIRE(staj_events::string_value == cursor.current().event_type());
+    CHECK(cursor.current().get<std::string>() == "fghij");
+}
+
+TEST_CASE("cbor iterator source rejects a huge claimed byte string cleanly")
+{
+    const std::vector<uint8_t> data = {0x5b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00};
+    std::list<uint8_t> input(data.begin(), data.end());
+
+    auto result = cbor::try_decode_cbor<json>(input.begin(), input.end());
+    REQUIRE_FALSE(result);
 }
 
 TEST_CASE("cbor_cursor reputon test")

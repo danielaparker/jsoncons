@@ -2045,29 +2045,7 @@ private:
                     break;
                 }
                 case 0x15:
-                {
-                    auto bytes = read.view(ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        more_ = false;
-                        return;
-                    }
-                    visitor.byte_string_value(bytes, semantic_tag::base64url, *this, ec);
-                    more_ = !cursor_mode_;
-                    break;
-                }
                 case 0x16:
-                {
-                    auto bytes = read.view(ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        more_ = false;
-                        return;
-                    }
-                    visitor.byte_string_value(bytes, semantic_tag::base64, *this, ec);
-                    more_ = !cursor_mode_;
-                    break;
-                }
                 case 0x17:
                 {
                     auto bytes = read.view(ec);
@@ -2076,7 +2054,10 @@ private:
                         more_ = false;
                         return;
                     }
-                    visitor.byte_string_value(bytes, semantic_tag::base16, *this, ec);
+                    const semantic_tag tag = raw_tag_ == 0x15 ? semantic_tag::base64url
+                        : raw_tag_ == 0x16 ? semantic_tag::base64
+                        : semantic_tag::base16;
+                    visitor.byte_string_value(bytes, tag, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
