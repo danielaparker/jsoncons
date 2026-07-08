@@ -396,7 +396,6 @@ struct decode_traits<T,
                         return result_type(jsoncons::unexpect, r.error());
                     }
                     v.push_back(*r);
-                    //v[i] = std::move(*r);
                     cursor.next(ec);
                 }
                 if (JSONCONS_UNLIKELY(ec)) 
@@ -515,15 +514,24 @@ struct decode_traits<T,
             reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
         }
         cursor.next(ec);
-        while (cursor.current().event_type() != staj_events::end_array && !ec)
+        if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
+        auto it = v.begin();
+        while (cursor.current().event_type() != staj_events::end_array)
         {
             auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
             }
-            v.push_front(std::move(*r));
-            if (JSONCONS_UNLIKELY(ec)) {return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());}
+            if (v.empty())
+            {
+                v.push_front(std::move(*r));
+                it = v.begin();
+            }
+            else
+            {
+                it = v.insert_after(it, std::move(*r));
+            }
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
         }

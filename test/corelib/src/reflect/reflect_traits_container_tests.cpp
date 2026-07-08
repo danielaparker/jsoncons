@@ -755,7 +755,7 @@ TEST_CASE("encode/decode std::forward_list traits")
 
         auto project2 = decode_json<project_type>(s);
 
-        CHECK(project2 == project);
+        CHECK((project2 == project));
     }
 
     SECTION("json_type_traits")

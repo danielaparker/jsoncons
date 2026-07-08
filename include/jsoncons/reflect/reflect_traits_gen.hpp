@@ -227,76 +227,76 @@ is_optional_value_set(const T&)
 #define JSONCONS_VARIADIC_REP_OF_N(Call, P1, P2, P3, Index, ...)  JSONCONS_VARIADIC_REP_OF_N_(Call, P1, P2, P3, Index, __VA_ARGS__)
 #define JSONCONS_VARIADIC_REP_OF_N_(Call, P1, P2, P3, Index, ...) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_ ## Index(Call, P1, P2, P3, __VA_ARGS__))
 
-#define JSONCONS_VARIADIC_REP_OF_70(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 69) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_69(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_69(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 68) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_68(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_68(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 67) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_67(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_67(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 66) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_66(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_66(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 65) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_65(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_65(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 64) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_64(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_64(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 63) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_63(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_63(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 62) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_62(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_62(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 61) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_61(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_61(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 60) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_60(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_60(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 59) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_59(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_59(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 58) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_58(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_58(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 57) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_57(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_57(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 56) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_56(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_56(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 55) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_55(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_55(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 54) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_54(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_54(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 53) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_53(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_53(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 52) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_52(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_52(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 51) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_51(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_51(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 50) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_50(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_50(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 49) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_49(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_49(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 48) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_48(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_48(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 47) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_47(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_47(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 46) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_46(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_46(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 45) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_45(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_45(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 44) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_44(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_44(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 43) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_43(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_43(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 42) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_42(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_42(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 41) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_41(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_41(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 40) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_40(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_40(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 39) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_39(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_39(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 38) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_38(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_38(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 37) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_37(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_37(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 36) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_36(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_36(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 35) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_35(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_35(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 34) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_34(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_34(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 33) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_33(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_33(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 32) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_32(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_32(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 31) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_31(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_31(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 30) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_30(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_30(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 29) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_29(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_29(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 28) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_28(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_28(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 27) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_27(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_27(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 26) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_26(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_26(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 25) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_25(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_25(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 24) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_24(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_24(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 23) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_23(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_23(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 22) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_22(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_22(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 21) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_21(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_21(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 20) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_20(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_20(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 19) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_19(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_19(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 18) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_18(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_18(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 17) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_17(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_17(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 16) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_16(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_16(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 15) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_15(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_15(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 14) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_14(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_14(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 13) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_13(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_13(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 12) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_12(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_12(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 11) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_11(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_11(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 10) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_10(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_10(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 9) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_9(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_9(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 8) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_8(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_8(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 7) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_7(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_7(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 6) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_6(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_6(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 5) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_5(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_5(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 4) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_4(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_4(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 3) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_3(Call, P1, P2, P3, __VA_ARGS__))
-#define JSONCONS_VARIADIC_REP_OF_3(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 2) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_2(Call, P1, P2, P3, __VA_ARGS__)) 
-#define JSONCONS_VARIADIC_REP_OF_2(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 1) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_1(Call, P1, P2, P3, __VA_ARGS__)) 
-#define JSONCONS_VARIADIC_REP_OF_1(Call, P1, P2, P3, P4)         JSONCONS_PP_EXPAND(Call ## _LAST(P1, P2, P3, P4, 0))
+#define JSONCONS_VARIADIC_REP_OF_70(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 70) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_69(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_69(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 69) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_68(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_68(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 68) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_67(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_67(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 67) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_66(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_66(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 66) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_65(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_65(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 65) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_64(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_64(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 64) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_63(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_63(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 63) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_62(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_62(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 62) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_61(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_61(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 61) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_60(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_60(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 60) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_59(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_59(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 59) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_58(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_58(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 58) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_57(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_57(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 57) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_56(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_56(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 56) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_55(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_55(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 55) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_54(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_54(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 54) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_53(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_53(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 53) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_52(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_52(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 52) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_51(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_51(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 51) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_50(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_50(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 50) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_49(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_49(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 49) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_48(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_48(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 48) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_47(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_47(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 47) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_46(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_46(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 46) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_45(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_45(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 45) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_44(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_44(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 44) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_43(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_43(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 43) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_42(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_42(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 42) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_41(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_41(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 41) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_40(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_40(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 40) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_39(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_39(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 39) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_38(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_38(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 38) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_37(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_37(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 37) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_36(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_36(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 36) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_35(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_35(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 35) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_34(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_34(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 34) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_33(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_33(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 33) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_32(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_32(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 32) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_31(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_31(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 31) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_30(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_30(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 30) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_29(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_29(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 29) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_28(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_28(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 28) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_27(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_27(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 27) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_26(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_26(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 26) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_25(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_25(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 25) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_24(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_24(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 24) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_23(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_23(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 23) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_22(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_22(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 22) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_21(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_21(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 21) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_20(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_20(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 20) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_19(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_19(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 19) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_18(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_18(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 18) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_17(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_17(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 17) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_16(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_16(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 16) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_15(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_15(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 15) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_14(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_14(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 14) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_13(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_13(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 13) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_12(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_12(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 12) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_11(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_11(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 11) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_10(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_10(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 10) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_9(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_9(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 9) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_8(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_8(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 8) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_7(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_7(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 7) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_6(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_6(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 6) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_5(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_5(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 5) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_4(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_4(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 4) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_3(Call, P1, P2, P3, __VA_ARGS__))
+#define JSONCONS_VARIADIC_REP_OF_3(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 3) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_2(Call, P1, P2, P3, __VA_ARGS__)) 
+#define JSONCONS_VARIADIC_REP_OF_2(Call, P1, P2, P3, P4, ...)    JSONCONS_EXPAND_CALL5(Call, P1, P2, P3, P4, 2) JSONCONS_PP_EXPAND(JSONCONS_VARIADIC_REP_OF_1(Call, P1, P2, P3, __VA_ARGS__)) 
+#define JSONCONS_VARIADIC_REP_OF_1(Call, P1, P2, P3, P4)         JSONCONS_PP_EXPAND(Call ## _LAST(P1, P2, P3, P4, 1))
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <typename JSON,typename T,typename Enable> \
@@ -403,13 +403,13 @@ is_optional_value_set(const T&)
 /**/
 
 #define JSONCONS_N_MEMBER_IS(Prefix, P2, P3, Member, Index) JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index)
-#define JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index) if ((num_params-(Index+1)) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Member())) return false;
+#define JSONCONS_N_MEMBER_IS_LAST(Prefix, P2, P3, Member, Index) if ((num_params-Index) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Member())) return false;
 
 #define JSONCONS_N_MEMBER_AS(Prefix,P2,P3, Member, Index) JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index)
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index) { \
   auto it = ajson.find(object_names<value_type,char_type>::Member()); \
   if (it == ajson.object_range().end()) \
-    {if ((num_params-(Index+1)) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Member());}} \
+    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Member());}} \
   else \
   { \
       auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Member)>::type>(aset, it->value()); \
@@ -431,7 +431,7 @@ is_optional_value_set(const T&)
 /**/
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Index) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Index)
-#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Index) if ((num_params-(Index+1)) < num_mandatory_params) \
+#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Index) if ((num_params-Index) < num_mandatory_params) \
     {ajson.try_emplace(object_names<value_type,char_type>::Member(),class_instance.Member);} \
     else {json_traits_helper<Json>::set_optional_json_member(object_names<value_type,char_type>::Member(),class_instance.Member, ajson);} \
 /**/
@@ -458,7 +458,7 @@ is_optional_value_set(const T&)
             return result_type{std::move(val)}; \
         } \
     } \
-    else if (!indices[num_params-(Index+1)] && key == object_names<value_type,char_type>::Member()) { \
+    else if (!indices[num_params-Index] && key == object_names<value_type,char_type>::Member()) { \
         cursor.next(ec); \
         if (JSONCONS_UNLIKELY(ec)) \
         { \
@@ -469,7 +469,7 @@ is_optional_value_set(const T&)
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
         set_member(std::move(*r1), val.Member); \
-        indices[num_params-(Index+1)] = true; \
+        indices[num_params-Index] = true; \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
         { \
@@ -509,7 +509,7 @@ is_optional_value_set(const T&)
             return result_type{std::move(val)}; \
         } \
     } \
-    else if (!indices[num_params-(Index+1)] && key == object_names<value_type,char_type>::Member()) { \
+    else if (!indices[num_params-Index] && key == object_names<value_type,char_type>::Member()) { \
         cursor.next(ec); \
         if (JSONCONS_UNLIKELY(ec)) \
         { \
@@ -520,7 +520,7 @@ is_optional_value_set(const T&)
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
         set_member(std::move(*r1), val.Member); \
-        indices[num_params-(Index+1)] = true; \
+        indices[num_params-Index] = true; \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
         { \
@@ -545,7 +545,7 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_N_MEMBER_ENCODE(Prefix, P2, P3, Member, Index) JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
     { \
         auto r = try_encode_member(object_names<value_type,char_type>::Member(), val.Member, encoder); \
         if (JSONCONS_UNLIKELY(!r)) {return r;} \
@@ -563,7 +563,7 @@ if ((num_params-(Index+1)) < num_mandatory_params) \
 
 #define JSONCONS_MEMBER_COUNT(Prefix, P2, P3, Member, Index) JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Index)
 #define JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
 { \
     ++member_count; \
 } \
@@ -730,7 +730,7 @@ namespace reflect { \
   /**/ 
 
 #define JSONCONS_MEMBER_NAME_IS(P1, P2, P3, Seq, Index) JSONCONS_MEMBER_NAME_IS_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_MEMBER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_MEMBER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_MEMBER_NAME_IS_2(Member, Name) !ajson.contains(Name)) return false;
 #define JSONCONS_MEMBER_NAME_IS_3(Member, Name, Mode) JSONCONS_MEMBER_NAME_IS_2(Member, Name)
 #define JSONCONS_MEMBER_NAME_IS_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_IS_6(Member, Name, Mode, Match, , )
@@ -740,7 +740,7 @@ namespace reflect { \
     JSONCONS_CATCH(...) {return false;}
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Index) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Index) index = num_params-(Index+1); JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Index) index = num_params-Index; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
 #define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode,always_true(),,))
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,)
@@ -783,7 +783,7 @@ namespace reflect { \
   else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Index) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name) \
   {ajson.try_emplace(Name,class_instance.Member);} \
 else \
@@ -805,7 +805,7 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, From) ajson.try_emplace(Name, Into(class_instance.Member));
 
 #define JSONCONS_N_MEMBER_NAME_ENCODE(P1, P2, P3, Seq, Index) JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name) \
     { \
         auto r = try_encode_member(string_view_type(Name), val.Member, encoder); \
@@ -841,7 +841,7 @@ else \
     {auto r = try_encode_member(string_view_type(Name), Into(val.Member), encoder); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 
 #define JSONCONS_MEMBER_NAME_COUNT(P1, P2, P3, Seq, Index) JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_MEMBER_NAME_COUNT_2(Member, Name) \
 { \
     ++member_count; \
@@ -962,14 +962,14 @@ namespace reflect { \
   /**/
 
 #define JSONCONS_CTOR_GETTER_IS(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_IS_LAST(Prefix, P2, P3, Getter, Index)
-#define JSONCONS_CTOR_GETTER_IS_LAST(Prefix, P2, P3, Getter, Index) if ((num_params-(Index+1)) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Getter())) return false;
+#define JSONCONS_CTOR_GETTER_IS_LAST(Prefix, P2, P3, Getter, Index) if ((num_params-Index) < num_mandatory_params && !ajson.contains(object_names<value_type,char_type>::Getter())) return false;
 
 #define JSONCONS_CTOR_GETTER_GET(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Index)
 #define JSONCONS_CTOR_GETTER_GET_LAST(Prefix, P2, P3, Getter, Index) \
   conversion_result<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type> _r ## Getter{unexpect, conv_errc::missing_required_member}; \
   {auto it = ajson.find(object_names<value_type,char_type>::Getter()); \
   if (it == ajson.object_range().end()) \
-    {if ((num_params-(Index+1)) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
+    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
   else \
   { \
     _r ## Getter = json_traits_helper<Json>::template try_as_value<typename decltype(_r ## Getter)::value_type>(aset, it->value()); \
@@ -982,7 +982,7 @@ namespace reflect { \
 
 #define JSONCONS_CTOR_GETTER_TO_JSON(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Index)
 #define JSONCONS_CTOR_GETTER_TO_JSON_LAST(Prefix, P2, P3, Getter, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) { \
+if ((num_params-Index) < num_mandatory_params) { \
        ajson.try_emplace(object_names<value_type,char_type>::Getter(),class_instance.Getter()); \
   } \
 else { \
@@ -991,7 +991,7 @@ else { \
 
 #define JSONCONS_CTOR_GETTER_COUNT(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_COUNT_LAST(Prefix, P2, P3, Getter, Index)
 #define JSONCONS_CTOR_GETTER_COUNT_LAST(Prefix, P2, P3, Getter, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
 { \
     ++member_count; \
 } \
@@ -1005,7 +1005,7 @@ else \
 
 #define JSONCONS_CTOR_GETTER_ENCODE(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Index)
 #define JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
 { \
     auto r = try_encode_member(object_names<value_type,char_type>::Getter(), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
@@ -1112,7 +1112,7 @@ namespace reflect { \
   /**/
  
 #define JSONCONS_CTOR_GETTER_NAME_IS(P1, P2, P3, Seq, Index) JSONCONS_CTOR_GETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_CTOR_GETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_IS_2(Getter, Name) !ajson.contains(Name)) return false;
 #define JSONCONS_CTOR_GETTER_NAME_IS_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_IS_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_IS_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_IS_6(Getter, Name, Mode, Match, , )
@@ -1139,7 +1139,7 @@ namespace reflect { \
 #define JSONCONS_COMMA ,
 
 #define JSONCONS_CTOR_GETTER_NAME_GET(P1, P2, P3, Seq, Index) JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Index) index = num_params-(Index+1); JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_GET_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_GET_LAST(P1, P2, P3, Seq, Index) index = num_params-Index; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_GET_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_GET_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name,JSONCONS_RDWR,always_true(),,)
 #define JSONCONS_CTOR_GETTER_NAME_GET_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, always_true(),,))
 #define JSONCONS_CTOR_GETTER_NAME_GET_4(Getter, Name, Mode, Match) Mode(JSONCONS_CTOR_GETTER_NAME_GET_7(Getter, Name, Mode, Match,,))
@@ -1174,7 +1174,7 @@ namespace reflect { \
   _r ## Getter ? From(std::move(*_r ## Getter)) : From(jsoncons::make_obj_using_allocator<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset.get_allocator()))
 
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON(P1, P2, P3, Seq, Index) JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name) \
 { \
   ajson.try_emplace(Name,class_instance.Getter()); \
@@ -1194,7 +1194,7 @@ else { \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_COUNT(P1, P2, P3, Seq, Index) JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_COUNT_2(Getter, Name) \
 { \
     ++member_count; \
@@ -1222,7 +1222,7 @@ else \
 }    
 
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE(P1, P2, P3, Seq, Index) JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name) \
 { \
     auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
@@ -1725,7 +1725,7 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_AS_(Prefix, Getter, Setter, Property, Index) { \
   auto it = ajson.find(object_names<value_type,char_type>::Property()); \
   if (it == ajson.object_range().end()) \
-    {if ((num_params-(Index+1)) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, # Prefix);}} \
+    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, # Prefix);}} \
   else \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Getter())>::type>(aset, it->value()); \
@@ -1748,7 +1748,7 @@ namespace reflect { \
 #define JSONCONS_N_GETTER_SETTER_TO_JSON(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_TO_JSON_LAST(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_TO_JSON_(Prefix, Getter, Setter, Property, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
   {ajson.try_emplace(object_names<value_type,char_type>::Property(),class_instance.Getter());} \
 else \
   {json_traits_helper<Json>::set_optional_json_member(object_names<value_type,char_type>::Property(),class_instance.Getter(), ajson);}
@@ -1760,7 +1760,7 @@ else \
 #define JSONCONS_N_GETTER_SETTER_COUNT(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_COUNT_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_COUNT_LAST(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_COUNT_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_COUNT_(Prefix, Getter, Setter, Property, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
 { \
     ++member_count; \
 } \
@@ -1775,7 +1775,7 @@ else \
 #define JSONCONS_N_GETTER_SETTER_ENCODE(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_ENCODE_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_ENCODE_LAST(Prefix, GetPrefix, SetPrefix, Property, Index) JSONCONS_N_GETTER_SETTER_ENCODE_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Index) 
 #define JSONCONS_N_GETTER_SETTER_ENCODE_(Prefix, Getter, Setter, Property, Index) \
-if ((num_params-(Index+1)) < num_mandatory_params) \
+if ((num_params-Index) < num_mandatory_params) \
 { \
     auto r = try_encode_member(object_names<value_type,char_type>::Property(), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
@@ -1890,7 +1890,7 @@ namespace reflect { \
   /**/
  
 #define JSONCONS_GETTER_SETTER_NAME_IS(P1, P2, P3, Seq, Index) JSONCONS_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_GETTER_SETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params && JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_GETTER_SETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_GETTER_SETTER_NAME_IS_3(Getter, Setter, Name) !ajson.contains(Name)) return false;
 #define JSONCONS_GETTER_SETTER_NAME_IS_5(Getter, Setter, Name, Mode, Match) JSONCONS_GETTER_SETTER_NAME_IS_7(Getter, Setter, Name, Mode, Match,, )
 #define JSONCONS_GETTER_SETTER_NAME_IS_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_GETTER_SETTER_NAME_IS_7(Getter, Setter, Name, Mode, Match, Into, )
@@ -1899,7 +1899,7 @@ namespace reflect { \
     JSONCONS_CATCH(...) {return false;}
 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Index) JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Index) index = num_params-(Index+1); JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Index) index = num_params-Index; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name,JSONCONS_RDWR,always_true(),,)
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, always_true(),,))
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
@@ -1951,7 +1951,7 @@ namespace reflect { \
   else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Index) JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_3(Getter, Setter, Name) \
   ajson.try_emplace(Name,class_instance.Getter()); \
 else \
@@ -1964,7 +1964,7 @@ else \
   {json_traits_helper<Json>::set_optional_json_member(string_view_type(Name), Into(class_instance.Getter()), ajson);}
  
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT(P1, P2, P3, Seq, Index) JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_COUNT_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_COUNT_3(Getter, Setter, Name) \
 { \
     ++member_count; \
@@ -1991,7 +1991,7 @@ else \
 }    
 
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE(P1, P2, P3, Seq, Index) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index)
-#define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-(Index+1)) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_3(Getter, Setter, Name) \
 { \
     auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
