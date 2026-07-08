@@ -392,11 +392,6 @@ is_optional_value_set(const T&)
     static inline const wstring_view& Member() {static const wstring_view sv = JSONCONS_PP_QUOTE(L,Member); return sv;} \
 /**/
 
-#define JSONCONS_GENERATE_ERROR_CONTEXT(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Index) 
-#define JSONCONS_GENERATE_ERROR_CONTEXT_LAST(Prefix, P2, P3, Member, Index) \
-    static inline const string_view& Member() {static const string_view sv = # Prefix "::" # Member; return sv;} \
-/**/
-
 #define JSONCONS_GENERATE_WHAT_ARG(Prefix, P2, P3, Member, Index) JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) 
 #define JSONCONS_GENERATE_WHAT_ARG_LAST(Prefix, P2, P3, Member, Index) \
     # Prefix "::" # Member, \
@@ -409,12 +404,12 @@ is_optional_value_set(const T&)
 #define JSONCONS_N_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index) { \
   auto it = ajson.find(object_names<value_type,char_type>::Member()); \
   if (it == ajson.object_range().end()) \
-    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Member());}} \
+    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(num_params-Index));}} \
   else \
   { \
       auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Member)>::type>(aset, it->value()); \
       if (result) {set_member(std::move(*result), class_instance.Member);} \
-      else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::Member());} \
+      else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::what_arg(num_params-Index));} \
   } \
 } \
 /**/
@@ -423,10 +418,10 @@ is_optional_value_set(const T&)
 #define JSONCONS_ALL_MEMBER_AS_LAST(Prefix,P2,P3, Member, Index) { \
   auto it = ajson.find(object_names<value_type,char_type>::Member()); \
   if (it == ajson.object_range().end()) \
-    {return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Member());} \
+    {return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(num_params-Index));} \
   auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(class_instance.Member)>::type>(aset, it->value()); \
   if (result) {set_member(std::move(*result), class_instance.Member);} \
-  else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::Member());} \
+  else {return result_type(jsoncons::unexpect, result.error().code(), error_context<value_type>::what_arg(num_params-Index));} \
 } \
 /**/
 
@@ -591,7 +586,6 @@ namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
     struct error_context<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_ERROR_CONTEXT,TypeName,,, __VA_ARGS__)\
         static std::string what_arg(std::size_t index) \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -969,11 +963,11 @@ namespace reflect { \
   conversion_result<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type> _r ## Getter{unexpect, conv_errc::missing_required_member}; \
   {auto it = ajson.find(object_names<value_type,char_type>::Getter()); \
   if (it == ajson.object_range().end()) \
-    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::Getter());}} \
+    {if ((num_params-Index) < num_mandatory_params){return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::what_arg(num_params-Index));}} \
   else \
   { \
     _r ## Getter = json_traits_helper<Json>::template try_as_value<typename decltype(_r ## Getter)::value_type>(aset, it->value()); \
-    if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::Getter());} \
+    if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), error_context<value_type>::what_arg(num_params-Index));} \
   }} 
 
 #define JSONCONS_CTOR_GETTER_AS(Prefix, P2, P3, Getter, Index) JSONCONS_CTOR_GETTER_AS_LAST(Prefix, P2, P3, Getter, Index),
@@ -1032,7 +1026,14 @@ namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
     struct error_context<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_ERROR_CONTEXT,TypeName,,, __VA_ARGS__)\
+        static std::string what_arg(std::size_t index) \
+        { \
+            static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+            static std::array<std::string,num_params> what_args = { \
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+            }; \
+            return what_args[index]; \
+        } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
@@ -1350,7 +1351,14 @@ namespace reflect { \
     template<> \
     struct error_context<EnumType> \
     { \
-        JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_ERROR_CONTEXT, ,,, __VA_ARGS__)\
+        static std::string what_arg(std::size_t index) \
+        { \
+            static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+            static std::array<std::string,num_params> what_args = { \
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+            }; \
+            return what_args[index]; \
+        } \
     }; \
     template<> \
     struct reflect_type_properties<EnumType> \
@@ -1802,7 +1810,14 @@ namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
     struct error_context<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_ERROR_CONTEXT, ,,, __VA_ARGS__)\
+        static std::string what_arg(std::size_t index) \
+        { \
+            static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+            static std::array<std::string,num_params> what_args = { \
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+            }; \
+            return what_args[index]; \
+        } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
