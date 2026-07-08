@@ -650,7 +650,6 @@ namespace reflect { \
         static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
-            using string_view_type = basic_string_view<char_type>; \
             value_type val{jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator())}; \
             std::error_code ec; \
             std::bitset<num_params> indices; \
