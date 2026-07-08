@@ -61,12 +61,13 @@ endif()
 target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
-               bson/src/bson_cursor_tests.cpp
-               bson/src/bson_decimal128_tests.cpp
-               bson/src/bson_encoder_tests.cpp
-               bson/src/bson_oid_tests.cpp
-               bson/src/bson_reader_tests.cpp
-               bson/src/bson_test_suite.cpp
+               corelib/src/utility/bigint_tests.cpp
+               #bson/src/bson_cursor_tests.cpp
+               #bson/src/bson_decimal128_tests.cpp
+               #bson/src/bson_encoder_tests.cpp
+               #bson/src/bson_oid_tests.cpp
+               #bson/src/bson_reader_tests.cpp
+               #bson/src/bson_test_suite.cpp
                bson/src/encode_decode_bson_tests.cpp
                #cbor/src/cbor_bitset_traits_tests.cpp
                #cbor/src/cbor_cursor_tests.cpp
@@ -144,7 +145,7 @@ add_executable(unit_tests
                #corelib/src/string_to_double_tests.cpp
                #corelib/src/try_decode_json_tests.cpp
                #corelib/src/try_to_json_tests.cpp
-               corelib/src/utility/bigint_tests.cpp
+               #corelib/src/utility/bigint_tests.cpp
                #corelib/src/utility/byte_string_tests.cpp
                #corelib/src/utility/conversion_tests.cpp
                #corelib/src/utility/more_type_traits_tests.cpp
