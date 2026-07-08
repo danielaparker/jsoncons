@@ -651,7 +651,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         //std::cout << result.error() .message() << "\n";
     }
     
-    /*SECTION("parsing error")
+    SECTION("parsing error")
     {
         std::string input = R"(
 {
@@ -689,10 +689,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         REQUIRE_FALSE(result);
         CHECK(conv_errc::not_double == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
-    }*/
+    }
 }
 
-#if 0
 TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -1627,4 +1626,4 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with mandatory-field errors when nested insi
         CHECK_FALSE(r);
     }
 }
-#endif
+
