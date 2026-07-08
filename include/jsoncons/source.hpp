@@ -465,7 +465,7 @@ namespace jsoncons {
                     std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_ + length_), buffer_size_ - length_);
                     std::size_t len = static_cast<std::size_t>(count);
                     length_ += len;
-                    if (len == 0 || length_ < length)
+                    if (len == 0)
                     {
                         stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     }
@@ -692,6 +692,10 @@ namespace jsoncons {
 
         span<const value_type> read_span(std::size_t length)
         {
+            if (length > default_max_buffer_size)
+            {
+                return span<const value_type>();
+            }
             if (length > buffer_.size())
             {
                 buffer_.resize(length);
@@ -924,6 +928,10 @@ namespace jsoncons {
 
         span<const value_type> read_span(std::size_t length)
         {
+            if (length > default_max_buffer_size)
+            {
+                return span<const value_type>();
+            }
             if (length > buffer_.size())
             {
                 buffer_.resize(length);

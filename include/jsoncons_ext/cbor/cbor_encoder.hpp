@@ -284,39 +284,7 @@ private:
         } 
         stack_.emplace_back(cbor_container_type::object, length);
 
-        if (length <= 0x17)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0xa0 + length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0xb8), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint8_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0xb9), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint16_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xffffffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0xba), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint32_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (uint64_t(length) <= (std::numeric_limits<std::uint64_t>::max)())
-        {
-            binary::native_to_big(static_cast<uint8_t>(0xbb), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint64_t>(length), 
-                                  std::back_inserter(sink_));
-        }
+        write_type_and_length(0xa0, length);
 
         JSONCONS_VISITOR_RETURN;
     }
@@ -370,39 +338,7 @@ private:
             JSONCONS_VISITOR_RETURN;
         } 
         stack_.emplace_back(cbor_container_type::array, length);
-        if (length <= 0x17)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x80 + length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x98), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint8_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x99), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint16_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (length <= 0xffffffff)
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x9a), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint32_t>(length), 
-                                  std::back_inserter(sink_));
-        } 
-        else if (uint64_t(length) <= (std::numeric_limits<std::uint64_t>::max)())
-        {
-            binary::native_to_big(static_cast<uint8_t>(0x9b), 
-                                  std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint64_t>(length), 
-                                  std::back_inserter(sink_));
-        }
+        write_type_and_length(0x80, length);
         JSONCONS_VISITOR_RETURN;
     }
 
@@ -485,39 +421,33 @@ private:
         }
     }
 
-    void write_type_and_length(uint8_t major_type, std::size_t length)
+    void write_type_and_length(uint8_t major_type, uint64_t length)
     {
         if (length <= 0x17)
         {
-            binary::native_to_big(static_cast<uint8_t>(major_type + length),
-                                            std::back_inserter(sink_));
+            sink_.push_back(static_cast<uint8_t>(major_type + length));
         }
         else if (length <= 0xff)
         {
-            binary::native_to_big(static_cast<uint8_t>(major_type + 0x18),
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint8_t>(length), 
-                                            std::back_inserter(sink_));
+            sink_.push_back(static_cast<uint8_t>(major_type + 0x18));
+            sink_.push_back(static_cast<uint8_t>(length));
         }
         else if (length <= 0xffff)
         {
-            binary::native_to_big(static_cast<uint8_t>(major_type + 0x19),
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint16_t>(length), 
+            sink_.push_back(static_cast<uint8_t>(major_type + 0x19));
+            binary::native_to_big(static_cast<uint16_t>(length),
                                             std::back_inserter(sink_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::native_to_big(static_cast<uint8_t>(major_type + 0x1a),
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint32_t>(length), 
+            sink_.push_back(static_cast<uint8_t>(major_type + 0x1a));
+            binary::native_to_big(static_cast<uint32_t>(length),
                                             std::back_inserter(sink_));
         }
-        else if (uint64_t(length) <= (std::numeric_limits<std::uint64_t>::max)())
+        else
         {
-            binary::native_to_big(static_cast<uint8_t>(major_type + 0x1b),
-                                            std::back_inserter(sink_));
-            binary::native_to_big(static_cast<uint64_t>(length), 
+            sink_.push_back(static_cast<uint8_t>(major_type + 0x1b));
+            binary::native_to_big(static_cast<uint64_t>(length),
                                             std::back_inserter(sink_));
         }
     }
@@ -1166,139 +1096,23 @@ private:
 
     void write_tag(uint64_t value)
     {
-        if (value <= 0x17)
-        {
-            sink_.push_back(0xc0 | static_cast<uint8_t>(value)); 
-        } 
-        else if (value <=(std::numeric_limits<uint8_t>::max)())
-        {
-            sink_.push_back(0xd8);
-            sink_.push_back(static_cast<uint8_t>(value));
-        } 
-        else if (value <=(std::numeric_limits<uint16_t>::max)())
-        {
-            sink_.push_back(0xd9);
-            binary::native_to_big(static_cast<uint16_t>(value), 
-                                            std::back_inserter(sink_));
-        }
-        else if (value <=(std::numeric_limits<uint32_t>::max)())
-        {
-            sink_.push_back(0xda);
-            binary::native_to_big(static_cast<uint32_t>(value), 
-                                            std::back_inserter(sink_));
-        }
-        else 
-        {
-            sink_.push_back(0xdb);
-            binary::native_to_big(static_cast<uint64_t>(value), 
-                                            std::back_inserter(sink_));
-        }
+        write_type_and_length(0xc0, value);
     }
 
-    void write_uint64_value(uint64_t value) 
+    void write_uint64_value(uint64_t value)
     {
-        if (value <= 0x17)
-        {
-            sink_.push_back(static_cast<uint8_t>(value));
-        } 
-        else if (value <=(std::numeric_limits<uint8_t>::max)())
-        {
-            sink_.push_back(static_cast<uint8_t>(0x18));
-            sink_.push_back(static_cast<uint8_t>(value));
-        } 
-        else if (value <=(std::numeric_limits<uint16_t>::max)())
-        {
-            sink_.push_back(static_cast<uint8_t>(0x19));
-            binary::native_to_big(static_cast<uint16_t>(value), 
-                                            std::back_inserter(sink_));
-        } 
-        else if (value <=(std::numeric_limits<uint32_t>::max)())
-        {
-            sink_.push_back(static_cast<uint8_t>(0x1a));
-            binary::native_to_big(static_cast<uint32_t>(value), 
-                                            std::back_inserter(sink_));
-        } 
-        else if (value <=(std::numeric_limits<uint64_t>::max)())
-        {
-            sink_.push_back(static_cast<uint8_t>(0x1b));
-            binary::native_to_big(static_cast<uint64_t>(value), 
-                                            std::back_inserter(sink_));
-        }
+        write_type_and_length(0x00, value);
     }
 
     void write_int64_value(int64_t value) 
     {
         if (value >= 0)
         {
-            if (value <= 0x17)
-            {
-                binary::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint8_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x18), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint16_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x19), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint16_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint32_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x1a), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint32_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<int64_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x1b), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<int64_t>(value), 
-                                  std::back_inserter(sink_));
-            }
-        } else
+            write_type_and_length(0x00, static_cast<uint64_t>(value));
+        }
+        else
         {
-            const auto posnum = -1 - value;
-            if (value >= -24)
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x20 + posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint8_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x38), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint8_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint16_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x39), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint16_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint32_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x3a), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint32_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<int64_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x3b), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<int64_t>(posnum), 
-                                  std::back_inserter(sink_));
-            }
+            write_type_and_length(0x20, static_cast<uint64_t>(-1 - value));
         }
     }
 
