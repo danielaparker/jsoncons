@@ -339,6 +339,28 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
+        span<const value_type> read_span(std::size_t length)
+        {
+            if (length == 0)
+            {
+                return span<const value_type>(data_, std::size_t(0));
+            }
+            if (length_ < length)
+            {
+                make_available(length);
+            }
+            if (length_ < length)
+            {
+                return span<const value_type>();
+            }
+
+            const value_type* data = data_;
+            data_ += length;
+            length_ -= length;
+            position_ += length;
+            return span<const value_type>(data, length);
+        }
+
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len = 0;
@@ -395,6 +417,67 @@ namespace jsoncons {
             }
         }
     private:
+        void reserve_buffer(std::size_t capacity)
+        {
+            if (capacity <= buffer_size_)
+            {
+                return;
+            }
+
+            value_type* new_buffer = std::allocator_traits<char_allocator_type>::allocate(alloc_, capacity);
+            if (length_ > 0)
+            {
+                std::memcpy(new_buffer, data_, sizeof(value_type)*length_);
+            }
+            if (buffer_)
+            {
+                std::allocator_traits<char_allocator_type>::deallocate(alloc_, buffer_, buffer_size_);
+            }
+            buffer_ = new_buffer;
+            buffer_size_ = capacity;
+            data_ = buffer_;
+        }
+
+        void make_available(std::size_t length)
+        {
+            if (length > buffer_size_)
+            {
+                if (length > default_max_buffer_size)
+                {
+                    return;
+                }
+                reserve_buffer(length);
+            }
+            else if (length_ > 0 && data_ != buffer_)
+            {
+                std::memmove(buffer_, data_, sizeof(value_type)*length_);
+                data_ = buffer_;
+            }
+            else if (length_ == 0)
+            {
+                data_ = buffer_;
+            }
+
+            while (length_ < length && !stream_ptr_->eof())
+            {
+                JSONCONS_TRY
+                {
+                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_ + length_), buffer_size_ - length_);
+                    std::size_t len = static_cast<std::size_t>(count);
+                    length_ += len;
+                    if (len == 0 || length_ < length)
+                    {
+                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    }
+                }
+                JSONCONS_CATCH(const std::exception&)
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                    return;
+                }
+            }
+        }
+
         void fill_buffer()
         {
             if (stream_ptr_->eof())
@@ -503,6 +586,17 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
+        span<const value_type> read_span(std::size_t length)
+        {
+            if (std::size_t(end_ - current_) < length)
+            {
+                return span<const value_type>();
+            }
+            const value_type* data = current_;
+            current_ += length;
+            return span<const value_type>(data, length);
+        }
+
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len;
@@ -593,6 +687,20 @@ namespace jsoncons {
             std::size_t length = buffer_len_;
             buffer_len_ = 0;
 
+            return span<const value_type>(buffer_.data(), length);
+        }
+
+        span<const value_type> read_span(std::size_t length)
+        {
+            if (length > buffer_.size())
+            {
+                buffer_.resize(length);
+            }
+            std::size_t actual = read(buffer_.data(), length);
+            if (actual != length)
+            {
+                return span<const value_type>();
+            }
             return span<const value_type>(buffer_.data(), length);
         }
 
@@ -712,6 +820,17 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
+        span<const value_type> read_span(std::size_t length)
+        {
+            if (std::size_t(end_ - current_) < length)
+            {
+                return span<const value_type>();
+            }
+            const value_type* data = current_;
+            current_ += length;
+            return span<const value_type>(data, length);
+        }
+
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len;
@@ -800,6 +919,20 @@ namespace jsoncons {
             std::size_t length = buffer_len_;
             buffer_len_ = 0;
 
+            return span<const value_type>(buffer_.data(), length);
+        }
+
+        span<const value_type> read_span(std::size_t length)
+        {
+            if (length > buffer_.size())
+            {
+                buffer_.resize(length);
+            }
+            std::size_t actual = read(buffer_.data(), length);
+            if (actual != length)
+            {
+                return span<const value_type>();
+            }
             return span<const value_type>(buffer_.data(), length);
         }
 

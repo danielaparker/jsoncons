@@ -325,9 +325,51 @@ namespace jsoncons {
         {
         }
 
+        void append(const uint8_t* s, std::size_t length)
+        {
+            append_impl(*buf_ptr, s, length, 0);
+        }
+
         void push_back(uint8_t ch)
         {
             buf_ptr->push_back(static_cast<value_type>(ch));
+        }
+
+    private:
+        template <typename C>
+        static auto append_impl(C& c, const uint8_t* s, std::size_t length, int)
+            -> decltype(c.append(s, length), void())
+        {
+            c.append(s, length);
+        }
+
+        template <typename C>
+        static auto append_impl(C& c, const uint8_t* s, std::size_t length, long)
+            -> decltype(c.insert(c.end(), s, s + length), void())
+        {
+            c.insert(c.end(), s, s + length);
+        }
+
+        template <typename C>
+        static void append_impl(C& c, const uint8_t* s, std::size_t length, ...)
+        {
+            reserve(c, length, 0);
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                c.push_back(static_cast<typename C::value_type>(s[i]));
+            }
+        }
+
+        template <typename C>
+        static auto reserve(C& c, std::size_t length, int)
+            -> decltype(c.reserve(c.size() + length), void())
+        {
+            c.reserve(c.size() + length);
+        }
+
+        template <typename C>
+        static void reserve(C&, std::size_t, ...)
+        {
         }
     };
 
