@@ -52,7 +52,7 @@ bool read_next_or_end(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
     cursor.next(ec); 
     if (ec) 
     { 
-        true; 
+        return true; 
     } 
     return (cursor.current().event_type() == staj_events::end_object) ? true : false; 
 }
