@@ -60,7 +60,7 @@ bool read_next_or_end(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
 template <std::size_t N>
 std::size_t find_first_not_set(const std::bitset<N>& indices)
 {
-    for (std::size_t i = indices.size(); i-- > 0;) {
+    for (std::size_t i = 0; i < indices.size(); ++i) {
         if (!indices[i]) {
             return i;
         }
@@ -72,8 +72,7 @@ template <std::size_t N>
 std::size_t find_first_not_set(const std::bitset<N>& indices, 
     std::size_t num_mandatory_params)
 {
-    std::size_t end = indices.size() - num_mandatory_params;
-    for (std::size_t i = indices.size(); i-- > end;) {
+    for (std::size_t i = 0; i < num_mandatory_params; ++i) {
         if (!indices[i]) {
             return i;
         }
@@ -474,7 +473,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        indices[Index] = true; \
+        indices[num_params-(Index+1)] = true; \
         if (is_end) \
         { \
             if (!indices.all()) { \
@@ -510,7 +509,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        indices[Index] = true; \
+        indices[num_params-(Index+1)] = true; \
         if (is_end) \
         { \
             std::size_t index = find_first_not_set(indices, num_mandatory_params); \
@@ -583,7 +582,7 @@ namespace reflect { \
             static std::array<std::string,num_params> what_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[num_params - (index+1)]; \
+            return what_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
