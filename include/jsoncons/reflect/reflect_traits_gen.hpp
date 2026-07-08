@@ -34,7 +34,6 @@ namespace reflect {
 template <typename CharT>
 basic_string_view<CharT> get_key(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
 { 
-    using char_type = CharT; 
     using string_view_type = basic_string_view<CharT>;
 
     if (cursor.current().event_type() != staj_events::key)
