@@ -356,6 +356,11 @@ namespace view {
         }
     };
 
+    inline bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
+    {
+        return detail_view::read_head(p, end, head, ec);
+    }
+
     inline bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
         int max_nesting_depth = default_max_nesting_depth)
     {
