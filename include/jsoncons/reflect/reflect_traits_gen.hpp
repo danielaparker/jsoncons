@@ -1542,7 +1542,6 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
-        constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static result_type try_decode(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
         { \
