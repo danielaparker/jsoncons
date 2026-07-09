@@ -1507,7 +1507,6 @@ namespace reflect { \
     { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
-        constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
