@@ -11,7 +11,6 @@
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
-#include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <jsoncons_ext/cbor/decode_cbor.hpp>
 #include <jsoncons_ext/cbor/encode_cbor.hpp>
 
