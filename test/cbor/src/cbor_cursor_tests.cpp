@@ -63,6 +63,124 @@ TEST_CASE("cbor stream source spans straddled strings")
     CHECK(cursor.current().get<std::string>() == "hello");
 }
 
+TEST_CASE("cbor stream source with tiny buffer reads strings around the buffer size")
+{
+    SECTION("text string shorter than the buffer size")
+    {
+        std::string data;
+        data.push_back('\x63');
+        data.append("abc");
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is, 4);
+        std::error_code ec;
+        cbor::cbor_stream_cursor cursor(std::move(source), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abc");
+    }
+
+    SECTION("text string of exactly the buffer size")
+    {
+        std::string data;
+        data.push_back('\x64');
+        data.append("abcd");
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is, 4);
+        std::error_code ec;
+        cbor::cbor_stream_cursor cursor(std::move(source), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abcd");
+    }
+
+    SECTION("text string longer than the buffer size")
+    {
+        std::string data;
+        data.push_back('\x65');
+        data.append("abcde");
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is, 4);
+        std::error_code ec;
+        cbor::cbor_stream_cursor cursor(std::move(source), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abcde");
+    }
+
+    SECTION("byte string longer than the buffer size")
+    {
+        std::string data;
+        data.push_back('\x45');
+        data.append("abcde");
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is, 4);
+        std::error_code ec;
+        cbor::cbor_stream_cursor cursor(std::move(source), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::byte_string_value == cursor.current().event_type());
+        auto bytes = cursor.current().get<byte_string_view>();
+        REQUIRE(5 == bytes.size());
+        CHECK('a' == bytes[0]);
+        CHECK('e' == bytes[4]);
+    }
+}
+
+TEST_CASE("cbor iterator source with tiny buffer reads strings around the buffer size")
+{
+    using source_type = jsoncons::binary_iterator_source<std::vector<uint8_t>::const_iterator>;
+
+    SECTION("text string shorter than the buffer size")
+    {
+        std::vector<uint8_t> data = {0x63,'a','b','c'};
+        std::error_code ec;
+        cbor::basic_cbor_cursor<source_type> cursor(source_type(data.cbegin(), data.cend(), 4), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abc");
+    }
+
+    SECTION("text string of exactly the buffer size")
+    {
+        std::vector<uint8_t> data = {0x64,'a','b','c','d'};
+        std::error_code ec;
+        cbor::basic_cbor_cursor<source_type> cursor(source_type(data.cbegin(), data.cend(), 4), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abcd");
+    }
+
+    SECTION("text string longer than the buffer size")
+    {
+        std::vector<uint8_t> data = {0x65,'a','b','c','d','e'};
+        std::error_code ec;
+        cbor::basic_cbor_cursor<source_type> cursor(source_type(data.cbegin(), data.cend(), 4), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        CHECK(cursor.current().get<std::string>() == "abcde");
+    }
+
+    SECTION("byte string longer than the buffer size")
+    {
+        std::vector<uint8_t> data = {0x45,1,2,3,4,5};
+        std::error_code ec;
+        cbor::basic_cbor_cursor<source_type> cursor(source_type(data.cbegin(), data.cend(), 4), ec);
+
+        REQUIRE_FALSE(ec);
+        REQUIRE(staj_events::byte_string_value == cursor.current().event_type());
+        auto bytes = cursor.current().get<byte_string_view>();
+        REQUIRE(5 == bytes.size());
+        CHECK(1 == bytes[0]);
+        CHECK(5 == bytes[4]);
+    }
+}
+
 TEST_CASE("cbor stream rejects truncated huge byte string length")
 {
     std::string data;

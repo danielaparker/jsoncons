@@ -417,38 +417,13 @@ namespace jsoncons {
             }
         }
     private:
-        void reserve_buffer(std::size_t capacity)
-        {
-            if (capacity <= buffer_size_)
-            {
-                return;
-            }
-
-            value_type* new_buffer = std::allocator_traits<char_allocator_type>::allocate(alloc_, capacity);
-            if (length_ > 0)
-            {
-                std::memcpy(new_buffer, data_, sizeof(value_type)*length_);
-            }
-            if (buffer_)
-            {
-                std::allocator_traits<char_allocator_type>::deallocate(alloc_, buffer_, buffer_size_);
-            }
-            buffer_ = new_buffer;
-            buffer_size_ = capacity;
-            data_ = buffer_;
-        }
-
         void make_available(std::size_t length)
         {
             if (length > buffer_size_)
             {
-                if (length > default_max_buffer_size)
-                {
-                    return;
-                }
-                reserve_buffer(length);
+                return;
             }
-            else if (length_ > 0 && data_ != buffer_)
+            if (length_ > 0 && data_ != buffer_)
             {
                 std::memmove(buffer_, data_, sizeof(value_type)*length_);
                 data_ = buffer_;
@@ -692,13 +667,9 @@ namespace jsoncons {
 
         span<const value_type> read_span(std::size_t length)
         {
-            if (length > default_max_buffer_size)
-            {
-                return span<const value_type>();
-            }
             if (length > buffer_.size())
             {
-                buffer_.resize(length);
+                return span<const value_type>();
             }
             std::size_t actual = read(buffer_.data(), length);
             if (actual != length)
@@ -928,13 +899,9 @@ namespace jsoncons {
 
         span<const value_type> read_span(std::size_t length)
         {
-            if (length > default_max_buffer_size)
-            {
-                return span<const value_type>();
-            }
             if (length > buffer_.size())
             {
-                buffer_.resize(length);
+                return span<const value_type>();
             }
             std::size_t actual = read(buffer_.data(), length);
             if (actual != length)

@@ -509,6 +509,80 @@ TEST_CASE("binary_stream_source tests")
     }
 }
 
+TEST_CASE("binary_stream_source read_span tests")
+{
+    std::string data = "0123456789abcdef";
+
+    SECTION("read_span within the configured buffer size")
+    {
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is,4);
+
+        auto s = source.read_span(3);
+        REQUIRE(3 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), data.begin()));
+        CHECK(3 == source.position());
+        CHECK(4 == source.buffer_size());
+    }
+
+    SECTION("read_span of exactly the configured buffer size")
+    {
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is,4);
+
+        auto s = source.read_span(4);
+        REQUIRE(4 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), data.begin()));
+        CHECK(4 == source.position());
+        CHECK(4 == source.buffer_size());
+    }
+
+    SECTION("read_span straddling buffer refills")
+    {
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is,4);
+
+        auto s = source.read_span(3);
+        REQUIRE(3 == s.size());
+        auto s2 = source.read_span(3);
+        REQUIRE(3 == s2.size());
+        CHECK(std::equal(s2.begin(), s2.end(), data.begin()+3));
+        CHECK(6 == source.position());
+        CHECK(4 == source.buffer_size());
+    }
+
+    SECTION("read_span larger than the configured buffer size fails without consuming")
+    {
+        std::istringstream is(data);
+        jsoncons::binary_stream_source source(is,4);
+
+        auto s = source.read_span(5);
+        CHECK(0 == s.size());
+        CHECK(0 == source.position());
+        CHECK(4 == source.buffer_size());
+
+        std::vector<uint8_t> v(5);
+        REQUIRE(5 == source.read(v.data(),5));
+        CHECK(std::equal(v.begin(), v.end(), data.begin()));
+    }
+
+    SECTION("read_span larger than the default buffer size succeeds when configured")
+    {
+        std::string big(20000, '\0');
+        for (std::size_t i = 0; i < big.size(); ++i)
+        {
+            big[i] = static_cast<char>('a' + (i % 26));
+        }
+        std::istringstream is(big);
+        jsoncons::binary_stream_source source(is,big.size());
+
+        auto s = source.read_span(17000);
+        REQUIRE(17000 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), big.begin()));
+        CHECK(big.size() == source.buffer_size());
+    }
+}
+
 TEST_CASE("random access iterator iterator_stream source tests")
 {
     std::string data = "012345678";
@@ -580,6 +654,96 @@ TEST_CASE("forward iterator iterator_stream source tests")
         CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
         CHECK(9 == source.position());
+    }
+}
+
+TEST_CASE("iterator_source read_span tests")
+{
+    std::string data = "0123456789abcdef";
+
+    SECTION("read_span within the configured buffer size")
+    {
+        jsoncons::iterator_source<std::string::iterator> source(data.begin(), data.end(), 4);
+
+        auto s = source.read_span(3);
+        REQUIRE(3 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), data.begin()));
+        auto s2 = source.read_span(4);
+        REQUIRE(4 == s2.size());
+        CHECK(std::equal(s2.begin(), s2.end(), data.begin()+3));
+        CHECK(7 == source.position());
+    }
+
+    SECTION("read_span larger than the configured buffer size fails without consuming")
+    {
+        jsoncons::iterator_source<std::string::iterator> source(data.begin(), data.end(), 4);
+
+        auto s = source.read_span(5);
+        CHECK(0 == s.size());
+        CHECK(0 == source.position());
+
+        std::vector<char> v(5);
+        REQUIRE(5 == source.read(v.data(),5));
+        CHECK(std::equal(v.begin(), v.end(), data.begin()));
+    }
+
+    SECTION("read_span larger than the default buffer size succeeds when configured")
+    {
+        std::string big(20000, '\0');
+        for (std::size_t i = 0; i < big.size(); ++i)
+        {
+            big[i] = static_cast<char>('a' + (i % 26));
+        }
+        jsoncons::iterator_source<std::string::iterator> source(big.begin(), big.end(), big.size());
+
+        auto s = source.read_span(17000);
+        REQUIRE(17000 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), big.begin()));
+    }
+}
+
+TEST_CASE("binary_iterator_source read_span tests")
+{
+    std::vector<uint8_t> data = { 0,1,2,3,4,5,6,7,8,10,11,12,13,14,15 };
+
+    SECTION("read_span within the configured buffer size")
+    {
+        jsoncons::binary_iterator_source<std::vector<uint8_t>::iterator> source(data.begin(), data.end(), 4);
+
+        auto s = source.read_span(3);
+        REQUIRE(3 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), data.begin()));
+        auto s2 = source.read_span(4);
+        REQUIRE(4 == s2.size());
+        CHECK(std::equal(s2.begin(), s2.end(), data.begin()+3));
+        CHECK(7 == source.position());
+    }
+
+    SECTION("read_span larger than the configured buffer size fails without consuming")
+    {
+        jsoncons::binary_iterator_source<std::vector<uint8_t>::iterator> source(data.begin(), data.end(), 4);
+
+        auto s = source.read_span(5);
+        CHECK(0 == s.size());
+        CHECK(0 == source.position());
+
+        std::vector<uint8_t> v(5);
+        REQUIRE(5 == source.read(v.data(),5));
+        CHECK(std::equal(v.begin(), v.end(), data.begin()));
+    }
+
+    SECTION("read_span larger than the default buffer size succeeds when configured")
+    {
+        std::vector<uint8_t> big(20000);
+        for (std::size_t i = 0; i < big.size(); ++i)
+        {
+            big[i] = static_cast<uint8_t>(i & 0xff);
+        }
+        jsoncons::binary_iterator_source<std::vector<uint8_t>::iterator> source(big.begin(), big.end(), big.size());
+
+        auto s = source.read_span(17000);
+        REQUIRE(17000 == s.size());
+        CHECK(std::equal(s.begin(), s.end(), big.begin()));
     }
 }
 
