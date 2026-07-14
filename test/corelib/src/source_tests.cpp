@@ -1,6 +1,10 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 12
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
+
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <sstream>
@@ -704,7 +708,7 @@ TEST_CASE("iterator_source read_span tests")
 
 TEST_CASE("binary_iterator_source read_span tests")
 {
-    std::vector<uint8_t> data = { 0,1,2,3,4,5,6,7,8,10,11,12,13,14,15 };
+    std::vector<uint8_t> data = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 
     SECTION("read_span within the configured buffer size")
     {
