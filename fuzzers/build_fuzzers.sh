@@ -34,6 +34,16 @@ oss_fuzz_compile_all()
 
     # Fuzzers that target the cursors
     $CXX ./fuzzers/fuzz_json_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_json_cursor
+    $CXX ./fuzzers/fuzz_cbor_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_cursor
+    $CXX ./fuzzers/fuzz_cbor_typed_array.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_typed_array
+
+    # Fuzzers that target error_code paths
+    $CXX ./fuzzers/fuzz_cbor_noexcept.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_noexcept
+
+    # Seed corpora
+    zip -j $OUT/fuzz_cbor_cursor_seed_corpus.zip ./fuzzers/corpus/cbor/*
+    zip -j $OUT/fuzz_cbor_typed_array_seed_corpus.zip ./fuzzers/corpus/cbor/*
+    zip -j $OUT/fuzz_cbor_noexcept_seed_corpus.zip ./fuzzers/corpus/cbor/*
 }
 
 if [[ -z "${OUT}" ]]; then
