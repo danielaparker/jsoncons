@@ -1839,7 +1839,7 @@ private:
                 str.push_back('-');
                 str.push_back('0');
                 str.push_back('x');
-                jsoncons::integer_to_hex(static_cast<uint64_t>(-val), str);
+                jsoncons::integer_to_hex(static_cast<uint64_t>(-1 - val) + 1u, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1905,7 +1905,7 @@ private:
         else
         {
             str.push_back('-');
-            jsoncons::integer_to_hex(static_cast<uint64_t>(-exponent), str);
+            jsoncons::integer_to_hex(static_cast<uint64_t>(-1 - exponent) + 1u, str);
         }
     }
 
@@ -2664,10 +2664,17 @@ private:
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::byte_string)
         {
+            std::size_t typed_array_count = typed_array_stack_.size();
             read_byte_string_from_source read(this);
             read_byte_string(read, visitor, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
+                return;
+            }
+            if (typed_array_stack_.size() == typed_array_count)
+            {
+                // Byte string storage must be a typed array
+                ec = cbor_errc::bad_mdarray;
                 return;
             }
         }
@@ -2690,13 +2697,21 @@ private:
             more_ = false;
             return;
         }
+        if (get_major_type(b.value) != jsoncons::cbor::detail::cbor_major_type::array)
+        {
+            ec = cbor_errc::bad_extents;
+            more_ = false;
+            return;
+        }
         uint8_t info = get_additional_information_value(b.value);
 
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                while (true)
+                source_.ignore(1);
+                bool done = false;
+                while (!done)
                 {
                     auto c = source_.peek();
                     if (JSONCONS_UNLIKELY(c.eof))
@@ -2708,7 +2723,7 @@ private:
                     if (c.value == 0xff)
                     {
                         source_.ignore(1);
-                        return;
+                        done = true;
                     }
                     else
                     {
