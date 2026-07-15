@@ -348,7 +348,7 @@ public:
     {
         if (JSONCONS_UNLIKELY(length == 0))
         {
-            return span<const value_type>(data_, std::size_t(0));
+            return span<const value_type>{};
         }
         if (length > length_)
         {
@@ -667,22 +667,15 @@ public:
 
 
     template <typename Buffer>
-    span<const value_type> read_span(std::size_t length, Buffer&&)
+    span<const value_type> read_span(std::size_t length, Buffer&& buffer)
     {
-        if (length > default_max_chunk_size)
+        if (JSONCONS_UNLIKELY(length == 0))
         {
-            return span<const value_type>();
+            return span<const value_type>{};
         }
-        if (length > chunk_.size())
-        {
-            chunk_.resize(length);
-        }
-        std::size_t actual = read(chunk_.data(), length);
-        if (actual != length)
-        {
-            return span<const value_type>();
-        }
-        return span<const value_type>(chunk_.data(), length);
+        buffer.clear();
+        source_reader<iterator_source<IteratorT>>::read(*this, buffer, length);
+        return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
     }
 
     template <typename Category = iterator_category>
@@ -916,22 +909,15 @@ public:
     }
 
     template <typename Buffer>
-    span<const value_type> read_span(std::size_t length, Buffer&&)
+    span<const value_type> read_span(std::size_t length, Buffer&& buffer)
     {
-        if (length > default_max_chunk_size)
+        if (JSONCONS_UNLIKELY(length == 0))
         {
-            return span<const value_type>();
+            return span<const value_type>{};
         }
-        if (length > chunk_.size())
-        {
-            chunk_.resize(length);
-        }
-        std::size_t actual = read(chunk_.data(), length);
-        if (actual != length)
-        {
-            return span<const value_type>();
-        }
-        return span<const value_type>(chunk_.data(), length);
+        buffer.clear();
+        source_reader<binary_iterator_source<IteratorT>>::read(*this, buffer, length);
+        return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
     }
 
     template <typename Category = iterator_category>
