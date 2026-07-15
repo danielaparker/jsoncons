@@ -25,6 +25,9 @@
 
 namespace jsoncons { 
 
+    template <typename Source>
+    struct source_reader;
+
     // The source data must be padded by at least `buffer_padding_size` bytes.
     JSONCONS_INLINE_CONSTEXPR uint8_t buffer_padding_size = 4;
 
@@ -85,14 +88,15 @@ namespace jsoncons {
     private:
         using char_type = typename std::conditional<sizeof(CharT) == sizeof(char),char,CharT>::type;
         using char_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type>;
+        using stream_source_type = stream_source<CharT,Allocator>;
 
         Allocator alloc_;
         basic_null_istream<char_type> null_is_;
         std::basic_istream<char_type>* stream_ptr_;
         std::basic_streambuf<char_type>* sbuf_;
         std::size_t position_{0};
-        value_type* buffer_{nullptr};
-        std::size_t buffer_size_{0};
+        value_type* chunk_{nullptr};
+        std::size_t chunk_size_{0};
         value_type* data_{nullptr};
         std::size_t length_{0};
     public:
@@ -113,13 +117,13 @@ namespace jsoncons {
         stream_source(stream_source&& other) noexcept
             : alloc_(other.alloc_), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf())
         {
-            buffer_ = other.buffer_;
+            chunk_ = other.chunk_;
             data_ = other.data_;
-            buffer_size_ = other.buffer_size_;
+            chunk_size_ = other.chunk_size_;
             length_ = other.length_;
-            other.buffer_ = nullptr;
+            other.chunk_ = nullptr;
             other.data_ = nullptr;
-            other.buffer_size_ = 0;
+            other.chunk_size_ = 0;
             other.length_ = 0;
 
             if (other.stream_ptr_ != &other.null_is_)
@@ -135,21 +139,21 @@ namespace jsoncons {
 
         stream_source(stream_source&& other, const Allocator& alloc) noexcept
             : alloc_(alloc), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
-              buffer_size_(other.buffer_size_), length_(other.length_)
+              chunk_size_(other.chunk_size_), length_(other.length_)
         {
             if (alloc == other.get_allocator())
             {
-                buffer_ = other.buffer_;
+                chunk_ = other.chunk_;
                 data_ = other.data_;
                 length_ = other.length_;
-                other.buffer_ = nullptr;
+                other.chunk_ = nullptr;
                 other.data_ = nullptr;
                 other.length_ = 0;
             }
-            else if (other.buffer_ != nullptr)
+            else if (other.chunk_ != nullptr)
             {
-                buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-                data_ = buffer_ + (other.data_ - other.buffer_);
+                chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
+                data_ = chunk_ + (other.data_ - other.chunk_);
                 std::memcpy(data_, other.data_, sizeof(value_type)*other.length_);
             }
             if (other.stream_ptr_ != &other.null_is_)
@@ -169,26 +173,26 @@ namespace jsoncons {
         stream_source(std::basic_istream<char_type>& is,
             const Allocator& alloc = Allocator())
             : alloc_(alloc), stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
-              buffer_size_(default_max_buffer_size)
+              chunk_size_(default_max_buffer_size)
         {
-            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-            data_ = buffer_;
+            chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
+            data_ = chunk_;
         }
 
         stream_source(std::basic_istream<char_type>& is, std::size_t buf_size,
             const Allocator& alloc = Allocator())
             : alloc_(alloc), stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
-              buffer_size_(buf_size)
+              chunk_size_(buf_size)
         {
-            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-            data_ = buffer_;
+            chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
+            data_ = chunk_;
         }
 
         ~stream_source() noexcept
         {
-            if (buffer_)
+            if (chunk_)
             {
-                std::allocator_traits<char_allocator_type>::deallocate(alloc_, buffer_, buffer_size_);
+                std::allocator_traits<char_allocator_type>::deallocate(alloc_, chunk_, chunk_size_);
             }
         }
 
@@ -200,8 +204,8 @@ namespace jsoncons {
             auto alloc = other.alloc_;
             other.alloc_ = alloc_;
             alloc_ = alloc;
-            std::swap(buffer_, other.buffer_);
-            std::swap(buffer_size_, other.buffer_size_);
+            std::swap(chunk_, other.chunk_);
+            std::swap(chunk_size_, other.chunk_size_);
             std::swap(data_, other.data_);
             std::swap(length_, other.length_);
             if (other.stream_ptr_ != &other.null_is_)
@@ -221,11 +225,11 @@ namespace jsoncons {
         void move_assignment(std::false_type, // not propagate_on_container_move_assignment
             stream_source&& other) noexcept
         {
-            buffer_size_ = other.buffer_size_;
-            buffer_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, buffer_size_);
-            data_ = buffer_ + (other.data_ - other.buffer_);
+            chunk_size_ = other.chunk_size_;
+            chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
+            data_ = chunk_ + (other.data_ - other.chunk_);
             length_ = other.length_;
-            std::memcpy(buffer_, other.buffer_, sizeof(value_type)*other.length_);
+            std::memcpy(chunk_, other.chunk_, sizeof(value_type)*other.length_);
             if (other.stream_ptr_ != &other.null_is_)
             {
                 stream_ptr_ = other.stream_ptr_;
@@ -249,12 +253,12 @@ namespace jsoncons {
 
         const value_type* buffer() const
         {
-            return buffer_;
+            return chunk_;
         }
 
         std::size_t buffer_size() const
         {
-            return buffer_size_;
+            return chunk_size_;
         }
 
         const value_type* data() const
@@ -339,19 +343,18 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
-        span<const value_type> read_span(std::size_t length)
+        template <typename Buffer>
+        span<const value_type> read_span(std::size_t length, Buffer&& buffer)
         {
-            if (length == 0)
+            if (JSONCONS_UNLIKELY(length == 0))
             {
                 return span<const value_type>(data_, std::size_t(0));
             }
-            if (length_ < length)
+            if (length > length_)
             {
-                make_available(length);
-            }
-            if (length_ < length)
-            {
-                return span<const value_type>();
+                buffer.clear();
+                source_reader<stream_source_type>::read(*this, std::forward<Buffer>(buffer), length);
+                return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
             }
 
             const value_type* data = data_;
@@ -376,7 +379,7 @@ namespace jsoncons {
             {
                 return len;
             }
-            else if (length - len < buffer_size_)
+            else if (length - len < chunk_size_)
             {
                 fill_buffer();
                 if (length_ > 0)
@@ -419,7 +422,7 @@ namespace jsoncons {
     private:
         void reserve_buffer(std::size_t capacity)
         {
-            if (capacity <= buffer_size_)
+            if (capacity <= chunk_size_)
             {
                 return;
             }
@@ -429,53 +432,13 @@ namespace jsoncons {
             {
                 std::memcpy(new_buffer, data_, sizeof(value_type)*length_);
             }
-            if (buffer_)
+            if (chunk_)
             {
-                std::allocator_traits<char_allocator_type>::deallocate(alloc_, buffer_, buffer_size_);
+                std::allocator_traits<char_allocator_type>::deallocate(alloc_, chunk_, chunk_size_);
             }
-            buffer_ = new_buffer;
-            buffer_size_ = capacity;
-            data_ = buffer_;
-        }
-
-        void make_available(std::size_t length)
-        {
-            if (length > buffer_size_)
-            {
-                if (length > default_max_buffer_size)
-                {
-                    return;
-                }
-                reserve_buffer(length);
-            }
-            else if (length_ > 0 && data_ != buffer_)
-            {
-                std::memmove(buffer_, data_, sizeof(value_type)*length_);
-                data_ = buffer_;
-            }
-            else if (length_ == 0)
-            {
-                data_ = buffer_;
-            }
-
-            while (length_ < length && !stream_ptr_->eof())
-            {
-                JSONCONS_TRY
-                {
-                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_ + length_), buffer_size_ - length_);
-                    std::size_t len = static_cast<std::size_t>(count);
-                    length_ += len;
-                    if (len == 0)
-                    {
-                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    }
-                }
-                JSONCONS_CATCH(const std::exception&)
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                    return;
-                }
-            }
+            chunk_ = new_buffer;
+            chunk_size_ = capacity;
+            data_ = chunk_;
         }
 
         void fill_buffer()
@@ -486,13 +449,13 @@ namespace jsoncons {
                 return;
             }
 
-            data_ = buffer_;
+            data_ = chunk_;
             JSONCONS_TRY
             {
-                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_), buffer_size_);
+                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(chunk_), chunk_size_);
                 length_ = static_cast<std::size_t>(count);
 
-                if (length_ < buffer_size_)
+                if (length_ < chunk_size_)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
@@ -586,7 +549,9 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
-        span<const value_type> read_span(std::size_t length)
+
+        template <typename Buffer>
+        span<const value_type> read_span(std::size_t length, Buffer&&)
         {
             if (std::size_t(end_ - current_) < length)
             {
@@ -627,7 +592,7 @@ namespace jsoncons {
         IteratorT current_;
         IteratorT end_;
         std::size_t position_{0};
-        std::vector<value_type> buffer_;
+        std::vector<value_type> chunk_;
         std::size_t buffer_len_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
@@ -640,7 +605,7 @@ namespace jsoncons {
         iterator_source(iterator_source&& other) = default;
 
         iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
-            : current_(first), end_(last), buffer_(buf_size)
+            : current_(first), end_(last), chunk_(buf_size)
         {
         }
         
@@ -682,30 +647,32 @@ namespace jsoncons {
         {
             if (buffer_len_ == 0)
             {
-                buffer_len_ = read(buffer_.data(), buffer_.size());
+                buffer_len_ = read(chunk_.data(), chunk_.size());
             }
             std::size_t length = buffer_len_;
             buffer_len_ = 0;
 
-            return span<const value_type>(buffer_.data(), length);
+            return span<const value_type>(chunk_.data(), length);
         }
 
-        span<const value_type> read_span(std::size_t length)
+
+        template <typename Buffer>
+        span<const value_type> read_span(std::size_t length, Buffer&&)
         {
             if (length > default_max_buffer_size)
             {
                 return span<const value_type>();
             }
-            if (length > buffer_.size())
+            if (length > chunk_.size())
             {
-                buffer_.resize(length);
+                chunk_.resize(length);
             }
-            std::size_t actual = read(buffer_.data(), length);
+            std::size_t actual = read(chunk_.data(), length);
             if (actual != length)
             {
                 return span<const value_type>();
             }
-            return span<const value_type>(buffer_.data(), length);
+            return span<const value_type>(chunk_.data(), length);
         }
 
         template <typename Category = iterator_category>
@@ -824,7 +791,9 @@ namespace jsoncons {
             return span<const value_type>(data, length);
         }
 
-        span<const value_type> read_span(std::size_t length)
+
+        template <typename Buffer>
+        span<const value_type> read_span(std::size_t length, Buffer&&)
         {
             if (std::size_t(end_ - current_) < length)
             {
@@ -865,7 +834,7 @@ namespace jsoncons {
         IteratorT current_;
         IteratorT end_;
         std::size_t position_{0};
-        std::vector<value_type> buffer_;
+        std::vector<value_type> chunk_;
         std::size_t buffer_len_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
@@ -878,7 +847,7 @@ namespace jsoncons {
         binary_iterator_source(binary_iterator_source&& other) = default;
 
         binary_iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
-            : current_(first), end_(last), buffer_(buf_size)
+            : current_(first), end_(last), chunk_(buf_size)
         {
         }
 
@@ -918,30 +887,31 @@ namespace jsoncons {
         {
             if (buffer_len_ == 0)
             {
-                buffer_len_ = read(buffer_.data(), buffer_.size());
+                buffer_len_ = read(chunk_.data(), chunk_.size());
             }
             std::size_t length = buffer_len_;
             buffer_len_ = 0;
 
-            return span<const value_type>(buffer_.data(), length);
+            return span<const value_type>(chunk_.data(), length);
         }
 
-        span<const value_type> read_span(std::size_t length)
+        template <typename Buffer>
+        span<const value_type> read_span(std::size_t length, Buffer&&)
         {
             if (length > default_max_buffer_size)
             {
                 return span<const value_type>();
             }
-            if (length > buffer_.size())
+            if (length > chunk_.size())
             {
-                buffer_.resize(length);
+                chunk_.resize(length);
             }
-            std::size_t actual = read(buffer_.data(), length);
+            std::size_t actual = read(chunk_.data(), length);
             if (actual != length)
             {
                 return span<const value_type>();
             }
-            return span<const value_type>(buffer_.data(), length);
+            return span<const value_type>(chunk_.data(), length);
         }
 
         template <typename Category = iterator_category>
@@ -990,13 +960,11 @@ namespace jsoncons {
         using value_type = typename Source::value_type;
         static constexpr std::size_t max_buffer_length = 16384;
 
-        template <typename Container>
+        template <typename Buffer>
         static
-        typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                ext_traits::has_reserve<Container>::value &&
-                                ext_traits::has_data_exact<value_type*,Container>::value 
-     , std::size_t>::type
-        read(Source& source, Container& v, std::size_t length)
+        typename std::enable_if<ext_traits::is_byte<typename Source::value_type>::value &&
+            ext_traits::is_byte<typename Buffer::value_type>::value, std::size_t>::type
+        read(Source& source, Buffer& v, std::size_t length)
         {
             std::size_t unread = length;
 
@@ -1005,42 +973,9 @@ namespace jsoncons {
                 std::size_t n = (std::min)(max_buffer_length, unread);
                 std::size_t offset = v.size();
                 v.resize(v.size()+n);
-                std::size_t actual = source.read(v.data()+offset, n);
+                std::size_t actual = source.read(reinterpret_cast<value_type*>(&v[0]) + offset, n);
                 unread -= actual;
             }
-
-            return length - unread;
-        }
-
-        template <typename Container>
-        static
-        typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                ext_traits::has_reserve<Container>::value &&
-                                !ext_traits::has_data_exact<value_type*, Container>::value 
-     , std::size_t>::type
-        read(Source& source, Container& v, std::size_t length)
-        {
-            std::size_t unread = length;
-
-            std::size_t n = (std::min)(max_buffer_length, unread);
-            while (n > 0 && !source.eof())
-            {
-                v.reserve(v.size()+n);
-                std::size_t actual = 0;
-                while (actual < n)
-                {
-                    typename Source::value_type c{};
-                    if (source.read(&c,1) != 1)
-                    {
-                        break;
-                    }
-                    v.push_back(c);
-                    ++actual;
-                }
-                unread -= actual;
-                n = (std::min)(max_buffer_length, unread);
-            }
-
             return length - unread;
         }
     };
