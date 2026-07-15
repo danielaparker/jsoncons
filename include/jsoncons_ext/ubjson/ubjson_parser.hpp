@@ -528,7 +528,7 @@ private:
                     more_ = false;
                     return;
                 }
-                visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                visitor.string_value(jsoncons::string_view(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
@@ -548,12 +548,12 @@ private:
                 }
                 if (jsoncons::is_base10(text_buffer_.data(),text_buffer_.length()))
                 {
-                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this, ec);
+                    visitor.string_value(jsoncons::string_view(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 else
                 {
-                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this, ec);
+                    visitor.string_value(jsoncons::string_view(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 break;
@@ -935,7 +935,7 @@ private:
             more_ = false;
             return;
         }
-        visitor.key(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
+        visitor.key(jsoncons::string_view(text_buffer_.data(),text_buffer_.length()), *this, ec);
         more_ = !cursor_mode_;
     }
 };

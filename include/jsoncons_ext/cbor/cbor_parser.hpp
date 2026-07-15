@@ -644,7 +644,7 @@ public:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            handle_string(visitor, jsoncons::basic_string_view<char>(str.str.data(),str.str.length()),ec);
+                            handle_string(visitor, jsoncons::string_view(str.str.data(),str.str.length()),ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -1942,7 +1942,7 @@ private:
         }
     }
 
-    void handle_string(generic_visitor& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(generic_visitor& visitor, const jsoncons::string_view& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])

@@ -268,23 +268,23 @@ private:
                 // fixstr
                 const size_t len = type & 0x1f;
 
-                text_buffer_.clear();
-
-                if (source_reader<Source>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                auto data = source_.read_span(len, bytes_buffer_);
+                if (data.size() != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
 
-                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+                auto result = unicode_traits::validate(data.data(), data.size());
                 if (result.ec != unicode_traits::unicode_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                visitor.string_value(jsoncons::string_view(reinterpret_cast<const char*>(data.data()),data.size()), 
+                    semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
             }
         }
@@ -475,22 +475,23 @@ private:
                         return;
                     }
 
-                    text_buffer_.clear();
-                    if (source_reader<Source>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                    auto data = source_.read_span(len, bytes_buffer_);
+                    if (data.size() != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
 
-                    auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+                    auto result = unicode_traits::validate(data.data(), data.size());
                     if (result.ec != unicode_traits::unicode_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         more_ = false;
                         return;
                     }
-                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                    visitor.string_value(jsoncons::string_view(reinterpret_cast<const char*>(data.data()),data.size()), 
+                        semantic_tag::none, *this, ec);
                     more_ = !cursor_mode_;
                     break;
                 }
