@@ -256,13 +256,13 @@ TEST_CASE("stream_source with non-propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_chunk_size == source.buffer_size());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
         CHECK(0 == source.length());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -272,14 +272,14 @@ TEST_CASE("stream_source with non-propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_chunk_size == source.buffer_size());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
         CHECK(0 == source.length());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
         source2 = std::move(source);
         CHECK_FALSE(nullptr == source.buffer());
-        CHECK_FALSE(0 == source.buffer_size());
+        CHECK_FALSE(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -299,13 +299,13 @@ TEST_CASE("stream_source with propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_chunk_size == source.buffer_size());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
         CHECK(0 == source.length());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -315,14 +315,14 @@ TEST_CASE("stream_source with propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_chunk_size == source.buffer_size());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
         CHECK(0 == source.length());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
         source2 = std::move(source);
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
