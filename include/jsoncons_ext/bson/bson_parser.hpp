@@ -584,8 +584,7 @@ private:
                 }
                 state_stack_.back().pos += data.size();
 
-                byte_string_view bytes(data.data(), data.size());
-                visitor.byte_string_value(bytes, subtype, *this, ec);
+                visitor.byte_string_value(byte_string_view(data.data(), data.size()), subtype, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }

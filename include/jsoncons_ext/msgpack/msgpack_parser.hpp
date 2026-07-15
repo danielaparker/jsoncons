@@ -504,18 +504,18 @@ private:
                     {
                         return;
                     }
-                    bytes_buffer_.clear();
-                    if (source_reader<Source>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                    auto data = source_.read_span(len, bytes_buffer_);
+                    if (JSONCONS_UNLIKELY(data.size() != static_cast<std::size_t>(len)))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
 
-                    visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                      semantic_tag::none, 
-                                                      *this,
-                                                      ec);
+                    visitor.byte_string_value(byte_string_view(data.data(),data.size()), 
+                        semantic_tag::none, 
+                        *this,
+                        ec);
                     more_ = !cursor_mode_;
                     break;
                 }
@@ -628,15 +628,15 @@ private:
                     }
                     else
                     {
-                        bytes_buffer_.clear();
-                        if (source_reader<Source>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                        auto data = source_.read_span(len, bytes_buffer_);
+                        if (JSONCONS_UNLIKELY(data.size() != static_cast<std::size_t>(len)))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
                             return;
                         }
 
-                        visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
+                        visitor.byte_string_value(byte_string_view(data.data(),data.size()), 
                                                           static_cast<uint8_t>(ext_type), 
                                                           *this,
                                                           ec);
