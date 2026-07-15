@@ -420,26 +420,6 @@ public:
         }
     }
 private:
-    void reserve_buffer(std::size_t capacity)
-    {
-        if (capacity <= chunk_size_)
-        {
-            return;
-        }
-
-        value_type* new_buffer = std::allocator_traits<char_allocator_type>::allocate(alloc_, capacity);
-        if (length_ > 0)
-        {
-            std::memcpy(new_buffer, data_, sizeof(value_type)*length_);
-        }
-        if (chunk_)
-        {
-            std::allocator_traits<char_allocator_type>::deallocate(alloc_, chunk_, chunk_size_);
-        }
-        chunk_ = new_buffer;
-        chunk_size_ = capacity;
-        data_ = chunk_;
-    }
 
     void fill_buffer()
     {
