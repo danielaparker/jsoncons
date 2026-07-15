@@ -489,21 +489,21 @@ private:
             }
             case jsoncons::ubjson::ubjson_type::char_type: 
             {
-                text_buffer_.clear();
-                if (source_reader<Source>::read(source_,text_buffer_,1) != 1)
+                uint8_t ch{};
+                if (source_.read(&ch, 1) != 1)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+                auto result = unicode_traits::validate(&ch, 1);
                 if (result.ec != unicode_traits::unicode_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(string_view(reinterpret_cast<const char*>(&ch), 1), semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
