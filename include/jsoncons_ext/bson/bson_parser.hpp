@@ -660,6 +660,8 @@ private:
 
     string_view read_string(std::error_code& ec)
     {
+        std::size_t offset = 0;
+
         uint8_t buf[sizeof(int32_t)]; 
         std::size_t n = source_.read(buf, sizeof(int32_t));
         if (JSONCONS_UNLIKELY(n != sizeof(int32_t)))
@@ -668,7 +670,7 @@ private:
             more_ = false;
             return string_view{};
         }
-        state_stack_.back().pos += n;
+        offset += n;
 
         auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
         if (JSONCONS_UNLIKELY(len < 1))
@@ -686,30 +688,18 @@ private:
             more_ = false;
             return string_view{};
         }
-        state_stack_.back().pos += data.size();
-
-
-        /*n = source_reader<Source>::read(source_, text_buffer_, size);
-        if (JSONCONS_UNLIKELY(n != size))
-        {
-            ec = bson_errc::unexpected_eof;
-            more_ = false;
-            return string_view{};
-        }
-        state_stack_.back().pos += n; 
-        */ 
+        offset += data.size();
 
         uint8_t c;
-        n = source_.read(&c, 1);
-        if (JSONCONS_UNLIKELY(n != 1))
+        if (JSONCONS_UNLIKELY(source_.read(&c, 1) != 1))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
             return string_view{};
         }
-        state_stack_.back().pos += n;
+        ++offset;
 
-        //return string_view{text_buffer_.data(), text_buffer_.size()};
+        state_stack_.back().pos += offset;
         return string_view{reinterpret_cast<const char*>(data.data()), data.size()};
     }
 };
