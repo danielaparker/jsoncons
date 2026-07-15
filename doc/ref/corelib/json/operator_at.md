@@ -77,7 +77,7 @@ Output:
     }
 }
 ```
-Note that if `file_export["File Format Options"]` doesn’t exist, the statement
+Note that if `file_export["File Format Options"]` doesn't exist, the statement
 ```
 file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces)
 ```
