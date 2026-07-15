@@ -151,7 +151,7 @@ namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_.read_buffer(ec);
+                    auto s = source_.read_chunk(ec);
                     if (JSONCONS_UNLIKELY(ec)) return;
                     if (s.size() > 0)
                     {

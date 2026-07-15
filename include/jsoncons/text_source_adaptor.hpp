@@ -47,14 +47,14 @@ namespace jsoncons {
             return source_.eof();  
         }
 
-        span<const value_type> read_buffer(std::error_code& ec)
+        span<const value_type> read_chunk(std::error_code& ec)
         {
             if (source_.eof())
             {
                 return span<const value_type>();
             }
 
-            auto s = source_.read_buffer();
+            auto s = source_.read_chunk();
             const value_type* data = s.data();
             std::size_t length = s.size();
 
@@ -105,14 +105,14 @@ namespace jsoncons {
             return source_.eof();  
         }
 
-        span<const value_type> read_buffer(std::error_code& ec)
+        span<const value_type> read_chunk(std::error_code& ec)
         {
             if (source_.eof())
             {
                 return span<const value_type>();
             }
 
-            auto s = source_.read_buffer();
+            auto s = source_.read_chunk();
             const value_type* data = s.data(); 
             std::size_t length = s.size();
 

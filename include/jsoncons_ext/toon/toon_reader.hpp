@@ -1730,7 +1730,7 @@ public:
 private:
     using char_allocator_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
 
-    static constexpr size_t default_max_buffer_size = 16384;
+    static constexpr size_t default_max_chunk_size = 16384;
 
     source_type source_;
     default_json_visitor default_visitor_;
@@ -1794,7 +1794,7 @@ public:
 
         while (!source_.eof())
         {
-            auto s = source_.read_buffer();
+            auto s = source_.read_chunk();
             raw.append(s.data(), s.size());
         }
 
