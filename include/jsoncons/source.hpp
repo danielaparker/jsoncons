@@ -99,7 +99,7 @@ private:
     value_type* chunk_{nullptr};
     std::size_t chunk_size_{0};
     value_type* data_{nullptr};
-    std::size_t length_{0};
+    std::size_t count_{0};
 public:
 
     const Allocator& get_allocator() const
@@ -121,11 +121,11 @@ public:
         chunk_ = other.chunk_;
         data_ = other.data_;
         chunk_size_ = other.chunk_size_;
-        length_ = other.length_;
+        count_ = other.count_;
         other.chunk_ = nullptr;
         other.data_ = nullptr;
         other.chunk_size_ = 0;
-        other.length_ = 0;
+        other.count_ = 0;
 
         if (other.stream_ptr_ != &other.null_is_)
         {
@@ -140,22 +140,22 @@ public:
 
     stream_source(stream_source&& other, const Allocator& alloc) noexcept
         : alloc_(alloc), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
-          chunk_size_(other.chunk_size_), length_(other.length_)
+          chunk_size_(other.chunk_size_), count_(other.count_)
     {
         if (alloc == other.get_allocator())
         {
             chunk_ = other.chunk_;
             data_ = other.data_;
-            length_ = other.length_;
+            count_ = other.count_;
             other.chunk_ = nullptr;
             other.data_ = nullptr;
-            other.length_ = 0;
+            other.count_ = 0;
         }
         else if (other.chunk_ != nullptr)
         {
             chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
             data_ = chunk_ + (other.data_ - other.chunk_);
-            std::memcpy(data_, other.data_, sizeof(value_type)*other.length_);
+            std::memcpy(data_, other.data_, sizeof(value_type)*other.count_);
         }
         if (other.stream_ptr_ != &other.null_is_)
         {
@@ -208,7 +208,7 @@ public:
         std::swap(chunk_, other.chunk_);
         std::swap(chunk_size_, other.chunk_size_);
         std::swap(data_, other.data_);
-        std::swap(length_, other.length_);
+        std::swap(count_, other.count_);
         if (other.stream_ptr_ != &other.null_is_)
         {
             stream_ptr_ = other.stream_ptr_;
@@ -229,8 +229,8 @@ public:
         chunk_size_ = other.chunk_size_;
         chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
         data_ = chunk_ + (other.data_ - other.chunk_);
-        length_ = other.length_;
-        std::memcpy(chunk_, other.chunk_, sizeof(value_type)*other.length_);
+        count_ = other.count_;
+        std::memcpy(chunk_, other.chunk_, sizeof(value_type)*other.count_);
         if (other.stream_ptr_ != &other.null_is_)
         {
             stream_ptr_ = other.stream_ptr_;
@@ -269,7 +269,7 @@ public:
 
     bool eof() const
     {
-        return length_ == 0 && stream_ptr_->eof();
+        return count_ == 0 && stream_ptr_->eof();
     }
 
     bool is_error() const
@@ -285,37 +285,37 @@ public:
     void ignore(std::size_t length)
     {
         std::size_t len = 0;
-        if (length_ > 0)
+        if (count_ > 0)
         {
-            len = (std::min)(length_, length);
+            len = (std::min)(count_, length);
             position_ += len;
             data_ += len;
-            length_ -= len;
+            count_ -= len;
         }
         while (len < length)
         {
             data_ = chunk_;
-            length_ = fill_buffer(chunk_, chunk_size_);
-            if (length_ == 0)
+            count_ = fill_buffer(chunk_, chunk_size_);
+            if (count_ == 0)
             {
                 break;
             }
-            std::size_t len2 = (std::min)(length_, length-len);
+            std::size_t len2 = (std::min)(count_, length-len);
             position_ += len2;
             data_ += len2;
-            length_ -= len2;
+            count_ -= len2;
             len += len2;
         }
     }
 
     char_result<value_type> peek() 
     {
-        if (length_ == 0)
+        if (count_ == 0)
         {
             data_ = chunk_;
-            length_ = fill_buffer(chunk_, chunk_size_);
+            count_ = fill_buffer(chunk_, chunk_size_);
         }
-        if (length_ > 0)
+        if (count_ > 0)
         {
             value_type c = *data_;
             return char_result<value_type>{c, false};
@@ -328,23 +328,23 @@ public:
 
     span<const value_type> read_chunk() 
     {
-        if (length_ == 0)
+        if (count_ == 0)
         {
             data_ = chunk_;
-            length_ = fill_buffer(chunk_, chunk_size_);
+            count_ = fill_buffer(chunk_, chunk_size_);
         }
         const value_type* data = data_;
-        std::size_t length = length_;
-        data_ += length_;
-        position_ += length_;
-        length_ = 0;
+        std::size_t length = count_;
+        data_ += count_;
+        position_ += count_;
+        count_ = 0;
 
         return span<const value_type>(data, length);
     }
 
-    std::size_t length() const
+    std::size_t count() const
     {
-        return length_;
+        return count_;
     }
 
     template <typename Buffer>
@@ -354,7 +354,7 @@ public:
         {
             return span<const value_type>{};
         }
-        if (length > length_)
+        if (length > count_)
         {
             buffer.clear();
             source_reader<stream_source_type>::read(*this, std::forward<Buffer>(buffer), length);
@@ -363,7 +363,7 @@ public:
 
         const value_type* data = data_;
         data_ += length;
-        length_ -= length;
+        count_ -= length;
         position_ += length;
         return span<const value_type>(data, length);
     }
@@ -371,12 +371,12 @@ public:
     std::size_t read(value_type* p, std::size_t length)
     {
         std::size_t len = 0;
-        if (length_ > 0)
+        if (count_ > 0)
         {
-            len = (std::min)(length_, length);
+            len = (std::min)(count_, length);
             std::memcpy(p, data_, len*sizeof(value_type));
             data_ += len;
-            length_ -= len;
+            count_ -= len;
             position_ += len;
         }
         if (length - len == 0)
@@ -386,13 +386,13 @@ public:
         else if (length - len < chunk_size_)
         {
             data_ = chunk_;
-            length_ = fill_buffer(chunk_, chunk_size_);
-            if (length_ > 0)
+            count_ = fill_buffer(chunk_, chunk_size_);
+            if (count_ > 0)
             {
-                std::size_t len2 = (std::min)(length_, length-len);
+                std::size_t len2 = (std::min)(count_, length-len);
                 std::memcpy(p+len, data_, len2*sizeof(value_type));
                 data_ += len2;
-                length_ -= len2;
+                count_ -= len2;
                 position_ += len2;
                 len += len2;
             }
@@ -402,7 +402,7 @@ public:
         {
             if (stream_ptr_->eof())
             {
-                length_ = 0;
+                count_ = 0;
                 return 0;
             }
             JSONCONS_TRY
@@ -544,7 +544,7 @@ public:
         return read(chunk, chunk_size);
     }
 
-    std::size_t length() const
+    std::size_t count() const
     {
         return std::size_t(end_ - current_);
     }
@@ -665,7 +665,7 @@ public:
         return read(chunk, chunk_size);
     }
 
-    std::size_t length() const
+    std::size_t count() const
     {
         return chunk_len_;
     }
@@ -808,7 +808,7 @@ public:
         return read(chunk, chunk_size);
     }
 
-    std::size_t length() const
+    std::size_t count() const
     {
         return std::size_t(end_ - current_);
     }
@@ -926,7 +926,7 @@ public:
         return read(chunk, chunk_size);
     }
 
-    std::size_t length() const
+    std::size_t count() const
     {
         return chunk_len_;
     }
@@ -998,7 +998,7 @@ struct source_reader
 
         while (unread > 0 && !source.eof())
         {
-            if (source.length() == 0 && unread >= source.chunk_size())
+            if (source.count() == 0 && unread >= source.chunk_size())
             {
                 std::size_t n = source.chunk_size();
                 std::size_t offset = buffer.size();
@@ -1029,7 +1029,7 @@ struct source_reader
 
         while (unread > 0 && !source.eof())
         {
-            if (source.length() == 0 && unread >= source.chunk_size())
+            if (source.count() == 0 && unread >= source.chunk_size())
             {
                 std::size_t n = source.chunk_size();
                 std::size_t offset = buffer.size();
