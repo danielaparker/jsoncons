@@ -257,7 +257,7 @@ TEST_CASE("stream_source with non-propagating allocator tests")
 
         source_type source(is, alloc);
         CHECK(source_type::default_max_chunk_size == source.chunk_size());
-        CHECK(0 == source.length());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
@@ -273,7 +273,7 @@ TEST_CASE("stream_source with non-propagating allocator tests")
 
         source_type source(is, alloc);
         CHECK(source_type::default_max_chunk_size == source.chunk_size());
-        CHECK(0 == source.length());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
@@ -300,7 +300,7 @@ TEST_CASE("stream_source with propagating allocator tests")
 
         source_type source(is, alloc);
         CHECK(source_type::default_max_chunk_size == source.chunk_size());
-        CHECK(0 == source.length());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
@@ -316,7 +316,7 @@ TEST_CASE("stream_source with propagating allocator tests")
 
         source_type source(is, alloc);
         CHECK(source_type::default_max_chunk_size == source.chunk_size());
-        CHECK(0 == source.length());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
