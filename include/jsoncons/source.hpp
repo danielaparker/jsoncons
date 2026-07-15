@@ -82,6 +82,7 @@ struct char_result
 template <typename CharT,typename Allocator = std::allocator<CharT>>
 class stream_source
 {
+    friend struct source_reader<stream_source<CharT,Allocator>>;
 public:
     using value_type = CharT;
     static constexpr std::size_t default_max_chunk_size = 16384;
@@ -266,11 +267,6 @@ public:
         return data_;
     }
 
-    std::size_t length() const
-    {
-        return length_;
-    }
-
     bool eof() const
     {
         return length_ == 0 && stream_ptr_->eof();
@@ -298,7 +294,8 @@ public:
         }
         while (len < length)
         {
-            fill_buffer();
+            data_ = chunk_;
+            length_ = fill_buffer(chunk_, chunk_size_);
             if (length_ == 0)
             {
                 break;
@@ -315,7 +312,8 @@ public:
     {
         if (length_ == 0)
         {
-            fill_buffer();
+            data_ = chunk_;
+            length_ = fill_buffer(chunk_, chunk_size_);
         }
         if (length_ > 0)
         {
@@ -332,7 +330,8 @@ public:
     {
         if (length_ == 0)
         {
-            fill_buffer();
+            data_ = chunk_;
+            length_ = fill_buffer(chunk_, chunk_size_);
         }
         const value_type* data = data_;
         std::size_t length = length_;
@@ -341,6 +340,11 @@ public:
         length_ = 0;
 
         return span<const value_type>(data, length);
+    }
+
+    std::size_t length() const
+    {
+        return length_;
     }
 
     template <typename Buffer>
@@ -381,7 +385,8 @@ public:
         }
         else if (length - len < chunk_size_)
         {
-            fill_buffer();
+            data_ = chunk_;
+            length_ = fill_buffer(chunk_, chunk_size_);
             if (length_ > 0)
             {
                 std::size_t len2 = (std::min)(length_, length-len);
@@ -421,29 +426,28 @@ public:
     }
 private:
 
-    void fill_buffer()
+    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
     {
         if (stream_ptr_->eof())
         {
-            length_ = 0;
-            return;
+            return 0;
         }
 
-        data_ = chunk_;
         JSONCONS_TRY
         {
-            std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(chunk_), chunk_size_);
-            length_ = static_cast<std::size_t>(count);
+            std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(chunk), chunk_size);
+            std::size_t length = static_cast<std::size_t>(count);
 
-            if (length_ < chunk_size_)
+            if (length < chunk_size)
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
             }
+            return length;
         }
         JSONCONS_CATCH(const std::exception&)     
         {
             stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            length_ = 0;
+            return 0;
         }
     }
 };
@@ -535,6 +539,16 @@ public:
     }
 
 
+    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
+    {
+        return read(chunk, chunk_size);
+    }
+
+    std::size_t length() const
+    {
+        return std::size_t(end_ - current_);
+    }
+
     template <typename Buffer>
     span<const value_type> read_span(std::size_t length, Buffer&&)
     {
@@ -578,7 +592,7 @@ private:
     IteratorT end_;
     std::size_t position_{0};
     std::vector<value_type> chunk_;
-    std::size_t buffer_len_{0};
+    std::size_t chunk_len_{0};
 
     using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
     using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -635,16 +649,26 @@ public:
 
     span<const value_type> read_chunk() 
     {
-        if (buffer_len_ == 0)
+        if (chunk_len_ == 0)
         {
-            buffer_len_ = read(chunk_.data(), chunk_.size());
+            chunk_len_ = read(chunk_.data(), chunk_.size());
         }
-        std::size_t length = buffer_len_;
-        buffer_len_ = 0;
+        std::size_t length = chunk_len_;
+        chunk_len_ = 0;
 
         return span<const value_type>(chunk_.data(), length);
     }
 
+
+    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
+    {
+        return read(chunk, chunk_size);
+    }
+
+    std::size_t length() const
+    {
+        return chunk_len_;
+    }
 
     template <typename Buffer>
     span<const value_type> read_span(std::size_t length, Buffer&& buffer)
@@ -779,6 +803,15 @@ public:
         return span<const value_type>(data, length);
     }
 
+    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
+    {
+        return read(chunk, chunk_size);
+    }
+
+    std::size_t length() const
+    {
+        return std::size_t(end_ - current_);
+    }
 
     template <typename Buffer>
     span<const value_type> read_span(std::size_t length, Buffer&&)
@@ -823,7 +856,7 @@ private:
     IteratorT end_;
     std::size_t position_{0};
     std::vector<value_type> chunk_;
-    std::size_t buffer_len_{0};
+    std::size_t chunk_len_{0};
 
     using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
     using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -878,14 +911,24 @@ public:
 
     span<const value_type> read_chunk() 
     {
-        if (buffer_len_ == 0)
+        if (chunk_len_ == 0)
         {
-            buffer_len_ = read(chunk_.data(), chunk_.size());
+            chunk_len_ = read(chunk_.data(), chunk_.size());
         }
-        std::size_t length = buffer_len_;
-        buffer_len_ = 0;
+        std::size_t length = chunk_len_;
+        chunk_len_ = 0;
 
         return span<const value_type>(chunk_.data(), length);
+    }
+
+    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
+    {
+        return read(chunk, chunk_size);
+    }
+
+    std::size_t length() const
+    {
+        return chunk_len_;
     }
 
     template <typename Buffer>
@@ -949,17 +992,28 @@ struct source_reader
     static
     typename std::enable_if<ext_traits::is_byte<value_type>::value &&
         ext_traits::is_byte<typename Buffer::value_type>::value, std::size_t>::type
-    read(Source& source, Buffer& v, std::size_t length)
+    read(Source& source, Buffer& buffer, std::size_t length)
     {
         std::size_t unread = length;
 
         while (unread > 0 && !source.eof())
         {
-            std::size_t n = (std::min)(source.chunk_size(), unread);
-            std::size_t offset = v.size();
-            v.resize(v.size()+n);
-            std::size_t actual = source.read(reinterpret_cast<value_type*>(&v[0]) + offset, n);
-            unread -= actual;
+            if (source.length() == 0 && unread >= source.chunk_size())
+            {
+                std::size_t n = source.chunk_size();
+                std::size_t offset = buffer.size();
+                buffer.resize(buffer.size()+n);
+                std::size_t actual = source.fill_buffer(reinterpret_cast<value_type*>(&buffer[0]) + offset, n);
+                unread -= actual;
+            }
+            else
+            {
+                std::size_t n = (std::min)(source.chunk_size(), unread);
+                std::size_t offset = buffer.size();
+                buffer.resize(buffer.size()+n);
+                std::size_t actual = source.read(reinterpret_cast<value_type*>(&buffer[0]) + offset, n);
+                unread -= actual;
+            }
         }
         return length - unread;
     }
@@ -975,11 +1029,22 @@ struct source_reader
 
         while (unread > 0 && !source.eof())
         {
-            std::size_t n = (std::min)(source.chunk_size(), unread);
-            std::size_t offset = buffer.size();
-            buffer.resize(buffer.size()+n);
-            std::size_t actual = source.read(&buffer[0]+offset, n);
-            unread -= actual;
+            if (source.length() == 0 && unread >= source.chunk_size())
+            {
+                std::size_t n = source.chunk_size();
+                std::size_t offset = buffer.size();
+                buffer.resize(buffer.size()+n);
+                std::size_t actual = source.fill_buffer(&buffer[0]+offset, n);
+                unread -= actual;
+            }
+            else
+            {
+                std::size_t n = (std::min)(source.chunk_size(), unread);
+                std::size_t offset = buffer.size();
+                buffer.resize(buffer.size()+n);
+                std::size_t actual = source.read(&buffer[0]+offset, n);
+                unread -= actual;
+            }
         }
 
         return length - unread;
