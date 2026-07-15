@@ -575,20 +575,17 @@ private:
                     return;
                 }
 
-                bytes_buffer_.clear();
-                n = source_reader<Source>::read(source_, bytes_buffer_, len);
-                state_stack_.back().pos += n;
-                if (JSONCONS_UNLIKELY(n != static_cast<std::size_t>(len)))
+                auto data = source_.read_span(len, bytes_buffer_);
+                if (JSONCONS_UNLIKELY(data.size() != static_cast<std::size_t>(len)))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
+                state_stack_.back().pos += data.size();
 
-                visitor.byte_string_value(bytes_buffer_, 
-                                                  subtype, 
-                                                  *this,
-                                                  ec);
+                byte_string_view bytes(data.data(), data.size());
+                visitor.byte_string_value(bytes, subtype, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
