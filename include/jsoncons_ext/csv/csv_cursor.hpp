@@ -36,7 +36,7 @@ public:
     using char_type = CharT;
     using allocator_type = Allocator;
 private:
-    static constexpr size_t default_max_buffer_size = 16384;
+    static constexpr size_t default_max_chunk_size = 16384;
 
     using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
 
@@ -408,7 +408,7 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                auto s = source_.read_buffer(ec);
+                auto s = source_.read_chunk(ec);
                 if (JSONCONS_UNLIKELY(ec)) {return;}
                 if (s.size() > 0)
                 {

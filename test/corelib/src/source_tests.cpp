@@ -86,9 +86,9 @@ TEST_CASE("string_source tests")
         CHECK(source.eof());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK(source.eof());
         CHECK(9 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
@@ -163,9 +163,9 @@ TEST_CASE("byte_source tests")
         CHECK(source.eof());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK(source.eof());
         CHECK(9 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
@@ -256,13 +256,13 @@ TEST_CASE("stream_source with non-propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_buffer_size == source.buffer_size());
-        CHECK(0 == source.length());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -272,14 +272,14 @@ TEST_CASE("stream_source with non-propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_buffer_size == source.buffer_size());
-        CHECK(0 == source.length());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
         source2 = std::move(source);
         CHECK_FALSE(nullptr == source.buffer());
-        CHECK_FALSE(0 == source.buffer_size());
+        CHECK_FALSE(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -299,13 +299,13 @@ TEST_CASE("stream_source with propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_buffer_size == source.buffer_size());
-        CHECK(0 == source.length());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(std::move(source));
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -315,14 +315,14 @@ TEST_CASE("stream_source with propagating allocator tests")
         char b{};
 
         source_type source(is, alloc);
-        CHECK(source_type::default_max_buffer_size == source.buffer_size());
-        CHECK(0 == source.length());
+        CHECK(source_type::default_max_chunk_size == source.chunk_size());
+        CHECK(0 == source.count());
         CHECK(1 == source.read(&b, 1));
 
         source_type source2(alloc);
         source2 = std::move(source);
         CHECK(nullptr == source.buffer());
-        CHECK(0 == source.buffer_size());
+        CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
     }
@@ -487,21 +487,21 @@ TEST_CASE("binary_stream_source tests")
         CHECK(9 == source.position());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
         CHECK(4 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
         CHECK(8 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK(source.eof());
         CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
@@ -523,21 +523,21 @@ TEST_CASE("random access iterator iterator_stream source tests")
         CHECK(3 == source.position());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
         CHECK(4 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
         CHECK(8 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK(source.eof());
         CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
@@ -561,21 +561,21 @@ TEST_CASE("forward iterator iterator_stream source tests")
         CHECK(3 == source.position());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
         CHECK(4 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
         CHECK(8 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK(source.eof());
         CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));
@@ -597,21 +597,21 @@ TEST_CASE("binary_iterator_stream source tests")
         CHECK(3 == source.position());
     }
 
-    SECTION("read_buffer")
+    SECTION("read_chunk")
     {
-        auto s = source.read_buffer();
+        auto s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()));
         CHECK(4 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK_FALSE(source.eof());
         CHECK(4 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+4));
         CHECK(8 == source.position());
 
-        s = source.read_buffer();
+        s = source.read_chunk();
         CHECK(source.eof());
         CHECK(1 == s.size());
         CHECK(std::equal(s.begin(), s.end(), data.begin()+8));

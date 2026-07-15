@@ -489,21 +489,21 @@ private:
             }
             case jsoncons::ubjson::ubjson_type::char_type: 
             {
-                text_buffer_.clear();
-                if (source_reader<Source>::read(source_,text_buffer_,1) != 1)
+                uint8_t ch{};
+                if (source_.read(&ch, 1) != 1)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+                auto result = unicode_traits::validate(&ch, 1);
                 if (result.ec != unicode_traits::unicode_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(string_view(reinterpret_cast<const char*>(&ch), 1), semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
@@ -514,21 +514,22 @@ private:
                 {
                     return;
                 }
-                text_buffer_.clear();
-                if (source_reader<Source>::read(source_,text_buffer_,length) != length)
+                auto data = source_.read_span(length, text_buffer_);
+                if (data.size() != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+                auto result = unicode_traits::validate(data.data(), data.size());
                 if (result.ec != unicode_traits::unicode_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                visitor.string_value(jsoncons::string_view(reinterpret_cast<const char*>(data.data()),data.size()), 
+                    semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
@@ -539,21 +540,23 @@ private:
                 {
                     return;
                 }
-                text_buffer_.clear();
-                if (source_reader<Source>::read(source_,text_buffer_,length) != length)
+                auto data = source_.read_span(length, text_buffer_);
+                if (data.size() != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                if (jsoncons::is_base10(text_buffer_.data(),text_buffer_.length()))
+                if (jsoncons::is_base10(data.data(), data.size()))
                 {
-                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this, ec);
+                    visitor.string_value(jsoncons::string_view(reinterpret_cast<const char*>(data.data()), data.size()), 
+                        semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 else
                 {
-                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this, ec);
+                    visitor.string_value(jsoncons::string_view(reinterpret_cast<const char*>(data.data()), data.size()), 
+                        semantic_tag::bigdec, *this, ec);
                     more_ = !cursor_mode_;
                 }
                 break;
@@ -920,22 +923,23 @@ private:
             more_ = false;
             return;
         }
-        text_buffer_.clear();
-        if (source_reader<Source>::read(source_,text_buffer_,length) != length)
+        auto data = source_.read_span(length, text_buffer_);
+        if (data.size() != length)
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;
             return;
         }
 
-        auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
+        auto result = unicode_traits::validate(data.data(), data.size());
         if (result.ec != unicode_traits::unicode_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             more_ = false;
             return;
         }
-        visitor.key(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
+        visitor.key(jsoncons::string_view(reinterpret_cast<const char*>(data.data()),data.size()), 
+            *this, ec);
         more_ = !cursor_mode_;
     }
 };

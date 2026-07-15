@@ -387,39 +387,37 @@ private:
             case jsoncons::bson::bson_type::max_key_type:
             case jsoncons::bson::bson_type::string_type:
             {
-                text_buffer_.clear();
-                read_string(text_buffer_, ec);
+                auto sv = read_string(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
-                auto result = unicode_traits::validate(text_buffer_.data(), text_buffer_.size());
+                auto result = unicode_traits::validate(sv.data(), sv.size());
                 if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
                 {
                     ec = bson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(sv, semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::javascript_type:
             {
-                text_buffer_.clear();
-                read_string(text_buffer_, ec);
+                auto sv = read_string(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
-                auto result = unicode_traits::validate(text_buffer_.data(), text_buffer_.size());
+                auto result = unicode_traits::validate(sv.data(), sv.size());
                 if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
                 {
                     ec = bson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                visitor.string_value(text_buffer_, semantic_tag::code, *this, ec);
+                visitor.string_value(sv, semantic_tag::code, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
@@ -575,20 +573,16 @@ private:
                     return;
                 }
 
-                bytes_buffer_.clear();
-                n = source_reader<Source>::read(source_, bytes_buffer_, len);
-                state_stack_.back().pos += n;
-                if (JSONCONS_UNLIKELY(n != static_cast<std::size_t>(len)))
+                auto data = source_.read_span(len, bytes_buffer_);
+                if (JSONCONS_UNLIKELY(data.size() != static_cast<std::size_t>(len)))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
+                state_stack_.back().pos += data.size();
 
-                visitor.byte_string_value(bytes_buffer_, 
-                                                  subtype, 
-                                                  *this,
-                                                  ec);
+                visitor.byte_string_value(byte_string_view(data.data(), data.size()), subtype, *this, ec);
                 more_ = !cursor_mode_;
                 break;
             }
@@ -664,44 +658,49 @@ private:
         }
     }
 
-    void read_string(string_type& buffer, std::error_code& ec)
+    string_view read_string(std::error_code& ec)
     {
+        std::size_t offset = 0;
+
         uint8_t buf[sizeof(int32_t)]; 
         std::size_t n = source_.read(buf, sizeof(int32_t));
-        state_stack_.back().pos += n;
         if (JSONCONS_UNLIKELY(n != sizeof(int32_t)))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
-            return;
+            return string_view{};
         }
+        offset += n;
+
         auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
         if (JSONCONS_UNLIKELY(len < 1))
         {
             ec = bson_errc::string_length_is_non_positive;
             more_ = false;
-            return;
+            return string_view{};
         }
 
         std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
-        n = source_reader<Source>::read(source_, buffer, size);
-        state_stack_.back().pos += n;
+        auto data = source_.read_span(size, text_buffer_);
+        if (JSONCONS_UNLIKELY(data.size() != size))
+        {
+            ec = bson_errc::unexpected_eof;
+            more_ = false;
+            return string_view{};
+        }
+        offset += data.size();
 
-        if (JSONCONS_UNLIKELY(n != size))
-        {
-            ec = bson_errc::unexpected_eof;
-            more_ = false;
-            return;
-        }
         uint8_t c;
-        n = source_.read(&c, 1);
-        state_stack_.back().pos += n;
-        if (JSONCONS_UNLIKELY(n != 1))
+        if (JSONCONS_UNLIKELY(source_.read(&c, 1) != 1))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
-            return;
+            return string_view{};
         }
+        ++offset;
+
+        state_stack_.back().pos += offset;
+        return string_view{reinterpret_cast<const char*>(data.data()), data.size()};
     }
 };
 

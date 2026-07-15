@@ -644,7 +644,7 @@ public:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            handle_string(visitor, jsoncons::basic_string_view<char>(str.str.data(),str.str.length()),ec);
+                            handle_string(visitor, jsoncons::string_view(str.str.data(),str.str.length()),ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -1143,30 +1143,18 @@ private:
         {
             return string_view_type();
         }
-        auto data = source_.read_span(length);
-        if (data.size() == length)
-        {
-            string_view_type sv(reinterpret_cast<const char_type*>(data.data()), data.size());
-            if (!stringref_map_stack_.empty() &&
-                sv.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
-            {
-                stringref_map_stack_.back().emplace_back(mapped_string(sv,alloc_));
-            }
-            return sv;
-        }
-
-        text_buffer_.clear();
-        if (source_reader<Source>::read(source_, text_buffer_, length) != length)
+        auto data = source_.read_span(length, text_buffer_);
+        if (data.size() != length)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return string_view_type();
         }
-        string_view_type sv(text_buffer_.data(), text_buffer_.size());
+        string_view_type sv(reinterpret_cast<const char_type*>(data.data()), data.size());
         if (!stringref_map_stack_.empty() &&
             sv.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
         {
-            stringref_map_stack_.back().emplace_back(mapped_string(text_buffer_,alloc_));
+            stringref_map_stack_.back().emplace_back(mapped_string(sv,alloc_));
         }
         return sv;
     }
@@ -1245,30 +1233,19 @@ private:
         {
             return byte_string_view();
         }
-        auto data = source_.read_span(length);
-        if (data.size() == length)
-        {
-            byte_string_view bytes(data.data(), data.size());
-            if (!stringref_map_stack_.empty() &&
-                bytes.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
-            {
-                stringref_map_stack_.back().emplace_back(mapped_string(bytes, alloc_));
-            }
-            return bytes;
-        }
-
-        bytes_buffer_.clear();
-        if (source_reader<Source>::read(source_, bytes_buffer_, length) != length)
+        auto data = source_.read_span(length, bytes_buffer_);
+        if (data.size() != length)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return byte_string_view();
         }
-        byte_string_view bytes(bytes_buffer_.data(), bytes_buffer_.size());
+        
+        byte_string_view bytes(data.data(), data.size());
         if (!stringref_map_stack_.empty() &&
             bytes.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
         {
-            stringref_map_stack_.back().emplace_back(mapped_string(bytes_buffer_, alloc_));
+            stringref_map_stack_.back().emplace_back(mapped_string(bytes, alloc_));
         }
         return bytes;
     }
@@ -1965,7 +1942,7 @@ private:
         }
     }
 
-    void handle_string(generic_visitor& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(generic_visitor& visitor, const jsoncons::string_view& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
