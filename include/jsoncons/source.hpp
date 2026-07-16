@@ -474,7 +474,6 @@ class string_source
 {
 public:
     using value_type = CharT;
-    using string_view_type = jsoncons::basic_string_view<value_type>;
 private:
     const value_type* data_{nullptr};
     const value_type* current_{nullptr};
