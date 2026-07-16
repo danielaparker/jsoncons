@@ -354,7 +354,7 @@ public:
         {
             return span<const value_type>{};
         }
-        if (remaining_ == 0)
+        if (remaining_ == 0 && length <= chunk_size_)
         {
             remaining_ = fill_buffer(chunk_, chunk_size_);
             data_ = chunk_;
@@ -571,13 +571,16 @@ public:
     template <typename Buffer>
     span<const value_type> read_span(std::size_t length, Buffer&&)
     {
-        if (std::size_t(end_ - current_) < length)
+        if (JSONCONS_UNLIKELY(length == 0))
         {
-            return span<const value_type>();
+            return span<const value_type>{};
         }
+        std::size_t remaining = std::size_t(end_ - current_);
+        std::size_t len = remaining < length ? remaining : length;
+
         const value_type* data = current_;
-        current_ += length;
-        return span<const value_type>(data, length);
+        current_ += len;
+        return span<const value_type>(data, len);
     }
 
     std::size_t read(value_type* p, std::size_t length)
@@ -1041,16 +1044,24 @@ struct source_reader
             {
                 std::size_t n = source.chunk_size();
                 std::size_t offset = buffer.size();
-                buffer.resize(buffer.size()+n);
+                buffer.resize(offset+n);
                 std::size_t actual = source.read_buffer(reinterpret_cast<value_type*>(&buffer[0]) + offset, n);
+                if (JSONCONS_UNLIKELY(actual != n))
+                {
+                    buffer.resize(offset+actual);
+                }
                 unread -= actual;
             }
             else
             {
                 std::size_t n = (std::min)(source.chunk_size(), unread);
                 std::size_t offset = buffer.size();
-                buffer.resize(buffer.size()+n);
+                buffer.resize(offset+n);
                 std::size_t actual = source.read(reinterpret_cast<value_type*>(&buffer[0]) + offset, n);
+                if (JSONCONS_UNLIKELY(actual != n))
+                {
+                    buffer.resize(offset + actual);
+                }
                 unread -= actual;
             }
         }
@@ -1072,16 +1083,24 @@ struct source_reader
             {
                 std::size_t n = source.chunk_size();
                 std::size_t offset = buffer.size();
-                buffer.resize(buffer.size()+n);
+                buffer.resize(offset+n);
                 std::size_t actual = source.read_buffer(&buffer[0]+offset, n);
+                if (JSONCONS_UNLIKELY(actual != n))
+                {
+                    buffer.resize(offset + actual);
+                }
                 unread -= actual;
             }
             else
             {
                 std::size_t n = (std::min)(source.chunk_size(), unread);
                 std::size_t offset = buffer.size();
-                buffer.resize(buffer.size()+n);
+                buffer.resize(offset+n);
                 std::size_t actual = source.read(&buffer[0]+offset, n);
+                if (JSONCONS_UNLIKELY(actual != n))
+                {
+                    buffer.resize(offset + actual);
+                }
                 unread -= actual;
             }
         }

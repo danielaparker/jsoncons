@@ -631,20 +631,20 @@ TEST_CASE("stream_source::read_span tests")
         auto sp = source.read_span(4, buffer);
         CHECK(jsoncons::string_view(sp.data(),sp.size()) == data.substr(0, 4));
         CHECK(buffer.empty());
-        CHECK(source.remaining() == 0);
-        CHECK(source.position() == 4);
+        CHECK(0 == source.remaining());
+        CHECK(4 == source.position());
 
         sp = source.read_span(1, buffer);
         CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(4, 1));
         CHECK(buffer.empty());
-        CHECK(source.remaining() == 3);
-        CHECK(source.position() == 5);
+        CHECK(3 == source.remaining());
+        CHECK(5 == source.position());
 
         sp = source.read_span(6, buffer);
         CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(5, 6));
         CHECK(6 == buffer.size());
-        CHECK(source.remaining() == 1);
-        CHECK(source.position() == 11);
+        CHECK(1 == source.remaining());
+        CHECK(11 == source.position());
     }
 
     SECTION("read 15")
@@ -652,8 +652,67 @@ TEST_CASE("stream_source::read_span tests")
         std::string buffer;
         auto sp = source.read_span(15, buffer);
         CHECK(jsoncons::string_view(sp.data(),sp.size()) == data);
-        CHECK(buffer.size() == 15);
-        CHECK(source.remaining() == 0);
+        CHECK(15 == buffer.size());
+        CHECK(0 == source.remaining());
+        CHECK(source.position() == 15);
+    }
+
+    SECTION("read 16")
+    {
+        std::string buffer;
+        auto sp = source.read_span(16, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data);
+        CHECK(15 == buffer.size());
+        CHECK(0 == source.remaining());
         CHECK(source.position() == 15);
     }
 }
+
+TEST_CASE("string_source::read_span tests")
+{
+    std::string data = "0123456789abcde";
+    jsoncons::string_source<char> source(data);
+
+    SECTION("read 4, then 1, then 5")
+    {
+        std::string buffer;
+        auto sp = source.read_span(4, buffer);
+        CHECK(jsoncons::string_view(sp.data(),sp.size()) == data.substr(0, 4));
+        CHECK(buffer.empty());
+        CHECK(11 == source.remaining());
+        CHECK(4 == source.position());
+
+        sp = source.read_span(1, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(4, 1));
+        CHECK(buffer.empty());
+        CHECK(10 == source.remaining());
+        CHECK(5 == source.position());
+
+        sp = source.read_span(6, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(5, 6));
+        CHECK(buffer.empty());
+        CHECK(4 == source.remaining());
+        CHECK(11 == source.position());
+    }
+
+    SECTION("read 15")
+    {
+        std::string buffer;
+        auto sp = source.read_span(15, buffer);
+        CHECK(jsoncons::string_view(sp.data(),sp.size()) == data);
+        CHECK(buffer.empty());
+        CHECK(0 == source.remaining());
+        CHECK(source.position() == 15);
+    }
+
+    SECTION("read 16")
+    {
+        std::string buffer;
+        auto sp = source.read_span(16, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data);
+        CHECK(buffer.empty());
+        CHECK(0 == source.remaining());
+        CHECK(source.position() == 15);
+    }
+}
+
