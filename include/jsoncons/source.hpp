@@ -818,9 +818,6 @@ struct source_reader
 template <typename CharT>
 using string_source = chars_source<CharT>;
 
-template <typename IteratorT>
-using binary_iterator_source2 = iterator_source<IteratorT>;
-
 #endif
 
 using binary_stream_source = stream_source<uint8_t>;

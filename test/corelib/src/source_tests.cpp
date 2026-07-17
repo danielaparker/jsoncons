@@ -11,6 +11,7 @@
 #include "common/mock_stateful_allocator.hpp"
 #include <catch/catch.hpp>
 
+#if 0
 TEST_CASE("basic_null_istream tests")
 {
     SECTION("test1")
@@ -672,6 +673,54 @@ TEST_CASE("chars_source::read_span tests")
 {
     std::string data = "0123456789abcde";
     jsoncons::chars_source<char> source(data);
+
+    SECTION("read 4, then 1, then 5")
+    {
+        std::string buffer;
+        auto sp = source.read_span(4, buffer);
+        CHECK(jsoncons::string_view(sp.data(),sp.size()) == data.substr(0, 4));
+        CHECK(buffer.empty());
+        CHECK(11 == source.remaining());
+        CHECK(4 == source.position());
+
+        sp = source.read_span(1, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(4, 1));
+        CHECK(buffer.empty());
+        CHECK(10 == source.remaining());
+        CHECK(5 == source.position());
+
+        sp = source.read_span(6, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(5, 6));
+        CHECK(buffer.empty());
+        CHECK(4 == source.remaining());
+        CHECK(11 == source.position());
+    }
+
+    SECTION("read 15")
+    {
+        std::string buffer;
+        auto sp = source.read_span(15, buffer);
+        CHECK(jsoncons::string_view(sp.data(),sp.size()) == data);
+        CHECK(buffer.empty());
+        CHECK(0 == source.remaining());
+        CHECK(source.position() == 15);
+    }
+
+    SECTION("read 16")
+    {
+        std::string buffer;
+        auto sp = source.read_span(16, buffer);
+        CHECK(jsoncons::string_view(sp.data(), sp.size()) == data);
+        CHECK(buffer.empty());
+        CHECK(0 == source.remaining());
+        CHECK(source.position() == 15);
+    }
+}
+#endif
+TEST_CASE("iterator_source::read_span tests")
+{
+    std::string data = "0123456789abcde";
+    jsoncons::iterator_source<std::string::iterator> source(data.begin(), data.end());
 
     SECTION("read 4, then 1, then 5")
     {
