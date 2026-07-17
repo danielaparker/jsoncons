@@ -711,30 +711,7 @@ public:
         return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
     }
 
-    template <typename Category = iterator_category>
-    typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-    read(value_type* data, std::size_t length)
-    {
-        std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-
-        //JSONCONS_COPY(current_, current_ + count, data);
-
-        auto end = current_ + count;
-        value_type* p = data;
-        while (current_ != end)
-        {
-            *p++ = *current_++;
-        }
-
-        //current_ += count;
-        position_ += count;
-
-        return count;
-    }
-
-    template <typename Category = iterator_category>
-    typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-    read(value_type* data, std::size_t length)
+    std::size_t read(value_type* data, std::size_t length)
     {
         value_type* p = data;
         value_type* pend = data + length;
