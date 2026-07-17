@@ -486,16 +486,16 @@ public:
 
     chars_source(chars_source&& other) = default;
 
-    template <typename Sourceable>
+    template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_byte<value_type>::value && ext_traits::is_byte<typename Sourceable::value_type>::value>::type* = 0)
+        typename std::enable_if<ext_traits::is_byte<ChT>::value && ext_traits::is_byte<typename Sourceable::value_type>::value>::type* = 0)
         : data_(reinterpret_cast<const value_type*>(s.data())), current_(data_), end_(data_+s.size())
     {
     }
 
-    template <typename Sourceable>
+    template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_wide_character<value_type>::value && ext_traits::has_data_exact<const value_type*,Sourceable>::value>::type* = 0)
+        typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::has_data_exact<const ChT*,Sourceable>::value>::type* = 0)
         : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
