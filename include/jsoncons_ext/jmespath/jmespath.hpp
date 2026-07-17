@@ -4403,7 +4403,7 @@ namespace detail {
                             case '`':
                             {
                                 json_decoder<Json> decoder;
-                                basic_json_reader<char_type,string_source<char_type>> reader(buffer, decoder);
+                                basic_json_reader<char_type,chars_source<char_type>> reader(buffer, decoder);
                                 std::error_code parse_ec;
                                 reader.read(parse_ec);
                                 if (parse_ec)

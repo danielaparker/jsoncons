@@ -849,7 +849,7 @@ void make_expression_with_stateful_allocator()
     // since 0.171.0
     jsoncons::json_decoder<cust_json,my_alloc> decoder(alloc, alloc);
 
-    jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_text, decoder, alloc);
+    jsoncons::basic_json_reader<char,jsoncons::chars_source<char>,my_alloc> reader(json_text, decoder, alloc);
     reader.read();
 
     cust_json doc = decoder.get_result();

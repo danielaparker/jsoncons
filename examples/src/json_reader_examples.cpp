@@ -159,7 +159,7 @@ void read_with_stateful_allocator()
 
     auto myAlloc = MyScopedAllocator<char>(3);
 
-    basic_json_reader<char,string_source<char>, MyScopedAllocator<char>> reader(input, decoder, myAlloc);
+    basic_json_reader<char,chars_source<char>, MyScopedAllocator<char>> reader(input, decoder, myAlloc);
     reader.read();
 
     cust_json j = decoder.get_result();

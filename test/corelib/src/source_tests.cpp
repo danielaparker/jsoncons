@@ -19,10 +19,10 @@ TEST_CASE("basic_null_istream tests")
     }
 }
 
-TEST_CASE("string_source tests")
+TEST_CASE("chars_source tests")
 {
     std::string data = "012345678";
-    jsoncons::string_source<char> source(data);
+    jsoncons::chars_source<char> source(data);
 
     SECTION("test get and peek")
     {
@@ -668,10 +668,10 @@ TEST_CASE("stream_source::read_span tests")
     }
 }
 
-TEST_CASE("string_source::read_span tests")
+TEST_CASE("chars_source::read_span tests")
 {
     std::string data = "0123456789abcde";
-    jsoncons::string_source<char> source(data);
+    jsoncons::chars_source<char> source(data);
 
     SECTION("read 4, then 1, then 5")
     {

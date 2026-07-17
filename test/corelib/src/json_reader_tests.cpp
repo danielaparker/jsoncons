@@ -391,7 +391,7 @@ TEST_CASE("json_reader stateful allocator tests")
 
         json_decoder<cust_json,MyScopedAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
-        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, my_allocator);
+        basic_json_reader<char,chars_source<char>,MyScopedAllocator<char>> reader(input, decoder, my_allocator);
         reader.read();
 
         cust_json j = decoder.get_result();

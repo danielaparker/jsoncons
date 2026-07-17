@@ -25,9 +25,9 @@ Aliases for common character types are provided:
 Type                |Definition
 --------------------|------------------------------
 `json_stream_cursor` (since 0.167.0)  |`basic_json_cursor<char,jsoncons::stream_source<char>>`
-`json_string_cursor` (since 0.167.0)  |`basic_json_cursor<char,jsoncons::string_source<char>>`
+`json_string_cursor` (since 0.167.0)  |`basic_json_cursor<char,jsoncons::chars_source<char>>`
 `wjson_stream_cursor` (since 0.167.0) |`basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>>`
-`wjson_string_cursor` (since 0.167.0) |`basic_json_cursor<wchar_t,jsoncons::string_source<wchar_t>>`
+`wjson_string_cursor` (since 0.167.0) |`basic_json_cursor<wchar_t,jsoncons::chars_source<wchar_t>>`
 `json_cursor` (until 0.167.0)         |`basic_json_cursor<char>`
 `wjson_cursor` (until 0.167.0)        |`basic_json_cursor<wchar_t>`
 

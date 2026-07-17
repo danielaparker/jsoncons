@@ -25,9 +25,9 @@ Aliases for common character types are provided:
 Type                |Definition
 --------------------|------------------------------
 `csv_stream_cursor` (since 0.167.0)  |`basic_csv_cursor<char,csvcons::stream_source<char>>`
-`csv_string_cursor` (since 0.167.0)  |`basic_csv_cursor<char,csvcons::string_source<char>>`
+`csv_string_cursor` (since 0.167.0)  |`basic_csv_cursor<char,csvcons::chars_source<char>>`
 `wcsv_stream_cursor` (since 0.167.0) |`basic_csv_cursor<wchar_t,csvcons::stream_source<wchar_t>>`
-`wcsv_string_cursor` (since 0.167.0) |`basic_csv_cursor<wchar_t,csvcons::string_source<wchar_t>>`
+`wcsv_string_cursor` (since 0.167.0) |`basic_csv_cursor<wchar_t,csvcons::chars_source<wchar_t>>`
 `csv_cursor` (until 0.167.0)         |`basic_csv_cursor<char>`
 `wcsv_cursor` (until 0.167.0)        |`basic_csv_cursor<wchar_t>`
 

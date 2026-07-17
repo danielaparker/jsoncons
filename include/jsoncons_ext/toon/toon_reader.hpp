@@ -1876,7 +1876,7 @@ public:
     }
 };
 
-using toon_string_reader = basic_toon_reader<string_source<char>>;
+using toon_string_reader = basic_toon_reader<chars_source<char>>;
 using toon_stream_reader = basic_toon_reader<stream_source<char>>;
 
 } // namespace toon
