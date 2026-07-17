@@ -495,7 +495,7 @@ public:
 
     template <typename Sourceable>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_wide_character<value_type>::value && ext_traits::has_data_exact<value_type*,Sourceable>::value>::type* = 0)
+        typename std::enable_if<ext_traits::is_wide_character<value_type>::value && ext_traits::has_data_exact<const value_type*,Sourceable>::value>::type* = 0)
         : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
