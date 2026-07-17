@@ -694,10 +694,10 @@ TEST_CASE("cbor bigfloat tests")
     }
     SECTION("-1.5")
     {
-        std::vector<uint8_t> v = {0xc5, // Tag 5 
+        std::vector<uint8_t> v = {0xc5, // Tag 5
                                   0x82, // Array of length 2
-                                  0x20, // -1 
-                                  0x22 // -3 
+                                  0x20, // -1
+                                  0x22 // -3
                                  };
 
         json j = cbor::decode_cbor<json>(v);
@@ -707,7 +707,19 @@ TEST_CASE("cbor bigfloat tests")
         double val = j.as<double>();
         CHECK(val == Approx(-1.5).epsilon(0.0000000001));
     }
-} 
+    SECTION("most negative mantissa and exponent")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff, // -9223372036854775808
+                                  0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -9223372036854775808
+                                 };
+
+        json j = cbor::decode_cbor<json>(v);
+
+        CHECK(j.as<std::string>() == std::string("-0x8000000000000000p-8000000000000000"));
+    }
+}
 
 TEST_CASE("encode decode cbor source")
 {
