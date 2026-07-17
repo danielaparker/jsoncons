@@ -586,7 +586,7 @@ TEST_CASE("forward iterator iterator_stream source tests")
 TEST_CASE("binary_iterator_stream source tests")
 {
     std::vector<uint8_t> data = { 0,1,2,3,4,5,6,7,8 };
-    jsoncons::binary_iterator_source<std::vector<uint8_t>::iterator> source(data.begin(), data.end(), 4);
+    jsoncons::iterator_source<std::vector<uint8_t>::iterator> source(data.begin(), data.end(), 4);
 
     SECTION("read 3")
     {

@@ -125,7 +125,7 @@ try_decode_bson(InputIt first, InputIt last,
     std::error_code ec;   
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-    basic_bson_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
+    basic_bson_reader<iterator_source<InputIt>> reader(iterator_source<InputIt>(first, last), adaptor, options);
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -147,7 +147,7 @@ try_decode_bson(InputIt first, InputIt last,
     using result_type = read_result<value_type>;
 
     std::error_code ec;
-    basic_bson_cursor<binary_iterator_source<InputIt>> cursor(binary_iterator_source<InputIt>(first, last), options, ec);
+    basic_bson_cursor<iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};

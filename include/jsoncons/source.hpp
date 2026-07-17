@@ -752,154 +752,6 @@ public:
     }
 };
 
-// binary_iterator source
-
-template <typename IteratorT>
-class binary_iterator_source
-{
-public:
-    using value_type = uint8_t;
-private:
-    static constexpr std::size_t default_max_chunk_size = 16384;
-
-    IteratorT current_;
-    IteratorT end_;
-    std::size_t position_{0};
-    std::vector<value_type> chunk_;
-    std::size_t chunk_len_{0};
-
-    using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
-    using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
-public:
-
-    // Noncopyable 
-    binary_iterator_source(const binary_iterator_source&) = delete;
-
-    binary_iterator_source(binary_iterator_source&& other) = default;
-
-    binary_iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_chunk_size)
-        : current_(first), end_(last), chunk_(buf_size)
-    {
-    }
-
-    binary_iterator_source& operator=(const binary_iterator_source&) = delete;
-    binary_iterator_source& operator=(binary_iterator_source&& other) = default;
-
-    bool eof() const
-    {
-        return !(current_ != end_);  
-    }
-
-    bool is_error() const
-    {
-        return false;  
-    }
-
-    std::size_t position() const
-    {
-        return position_;
-    }
-
-    void ignore(std::size_t count)
-    {
-        while (count-- > 0 && current_ != end_)
-        {
-            ++position_;
-            ++current_;
-        }
-    }
-
-    char_result<value_type> peek() 
-    {
-        return current_ != end_ ? char_result<value_type>{static_cast<value_type>(*current_), false} : char_result<value_type>{0, true};
-    }
-
-    std::size_t chunk_size() const
-    {
-        return chunk_.size();
-    }
-
-    span<const value_type> read_chunk() 
-    {
-        if (chunk_len_ == 0)
-        {
-            chunk_len_ = read(chunk_.data(), chunk_.size());
-        }
-        std::size_t length = chunk_len_;
-        chunk_len_ = 0;
-
-        return span<const value_type>(chunk_.data(), length);
-    }
-
-    std::size_t read_buffer(value_type* chunk, std::size_t chunk_size)
-    {
-        auto len = fill_buffer(chunk, chunk_size);
-        position_ += len;
-        return len;
-    }
-
-    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
-    {
-        return read(chunk, chunk_size);
-    }
-
-    std::size_t remaining() const
-    {
-        return chunk_len_;
-    }
-
-    template <typename Buffer>
-    span<const value_type> read_span(std::size_t length, Buffer&& buffer)
-    {
-        if (JSONCONS_UNLIKELY(length == 0))
-        {
-            return span<const value_type>{};
-        }
-        buffer.clear();
-        source_reader<binary_iterator_source<IteratorT>>::read(*this, buffer, length);
-        return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
-    }
-
-    template <typename Category = iterator_category>
-    typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-    read(value_type* data, std::size_t length)
-    {
-        std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-        //JSONCONS_COPY(current_, current_ + count, data);
-
-        auto end = current_ + count;
-        value_type* p = data;
-        while (current_ != end)
-        {
-            *p++ = *current_++;
-        }
-
-        //current_ += count;
-        position_ += count;
-
-        return count;
-    }
-
-    template <typename Category = iterator_category>
-    typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-    read(value_type* data, std::size_t length)
-    {
-        value_type* p = data;
-        value_type* pend = data + length;
-
-        while (p < pend && current_ != end_)
-        {
-            *p = static_cast<value_type>(*current_);
-            ++p;
-            ++current_;
-        }
-
-        position_ += (p - data);
-
-        return p - data;
-    }
-};
-
 template <typename Source>
 struct source_reader
 {
@@ -988,6 +840,9 @@ struct source_reader
 
 template <typename CharT>
 using string_source = chars_source<CharT>;
+
+template <typename IteratorT>
+using binary_iterator_source2 = iterator_source<IteratorT>;
 
 #endif
 
