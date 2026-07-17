@@ -1556,7 +1556,7 @@ TEST_CASE("csv_reader constructors")
 
         json_decoder<cust_json,MyScopedAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
-        csv::basic_csv_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, options, my_allocator);
+        csv::basic_csv_reader<char,chars_source<char>,MyScopedAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
         cust_json j = decoder.get_result();

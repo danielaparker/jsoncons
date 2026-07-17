@@ -467,40 +467,41 @@ private:
 template <typename CharT,typename Allocator>
 constexpr std::size_t stream_source<CharT,Allocator>::default_max_chunk_size;
 
-// string_source
+// chars_source
 
 template <typename CharT>
-class string_source 
+class chars_source 
 {
 public:
     using value_type = CharT;
-    using string_view_type = jsoncons::basic_string_view<value_type>;
 private:
     const value_type* data_{nullptr};
     const value_type* current_{nullptr};
     const value_type* end_{nullptr};
 public:
-    string_source() noexcept = default;
+    chars_source() noexcept = default;
 
     // Noncopyable 
-    string_source(const string_source&) = delete;
+    chars_source(const chars_source&) = delete;
 
-    string_source(string_source&& other) = default;
+    chars_source(chars_source&& other) = default;
 
-    template <typename Sourceable>
-    string_source(const Sourceable& s,
-                  typename std::enable_if<ext_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
+    template <typename Sourceable,typename ChT=CharT>
+    chars_source(const Sourceable& s,
+        typename std::enable_if<ext_traits::is_byte<ChT>::value && ext_traits::is_byte<typename Sourceable::value_type>::value>::type* = 0)
+        : data_(reinterpret_cast<const value_type*>(s.data())), current_(data_), end_(data_+s.size())
+    {
+    }
+
+    template <typename Sourceable,typename ChT=CharT>
+    chars_source(const Sourceable& s,
+        typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
         : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
 
-    string_source(const value_type* data)
-        : data_(data), current_(data), end_(data+std::char_traits<value_type>::length(data))
-    {
-    }
-
-    string_source& operator=(const string_source&) = delete;
-    string_source& operator=(string_source&& other) = default;
+    chars_source& operator=(const chars_source&) = delete;
+    chars_source& operator=(chars_source&& other) = default;
 
     bool eof() const
     {
@@ -751,132 +752,6 @@ public:
     }
 };
 
-// binary sources
-
-using binary_stream_source = stream_source<uint8_t>;
-
-class bytes_source 
-{
-public:
-    typedef uint8_t value_type;
-private:
-    const value_type* data_{nullptr};
-    const value_type* current_{nullptr};
-    const value_type* end_{nullptr};
-public:
-    bytes_source() noexcept = default;
-
-    // Noncopyable 
-    bytes_source(const bytes_source&) = delete;
-
-    bytes_source(bytes_source&&) = default;
-
-    template <typename Sourceable>
-    bytes_source(const Sourceable& source,
-                 typename std::enable_if<ext_traits::is_bytes_view_like<Sourceable>::value,int>::type = 0)
-        : data_(reinterpret_cast<const value_type*>(source.data())), 
-          current_(data_), 
-          end_(data_+source.size())
-    {
-    }
-
-    bytes_source& operator=(const bytes_source&) = delete;
-    bytes_source& operator=(bytes_source&&) = default;
-
-    bool eof() const
-    {
-        return current_ == end_;  
-    }
-
-    bool is_error() const
-    {
-        return false;  
-    }
-
-    std::size_t position() const
-    {
-        return current_ - data_;
-    }
-
-    void ignore(std::size_t count)
-    {
-        std::size_t len;
-        if (std::size_t(end_ - current_) < count)
-        {
-            len = end_ - current_;
-        }
-        else
-        {
-            len = count;
-        }
-        current_ += len;
-    }
-
-    char_result<value_type> peek() 
-    {
-        return current_ < end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
-    }
-
-    std::size_t chunk_size() const
-    {
-        return end_ - current_;
-    }
-
-    span<const value_type> read_chunk() 
-    {
-        const value_type* data = current_;
-        std::size_t length = end_ - current_;
-        current_ = end_;
-
-        return span<const value_type>(data, length);
-    }
-
-    std::size_t read_buffer(value_type* chunk, std::size_t chunk_size)
-    {
-        auto len = fill_buffer(chunk, chunk_size);
-        //position_ += len;
-        return len;
-    }
-
-    std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
-    {
-        return read(chunk, chunk_size);
-    }
-
-    std::size_t remaining() const
-    {
-        return std::size_t(end_ - current_);
-    }
-
-    template <typename Buffer>
-    span<const value_type> read_span(std::size_t length, Buffer&&)
-    {
-        if (std::size_t(end_ - current_) < length)
-        {
-            return span<const value_type>();
-        }
-        const value_type* data = current_;
-        current_ += length;
-        return span<const value_type>(data, length);
-    }
-
-    std::size_t read(value_type* p, std::size_t length)
-    {
-        std::size_t len;
-        if (std::size_t(end_ - current_) < length)
-        {
-            len = end_ - current_;
-        }
-        else
-        {
-            len = length;
-        }
-        std::memcpy(p, current_, len*sizeof(value_type));
-        current_  += len;
-        return len;
-    }
-};
-
 // binary_iterator source
 
 template <typename IteratorT>
@@ -1108,6 +983,17 @@ struct source_reader
         return length - unread;
     }
 };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+template <typename CharT>
+using string_source = chars_source<CharT>;
+
+#endif
+
+using binary_stream_source = stream_source<uint8_t>;
+
+using bytes_source = chars_source<uint8_t>;
 
 } // namespace jsoncons
 

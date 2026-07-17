@@ -561,9 +561,9 @@ private:
 };
 
 using json_stream_cursor = basic_json_cursor<char,jsoncons::stream_source<char>>;
-using json_string_cursor = basic_json_cursor<char,jsoncons::string_source<char>>;
+using json_string_cursor = basic_json_cursor<char,jsoncons::chars_source<char>>;
 using wjson_stream_cursor = basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
-using wjson_string_cursor = basic_json_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
+using wjson_string_cursor = basic_json_cursor<wchar_t,jsoncons::chars_source<wchar_t>>;
 
 } // namespace jsoncons
 

@@ -36,7 +36,7 @@ try_decode_json(const StringViewLike& s,
 
     std::error_code ec;   
     jsoncons::json_decoder<T> decoder;
-    basic_json_reader<char_type, string_source<char_type>> reader(s, decoder, options);
+    basic_json_reader<char_type, chars_source<char_type>> reader(s, decoder, options);
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -60,7 +60,7 @@ try_decode_json(const StringViewLike& s,
     using char_type = typename StringViewLike::value_type;
 
     std::error_code ec;
-    basic_json_cursor<char_type,string_source<char_type>> cursor(s, options, ec);
+    basic_json_cursor<char_type,chars_source<char_type>> cursor(s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
@@ -169,7 +169,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     json_decoder<T,TempAlloc> decoder(aset.get_allocator(), aset.get_temp_allocator());
 
     std::error_code ec;   
-    basic_json_reader<char_type, string_source<char_type>,TempAlloc> reader(s, decoder, options, aset.get_temp_allocator());
+    basic_json_reader<char_type, chars_source<char_type>,TempAlloc> reader(s, decoder, options, aset.get_temp_allocator());
     reader.read(ec);
     if (JSONCONS_UNLIKELY(ec))
     {
@@ -194,7 +194,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     using char_type = typename StringViewLike::value_type;
 
     std::error_code ec;
-    basic_json_cursor<char_type,string_source<char_type>,TempAlloc> cursor(
+    basic_json_cursor<char_type,chars_source<char_type>,TempAlloc> cursor(
         std::allocator_arg, aset.get_temp_allocator(), s, options, ec);
     if (JSONCONS_UNLIKELY(ec))
     {
