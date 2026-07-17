@@ -142,12 +142,11 @@ TEST_CASE("decode msgpack from source")
         REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));
     }
-    SECTION("from string iterator pair")
+    SECTION("from vector iterator pair")
     {
         std::vector<uint8_t> v = {0x91,0xa5,'H','e','l','l','o'};
-        std::string s(reinterpret_cast<const char*>(v.data()),v.size());
 
-        json j = msgpack::decode_msgpack<json>(s.begin(), s.end());
+        json j = msgpack::decode_msgpack<json>(v.begin(), v.end());
 
         REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));
