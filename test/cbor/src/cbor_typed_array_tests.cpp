@@ -888,6 +888,129 @@ TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
     }
 }
 
+TEST_CASE("cbor multi-dim malformed input tests")
+{
+    SECTION("break byte in place of the extents array")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28, // semantic tag 40, row-major storage
+            0x82,      // array(2)
+            0xff,      // break byte where the extents array should be
+            0x81,0x01  // array(1) -> [1]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::bad_extents == ec);
+    }
+
+    SECTION("empty indefinite length extents array")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28, // semantic tag 40, row-major storage
+            0x82,      // array(2)
+            0x9f,0xff, // array(indefinite length) -> []
+            0x81,0x01  // array(1) -> [1]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::bad_extents == ec);
+    }
+
+    SECTION("untagged byte string storage")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28, // semantic tag 40, row-major storage
+            0x82,      // array(2)
+            0x82,0x01,0x01, // array(2) -> [1,1]
+            0x41,0x00  // byte string(1)
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::bad_mdarray == ec);
+    }
+
+    SECTION("byte string storage with a non typed array tag")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28, // semantic tag 40, row-major storage
+            0x82,      // array(2)
+            0x82,0x01,0x01, // array(2) -> [1,1]
+            0xd8,0x07, // semantic tag 7, not a typed array tag
+            0x41,0x00  // byte string(1)
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::bad_mdarray == ec);
+    }
+
+    SECTION("cursor stops with an error on malformed extents")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28, // semantic tag 40, row-major storage
+            0x82,      // array(2)
+            0xff,      // break byte where the extents array should be
+            0x81,0x01  // array(1) -> [1]
+        };
+
+        std::error_code ec;
+        cbor::cbor_bytes_cursor cursor(data, ec);
+        while (!cursor.done() && !ec)
+        {
+            cursor.next(ec);
+        }
+        CHECK(cbor::cbor_errc::bad_extents == ec);
+    }
+}
+
+TEST_CASE("cbor multi-dim indefinite length extents tests")
+{
+    const std::vector<uint8_t> data = {
+        0xd8,0x28, // semantic tag 40, row-major storage
+        0x82,  // array(2)
+        0x9f,0x02,0x03,0xff, // array(indefinite length) -> [2,3]
+        0x86,  // array(6)
+        0x02,  // 2
+        0x04,  // 4
+        0x08,  // 8
+        0x04,  // 4
+        0x10,  // 16
+        0x19,0x01,0x00  // 256
+    };
+
+    auto expected = jsoncons::json::parse(R"(
+[[2,4,8],[4,16,256]]
+    )");
+
+    SECTION("parser test")
+    {
+        std::error_code ec;
+
+        jsoncons::json_decoder<json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        REQUIRE_FALSE(ec);
+        json result = decoder.get_result();
+        CHECK(expected == result);
+    }
+}
+
 TEST_CASE("cbor multi-dim typed array parse tests")
 {
     const std::vector<uint8_t> data = {
