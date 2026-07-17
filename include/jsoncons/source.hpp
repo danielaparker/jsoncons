@@ -495,7 +495,7 @@ public:
 
     template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::ext_traits::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
+        typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
         : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
