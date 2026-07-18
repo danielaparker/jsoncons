@@ -717,6 +717,7 @@ TEST_CASE("chars_source::read_span tests")
     }
 }
 #endif
+
 TEST_CASE("iterator_source::read_span tests")
 {
     std::string data = "0123456789abcde";
@@ -728,19 +729,19 @@ TEST_CASE("iterator_source::read_span tests")
         auto sp = source.read_span(4, buffer);
         CHECK(jsoncons::string_view(sp.data(),sp.size()) == data.substr(0, 4));
         CHECK(buffer.empty());
-        CHECK(11 == source.remaining());
+        CHECK(0 == source.remaining());
         CHECK(4 == source.position());
 
         sp = source.read_span(1, buffer);
         CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(4, 1));
         CHECK(buffer.empty());
-        CHECK(10 == source.remaining());
+        CHECK(0 == source.remaining());
         CHECK(5 == source.position());
 
         sp = source.read_span(6, buffer);
         CHECK(jsoncons::string_view(sp.data(), sp.size()) == data.substr(5, 6));
         CHECK(buffer.empty());
-        CHECK(4 == source.remaining());
+        CHECK(0 == source.remaining());
         CHECK(11 == source.position());
     }
 

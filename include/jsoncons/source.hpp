@@ -180,10 +180,10 @@ public:
         data_ = chunk_;
     }
 
-    stream_source(std::basic_istream<char_type>& is, std::size_t buf_size,
+    stream_source(std::basic_istream<char_type>& is, std::size_t chunk_size,
         const Allocator& alloc = Allocator())
         : alloc_(alloc), stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
-          chunk_size_(buf_size)
+          chunk_size_(chunk_size)
     {
         chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
         data_ = chunk_;
@@ -614,8 +614,8 @@ private:
     IteratorT current_;
     IteratorT end_;
     std::size_t position_{0};
-    std::vector<value_type> chunk_;
-    std::size_t chunk_len_{0};
+    std::vector<value_type> chunk_; // used by read_chunk to return a whole chunk, nothing is left in the chunk
+    std::size_t chunk_size_{0};
 
     using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
     using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -626,8 +626,8 @@ public:
 
     iterator_source(iterator_source&& other) = default;
 
-    iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_chunk_size)
-        : current_(first), end_(last), chunk_(buf_size)
+    iterator_source(const IteratorT& first, const IteratorT& last, std::size_t chunk_size = default_max_chunk_size)
+        : current_(first), end_(last), chunk_(chunk_size)
     {
     }
     
@@ -672,14 +672,7 @@ public:
 
     span<const value_type> read_chunk() 
     {
-        if (chunk_len_ == 0)
-        {
-            chunk_len_ = read(chunk_.data(), chunk_.size());
-        }
-        std::size_t length = chunk_len_;
-        chunk_len_ = 0;
-
-        return span<const value_type>(chunk_.data(), length);
+        return span<const value_type>(chunk_.data(), chunk_.size());
     }
 
     std::size_t read_buffer(value_type* chunk, std::size_t chunk_size)
@@ -691,12 +684,22 @@ public:
 
     std::size_t fill_buffer(value_type* chunk, std::size_t chunk_size)
     {
-        return read(chunk, chunk_size);
+        value_type* p = chunk;
+        value_type* pend = chunk + chunk_size;
+
+        while (p < pend && current_ != end_)
+        {
+            *p = static_cast<value_type>(*current_);
+            ++p;
+            ++current_;
+        }
+
+        return p - chunk;
     }
 
     std::size_t remaining() const
     {
-        return chunk_len_;
+        return 0;
     }
 
     template <typename Buffer>
@@ -706,6 +709,14 @@ public:
         {
             return span<const value_type>{};
         }
+
+        if (length <= chunk_.size())
+        {
+            auto len = fill_buffer(chunk_.data(), length);
+            position_ += len;
+            return span<const value_type>(chunk_.data(), len);
+        }
+
         buffer.clear();
         source_reader<iterator_source<IteratorT>>::read(*this, buffer, length);
         return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
@@ -713,19 +724,11 @@ public:
 
     std::size_t read(value_type* data, std::size_t length)
     {
-        value_type* p = data;
-        value_type* pend = data + length;
+        std::size_t len = fill_buffer(data, length);
 
-        while (p < pend && current_ != end_)
-        {
-            *p = static_cast<value_type>(*current_);
-            ++p;
-            ++current_;
-        }
+        position_ += len;
 
-        position_ += (p - data);
-
-        return p - data;
+        return len;
     }
 };
 
