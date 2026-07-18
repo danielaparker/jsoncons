@@ -359,7 +359,7 @@ public:
             remaining_ = fill_buffer(chunk_, chunk_size_);
             data_ = chunk_;
         }
-        if (length > remaining_)
+        else if (length > remaining_)
         {
             buffer.clear();
             source_reader<stream_source_type>::read(*this, std::forward<Buffer>(buffer), length);
