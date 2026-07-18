@@ -11,7 +11,6 @@
 #include "common/mock_stateful_allocator.hpp"
 #include <catch/catch.hpp>
 
-#if 0
 TEST_CASE("basic_null_istream tests")
 {
     SECTION("test1")
@@ -716,7 +715,6 @@ TEST_CASE("chars_source::read_span tests")
         CHECK(source.position() == 15);
     }
 }
-#endif
 
 TEST_CASE("iterator_source::read_span tests")
 {

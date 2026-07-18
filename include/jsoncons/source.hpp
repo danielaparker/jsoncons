@@ -672,7 +672,8 @@ public:
 
     span<const value_type> read_chunk() 
     {
-        return span<const value_type>(chunk_.data(), chunk_.size());
+        auto len = read(chunk_.data(), chunk_.size());
+        return span<const value_type>(chunk_.data(), len);
     }
 
     std::size_t read_buffer(value_type* chunk, std::size_t chunk_size)
