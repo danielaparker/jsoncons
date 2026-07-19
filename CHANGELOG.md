@@ -6,7 +6,16 @@ master (1.9.0 preview)
   - Fixed issue identified by Google fuzz where a CBOR classical multi-dimensional array 
   contained elements of typed array.
 
-- Emhancements:
+  - Git PR #727: fix CBOR parser issues the fuzzer exposed
+
+- Changes
+
+  - The type name `string_source` has been deprecated and renamed to `chars_source`.
+
+  - The class `binary_iterator_source` has been removed (replaced by `iterator_source`).
+
+
+- Enhancements:
 
   - Until 1.9.0, cbor and msgpack cursors read key-value pairs
   and convert the key part into a string before making it
@@ -41,6 +50,11 @@ master (1.9.0 preview)
   ```
   produces the same result as 1.8.0, but no longer results in conversions
   from integer to string and back to integer.  
+
+  - Reduced allocations when parsing BSON, CBOR, MessagePack and UBJSON. 
+
+  - JSONCONS_ALL_MEMBER_TRAITS and JSONCONS_N_MEMBER_TRAITS now generate
+  decode traits that support decode without an intermediate `basic_json` value.
 
 Release 1.8.1
 -------------
