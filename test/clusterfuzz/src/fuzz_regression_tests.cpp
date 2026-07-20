@@ -965,7 +965,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((int)cbor::cbor_errc::unknown_type == ec.value());
         //std::cout << ec.message() << "\n";
-    }*/
+    }
 
 
     // Fuzz target: fuzz_cbor
@@ -984,6 +984,22 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         std::cout << ec.message() << "\n";
+    }*/
+    SECTION("issue 536466724")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_msgpack-5217334684614656";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        json_decoder<json> visitor;
+
+        auto options = msgpack::msgpack_options{};
+
+        msgpack::msgpack_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(msgpack::msgpack_errc::invalid_utf8_text_string == ec); 
     }
 }
 
