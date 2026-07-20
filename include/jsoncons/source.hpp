@@ -98,7 +98,7 @@ private:
     std::size_t position_{0};
     value_type* chunk_{nullptr};
     std::size_t chunk_size_{0};
-    value_type* data_{nullptr};
+    value_type* data_end_{nullptr};
     std::size_t remaining_{0};
 public:
 
@@ -119,11 +119,11 @@ public:
         : alloc_(other.alloc_), stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf())
     {
         chunk_ = other.chunk_;
-        data_ = other.data_;
+        data_end_ = other.data_end_;
         chunk_size_ = other.chunk_size_;
         remaining_ = other.remaining_;
         other.chunk_ = nullptr;
-        other.data_ = nullptr;
+        other.data_end_ = nullptr;
         other.chunk_size_ = 0;
         other.remaining_ = 0;
 
@@ -145,17 +145,17 @@ public:
         if (alloc == other.get_allocator())
         {
             chunk_ = other.chunk_;
-            data_ = other.data_;
+            data_end_ = other.data_end_;
             remaining_ = other.remaining_;
             other.chunk_ = nullptr;
-            other.data_ = nullptr;
+            other.data_end_ = nullptr;
             other.remaining_ = 0;
         }
         else if (other.chunk_ != nullptr)
         {
             chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
-            data_ = chunk_ + (other.data_ - other.chunk_);
-            std::memcpy(data_, other.data_, sizeof(value_type)*other.remaining_);
+            data_end_ = chunk_ + (other.data_end_ - other.chunk_);
+            std::memcpy(data_end_, other.data_end_, sizeof(value_type)*other.remaining_);
         }
         if (other.stream_ptr_ != &other.null_is_)
         {
@@ -177,7 +177,7 @@ public:
           chunk_size_(default_max_chunk_size)
     {
         chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
-        data_ = chunk_;
+        data_end_ = chunk_;
     }
 
     stream_source(std::basic_istream<char_type>& is, std::size_t chunk_size,
@@ -186,7 +186,7 @@ public:
           chunk_size_(chunk_size)
     {
         chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
-        data_ = chunk_;
+        data_end_ = chunk_;
     }
 
     ~stream_source() noexcept
@@ -207,7 +207,7 @@ public:
         alloc_ = alloc;
         std::swap(chunk_, other.chunk_);
         std::swap(chunk_size_, other.chunk_size_);
-        std::swap(data_, other.data_);
+        std::swap(data_end_, other.data_end_);
         std::swap(remaining_, other.remaining_);
         if (other.stream_ptr_ != &other.null_is_)
         {
@@ -228,7 +228,7 @@ public:
     {
         chunk_size_ = other.chunk_size_;
         chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
-        data_ = chunk_ + (other.data_ - other.chunk_);
+        data_end_ = chunk_ + (other.data_end_ - other.chunk_);
         remaining_ = other.remaining_;
         std::memcpy(chunk_, other.chunk_, sizeof(value_type)*other.remaining_);
         if (other.stream_ptr_ != &other.null_is_)
@@ -264,7 +264,7 @@ public:
 
     const value_type* data() const
     {
-        return data_;
+        return data_end_;
     }
 
     bool eof() const
@@ -289,12 +289,12 @@ public:
         {
             len = (std::min)(remaining_, length);
             position_ += len;
-            data_ += len;
+            data_end_ += len;
             remaining_ -= len;
         }
         while (len < length)
         {
-            data_ = chunk_;
+            data_end_ = chunk_;
             remaining_ = fill_buffer(chunk_, chunk_size_);
             if (remaining_ == 0)
             {
@@ -302,7 +302,7 @@ public:
             }
             std::size_t len2 = (std::min)(remaining_, length-len);
             position_ += len2;
-            data_ += len2;
+            data_end_ += len2;
             remaining_ -= len2;
             len += len2;
         }
@@ -312,12 +312,12 @@ public:
     {
         if (remaining_ == 0)
         {
-            data_ = chunk_;
+            data_end_ = chunk_;
             remaining_ = fill_buffer(chunk_, chunk_size_);
         }
         if (remaining_ > 0)
         {
-            value_type c = *data_;
+            value_type c = *data_end_;
             return char_result<value_type>{c, false};
         }
         else
@@ -330,12 +330,12 @@ public:
     {
         if (remaining_ == 0)
         {
-            data_ = chunk_;
+            data_end_ = chunk_;
             remaining_ = fill_buffer(chunk_, chunk_size_);
         }
-        const value_type* data = data_;
+        const value_type* data = data_end_;
         std::size_t length = remaining_;
-        data_ += remaining_;
+        data_end_ += remaining_;
         position_ += remaining_;
         remaining_ = 0;
 
@@ -357,17 +357,17 @@ public:
         if (remaining_ == 0 && length <= chunk_size_)
         {
             remaining_ = fill_buffer(chunk_, chunk_size_);
-            data_ = chunk_;
+            data_end_ = chunk_;
         }
-        else if (length > remaining_)
+        if (length > remaining_)
         {
             buffer.clear();
             source_reader<stream_source_type>::read(*this, std::forward<Buffer>(buffer), length);
             return span<const value_type>(reinterpret_cast<const value_type*>(buffer.data()), buffer.size());
         }
 
-        const value_type* data = data_;
-        data_ += length;
+        const value_type* data = data_end_;
+        data_end_ += length;
         remaining_ -= length;
         position_ += length;
         return span<const value_type>(data, length);
@@ -379,8 +379,8 @@ public:
         if (remaining_ > 0)
         {
             len = (std::min)(remaining_, length);
-            std::memcpy(p, data_, len*sizeof(value_type));
-            data_ += len;
+            std::memcpy(p, data_end_, len*sizeof(value_type));
+            data_end_ += len;
             remaining_ -= len;
             position_ += len;
         }
@@ -390,13 +390,13 @@ public:
         }
         else if (length - len < chunk_size_)
         {
-            data_ = chunk_;
+            data_end_ = chunk_;
             remaining_ = fill_buffer(chunk_, chunk_size_);
             if (remaining_ > 0)
             {
                 std::size_t len2 = (std::min)(remaining_, length-len);
-                std::memcpy(p+len, data_, len2*sizeof(value_type));
-                data_ += len2;
+                std::memcpy(p+len, data_end_, len2*sizeof(value_type));
+                data_end_ += len2;
                 remaining_ -= len2;
                 position_ += len2;
                 len += len2;
@@ -475,7 +475,7 @@ class chars_source
 public:
     using value_type = CharT;
 private:
-    const value_type* data_{nullptr};
+    const value_type* data_end_{nullptr};
     const value_type* current_{nullptr};
     const value_type* end_{nullptr};
 public:
@@ -489,14 +489,14 @@ public:
     template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
         typename std::enable_if<ext_traits::is_byte<ChT>::value && ext_traits::is_byte<typename Sourceable::value_type>::value>::type* = 0)
-        : data_(reinterpret_cast<const value_type*>(s.data())), current_(data_), end_(data_+s.size())
+        : data_end_(reinterpret_cast<const value_type*>(s.data())), current_(data_end_), end_(data_end_+s.size())
     {
     }
 
     template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
         typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
-        : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
+        : data_end_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
 
@@ -515,7 +515,7 @@ public:
 
     std::size_t position() const
     {
-        return (current_ - data_)/sizeof(value_type);
+        return (current_ - data_end_)/sizeof(value_type);
     }
 
     void ignore(std::size_t count)
