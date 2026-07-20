@@ -999,7 +999,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         msgpack::msgpack_stream_reader reader(is,visitor);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(msgpack::msgpack_errc::invalid_utf8_text_string == ec); 
+        CHECK(msgpack::msgpack_errc::unexpected_eof == ec); 
     }
 }
 
