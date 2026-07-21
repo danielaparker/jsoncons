@@ -984,7 +984,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         std::cout << ec.message() << "\n";
-    }*/
+    }
     SECTION("issue 536466724")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_msgpack-5217334684614656";
@@ -1000,6 +1000,27 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(msgpack::msgpack_errc::unexpected_eof == ec); 
+    }*/
+    // Fuzz target: fuzz_cbor_parser_max
+    // Issue: Timeout (exceeds 60 secs)
+    SECTION("issue 536952813")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_parser_max-5653520134242304";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        try
+        {
+            default_json_visitor visitor;
+            cbor::cbor_stream_reader reader(is, visitor);
+            std::error_code ec;
+            reader.read(ec);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
     }
 }
 
