@@ -1608,7 +1608,7 @@ private:
                 {
                     return;
                 }
-                if (u > static_cast<uint64_t>(std::numeric_limits<int32_t>::max()))
+                if (u > static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
@@ -1624,7 +1624,7 @@ private:
                 {
                     return;
                 }
-                if (u < static_cast<int64_t>(std::numeric_limits<int32_t>::min()) || u > static_cast<int64_t>(std::numeric_limits<int32_t>::max()))
+                if (u < static_cast<int64_t>((std::numeric_limits<int32_t>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int32_t>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
