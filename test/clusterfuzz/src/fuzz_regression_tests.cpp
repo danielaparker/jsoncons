@@ -1002,7 +1002,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         CHECK(msgpack::msgpack_errc::unexpected_eof == ec); 
     }*/
     // Fuzz target: fuzz_cbor_parser_max
-    // Issue: Timeout (exceeds 60 secs)
+    // Issue: Integer-overflow in void jsoncons::prettify_string<std::__1::basic_string<char, std::__1::char_trait
     SECTION("issue 536952813")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_parser_max-5653520134242304";
@@ -1010,17 +1010,11 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        try
-        {
-            default_json_visitor visitor;
-            cbor::cbor_stream_reader reader(is, visitor);
-            std::error_code ec;
-            reader.read(ec);
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << "\n";
-        }
+        default_json_visitor visitor;
+        cbor::cbor_stream_reader reader(is, visitor);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK_FALSE(ec);
     }
 }
 
