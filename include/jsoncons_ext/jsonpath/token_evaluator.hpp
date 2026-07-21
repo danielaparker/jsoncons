@@ -1614,7 +1614,7 @@ namespace detail {
                     }
                     auto s = arg0.as_string();
                     double d;
-                    auto result = jsoncons::decstr_to_double(s.c_str(), s.length(), d);
+                    auto result = jsoncons::decstr_to_double(s.data(), s.length(), d);
                     if (result.ec == std::errc::invalid_argument)
                     {
                         return value_type::null();

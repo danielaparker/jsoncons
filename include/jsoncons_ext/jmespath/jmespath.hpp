@@ -2494,7 +2494,7 @@ namespace detail {
                         }
                         auto s = arg0.as_string();
                         double d{0};
-                        auto result3 = jsoncons::decstr_to_double(s.c_str(), s.length(), d);
+                        auto result3 = jsoncons::decstr_to_double(s.data(), s.length(), d);
                         if (result3)
                         {
                             return *context.create_json(d);

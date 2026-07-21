@@ -298,7 +298,7 @@ namespace jsoncons {
         {
             for (auto it = first; it != last; ++it)
             {
-                data_.emplace_back(key_type((*it).first.c_str(), (*it).first.size(), get_allocator()), (*it).second);
+                data_.emplace_back(key_type((*it).first.data(), (*it).first.size(), get_allocator()), (*it).second);
             }
             std::stable_sort(data_.begin(),data_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});

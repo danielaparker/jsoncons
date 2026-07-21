@@ -2362,7 +2362,7 @@ private:
                 else
                 {
                     double d{0};
-                    auto result = jsoncons::decstr_to_double(buffer.c_str(), buffer.length(), d);
+                    auto result = jsoncons::decstr_to_double(buffer.data(), buffer.length(), d);
                     if (result.ec == std::errc::result_out_of_range)
                     {
                         d = buffer.front() == '-' ? -HUGE_VAL : HUGE_VAL;
