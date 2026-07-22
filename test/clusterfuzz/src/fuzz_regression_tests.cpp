@@ -7,6 +7,7 @@
 #include <jsoncons_ext/bson/bson.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/tracing_json_visitor.hpp>
 
 #include <iostream>
 #include <vector>
@@ -1009,6 +1010,11 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
+
+        // c4               Tag 4 (decimal fraction)
+        // 82               Array of length 2
+        // 1a 7f ff ff fe   Unsigned 32-bit integer: 2147483646
+        // 2c               Negative integer -13 (CBOR negative integers encode -1 - n, so 0x2c = -13)
 
         default_json_visitor visitor;
         cbor::cbor_stream_reader reader(is, visitor);
