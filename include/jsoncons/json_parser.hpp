@@ -2643,6 +2643,7 @@ private:
                     visitor.string_value(sv, escape_tag_, *this, ec);
                 }
                 if (JSONCONS_UNLIKELY(ec)){return;}
+                more_ = !cursor_mode_;
                 state_ = parse_state::accept;
                 break;
             }
