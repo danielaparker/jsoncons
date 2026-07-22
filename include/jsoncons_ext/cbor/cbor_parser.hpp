@@ -1350,6 +1350,7 @@ private:
             {
                 return;
             }
+            const std::size_t offset = v.size();
             if (source_reader<Source>::read(source_, v, length) != length)
             {
                 ec = cbor_errc::unexpected_eof;
@@ -1358,7 +1359,21 @@ private:
             {
                 return;
             }
-        } 
+            if (type == jsoncons::cbor::detail::cbor_major_type::text_string)
+            {
+                // RFC 8949 3.2.3: each chunk of an indefinite-length text
+                // string must itself be well-formed UTF-8, so a code point
+                // may not be split across chunks.
+                auto result = unicode_traits::validate(
+                    reinterpret_cast<const char*>(v.data()) + offset, length);
+                if (result.ec != unicode_traits::unicode_errc())
+                {
+                    ec = cbor_errc::invalid_utf8_text_string;
+                    more_ = false;
+                    return;
+                }
+            }
+        }
     }
 
     uint64_t read_uint64(std::error_code& ec)
@@ -1397,7 +1412,12 @@ private:
             case 0x19: // Unsigned integer (two-byte uint16_t follows)
             {
                 uint8_t buf[sizeof(uint16_t)];
-                source_.read(buf, sizeof(uint16_t));
+                if (source_.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return val;
+                }
                 val = binary::big_to_native<uint16_t>(buf, sizeof(buf));
                 break;
             }
@@ -1405,7 +1425,12 @@ private:
             case 0x1a: // Unsigned integer (four-byte uint32_t follows)
             {
                 uint8_t buf[sizeof(uint32_t)];
-                source_.read(buf, sizeof(uint32_t));
+                if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return val;
+                }
                 val = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                 break;
             }
@@ -1413,7 +1438,12 @@ private:
             case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
                 uint8_t buf[sizeof(uint64_t)];
-                source_.read(buf, sizeof(uint64_t));
+                if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return val;
+                }
                 val = binary::big_to_native<uint64_t>(buf, sizeof(buf));
                 break;
             }
@@ -1608,13 +1638,13 @@ private:
                 {
                     return;
                 }
-                if (u > static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
+                if (u > static_cast<uint64_t>((std::numeric_limits<int>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
                     return;
                 }
-                exponent = static_cast<int32_t>(u);
+                exponent = static_cast<int>(u);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1624,13 +1654,13 @@ private:
                 {
                     return;
                 }
-                if (u < static_cast<int64_t>((std::numeric_limits<int32_t>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int32_t>::max)()))
+                if (u < static_cast<int64_t>((std::numeric_limits<int>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
                     return;
                 }
-                exponent = static_cast<int32_t>(u);
+                exponent = static_cast<int>(u);
                 break;
             }
             default:
@@ -1722,22 +1752,23 @@ private:
             }
         }
 
-        if (str.size() >= static_cast<std::size_t>((std::numeric_limits<int32_t>::max)()))
+        if (str.size() > static_cast<std::size_t>((std::numeric_limits<int>::max)()))
         {
             ec = cbor_errc::invalid_decimal_fraction;
             more_ = false;
             return;
         }
-        else if (str.size() > 0)
+        int length = static_cast<int>(str.size());
+        if (length > 0)
         {
             if (str[0] == '-')
             {
                 result.push_back('-');
-                jsoncons::prettify_string(str.data()+1, str.size()-1, (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data()+1, length-1, exponent, -4, 17, result);
             }
             else
             {
-                jsoncons::prettify_string(str.data(), str.size(), (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data(), length, exponent, -4, 17, result);
             }
         }
         else

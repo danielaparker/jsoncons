@@ -738,3 +738,70 @@ TEST_CASE("CBOR stringref tag 3")
 
     CHECK(expected == j);
 }
+
+namespace {
+
+    std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
+    {
+        std::error_code ec;
+        jsoncons::json_decoder<json> decoder;
+        cbor_bytes_reader reader(v, decoder);
+        reader.read(ec);
+
+        // the stream source must agree with the bytes source
+        std::string s(v.begin(), v.end());
+        std::istringstream is(s);
+        std::error_code stream_ec;
+        jsoncons::json_decoder<json> stream_decoder;
+        cbor_stream_reader stream_reader(is, stream_decoder);
+        stream_reader.read(stream_ec);
+        CHECK(stream_ec == ec);
+
+        return ec;
+    }
+
+} // namespace
+
+TEST_CASE("cbor truncated multibyte heads are rejected")
+{
+    SECTION("truncated integer arguments")
+    {
+        CHECK(parse_cbor_error({0x19,0x01}) == cbor_errc::unexpected_eof);           // uint16
+        CHECK(parse_cbor_error({0x1a,0xff}) == cbor_errc::unexpected_eof);           // uint32
+        CHECK(parse_cbor_error({0x1a,0xff,0xff,0xff}) == cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1b,0x01,0x02}) == cbor_errc::unexpected_eof);      // uint64
+    }
+
+    SECTION("truncated half-precision float")
+    {
+        CHECK(parse_cbor_error({0xf9,0x3c}) == cbor_errc::unexpected_eof);
+    }
+
+    SECTION("complete heads still parse")
+    {
+        check_parse_cbor({0x19,0x01,0x00}, json(256));
+        check_parse_cbor({0x1a,0xff,0x00,0x00,0x00}, json(4278190080ULL));
+        // a complete half head still reads through the same two-byte path
+        json half = decode_cbor<json>(std::vector<uint8_t>{0xf9,0x3c,0x00});
+        CHECK(half.as<double>() == 1.0);
+    }
+}
+
+TEST_CASE("cbor indefinite length text chunks are validated individually")
+{
+    SECTION("a code point split across chunks is rejected")
+    {
+        // RFC 8949 3.2.3
+        CHECK(parse_cbor_error({0x7f,0x61,0xc3,0x61,0xa9,0xff}) == cbor_errc::invalid_utf8_text_string);
+    }
+
+    SECTION("well-formed chunks are accepted")
+    {
+        check_parse_cbor({0x7f,0x62,0xc3,0xa9,0x61,0x61,0xff}, json(std::string("\xc3\xa9""a")));
+    }
+
+    SECTION("byte string chunks are not text")
+    {
+        check_parse_cbor({0x5f,0x41,0xc3,0xff}, json(byte_string({0xc3})));
+    }
+}
