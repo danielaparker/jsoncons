@@ -2102,7 +2102,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint8, extents_, mdarray_order::row_major, alloc_);
+                            typed_array_tags::uint8, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
