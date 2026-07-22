@@ -34,6 +34,9 @@ oss_fuzz_compile_all()
 
     # Fuzzers that target the cursors
     $CXX ./fuzzers/fuzz_json_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_json_cursor
+
+    # Fuzzers that target the views
+    $CXX ./fuzzers/fuzz_cbor_view.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_view
 }
 
 if [[ -z "${OUT}" ]]; then
