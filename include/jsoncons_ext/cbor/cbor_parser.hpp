@@ -1608,13 +1608,13 @@ private:
                 {
                     return;
                 }
-                if (u > static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
+                if (u > static_cast<uint64_t>((std::numeric_limits<int>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
                     return;
                 }
-                exponent = static_cast<int32_t>(u);
+                exponent = static_cast<int>(u);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1624,13 +1624,13 @@ private:
                 {
                     return;
                 }
-                if (u < static_cast<int64_t>((std::numeric_limits<int32_t>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int32_t>::max)()))
+                if (u < static_cast<int64_t>((std::numeric_limits<int>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
                     return;
                 }
-                exponent = static_cast<int32_t>(u);
+                exponent = static_cast<int>(u);
                 break;
             }
             default:
@@ -1722,22 +1722,23 @@ private:
             }
         }
 
-        if (str.size() >= static_cast<std::size_t>((std::numeric_limits<int>::max)()))
+        if (str.size() > static_cast<std::size_t>((std::numeric_limits<int>::max)()))
         {
             ec = cbor_errc::invalid_decimal_fraction;
             more_ = false;
             return;
         }
-        if (str.size() > 0)
+        int length = static_cast<int>(str.size());
+        if (length > 0)
         {
             if (str[0] == '-')
             {
                 result.push_back('-');
-                jsoncons::prettify_string(str.data()+1, static_cast<int>(str.size())-1, (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data()+1, length-1, exponent, -4, 17, result);
             }
             else
             {
-                jsoncons::prettify_string(str.data(), static_cast<int>(str.size()), (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data(), length, exponent, -4, 17, result);
             }
         }
         else
