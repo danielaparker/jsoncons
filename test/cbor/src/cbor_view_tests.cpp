@@ -683,3 +683,127 @@ TEST_CASE("cbor view validate_text")
         CHECK_FALSE(cbor::view::validate_text(parse({0x41,0x61})));
     }
 }
+
+TEST_CASE("cbor view low-level tier")
+{
+    SECTION("read_head decodes one head and advances past it only")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x02};   // [1, 2]
+        const uint8_t* p = data.data();
+        const uint8_t* end = p + data.size();
+        cbor::view::item_head head;
+        std::error_code ec;
+        REQUIRE(cbor::view::read_head(p, end, head, ec));
+        CHECK_FALSE(ec);
+        CHECK(head.major_type == cbor::view::major_type::array);
+        CHECK(head.value == 2);
+        CHECK(p == data.data() + 1);   // past the head, not the elements
+    }
+
+    SECTION("read_head surfaces tags as their own heads")
+    {
+        std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1, 10
+        const uint8_t* p = data.data();
+        const uint8_t* end = p + data.size();
+        cbor::view::item_head head;
+        std::error_code ec;
+        REQUIRE(cbor::view::read_head(p, end, head, ec));
+        CHECK(head.major_type == cbor::view::major_type::semantic_tag);
+        CHECK(head.value == 1);
+        REQUIRE(cbor::view::read_head(p, end, head, ec));
+        CHECK(head.major_type == cbor::view::major_type::unsigned_integer);
+        CHECK(head.value == 10);
+        CHECK(p == end);
+    }
+
+    SECTION("read_head reports malformed and truncated heads")
+    {
+        std::vector<uint8_t> empty;
+        const uint8_t* p = empty.data();
+        cbor::view::item_head head;
+        std::error_code ec;
+        CHECK_FALSE(cbor::view::read_head(p, p, head, ec));
+        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+
+        std::vector<uint8_t> truncated = {0x19,0x01};
+        p = truncated.data();
+        ec.clear();
+        CHECK_FALSE(cbor::view::read_head(p, p + truncated.size(), head, ec));
+        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+    }
+
+    SECTION("skip_item advances past one complete item")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x02,0x63,'a','b','c'};   // [1,2] then "abc"
+        const uint8_t* p = data.data();
+        const uint8_t* end = p + data.size();
+        std::error_code ec;
+        REQUIRE(cbor::view::skip_item(p, end, ec));
+        CHECK(p == data.data() + 3);
+        REQUIRE(cbor::view::skip_item(p, end, ec));
+        CHECK(p == end);
+    }
+
+    SECTION("skip_item honours the depth bound")
+    {
+        std::vector<uint8_t> data = {0x81,0x81,0x01};   // [[1]]
+        const uint8_t* p = data.data();
+        std::error_code ec;
+        CHECK_FALSE(cbor::view::skip_item(p, p + data.size(), ec, 1));
+        CHECK(ec == cbor::cbor_errc::max_nesting_depth_exceeded);
+    }
+}
+
+TEST_CASE("cbor view span-based order entry points")
+{
+    struct reverse_bytewise
+    {
+        int operator()(jsoncons::span<const uint8_t> a, jsoncons::span<const uint8_t> b) const noexcept
+        {
+            return -cbor::view::bytewise_compare()(a, b);
+        }
+    };
+
+    SECTION("compare validates each span then orders, tolerating trailing bytes")
+    {
+        std::vector<uint8_t> ten = {0x0a};
+        std::vector<uint8_t> hundred = {0x18,0x64};
+        std::vector<uint8_t> ten_plus = {0x0a,0x63,'x','y','z'};   // 10 then trailing
+        auto lt = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred));
+        REQUIRE(lt.has_value());
+        CHECK(lt.value() < 0);
+        auto eq = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(ten_plus));
+        REQUIRE(eq.has_value());
+        CHECK(eq.value() == 0);
+        auto rev = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred), reverse_bytewise());
+        REQUIRE(rev.has_value());
+        CHECK(rev.value() > 0);
+    }
+
+    SECTION("compare reports malformed input with an offset")
+    {
+        std::vector<uint8_t> good = {0x01};
+        std::vector<uint8_t> bad = {0x82,0x01,0x1f};   // [1, <invalid>]
+        auto result = cbor::view::compare(jsoncons::span<const uint8_t>(good), jsoncons::span<const uint8_t>(bad));
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 3);
+    }
+
+    SECTION("map_keys_sorted over a span matches the item overload")
+    {
+        std::vector<uint8_t> sorted_map = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
+        std::vector<uint8_t> unsorted_map = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
+        auto sorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(sorted_map));
+        REQUIRE(sorted.has_value());
+        CHECK(sorted.value());
+        auto unsorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(unsorted_map));
+        REQUIRE(unsorted.has_value());
+        CHECK_FALSE(unsorted.value());
+
+        std::vector<uint8_t> malformed = {0xa1,0x01};   // key, no value
+        auto bad = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(malformed));
+        REQUIRE_FALSE(bad.has_value());
+        CHECK(bad.error().code == cbor::cbor_errc::unexpected_eof);
+    }
+}

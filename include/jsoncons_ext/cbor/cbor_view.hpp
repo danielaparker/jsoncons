@@ -52,6 +52,19 @@ namespace view {
         simple
     };
 
+    // The CBOR major type
+    enum class major_type : uint8_t
+    {
+        unsigned_integer = 0,
+        negative_integer = 1,
+        byte_string = 2,
+        text_string = 3,
+        array = 4,
+        map = 5,
+        semantic_tag = 6,
+        simple = 7
+    };
+
     struct scan_error
     {
         cbor_errc code;
@@ -683,6 +696,45 @@ namespace view {
 
     } // namespace detail_view
 
+    // ---- Low-level tier ----
+    // The wire-level head decoding the checked item layer is built on, for
+    // consumers that need sub-item head access. Prefer the checked item layer
+    // unless you are walking objects yourself with intention.
+
+    struct item_head
+    {
+        view::major_type major_type{};
+        uint8_t additional_info{0};
+        uint64_t value{0};
+
+        bool indefinite() const noexcept
+        {
+            return additional_info == 31;   // additional-info 31 = indefinite length
+        }
+    };
+
+    // Reads one head, advancing p past the head only; tags read as their own heads.
+    inline bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
+    {
+        detail_view::item_head h;
+        if (!detail_view::read_head(p, end, h, ec))
+        {
+            return false;
+        }
+        head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
+        head.additional_info = h.additional_info;
+        head.value = h.value;
+        return true;
+    }
+
+    // Advances p past one complete item, bounded by max_nesting_depth.
+    inline bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
+        int max_nesting_depth = default_max_nesting_depth)
+    {
+        detail_view::pending_stack open;
+        return detail_view::skip_item(p, end, max_nesting_depth, open, ec);
+    }
+
     // Iterates the values of an item's leading semantic tags.
     class item::tag_iterator
     {
@@ -1276,14 +1328,30 @@ namespace view {
         const uint8_t* p = input.data();
         const uint8_t* end = p + input.size();
         std::error_code ec;
-        if (!detail_view::skip_item(p, end, context.max_nesting_depth(),
-                detail_view::scan_access::workspace(context), ec))
+
+        // Parse the head once and keep it, so the item is built below without
+        // re-reading its own head.
+        detail_view::item_head head;
+        if (!detail_view::read_value_head(p, end, head, ec))
+        {
+            return expected<scan_result, scan_error>(unexpect,
+                scan_error{detail_view::to_cbor_errc(ec), static_cast<std::size_t>(p - input.data())});
+        }
+        const uint8_t* content = p;
+
+        const bool ok = (head.major_type == cbor::detail::cbor_major_type::array ||
+                         head.major_type == cbor::detail::cbor_major_type::map)
+            ? detail_view::skip_container(p, end, head, context.max_nesting_depth(),
+                  detail_view::scan_access::workspace(context), ec)
+            : detail_view::skip_scalar_or_string(head, p, end, ec);
+        if (!ok)
         {
             return expected<scan_result, scan_error>(unexpect,
                 scan_error{detail_view::to_cbor_errc(ec), static_cast<std::size_t>(p - input.data())});
         }
         return scan_result{
-            detail_view::item_access::make(span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data()))),
+            detail_view::item_access::make(
+                span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data())), head, content),
             span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
     }
 
@@ -1406,6 +1474,42 @@ namespace view {
             prev = key;
         }
         return true;
+    }
+
+    // Span-based order entry points for raw-span consumers (e.g. collation over
+    // byte-string keys). Each validates its input(s) then orders the encoded
+    // bytes; on malformed input the error carries the code and byte offset.
+    // Trailing bytes after the first item are tolerated.
+
+    template <typename Order = bytewise_compare>
+    expected<int, scan_error> compare(span<const uint8_t> a, span<const uint8_t> b,
+        Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto ra = scan_prefix(a, context);
+        if (!ra)
+        {
+            return expected<int, scan_error>(unexpect, ra.error());
+        }
+        auto rb = scan_prefix(b, context);
+        if (!rb)
+        {
+            return expected<int, scan_error>(unexpect, rb.error());
+        }
+        return order(ra.value().first.encoded_bytes(), rb.value().first.encoded_bytes());
+    }
+
+    template <typename Order = bytewise_compare>
+    expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
+        Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto result = scan_prefix(input, context);
+        if (!result)
+        {
+            return expected<bool, scan_error>(unexpect, result.error());
+        }
+        return map_keys_sorted(result.value().first, order);
     }
 
     // True if `text_item` is a text string whose content is well-formed
