@@ -1722,22 +1722,22 @@ private:
             }
         }
 
-        if (str.size() >= static_cast<std::size_t>((std::numeric_limits<int32_t>::max)()))
+        if (str.size() >= static_cast<std::size_t>((std::numeric_limits<int>::max)()))
         {
             ec = cbor_errc::invalid_decimal_fraction;
             more_ = false;
             return;
         }
-        else if (str.size() > 0)
+        if (str.size() > 0)
         {
             if (str[0] == '-')
             {
                 result.push_back('-');
-                jsoncons::prettify_string(str.data()+1, str.size()-1, (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data()+1, static_cast<int>(str.size())-1, (int)exponent, -4, 17, result);
             }
             else
             {
-                jsoncons::prettify_string(str.data(), str.size(), (int)exponent, -4, 17, result);
+                jsoncons::prettify_string(str.data(), static_cast<int>(str.size()), (int)exponent, -4, 17, result);
             }
         }
         else
