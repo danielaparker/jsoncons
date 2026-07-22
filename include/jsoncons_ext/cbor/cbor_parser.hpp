@@ -68,11 +68,11 @@ class basic_cbor_parser : public ser_context
     using allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
     using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using size_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;                  
     using tag_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;                 
     using parse_state_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state>;                         
     using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
     using string_view_type = jsoncons::basic_string_view<char_type>;
-    using byte_string_type = std::vector<uint8_t,byte_allocator_type>;
 
     struct mapped_string
     {
@@ -80,7 +80,7 @@ class basic_cbor_parser : public ser_context
 
         jsoncons::cbor::detail::cbor_major_type type;
         string_type str;
-        byte_string_type bytes;
+        std::vector<uint8_t,byte_allocator_type> bytes;
 
         mapped_string(const string_type& str, const allocator_type& alloc = allocator_type())
             : type(jsoncons::cbor::detail::cbor_major_type::text_string), 
@@ -98,7 +98,7 @@ class basic_cbor_parser : public ser_context
         {
         }
 
-        mapped_string(const byte_string_type& bytes, 
+        mapped_string(const std::vector<uint8_t,byte_allocator_type>& bytes, 
             const allocator_type& alloc = allocator_type())
             : type(jsoncons::cbor::detail::cbor_major_type::byte_string), str(alloc), bytes(bytes,alloc)
         {
@@ -110,7 +110,7 @@ class basic_cbor_parser : public ser_context
         {
         }
 
-        mapped_string(byte_string_type&& bytes, 
+        mapped_string(std::vector<uint8_t,byte_allocator_type>&& bytes, 
             const allocator_type& alloc = allocator_type())
             : type(jsoncons::cbor::detail::cbor_major_type::byte_string), str(alloc), bytes(std::move(bytes),alloc)
         {
@@ -156,14 +156,14 @@ class basic_cbor_parser : public ser_context
     Source source_;
     int max_nesting_depth_;
     string_type text_buffer_;
-    byte_string_type bytes_buffer_;
+    std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::shared_ptr<typed_array_iterator>> typed_array_stack_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
     mdarray_order order_{};
     typed_array_tags array_tag_{};
     semantic_tag typed_array_tag_{};
-    std::vector<std::size_t> extents_;
+    std::vector<std::size_t,size_type_allocator_type> extents_;
     std::size_t mdarray_size_{0};
 
     struct read_byte_string_from_buffer
@@ -222,7 +222,8 @@ public:
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
-         stringref_map_stack_(alloc)
+         stringref_map_stack_(alloc),
+         extents_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -1267,7 +1268,7 @@ private:
         return len;
     }
 
-    void read_byte_string(byte_string_type& v, std::error_code& ec)
+    void read_byte_string(std::vector<uint8_t,byte_allocator_type>& v, std::error_code& ec)
     {
         v.clear();
         auto c = source_.peek();
@@ -2085,7 +2086,7 @@ private:
                 case 0x40:
                 {
                     array_tag_ = typed_array_tags::uint8;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2121,7 +2122,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint8;
                     typed_array_tag_ = semantic_tag::clamped;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2157,7 +2158,7 @@ private:
                 case 0x45:
                 {
                     array_tag_ = typed_array_tags::uint16;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2202,7 +2203,7 @@ private:
                 case 0x46:
                 {
                     array_tag_ = typed_array_tags::uint32;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2247,7 +2248,7 @@ private:
                 case 0x47:
                 {
                     array_tag_ = typed_array_tags::uint64;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2291,7 +2292,7 @@ private:
                 case 0x48:
                 {
                     array_tag_ = typed_array_tags::int8;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2327,7 +2328,7 @@ private:
                 case 0x4d:
                 {
                     array_tag_ = typed_array_tags::int16;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2372,7 +2373,7 @@ private:
                 case 0x4e:
                 {
                     array_tag_ = typed_array_tags::int32;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2417,7 +2418,7 @@ private:
                 case 0x4f:
                 {
                     array_tag_ = typed_array_tags::int64;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2462,7 +2463,7 @@ private:
                 case 0x54:
                 {
                     array_tag_ = typed_array_tags::half_float;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2507,7 +2508,7 @@ private:
                 case 0x55:
                 {
                     array_tag_ = typed_array_tags::float32;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
@@ -2552,7 +2553,7 @@ private:
                 case 0x56:
                 {
                     array_tag_ = typed_array_tags::float64;
-                    byte_string_type array_buffer(alloc_);
+                    std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
                     read(array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {

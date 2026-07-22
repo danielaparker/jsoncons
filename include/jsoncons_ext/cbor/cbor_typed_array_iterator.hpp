@@ -192,7 +192,8 @@ class mdarray_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(std::vector<uint8_t,byte_allocator_type>&& data, typed_array_tags array_tag, const std::vector<std::size_t>& extents,
+    mdarray_iterator(std::vector<uint8_t,byte_allocator_type>&& data, typed_array_tags array_tag, 
+        const std::vector<std::size_t, size_type_allocator_type>& extents,
         mdarray_order order, 
         const Allocator& alloc)
         : data_(std::move(data), alloc), 
@@ -330,7 +331,7 @@ class cbor_mdarray_row_major_iterator : public typed_array_iterator
     basic_cbor_parser<Source,Allocator>* parser_;
     bool cursor_mode_;
 public:
-    cbor_mdarray_row_major_iterator(const std::vector<std::size_t>& extents,
+    cbor_mdarray_row_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
         const Allocator& alloc)
         : extents_(extents, alloc), dimensions_(extents.size(), mdarray_dimension{}, alloc),
@@ -471,7 +472,7 @@ class cbor_mdarray_column_major_iterator : public typed_array_iterator
     basic_cbor_parser<Source,Allocator>* parser_;
     bool cursor_mode_;
 public:
-    cbor_mdarray_column_major_iterator(const std::vector<std::size_t>& extents,
+    cbor_mdarray_column_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
         const Allocator& alloc)
         : extents_(extents,alloc), dimensions_(extents.size(), mdarray_dimension{},alloc),
