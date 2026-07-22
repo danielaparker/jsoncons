@@ -32,7 +32,8 @@ enum class cbor_errc
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,
-    bad_extents
+    bad_extents,
+    trailing_data
 };
 
 class cbor_error_category_impl
@@ -75,6 +76,8 @@ public:
                 return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
                 return "Product of extents does not match number of elements.";
+            case cbor_errc::trailing_data:
+                return "Trailing bytes after the end of a CBOR item";
             default:
                 return "Unknown CBOR parser error";
         }
