@@ -87,9 +87,9 @@ class oned_typed_array_iterator : public typed_array_iterator
 {
     using allocator_type = Allocator;
     using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
-    using byte_string_type = std::vector<uint8_t,byte_allocator_type>;
+    using size_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;                  
 
-    byte_string_type data_;
+    std::vector<uint8_t,byte_allocator_type> data_;
     jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
     std::size_t extent_;
@@ -99,15 +99,16 @@ class oned_typed_array_iterator : public typed_array_iterator
     bool done_{false};
     std::size_t index_{0};
 public:
-    oned_typed_array_iterator(byte_string_type&& data, 
+    oned_typed_array_iterator(std::vector<uint8_t,byte_allocator_type>&& data, 
         typed_array_tags array_tag,
-        semantic_tag tag = semantic_tag{}, Func func = Func())
-        : data_(std::move(data)), 
+        semantic_tag tag, 
+        const Allocator& alloc)
+        : data_(std::move(data), alloc), 
           span_(typed_array_cast<ValueType>(data_)), 
           array_tag_(array_tag), 
           extent_(span_.size()), 
           tag_(tag), 
-          func_(func)
+          func_(Func{})
     {
     }
 
@@ -175,26 +176,30 @@ class mdarray_iterator : public typed_array_iterator
 {
     using allocator_type = Allocator;
     using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
-    using byte_string_type = std::vector<uint8_t,byte_allocator_type>;
+    using size_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;                  
+    using dimension_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mdarray_dimension>;                  
 
-    byte_string_type data_;
+    std::vector<uint8_t,byte_allocator_type> data_;
     jsoncons::span<const ValueType> span_;
     typed_array_tags array_tag_;
-    std::vector<std::size_t> extents_;
+    std::vector<std::size_t,size_type_allocator_type> extents_;
     mdarray_order order_;
     Func func_;
-    std::vector<mdarray_dimension> dimensions_;
+    std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
     bool done_{false};
     std::size_t count_{0};
 public:
-    mdarray_iterator(byte_string_type&& data, typed_array_tags array_tag, const std::vector<std::size_t>& extents,
-        mdarray_order order = mdarray_order::row_major, Func func = Func())
-        : data_(std::move(data)), 
+    mdarray_iterator(std::vector<uint8_t,byte_allocator_type>&& data, typed_array_tags array_tag, 
+        const std::vector<std::size_t, size_type_allocator_type>& extents,
+        mdarray_order order, 
+        const Allocator& alloc)
+        : data_(std::move(data), alloc), 
           span_(typed_array_cast<ValueType>(data_)), 
-          array_tag_(array_tag), extents_(extents), order_(order), func_(func), dimensions_(extents.size(), mdarray_dimension{})
+        array_tag_(array_tag), extents_(extents,alloc), order_(order), func_(Func{}), 
+        dimensions_(extents.size(), mdarray_dimension{}, alloc)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         if (order == mdarray_order::column_major)
@@ -312,10 +317,12 @@ public:
 template <typename Source, typename Allocator>
 class cbor_mdarray_row_major_iterator : public typed_array_iterator
 {
-private:
+    using allocator_type = Allocator;
+    using size_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;
+    using dimension_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mdarray_dimension>;                  
 
-    std::vector<std::size_t> extents_;
-    std::vector<mdarray_dimension> dimensions_;
+    std::vector<std::size_t,size_type_allocator_type> extents_;
+    std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -324,9 +331,10 @@ private:
     basic_cbor_parser<Source,Allocator>* parser_;
     bool cursor_mode_;
 public:
-    cbor_mdarray_row_major_iterator(const std::vector<std::size_t>& extents,
-        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : extents_(extents), dimensions_(extents.size(), mdarray_dimension{}),
+    cbor_mdarray_row_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
+        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
+        const Allocator& alloc)
+        : extents_(extents, alloc), dimensions_(extents.size(), mdarray_dimension{}, alloc),
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -448,12 +456,14 @@ public:
 };
 
 template <typename Source, typename Allocator>
-class cbor_mdarray_column_major_iterator  : public typed_array_iterator
+class cbor_mdarray_column_major_iterator : public typed_array_iterator
 {
-private:
+    using allocator_type = Allocator;
+    using size_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;
+    using dimension_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mdarray_dimension>;                  
 
-    std::vector<std::size_t> extents_;
-    std::vector<mdarray_dimension> dimensions_;
+    std::vector<std::size_t,size_type_allocator_type> extents_;
+    std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -462,9 +472,10 @@ private:
     basic_cbor_parser<Source,Allocator>* parser_;
     bool cursor_mode_;
 public:
-    cbor_mdarray_column_major_iterator(const std::vector<std::size_t>& extents,
-        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode)
-        : extents_(extents), dimensions_(extents.size(), mdarray_dimension{}),
+    cbor_mdarray_column_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
+        basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
+        const Allocator& alloc)
+        : extents_(extents,alloc), dimensions_(extents.size(), mdarray_dimension{},alloc),
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
