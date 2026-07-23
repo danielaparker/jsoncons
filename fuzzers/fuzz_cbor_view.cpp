@@ -149,6 +149,72 @@ namespace {
         (void)map_keys_sorted(scanned, length_first_compare());
     }
 
+    void exercise_lowlevel(byte_span input)
+    {
+        const uint8_t* const end = input.data() + input.size();
+
+        // read_head walks heads, always advancing; ok <=> !ec.
+        const uint8_t* p = input.data();
+        for (int steps = 0; steps < 64 && p < end; ++steps)
+        {
+            const uint8_t* before = p;
+            item_head head;
+            std::error_code ec;
+            const bool ok = read_head(p, end, head, ec);
+            require(ok != static_cast<bool>(ec));
+            require(p >= before && p <= end);
+            if (!ok)
+            {
+                break;
+            }
+            require(p > before);
+        }
+
+        // skip_item agrees with scan_prefix on outcome and consumed length.
+        const uint8_t* sp = input.data();
+        std::error_code ec;
+        const bool ok = skip_item(sp, end, ec);
+        require(ok != static_cast<bool>(ec));
+        scan_context context;
+        auto scanned = scan_prefix(input, context);
+        require(ok == scanned.has_value());
+        if (ok)
+        {
+            require(sp == input.data() + scanned.value().first.encoded_bytes().size());
+        }
+    }
+
+    void exercise_span_orders(byte_span a, byte_span b)
+    {
+        auto ab = compare(a, b);
+        auto ba = compare(b, a);
+        if (ab.has_value() && ba.has_value())
+        {
+            require(sign(ab.value()) == -sign(ba.value()));
+        }
+
+        scan_context ca;
+        auto sa = scan_prefix(a, ca);
+        scan_context cb;
+        auto sb = scan_prefix(b, cb);
+        if (sa.has_value() && sb.has_value())
+        {
+            require(ab.has_value());
+            require(sign(ab.value()) == sign(bytewise_compare()(sa.value().first, sb.value().first)));
+        }
+        else
+        {
+            require(!ab.has_value());
+        }
+
+        auto sorted = map_keys_sorted(a);
+        require(sorted.has_value() == sa.has_value());
+        if (sorted.has_value())
+        {
+            require(sorted.value() == map_keys_sorted(sa.value().first));
+        }
+    }
+
     void exercise_input(byte_span input, scan_context& context)
     {
         auto scanned = scan_prefix(input, context);
@@ -205,6 +271,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 
     const int fuzz_depth = size <= 2 ? default_max_nesting_depth : static_cast<int>(base[2] & 0x0f);
     const int depths[] = {0, 1, fuzz_depth, default_max_nesting_depth};
+
+    exercise_lowlevel(input);
+    exercise_span_orders(byte_span(base, mid), byte_span(base + mid, size - mid));
+    exercise_span_orders(input, byte_span(base + p0, size - p0));
 
     for (int depth : depths)
     {

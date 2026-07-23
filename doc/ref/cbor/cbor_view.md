@@ -8,11 +8,14 @@
 
 The `cbor::view` namespace reads the *encoded* structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
-without copying it or building a data structure. It is a deliberately
-narrow, wire-level facility: scanning validates that bytes are
-well-formed CBOR once, and everything afterwards operates on checked
-`item` views and cannot fail structurally. Semantic interpretation —
-what tag 2 bytes or a tag 25 string reference *mean* — belongs to
+without copying it or building a data structure. Its spine is four stages:
+
+> owned bytes -> structural validation -> borrowed checked items -> application semantics
+
+A scan validates that bytes are *structurally* well-formed CBOR once
+(framing only — not validity such as UTF-8); everything afterwards
+operates on checked `item` views and cannot fail structurally. The last
+stage — what tag 2 bytes or a tag 25 string reference *mean* — belongs to
 [decode_cbor](decode_cbor.md) and [basic_cbor_cursor](basic_cbor_cursor.md),
 not here: tags are exposed, never interpreted.
 
@@ -142,6 +145,15 @@ struct length_first_less;
 
 template <typename Compare = bytewise_compare>
 bool map_keys_sorted(const item& map_item, Compare compare = Compare());
+
+// Span overloads for raw-span consumers; validate input, then order.
+template <typename Order = bytewise_compare>
+expected<int, scan_error> compare(span<const uint8_t> a, span<const uint8_t> b,
+    Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
+
+template <typename Order = bytewise_compare>
+expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
+    Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
 ```
 
 The order function objects compare encoded bytes and accept either two
@@ -149,8 +161,27 @@ items or two raw `span<const uint8_t>`. The `*_compare` forms return
 negative, zero, or positive; the `*_less` forms are predicates for
 `std::sort` and ordered containers. `map_keys_sorted` is true if
 `map_item` is a map whose keys are strictly ascending in the given
-order — the deterministic-encoding key condition — and does not
-allocate.
+order — the deterministic-encoding key condition. The span overloads
+validate before ordering and, on malformed input, return an error carrying
+the code and byte offset; trailing bytes after the first item are tolerated.
+
+#### Low-level tier
+
+```cpp
+enum class major_type;   // CBOR major types 0-7
+
+struct item_head { major_type major_type; uint8_t additional_info; uint64_t value; bool indefinite(); };
+
+bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec);
+bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
+    int max_nesting_depth = default_max_nesting_depth);
+```
+
+The wire-level head decoding the checked item layer is built on, for
+consumers that need sub-item head access. Prefer the checked item layer
+unless you are walking objects yourself with intention. `read_head`
+advances `p` past one head only (tags are returned as their own heads) and
+validates just that head; `skip_item` advances past one complete item.
 
 ### Examples
 
