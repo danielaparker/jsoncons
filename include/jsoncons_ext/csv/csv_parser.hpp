@@ -584,6 +584,12 @@ private:
     bool trim_trailing_;
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
+    bool enable_str_to_inf_;   
+    bool enable_str_to_neginf_;   
+    bool enable_str_to_nan_;   
+    std::basic_string<char_type> inf_to_str_;
+    std::basic_string<char_type> neginf_to_str_;
+    std::basic_string<char_type> nan_to_str_;
     std::size_t min_column_names_{0};
     std::size_t column_index_{0};
     int level_{0};
@@ -606,7 +612,6 @@ private:
     std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
     string_type buffer_;
-    std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
 public:
     basic_csv_parser()
@@ -649,6 +654,12 @@ public:
          trim_trailing_(options.trim_trailing()),
          trim_trailing_inside_quotes_(options.trim_trailing_inside_quotes()),
          unquoted_empty_value_is_null_(options.unquoted_empty_value_is_null()),
+         enable_str_to_inf_(options.enable_str_to_inf()),
+         enable_str_to_neginf_(options.enable_str_to_neginf()),
+         enable_str_to_nan_(options.enable_str_to_nan()),
+         inf_to_str_(options.inf_to_str()),
+         neginf_to_str_(options.neginf_to_str()),
+         nan_to_str_(options.nan_to_str()),
          m_columns_filter_(alloc),
          stack_(alloc),
          column_names_(alloc),
@@ -657,19 +668,6 @@ public:
          state_stack_(alloc),
          buffer_(alloc)
     {
-        if (options.enable_str_to_nan())
-        {
-            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
-        }
-        if (options.enable_str_to_inf())
-        {
-            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
-        }
-        if (options.enable_str_to_neginf())
-        {
-            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
-        }
-
         jsoncons::csv::detail::parse_column_types(options.column_types(), column_types_);
         jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
         jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
@@ -710,6 +708,12 @@ public:
          trim_trailing_(options.trim_trailing()),
          trim_trailing_inside_quotes_(options.trim_trailing_inside_quotes()),
          unquoted_empty_value_is_null_(options.unquoted_empty_value_is_null()),
+         enable_str_to_inf_(options.enable_str_to_inf()),
+         enable_str_to_neginf_(options.enable_str_to_neginf()),
+         enable_str_to_nan_(options.enable_str_to_nan()),
+         inf_to_str_(options.inf_to_str()),
+         neginf_to_str_(options.neginf_to_str()),
+         nan_to_str_(options.nan_to_str()),
          m_columns_filter_(alloc),
          stack_(alloc),
          column_names_(alloc),
@@ -718,19 +722,6 @@ public:
          state_stack_(alloc),
          buffer_(alloc)
     {
-        if (options.enable_str_to_nan())
-        {
-            string_double_map_.emplace_back(options.nan_to_str(),std::nan(""));
-        }
-        if (options.enable_str_to_inf())
-        {
-            string_double_map_.emplace_back(options.inf_to_str(),std::numeric_limits<double>::infinity());
-        }
-        if (options.enable_str_to_neginf())
-        {
-            string_double_map_.emplace_back(options.neginf_to_str(),-std::numeric_limits<double>::infinity());
-        }
-
         jsoncons::csv::detail::parse_column_types(options.column_types(), column_types_);
         jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
         jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
@@ -1882,10 +1873,19 @@ private:
     void end_value(basic_json_visitor<CharT>& visitor, 
         bool infer_types, std::error_code&  ec)
     {
-        auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ buffer_ });
-        if (it != string_double_map_.end())
+        if (enable_str_to_inf_ && buffer_ == inf_to_str_)
         {
-            visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+            visitor.double_value(std::numeric_limits<double>::infinity(), semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
+        }
+        else if (enable_str_to_neginf_ && buffer_ == neginf_to_str_)
+        {
+            visitor.double_value(-std::numeric_limits<double>::infinity(), semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
+        }
+        else if (enable_str_to_nan_ && buffer_ == nan_to_str_)
+        {
+            visitor.double_value(std::numeric_limits<double>::quiet_NaN(), semantic_tag::none, *this, ec);
             more_ = !cursor_mode_;
         }
         else if (column_index_ < column_types_.size() + offset_)
