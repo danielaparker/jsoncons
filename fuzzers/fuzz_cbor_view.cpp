@@ -151,36 +151,36 @@ namespace {
 
     void exercise_lowlevel(byte_span input)
     {
-        const uint8_t* const end = input.data() + input.size();
-
-        // read_head walks heads, always advancing; ok <=> !ec.
-        const uint8_t* p = input.data();
-        for (int steps = 0; steps < 64 && p < end; ++steps)
+        // read_head walks heads by offset, always advancing when bytes are
+        // consumed; success and error are mutually exclusive.
+        wire_cursor heads(input);
+        for (int steps = 0; steps < 64 && !heads.remaining().empty(); ++steps)
         {
-            const uint8_t* before = p;
-            item_head head;
-            std::error_code ec;
-            const bool ok = read_head(p, end, head, ec);
-            require(ok != static_cast<bool>(ec));
-            require(p >= before && p <= end);
-            if (!ok)
+            const std::size_t before = heads.position();
+            auto result = heads.read_head();
+            require(heads.position() >= before && heads.position() <= input.size());
+            if (!result.has_value())
             {
+                require(result.error().offset == heads.position());
                 break;
             }
-            require(p > before);
+            require(heads.position() > before);
         }
 
-        // skip_item agrees with scan_prefix on outcome and consumed length.
-        const uint8_t* sp = input.data();
-        std::error_code ec;
-        const bool ok = skip_item(sp, end, ec);
-        require(ok != static_cast<bool>(ec));
+        // read_item agrees with scan_prefix on outcome and consumed length.
+        wire_cursor items(input);
         scan_context context;
+        auto read = items.read_item(context);
         auto scanned = scan_prefix(input, context);
-        require(ok == scanned.has_value());
-        if (ok)
+        require(read.has_value() == scanned.has_value());
+        if (read.has_value())
         {
-            require(sp == input.data() + scanned.value().first.encoded_bytes().size());
+            require(items.position() == scanned.value().first.encoded_bytes().size());
+            require(read.value().encoded_bytes().data() == input.data());
+        }
+        else
+        {
+            require(items.position() == read.error().offset);
         }
     }
 

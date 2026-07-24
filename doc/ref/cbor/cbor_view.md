@@ -172,17 +172,28 @@ enum class major_type;   // CBOR major types 0-7
 
 struct item_head { major_type major_type; uint8_t additional_info; uint64_t value; bool indefinite(); };
 
-bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec);
-bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
-    int max_nesting_depth = default_max_nesting_depth);
+class wire_cursor
+{
+public:
+    wire_cursor() noexcept;
+    explicit wire_cursor(span<const uint8_t> input) noexcept;
+    void reset(span<const uint8_t> input) noexcept;
+
+    std::size_t position() const noexcept;
+    span<const uint8_t> remaining() const noexcept;
+    expected<item_head, scan_error> read_head() noexcept;
+    expected<item, scan_error> read_item(scan_context& context);
+    expected<item, scan_error> read_item(
+        int max_nesting_depth = default_max_nesting_depth);
+};
 ```
 
-The wire-level head decoding the checked item layer is built on, for
-consumers that need sub-item head access. Prefer the checked item layer
-unless you are walking objects yourself with intention. `read_head`
-advances `p` past one head only (tags are returned as their own heads) and
-validates just that head; `skip_item` advances past one complete item.
-
+`wire_cursor` is the offset-based low-level tier for consumers that need
+sub-item head access. It borrows one input span and exposes its position and
+remaining bytes without a mutable pointer/end pair. `read_head` advances past
+one head only (tags are returned as their own heads); `read_item` validates and
+returns one complete checked item. Errors report offsets from the beginning of
+the cursor's input.
 ### Examples
 
 #### Reading a message without copying it

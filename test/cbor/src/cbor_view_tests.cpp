@@ -684,73 +684,104 @@ TEST_CASE("cbor view validate_text")
     }
 }
 
-TEST_CASE("cbor view low-level tier")
+TEST_CASE("cbor view wire cursor")
 {
     SECTION("read_head decodes one head and advances past it only")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x02};   // [1, 2]
-        const uint8_t* p = data.data();
-        const uint8_t* end = p + data.size();
-        cbor::view::item_head head;
-        std::error_code ec;
-        REQUIRE(cbor::view::read_head(p, end, head, ec));
-        CHECK_FALSE(ec);
-        CHECK(head.major_type == cbor::view::major_type::array);
-        CHECK(head.value == 2);
-        CHECK(p == data.data() + 1);   // past the head, not the elements
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        CHECK(cursor.position() == 0);
+        CHECK(cursor.remaining().size() == data.size());
+
+        auto result = cursor.read_head();
+        REQUIRE(result.has_value());
+        CHECK(result.value().major_type == cbor::view::major_type::array);
+        CHECK(result.value().value == 2);
+        CHECK(cursor.position() == 1);   // past the head, not the elements
+        CHECK(cursor.remaining().data() == data.data() + 1);
     }
 
     SECTION("read_head surfaces tags as their own heads")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1, 10
-        const uint8_t* p = data.data();
-        const uint8_t* end = p + data.size();
-        cbor::view::item_head head;
-        std::error_code ec;
-        REQUIRE(cbor::view::read_head(p, end, head, ec));
-        CHECK(head.major_type == cbor::view::major_type::semantic_tag);
-        CHECK(head.value == 1);
-        REQUIRE(cbor::view::read_head(p, end, head, ec));
-        CHECK(head.major_type == cbor::view::major_type::unsigned_integer);
-        CHECK(head.value == 10);
-        CHECK(p == end);
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+
+        auto tag = cursor.read_head();
+        REQUIRE(tag.has_value());
+        CHECK(tag.value().major_type == cbor::view::major_type::semantic_tag);
+        CHECK(tag.value().value == 1);
+
+        auto value = cursor.read_head();
+        REQUIRE(value.has_value());
+        CHECK(value.value().major_type == cbor::view::major_type::unsigned_integer);
+        CHECK(value.value().value == 10);
+        CHECK(cursor.remaining().empty());
     }
 
     SECTION("read_head reports malformed and truncated heads")
     {
-        std::vector<uint8_t> empty;
-        const uint8_t* p = empty.data();
-        cbor::view::item_head head;
-        std::error_code ec;
-        CHECK_FALSE(cbor::view::read_head(p, p, head, ec));
-        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+        cbor::view::wire_cursor empty;
+        auto no_head = empty.read_head();
+        REQUIRE_FALSE(no_head.has_value());
+        CHECK(no_head.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(no_head.error().offset == 0);
+        CHECK(empty.position() == 0);
 
         std::vector<uint8_t> truncated = {0x19,0x01};
-        p = truncated.data();
-        ec.clear();
-        CHECK_FALSE(cbor::view::read_head(p, p + truncated.size(), head, ec));
-        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(truncated)};
+        auto result = cursor.read_head();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(result.error().offset == 1);
+        CHECK(cursor.position() == 1);
     }
 
-    SECTION("skip_item advances past one complete item")
+    SECTION("read_item returns and advances past one complete item")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x02,0x63,'a','b','c'};   // [1,2] then "abc"
-        const uint8_t* p = data.data();
-        const uint8_t* end = p + data.size();
-        std::error_code ec;
-        REQUIRE(cbor::view::skip_item(p, end, ec));
-        CHECK(p == data.data() + 3);
-        REQUIRE(cbor::view::skip_item(p, end, ec));
-        CHECK(p == end);
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::view::scan_context context;
+
+        auto array = cursor.read_item(context);
+        REQUIRE(array.has_value());
+        CHECK(array.value().kind() == cbor::view::item_kind::array);
+        CHECK(array.value().encoded_bytes().size() == 3);
+        CHECK(cursor.position() == 3);
+
+        auto text = cursor.read_item(context);
+        REQUIRE(text.has_value());
+        CHECK(text.value().kind() == cbor::view::item_kind::text_string);
+        CHECK(cursor.position() == data.size());
+        CHECK(cursor.remaining().empty());
     }
 
-    SECTION("skip_item honours the depth bound")
+    SECTION("read_item honours the depth bound and reports an absolute offset")
     {
-        std::vector<uint8_t> data = {0x81,0x81,0x01};   // [[1]]
-        const uint8_t* p = data.data();
-        std::error_code ec;
-        CHECK_FALSE(cbor::view::skip_item(p, p + data.size(), ec, 1));
-        CHECK(ec == cbor::cbor_errc::max_nesting_depth_exceeded);
+        std::vector<uint8_t> data = {0x01,0x81,0x81,0x01};   // 1 then [[1]]
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        REQUIRE(cursor.read_item().has_value());
+
+        cbor::view::scan_context context(1);
+        auto result = cursor.read_item(context);
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
+        CHECK(result.error().offset == 3);
+        CHECK(cursor.position() == 3);
+    }
+
+    SECTION("reset reuses a cursor for a new span")
+    {
+        std::vector<uint8_t> first = {0x01};
+        std::vector<uint8_t> second = {0x02};
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(first)};
+        REQUIRE(cursor.read_item().has_value());
+        cursor.reset(jsoncons::span<const uint8_t>(second));
+        CHECK(cursor.position() == 0);
+        auto result = cursor.read_item();
+        REQUIRE(result.has_value());
+        uint64_t value = 0;
+        CHECK(result.value().uint64_value(value));
+        CHECK(value == 2);
     }
 }
 

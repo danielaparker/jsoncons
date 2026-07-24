@@ -286,6 +286,7 @@ namespace view {
             uint64_t local_[local_capacity];
             std::vector<uint64_t> spill_;
             std::size_t size_{0};
+            std::size_t peak_size_{0};
         public:
             bool empty() const noexcept
             {
@@ -297,10 +298,16 @@ namespace view {
                 return size_;
             }
 
+            std::size_t peak_size() const noexcept
+            {
+                return peak_size_;
+            }
+
             void clear() noexcept
             {
                 spill_.clear();
                 size_ = 0;
+                peak_size_ = 0;
             }
 
             void push(uint64_t count)
@@ -314,6 +321,10 @@ namespace view {
                     spill_.push_back(count);
                 }
                 ++size_;
+                if (size_ > peak_size_)
+                {
+                    peak_size_ = size_;
+                }
             }
 
             uint64_t pop() noexcept
@@ -713,27 +724,80 @@ namespace view {
         }
     };
 
-    // Reads one head, advancing p past the head only; tags read as their own heads.
-    inline bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
-    {
-        detail_view::item_head h;
-        if (!detail_view::read_head(p, end, h, ec))
-        {
-            return false;
-        }
-        head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
-        head.additional_info = h.additional_info;
-        head.value = h.value;
-        return true;
-    }
+    class scan_context;
 
-    // Advances p past one complete item, bounded by max_nesting_depth.
-    inline bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
-        int max_nesting_depth = default_max_nesting_depth)
+    // Offset-based access to unchecked CBOR wire data. The cursor borrows its
+    // input and never exposes a mutable pointer/end pair.
+    class wire_cursor
     {
-        detail_view::pending_stack open;
-        return detail_view::skip_item(p, end, max_nesting_depth, open, ec);
-    }
+    public:
+        wire_cursor() noexcept
+            : input_(), offset_(0)
+        {
+        }
+
+        explicit wire_cursor(span<const uint8_t> input) noexcept
+            : input_(input), offset_(0)
+        {
+        }
+
+        void reset(span<const uint8_t> input) noexcept
+        {
+            input_ = input;
+            offset_ = 0;
+        }
+
+        std::size_t position() const noexcept
+        {
+            return offset_;
+        }
+
+        span<const uint8_t> remaining() const noexcept
+        {
+            const uint8_t* data = offset_ == 0 ? input_.data() : input_.data() + offset_;
+            return span<const uint8_t>(data, input_.size() - offset_);
+        }
+
+        // Reads one head and advances past that head only. Tags are returned
+        // as their own heads. On failure, position() is the reported offset.
+        expected<item_head, scan_error> read_head() noexcept
+        {
+            if (offset_ >= input_.size())
+            {
+                return expected<item_head, scan_error>(unexpect,
+                    scan_error{cbor_errc::unexpected_eof, offset_});
+            }
+
+            const uint8_t* p = input_.data() + offset_;
+            const uint8_t* end = input_.data() + input_.size();
+            detail_view::item_head h;
+            std::error_code ec;
+            const bool ok = detail_view::read_head(p, end, h, ec);
+            offset_ = static_cast<std::size_t>(p - input_.data());
+            if (!ok)
+            {
+                return expected<item_head, scan_error>(unexpect,
+                    scan_error{static_cast<cbor_errc>(ec.value()), offset_});
+            }
+
+            item_head head;
+            head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
+            head.additional_info = h.additional_info;
+            head.value = h.value;
+            return head;
+        }
+
+        // Reads and validates one complete item. This is the fallible boundary
+        // at which the supplied scanning workspace may grow.
+        expected<item, scan_error> read_item(scan_context& context);
+
+        expected<item, scan_error> read_item(
+            int max_nesting_depth = default_max_nesting_depth);
+
+    private:
+        span<const uint8_t> input_;
+        std::size_t offset_;
+    };
 
     // Iterates the values of an item's leading semantic tags.
     class item::tag_iterator
@@ -1304,6 +1368,11 @@ namespace view {
             {
                 return context.workspace_;
             }
+
+            static std::size_t peak_depth(scan_context& context) noexcept
+            {
+                return context.workspace_.peak_size();
+            }
         };
 
         // All error codes assigned by the walker are cbor_errc values.
@@ -1329,6 +1398,8 @@ namespace view {
         const uint8_t* end = p + input.size();
         std::error_code ec;
 
+        detail_view::pending_stack& workspace = detail_view::scan_access::workspace(context);
+        workspace.clear();
         // Parse the head once and keep it, so the item is built below without
         // re-reading its own head.
         detail_view::item_head head;
@@ -1342,7 +1413,7 @@ namespace view {
         const bool ok = (head.major_type == cbor::detail::cbor_major_type::array ||
                          head.major_type == cbor::detail::cbor_major_type::map)
             ? detail_view::skip_container(p, end, head, context.max_nesting_depth(),
-                  detail_view::scan_access::workspace(context), ec)
+                  workspace, ec)
             : detail_view::skip_scalar_or_string(head, p, end, ec);
         if (!ok)
         {
@@ -1382,6 +1453,30 @@ namespace view {
     {
         scan_context context;
         return parse_exact(input, context);
+    }
+
+    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
+    {
+        const std::size_t start = offset_;
+        auto scanned = scan_prefix(remaining(), context);
+        if (!scanned)
+        {
+            scan_error error = scanned.error();
+            const std::size_t available = input_.size() - offset_;
+            const std::size_t consumed = (std::min)(error.offset, available);
+            offset_ += consumed;
+            error.offset += start;
+            return expected<item, scan_error>(unexpect, error);
+        }
+
+        offset_ += scanned.value().first.encoded_bytes().size();
+        return scanned.value().first;
+    }
+
+    inline expected<item, scan_error> wire_cursor::read_item(int max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        return read_item(context);
     }
 
     // Guard against scanning a temporary container: the resulting views
