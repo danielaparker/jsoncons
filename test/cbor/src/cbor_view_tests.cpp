@@ -790,6 +790,205 @@ TEST_CASE("cbor view navigator construction and root access")
     }
 }
 
+TEST_CASE("cbor view navigator movement")
+{
+    SECTION("walks nested definite arrays without prefinishing parents")
+    {
+        std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04}; // [1,[2,3],4]
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+
+        REQUIRE(navigator.enter());
+        CHECK(navigator.depth() == 1);
+        CHECK(navigator.role() == cbor::view::position_role::array_element);
+        CHECK(navigator.argument() == 1);
+
+        REQUIRE(navigator.next());
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK_FALSE(navigator.extent_known());
+        REQUIRE(navigator.enter());
+        CHECK(navigator.depth() == 2);
+        CHECK(navigator.argument() == 2);
+        REQUIRE(navigator.next());
+        CHECK(navigator.argument() == 3);
+        CHECK_FALSE(navigator.next());
+        CHECK_FALSE(navigator.next());
+        REQUIRE(navigator.leave());
+        CHECK(navigator.depth() == 1);
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK(navigator.extent_known());
+
+        REQUIRE(navigator.next());
+        CHECK(navigator.argument() == 4);
+        CHECK(navigator.extent_known());
+        CHECK_FALSE(navigator.next());
+        REQUIRE(navigator.leave());
+        CHECK(navigator.depth() == 0);
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK_FALSE(navigator.leave());
+    }
+
+    SECTION("next skips an unopened container once")
+    {
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        REQUIRE(navigator.enter());
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK_FALSE(navigator.extent_known());
+        REQUIRE(navigator.next());
+        CHECK(navigator.argument() == 3);
+        CHECK(navigator.extent_known());
+    }
+
+    SECTION("early leave skips only the unread remainder")
+    {
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        REQUIRE(navigator.enter());
+        REQUIRE(navigator.enter());
+        CHECK(navigator.argument() == 1);
+        REQUIRE(navigator.leave());
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK(navigator.extent_known());
+        REQUIRE(navigator.next());
+        CHECK(navigator.argument() == 3);
+    }
+
+    SECTION("map roles alternate for definite and indefinite maps")
+    {
+        const std::vector<std::vector<uint8_t>> maps = {
+            {0xa2,0x01,0x02,0x03,0x04},
+            {0xbf,0x01,0x02,0x03,0x04,0xff}
+        };
+        for (const auto& data : maps)
+        {
+            auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+            REQUIRE(result.has_value());
+            cbor::view::navigator navigator = std::move(result.value());
+            REQUIRE(navigator.enter());
+            CHECK(navigator.role() == cbor::view::position_role::map_key);
+            CHECK(navigator.argument() == 1);
+            REQUIRE(navigator.next());
+            CHECK(navigator.role() == cbor::view::position_role::map_value);
+            CHECK(navigator.argument() == 2);
+            REQUIRE(navigator.next());
+            CHECK(navigator.role() == cbor::view::position_role::map_key);
+            CHECK(navigator.argument() == 3);
+            REQUIRE(navigator.next());
+            CHECK(navigator.role() == cbor::view::position_role::map_value);
+            CHECK(navigator.argument() == 4);
+            CHECK_FALSE(navigator.next());
+            REQUIRE(navigator.leave());
+            CHECK(navigator.role() == cbor::view::position_role::root);
+        }
+    }
+
+    SECTION("empty and non-container enter leave position unchanged")
+    {
+        const std::vector<std::vector<uint8_t>> values = {
+            {0x01}, {0x80}, {0x9f,0xff}, {0xa0}, {0xbf,0xff}
+        };
+        for (const auto& data : values)
+        {
+            auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+            REQUIRE(result.has_value());
+            cbor::view::navigator navigator = std::move(result.value());
+            const cbor::view::item_kind kind = navigator.kind();
+            CHECK_FALSE(navigator.enter());
+            CHECK(navigator.kind() == kind);
+            CHECK(navigator.depth() == 0);
+        }
+    }
+
+    SECTION("finish_item caches an unknown extent and descent remains legal")
+    {
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        REQUIRE(navigator.enter());
+        CHECK_FALSE(navigator.extent_known());
+        cbor::view::item nested = navigator.finish_item();
+        CHECK(navigator.extent_known());
+        CHECK(nested.encoded_bytes().data() == data.data() + 1);
+        CHECK(nested.encoded_bytes().size() == 3);
+        REQUIRE(navigator.enter());
+        CHECK(navigator.argument() == 1);
+    }
+
+    SECTION("right fences make the final payload immediately finishable")
+    {
+        std::vector<uint8_t> data = {
+            0x87,0x01,0x02,0x03,0x04,0x05,0x06,
+            0x82,0x81,0x07,0x81,0x08
+        };
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        REQUIRE(navigator.enter());
+        for (int i = 0; i < 6; ++i)
+        {
+            REQUIRE(navigator.next());
+        }
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK(navigator.extent_known());
+        cbor::view::item payload = navigator.finish_item();
+        CHECK(payload.encoded_bytes().data() == data.data() + 7);
+        CHECK(payload.encoded_bytes().size() == 5);
+
+        REQUIRE(navigator.enter());
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK_FALSE(navigator.extent_known());
+        REQUIRE(navigator.enter());
+        CHECK(navigator.argument() == 7);
+        CHECK(navigator.extent_known());
+    }
+
+    SECTION("rewind restores the checked root")
+    {
+        std::vector<uint8_t> data = {0x81,0x81,0x01};
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        REQUIRE(navigator.enter());
+        REQUIRE(navigator.enter());
+        CHECK(navigator.depth() == 2);
+        navigator.rewind();
+        CHECK(navigator.depth() == 0);
+        CHECK(navigator.role() == cbor::view::position_role::root);
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        REQUIRE(navigator.enter());
+        CHECK(navigator.depth() == 1);
+    }
+
+    SECTION("deep movement uses the validation-sized workspace")
+    {
+        const std::size_t depth = 100;
+        std::vector<uint8_t> data(depth, 0x81);
+        data.push_back(0x01);
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::navigator navigator = std::move(result.value());
+        for (std::size_t i = 0; i < depth; ++i)
+        {
+            REQUIRE(navigator.enter());
+            CHECK(navigator.depth() == i + 1);
+        }
+        CHECK(navigator.argument() == 1);
+        for (std::size_t i = 0; i < depth; ++i)
+        {
+            REQUIRE(navigator.leave());
+        }
+        CHECK(navigator.depth() == 0);
+    }
+}
+
+
 
 TEST_CASE("cbor view wire cursor")
 {

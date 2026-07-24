@@ -1543,6 +1543,13 @@ namespace view {
     private:
         friend struct detail_view::navigator_access;
 
+        node_state read_node(std::size_t begin, position_role role,
+                             std::size_t right_fence = npos) const noexcept;
+        void initialize_frame(navigation_frame& frame, const node_state& container) noexcept;
+        bool take_child(navigation_frame& frame, std::size_t& offset,
+                        position_role& role, std::size_t& right_fence) noexcept;
+        void establish_end(node_state& node) noexcept;
+
         navigator(span<const uint8_t> root, std::size_t peak_depth)
             : input_(root), root_(), current_(), frames_(peak_depth), active_depth_(0)
         {
@@ -1837,6 +1844,310 @@ namespace view {
         prepare_checked(scanned.value().first.encoded_bytes(),
                         detail_view::scan_access::peak_depth(context));
         return expected<void, scan_error>();
+    }
+
+    inline navigator::node_state navigator::read_node(
+        std::size_t begin, position_role role, std::size_t right_fence) const noexcept
+    {
+        const uint8_t* const base = input_.data();
+        const uint8_t* p = base + begin;
+        const uint8_t* const input_end = base + input_.size();
+        detail_view::item_head head;
+        std::error_code ec;
+        std::size_t head_begin = begin;
+        bool ok;
+        do
+        {
+            head_begin = static_cast<std::size_t>(p - base);
+            ok = detail_view::read_head(p, input_end, head, ec);
+            assert(ok && !ec);
+        }
+        while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+        (void)ok;
+
+        node_state node;
+        node.begin = begin;
+        node.head_begin = head_begin;
+        node.content_begin = static_cast<std::size_t>(p - base);
+        node.head = head;
+        node.role = role;
+
+        switch (head.major_type)
+        {
+            case cbor::detail::cbor_major_type::unsigned_integer:
+            case cbor::detail::cbor_major_type::negative_integer:
+            case cbor::detail::cbor_major_type::simple:
+                node.end = node.content_begin;
+                break;
+            case cbor::detail::cbor_major_type::byte_string:
+            case cbor::detail::cbor_major_type::text_string:
+                if (!head.indefinite())
+                {
+                    node.end = node.content_begin + static_cast<std::size_t>(head.value);
+                }
+                else if (right_fence != npos)
+                {
+                    node.end = right_fence;
+                }
+                else if (input_[node.content_begin] == 0xff)
+                {
+                    node.end = node.content_begin + 1;
+                }
+                break;
+            case cbor::detail::cbor_major_type::array:
+            case cbor::detail::cbor_major_type::map:
+                if (right_fence != npos)
+                {
+                    node.end = right_fence;
+                }
+                else if (!head.indefinite() && head.value == 0)
+                {
+                    node.end = node.content_begin;
+                }
+                else if (head.indefinite() && input_[node.content_begin] == 0xff)
+                {
+                    node.end = node.content_begin + 1;
+                }
+                break;
+            default:
+                assert(false);
+                break;
+        }
+        return node;
+    }
+
+    inline void navigator::initialize_frame(
+        navigation_frame& frame, const node_state& container) noexcept
+    {
+        frame.container = container;
+        frame.next_offset = container.content_begin;
+        frame.content_fence = container.end;
+        frame.indefinite = container.head.indefinite();
+        frame.completed = false;
+        if (container.head.major_type == cbor::detail::cbor_major_type::array)
+        {
+            frame.phase = container_phase::array;
+            frame.remaining = frame.indefinite ? 0 : container.head.value;
+        }
+        else
+        {
+            assert(container.head.major_type == cbor::detail::cbor_major_type::map);
+            frame.phase = container_phase::map_key;
+            frame.remaining = frame.indefinite ? 0 : 2 * container.head.value;
+        }
+    }
+
+    inline bool navigator::take_child(
+        navigation_frame& frame, std::size_t& offset,
+        position_role& role, std::size_t& right_fence) noexcept
+    {
+        right_fence = npos;
+        if (frame.indefinite)
+        {
+            const bool at_item_boundary = frame.phase != container_phase::map_value;
+            if (at_item_boundary && input_[offset] == 0xff)
+            {
+                ++offset;
+                frame.container.end = offset;
+                frame.next_offset = offset;
+                frame.completed = true;
+                return false;
+            }
+        }
+        else
+        {
+            if (frame.remaining == 0)
+            {
+                if (frame.content_fence != npos)
+                {
+                    assert(offset == frame.content_fence);
+                    offset = frame.content_fence;
+                }
+                frame.container.end = offset;
+                frame.next_offset = offset;
+                frame.completed = true;
+                return false;
+            }
+            --frame.remaining;
+            if (frame.remaining == 0 && frame.content_fence != npos)
+            {
+                right_fence = frame.content_fence;
+            }
+        }
+
+        switch (frame.phase)
+        {
+            case container_phase::array:
+                role = position_role::array_element;
+                break;
+            case container_phase::map_key:
+                role = position_role::map_key;
+                frame.phase = container_phase::map_value;
+                break;
+            case container_phase::map_value:
+                role = position_role::map_value;
+                frame.phase = container_phase::map_key;
+                break;
+        }
+        frame.next_offset = offset;
+        return true;
+    }
+
+    inline void navigator::establish_end(node_state& node) noexcept
+    {
+        if (node.end != npos)
+        {
+            return;
+        }
+
+        const uint8_t* const base = input_.data();
+        const uint8_t* const input_end = base + input_.size();
+        if (node.head.major_type != cbor::detail::cbor_major_type::array &&
+            node.head.major_type != cbor::detail::cbor_major_type::map)
+        {
+            const uint8_t* p = base + node.content_begin;
+            std::error_code ec;
+            const bool ok = detail_view::skip_scalar_or_string(node.head, p, input_end, ec);
+            assert(ok && !ec);
+            (void)ok;
+            node.end = static_cast<std::size_t>(p - base);
+            return;
+        }
+
+        std::size_t scratch_depth = 0;
+        assert(active_depth_ < frames_.size());
+        initialize_frame(frames_[active_depth_], node);
+        ++scratch_depth;
+        std::size_t offset = node.content_begin;
+
+        for (;;)
+        {
+            navigation_frame& frame = frames_[active_depth_ + scratch_depth - 1];
+            position_role child_role = position_role::array_element;
+            std::size_t right_fence = npos;
+            if (!take_child(frame, offset, child_role, right_fence))
+            {
+                offset = frame.container.end;
+                --scratch_depth;
+                if (scratch_depth == 0)
+                {
+                    node.end = offset;
+                    return;
+                }
+                continue;
+            }
+
+            node_state child = read_node(offset, child_role, right_fence);
+            if (child.end != npos)
+            {
+                offset = child.end;
+                continue;
+            }
+            if (child.head.major_type == cbor::detail::cbor_major_type::array ||
+                child.head.major_type == cbor::detail::cbor_major_type::map)
+            {
+                assert(active_depth_ + scratch_depth < frames_.size());
+                initialize_frame(frames_[active_depth_ + scratch_depth], child);
+                ++scratch_depth;
+                offset = child.content_begin;
+                continue;
+            }
+
+            const uint8_t* p = base + child.content_begin;
+            std::error_code ec;
+            const bool ok = detail_view::skip_scalar_or_string(child.head, p, input_end, ec);
+            assert(ok && !ec);
+            (void)ok;
+            offset = static_cast<std::size_t>(p - base);
+        }
+    }
+
+    inline bool navigator::enter() noexcept
+    {
+        if (current_.head.major_type != cbor::detail::cbor_major_type::array &&
+            current_.head.major_type != cbor::detail::cbor_major_type::map)
+        {
+            return false;
+        }
+        if ((!current_.head.indefinite() && current_.head.value == 0) ||
+            (current_.head.indefinite() && input_[current_.content_begin] == 0xff))
+        {
+            return false;
+        }
+
+        assert(active_depth_ < frames_.size());
+        navigation_frame& frame = frames_[active_depth_];
+        initialize_frame(frame, current_);
+        std::size_t offset = current_.content_begin;
+        position_role child_role = position_role::array_element;
+        std::size_t right_fence = npos;
+        const bool has_child = take_child(frame, offset, child_role, right_fence);
+        assert(has_child);
+        (void)has_child;
+        current_ = read_node(offset, child_role, right_fence);
+        ++active_depth_;
+        return true;
+    }
+
+    inline bool navigator::next() noexcept
+    {
+        if (active_depth_ == 0)
+        {
+            return false;
+        }
+
+        navigation_frame& frame = frames_[active_depth_ - 1];
+        if (frame.completed)
+        {
+            return false;
+        }
+        establish_end(current_);
+        std::size_t offset = current_.end;
+        position_role child_role = position_role::array_element;
+        std::size_t right_fence = npos;
+        if (!take_child(frame, offset, child_role, right_fence))
+        {
+            return false;
+        }
+
+        current_ = read_node(offset, child_role, right_fence);
+        return true;
+    }
+
+    inline bool navigator::leave() noexcept
+    {
+        if (active_depth_ == 0)
+        {
+            return false;
+        }
+
+        navigation_frame& frame = frames_[active_depth_ - 1];
+        if (frame.container.end == npos)
+        {
+            establish_end(current_);
+            std::size_t offset = current_.end;
+            position_role child_role = position_role::array_element;
+            std::size_t right_fence = npos;
+            while (take_child(frame, offset, child_role, right_fence))
+            {
+                node_state unread = read_node(offset, child_role, right_fence);
+                establish_end(unread);
+                offset = unread.end;
+            }
+        }
+
+        current_ = frame.container;
+        --active_depth_;
+        return true;
+    }
+
+    inline item navigator::finish_item() noexcept
+    {
+        establish_end(current_);
+        return detail_view::item_access::make(
+            span<const uint8_t>(input_.data() + current_.begin,
+                                current_.end - current_.begin),
+            current_.head, input_.data() + current_.content_begin);
     }
 
     // Guard against scanning a temporary container: the resulting views
