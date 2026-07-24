@@ -788,6 +788,22 @@ namespace view {
         // at which the supplied scanning workspace may grow.
         expected<item, scan_error> read_item(scan_context& context);
 
+        // Validates and passes over one complete item, returning its encoded
+        // bytes unparsed. Costs and failure reporting match read_item.
+        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+
+        // Advances past `count` bytes of already-measured content, such as a
+        // definite string payload after its head. False, leaving the position
+        // unchanged, when fewer bytes remain.
+        bool skip(std::size_t count) noexcept
+        {
+            if (input_.size() - offset_ < count)
+            {
+                return false;
+            }
+            offset_ += count;
+            return true;
+        }
 
     private:
         span<const uint8_t> input_;
@@ -1402,6 +1418,24 @@ namespace view {
 
         offset_ += scanned.value().first.encoded_bytes().size();
         return scanned.value().first;
+    }
+
+    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context)
+    {
+        const uint8_t* const base = input_.data();
+        const uint8_t* p = base + offset_;
+        const uint8_t* const end = base + input_.size();
+        const std::size_t start = offset_;
+        std::error_code ec;
+        const bool ok = detail_view::skip_item(p, end, context.max_nesting_depth(),
+            detail_view::scan_access::workspace(context), ec);
+        offset_ = static_cast<std::size_t>(p - base);
+        if (!ok)
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect,
+                scan_error{detail_view::to_cbor_errc(ec), offset_});
+        }
+        return span<const uint8_t>(base + start, offset_ - start);
     }
 
 

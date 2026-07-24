@@ -940,6 +940,53 @@ TEST_CASE("cbor view wire cursor")
         CHECK(cursor.position() == 3);
     }
 
+    SECTION("skip_item passes over one item, returning its bytes unparsed")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x02,0x63,'a','b','c'};   // [1,2] then "abc"
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::view::scan_context context;
+
+        auto skipped = cursor.skip_item(context);
+        REQUIRE(skipped.has_value());
+        CHECK(skipped.value().data() == data.data());
+        CHECK(skipped.value().size() == 3);
+        CHECK(cursor.position() == 3);
+
+        auto text = cursor.read_item(context);
+        REQUIRE(text.has_value());
+        CHECK(text.value().kind() == cbor::view::item_kind::text_string);
+        CHECK(cursor.remaining().empty());
+    }
+
+    SECTION("skip_item honours the depth bound like read_item")
+    {
+        std::vector<uint8_t> data = {0x01,0x81,0x81,0x01};   // 1 then [[1]]
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::view::scan_context default_context;
+        REQUIRE(cursor.skip_item(default_context).has_value());
+
+        cbor::view::scan_context context(1);
+        auto result = cursor.skip_item(context);
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
+        CHECK(result.error().offset == 3);
+        CHECK(cursor.position() == 3);
+    }
+
+    SECTION("skip advances past measured content only when it is available")
+    {
+        std::vector<uint8_t> data = {0x63,'a','b','c'};
+        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        auto head = cursor.read_head();
+        REQUIRE(head.has_value());
+        REQUIRE(cursor.skip(static_cast<std::size_t>(head.value().value)));
+        CHECK(cursor.position() == data.size());
+        CHECK(cursor.remaining().empty());
+        CHECK(cursor.skip(0));
+        CHECK_FALSE(cursor.skip(1));
+        CHECK(cursor.position() == data.size());
+    }
+
 }
 
 TEST_CASE("cbor view span-based order entry points")

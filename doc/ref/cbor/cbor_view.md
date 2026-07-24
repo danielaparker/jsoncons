@@ -252,6 +252,8 @@ public:
     span<const uint8_t> remaining() const noexcept;
     expected<item_head, scan_error> read_head() noexcept;
     expected<item, scan_error> read_item(scan_context& context);
+    expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+    bool skip(std::size_t count) noexcept;
 };
 ```
 
@@ -259,8 +261,11 @@ public:
 sub-item head access. It borrows one input span and exposes its position and
 remaining bytes without a mutable pointer/end pair. `read_head` advances past
 one head only (tags are returned as their own heads); `read_item` validates and
-returns one complete checked item. Errors report offsets from the beginning of
-the cursor's input.
+returns one complete checked item; `skip_item` validates and passes over one
+complete item, returning its encoded bytes unparsed; `skip` advances past
+`count` bytes of already-measured content, such as a definite string payload
+after its head, refusing when fewer bytes remain. Errors report offsets from
+the beginning of the cursor's input.
 The former public `(const uint8_t*& p, const uint8_t* end)` overloads have
 been removed; raw pointer pairs remain implementation details only.
 ### Examples

@@ -158,6 +158,33 @@ namespace {
         {
             require(items.position() == read.error().offset);
         }
+
+        // skip_item agrees with read_item on outcome, consumed length, and
+        // failure; on success its span is the item's encoded bytes unparsed.
+        wire_cursor skips(input);
+        auto skipped = skips.skip_item(context);
+        require(skipped.has_value() == read.has_value());
+        require(skips.position() == items.position());
+        if (skipped.has_value())
+        {
+            require(skipped.value().data() == read.value().encoded_bytes().data());
+            require(skipped.value().size() == read.value().encoded_bytes().size());
+        }
+        else
+        {
+            require(skipped.error().code == read.error().code);
+            require(skipped.error().offset == read.error().offset);
+        }
+
+        // skip consumes exactly the requested content when it is available.
+        wire_cursor content(input);
+        const std::size_t half = input.size() / 2;
+        require(content.skip(half));
+        require(content.position() == half);
+        require(!content.skip(input.size() - half + 1));
+        require(content.position() == half);
+        require(content.skip(input.size() - half));
+        require(content.remaining().empty());
     }
 
     void exercise_span_orders(byte_span a, byte_span b)
