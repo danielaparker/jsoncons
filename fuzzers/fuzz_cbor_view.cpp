@@ -280,6 +280,53 @@ namespace {
         require(reset.value().size() == navigated.value().remainder.size());
     }
 
+    // Children agree with navigator movement over the same container.
+    void exercise_children(byte_span input, scan_context& context)
+    {
+        auto scanned = scan_prefix(input, context);
+        if (!scanned.has_value())
+        {
+            return;
+        }
+        const item root = scanned.value().first;
+
+        auto navigated = navigate_prefix(input);
+        require(navigated.has_value());
+        navigator nav = std::move(navigated.value().first);
+
+        auto it = root.children(context).begin();
+        if (!nav.enter())
+        {
+            require(root.children(context).empty());
+            require(it == item::child_iterator());
+            return;
+        }
+        require(!root.children(context).empty());
+
+        std::size_t count = 0;
+        for (;;)
+        {
+            require(it != item::child_iterator());
+            const item child = *it;
+            require(child.kind() == nav.kind());
+            require(child.argument() == nav.argument());
+            require(child.indefinite() == nav.indefinite());
+            const item finished = nav.finish_item();
+            require(finished.encoded_bytes().data() == child.encoded_bytes().data());
+            require(finished.encoded_bytes().size() == child.encoded_bytes().size());
+            ++it;
+            if (++count > 4096)
+            {
+                return;
+            }
+            if (!nav.next())
+            {
+                break;
+            }
+        }
+        require(it == item::child_iterator());
+    }
+
 
     void exercise_input(byte_span input, scan_context& context)
     {
@@ -347,6 +394,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
         scan_context context(depth);
         exercise_input(input, context);
         exercise_navigator(input, depth);
+        exercise_children(input, context);
         exercise_input(byte_span(base, mid), context);
         exercise_navigator(byte_span(base, mid), depth);
         exercise_input(byte_span(base + mid, size - mid), context);

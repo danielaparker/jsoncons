@@ -582,6 +582,8 @@ namespace view {
 
     } // namespace detail_view
 
+    class scan_context;
+
     // A checked, zero-copy view of one complete, structurally well-formed CBOR
     // item: its leading semantic tags, head, and content. Obtained from
     // scan_prefix, parse_exact, wire_cursor, or navigator::finish_item; never
@@ -619,6 +621,8 @@ namespace view {
         class tag_range;
         class chunk_iterator;
         class chunk_range;
+        class child_iterator;
+        class child_range;
 
         // The item's leading semantic tags, outermost first. Empty for
         // untagged items. Tags are exposed, never interpreted: deciding what
@@ -629,6 +633,9 @@ namespace view {
         // definite-length string, one per chunk for an indefinite-length
         // one. Empty unless kind() is byte_string or text_string.
         chunk_range chunks() const noexcept;
+
+        // Raw children of an array or map: elements, or keys and values alternating.
+        child_range children(scan_context& context) const noexcept;
 
         // The typed accessors return false, leaving `value` untouched, on a
         // kind mismatch. Structural well-formedness was established by scanning.
@@ -710,8 +717,6 @@ namespace view {
             return additional_info == 31;   // additional-info 31 = indefinite length
         }
     };
-
-    class scan_context;
 
     // Offset-based access to unchecked CBOR wire data. The cursor borrows its
     // input and never exposes a mutable pointer/end pair.
@@ -1310,6 +1315,166 @@ namespace view {
 
     } // namespace detail_view
 
+    // Iterates the raw children of a checked container item, measuring each
+    // child once to yield it as a complete checked item.
+    class item::child_iterator
+    {
+    public:
+        using value_type = item;
+        using reference = item;
+        using pointer = void;
+        using difference_type = std::ptrdiff_t;
+        using iterator_category = std::input_iterator_tag;
+
+        child_iterator() noexcept
+            : pos_(nullptr), next_(nullptr), end_(nullptr), remaining_(0),
+              content_(nullptr), context_(nullptr)
+        {
+        }
+
+        item operator*() const noexcept
+        {
+            assert(pos_ != nullptr);
+            return detail_view::item_access::make(
+                span<const uint8_t>(pos_, static_cast<std::size_t>(next_ - pos_)),
+                head_, content_);
+        }
+
+        child_iterator& operator++()
+        {
+            advance();
+            return *this;
+        }
+
+        child_iterator operator++(int)
+        {
+            child_iterator temp = *this;
+            advance();
+            return temp;
+        }
+
+        friend bool operator==(const child_iterator& a, const child_iterator& b) noexcept
+        {
+            return a.pos_ == b.pos_;
+        }
+
+        friend bool operator!=(const child_iterator& a, const child_iterator& b) noexcept
+        {
+            return a.pos_ != b.pos_;
+        }
+
+    private:
+        friend class child_range;
+
+        child_iterator(const uint8_t* first, const uint8_t* end, uint64_t remaining,
+                       scan_context& context) noexcept
+            : pos_(nullptr), next_(first), end_(end), remaining_(remaining),
+              content_(nullptr), context_(&context)
+        {
+            advance();
+        }
+
+        void advance()
+        {
+            pos_ = next_;
+            if (remaining_ == detail_view::indefinite_array_marker)
+            {
+                if (*pos_ == 0xff)
+                {
+                    pos_ = nullptr;
+                    return;
+                }
+            }
+            else if (remaining_ == 0)
+            {
+                pos_ = nullptr;
+                return;
+            }
+            else
+            {
+                --remaining_;
+            }
+
+            const uint8_t* p = pos_;
+            std::error_code ec;
+            bool ok = detail_view::read_value_head(p, end_, head_, ec);
+            assert(ok && !ec);
+            content_ = p;
+            ok = head_.major_type == cbor::detail::cbor_major_type::array ||
+                 head_.major_type == cbor::detail::cbor_major_type::map
+                ? detail_view::skip_container(p, end_, head_,
+                      (std::numeric_limits<int>::max)(),
+                      detail_view::scan_access::workspace(*context_), ec)
+                : detail_view::skip_scalar_or_string(head_, p, end_, ec);
+            assert(ok && !ec);
+            (void)ok;
+            next_ = p;
+        }
+
+        const uint8_t* pos_;    // current child's begin, nullptr when exhausted
+        const uint8_t* next_;   // current child's end, the next child's begin
+        const uint8_t* end_;    // the parent's end
+        uint64_t remaining_;    // raw children left; indefinite ends at a break
+        detail_view::item_head head_;
+        const uint8_t* content_;
+        scan_context* context_;
+    };
+
+    class item::child_range
+    {
+    public:
+        using iterator = child_iterator;
+        using const_iterator = child_iterator;
+
+        child_iterator begin() const
+        {
+            if (first_ == nullptr)
+            {
+                return child_iterator();
+            }
+            return child_iterator(first_, end_, remaining_, *context_);
+        }
+
+        child_iterator end() const noexcept
+        {
+            return child_iterator();
+        }
+
+        bool empty() const noexcept
+        {
+            return first_ == nullptr ||
+                (remaining_ == detail_view::indefinite_array_marker
+                    ? *first_ == 0xff : remaining_ == 0);
+        }
+
+    private:
+        friend class item;
+        child_range(const uint8_t* first, const uint8_t* end, uint64_t remaining,
+                    scan_context* context) noexcept
+            : first_(first), end_(end), remaining_(remaining), context_(context)
+        {
+        }
+
+        const uint8_t* first_;
+        const uint8_t* end_;
+        uint64_t remaining_;
+        scan_context* context_;
+    };
+
+    inline item::child_range item::children(scan_context& context) const noexcept
+    {
+        if (head_.major_type != cbor::detail::cbor_major_type::array &&
+            head_.major_type != cbor::detail::cbor_major_type::map)
+        {
+            return child_range(nullptr, nullptr, 0, &context);
+        }
+        const uint64_t remaining = head_.indefinite()
+            ? detail_view::indefinite_array_marker
+            : (head_.major_type == cbor::detail::cbor_major_type::map
+                ? 2 * head_.value : head_.value);
+        return child_range(content_, bytes_.data() + bytes_.size(), remaining, &context);
+    }
+
     struct scan_result
     {
         item first;
@@ -1858,41 +2023,34 @@ namespace view {
     expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
         Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
     {
-        auto result = navigate_prefix(input, max_nesting_depth);
-        if (!result)
+        scan_context context(max_nesting_depth);
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
         {
-            return expected<bool, scan_error>(unexpect, result.error());
+            return expected<bool, scan_error>(unexpect, scanned.error());
         }
-
-        navigator nav = std::move(result.value().first);
-        if (nav.kind() != item_kind::map)
+        const item map_item = scanned.value().first;
+        if (map_item.kind() != item_kind::map)
         {
             return false;
         }
 
         span<const uint8_t> previous;
-        if (!nav.enter())
+        bool is_key = true;
+        for (item child : map_item.children(context))
         {
-            return true;
-        }
-        for (;;)
-        {
-            assert(nav.role() == position_role::map_key);
-            const span<const uint8_t> key = nav.finish_item().encoded_bytes();
-            if (!previous.empty() && order(previous, key) >= 0)
+            if (is_key)
             {
-                return false;
+                const span<const uint8_t> key = child.encoded_bytes();
+                if (!previous.empty() && order(previous, key) >= 0)
+                {
+                    return false;
+                }
+                previous = key;
             }
-            previous = key;
-
-            const bool has_value = nav.next();
-            assert(has_value && nav.role() == position_role::map_value);
-            (void)has_value;
-            if (!nav.next())
-            {
-                return true;
-            }
+            is_key = !is_key;
         }
+        return true;
     }
 
     // True if `text_item` is a text string whose content is well-formed

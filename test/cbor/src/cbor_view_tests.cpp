@@ -852,7 +852,112 @@ TEST_CASE("cbor view navigator movement")
     }
 }
 
+TEST_CASE("cbor view item children")
+{
+    cbor::view::scan_context context;
 
+    SECTION("array children are checked items in order")
+    {
+        std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x63,'a','b','c'};   // [1,[2,3],"abc"]
+        auto result = cbor::view::parse_exact(jsoncons::span<const uint8_t>(data), context);
+        REQUIRE(result.has_value());
+
+        std::vector<cbor::view::item> children;
+        for (cbor::view::item child : result.value().children(context))
+        {
+            children.push_back(child);
+        }
+        REQUIRE(children.size() == 3);
+        CHECK(children[0].kind() == cbor::view::item_kind::unsigned_integer);
+        CHECK(children[0].argument() == 1);
+        CHECK(children[1].kind() == cbor::view::item_kind::array);
+        CHECK(children[1].encoded_bytes().data() == data.data() + 2);
+        CHECK(children[1].encoded_bytes().size() == 3);
+        CHECK(children[2].kind() == cbor::view::item_kind::text_string);
+        jsoncons::string_view text;
+        CHECK(children[2].text(text));
+        CHECK(text == "abc");
+
+        std::vector<uint64_t> nested;
+        for (cbor::view::item grandchild : children[1].children(context))
+        {
+            uint64_t value = 0;
+            REQUIRE(grandchild.uint64_value(value));
+            nested.push_back(value);
+        }
+        REQUIRE(nested.size() == 2);
+        CHECK(nested[0] == 2);
+        CHECK(nested[1] == 3);
+    }
+
+    SECTION("map children alternate keys and values")
+    {
+        const std::vector<std::vector<uint8_t>> maps = {
+            {0xa2,0x01,0x02,0x03,0x04},
+            {0xbf,0x01,0x02,0x03,0x04,0xff}
+        };
+        for (const auto& data : maps)
+        {
+            auto result = cbor::view::parse_exact(jsoncons::span<const uint8_t>(data), context);
+            REQUIRE(result.has_value());
+            std::vector<uint64_t> values;
+            for (cbor::view::item child : result.value().children(context))
+            {
+                uint64_t value = 0;
+                REQUIRE(child.uint64_value(value));
+                values.push_back(value);
+            }
+            REQUIRE(values.size() == 4);
+            CHECK(values[0] == 1);
+            CHECK(values[1] == 2);
+            CHECK(values[2] == 3);
+            CHECK(values[3] == 4);
+        }
+    }
+
+    SECTION("empty containers and non-containers have no children")
+    {
+        const std::vector<std::vector<uint8_t>> values = {
+            {0x01}, {0x63,'a','d','a'}, {0x80}, {0x9f,0xff}, {0xa0}, {0xbf,0xff}
+        };
+        for (const auto& data : values)
+        {
+            auto result = cbor::view::parse_exact(jsoncons::span<const uint8_t>(data), context);
+            REQUIRE(result.has_value());
+            CHECK(result.value().children(context).empty());
+            CHECK(result.value().children(context).begin() == cbor::view::item::child_iterator());
+        }
+    }
+
+    SECTION("indefinite container children stop at the break")
+    {
+        std::vector<uint8_t> data = {0x9f,0x01,0x81,0x02,0xff};   // [_ 1,[2]]
+        auto result = cbor::view::parse_exact(jsoncons::span<const uint8_t>(data), context);
+        REQUIRE(result.has_value());
+        std::size_t count = 0;
+        for (cbor::view::item child : result.value().children(context))
+        {
+            (void)child;
+            ++count;
+        }
+        CHECK(count == 2);
+    }
+
+    SECTION("a deep container child grows and reuses the context workspace")
+    {
+        const std::size_t depth = 100;
+        std::vector<uint8_t> data(depth + 1, 0x81);
+        data.push_back(0x01);
+        cbor::view::scan_context deep_context(200);
+        auto result = cbor::view::parse_exact(jsoncons::span<const uint8_t>(data), deep_context);
+        REQUIRE(result.has_value());
+        auto it = result.value().children(deep_context).begin();
+        REQUIRE(it != cbor::view::item::child_iterator());
+        CHECK((*it).encoded_bytes().size() == data.size() - 1);
+        ++it;
+        CHECK(it == cbor::view::item::child_iterator());
+    }
+}
 
 TEST_CASE("cbor view wire cursor")
 {

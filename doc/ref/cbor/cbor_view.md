@@ -164,6 +164,7 @@ class item
     tag_range tags() const noexcept;                     // leading tags, outermost first
 
     chunk_range chunks() const noexcept;                 // string content spans
+    child_range children(scan_context& context) const noexcept;   // raw children as items
 
     bool uint64_value(uint64_t& value) const noexcept;
     bool int64_value(int64_t& value) const noexcept;
@@ -191,9 +192,15 @@ length, a container's count, a simple value's number, or the bit
 pattern of a floating-point value.
 
 `chunks()` yields the contiguous spans of a string's content, one per chunk
-for indefinite-length strings. Structural container traversal is intentionally
-provided only by `navigator`, avoiding a second iterator state machine and its
-hidden subtree rescans.
+for indefinite-length strings.
+
+`children(context)` yields a container's raw children in order — array
+elements, or a map's keys and values alternating — each a complete checked
+item, measured once on the way past. The item's bytes are checked, so
+iteration cannot fail; the context, which must outlive the range, supplies
+skip workspace for container children and grows only past 32 open
+containers. `children` serves sibling iteration over checked bytes;
+`navigator` serves stateful traversal with retained parents and extents.
 
 The typed accessors return `false`, leaving `value` untouched, exactly
 when the item is not of the requested kind; conversions are strict.
