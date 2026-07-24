@@ -120,68 +120,71 @@ namespace {
             require(!validate_text(scanned));
         }
 
-        // Containers: children are checked items inside the parent.
-        if (depth_budget > 0)
-        {
-            const uint8_t* prev_end = nullptr;
-            for (item element : scanned.elements())
-            {
-                require(contains(bytes, element.encoded_bytes()));
-                if (prev_end != nullptr)
-                {
-                    require(element.encoded_bytes().data() >= prev_end);
-                }
-                prev_end = element.encoded_bytes().data() + element.encoded_bytes().size();
-                exercise_item(element, depth_budget - 1);
-            }
-            for (map_entry entry : scanned.entries())
-            {
-                require(contains(bytes, entry.key.encoded_bytes()));
-                require(contains(bytes, entry.value.encoded_bytes()));
-                require(entry.value.encoded_bytes().data() ==
-                    entry.key.encoded_bytes().data() + entry.key.encoded_bytes().size());
-                exercise_item(entry.key, depth_budget - 1);
-                exercise_item(entry.value, depth_budget - 1);
-            }
-        }
-
-        (void)map_keys_sorted(scanned);
-        (void)map_keys_sorted(scanned, length_first_compare());
+        (void)depth_budget;
+        (void)map_keys_sorted(bytes);
+        (void)map_keys_sorted(bytes, length_first_compare());
     }
 
     void exercise_lowlevel(byte_span input)
     {
-        const uint8_t* const end = input.data() + input.size();
-
-        // read_head walks heads, always advancing; ok <=> !ec.
-        const uint8_t* p = input.data();
-        for (int steps = 0; steps < 64 && p < end; ++steps)
+        // read_head walks heads by offset, always advancing when bytes are
+        // consumed; success and error are mutually exclusive.
+        wire_cursor heads(input);
+        for (int steps = 0; steps < 64 && !heads.remaining().empty(); ++steps)
         {
-            const uint8_t* before = p;
-            item_head head;
-            std::error_code ec;
-            const bool ok = read_head(p, end, head, ec);
-            require(ok != static_cast<bool>(ec));
-            require(p >= before && p <= end);
-            if (!ok)
+            const std::size_t before = heads.position();
+            auto result = heads.read_head();
+            require(heads.position() >= before && heads.position() <= input.size());
+            if (!result.has_value())
             {
+                require(result.error().offset == heads.position());
                 break;
             }
-            require(p > before);
+            require(heads.position() > before);
         }
 
-        // skip_item agrees with scan_prefix on outcome and consumed length.
-        const uint8_t* sp = input.data();
-        std::error_code ec;
-        const bool ok = skip_item(sp, end, ec);
-        require(ok != static_cast<bool>(ec));
+        // read_item agrees with scan_prefix on outcome and consumed length.
+        wire_cursor items(input);
         scan_context context;
+        auto read = items.read_item(context);
         auto scanned = scan_prefix(input, context);
-        require(ok == scanned.has_value());
-        if (ok)
+        require(read.has_value() == scanned.has_value());
+        if (read.has_value())
         {
-            require(sp == input.data() + scanned.value().first.encoded_bytes().size());
+            require(items.position() == scanned.value().first.encoded_bytes().size());
+            require(read.value().encoded_bytes().data() == input.data());
         }
+        else
+        {
+            require(items.position() == read.error().offset);
+        }
+
+        // skip_item agrees with read_item on outcome, consumed length, and
+        // failure; on success its span is the item's encoded bytes unparsed.
+        wire_cursor skips(input);
+        auto skipped = skips.skip_item(context);
+        require(skipped.has_value() == read.has_value());
+        require(skips.position() == items.position());
+        if (skipped.has_value())
+        {
+            require(skipped.value().data() == read.value().encoded_bytes().data());
+            require(skipped.value().size() == read.value().encoded_bytes().size());
+        }
+        else
+        {
+            require(skipped.error().code == read.error().code);
+            require(skipped.error().offset == read.error().offset);
+        }
+
+        // skip consumes exactly the requested content when it is available.
+        wire_cursor content(input);
+        const std::size_t half = input.size() / 2;
+        require(content.skip(half));
+        require(content.position() == half);
+        require(!content.skip(input.size() - half + 1));
+        require(content.position() == half);
+        require(content.skip(input.size() - half));
+        require(content.remaining().empty());
     }
 
     void exercise_span_orders(byte_span a, byte_span b)
@@ -211,9 +214,119 @@ namespace {
         require(sorted.has_value() == sa.has_value());
         if (sorted.has_value())
         {
-            require(sorted.value() == map_keys_sorted(sa.value().first));
+            auto checked = map_keys_sorted(sa.value().first.encoded_bytes());
+            require(checked.has_value() && sorted.value() == checked.value());
         }
     }
+
+    void exercise_navigator(byte_span input, int depth)
+    {
+        auto navigated = navigate_prefix(input, depth);
+        scan_context context(depth);
+        auto scanned = scan_prefix(input, context);
+        require(navigated.has_value() == scanned.has_value());
+        if (!navigated.has_value())
+        {
+            return;
+        }
+
+        navigator nav = std::move(navigated.value().first);
+        require(navigated.value().remainder.size() == scanned.value().remainder.size());
+        require(nav.role() == position_role::root);
+        require(nav.depth() == 0);
+        require(nav.extent_known());
+
+        const item root = nav.finish_item();
+        require(root.encoded_bytes().data() == input.data());
+        require(root.encoded_bytes().size() == scanned.value().first.encoded_bytes().size());
+
+        for (int steps = 0; steps < 256; ++steps)
+        {
+            uint64_t u = 0;
+            int64_t i = 0;
+            bool b = false;
+            double d = 0;
+            jsoncons::string_view text;
+            byte_span bytes;
+            (void)nav.uint64_value(u);
+            (void)nav.int64_value(i);
+            (void)nav.bool_value(b);
+            (void)nav.double_value(d);
+            (void)nav.text(text);
+            (void)nav.bytes(bytes);
+
+            if (nav.enter())
+            {
+                require(nav.depth() > 0);
+                continue;
+            }
+            if (nav.next())
+            {
+                continue;
+            }
+            if (!nav.leave())
+            {
+                break;
+            }
+        }
+
+        nav.rewind();
+        require(nav.depth() == 0);
+        require(nav.role() == position_role::root);
+        require(nav.finish_item().encoded_bytes().size() == root.encoded_bytes().size());
+
+        auto reset = nav.reset_prefix(input, depth);
+        require(reset.has_value());
+        require(reset.value().size() == navigated.value().remainder.size());
+    }
+
+    // Children agree with navigator movement over the same container.
+    void exercise_children(byte_span input, scan_context& context)
+    {
+        auto scanned = scan_prefix(input, context);
+        if (!scanned.has_value())
+        {
+            return;
+        }
+        const item root = scanned.value().first;
+
+        auto navigated = navigate_prefix(input);
+        require(navigated.has_value());
+        navigator nav = std::move(navigated.value().first);
+
+        auto it = root.children(context).begin();
+        if (!nav.enter())
+        {
+            require(root.children(context).empty());
+            require(it == item::child_iterator());
+            return;
+        }
+        require(!root.children(context).empty());
+
+        std::size_t count = 0;
+        for (;;)
+        {
+            require(it != item::child_iterator());
+            const item child = *it;
+            require(child.kind() == nav.kind());
+            require(child.argument() == nav.argument());
+            require(child.indefinite() == nav.indefinite());
+            const item finished = nav.finish_item();
+            require(finished.encoded_bytes().data() == child.encoded_bytes().data());
+            require(finished.encoded_bytes().size() == child.encoded_bytes().size());
+            ++it;
+            if (++count > 4096)
+            {
+                return;
+            }
+            if (!nav.next())
+            {
+                break;
+            }
+        }
+        require(it == item::child_iterator());
+    }
+
 
     void exercise_input(byte_span input, scan_context& context)
     {
@@ -280,9 +393,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     {
         scan_context context(depth);
         exercise_input(input, context);
+        exercise_navigator(input, depth);
+        exercise_children(input, context);
         exercise_input(byte_span(base, mid), context);
+        exercise_navigator(byte_span(base, mid), depth);
         exercise_input(byte_span(base + mid, size - mid), context);
+        exercise_navigator(byte_span(base + mid, size - mid), depth);
         exercise_input(byte_span(base + p0, size - p0), context);
+        exercise_navigator(byte_span(base + p0, size - p0), depth);
     }
 
     return 0;

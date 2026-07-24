@@ -8,28 +8,30 @@
 
 The `cbor::view` namespace reads the *encoded* structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
-without copying it or building a data structure. Its spine is four stages:
+without copying it or building a data structure. Its checked-item layer
+borrows complete encodings; its move-only `navigator` owns reusable traversal
+workspace while borrowing the same bytes. The data flow is:
+> owned bytes -> structural validation -> checked item or navigator -> application semantics
 
-> owned bytes -> structural validation -> borrowed checked items -> application semantics
-
-A scan validates that bytes are *structurally* well-formed CBOR once
-(framing only — not validity such as UTF-8); everything afterwards
-operates on checked `item` views and cannot fail structurally. The last
-stage — what tag 2 bytes or a tag 25 string reference *mean* — belongs to
-[decode_cbor](decode_cbor.md) and [basic_cbor_cursor](basic_cbor_cursor.md),
-not here: tags are exposed, never interpreted.
+Validation checks structural well-formedness once (framing only — not content
+validity such as UTF-8). Checked items and navigator movement then cannot fail
+structurally. The last stage — what tag 2 bytes or a tag 25 string reference
+*mean* — belongs to [decode_cbor](decode_cbor.md) and
+[basic_cbor_cursor](basic_cbor_cursor.md), not here: tags are exposed, never
+interpreted.
 
 This namespace is experimental.
 
 #### Ownership and lifetime
 
-Everything in this namespace borrows. An `item`, the items produced by
-iterating it, and every span and string view obtained from them point
-into the scanned input bytes, and are invalidated by anything that
-invalidates those bytes: destroying the container, mutating it, or any
-reallocation. Scanning a temporary container is rejected at compile
-time. The copying accessors (`text` into `std::string`, `bytes` into
-`std::vector`) are the way to keep content beyond the input's lifetime.
+All views borrow the input bytes. An `item`, a `navigator`, and every span or
+string view obtained from them are
+invalidated by anything that invalidates those bytes: destroying the container,
+mutating it, or reallocation. A navigator owns only its mutable navigation and
+validation workspace; it does not own the encoded bytes. Factory, reset, and
+`wire_cursor` entry points reject temporary owning containers at compile time.
+The copying item accessors (`text` into `std::string`, `bytes` into
+`std::vector`) retain content independently.
 
 #### Scanning
 
@@ -62,8 +64,93 @@ anything after it as `cbor_errc::trailing_data`.
 
 Scanning enforces `scan_context::max_nesting_depth` (default
 `default_max_nesting_depth`, 1024) using constant call-stack space at
-any depth. It allocates only when nesting exceeds 32 open containers;
-a reused `scan_context` retains that capacity across scans.
+any depth. It allocates only when nesting exceeds 32 open containers; a reused
+`scan_context`, `wire_cursor` with a supplied context, or navigator reset retains
+that validation capacity.
+
+#### Structural navigation
+
+```cpp
+enum class position_role { root, array_element, map_key, map_value };
+
+struct navigation_result
+{
+    navigator first;
+    span<const uint8_t> remainder;
+};
+
+expected<navigation_result, scan_error> navigate_prefix(
+    span<const uint8_t> input,
+    int max_nesting_depth = default_max_nesting_depth);
+
+expected<navigator, scan_error> navigate_exact(
+    span<const uint8_t> input,
+    int max_nesting_depth = default_max_nesting_depth);
+
+class navigator
+{
+public:
+    navigator(navigator&&) noexcept;
+    navigator& operator=(navigator&&) noexcept;
+    navigator(const navigator&) = delete;
+
+    item_kind kind() const noexcept;
+    uint64_t argument() const noexcept;
+    bool indefinite() const noexcept;
+    tag_range tags() const noexcept;
+    position_role role() const noexcept;
+    std::size_t depth() const noexcept;
+
+    bool uint64_value(uint64_t&) const noexcept;
+    bool int64_value(int64_t&) const noexcept;
+    bool bool_value(bool&) const noexcept;
+    bool double_value(double&) const noexcept;
+    bool text(string_view&) const noexcept;
+    bool bytes(span<const uint8_t>&) const noexcept;
+
+    bool enter() noexcept;
+    bool next() noexcept;
+    bool leave() noexcept;
+    void rewind() noexcept;
+
+    item finish_item() noexcept;
+    bool extent_known() const noexcept;
+
+    expected<span<const uint8_t>, scan_error> reset_prefix(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth);
+    expected<span<const uint8_t>, scan_error> reset_exact(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth);
+};
+```
+
+A navigator begins at the checked root. `enter()` moves into a nonempty array
+or map; maps expose raw children with alternating key/value roles. `next()`
+moves to the next raw sibling, skipping the current unopened container if
+necessary. At the end of the siblings it returns `false`; `leave()` restores
+the completed parent. Calling `leave()` early skips only the unread remainder.
+`rewind()` restores the root.
+
+The current position exposes its already parsed head and scalar/string content.
+A container child may not yet have a known end. `finish_item()` establishes and
+caches that end, walking the current subtree only when necessary, and returns an
+ordinary complete `item`. `extent_known()` makes that cost visible. Descent after
+`finish_item()` is legal and revisits the subtree.
+
+Validation records the observed peak open-container depth, prepares that many
+navigation frames, and retains the validation scratch. Movement uses indexed
+frames; subtree skips reuse the retained scratch. Neither allocates after
+successful construction. Resets are transactional and retain both capacities.
+Both reset forms return the unconsumed remainder; it is empty after a
+successful exact reset.
+
+A known parent boundary propagates to its final definite child. Consequently,
+the last payload in a definite transport tuple can be finished in O(1), even
+when it is a large container. Non-final arbitrary containers have the honest
+O(depth) tradeoff: descend immediately without a pre-walk, or establish/capture
+the exact span with one subtree walk.
+
 
 #### The checked item
 
@@ -76,9 +163,8 @@ class item
     bool indefinite() const noexcept;
     tag_range tags() const noexcept;                     // leading tags, outermost first
 
-    element_range elements() const noexcept;             // array elements
-    entry_range entries() const noexcept;                // map entries
     chunk_range chunks() const noexcept;                 // string content spans
+    child_range children(scan_context& context) const noexcept;   // raw children as items
 
     bool uint64_value(uint64_t& value) const noexcept;
     bool int64_value(int64_t& value) const noexcept;
@@ -96,27 +182,25 @@ enum class item_kind
     array, map, simple
 };
 
-struct map_entry
-{
-    item key;
-    item value;
-};
 ```
 
-An `item` is one complete, well-formed encoded item: its leading
+An `item` is one complete, structurally well-formed encoded item: its leading
 semantic tags, head, and content. `kind()` classifies the content after
 tags (`simple` covers major type 7: simple values and floating point);
 `argument()` is the head's argument — an integer's value, a string's
 length, a container's count, a simple value's number, or the bit
 pattern of a floating-point value.
 
-The ranges iterate with plain range-`for` and cannot fail: validation
-already happened. `elements()` and `entries()` yield checked items;
-`chunks()` yields the contiguous spans of a string's content, one per
-chunk for indefinite-length strings. Kind mismatches yield empty
-ranges. Iterating a container walks its encoding, so navigating to
-depth *d* of a document rescans the subtrees on that path; iteration
-beyond 32 levels of nesting inside one item may allocate.
+`chunks()` yields the contiguous spans of a string's content, one per chunk
+for indefinite-length strings.
+
+`children(context)` yields a container's raw children in order — array
+elements, or a map's keys and values alternating — each a complete checked
+item, measured once on the way past. The item's bytes are checked, so
+iteration cannot fail; the context, which must outlive the range, supplies
+skip workspace for container children and grows only past 32 open
+containers. `children` serves sibling iteration over checked bytes;
+`navigator` serves stateful traversal with retained parents and extents.
 
 The typed accessors return `false`, leaving `value` untouched, exactly
 when the item is not of the requested kind; conversions are strict.
@@ -143,9 +227,6 @@ struct length_first_compare;   // RFC 8949 4.2.3 order, three-way
 struct bytewise_less;          // strict weak orders for sorting
 struct length_first_less;
 
-template <typename Compare = bytewise_compare>
-bool map_keys_sorted(const item& map_item, Compare compare = Compare());
-
 // Span overloads for raw-span consumers; validate input, then order.
 template <typename Order = bytewise_compare>
 expected<int, scan_error> compare(span<const uint8_t> a, span<const uint8_t> b,
@@ -156,14 +237,11 @@ expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
     Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
 ```
 
-The order function objects compare encoded bytes and accept either two
-items or two raw `span<const uint8_t>`. The `*_compare` forms return
-negative, zero, or positive; the `*_less` forms are predicates for
-`std::sort` and ordered containers. `map_keys_sorted` is true if
-`map_item` is a map whose keys are strictly ascending in the given
-order — the deterministic-encoding key condition. The span overloads
-validate before ordering and, on malformed input, return an error carrying
-the code and byte offset; trailing bytes after the first item are tolerated.
+The order function objects compare encoded bytes and accept either two items
+or two raw spans. The `*_compare` forms return a three-way result; the `*_less`
+forms are predicates for sorting and ordered containers. The span-based
+`map_keys_sorted` validates once, then walks keys with a navigator; malformed
+input returns the code and byte offset, and trailing bytes are tolerated.
 
 #### Low-level tier
 
@@ -172,16 +250,29 @@ enum class major_type;   // CBOR major types 0-7
 
 struct item_head { major_type major_type; uint8_t additional_info; uint64_t value; bool indefinite(); };
 
-bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec);
-bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
-    int max_nesting_depth = default_max_nesting_depth);
+class wire_cursor
+{
+public:
+    explicit wire_cursor(span<const uint8_t> input) noexcept;
+
+    std::size_t position() const noexcept;
+    span<const uint8_t> remaining() const noexcept;
+    expected<item_head, scan_error> read_head() noexcept;
+    expected<item, scan_error> read_item(scan_context& context);
+    expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+    bool skip(std::size_t count) noexcept;
+};
 ```
 
-The wire-level head decoding the checked item layer is built on, for
-consumers that need sub-item head access. Prefer the checked item layer
-unless you are walking objects yourself with intention. `read_head`
-advances `p` past one head only (tags are returned as their own heads) and
-validates just that head; `skip_item` advances past one complete item.
+`wire_cursor` is the offset-based low-level tier for consumers that need
+sub-item head access. It borrows one input span and exposes its position and
+remaining bytes without a mutable pointer/end pair. `read_head` advances past
+one head only (tags are returned as their own heads); `read_item` validates and
+returns one complete checked item; `skip_item` validates and passes over one
+complete item, returning its encoded bytes unparsed; `skip` advances past
+`count` bytes of already-measured content, such as a definite string payload
+after its head, refusing when fewer bytes remain. Errors report offsets from
+the beginning of the cursor's input.
 
 ### Examples
 
@@ -190,55 +281,61 @@ validates just that head; `skip_item` advances past one complete item.
 ```cpp
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 int main()
 {
-    // {"id": 42, "name": "ada", "scores": [1, 2]}
+    // {"id": 42, "scores": [1, 2]}
     const std::vector<uint8_t> data = {
-        0xa3,
+        0xa2,
         0x62,'i','d', 0x18,0x2a,
-        0x64,'n','a','m','e', 0x63,'a','d','a',
         0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
     };
 
-    auto doc = jsoncons::cbor::view::parse_exact(
-        jsoncons::span<const uint8_t>(data.data(), data.size()));
-    if (!doc.has_value())
+    auto result = jsoncons::cbor::view::navigate_exact(
+        jsoncons::span<const uint8_t>(data));
+    if (!result)
     {
-        std::cout << "malformed at offset " << doc.error().offset << "\n";
         return 1;
     }
 
-    for (jsoncons::cbor::view::map_entry entry : doc.value().entries())
+    auto nav = std::move(result.value());
+    if (!nav.enter())
+    {
+        return 0;
+    }
+    for (;;)
     {
         jsoncons::string_view name;
-        if (!entry.key.text(name))
+        if (!nav.text(name) || !nav.next())
         {
-            continue;
+            break;
         }
         std::cout << name << ":";
 
         uint64_t number = 0;
-        jsoncons::string_view text;
-        if (entry.value.text(text))
-        {
-            std::cout << " " << text;
-        }
-        else if (entry.value.uint64_value(number))
+        if (nav.uint64_value(number))
         {
             std::cout << " " << number;
         }
-        else
+        else if (nav.enter())
         {
-            for (jsoncons::cbor::view::item element : entry.value.elements())
+            do
             {
-                if (element.uint64_value(number))
+                if (nav.uint64_value(number))
                 {
                     std::cout << " " << number;
                 }
             }
+            while (nav.next());
+            nav.leave();
         }
         std::cout << "\n";
+        if (!nav.next())
+        {
+            break;
+        }
     }
 }
 ```
@@ -246,7 +343,6 @@ int main()
 Output:
 ```
 id: 42
-name: ada
 scores: 1 2
 ```
 

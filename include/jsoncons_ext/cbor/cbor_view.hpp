@@ -16,7 +16,6 @@
 #include <limits>
 #include <string>
 #include <system_error>
-#include <type_traits>
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -26,8 +25,8 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 
 // A deliberately narrow, zero-copy facility for reading the *encoded*
-// structure of CBOR data in place. Scanning validates well-formedness
-// once; everything after that operates on checked `item` views and
+// structure of CBOR data in place. Scanning validates structural well-formedness
+// once; everything after that operates on checked items or navigation state and
 // cannot fail structurally. Semantic interpretation (tag 2 bignums,
 // string references, typed arrays, ...) belongs to the parser and
 // cursor layers, not here: tags are exposed, never interpreted.
@@ -52,6 +51,14 @@ namespace view {
         simple
     };
 
+    enum class position_role : uint8_t
+    {
+        root,
+        array_element,
+        map_key,
+        map_value
+    };
+
     // The CBOR major type
     enum class major_type : uint8_t
     {
@@ -68,8 +75,9 @@ namespace view {
     struct scan_error
     {
         cbor_errc code;
-        std::size_t offset;   // bytes consumed when the error was detected
+        std::size_t offset;
     };
+
 
     using jsoncons::detail::expected;
     using jsoncons::detail::unexpect;
@@ -87,6 +95,107 @@ namespace view {
                 return additional_info == cbor::detail::additional_info::indefinite_length;
             }
         };
+
+        inline item_kind kind(const item_head& head) noexcept
+        {
+            switch (head.major_type)
+            {
+                case cbor::detail::cbor_major_type::unsigned_integer: return item_kind::unsigned_integer;
+                case cbor::detail::cbor_major_type::negative_integer: return item_kind::negative_integer;
+                case cbor::detail::cbor_major_type::byte_string:      return item_kind::byte_string;
+                case cbor::detail::cbor_major_type::text_string:      return item_kind::text_string;
+                case cbor::detail::cbor_major_type::array:            return item_kind::array;
+                case cbor::detail::cbor_major_type::map:              return item_kind::map;
+                default:                                              return item_kind::simple;
+            }
+        }
+
+        inline bool uint64_value(const item_head& head, uint64_t& value) noexcept
+        {
+            if (head.major_type != cbor::detail::cbor_major_type::unsigned_integer)
+            {
+                return false;
+            }
+            value = head.value;
+            return true;
+        }
+
+        inline bool int64_value(const item_head& head, int64_t& value) noexcept
+        {
+            const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
+            if (head.major_type == cbor::detail::cbor_major_type::unsigned_integer && head.value <= int64_max)
+            {
+                value = static_cast<int64_t>(head.value);
+                return true;
+            }
+            if (head.major_type == cbor::detail::cbor_major_type::negative_integer && head.value <= int64_max)
+            {
+                value = -1 - static_cast<int64_t>(head.value);
+                return true;
+            }
+            return false;
+        }
+
+        inline bool bool_value(const item_head& head, bool& value) noexcept
+        {
+            if (head.major_type != cbor::detail::cbor_major_type::simple ||
+                (head.additional_info != 20 && head.additional_info != 21))
+            {
+                return false;
+            }
+            value = head.additional_info == 21;
+            return true;
+        }
+
+        inline bool double_value(const item_head& head, double& value) noexcept
+        {
+            if (head.major_type != cbor::detail::cbor_major_type::simple)
+            {
+                return false;
+            }
+            switch (head.additional_info)
+            {
+                case 25:
+                    value = binary::decode_half(static_cast<uint16_t>(head.value));
+                    return true;
+                case 26:
+                {
+                    const uint32_t bits = static_cast<uint32_t>(head.value);
+                    float single;
+                    std::memcpy(&single, &bits, sizeof single);
+                    value = single;
+                    return true;
+                }
+                case 27:
+                {
+                    const uint64_t bits = head.value;
+                    std::memcpy(&value, &bits, sizeof value);
+                    return true;
+                }
+                default:
+                    return false;
+            }
+        }
+
+        inline bool text(const item_head& head, const uint8_t* content, string_view& value) noexcept
+        {
+            if (head.major_type != cbor::detail::cbor_major_type::text_string || head.indefinite())
+            {
+                return false;
+            }
+            value = string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value));
+            return true;
+        }
+
+        inline bool bytes(const item_head& head, const uint8_t* content, span<const uint8_t>& value) noexcept
+        {
+            if (head.major_type != cbor::detail::cbor_major_type::byte_string || head.indefinite())
+            {
+                return false;
+            }
+            value = span<const uint8_t>(content, static_cast<std::size_t>(head.value));
+            return true;
+        }
 
         inline int sign(int value) noexcept
         {
@@ -283,9 +392,10 @@ namespace view {
         {
             static constexpr std::size_t local_capacity = 32;
 
-            uint64_t local_[local_capacity];
+            uint64_t local_[local_capacity]{};
             std::vector<uint64_t> spill_;
             std::size_t size_{0};
+            std::size_t peak_size_{0};
         public:
             bool empty() const noexcept
             {
@@ -297,11 +407,18 @@ namespace view {
                 return size_;
             }
 
+            std::size_t peak_size() const noexcept
+            {
+                return peak_size_;
+            }
+
             void clear() noexcept
             {
                 spill_.clear();
                 size_ = 0;
+                peak_size_ = 0;
             }
+
 
             void push(uint64_t count)
             {
@@ -314,6 +431,10 @@ namespace view {
                     spill_.push_back(count);
                 }
                 ++size_;
+                if (size_ > peak_size_)
+                {
+                    peak_size_ = size_;
+                }
             }
 
             uint64_t pop() noexcept
@@ -448,31 +569,6 @@ namespace view {
             return skip_scalar_or_string(head, p, end, ec);
         }
 
-        // Skips one item over bytes already validated by a scan, surfacing
-        // the untagged head and content position so callers can build items
-        // without reparsing. Cannot fail; the depth bound was enforced when
-        // the bytes were scanned. Shallow items take no workspace at all.
-        inline const uint8_t* skip_checked(const uint8_t* p, const uint8_t* end,
-            item_head& head, const uint8_t*& content) noexcept
-        {
-            std::error_code ec;
-            bool ok = read_value_head(p, end, head, ec);
-            assert(ok);
-            content = p;
-            if (head.major_type == cbor::detail::cbor_major_type::array ||
-                head.major_type == cbor::detail::cbor_major_type::map)
-            {
-                pending_stack open;
-                ok = skip_container(p, end, head, (std::numeric_limits<int>::max)(), open, ec);
-            }
-            else
-            {
-                ok = skip_scalar_or_string(head, p, end, ec);
-            }
-            assert(ok && !ec);
-            (void)ok;
-            return p;
-        }
 
         inline bool validate_utf8(const uint8_t* p, std::size_t length) noexcept
         {
@@ -482,12 +578,15 @@ namespace view {
 
         struct item_access;
         struct scan_access;
+        struct navigator_access;
 
     } // namespace detail_view
 
-    // A checked, zero-copy view of one complete, well-formed encoded CBOR
+    class scan_context;
+
+    // A checked, zero-copy view of one complete, structurally well-formed CBOR
     // item: its leading semantic tags, head, and content. Obtained from
-    // scan_prefix or parse_exact, or by iterating a container item; never
+    // scan_prefix, parse_exact, wire_cursor, or navigator::finish_item; never
     // constructed from unvalidated bytes. Borrows the scanned input, so it
     // must not outlive the bytes it was scanned from.
     class item
@@ -502,16 +601,7 @@ namespace view {
 
         item_kind kind() const noexcept
         {
-            switch (head_.major_type)
-            {
-                case cbor::detail::cbor_major_type::unsigned_integer: return item_kind::unsigned_integer;
-                case cbor::detail::cbor_major_type::negative_integer: return item_kind::negative_integer;
-                case cbor::detail::cbor_major_type::byte_string:      return item_kind::byte_string;
-                case cbor::detail::cbor_major_type::text_string:      return item_kind::text_string;
-                case cbor::detail::cbor_major_type::array:            return item_kind::array;
-                case cbor::detail::cbor_major_type::map:              return item_kind::map;
-                default:                                              return item_kind::simple;
-            }
+            return detail_view::kind(head_);
         }
 
         // The head's argument (RFC 8949 3): the integer's value, a string's
@@ -529,123 +619,55 @@ namespace view {
 
         class tag_iterator;
         class tag_range;
-        class element_iterator;
-        class element_range;
         class chunk_iterator;
         class chunk_range;
-        class entry_iterator;
-        class entry_range;
+        class child_iterator;
+        class child_range;
 
         // The item's leading semantic tags, outermost first. Empty for
         // untagged items. Tags are exposed, never interpreted: deciding what
         // a tag means is the caller's or a higher layer's concern.
         tag_range tags() const noexcept;
 
-        // The elements of an array item, in order; empty unless kind() is
-        // array. Iteration is read-only and borrows this item's bytes.
-        element_range elements() const noexcept;
-
-        // The entries of a map item, in order; empty unless kind() is map.
-        entry_range entries() const noexcept;
-
         // The content of a string item as contiguous spans: one span for a
         // definite-length string, one per chunk for an indefinite-length
         // one. Empty unless kind() is byte_string or text_string.
         chunk_range chunks() const noexcept;
 
-        // The typed accessors below return false, leaving `value` untouched,
-        // when this item is not of the requested kind. Well-formedness was
-        // established when the item was scanned, so kind is the only thing
-        // that can be wrong.
+        // Raw children of an array or map: elements, or keys and values alternating.
+        child_range children(scan_context& context) const noexcept;
 
+        // The typed accessors return false, leaving `value` untouched, on a
+        // kind mismatch. Structural well-formedness was established by scanning.
         bool uint64_value(uint64_t& value) const noexcept
         {
-            if (head_.major_type != cbor::detail::cbor_major_type::unsigned_integer)
-            {
-                return false;
-            }
-            value = head_.value;
-            return true;
+            return detail_view::uint64_value(head_, value);
         }
 
         bool int64_value(int64_t& value) const noexcept
         {
-            const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
-            if (head_.major_type == cbor::detail::cbor_major_type::unsigned_integer && head_.value <= int64_max)
-            {
-                value = static_cast<int64_t>(head_.value);
-                return true;
-            }
-            if (head_.major_type == cbor::detail::cbor_major_type::negative_integer && head_.value <= int64_max)
-            {
-                value = -1 - static_cast<int64_t>(head_.value);
-                return true;
-            }
-            return false;
+            return detail_view::int64_value(head_, value);
         }
 
         bool bool_value(bool& value) const noexcept
         {
-            if (head_.major_type != cbor::detail::cbor_major_type::simple ||
-                (head_.additional_info != 20 && head_.additional_info != 21))
-            {
-                return false;
-            }
-            value = head_.additional_info == 21;
-            return true;
+            return detail_view::bool_value(head_, value);
         }
 
         bool double_value(double& value) const noexcept
         {
-            if (head_.major_type != cbor::detail::cbor_major_type::simple)
-            {
-                return false;
-            }
-            switch (head_.additional_info)
-            {
-                case 25:
-                    value = binary::decode_half(static_cast<uint16_t>(head_.value));
-                    return true;
-                case 26:
-                {
-                    const uint32_t bits = static_cast<uint32_t>(head_.value);
-                    float single;
-                    std::memcpy(&single, &bits, sizeof single);
-                    value = single;
-                    return true;
-                }
-                case 27:
-                {
-                    const uint64_t bits = head_.value;
-                    std::memcpy(&value, &bits, sizeof value);
-                    return true;
-                }
-                default:
-                    return false;
-            }
+            return detail_view::double_value(head_, value);
         }
 
-        // Zero-copy string content. False for indefinite-length (chunked)
-        // strings, whose content is not contiguous; use chunks() or the
-        // copying overloads for those.
+        // Zero-copy string content. False for indefinite-length strings.
         bool text(string_view& value) const noexcept
         {
-            if (head_.major_type != cbor::detail::cbor_major_type::text_string || head_.indefinite())
-            {
-                return false;
-            }
-            value = string_view(reinterpret_cast<const char*>(content_), static_cast<std::size_t>(head_.value));
-            return true;
+            return detail_view::text(head_, content_, value);
         }
 
         bool bytes(span<const uint8_t>& value) const noexcept
         {
-            if (head_.major_type != cbor::detail::cbor_major_type::byte_string || head_.indefinite())
-            {
-                return false;
-            }
-            value = span<const uint8_t>(content_, static_cast<std::size_t>(head_.value));
-            return true;
+            return detail_view::bytes(head_, content_, value);
         }
 
         // Copying string content, assembling chunked strings. Transactional:
@@ -656,18 +678,6 @@ namespace view {
 
     private:
         friend struct detail_view::item_access;
-
-        explicit item(span<const uint8_t> bytes) noexcept
-            : bytes_(bytes)
-        {
-            const uint8_t* p = bytes.data();
-            const uint8_t* end = p + bytes.size();
-            std::error_code ec;
-            const bool ok = detail_view::read_value_head(p, end, head_, ec);
-            assert(ok && !ec);
-            (void)ok;
-            content_ = p;
-        }
 
         item(span<const uint8_t> bytes, const detail_view::item_head& head, const uint8_t* content) noexcept
             : bytes_(bytes), head_(head), content_(content)
@@ -683,11 +693,6 @@ namespace view {
 
         struct item_access
         {
-            static item make(span<const uint8_t> bytes) noexcept
-            {
-                return item(bytes);
-            }
-
             static item make(span<const uint8_t> bytes, const item_head& head, const uint8_t* content) noexcept
             {
                 return item(bytes, head, content);
@@ -713,27 +718,82 @@ namespace view {
         }
     };
 
-    // Reads one head, advancing p past the head only; tags read as their own heads.
-    inline bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
+    // Offset-based access to unchecked CBOR wire data. The cursor borrows its
+    // input and never exposes a mutable pointer/end pair.
+    class wire_cursor
     {
-        detail_view::item_head h;
-        if (!detail_view::read_head(p, end, h, ec))
-        {
-            return false;
-        }
-        head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
-        head.additional_info = h.additional_info;
-        head.value = h.value;
-        return true;
-    }
+    public:
 
-    // Advances p past one complete item, bounded by max_nesting_depth.
-    inline bool skip_item(const uint8_t*& p, const uint8_t* end, std::error_code& ec,
-        int max_nesting_depth = default_max_nesting_depth)
-    {
-        detail_view::pending_stack open;
-        return detail_view::skip_item(p, end, max_nesting_depth, open, ec);
-    }
+        explicit wire_cursor(span<const uint8_t> input) noexcept
+            : begin_(input.data()), current_(input.data()), end_(input.data() + input.size())
+        {
+        }
+
+        template <typename Container>
+        wire_cursor(const Container&&) = delete;
+
+        std::size_t position() const noexcept
+        {
+            return static_cast<std::size_t>(current_ - begin_);
+        }
+
+        span<const uint8_t> remaining() const noexcept
+        {
+            return span<const uint8_t>(current_, static_cast<std::size_t>(end_ - current_));
+        }
+
+        // Reads one head and advances past that head only. Tags are returned
+        // as their own heads. On failure, position() is the reported offset.
+        expected<item_head, scan_error> read_head() noexcept
+        {
+            if (current_ >= end_)
+            {
+                return expected<item_head, scan_error>(unexpect,
+                    scan_error{cbor_errc::unexpected_eof, position()});
+            }
+
+            detail_view::item_head h;
+            std::error_code ec;
+            const bool ok = detail_view::read_head(current_, end_, h, ec);
+            if (!ok)
+            {
+                return expected<item_head, scan_error>(unexpect,
+                    scan_error{static_cast<cbor_errc>(ec.value()), position()});
+            }
+
+            item_head head;
+            head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
+            head.additional_info = h.additional_info;
+            head.value = h.value;
+            return head;
+        }
+
+        // Reads and validates one complete item. This is the fallible boundary
+        // at which the supplied scanning workspace may grow.
+        expected<item, scan_error> read_item(scan_context& context);
+
+        // Validates and passes over one complete item, returning its encoded
+        // bytes unparsed. Costs and failure reporting match read_item.
+        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+
+        // Advances past `count` bytes of already-measured content, such as a
+        // definite string payload after its head. False, leaving the position
+        // unchanged, when fewer bytes remain.
+        bool skip(std::size_t count) noexcept
+        {
+            if (static_cast<std::size_t>(end_ - current_) < count)
+            {
+                return false;
+            }
+            current_ += count;
+            return true;
+        }
+
+    private:
+        const uint8_t* begin_;
+        const uint8_t* current_;
+        const uint8_t* end_;
+    };
 
     // Iterates the values of an item's leading semantic tags.
     class item::tag_iterator
@@ -821,6 +881,7 @@ namespace view {
 
     private:
         friend class item;
+        friend class navigator;
         tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 
         const uint8_t* first_;
@@ -842,257 +903,6 @@ namespace view {
         return tag_range(bytes_.data(), stop);
     }
 
-    // Iterates the elements of an array item as checked items.
-    class item::element_iterator
-    {
-    public:
-        using value_type = item;
-        using reference = item;
-        using pointer = void;
-        using difference_type = std::ptrdiff_t;
-        using iterator_category = std::input_iterator_tag;
-
-        element_iterator() noexcept : pos_(nullptr), end_(nullptr), remaining_(0), current_(nullptr), content_(nullptr) {}
-
-        item operator*() const noexcept
-        {
-            assert(pos_ != nullptr);
-            return detail_view::item_access::make(
-                span<const uint8_t>(pos_, static_cast<std::size_t>(current_ - pos_)), head_, content_);
-        }
-
-        element_iterator& operator++()
-        {
-            pos_ = current_;
-            advance();
-            return *this;
-        }
-
-        element_iterator operator++(int)
-        {
-            element_iterator temp = *this;
-            ++(*this);
-            return temp;
-        }
-
-        friend bool operator==(const element_iterator& a, const element_iterator& b) noexcept
-        {
-            return a.pos_ == b.pos_;
-        }
-
-        friend bool operator!=(const element_iterator& a, const element_iterator& b) noexcept
-        {
-            return a.pos_ != b.pos_;
-        }
-
-    private:
-        friend class item;
-        friend class element_range;
-
-        element_iterator(const uint8_t* pos, const uint8_t* end, uint64_t remaining) noexcept
-            : pos_(pos), end_(end), remaining_(remaining), current_(nullptr), content_(nullptr)
-        {
-            advance();
-        }
-
-        void advance() noexcept
-        {
-            if (pos_ == nullptr)
-            {
-                return;
-            }
-            if (remaining_ == detail_view::indefinite_array_marker)
-            {
-                assert(pos_ < end_);
-                if (*pos_ == 0xff)
-                {
-                    pos_ = nullptr;
-                    return;
-                }
-            }
-            else if (remaining_ == 0)
-            {
-                pos_ = nullptr;
-                return;
-            }
-            else
-            {
-                --remaining_;
-            }
-            current_ = detail_view::skip_checked(pos_, end_, head_, content_);
-        }
-
-        const uint8_t* pos_;       // start of the current element; nullptr at end
-        const uint8_t* end_;
-        uint64_t remaining_;       // count left, or indefinite_array_marker
-        const uint8_t* current_;   // end of the current element
-        detail_view::item_head head_;
-        const uint8_t* content_;
-    };
-
-    class item::element_range
-    {
-    public:
-        using iterator = element_iterator;
-        using const_iterator = element_iterator;
-
-        element_iterator begin() const noexcept { return element_iterator(first_, end_, remaining_); }
-        element_iterator end() const noexcept { return element_iterator(); }
-        bool empty() const noexcept { return begin() == this->end(); }
-
-    private:
-        friend class item;
-        element_range(const uint8_t* first, const uint8_t* end, uint64_t remaining) noexcept
-            : first_(first), end_(end), remaining_(remaining) {}
-
-        const uint8_t* first_;
-        const uint8_t* end_;
-        uint64_t remaining_;
-    };
-
-    inline item::element_range item::elements() const noexcept
-    {
-        if (head_.major_type != cbor::detail::cbor_major_type::array)
-        {
-            return element_range(nullptr, nullptr, 0);
-        }
-        return element_range(content_, bytes_.data() + bytes_.size(),
-            head_.indefinite() ? detail_view::indefinite_array_marker : head_.value);
-    }
-
-    // One entry of a map item.
-    struct map_entry
-    {
-        item key;
-        item value;
-    };
-
-    // Iterates the entries of a map item as checked key and value items.
-    class item::entry_iterator
-    {
-    public:
-        using value_type = map_entry;
-        using reference = map_entry;
-        using pointer = void;
-        using difference_type = std::ptrdiff_t;
-        using iterator_category = std::input_iterator_tag;
-
-        entry_iterator() noexcept : pos_(nullptr), end_(nullptr), remaining_(0), key_end_(nullptr), value_end_(nullptr),
-            key_content_(nullptr), value_content_(nullptr) {}
-
-        map_entry operator*() const noexcept
-        {
-            assert(pos_ != nullptr);
-            return map_entry{
-                detail_view::item_access::make(
-                    span<const uint8_t>(pos_, static_cast<std::size_t>(key_end_ - pos_)), key_head_, key_content_),
-                detail_view::item_access::make(
-                    span<const uint8_t>(key_end_, static_cast<std::size_t>(value_end_ - key_end_)), value_head_, value_content_)};
-        }
-
-        entry_iterator& operator++()
-        {
-            pos_ = value_end_;
-            advance();
-            return *this;
-        }
-
-        entry_iterator operator++(int)
-        {
-            entry_iterator temp = *this;
-            ++(*this);
-            return temp;
-        }
-
-        friend bool operator==(const entry_iterator& a, const entry_iterator& b) noexcept
-        {
-            return a.pos_ == b.pos_;
-        }
-
-        friend bool operator!=(const entry_iterator& a, const entry_iterator& b) noexcept
-        {
-            return a.pos_ != b.pos_;
-        }
-
-    private:
-        friend class item;
-        friend class entry_range;
-
-        entry_iterator(const uint8_t* pos, const uint8_t* end, uint64_t remaining) noexcept
-            : pos_(pos), end_(end), remaining_(remaining), key_end_(nullptr), value_end_(nullptr),
-              key_content_(nullptr), value_content_(nullptr)
-        {
-            advance();
-        }
-
-        void advance() noexcept
-        {
-            if (pos_ == nullptr)
-            {
-                return;
-            }
-            if (remaining_ == detail_view::indefinite_map_key_marker)
-            {
-                assert(pos_ < end_);
-                if (*pos_ == 0xff)
-                {
-                    pos_ = nullptr;
-                    return;
-                }
-            }
-            else if (remaining_ == 0)
-            {
-                pos_ = nullptr;
-                return;
-            }
-            else
-            {
-                --remaining_;
-            }
-            key_end_ = detail_view::skip_checked(pos_, end_, key_head_, key_content_);
-            value_end_ = detail_view::skip_checked(key_end_, end_, value_head_, value_content_);
-        }
-
-        const uint8_t* pos_;        // start of the current entry's key; nullptr at end
-        const uint8_t* end_;
-        uint64_t remaining_;        // entry count left, or indefinite_map_key_marker
-        const uint8_t* key_end_;
-        const uint8_t* value_end_;
-        detail_view::item_head key_head_;
-        const uint8_t* key_content_;
-        detail_view::item_head value_head_;
-        const uint8_t* value_content_;
-    };
-
-    class item::entry_range
-    {
-    public:
-        using iterator = entry_iterator;
-        using const_iterator = entry_iterator;
-
-        entry_iterator begin() const noexcept { return entry_iterator(first_, end_, remaining_); }
-        entry_iterator end() const noexcept { return entry_iterator(); }
-        bool empty() const noexcept { return begin() == this->end(); }
-
-    private:
-        friend class item;
-        entry_range(const uint8_t* first, const uint8_t* end, uint64_t remaining) noexcept
-            : first_(first), end_(end), remaining_(remaining) {}
-
-        const uint8_t* first_;
-        const uint8_t* end_;
-        uint64_t remaining_;
-    };
-
-    inline item::entry_range item::entries() const noexcept
-    {
-        if (head_.major_type != cbor::detail::cbor_major_type::map)
-        {
-            return entry_range(nullptr, nullptr, 0);
-        }
-        return entry_range(content_, bytes_.data() + bytes_.size(),
-            head_.indefinite() ? detail_view::indefinite_map_key_marker : head_.value);
-    }
 
     // Iterates the contiguous spans of a string item's content.
     class item::chunk_iterator
@@ -1268,6 +1078,192 @@ namespace view {
         return true;
     }
 
+    using tag_range = item::tag_range;
+
+    class navigator
+    {
+        static constexpr std::size_t npos = (std::numeric_limits<std::size_t>::max)();
+
+        struct node_state
+        {
+            std::size_t begin{0};
+            std::size_t head_begin{0};
+            std::size_t content_begin{0};
+            std::size_t end{npos};
+            detail_view::item_head head{};
+            position_role role{position_role::root};
+        };
+
+        struct navigation_frame
+        {
+            node_state container{};
+            uint64_t remaining{0};
+        };
+
+    public:
+        navigator(navigator&&) noexcept = default;
+        navigator& operator=(navigator&&) noexcept = default;
+        navigator(const navigator&) = delete;
+        navigator& operator=(const navigator&) = delete;
+
+        item_kind kind() const noexcept
+        {
+            return detail_view::kind(current_.head);
+        }
+
+        uint64_t argument() const noexcept
+        {
+            return current_.head.value;
+        }
+
+        bool indefinite() const noexcept
+        {
+            return current_.head.indefinite();
+        }
+
+        tag_range tags() const noexcept
+        {
+            return tag_range(input_.data() + current_.begin,
+                             input_.data() + current_.head_begin);
+        }
+
+        position_role role() const noexcept
+        {
+            return current_.role;
+        }
+
+        std::size_t depth() const noexcept
+        {
+            return active_depth_;
+        }
+
+        bool uint64_value(uint64_t& value) const noexcept
+        {
+            return detail_view::uint64_value(current_.head, value);
+        }
+
+        bool int64_value(int64_t& value) const noexcept
+        {
+            return detail_view::int64_value(current_.head, value);
+        }
+
+        bool bool_value(bool& value) const noexcept
+        {
+            return detail_view::bool_value(current_.head, value);
+        }
+
+        bool double_value(double& value) const noexcept
+        {
+            return detail_view::double_value(current_.head, value);
+        }
+
+        bool text(string_view& value) const noexcept
+        {
+            return detail_view::text(current_.head,
+                                     input_.data() + current_.content_begin, value);
+        }
+
+        bool bytes(span<const uint8_t>& value) const noexcept
+        {
+            return detail_view::bytes(current_.head,
+                                      input_.data() + current_.content_begin, value);
+        }
+
+        bool enter() noexcept;
+        bool next() noexcept;
+        bool leave() noexcept;
+
+        void rewind() noexcept
+        {
+            current_ = root_;
+            active_depth_ = 0;
+        }
+
+        item finish_item() noexcept;
+
+        bool extent_known() const noexcept
+        {
+            return current_.end != npos;
+        }
+
+        expected<span<const uint8_t>, scan_error> reset_prefix(
+            span<const uint8_t> input,
+            int max_nesting_depth = default_max_nesting_depth);
+
+        expected<span<const uint8_t>, scan_error> reset_exact(
+            span<const uint8_t> input,
+            int max_nesting_depth = default_max_nesting_depth);
+
+        template <typename Container>
+        expected<span<const uint8_t>, scan_error> reset_prefix(
+            const Container&&,
+            int = default_max_nesting_depth) = delete;
+
+        template <typename Container>
+        expected<span<const uint8_t>, scan_error> reset_exact(
+            const Container&&,
+            int = default_max_nesting_depth) = delete;
+
+    private:
+        friend struct detail_view::navigator_access;
+
+        node_state read_node(std::size_t begin, position_role role,
+                             std::size_t right_fence = npos) const noexcept;
+        void initialize_frame(navigation_frame& frame, const node_state& container) noexcept;
+        bool take_child(navigation_frame& frame, std::size_t& offset,
+                        position_role& role, std::size_t& right_fence) noexcept;
+        void establish_end(node_state& node) noexcept;
+
+        navigator(span<const uint8_t> root, std::size_t peak_depth,
+                  detail_view::pending_stack&& validation_workspace)
+            : input_(root), frames_(peak_depth),
+              validation_workspace_(std::move(validation_workspace)), active_depth_(0)
+        {
+            initialize_root();
+        }
+
+        void initialize_root() noexcept
+        {
+            root_ = read_node(0, position_role::root, input_.size());
+            current_ = root_;
+            active_depth_ = 0;
+        }
+
+        void prepare_checked(span<const uint8_t> root, std::size_t peak_depth)
+        {
+            frames_.resize(peak_depth);
+            input_ = root;
+            initialize_root();
+        }
+
+        span<const uint8_t> input_;
+        node_state root_;
+        node_state current_;
+        std::vector<navigation_frame> frames_;
+        detail_view::pending_stack validation_workspace_;
+        std::size_t active_depth_;
+    };
+
+    namespace detail_view {
+
+        struct navigator_access
+        {
+            static navigator make(span<const uint8_t> root, std::size_t peak_depth,
+                                  pending_stack&& validation_workspace)
+            {
+                return navigator(root, peak_depth, std::move(validation_workspace));
+            }
+        };
+
+    } // namespace detail_view
+
+    struct navigation_result
+    {
+        navigator first;
+        span<const uint8_t> remainder;
+    };
+
+
     // Reusable scanning state: the depth policy and the walker's workspace.
     // Scanning allocates only when nesting exceeds 32 open containers, and
     // a reused context retains that capacity.
@@ -1304,6 +1300,11 @@ namespace view {
             {
                 return context.workspace_;
             }
+
+            static std::size_t peak_depth(scan_context& context) noexcept
+            {
+                return context.workspace_.peak_size();
+            }
         };
 
         // All error codes assigned by the walker are cbor_errc values.
@@ -1314,13 +1315,173 @@ namespace view {
 
     } // namespace detail_view
 
+    // Iterates the raw children of a checked container item, measuring each
+    // child once to yield it as a complete checked item.
+    class item::child_iterator
+    {
+    public:
+        using value_type = item;
+        using reference = item;
+        using pointer = void;
+        using difference_type = std::ptrdiff_t;
+        using iterator_category = std::input_iterator_tag;
+
+        child_iterator() noexcept
+            : pos_(nullptr), next_(nullptr), end_(nullptr), remaining_(0),
+              content_(nullptr), context_(nullptr)
+        {
+        }
+
+        item operator*() const noexcept
+        {
+            assert(pos_ != nullptr);
+            return detail_view::item_access::make(
+                span<const uint8_t>(pos_, static_cast<std::size_t>(next_ - pos_)),
+                head_, content_);
+        }
+
+        child_iterator& operator++()
+        {
+            advance();
+            return *this;
+        }
+
+        child_iterator operator++(int)
+        {
+            child_iterator temp = *this;
+            advance();
+            return temp;
+        }
+
+        friend bool operator==(const child_iterator& a, const child_iterator& b) noexcept
+        {
+            return a.pos_ == b.pos_;
+        }
+
+        friend bool operator!=(const child_iterator& a, const child_iterator& b) noexcept
+        {
+            return a.pos_ != b.pos_;
+        }
+
+    private:
+        friend class child_range;
+
+        child_iterator(const uint8_t* first, const uint8_t* end, uint64_t remaining,
+                       scan_context& context) noexcept
+            : pos_(nullptr), next_(first), end_(end), remaining_(remaining),
+              content_(nullptr), context_(&context)
+        {
+            advance();
+        }
+
+        void advance()
+        {
+            pos_ = next_;
+            if (remaining_ == detail_view::indefinite_array_marker)
+            {
+                if (*pos_ == 0xff)
+                {
+                    pos_ = nullptr;
+                    return;
+                }
+            }
+            else if (remaining_ == 0)
+            {
+                pos_ = nullptr;
+                return;
+            }
+            else
+            {
+                --remaining_;
+            }
+
+            const uint8_t* p = pos_;
+            std::error_code ec;
+            bool ok = detail_view::read_value_head(p, end_, head_, ec);
+            assert(ok && !ec);
+            content_ = p;
+            ok = head_.major_type == cbor::detail::cbor_major_type::array ||
+                 head_.major_type == cbor::detail::cbor_major_type::map
+                ? detail_view::skip_container(p, end_, head_,
+                      (std::numeric_limits<int>::max)(),
+                      detail_view::scan_access::workspace(*context_), ec)
+                : detail_view::skip_scalar_or_string(head_, p, end_, ec);
+            assert(ok && !ec);
+            (void)ok;
+            next_ = p;
+        }
+
+        const uint8_t* pos_;    // current child's begin, nullptr when exhausted
+        const uint8_t* next_;   // current child's end, the next child's begin
+        const uint8_t* end_;    // the parent's end
+        uint64_t remaining_;    // raw children left; indefinite ends at a break
+        detail_view::item_head head_;
+        const uint8_t* content_;
+        scan_context* context_;
+    };
+
+    class item::child_range
+    {
+    public:
+        using iterator = child_iterator;
+        using const_iterator = child_iterator;
+
+        child_iterator begin() const
+        {
+            if (first_ == nullptr)
+            {
+                return child_iterator();
+            }
+            return child_iterator(first_, end_, remaining_, *context_);
+        }
+
+        child_iterator end() const noexcept
+        {
+            return child_iterator();
+        }
+
+        bool empty() const noexcept
+        {
+            return first_ == nullptr ||
+                (remaining_ == detail_view::indefinite_array_marker
+                    ? *first_ == 0xff : remaining_ == 0);
+        }
+
+    private:
+        friend class item;
+        child_range(const uint8_t* first, const uint8_t* end, uint64_t remaining,
+                    scan_context* context) noexcept
+            : first_(first), end_(end), remaining_(remaining), context_(context)
+        {
+        }
+
+        const uint8_t* first_;
+        const uint8_t* end_;
+        uint64_t remaining_;
+        scan_context* context_;
+    };
+
+    inline item::child_range item::children(scan_context& context) const noexcept
+    {
+        if (head_.major_type != cbor::detail::cbor_major_type::array &&
+            head_.major_type != cbor::detail::cbor_major_type::map)
+        {
+            return child_range(nullptr, nullptr, 0, &context);
+        }
+        const uint64_t remaining = head_.indefinite()
+            ? detail_view::indefinite_array_marker
+            : (head_.major_type == cbor::detail::cbor_major_type::map
+                ? 2 * head_.value : head_.value);
+        return child_range(content_, bytes_.data() + bytes_.size(), remaining, &context);
+    }
+
     struct scan_result
     {
         item first;
         span<const uint8_t> remainder;
     };
 
-    // Scans the first item in `input`, validating its well-formedness, and
+    // Scans the first item in `input`, validating structural well-formedness, and
     // returns it together with the remaining bytes. On failure the error
     // holds the offending code and the offset at which scanning stopped.
     inline expected<scan_result, scan_error> scan_prefix(span<const uint8_t> input, scan_context& context)
@@ -1329,6 +1490,8 @@ namespace view {
         const uint8_t* end = p + input.size();
         std::error_code ec;
 
+        detail_view::pending_stack& workspace = detail_view::scan_access::workspace(context);
+        workspace.clear();
         // Parse the head once and keep it, so the item is built below without
         // re-reading its own head.
         detail_view::item_head head;
@@ -1342,7 +1505,7 @@ namespace view {
         const bool ok = (head.major_type == cbor::detail::cbor_major_type::array ||
                          head.major_type == cbor::detail::cbor_major_type::map)
             ? detail_view::skip_container(p, end, head, context.max_nesting_depth(),
-                  detail_view::scan_access::workspace(context), ec)
+                  workspace, ec)
             : detail_view::skip_scalar_or_string(head, p, end, ec);
         if (!ok)
         {
@@ -1384,16 +1547,395 @@ namespace view {
         return parse_exact(input, context);
     }
 
-    // Guard against scanning a temporary container: the resulting views
-    // would dangle immediately. Non-owning view types (spans, string views)
-    // are trivially copyable and pass through.
-    template <typename Container, typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
+    {
+        const std::size_t start = position();
+        auto scanned = scan_prefix(remaining(), context);
+        if (!scanned)
+        {
+            scan_error error = scanned.error();
+            const std::size_t available = static_cast<std::size_t>(end_ - current_);
+            current_ += (std::min)(error.offset, available);
+            error.offset += start;
+            return expected<item, scan_error>(unexpect, error);
+        }
+
+        current_ += scanned.value().first.encoded_bytes().size();
+        return scanned.value().first;
+    }
+
+    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context)
+    {
+        const uint8_t* const start = current_;
+        std::error_code ec;
+        const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
+            detail_view::scan_access::workspace(context), ec);
+        if (!ok)
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect,
+                scan_error{detail_view::to_cbor_errc(ec), position()});
+        }
+        return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
+    }
+
+
+    inline expected<navigation_result, scan_error> navigate_prefix(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
+        {
+            return expected<navigation_result, scan_error>(unexpect, scanned.error());
+        }
+
+        navigator result = detail_view::navigator_access::make(
+            scanned.value().first.encoded_bytes(),
+            detail_view::scan_access::peak_depth(context),
+            std::move(detail_view::scan_access::workspace(context)));
+        return navigation_result{std::move(result), scanned.value().remainder};
+    }
+
+    inline expected<navigator, scan_error> navigate_exact(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth)
+    {
+        auto navigated = navigate_prefix(input, max_nesting_depth);
+        if (!navigated)
+        {
+            return expected<navigator, scan_error>(unexpect, navigated.error());
+        }
+        if (!navigated.value().remainder.empty())
+        {
+            return expected<navigator, scan_error>(unexpect,
+                scan_error{cbor_errc::trailing_data,
+                    input.size() - navigated.value().remainder.size()});
+        }
+        return std::move(navigated.value().first);
+    }
+
+    inline expected<span<const uint8_t>, scan_error> navigator::reset_prefix(
+        span<const uint8_t> input, int max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
+        auto scanned = scan_prefix(input, context);
+        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
+        validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
+        if (!scanned)
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
+        }
+
+        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
+        return scanned.value().remainder;
+    }
+
+    inline expected<span<const uint8_t>, scan_error> navigator::reset_exact(
+        span<const uint8_t> input, int max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
+        auto scanned = scan_prefix(input, context);
+        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
+        validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
+        if (!scanned)
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
+        }
+        if (!scanned.value().remainder.empty())
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect,
+                scan_error{cbor_errc::trailing_data,
+                    scanned.value().first.encoded_bytes().size()});
+        }
+
+        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
+        return span<const uint8_t>();
+    }
+
+    inline navigator::node_state navigator::read_node(
+        std::size_t begin, position_role role, std::size_t right_fence) const noexcept
+    {
+        const uint8_t* const base = input_.data();
+        const uint8_t* p = base + begin;
+        const uint8_t* const input_end = base + input_.size();
+        detail_view::item_head head;
+        std::error_code ec;
+        std::size_t head_begin = begin;
+        bool ok;
+        do
+        {
+            head_begin = static_cast<std::size_t>(p - base);
+            ok = detail_view::read_head(p, input_end, head, ec);
+            assert(ok && !ec);
+        }
+        while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+        (void)ok;
+
+        node_state node;
+        node.begin = begin;
+        node.head_begin = head_begin;
+        node.content_begin = static_cast<std::size_t>(p - base);
+        node.head = head;
+        node.role = role;
+
+        switch (head.major_type)
+        {
+            case cbor::detail::cbor_major_type::unsigned_integer:
+            case cbor::detail::cbor_major_type::negative_integer:
+            case cbor::detail::cbor_major_type::simple:
+                node.end = node.content_begin;
+                break;
+            case cbor::detail::cbor_major_type::byte_string:
+            case cbor::detail::cbor_major_type::text_string:
+                if (!head.indefinite())
+                {
+                    node.end = node.content_begin + static_cast<std::size_t>(head.value);
+                }
+                else if (right_fence != npos)
+                {
+                    node.end = right_fence;
+                }
+                else if (input_[node.content_begin] == 0xff)
+                {
+                    node.end = node.content_begin + 1;
+                }
+                break;
+            case cbor::detail::cbor_major_type::array:
+            case cbor::detail::cbor_major_type::map:
+                if (right_fence != npos)
+                {
+                    node.end = right_fence;
+                }
+                else if (!head.indefinite() && head.value == 0)
+                {
+                    node.end = node.content_begin;
+                }
+                else if (head.indefinite() && input_[node.content_begin] == 0xff)
+                {
+                    node.end = node.content_begin + 1;
+                }
+                break;
+            default:
+                assert(false);
+                break;
+        }
+        return node;
+    }
+
+    inline void navigator::initialize_frame(
+        navigation_frame& frame, const node_state& container) noexcept
+    {
+        frame.container = container;
+        if (container.head.indefinite())
+        {
+            frame.remaining = container.head.major_type == cbor::detail::cbor_major_type::map
+                ? detail_view::indefinite_map_key_marker
+                : detail_view::indefinite_array_marker;
+        }
+        else
+        {
+            frame.remaining = container.head.major_type == cbor::detail::cbor_major_type::map
+                ? 2 * container.head.value
+                : container.head.value;
+        }
+    }
+
+    inline bool navigator::take_child(
+        navigation_frame& frame, std::size_t& offset,
+        position_role& role, std::size_t& right_fence) noexcept
+    {
+        right_fence = npos;
+        if (frame.remaining == 0)
+        {
+            if (frame.container.end != npos)
+            {
+                assert(offset == frame.container.end);
+                offset = frame.container.end;
+            }
+            else
+            {
+                frame.container.end = offset;
+            }
+            return false;
+        }
+
+        if (frame.remaining == detail_view::indefinite_array_marker ||
+            frame.remaining == detail_view::indefinite_map_key_marker)
+        {
+            if (input_[offset] == 0xff)
+            {
+                frame.container.end = ++offset;
+                frame.remaining = 0;
+                return false;
+            }
+        }
+
+        if (frame.remaining < detail_view::indefinite_map_value_marker)
+        {
+            role = frame.container.head.major_type == cbor::detail::cbor_major_type::map
+                ? ((frame.remaining & 1) == 0 ? position_role::map_key : position_role::map_value)
+                : position_role::array_element;
+            --frame.remaining;
+            if (frame.remaining == 0 && frame.container.end != npos)
+            {
+                right_fence = frame.container.end;
+            }
+        }
+        else if (frame.remaining == detail_view::indefinite_array_marker)
+        {
+            role = position_role::array_element;
+        }
+        else if (frame.remaining == detail_view::indefinite_map_key_marker)
+        {
+            role = position_role::map_key;
+            frame.remaining = detail_view::indefinite_map_value_marker;
+        }
+        else
+        {
+            role = position_role::map_value;
+            frame.remaining = detail_view::indefinite_map_key_marker;
+        }
+        return true;
+    }
+
+    inline void navigator::establish_end(node_state& node) noexcept
+    {
+        if (node.end != npos)
+        {
+            return;
+        }
+
+        const uint8_t* const base = input_.data();
+        const uint8_t* p = base + node.content_begin;
+        const uint8_t* const end = base + input_.size();
+        std::error_code ec;
+        const bool is_container = node.head.major_type == cbor::detail::cbor_major_type::array ||
+                                  node.head.major_type == cbor::detail::cbor_major_type::map;
+        const bool ok = is_container
+            ? detail_view::skip_container(p, end, node.head,
+                  (std::numeric_limits<int>::max)(), validation_workspace_, ec)
+            : detail_view::skip_scalar_or_string(node.head, p, end, ec);
+        assert(ok && !ec);
+        (void)ok;
+        node.end = static_cast<std::size_t>(p - base);
+    }
+
+    inline bool navigator::enter() noexcept
+    {
+        if (current_.head.major_type != cbor::detail::cbor_major_type::array &&
+            current_.head.major_type != cbor::detail::cbor_major_type::map)
+        {
+            return false;
+        }
+        if ((!current_.head.indefinite() && current_.head.value == 0) ||
+            (current_.head.indefinite() && input_[current_.content_begin] == 0xff))
+        {
+            return false;
+        }
+
+        assert(active_depth_ < frames_.size());
+        navigation_frame& frame = frames_[active_depth_];
+        initialize_frame(frame, current_);
+        std::size_t offset = current_.content_begin;
+        position_role child_role = position_role::array_element;
+        std::size_t right_fence = npos;
+        const bool has_child = take_child(frame, offset, child_role, right_fence);
+        assert(has_child);
+        (void)has_child;
+        current_ = read_node(offset, child_role, right_fence);
+        ++active_depth_;
+        return true;
+    }
+
+    inline bool navigator::next() noexcept
+    {
+        if (active_depth_ == 0)
+        {
+            return false;
+        }
+
+        navigation_frame& frame = frames_[active_depth_ - 1];
+        if (frame.remaining == 0)
+        {
+            if (frame.container.end == npos)
+            {
+                establish_end(current_);
+                frame.container.end = current_.end;
+            }
+            return false;
+        }
+        establish_end(current_);
+        std::size_t offset = current_.end;
+        position_role child_role = position_role::array_element;
+        std::size_t right_fence = npos;
+        if (!take_child(frame, offset, child_role, right_fence))
+        {
+            return false;
+        }
+
+        current_ = read_node(offset, child_role, right_fence);
+        return true;
+    }
+
+    inline bool navigator::leave() noexcept
+    {
+        if (active_depth_ == 0)
+        {
+            return false;
+        }
+
+        navigation_frame& frame = frames_[active_depth_ - 1];
+        if (frame.container.end == npos)
+        {
+            establish_end(current_);
+            std::size_t offset = current_.end;
+            position_role child_role = position_role::array_element;
+            std::size_t right_fence = npos;
+            while (take_child(frame, offset, child_role, right_fence))
+            {
+                node_state unread = read_node(offset, child_role, right_fence);
+                establish_end(unread);
+                offset = unread.end;
+            }
+        }
+
+        current_ = frame.container;
+        --active_depth_;
+        return true;
+    }
+
+    inline item navigator::finish_item() noexcept
+    {
+        establish_end(current_);
+        return detail_view::item_access::make(
+            span<const uint8_t>(input_.data() + current_.begin,
+                                current_.end - current_.begin),
+            current_.head, input_.data() + current_.content_begin);
+    }
+
+    template <typename Container>
+    expected<navigation_result, scan_error> navigate_prefix(
+        const Container&&,
+        int = default_max_nesting_depth) = delete;
+
+    template <typename Container>
+    expected<navigator, scan_error> navigate_exact(
+        const Container&&,
+        int = default_max_nesting_depth) = delete;
+
+
+    // Guard against temporary owning containers; the concrete span overloads
+    // remain available for explicit non-owning views.
+    template <typename Container>
     expected<scan_result, scan_error> scan_prefix(const Container&&, scan_context&) = delete;
-    template <typename Container, typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    template <typename Container>
     expected<scan_result, scan_error> scan_prefix(const Container&&) = delete;
-    template <typename Container, typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    template <typename Container>
     expected<item, scan_error> parse_exact(const Container&&, scan_context&) = delete;
-    template <typename Container, typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    template <typename Container>
     expected<item, scan_error> parse_exact(const Container&&) = delete;
 
     // Deterministic encoding orders over the encoded bytes of items.
@@ -1453,28 +1995,6 @@ namespace view {
         }
     };
 
-    // True if `map_item` is a map whose keys are strictly ascending in the
-    // given order, RFC 8949 4.2 deterministic encoding style. Duplicate
-    // keys are not ascending. Does not allocate.
-    template <typename Compare = bytewise_compare>
-    bool map_keys_sorted(const item& map_item, Compare compare = Compare())
-    {
-        if (map_item.kind() != item_kind::map)
-        {
-            return false;
-        }
-        span<const uint8_t> prev;
-        for (item::entry_iterator it = map_item.entries().begin(); it != item::entry_iterator(); ++it)
-        {
-            const span<const uint8_t> key = (*it).key.encoded_bytes();
-            if (!prev.empty() && compare(prev, key) >= 0)
-            {
-                return false;
-            }
-            prev = key;
-        }
-        return true;
-    }
 
     // Span-based order entry points for raw-span consumers (e.g. collation over
     // byte-string keys). Each validates its input(s) then orders the encoded
@@ -1504,12 +2024,33 @@ namespace view {
         Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
-        auto result = scan_prefix(input, context);
-        if (!result)
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
         {
-            return expected<bool, scan_error>(unexpect, result.error());
+            return expected<bool, scan_error>(unexpect, scanned.error());
         }
-        return map_keys_sorted(result.value().first, order);
+        const item map_item = scanned.value().first;
+        if (map_item.kind() != item_kind::map)
+        {
+            return false;
+        }
+
+        span<const uint8_t> previous;
+        bool is_key = true;
+        for (item child : map_item.children(context))
+        {
+            if (is_key)
+            {
+                const span<const uint8_t> key = child.encoded_bytes();
+                if (!previous.empty() && order(previous, key) >= 0)
+                {
+                    return false;
+                }
+                previous = key;
+            }
+            is_key = !is_key;
+        }
+        return true;
     }
 
     // True if `text_item` is a text string whose content is well-formed
