@@ -672,18 +672,6 @@ namespace view {
     private:
         friend struct detail_view::item_access;
 
-        explicit item(span<const uint8_t> bytes) noexcept
-            : bytes_(bytes)
-        {
-            const uint8_t* p = bytes.data();
-            const uint8_t* end = p + bytes.size();
-            std::error_code ec;
-            const bool ok = detail_view::read_value_head(p, end, head_, ec);
-            assert(ok && !ec);
-            (void)ok;
-            content_ = p;
-        }
-
         item(span<const uint8_t> bytes, const detail_view::item_head& head, const uint8_t* content) noexcept
             : bytes_(bytes), head_(head), content_(content)
         {
@@ -698,11 +686,6 @@ namespace view {
 
         struct item_access
         {
-            static item make(span<const uint8_t> bytes) noexcept
-            {
-                return item(bytes);
-            }
-
             static item make(span<const uint8_t> bytes, const item_head& head, const uint8_t* content) noexcept
             {
                 return item(bytes, head, content);

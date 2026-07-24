@@ -266,8 +266,7 @@ complete item, returning its encoded bytes unparsed; `skip` advances past
 `count` bytes of already-measured content, such as a definite string payload
 after its head, refusing when fewer bytes remain. Errors report offsets from
 the beginning of the cursor's input.
-The former public `(const uint8_t*& p, const uint8_t* end)` overloads have
-been removed; raw pointer pairs remain implementation details only.
+
 ### Examples
 
 #### Reading a message without copying it
