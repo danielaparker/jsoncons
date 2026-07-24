@@ -787,6 +787,17 @@ TEST_CASE("cbor view navigator construction and root access")
         CHECK(navigator.argument() == 1);
         CHECK(navigator.role() == cbor::view::position_role::root);
         CHECK(navigator.depth() == 0);
+        std::vector<uint8_t> deep(100, 0x81);
+        deep.push_back(0x05);
+        REQUIRE(navigator.reset_exact(jsoncons::span<const uint8_t>(deep), 200).has_value());
+        REQUIRE(navigator.reset_exact(jsoncons::span<const uint8_t>(replacement), 200).has_value());
+        REQUIRE(navigator.reset_exact(jsoncons::span<const uint8_t>(deep), 200).has_value());
+        for (std::size_t i = 0; i < 100; ++i)
+        {
+            REQUIRE(navigator.enter());
+        }
+        CHECK(navigator.argument() == 5);
+
     }
 }
 

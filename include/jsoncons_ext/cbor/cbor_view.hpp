@@ -318,6 +318,19 @@ namespace view {
                 peak_size_ = 0;
             }
 
+            void swap(pending_stack& other) noexcept
+            {
+                for (std::size_t i = 0; i < local_capacity; ++i)
+                {
+                    using std::swap;
+                    swap(local_[i], other.local_[i]);
+                }
+                spill_.swap(other.spill_);
+                using std::swap;
+                swap(size_, other.size_);
+                swap(peak_size_, other.peak_size_);
+            }
+
             void push(uint64_t count)
             {
                 if (size_ < local_capacity)
@@ -750,11 +763,19 @@ namespace view {
         {
         }
 
+        template <typename Container,
+                  typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+        wire_cursor(const Container&&) = delete;
+
         void reset(span<const uint8_t> input) noexcept
         {
             input_ = input;
             offset_ = 0;
         }
+
+        template <typename Container,
+                  typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+        void reset(const Container&&) = delete;
 
         std::size_t position() const noexcept
         {
@@ -1540,6 +1561,18 @@ namespace view {
             span<const uint8_t> input,
             int max_nesting_depth = default_max_nesting_depth);
 
+        template <typename Container,
+                  typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+        expected<span<const uint8_t>, scan_error> reset_prefix(
+            const Container&&,
+            int = default_max_nesting_depth) = delete;
+
+        template <typename Container,
+                  typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+        expected<void, scan_error> reset_exact(
+            const Container&&,
+            int = default_max_nesting_depth) = delete;
+
     private:
         friend struct detail_view::navigator_access;
 
@@ -1550,8 +1583,10 @@ namespace view {
                         position_role& role, std::size_t& right_fence) noexcept;
         void establish_end(node_state& node) noexcept;
 
-        navigator(span<const uint8_t> root, std::size_t peak_depth)
-            : input_(root), root_(), current_(), frames_(peak_depth), active_depth_(0)
+        navigator(span<const uint8_t> root, std::size_t peak_depth,
+                  detail_view::pending_stack&& validation_workspace)
+            : input_(root), root_(), current_(), frames_(peak_depth),
+              validation_workspace_(std::move(validation_workspace)), active_depth_(0)
         {
             initialize_root();
         }
@@ -1596,6 +1631,7 @@ namespace view {
         node_state root_;
         node_state current_;
         std::vector<navigation_frame> frames_;
+        detail_view::pending_stack validation_workspace_;
         std::size_t active_depth_;
     };
 
@@ -1603,9 +1639,10 @@ namespace view {
 
         struct navigator_access
         {
-            static navigator make(span<const uint8_t> root, std::size_t peak_depth)
+            static navigator make(span<const uint8_t> root, std::size_t peak_depth,
+                                  pending_stack&& validation_workspace)
             {
-                return navigator(root, peak_depth);
+                return navigator(root, peak_depth, std::move(validation_workspace));
             }
         };
 
@@ -1668,6 +1705,11 @@ namespace view {
             static std::size_t peak_depth(scan_context& context) noexcept
             {
                 return context.workspace_.peak_size();
+            }
+
+            static void swap_workspace(scan_context& context, pending_stack& workspace) noexcept
+            {
+                context.workspace_.swap(workspace);
             }
         };
 
@@ -1788,7 +1830,8 @@ namespace view {
 
         navigator result = detail_view::navigator_access::make(
             scanned.value().first.encoded_bytes(),
-            detail_view::scan_access::peak_depth(context));
+            detail_view::scan_access::peak_depth(context),
+            std::move(detail_view::scan_access::workspace(context)));
         return navigation_result(std::move(result), scanned.value().remainder);
     }
 
@@ -1814,14 +1857,16 @@ namespace view {
         span<const uint8_t> input, int max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
+        detail_view::scan_access::swap_workspace(context, validation_workspace_);
         auto scanned = scan_prefix(input, context);
+        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
+        detail_view::scan_access::swap_workspace(context, validation_workspace_);
         if (!scanned)
         {
             return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
         }
 
-        prepare_checked(scanned.value().first.encoded_bytes(),
-                        detail_view::scan_access::peak_depth(context));
+        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
         return scanned.value().remainder;
     }
 
@@ -1829,7 +1874,10 @@ namespace view {
         span<const uint8_t> input, int max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
+        detail_view::scan_access::swap_workspace(context, validation_workspace_);
         auto scanned = scan_prefix(input, context);
+        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
+        detail_view::scan_access::swap_workspace(context, validation_workspace_);
         if (!scanned)
         {
             return expected<void, scan_error>(unexpect, scanned.error());
@@ -1841,8 +1889,7 @@ namespace view {
                     scanned.value().first.encoded_bytes().size()});
         }
 
-        prepare_checked(scanned.value().first.encoded_bytes(),
-                        detail_view::scan_access::peak_depth(context));
+        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
         return expected<void, scan_error>();
     }
 
@@ -2149,6 +2196,19 @@ namespace view {
                                 current_.end - current_.begin),
             current_.head, input_.data() + current_.content_begin);
     }
+
+    template <typename Container,
+              typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    expected<navigation_result, scan_error> navigate_prefix(
+        const Container&&,
+        int = default_max_nesting_depth) = delete;
+
+    template <typename Container,
+              typename std::enable_if<!std::is_trivially_copyable<Container>::value, int>::type = 0>
+    expected<navigator, scan_error> navigate_exact(
+        const Container&&,
+        int = default_max_nesting_depth) = delete;
+
 
     // Guard against scanning a temporary container: the resulting views
     // would dangle immediately. Non-owning view types (spans, string views)

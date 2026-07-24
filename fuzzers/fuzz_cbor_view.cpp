@@ -215,6 +215,68 @@ namespace {
         }
     }
 
+    void exercise_navigator(byte_span input, int depth)
+    {
+        auto navigated = navigate_prefix(input, depth);
+        scan_context context(depth);
+        auto scanned = scan_prefix(input, context);
+        require(navigated.has_value() == scanned.has_value());
+        if (!navigated.has_value())
+        {
+            return;
+        }
+
+        navigator nav = std::move(navigated.value().first);
+        require(navigated.value().remainder.size() == scanned.value().remainder.size());
+        require(nav.role() == position_role::root);
+        require(nav.depth() == 0);
+        require(nav.extent_known());
+
+        const item root = nav.finish_item();
+        require(root.encoded_bytes().data() == input.data());
+        require(root.encoded_bytes().size() == scanned.value().first.encoded_bytes().size());
+
+        for (int steps = 0; steps < 256; ++steps)
+        {
+            uint64_t u = 0;
+            int64_t i = 0;
+            bool b = false;
+            double d = 0;
+            jsoncons::string_view text;
+            byte_span bytes;
+            (void)nav.uint64_value(u);
+            (void)nav.int64_value(i);
+            (void)nav.bool_value(b);
+            (void)nav.double_value(d);
+            (void)nav.text(text);
+            (void)nav.bytes(bytes);
+
+            if (nav.enter())
+            {
+                require(nav.depth() > 0);
+                continue;
+            }
+            if (nav.next())
+            {
+                continue;
+            }
+            if (!nav.leave())
+            {
+                break;
+            }
+        }
+
+        nav.rewind();
+        require(nav.depth() == 0);
+        require(nav.role() == position_role::root);
+        require(nav.finish_item().encoded_bytes().size() == root.encoded_bytes().size());
+
+        auto reset = nav.reset_prefix(input, depth);
+        require(reset.has_value());
+        require(reset.value().size() == navigated.value().remainder.size());
+    }
+
+
     void exercise_input(byte_span input, scan_context& context)
     {
         auto scanned = scan_prefix(input, context);
@@ -280,9 +342,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     {
         scan_context context(depth);
         exercise_input(input, context);
+        exercise_navigator(input, depth);
         exercise_input(byte_span(base, mid), context);
+        exercise_navigator(byte_span(base, mid), depth);
         exercise_input(byte_span(base + mid, size - mid), context);
+        exercise_navigator(byte_span(base + mid, size - mid), depth);
         exercise_input(byte_span(base + p0, size - p0), context);
+        exercise_navigator(byte_span(base + p0, size - p0), depth);
     }
 
     return 0;

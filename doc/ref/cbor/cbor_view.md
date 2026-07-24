@@ -8,28 +8,30 @@
 
 The `cbor::view` namespace reads the *encoded* structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
-without copying it or building a data structure. Its spine is four stages:
+without copying it or building a data structure. Its checked-item layer
+borrows complete encodings; its move-only `navigator` owns reusable traversal
+workspace while borrowing the same bytes. The data flow is:
+> owned bytes -> structural validation -> checked item or navigator -> application semantics
 
-> owned bytes -> structural validation -> borrowed checked items -> application semantics
-
-A scan validates that bytes are *structurally* well-formed CBOR once
-(framing only — not validity such as UTF-8); everything afterwards
-operates on checked `item` views and cannot fail structurally. The last
-stage — what tag 2 bytes or a tag 25 string reference *mean* — belongs to
-[decode_cbor](decode_cbor.md) and [basic_cbor_cursor](basic_cbor_cursor.md),
-not here: tags are exposed, never interpreted.
+Validation checks structural well-formedness once (framing only — not content
+validity such as UTF-8). Checked items and navigator movement then cannot fail
+structurally. The last stage — what tag 2 bytes or a tag 25 string reference
+*mean* — belongs to [decode_cbor](decode_cbor.md) and
+[basic_cbor_cursor](basic_cbor_cursor.md), not here: tags are exposed, never
+interpreted.
 
 This namespace is experimental.
 
 #### Ownership and lifetime
 
-Everything in this namespace borrows. An `item`, the items produced by
-iterating it, and every span and string view obtained from them point
-into the scanned input bytes, and are invalidated by anything that
-invalidates those bytes: destroying the container, mutating it, or any
-reallocation. Scanning a temporary container is rejected at compile
-time. The copying accessors (`text` into `std::string`, `bytes` into
-`std::vector`) are the way to keep content beyond the input's lifetime.
+All views borrow the input bytes. An `item`, a `navigator`, the items produced
+by container ranges, and every span and string view obtained from them are
+invalidated by anything that invalidates those bytes: destroying the container,
+mutating it, or reallocation. A navigator owns only its mutable navigation and
+validation workspace; it does not own the encoded bytes. Factory, reset, and
+`wire_cursor` entry points reject temporary owning containers at compile time.
+The copying item accessors (`text` into `std::string`, `bytes` into
+`std::vector`) retain content independently.
 
 #### Scanning
 
@@ -62,8 +64,92 @@ anything after it as `cbor_errc::trailing_data`.
 
 Scanning enforces `scan_context::max_nesting_depth` (default
 `default_max_nesting_depth`, 1024) using constant call-stack space at
-any depth. It allocates only when nesting exceeds 32 open containers;
-a reused `scan_context` retains that capacity across scans.
+any depth. It allocates only when nesting exceeds 32 open containers; a reused
+`scan_context`, `wire_cursor` with a supplied context, or navigator reset retains
+that validation capacity.
+
+#### Structural navigation
+
+```cpp
+enum class position_role { root, array_element, map_key, map_value };
+
+struct navigation_result
+{
+    navigator first;
+    span<const uint8_t> remainder;
+};
+
+expected<navigation_result, scan_error> navigate_prefix(
+    span<const uint8_t> input,
+    int max_nesting_depth = default_max_nesting_depth);
+
+expected<navigator, scan_error> navigate_exact(
+    span<const uint8_t> input,
+    int max_nesting_depth = default_max_nesting_depth);
+
+class navigator
+{
+public:
+    navigator(navigator&&) noexcept;
+    navigator& operator=(navigator&&) noexcept;
+    navigator(const navigator&) = delete;
+
+    item_kind kind() const noexcept;
+    uint64_t argument() const noexcept;
+    bool indefinite() const noexcept;
+    tag_range tags() const noexcept;
+    position_role role() const noexcept;
+    std::size_t depth() const noexcept;
+
+    bool uint64_value(uint64_t&) const noexcept;
+    bool int64_value(int64_t&) const noexcept;
+    bool bool_value(bool&) const noexcept;
+    bool double_value(double&) const noexcept;
+    bool text(string_view&) const noexcept;
+    bool bytes(span<const uint8_t>&) const noexcept;
+
+    bool enter() noexcept;
+    bool next() noexcept;
+    bool leave() noexcept;
+    void rewind() noexcept;
+
+    item finish_item() noexcept;
+    bool extent_known() const noexcept;
+
+    expected<span<const uint8_t>, scan_error> reset_prefix(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth);
+    expected<void, scan_error> reset_exact(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth);
+};
+```
+
+A navigator begins at the checked root. `enter()` moves into a nonempty array
+or map; maps expose raw children with alternating key/value roles. `next()`
+moves to the next raw sibling, skipping the current unopened container if
+necessary. At the end of the siblings it returns `false`; `leave()` restores
+the completed parent. Calling `leave()` early skips only the unread remainder.
+`rewind()` restores the root.
+
+The current position exposes its already parsed head and scalar/string content.
+A container child may not yet have a known end. `finish_item()` establishes and
+caches that end, walking the current subtree only when necessary, and returns an
+ordinary complete `item`. `extent_known()` makes that cost visible. Descent after
+`finish_item()` is legal and revisits the subtree.
+
+Validation records the observed peak open-container depth and prepares exactly
+that many frame slots. Movement, subtree skips, and parent restoration use
+indexed assignments into those slots and do not allocate. `reset_prefix` and
+`reset_exact` are transactional and retain both traversal-frame capacity and
+the validation walker's spill capacity across messages.
+
+A known parent boundary propagates to its final definite child. Consequently,
+the last payload in a definite transport tuple can be finished in O(1), even
+when it is a large container. Non-final arbitrary containers have the honest
+O(depth) tradeoff: descend immediately without a pre-walk, or establish/capture
+the exact span with one subtree walk.
+
 
 #### The checked item
 
@@ -194,6 +280,7 @@ remaining bytes without a mutable pointer/end pair. `read_head` advances past
 one head only (tags are returned as their own heads); `read_item` validates and
 returns one complete checked item. Errors report offsets from the beginning of
 the cursor's input.
+ The former public `(const uint8_t*& p, const uint8_t* end)` overloads have been removed; raw pointer pairs remain implementation details only.
 ### Examples
 
 #### Reading a message without copying it
