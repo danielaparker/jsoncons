@@ -390,125 +390,6 @@ TEST_CASE("cbor view copying accessors are transactional")
     }
 }
 
-TEST_CASE("cbor view container ranges")
-{
-    SECTION("elements are checked items in order")
-    {
-        // [1, "hi", [2, 3]]
-        std::vector<uint8_t> data = {0x83,0x01,0x62,'h','i',0x82,0x02,0x03};
-        cbor::view::item array_item = parse(data);
-
-        std::vector<cbor::view::item_kind> kinds;
-        std::vector<std::size_t> offsets;
-        for (cbor::view::item element : array_item.elements())
-        {
-            kinds.push_back(element.kind());
-            offsets.push_back(static_cast<std::size_t>(element.encoded_bytes().data() - data.data()));
-        }
-        CHECK((kinds == std::vector<cbor::view::item_kind>{
-            cbor::view::item_kind::unsigned_integer,
-            cbor::view::item_kind::text_string,
-            cbor::view::item_kind::array}));
-        CHECK((offsets == std::vector<std::size_t>{1,2,5}));
-    }
-
-    SECTION("nested containers iterate recursively")
-    {
-        std::vector<uint8_t> data = {0x82,0x81,0x0a,0x82,0x0b,0x0c};   // [[10],[11,12]]
-        uint64_t sum = 0;
-        for (cbor::view::item inner : parse(data).elements())
-        {
-            for (cbor::view::item element : inner.elements())
-            {
-                uint64_t v = 0;
-                REQUIRE(element.uint64_value(v));
-                sum += v;
-            }
-        }
-        CHECK(sum == 33);
-    }
-
-    SECTION("indefinite arrays iterate and may stop early")
-    {
-        std::vector<uint8_t> data = {0x9f,0x01,0x02,0x03,0xff};
-        std::size_t count = 0;
-        for (cbor::view::item element : parse(data).elements())
-        {
-            (void)element;
-            if (++count == 2)
-            {
-                break;
-            }
-        }
-        CHECK(count == 2);
-    }
-
-    SECTION("entries expose checked keys and values")
-    {
-        // {1: "a", "k": 2}
-        std::vector<uint8_t> data = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
-        std::size_t count = 0;
-        for (cbor::view::map_entry entry : parse(data).entries())
-        {
-            if (count == 0)
-            {
-                uint64_t k = 0;
-                REQUIRE(entry.key.uint64_value(k));
-                CHECK(k == 1);
-                jsoncons::string_view v;
-                REQUIRE(entry.value.text(v));
-                CHECK(std::string(v.data(), v.size()) == "a");
-                CHECK(entry.key.encoded_bytes().data() == data.data() + 1);
-                CHECK(entry.value.encoded_bytes().data() == data.data() + 2);
-            }
-            else
-            {
-                jsoncons::string_view k;
-                REQUIRE(entry.key.text(k));
-                CHECK(std::string(k.data(), k.size()) == "k");
-                uint64_t v = 0;
-                REQUIRE(entry.value.uint64_value(v));
-                CHECK(v == 2);
-            }
-            ++count;
-        }
-        CHECK(count == 2);
-    }
-
-    SECTION("indefinite and tagged maps iterate alike")
-    {
-        std::vector<uint8_t> indefinite = {0xbf,0x01,0x02,0x03,0x04,0xff};
-        std::size_t count = 0;
-        for (cbor::view::map_entry entry : parse(indefinite).entries())
-        {
-            (void)entry;
-            ++count;
-        }
-        CHECK(count == 2);
-
-        std::vector<uint8_t> tagged = {0xc0,0xa1,0x01,0x02};
-        cbor::view::item tagged_map = parse(tagged);
-        CHECK_FALSE(tagged_map.tags().empty());
-        count = 0;
-        for (cbor::view::map_entry entry : tagged_map.entries())
-        {
-            (void)entry;
-            ++count;
-        }
-        CHECK(count == 1);
-    }
-
-    SECTION("mismatched and empty ranges are empty")
-    {
-        CHECK(parse({0x80}).elements().empty());
-        CHECK(parse({0xa0}).entries().empty());
-        CHECK(parse({0x9f,0xff}).elements().empty());
-        CHECK(parse({0xbf,0xff}).entries().empty());
-        CHECK(parse({0xa1,0x01,0x02}).elements().empty());   // a map has no elements
-        CHECK(parse({0x81,0x01}).entries().empty());         // an array has no entries
-        CHECK(parse({0x01}).elements().empty());
-    }
-}
 
 TEST_CASE("cbor view string chunks")
 {
@@ -626,35 +507,6 @@ TEST_CASE("cbor view deterministic encoding orders")
     }
 }
 
-TEST_CASE("cbor view map_keys_sorted")
-{
-    SECTION("detects deterministically ordered keys")
-    {
-        std::vector<uint8_t> sorted_map = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
-        std::vector<uint8_t> unsorted_map = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
-        CHECK(cbor::view::map_keys_sorted(parse(sorted_map)));
-        CHECK_FALSE(cbor::view::map_keys_sorted(parse(unsorted_map)));
-    }
-
-    SECTION("duplicate keys are not sorted")
-    {
-        std::vector<uint8_t> dup_map = {0xa2,0x01,0x00,0x01,0x01};
-        CHECK_FALSE(cbor::view::map_keys_sorted(parse(dup_map)));
-    }
-
-    SECTION("bytewise and length-first orders can disagree")
-    {
-        std::vector<uint8_t> m = {0xa2,0x18,0x64,0x00,0x20,0x00};
-        CHECK(cbor::view::map_keys_sorted(parse(m)));
-        CHECK_FALSE(cbor::view::map_keys_sorted(parse(m), cbor::view::length_first_compare()));
-    }
-
-    SECTION("non-maps are not sorted maps")
-    {
-        CHECK_FALSE(cbor::view::map_keys_sorted(parse({0x81,0x01})));
-        CHECK_FALSE(cbor::view::map_keys_sorted(parse({0x01})));
-    }
-}
 
 TEST_CASE("cbor view validate_text")
 {
@@ -894,6 +746,7 @@ TEST_CASE("cbor view navigator movement")
             CHECK(navigator.role() == cbor::view::position_role::map_value);
             CHECK(navigator.argument() == 4);
             CHECK_FALSE(navigator.next());
+            CHECK_FALSE(navigator.next());
             REQUIRE(navigator.leave());
             CHECK(navigator.role() == cbor::view::position_role::root);
         }
@@ -1037,7 +890,7 @@ TEST_CASE("cbor view wire cursor")
 
     SECTION("read_head reports malformed and truncated heads")
     {
-        cbor::view::wire_cursor empty;
+        cbor::view::wire_cursor empty{jsoncons::span<const uint8_t>()};
         auto no_head = empty.read_head();
         REQUIRE_FALSE(no_head.has_value());
         CHECK(no_head.error().code == cbor::cbor_errc::unexpected_eof);
@@ -1076,7 +929,8 @@ TEST_CASE("cbor view wire cursor")
     {
         std::vector<uint8_t> data = {0x01,0x81,0x81,0x01};   // 1 then [[1]]
         cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
-        REQUIRE(cursor.read_item().has_value());
+        cbor::view::scan_context default_context;
+        REQUIRE(cursor.read_item(default_context).has_value());
 
         cbor::view::scan_context context(1);
         auto result = cursor.read_item(context);
@@ -1086,20 +940,6 @@ TEST_CASE("cbor view wire cursor")
         CHECK(cursor.position() == 3);
     }
 
-    SECTION("reset reuses a cursor for a new span")
-    {
-        std::vector<uint8_t> first = {0x01};
-        std::vector<uint8_t> second = {0x02};
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(first)};
-        REQUIRE(cursor.read_item().has_value());
-        cursor.reset(jsoncons::span<const uint8_t>(second));
-        CHECK(cursor.position() == 0);
-        auto result = cursor.read_item();
-        REQUIRE(result.has_value());
-        uint64_t value = 0;
-        CHECK(result.value().uint64_value(value));
-        CHECK(value == 2);
-    }
 }
 
 TEST_CASE("cbor view span-based order entry points")
@@ -1138,16 +978,34 @@ TEST_CASE("cbor view span-based order entry points")
         CHECK(result.error().offset == 3);
     }
 
-    SECTION("map_keys_sorted over a span matches the item overload")
+    SECTION("map_keys_sorted validates and checks map keys")
     {
         std::vector<uint8_t> sorted_map = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
         std::vector<uint8_t> unsorted_map = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
+        std::vector<uint8_t> duplicate_map = {0xa2,0x01,0x00,0x01,0x01};
         auto sorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(sorted_map));
         REQUIRE(sorted.has_value());
         CHECK(sorted.value());
         auto unsorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(unsorted_map));
         REQUIRE(unsorted.has_value());
         CHECK_FALSE(unsorted.value());
+        auto duplicate = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(duplicate_map));
+        REQUIRE(duplicate.has_value());
+        CHECK_FALSE(duplicate.value());
+
+        std::vector<uint8_t> length_order = {0xa2,0x18,0x64,0x00,0x20,0x00};
+        auto bytewise = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(length_order));
+        auto length_first = cbor::view::map_keys_sorted(
+            jsoncons::span<const uint8_t>(length_order), cbor::view::length_first_compare());
+        REQUIRE(bytewise.has_value());
+        REQUIRE(length_first.has_value());
+        CHECK(bytewise.value());
+        CHECK_FALSE(length_first.value());
+
+        std::vector<uint8_t> array = {0x81,0x01};
+        auto not_map = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(array));
+        REQUIRE(not_map.has_value());
+        CHECK_FALSE(not_map.value());
 
         std::vector<uint8_t> malformed = {0xa1,0x01};   // key, no value
         auto bad = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(malformed));

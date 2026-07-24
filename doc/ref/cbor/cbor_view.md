@@ -24,8 +24,8 @@ This namespace is experimental.
 
 #### Ownership and lifetime
 
-All views borrow the input bytes. An `item`, a `navigator`, the items produced
-by container ranges, and every span and string view obtained from them are
+All views borrow the input bytes. An `item`, a `navigator`, and every span or
+string view obtained from them are
 invalidated by anything that invalidates those bytes: destroying the container,
 mutating it, or reallocation. A navigator owns only its mutable navigation and
 validation workspace; it does not own the encoded bytes. Factory, reset, and
@@ -119,7 +119,7 @@ public:
     expected<span<const uint8_t>, scan_error> reset_prefix(
         span<const uint8_t> input,
         int max_nesting_depth = default_max_nesting_depth);
-    expected<void, scan_error> reset_exact(
+    expected<span<const uint8_t>, scan_error> reset_exact(
         span<const uint8_t> input,
         int max_nesting_depth = default_max_nesting_depth);
 };
@@ -138,11 +138,12 @@ caches that end, walking the current subtree only when necessary, and returns an
 ordinary complete `item`. `extent_known()` makes that cost visible. Descent after
 `finish_item()` is legal and revisits the subtree.
 
-Validation records the observed peak open-container depth and prepares exactly
-that many frame slots. Movement, subtree skips, and parent restoration use
-indexed assignments into those slots and do not allocate. `reset_prefix` and
-`reset_exact` are transactional and retain both traversal-frame capacity and
-the validation walker's spill capacity across messages.
+Validation records the observed peak open-container depth, prepares that many
+navigation frames, and retains the validation scratch. Movement uses indexed
+frames; subtree skips reuse the retained scratch. Neither allocates after
+successful construction. Resets are transactional and retain both capacities.
+Both reset forms return the unconsumed remainder; it is empty after a
+successful exact reset.
 
 A known parent boundary propagates to its final definite child. Consequently,
 the last payload in a definite transport tuple can be finished in O(1), even
@@ -162,8 +163,6 @@ class item
     bool indefinite() const noexcept;
     tag_range tags() const noexcept;                     // leading tags, outermost first
 
-    element_range elements() const noexcept;             // array elements
-    entry_range entries() const noexcept;                // map entries
     chunk_range chunks() const noexcept;                 // string content spans
 
     bool uint64_value(uint64_t& value) const noexcept;
@@ -182,27 +181,19 @@ enum class item_kind
     array, map, simple
 };
 
-struct map_entry
-{
-    item key;
-    item value;
-};
 ```
 
-An `item` is one complete, well-formed encoded item: its leading
+An `item` is one complete, structurally well-formed encoded item: its leading
 semantic tags, head, and content. `kind()` classifies the content after
 tags (`simple` covers major type 7: simple values and floating point);
 `argument()` is the head's argument — an integer's value, a string's
 length, a container's count, a simple value's number, or the bit
 pattern of a floating-point value.
 
-The ranges iterate with plain range-`for` and cannot fail: validation
-already happened. `elements()` and `entries()` yield checked items;
-`chunks()` yields the contiguous spans of a string's content, one per
-chunk for indefinite-length strings. Kind mismatches yield empty
-ranges. Iterating a container walks its encoding, so navigating to
-depth *d* of a document rescans the subtrees on that path; iteration
-beyond 32 levels of nesting inside one item may allocate.
+`chunks()` yields the contiguous spans of a string's content, one per chunk
+for indefinite-length strings. Structural container traversal is intentionally
+provided only by `navigator`, avoiding a second iterator state machine and its
+hidden subtree rescans.
 
 The typed accessors return `false`, leaving `value` untouched, exactly
 when the item is not of the requested kind; conversions are strict.
@@ -229,9 +220,6 @@ struct length_first_compare;   // RFC 8949 4.2.3 order, three-way
 struct bytewise_less;          // strict weak orders for sorting
 struct length_first_less;
 
-template <typename Compare = bytewise_compare>
-bool map_keys_sorted(const item& map_item, Compare compare = Compare());
-
 // Span overloads for raw-span consumers; validate input, then order.
 template <typename Order = bytewise_compare>
 expected<int, scan_error> compare(span<const uint8_t> a, span<const uint8_t> b,
@@ -242,14 +230,11 @@ expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
     Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
 ```
 
-The order function objects compare encoded bytes and accept either two
-items or two raw `span<const uint8_t>`. The `*_compare` forms return
-negative, zero, or positive; the `*_less` forms are predicates for
-`std::sort` and ordered containers. `map_keys_sorted` is true if
-`map_item` is a map whose keys are strictly ascending in the given
-order — the deterministic-encoding key condition. The span overloads
-validate before ordering and, on malformed input, return an error carrying
-the code and byte offset; trailing bytes after the first item are tolerated.
+The order function objects compare encoded bytes and accept either two items
+or two raw spans. The `*_compare` forms return a three-way result; the `*_less`
+forms are predicates for sorting and ordered containers. The span-based
+`map_keys_sorted` validates once, then walks keys with a navigator; malformed
+input returns the code and byte offset, and trailing bytes are tolerated.
 
 #### Low-level tier
 
@@ -261,16 +246,12 @@ struct item_head { major_type major_type; uint8_t additional_info; uint64_t valu
 class wire_cursor
 {
 public:
-    wire_cursor() noexcept;
     explicit wire_cursor(span<const uint8_t> input) noexcept;
-    void reset(span<const uint8_t> input) noexcept;
 
     std::size_t position() const noexcept;
     span<const uint8_t> remaining() const noexcept;
     expected<item_head, scan_error> read_head() noexcept;
     expected<item, scan_error> read_item(scan_context& context);
-    expected<item, scan_error> read_item(
-        int max_nesting_depth = default_max_nesting_depth);
 };
 ```
 
@@ -280,7 +261,8 @@ remaining bytes without a mutable pointer/end pair. `read_head` advances past
 one head only (tags are returned as their own heads); `read_item` validates and
 returns one complete checked item. Errors report offsets from the beginning of
 the cursor's input.
- The former public `(const uint8_t*& p, const uint8_t* end)` overloads have been removed; raw pointer pairs remain implementation details only.
+The former public `(const uint8_t*& p, const uint8_t* end)` overloads have
+been removed; raw pointer pairs remain implementation details only.
 ### Examples
 
 #### Reading a message without copying it
@@ -288,55 +270,61 @@ the cursor's input.
 ```cpp
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 int main()
 {
-    // {"id": 42, "name": "ada", "scores": [1, 2]}
+    // {"id": 42, "scores": [1, 2]}
     const std::vector<uint8_t> data = {
-        0xa3,
+        0xa2,
         0x62,'i','d', 0x18,0x2a,
-        0x64,'n','a','m','e', 0x63,'a','d','a',
         0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
     };
 
-    auto doc = jsoncons::cbor::view::parse_exact(
-        jsoncons::span<const uint8_t>(data.data(), data.size()));
-    if (!doc.has_value())
+    auto result = jsoncons::cbor::view::navigate_exact(
+        jsoncons::span<const uint8_t>(data));
+    if (!result)
     {
-        std::cout << "malformed at offset " << doc.error().offset << "\n";
         return 1;
     }
 
-    for (jsoncons::cbor::view::map_entry entry : doc.value().entries())
+    auto nav = std::move(result.value());
+    if (!nav.enter())
+    {
+        return 0;
+    }
+    for (;;)
     {
         jsoncons::string_view name;
-        if (!entry.key.text(name))
+        if (!nav.text(name) || !nav.next())
         {
-            continue;
+            break;
         }
         std::cout << name << ":";
 
         uint64_t number = 0;
-        jsoncons::string_view text;
-        if (entry.value.text(text))
-        {
-            std::cout << " " << text;
-        }
-        else if (entry.value.uint64_value(number))
+        if (nav.uint64_value(number))
         {
             std::cout << " " << number;
         }
-        else
+        else if (nav.enter())
         {
-            for (jsoncons::cbor::view::item element : entry.value.elements())
+            do
             {
-                if (element.uint64_value(number))
+                if (nav.uint64_value(number))
                 {
                     std::cout << " " << number;
                 }
             }
+            while (nav.next());
+            nav.leave();
         }
         std::cout << "\n";
+        if (!nav.next())
+        {
+            break;
+        }
     }
 }
 ```
@@ -344,7 +332,6 @@ int main()
 Output:
 ```
 id: 42
-name: ada
 scores: 1 2
 ```
 

@@ -120,33 +120,9 @@ namespace {
             require(!validate_text(scanned));
         }
 
-        // Containers: children are checked items inside the parent.
-        if (depth_budget > 0)
-        {
-            const uint8_t* prev_end = nullptr;
-            for (item element : scanned.elements())
-            {
-                require(contains(bytes, element.encoded_bytes()));
-                if (prev_end != nullptr)
-                {
-                    require(element.encoded_bytes().data() >= prev_end);
-                }
-                prev_end = element.encoded_bytes().data() + element.encoded_bytes().size();
-                exercise_item(element, depth_budget - 1);
-            }
-            for (map_entry entry : scanned.entries())
-            {
-                require(contains(bytes, entry.key.encoded_bytes()));
-                require(contains(bytes, entry.value.encoded_bytes()));
-                require(entry.value.encoded_bytes().data() ==
-                    entry.key.encoded_bytes().data() + entry.key.encoded_bytes().size());
-                exercise_item(entry.key, depth_budget - 1);
-                exercise_item(entry.value, depth_budget - 1);
-            }
-        }
-
-        (void)map_keys_sorted(scanned);
-        (void)map_keys_sorted(scanned, length_first_compare());
+        (void)depth_budget;
+        (void)map_keys_sorted(bytes);
+        (void)map_keys_sorted(bytes, length_first_compare());
     }
 
     void exercise_lowlevel(byte_span input)
@@ -211,7 +187,8 @@ namespace {
         require(sorted.has_value() == sa.has_value());
         if (sorted.has_value())
         {
-            require(sorted.value() == map_keys_sorted(sa.value().first));
+            auto checked = map_keys_sorted(sa.value().first.encoded_bytes());
+            require(checked.has_value() && sorted.value() == checked.value());
         }
     }
 
