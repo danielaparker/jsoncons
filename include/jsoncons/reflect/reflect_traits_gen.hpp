@@ -812,6 +812,8 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, From) ajson.try_emplace(Name, Into(class_instance.Member));
 
+#define JSONCONS_N_MEMBER_NAME_DECODE
+
 #define JSONCONS_N_MEMBER_NAME_ENCODE(P1, P2, P3, Seq, Index) JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index) if ((num_params-Index) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name) \
@@ -837,6 +839,8 @@ else \
     auto r = try_encode_optional_member(string_view_type(Name), Into(val.Member), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }    
+
+#define JSONCONS_ALL_MEMBER_NAME_DECODE
 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME(P1, P2, P3, Seq, Index) JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Index)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Index) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_ENCODE_NAME_,JSONCONS_NARGS Seq) Seq)
@@ -876,7 +880,7 @@ else \
     } \
 }    
 
-#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Encode, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
+#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Decode,Encode, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -950,22 +954,22 @@ namespace reflect { \
 
 
 #define JSONCONS_N_MEMBER_NAME_TRAITS(TypeName,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_MEMBER_NAME_ENCODE, 0, TypeName,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_MEMBER_NAME_DECODE, JSONCONS_N_MEMBER_NAME_ENCODE, 0, TypeName,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<TypeName> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_NAME_TRAITS(NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_MEMBER_NAME_ENCODE, NumTemplateParams, TypeName,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_N_MEMBER_NAME_TO_JSON, JSONCONS_N_MEMBER_NAME_DECODE, JSONCONS_N_MEMBER_NAME_ENCODE, NumTemplateParams, TypeName,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_ALL_MEMBER_NAME_TRAITS(TypeName, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_MEMBER_ENCODE_NAME, 0, TypeName, JSONCONS_NARGS(__VA_ARGS__),  __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_MEMBER_NAME_DECODE, JSONCONS_ALL_MEMBER_ENCODE_NAME, 0, TypeName, JSONCONS_NARGS(__VA_ARGS__),  __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<TypeName> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(NumTemplateParams, TypeName, ...)  \
-    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_MEMBER_ENCODE_NAME, NumTemplateParams, TypeName, JSONCONS_NARGS(__VA_ARGS__),  __VA_ARGS__) \
+    JSONCONS_MEMBER_NAME_TRAITS_BASE(JSONCONS_ALL_MEMBER_NAME_TO_JSON, JSONCONS_ALL_MEMBER_NAME_DECODE, JSONCONS_ALL_MEMBER_ENCODE_NAME, NumTemplateParams, TypeName, JSONCONS_NARGS(__VA_ARGS__),  __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
 
