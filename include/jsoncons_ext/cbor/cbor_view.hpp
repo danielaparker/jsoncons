@@ -52,6 +52,14 @@ namespace view {
         simple
     };
 
+    enum class position_role : uint8_t
+    {
+        root,
+        array_element,
+        map_key,
+        map_value
+    };
+
     // The CBOR major type
     enum class major_type : uint8_t
     {
@@ -493,6 +501,7 @@ namespace view {
 
         struct item_access;
         struct scan_access;
+        struct navigator_access;
 
     } // namespace detail_view
 
@@ -885,6 +894,7 @@ namespace view {
 
     private:
         friend class item;
+        friend class navigator;
         tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 
         const uint8_t* first_;
@@ -1332,6 +1342,285 @@ namespace view {
         return true;
     }
 
+    using tag_range = item::tag_range;
+
+    class navigator
+    {
+        static constexpr std::size_t npos = (std::numeric_limits<std::size_t>::max)();
+
+        struct node_state
+        {
+            std::size_t begin{0};
+            std::size_t head_begin{0};
+            std::size_t content_begin{0};
+            std::size_t end{npos};
+            detail_view::item_head head{};
+            position_role role{position_role::root};
+        };
+
+        enum class container_phase : uint8_t
+        {
+            array,
+            map_key,
+            map_value
+        };
+
+        struct navigation_frame
+        {
+            node_state container{};
+            std::size_t next_offset{npos};
+            std::size_t content_fence{npos};
+            uint64_t remaining{0};
+            container_phase phase{container_phase::array};
+            bool indefinite{false};
+            bool completed{false};
+        };
+
+    public:
+        navigator(navigator&&) noexcept = default;
+        navigator& operator=(navigator&&) noexcept = default;
+        navigator(const navigator&) = delete;
+        navigator& operator=(const navigator&) = delete;
+
+        item_kind kind() const noexcept
+        {
+            switch (current_.head.major_type)
+            {
+                case cbor::detail::cbor_major_type::unsigned_integer: return item_kind::unsigned_integer;
+                case cbor::detail::cbor_major_type::negative_integer: return item_kind::negative_integer;
+                case cbor::detail::cbor_major_type::byte_string:      return item_kind::byte_string;
+                case cbor::detail::cbor_major_type::text_string:      return item_kind::text_string;
+                case cbor::detail::cbor_major_type::array:            return item_kind::array;
+                case cbor::detail::cbor_major_type::map:              return item_kind::map;
+                default:                                              return item_kind::simple;
+            }
+        }
+
+        uint64_t argument() const noexcept
+        {
+            return current_.head.value;
+        }
+
+        bool indefinite() const noexcept
+        {
+            return current_.head.indefinite();
+        }
+
+        tag_range tags() const noexcept
+        {
+            return tag_range(input_.data() + current_.begin,
+                             input_.data() + current_.head_begin);
+        }
+
+        position_role role() const noexcept
+        {
+            return current_.role;
+        }
+
+        std::size_t depth() const noexcept
+        {
+            return active_depth_;
+        }
+
+        bool uint64_value(uint64_t& value) const noexcept
+        {
+            if (current_.head.major_type != cbor::detail::cbor_major_type::unsigned_integer)
+            {
+                return false;
+            }
+            value = current_.head.value;
+            return true;
+        }
+
+        bool int64_value(int64_t& value) const noexcept
+        {
+            const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
+            if (current_.head.major_type == cbor::detail::cbor_major_type::unsigned_integer &&
+                current_.head.value <= int64_max)
+            {
+                value = static_cast<int64_t>(current_.head.value);
+                return true;
+            }
+            if (current_.head.major_type == cbor::detail::cbor_major_type::negative_integer &&
+                current_.head.value <= int64_max)
+            {
+                value = -1 - static_cast<int64_t>(current_.head.value);
+                return true;
+            }
+            return false;
+        }
+
+        bool bool_value(bool& value) const noexcept
+        {
+            if (current_.head.major_type != cbor::detail::cbor_major_type::simple ||
+                (current_.head.additional_info != 20 && current_.head.additional_info != 21))
+            {
+                return false;
+            }
+            value = current_.head.additional_info == 21;
+            return true;
+        }
+
+        bool double_value(double& value) const noexcept
+        {
+            if (current_.head.major_type != cbor::detail::cbor_major_type::simple)
+            {
+                return false;
+            }
+            switch (current_.head.additional_info)
+            {
+                case 25:
+                    value = binary::decode_half(static_cast<uint16_t>(current_.head.value));
+                    return true;
+                case 26:
+                {
+                    const uint32_t bits = static_cast<uint32_t>(current_.head.value);
+                    float single;
+                    std::memcpy(&single, &bits, sizeof single);
+                    value = single;
+                    return true;
+                }
+                case 27:
+                {
+                    const uint64_t bits = current_.head.value;
+                    std::memcpy(&value, &bits, sizeof value);
+                    return true;
+                }
+                default:
+                    return false;
+            }
+        }
+
+        bool text(string_view& value) const noexcept
+        {
+            if (current_.head.major_type != cbor::detail::cbor_major_type::text_string ||
+                current_.head.indefinite())
+            {
+                return false;
+            }
+            value = string_view(reinterpret_cast<const char*>(input_.data() + current_.content_begin),
+                                static_cast<std::size_t>(current_.head.value));
+            return true;
+        }
+
+        bool bytes(span<const uint8_t>& value) const noexcept
+        {
+            if (current_.head.major_type != cbor::detail::cbor_major_type::byte_string ||
+                current_.head.indefinite())
+            {
+                return false;
+            }
+            value = span<const uint8_t>(input_.data() + current_.content_begin,
+                                        static_cast<std::size_t>(current_.head.value));
+            return true;
+        }
+
+        bool enter() noexcept;
+        bool next() noexcept;
+        bool leave() noexcept;
+
+        void rewind() noexcept
+        {
+            current_ = root_;
+            active_depth_ = 0;
+        }
+
+        item finish_item() noexcept;
+
+        bool extent_known() const noexcept
+        {
+            return current_.end != npos;
+        }
+
+        expected<span<const uint8_t>, scan_error> reset_prefix(
+            span<const uint8_t> input,
+            int max_nesting_depth = default_max_nesting_depth);
+
+        expected<void, scan_error> reset_exact(
+            span<const uint8_t> input,
+            int max_nesting_depth = default_max_nesting_depth);
+
+    private:
+        friend struct detail_view::navigator_access;
+
+        navigator(span<const uint8_t> root, std::size_t peak_depth)
+            : input_(root), root_(), current_(), frames_(peak_depth), active_depth_(0)
+        {
+            initialize_root();
+        }
+
+        void initialize_root() noexcept
+        {
+            assert(!input_.empty());
+            const uint8_t* const base = input_.data();
+            const uint8_t* p = base;
+            const uint8_t* const end = base + input_.size();
+            detail_view::item_head head;
+            std::error_code ec;
+            std::size_t head_begin = 0;
+            bool ok;
+            do
+            {
+                head_begin = static_cast<std::size_t>(p - base);
+                ok = detail_view::read_head(p, end, head, ec);
+                assert(ok && !ec);
+            }
+            while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+            (void)ok;
+
+            root_.begin = 0;
+            root_.head_begin = head_begin;
+            root_.content_begin = static_cast<std::size_t>(p - base);
+            root_.end = input_.size();
+            root_.head = head;
+            root_.role = position_role::root;
+            current_ = root_;
+            active_depth_ = 0;
+        }
+
+        void prepare_checked(span<const uint8_t> root, std::size_t peak_depth)
+        {
+            frames_.resize(peak_depth);
+            input_ = root;
+            initialize_root();
+        }
+
+        span<const uint8_t> input_;
+        node_state root_;
+        node_state current_;
+        std::vector<navigation_frame> frames_;
+        std::size_t active_depth_;
+    };
+
+    namespace detail_view {
+
+        struct navigator_access
+        {
+            static navigator make(span<const uint8_t> root, std::size_t peak_depth)
+            {
+                return navigator(root, peak_depth);
+            }
+        };
+
+    } // namespace detail_view
+
+    struct navigation_result
+    {
+        navigator first;
+        span<const uint8_t> remainder;
+
+        navigation_result(navigator&& first, span<const uint8_t> remainder) noexcept
+            : first(std::move(first)), remainder(remainder)
+        {
+        }
+
+        navigation_result(navigation_result&&) noexcept = default;
+        navigation_result& operator=(navigation_result&&) noexcept = default;
+        navigation_result(const navigation_result&) = delete;
+        navigation_result& operator=(const navigation_result&) = delete;
+    };
+
+
     // Reusable scanning state: the depth policy and the walker's workspace.
     // Scanning allocates only when nesting exceeds 32 open containers, and
     // a reused context retains that capacity.
@@ -1477,6 +1766,77 @@ namespace view {
     {
         scan_context context(max_nesting_depth);
         return read_item(context);
+    }
+
+    inline expected<navigation_result, scan_error> navigate_prefix(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
+        {
+            return expected<navigation_result, scan_error>(unexpect, scanned.error());
+        }
+
+        navigator result = detail_view::navigator_access::make(
+            scanned.value().first.encoded_bytes(),
+            detail_view::scan_access::peak_depth(context));
+        return navigation_result(std::move(result), scanned.value().remainder);
+    }
+
+    inline expected<navigator, scan_error> navigate_exact(
+        span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth)
+    {
+        auto navigated = navigate_prefix(input, max_nesting_depth);
+        if (!navigated)
+        {
+            return expected<navigator, scan_error>(unexpect, navigated.error());
+        }
+        if (!navigated.value().remainder.empty())
+        {
+            return expected<navigator, scan_error>(unexpect,
+                scan_error{cbor_errc::trailing_data,
+                    input.size() - navigated.value().remainder.size()});
+        }
+        return std::move(navigated.value().first);
+    }
+
+    inline expected<span<const uint8_t>, scan_error> navigator::reset_prefix(
+        span<const uint8_t> input, int max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
+        {
+            return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
+        }
+
+        prepare_checked(scanned.value().first.encoded_bytes(),
+                        detail_view::scan_access::peak_depth(context));
+        return scanned.value().remainder;
+    }
+
+    inline expected<void, scan_error> navigator::reset_exact(
+        span<const uint8_t> input, int max_nesting_depth)
+    {
+        scan_context context(max_nesting_depth);
+        auto scanned = scan_prefix(input, context);
+        if (!scanned)
+        {
+            return expected<void, scan_error>(unexpect, scanned.error());
+        }
+        if (!scanned.value().remainder.empty())
+        {
+            return expected<void, scan_error>(unexpect,
+                scan_error{cbor_errc::trailing_data,
+                    scanned.value().first.encoded_bytes().size()});
+        }
+
+        prepare_checked(scanned.value().first.encoded_bytes(),
+                        detail_view::scan_access::peak_depth(context));
+        return expected<void, scan_error>();
     }
 
     // Guard against scanning a temporary container: the resulting views

@@ -684,6 +684,113 @@ TEST_CASE("cbor view validate_text")
     }
 }
 
+static_assert(std::is_move_constructible<cbor::view::navigator>::value,
+              "navigator must be movable");
+static_assert(!std::is_copy_constructible<cbor::view::navigator>::value,
+              "navigator must not be copyable");
+
+TEST_CASE("cbor view navigator construction and root access")
+{
+    SECTION("navigate_prefix returns a checked root and remainder")
+    {
+        std::vector<uint8_t> data = {0xc1,0x18,0x2a,0x01};   // tag(1) 42, then 1
+        auto result = cbor::view::navigate_prefix(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        CHECK(result.value().first.kind() == cbor::view::item_kind::unsigned_integer);
+        CHECK(result.value().first.argument() == 42);
+        CHECK(result.value().first.role() == cbor::view::position_role::root);
+        CHECK(result.value().first.depth() == 0);
+        CHECK(result.value().first.extent_known());
+        REQUIRE(result.value().remainder.size() == 1);
+        CHECK(result.value().remainder.data() == data.data() + 3);
+
+        std::vector<uint64_t> tags;
+        for (uint64_t tag : result.value().first.tags())
+        {
+            tags.push_back(tag);
+        }
+        REQUIRE(tags.size() == 1);
+        CHECK(tags[0] == 1);
+
+        uint64_t value = 0;
+        CHECK(result.value().first.uint64_value(value));
+        CHECK(value == 42);
+    }
+
+    SECTION("navigate_exact exposes scalar and string content")
+    {
+        std::vector<uint8_t> text_data = {0x63,'a','d','a'};
+        auto text_result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(text_data));
+        REQUIRE(text_result.has_value());
+        jsoncons::string_view text;
+        CHECK(text_result.value().text(text));
+        CHECK(text == "ada");
+
+        std::vector<uint8_t> bytes_data = {0x42,0x01,0x02};
+        auto bytes_result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(bytes_data));
+        REQUIRE(bytes_result.has_value());
+        jsoncons::span<const uint8_t> bytes;
+        CHECK(bytes_result.value().bytes(bytes));
+        REQUIRE(bytes.size() == 2);
+        CHECK(bytes[0] == 1);
+        CHECK(bytes[1] == 2);
+
+        std::vector<uint8_t> boolean_data = {0xf5};
+        auto boolean_result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(boolean_data));
+        REQUIRE(boolean_result.has_value());
+        bool boolean = false;
+        CHECK(boolean_result.value().bool_value(boolean));
+        CHECK(boolean);
+    }
+
+    SECTION("navigate_exact rejects trailing data")
+    {
+        std::vector<uint8_t> data = {0x01,0x02};
+        auto result = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(data));
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::trailing_data);
+        CHECK(result.error().offset == 1);
+    }
+
+    SECTION("reset is transactional and reuses the navigator")
+    {
+        std::vector<uint8_t> first = {0x01};
+        auto made = cbor::view::navigate_exact(jsoncons::span<const uint8_t>(first));
+        REQUIRE(made.has_value());
+        cbor::view::navigator navigator = std::move(made.value());
+
+        std::vector<uint8_t> sequence = {0x02,0x03};
+        auto remainder = navigator.reset_prefix(jsoncons::span<const uint8_t>(sequence));
+        REQUIRE(remainder.has_value());
+        REQUIRE(remainder.value().size() == 1);
+        uint64_t value = 0;
+        REQUIRE(navigator.uint64_value(value));
+        CHECK(value == 2);
+
+        std::vector<uint8_t> malformed = {0x19,0x01};
+        auto malformed_result = navigator.reset_exact(jsoncons::span<const uint8_t>(malformed));
+        REQUIRE_FALSE(malformed_result.has_value());
+        value = 0;
+        REQUIRE(navigator.uint64_value(value));
+        CHECK(value == 2);
+
+        auto trailing_result = navigator.reset_exact(jsoncons::span<const uint8_t>(sequence));
+        REQUIRE_FALSE(trailing_result.has_value());
+        CHECK(trailing_result.error().code == cbor::cbor_errc::trailing_data);
+        value = 0;
+        REQUIRE(navigator.uint64_value(value));
+        CHECK(value == 2);
+
+        std::vector<uint8_t> replacement = {0x81,0x04};
+        REQUIRE(navigator.reset_exact(jsoncons::span<const uint8_t>(replacement)).has_value());
+        CHECK(navigator.kind() == cbor::view::item_kind::array);
+        CHECK(navigator.argument() == 1);
+        CHECK(navigator.role() == cbor::view::position_role::root);
+        CHECK(navigator.depth() == 0);
+    }
+}
+
+
 TEST_CASE("cbor view wire cursor")
 {
     SECTION("read_head decodes one head and advances past it only")
