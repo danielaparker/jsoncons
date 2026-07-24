@@ -720,7 +720,7 @@ namespace view {
     public:
 
         explicit wire_cursor(span<const uint8_t> input) noexcept
-            : input_(input), offset_(0)
+            : begin_(input.data()), current_(input.data()), end_(input.data() + input.size())
         {
         }
 
@@ -729,35 +729,31 @@ namespace view {
 
         std::size_t position() const noexcept
         {
-            return offset_;
+            return static_cast<std::size_t>(current_ - begin_);
         }
 
         span<const uint8_t> remaining() const noexcept
         {
-            const uint8_t* data = offset_ == 0 ? input_.data() : input_.data() + offset_;
-            return span<const uint8_t>(data, input_.size() - offset_);
+            return span<const uint8_t>(current_, static_cast<std::size_t>(end_ - current_));
         }
 
         // Reads one head and advances past that head only. Tags are returned
         // as their own heads. On failure, position() is the reported offset.
         expected<item_head, scan_error> read_head() noexcept
         {
-            if (offset_ >= input_.size())
+            if (current_ >= end_)
             {
                 return expected<item_head, scan_error>(unexpect,
-                    scan_error{cbor_errc::unexpected_eof, offset_});
+                    scan_error{cbor_errc::unexpected_eof, position()});
             }
 
-            const uint8_t* p = input_.data() + offset_;
-            const uint8_t* end = input_.data() + input_.size();
             detail_view::item_head h;
             std::error_code ec;
-            const bool ok = detail_view::read_head(p, end, h, ec);
-            offset_ = static_cast<std::size_t>(p - input_.data());
+            const bool ok = detail_view::read_head(current_, end_, h, ec);
             if (!ok)
             {
                 return expected<item_head, scan_error>(unexpect,
-                    scan_error{static_cast<cbor_errc>(ec.value()), offset_});
+                    scan_error{static_cast<cbor_errc>(ec.value()), position()});
             }
 
             item_head head;
@@ -780,17 +776,18 @@ namespace view {
         // unchanged, when fewer bytes remain.
         bool skip(std::size_t count) noexcept
         {
-            if (input_.size() - offset_ < count)
+            if (static_cast<std::size_t>(end_ - current_) < count)
             {
                 return false;
             }
-            offset_ += count;
+            current_ += count;
             return true;
         }
 
     private:
-        span<const uint8_t> input_;
-        std::size_t offset_;
+        const uint8_t* begin_;
+        const uint8_t* current_;
+        const uint8_t* end_;
     };
 
     // Iterates the values of an item's leading semantic tags.
@@ -1387,38 +1384,33 @@ namespace view {
 
     inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
     {
-        const std::size_t start = offset_;
+        const std::size_t start = position();
         auto scanned = scan_prefix(remaining(), context);
         if (!scanned)
         {
             scan_error error = scanned.error();
-            const std::size_t available = input_.size() - offset_;
-            const std::size_t consumed = (std::min)(error.offset, available);
-            offset_ += consumed;
+            const std::size_t available = static_cast<std::size_t>(end_ - current_);
+            current_ += (std::min)(error.offset, available);
             error.offset += start;
             return expected<item, scan_error>(unexpect, error);
         }
 
-        offset_ += scanned.value().first.encoded_bytes().size();
+        current_ += scanned.value().first.encoded_bytes().size();
         return scanned.value().first;
     }
 
     inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context)
     {
-        const uint8_t* const base = input_.data();
-        const uint8_t* p = base + offset_;
-        const uint8_t* const end = base + input_.size();
-        const std::size_t start = offset_;
+        const uint8_t* const start = current_;
         std::error_code ec;
-        const bool ok = detail_view::skip_item(p, end, context.max_nesting_depth(),
+        const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
             detail_view::scan_access::workspace(context), ec);
-        offset_ = static_cast<std::size_t>(p - base);
         if (!ok)
         {
             return expected<span<const uint8_t>, scan_error>(unexpect,
-                scan_error{detail_view::to_cbor_errc(ec), offset_});
+                scan_error{detail_view::to_cbor_errc(ec), position()});
         }
-        return span<const uint8_t>(base + start, offset_ - start);
+        return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
     }
 
 
