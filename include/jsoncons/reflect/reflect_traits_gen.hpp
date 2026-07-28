@@ -32,7 +32,7 @@ namespace jsoncons {
 namespace reflect {
 
 inline
-std::string generate_message_arg(const char* class_name, const char* s)
+std::string generate_msg_arg(const char* class_name, const char* s)
 {
     std::string str;
     str.push_back('\"');
@@ -44,7 +44,7 @@ std::string generate_message_arg(const char* class_name, const char* s)
 }
 
 inline
-std::string generate_message_arg(const char* class_name, const wchar_t* s)
+std::string generate_msg_arg(const char* class_name, const wchar_t* s)
 {
     std::string str;
     str.push_back('\"');
@@ -843,7 +843,7 @@ else \
 #define JSONCONS_GENERATE_MSG_ARG_NAME_3(Member, Name, Mode) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name,Mode,,,)
 #define JSONCONS_GENERATE_MSG_ARG_NAME_4(Member, Name, Mode, Match) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_GENERATE_MSG_ARG_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, )
-#define JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, From) generate_message_arg(class_name, Name),
+#define JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, From) generate_msg_arg(class_name, Name),
 
 #define JSONCONS_N_MEMBER_NAME_DECODE
 
