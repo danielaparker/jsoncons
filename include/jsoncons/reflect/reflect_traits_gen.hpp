@@ -883,6 +883,18 @@ else \
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Decode,Encode, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
+    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct error_context<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    { \
+        static std::string what_arg(std::size_t index) \
+        { \
+            static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+            static std::array<std::string,num_params> what_args = { \
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+            }; \
+            return what_args[index]; \
+        } \
+    }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
