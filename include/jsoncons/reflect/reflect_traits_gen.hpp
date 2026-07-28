@@ -31,6 +31,25 @@
 namespace jsoncons {
 namespace reflect {
 
+inline
+std::string to_narrow_name(const char* s)
+{
+    std::string str;
+    str.push_back('\"');
+    str.append(s, std::char_traits<char>::length(s));
+    str.push_back('\"');
+    return str;
+}
+
+inline
+std::string to_narrow_name(const wchar_t* s)
+{
+    std::size_t len = std::char_traits<wchar_t>::length(s);
+    std::string str;
+    jsoncons::unicode_traits::convert(s, len, str);
+    return " + str + ";
+}
+
 template <typename CharT>
 basic_string_view<CharT> get_key(basic_staj_cursor<CharT>& cursor, std::error_code& ec)
 { 
@@ -812,6 +831,14 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, Into, From) ajson.try_emplace(Name, Into(class_instance.Member));
 
+#define JSONCONS_GENERATE_WHAT_ARG_NAME(P1, P2, P3, Seq, Index) JSONCONS_GENERATE_WHAT_ARG_NAME_LAST(P1, P2, P3, Seq, Index)
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_LAST(P1, P2, P3, Seq, Index) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_GENERATE_WHAT_ARG_NAME_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_2(Member, Name) JSONCONS_GENERATE_WHAT_ARG_NAME_6(Member, Name,,,,)
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_3(Member, Name, Mode) JSONCONS_GENERATE_WHAT_ARG_NAME_6(Member, Name,Mode,,,)
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_4(Member, Name, Mode, Match) JSONCONS_GENERATE_WHAT_ARG_NAME_6(Member, Name, Mode, Match,,)
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_GENERATE_WHAT_ARG_NAME_6(Member, Name, Mode, Match, Into, )
+#define JSONCONS_GENERATE_WHAT_ARG_NAME_6(Member, Name, Mode, Match, Into, From) to_narrow_name(Name),
+
 #define JSONCONS_N_MEMBER_NAME_DECODE
 
 #define JSONCONS_N_MEMBER_NAME_ENCODE(P1, P2, P3, Seq, Index) JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Index)
@@ -890,7 +917,7 @@ namespace reflect { \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
             static std::array<std::string,num_params> what_args = { \
-                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG_NAME,TypeName,,, __VA_ARGS__)\
             }; \
             return what_args[index]; \
         } \
@@ -1888,7 +1915,7 @@ namespace reflect { \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
             static std::array<std::string,num_params> what_args = { \
-                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG,TypeName,,, __VA_ARGS__)\
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_WHAT_ARG_NAME,TypeName,,, __VA_ARGS__)\
             }; \
             return what_args[index]; \
         } \
