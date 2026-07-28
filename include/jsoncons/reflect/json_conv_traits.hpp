@@ -585,7 +585,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 auto res = item.template try_as<value_type>(aset);
                 if (JSONCONS_UNLIKELY(!res))
                 {
-                    return result_type(jsoncons::unexpect, res.error().code(), res.error().message_arg());
+                    return result_type(jsoncons::unexpect, res.error().code(), res.error().msg_arg());
                 }
                 result.push_back(std::move(*res));
             }
@@ -918,7 +918,7 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
                 auto r2 = item.value().template try_as<mapped_type>(aset);
                 if (!r2)
                 {
-                    return result_type(jsoncons::unexpect, r2.error().code(), r2.error().message_arg());
+                    return result_type(jsoncons::unexpect, r2.error().code(), r2.error().msg_arg());
                 }
                 val.emplace(std::move(key), std::move(*r2));
             }

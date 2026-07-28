@@ -35,11 +35,10 @@ inline
 std::string generate_msg_arg(const char* class_name, const char* s)
 {
     std::string str;
-    str.push_back('\"');
     str.append(class_name);
     str.push_back(':');
+    str.push_back(':');
     str.append(s);
-    str.push_back('\"');
     return str;
 }
 
@@ -47,12 +46,11 @@ inline
 std::string generate_msg_arg(const char* class_name, const wchar_t* s)
 {
     std::string str;
-    str.push_back('\"');
     str.append(class_name);
+    str.push_back(':');
     str.push_back(':');
     std::size_t len = std::char_traits<wchar_t>::length(s);
     jsoncons::unicode_traits::convert(s, len, str);
-    str.push_back('\"');
     return str;
 }
 
@@ -804,9 +802,9 @@ namespace reflect { \
 #define JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match, Into, From) { \
   auto it = ajson.find(Name); \
   if (it == ajson.object_range().end()) \
-    {return result_type(unexpect, conv_errc::missing_required_member, class_name);} \
+    {return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index));} \
   auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
-  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
   Mode(JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 
 #define JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
@@ -843,7 +841,7 @@ else \
 #define JSONCONS_GENERATE_MSG_ARG_NAME_3(Member, Name, Mode) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name,Mode,,,)
 #define JSONCONS_GENERATE_MSG_ARG_NAME_4(Member, Name, Mode, Match) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_GENERATE_MSG_ARG_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, )
-#define JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, From) generate_msg_arg(class_name, Name),
+#define JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, From) generate_msg_arg(class_name, # Member),
 
 #define JSONCONS_N_MEMBER_NAME_DECODE
 

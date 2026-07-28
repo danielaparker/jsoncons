@@ -152,7 +152,7 @@ T decode_toon(Args&& ... args)
     auto result = try_decode_toon<T>(std::forward<Args>(args)...); 
     if (!result)
     {
-        JSONCONS_THROW(ser_error(result.error().code(), result.error().message_arg(), result.error().line(), result.error().column()));
+        JSONCONS_THROW(ser_error(result.error().code(), result.error().msg_arg(), result.error().line(), result.error().column()));
     }
     return std::move(*result);
 }

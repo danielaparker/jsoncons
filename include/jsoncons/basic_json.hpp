@@ -3538,7 +3538,7 @@ namespace jsoncons {
             auto r = reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
+                JSONCONS_THROW(conv_error(r.error().code(), r.error().msg_arg()));
             }
             return std::move(r.value());
         }
@@ -3550,7 +3550,7 @@ namespace jsoncons {
             auto r = reflect::json_conv_traits<basic_json,T>::try_as(aset, *this);
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
+                JSONCONS_THROW(conv_error(r.error().code(), r.error().msg_arg()));
             }
             return std::move(r.value());
         }

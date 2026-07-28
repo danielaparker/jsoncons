@@ -56,12 +56,12 @@ struct decode_traits
             cursor);
         if (JSONCONS_UNLIKELY(!r1))
         {
-            return result_type(jsoncons::unexpect, r1.error().code(), r1.error().message_arg(), line, column);
+            return result_type(jsoncons::unexpect, r1.error().code(), r1.error().msg_arg(), line, column);
         }
         auto r2 = (*r1).template try_as<T>(aset);
         if (JSONCONS_UNLIKELY(!r2))
         {
-            return result_type(jsoncons::unexpect, r2.error().code(), r2.error().message_arg(), line, column);
+            return result_type(jsoncons::unexpect, r2.error().code(), r2.error().msg_arg(), line, column);
         }
         return result_type(std::move(*r2));
     }

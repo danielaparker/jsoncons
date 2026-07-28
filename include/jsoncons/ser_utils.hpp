@@ -86,7 +86,7 @@ public:
     {
         return ec_;
     }
-    const std::string& message_arg() const noexcept
+    const std::string& msg_arg() const noexcept
     {
         return message_arg_;
     }
