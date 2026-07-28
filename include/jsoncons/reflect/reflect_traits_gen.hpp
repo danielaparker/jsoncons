@@ -786,7 +786,7 @@ namespace reflect { \
   else \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
-    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
     Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }}
 #define JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
     if (result) { \
@@ -795,7 +795,7 @@ namespace reflect { \
     else {return result_type(jsoncons::unexpect, result.error().code(), class_name);} 
   
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
 #define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name,Mode,always_true(),,))
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_AS_7(Member, Name, Mode, Match,,)
@@ -940,6 +940,7 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
+            static const char* class_name = # TypeName; \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
@@ -947,17 +948,17 @@ namespace reflect { \
         template <typename Alloc,typename TempAlloc> \
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& ajson) \
         { \
-            const char* class_name = # TypeName; \
+            static const char* class_name = # TypeName; \
             std::error_code ec; \
             if (!ajson.is_object()) return result_type(jsoncons::unexpect, conv_errc::not_map, # TypeName); \
             value_type class_instance = jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator()); \
+            std::size_t index = 0; \
             if (num_params == num_mandatory_params) \
             { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_ALL_MEMBER_NAME_AS,,,, __VA_ARGS__) \
             } \
             else \
             { \
-                std::size_t index = 0; \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_MEMBER_NAME_AS,,,, __VA_ARGS__) \
             } \
             return result_type(std::move(class_instance)); \
@@ -1922,7 +1923,7 @@ namespace reflect { \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
             static std::array<std::string,num_params> what_args = { \
-                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG_NAME,TypeName,,, __VA_ARGS__)\
+                JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG,TypeName,,, __VA_ARGS__)\
             }; \
             return what_args[index]; \
         } \
