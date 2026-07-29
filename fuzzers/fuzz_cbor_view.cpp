@@ -40,7 +40,7 @@ namespace {
         require(bytes.size() > 0);
 
         // Self-similarity: an item's encoding is exactly one item.
-        auto reparsed = parse_exact(bytes);
+        auto reparsed = parse_item(bytes);
         require(reparsed.has_value());
         require(reparsed.value().encoded_bytes().data() == bytes.data());
         require(reparsed.value().encoded_bytes().size() == bytes.size());
@@ -143,11 +143,11 @@ namespace {
             require(heads.position() > before);
         }
 
-        // read_item agrees with scan_prefix on outcome and consumed length.
+        // read_item agrees with scan on outcome and consumed length.
         wire_cursor items(input);
         scan_context context;
         auto read = items.read_item(context);
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         require(read.has_value() == scanned.has_value());
         if (read.has_value())
         {
@@ -197,9 +197,9 @@ namespace {
         }
 
         scan_context ca;
-        auto sa = scan_prefix(a, ca);
+        auto sa = scan(a, ca);
         scan_context cb;
-        auto sb = scan_prefix(b, cb);
+        auto sb = scan(b, cb);
         if (sa.has_value() && sb.has_value())
         {
             require(ab.has_value());
@@ -219,24 +219,24 @@ namespace {
         }
     }
 
-    void exercise_navigator(byte_span input, int depth)
+    void exercise_walker(byte_span input, int depth)
     {
-        auto navigated = navigate_prefix(input, depth);
+        auto result = get_walker(input, prefix, depth);
         scan_context context(depth);
-        auto scanned = scan_prefix(input, context);
-        require(navigated.has_value() == scanned.has_value());
-        if (!navigated.has_value())
+        auto scanned = scan(input, context);
+        require(result.has_value() == scanned.has_value());
+        if (!result.has_value())
         {
             return;
         }
 
-        navigator nav = std::move(navigated.value().first);
-        require(navigated.value().remainder.size() == scanned.value().remainder.size());
-        require(nav.role() == position_role::root);
-        require(nav.depth() == 0);
-        require(nav.extent_known());
+        auto walker = std::move(result.value().first);
+        require(result.value().remainder.size() == scanned.value().remainder.size());
+        require(walker.role() == position_role::root);
+        require(walker.depth() == 0);
+        require(walker.extent_known());
 
-        const item root = nav.finish_item();
+        const item root = walker.finish_item();
         require(root.encoded_bytes().data() == input.data());
         require(root.encoded_bytes().size() == scanned.value().first.encoded_bytes().size());
 
@@ -248,54 +248,54 @@ namespace {
             double d = 0;
             jsoncons::string_view text;
             byte_span bytes;
-            (void)nav.uint64_value(u);
-            (void)nav.int64_value(i);
-            (void)nav.bool_value(b);
-            (void)nav.double_value(d);
-            (void)nav.text(text);
-            (void)nav.bytes(bytes);
+            (void)walker.uint64_value(u);
+            (void)walker.int64_value(i);
+            (void)walker.bool_value(b);
+            (void)walker.double_value(d);
+            (void)walker.text(text);
+            (void)walker.bytes(bytes);
 
-            if (nav.enter())
+            if (walker.enter())
             {
-                require(nav.depth() > 0);
+                require(walker.depth() > 0);
                 continue;
             }
-            if (nav.next())
+            if (walker.next())
             {
                 continue;
             }
-            if (!nav.leave())
+            if (!walker.leave())
             {
                 break;
             }
         }
 
-        nav.rewind();
-        require(nav.depth() == 0);
-        require(nav.role() == position_role::root);
-        require(nav.finish_item().encoded_bytes().size() == root.encoded_bytes().size());
+        walker.rewind();
+        require(walker.depth() == 0);
+        require(walker.role() == position_role::root);
+        require(walker.finish_item().encoded_bytes().size() == root.encoded_bytes().size());
 
-        auto reset = nav.reset_prefix(input, depth);
+        auto reset = walker.reset(input, prefix, depth);
         require(reset.has_value());
-        require(reset.value().size() == navigated.value().remainder.size());
+        require(reset.value().size() == result.value().remainder.size());
     }
 
-    // Children agree with navigator movement over the same container.
+    // Children agree with walker movement over the same container.
     void exercise_children(byte_span input, scan_context& context)
     {
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         if (!scanned.has_value())
         {
             return;
         }
         const item root = scanned.value().first;
 
-        auto navigated = navigate_prefix(input);
-        require(navigated.has_value());
-        navigator nav = std::move(navigated.value().first);
+        auto result = get_walker(input, prefix);
+        require(result.has_value());
+        auto walker = std::move(result.value().first);
 
         auto it = root.children(context).begin();
-        if (!nav.enter())
+        if (!walker.enter())
         {
             require(root.children(context).empty());
             require(it == item::child_iterator());
@@ -308,10 +308,10 @@ namespace {
         {
             require(it != item::child_iterator());
             const item child = *it;
-            require(child.kind() == nav.kind());
-            require(child.argument() == nav.argument());
-            require(child.indefinite() == nav.indefinite());
-            const item finished = nav.finish_item();
+            require(child.kind() == walker.kind());
+            require(child.argument() == walker.argument());
+            require(child.indefinite() == walker.indefinite());
+            const item finished = walker.finish_item();
             require(finished.encoded_bytes().data() == child.encoded_bytes().data());
             require(finished.encoded_bytes().size() == child.encoded_bytes().size());
             ++it;
@@ -319,7 +319,7 @@ namespace {
             {
                 return;
             }
-            if (!nav.next())
+            if (!walker.next())
             {
                 break;
             }
@@ -330,8 +330,8 @@ namespace {
 
     void exercise_input(byte_span input, scan_context& context)
     {
-        auto scanned = scan_prefix(input, context);
-        auto exact = parse_exact(input, context);
+        auto scanned = scan(input, context);
+        auto exact = parse_item(input, context);
 
         if (scanned.has_value())
         {
@@ -351,7 +351,7 @@ namespace {
             exercise_item(first, 24);
 
             // Comparison functors agree with their sign-flipped duals.
-            auto second = scan_prefix(remainder, context);
+            auto second = scan(remainder, context);
             if (second.has_value())
             {
                 const int ab = bytewise_compare()(first, second.value().first);
@@ -393,14 +393,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     {
         scan_context context(depth);
         exercise_input(input, context);
-        exercise_navigator(input, depth);
+        exercise_walker(input, depth);
         exercise_children(input, context);
         exercise_input(byte_span(base, mid), context);
-        exercise_navigator(byte_span(base, mid), depth);
+        exercise_walker(byte_span(base, mid), depth);
         exercise_input(byte_span(base + mid, size - mid), context);
-        exercise_navigator(byte_span(base + mid, size - mid), depth);
+        exercise_walker(byte_span(base + mid, size - mid), depth);
         exercise_input(byte_span(base + p0, size - p0), context);
-        exercise_navigator(byte_span(base + p0, size - p0), depth);
+        exercise_walker(byte_span(base + p0, size - p0), depth);
     }
 
     return 0;
