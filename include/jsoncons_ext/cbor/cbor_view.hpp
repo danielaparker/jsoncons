@@ -26,7 +26,7 @@
 
 // A deliberately narrow, zero-copy facility for reading the *encoded*
 // structure of CBOR data in place. Scanning validates structural well-formedness
-// once; everything after that operates on checked items or navigation state and
+// once; everything after that operates on checked items or traversal state and
 // cannot fail structurally. Semantic interpretation (tag 2 bignums,
 // string references, typed arrays, ...) belongs to the parser and
 // cursor layers, not here: tags are exposed, never interpreted.
@@ -578,7 +578,7 @@ namespace view {
 
         struct item_access;
         struct scan_access;
-        struct navigator_access;
+        struct walker_access;
 
     } // namespace detail_view
 
@@ -586,7 +586,7 @@ namespace view {
 
     // A checked, zero-copy view of one complete, structurally well-formed CBOR
     // item: its leading semantic tags, head, and content. Obtained from
-    // scan_prefix, parse_exact, wire_cursor, or navigator::finish_item; never
+    // scan, parse_item, wire_cursor, or walker::finish_item; never
     // constructed from unvalidated bytes. Borrows the scanned input, so it
     // must not outlive the bytes it was scanned from.
     class item
@@ -881,7 +881,7 @@ namespace view {
 
     private:
         friend class item;
-        friend class navigator;
+        friend class walker;
         tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 
         const uint8_t* first_;
@@ -1080,7 +1080,14 @@ namespace view {
 
     using tag_range = item::tag_range;
 
-    class navigator
+    struct prefix_t
+    {
+        explicit constexpr prefix_t() = default;
+    };
+
+    constexpr prefix_t prefix{};
+
+    class walker
     {
         static constexpr std::size_t npos = (std::numeric_limits<std::size_t>::max)();
 
@@ -1094,17 +1101,17 @@ namespace view {
             position_role role{position_role::root};
         };
 
-        struct navigation_frame
+        struct container_frame
         {
             node_state container{};
             uint64_t remaining{0};
         };
 
     public:
-        navigator(navigator&&) noexcept = default;
-        navigator& operator=(navigator&&) noexcept = default;
-        navigator(const navigator&) = delete;
-        navigator& operator=(const navigator&) = delete;
+        walker(walker&&) noexcept = default;
+        walker& operator=(walker&&) noexcept = default;
+        walker(const walker&) = delete;
+        walker& operator=(const walker&) = delete;
 
         item_kind kind() const noexcept
         {
@@ -1186,35 +1193,37 @@ namespace view {
             return current_.end != npos;
         }
 
-        expected<span<const uint8_t>, scan_error> reset_prefix(
+        expected<span<const uint8_t>, scan_error> reset(
             span<const uint8_t> input,
             int max_nesting_depth = default_max_nesting_depth);
 
-        expected<span<const uint8_t>, scan_error> reset_exact(
+        expected<span<const uint8_t>, scan_error> reset(
             span<const uint8_t> input,
+            prefix_t,
             int max_nesting_depth = default_max_nesting_depth);
 
         template <typename Container>
-        expected<span<const uint8_t>, scan_error> reset_prefix(
+        expected<span<const uint8_t>, scan_error> reset(
             const Container&&,
             int = default_max_nesting_depth) = delete;
 
         template <typename Container>
-        expected<span<const uint8_t>, scan_error> reset_exact(
+        expected<span<const uint8_t>, scan_error> reset(
             const Container&&,
+            prefix_t,
             int = default_max_nesting_depth) = delete;
 
     private:
-        friend struct detail_view::navigator_access;
+        friend struct detail_view::walker_access;
 
         node_state read_node(std::size_t begin, position_role role,
                              std::size_t right_fence = npos) const noexcept;
-        void initialize_frame(navigation_frame& frame, const node_state& container) noexcept;
-        bool take_child(navigation_frame& frame, std::size_t& offset,
+        void initialize_frame(container_frame& frame, const node_state& container) noexcept;
+        bool take_child(container_frame& frame, std::size_t& offset,
                         position_role& role, std::size_t& right_fence) noexcept;
         void establish_end(node_state& node) noexcept;
 
-        navigator(span<const uint8_t> root, std::size_t peak_depth,
+        walker(span<const uint8_t> root, std::size_t peak_depth,
                   detail_view::pending_stack&& validation_workspace)
             : input_(root), frames_(peak_depth),
               validation_workspace_(std::move(validation_workspace)), active_depth_(0)
@@ -1239,27 +1248,28 @@ namespace view {
         span<const uint8_t> input_;
         node_state root_;
         node_state current_;
-        std::vector<navigation_frame> frames_;
+        std::vector<container_frame> frames_;
         detail_view::pending_stack validation_workspace_;
         std::size_t active_depth_;
     };
 
     namespace detail_view {
 
-        struct navigator_access
+        struct walker_access
         {
-            static navigator make(span<const uint8_t> root, std::size_t peak_depth,
+            static walker make(span<const uint8_t> root, std::size_t peak_depth,
                                   pending_stack&& validation_workspace)
             {
-                return navigator(root, peak_depth, std::move(validation_workspace));
+                return walker(root, peak_depth, std::move(validation_workspace));
             }
         };
 
     } // namespace detail_view
 
-    struct navigation_result
+
+    struct walk_result
     {
-        navigator first;
+        walker first;
         span<const uint8_t> remainder;
     };
 
@@ -1484,7 +1494,7 @@ namespace view {
     // Scans the first item in `input`, validating structural well-formedness, and
     // returns it together with the remaining bytes. On failure the error
     // holds the offending code and the offset at which scanning stopped.
-    inline expected<scan_result, scan_error> scan_prefix(span<const uint8_t> input, scan_context& context)
+    inline expected<scan_result, scan_error> scan(span<const uint8_t> input, scan_context& context)
     {
         const uint8_t* p = input.data();
         const uint8_t* end = p + input.size();
@@ -1518,17 +1528,17 @@ namespace view {
             span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
     }
 
-    inline expected<scan_result, scan_error> scan_prefix(span<const uint8_t> input)
+    inline expected<scan_result, scan_error> scan(span<const uint8_t> input)
     {
         scan_context context;
-        return scan_prefix(input, context);
+        return scan(input, context);
     }
 
-    // Scans `input`, which must hold exactly one item: trailing bytes are
-    // an error (cbor_errc::trailing_data), unlike scan_prefix.
-    inline expected<item, scan_error> parse_exact(span<const uint8_t> input, scan_context& context)
+    // Parses `input`, which must hold exactly one item: trailing bytes are
+    // an error (cbor_errc::trailing_data), unlike scan.
+    inline expected<item, scan_error> parse_item(span<const uint8_t> input, scan_context& context)
     {
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         if (!scanned)
         {
             return expected<item, scan_error>(unexpect, scanned.error());
@@ -1541,16 +1551,16 @@ namespace view {
         return scanned.value().first;
     }
 
-    inline expected<item, scan_error> parse_exact(span<const uint8_t> input)
+    inline expected<item, scan_error> parse_item(span<const uint8_t> input)
     {
         scan_context context;
-        return parse_exact(input, context);
+        return parse_item(input, context);
     }
 
     inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
     {
         const std::size_t start = position();
-        auto scanned = scan_prefix(remaining(), context);
+        auto scanned = scan(remaining(), context);
         if (!scanned)
         {
             scan_error error = scanned.error();
@@ -1579,48 +1589,49 @@ namespace view {
     }
 
 
-    inline expected<navigation_result, scan_error> navigate_prefix(
+    inline expected<walk_result, scan_error> get_walker(
         span<const uint8_t> input,
+        prefix_t,
         int max_nesting_depth = default_max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         if (!scanned)
         {
-            return expected<navigation_result, scan_error>(unexpect, scanned.error());
+            return expected<walk_result, scan_error>(unexpect, scanned.error());
         }
 
-        navigator result = detail_view::navigator_access::make(
+        walker result = detail_view::walker_access::make(
             scanned.value().first.encoded_bytes(),
             detail_view::scan_access::peak_depth(context),
             std::move(detail_view::scan_access::workspace(context)));
-        return navigation_result{std::move(result), scanned.value().remainder};
+        return walk_result{std::move(result), scanned.value().remainder};
     }
 
-    inline expected<navigator, scan_error> navigate_exact(
+    inline expected<walker, scan_error> get_walker(
         span<const uint8_t> input,
         int max_nesting_depth = default_max_nesting_depth)
     {
-        auto navigated = navigate_prefix(input, max_nesting_depth);
-        if (!navigated)
+        auto result = get_walker(input, prefix, max_nesting_depth);
+        if (!result)
         {
-            return expected<navigator, scan_error>(unexpect, navigated.error());
+            return expected<walker, scan_error>(unexpect, result.error());
         }
-        if (!navigated.value().remainder.empty())
+        if (!result.value().remainder.empty())
         {
-            return expected<navigator, scan_error>(unexpect,
+            return expected<walker, scan_error>(unexpect,
                 scan_error{cbor_errc::trailing_data,
-                    input.size() - navigated.value().remainder.size()});
+                    input.size() - result.value().remainder.size()});
         }
-        return std::move(navigated.value().first);
+        return std::move(result.value().first);
     }
 
-    inline expected<span<const uint8_t>, scan_error> navigator::reset_prefix(
-        span<const uint8_t> input, int max_nesting_depth)
+    inline expected<span<const uint8_t>, scan_error> walker::reset(
+        span<const uint8_t> input, prefix_t, int max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
         detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
         validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
         if (!scanned)
@@ -1632,12 +1643,12 @@ namespace view {
         return scanned.value().remainder;
     }
 
-    inline expected<span<const uint8_t>, scan_error> navigator::reset_exact(
+    inline expected<span<const uint8_t>, scan_error> walker::reset(
         span<const uint8_t> input, int max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
         detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
         validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
         if (!scanned)
@@ -1655,7 +1666,7 @@ namespace view {
         return span<const uint8_t>();
     }
 
-    inline navigator::node_state navigator::read_node(
+    inline walker::node_state walker::read_node(
         std::size_t begin, position_role role, std::size_t right_fence) const noexcept
     {
         const uint8_t* const base = input_.data();
@@ -1725,8 +1736,8 @@ namespace view {
         return node;
     }
 
-    inline void navigator::initialize_frame(
-        navigation_frame& frame, const node_state& container) noexcept
+    inline void walker::initialize_frame(
+        container_frame& frame, const node_state& container) noexcept
     {
         frame.container = container;
         if (container.head.indefinite())
@@ -1743,8 +1754,8 @@ namespace view {
         }
     }
 
-    inline bool navigator::take_child(
-        navigation_frame& frame, std::size_t& offset,
+    inline bool walker::take_child(
+        container_frame& frame, std::size_t& offset,
         position_role& role, std::size_t& right_fence) noexcept
     {
         right_fence = npos;
@@ -1801,7 +1812,7 @@ namespace view {
         return true;
     }
 
-    inline void navigator::establish_end(node_state& node) noexcept
+    inline void walker::establish_end(node_state& node) noexcept
     {
         if (node.end != npos)
         {
@@ -1823,7 +1834,7 @@ namespace view {
         node.end = static_cast<std::size_t>(p - base);
     }
 
-    inline bool navigator::enter() noexcept
+    inline bool walker::enter() noexcept
     {
         if (current_.head.major_type != cbor::detail::cbor_major_type::array &&
             current_.head.major_type != cbor::detail::cbor_major_type::map)
@@ -1837,7 +1848,7 @@ namespace view {
         }
 
         assert(active_depth_ < frames_.size());
-        navigation_frame& frame = frames_[active_depth_];
+        container_frame& frame = frames_[active_depth_];
         initialize_frame(frame, current_);
         std::size_t offset = current_.content_begin;
         position_role child_role = position_role::array_element;
@@ -1850,14 +1861,14 @@ namespace view {
         return true;
     }
 
-    inline bool navigator::next() noexcept
+    inline bool walker::next() noexcept
     {
         if (active_depth_ == 0)
         {
             return false;
         }
 
-        navigation_frame& frame = frames_[active_depth_ - 1];
+        container_frame& frame = frames_[active_depth_ - 1];
         if (frame.remaining == 0)
         {
             if (frame.container.end == npos)
@@ -1880,14 +1891,14 @@ namespace view {
         return true;
     }
 
-    inline bool navigator::leave() noexcept
+    inline bool walker::leave() noexcept
     {
         if (active_depth_ == 0)
         {
             return false;
         }
 
-        navigation_frame& frame = frames_[active_depth_ - 1];
+        container_frame& frame = frames_[active_depth_ - 1];
         if (frame.container.end == npos)
         {
             establish_end(current_);
@@ -1907,7 +1918,7 @@ namespace view {
         return true;
     }
 
-    inline item navigator::finish_item() noexcept
+    inline item walker::finish_item() noexcept
     {
         establish_end(current_);
         return detail_view::item_access::make(
@@ -1917,12 +1928,13 @@ namespace view {
     }
 
     template <typename Container>
-    expected<navigation_result, scan_error> navigate_prefix(
+    expected<walk_result, scan_error> get_walker(
         const Container&&,
+        prefix_t,
         int = default_max_nesting_depth) = delete;
 
     template <typename Container>
-    expected<navigator, scan_error> navigate_exact(
+    expected<walker, scan_error> get_walker(
         const Container&&,
         int = default_max_nesting_depth) = delete;
 
@@ -1930,13 +1942,13 @@ namespace view {
     // Guard against temporary owning containers; the concrete span overloads
     // remain available for explicit non-owning views.
     template <typename Container>
-    expected<scan_result, scan_error> scan_prefix(const Container&&, scan_context&) = delete;
+    expected<scan_result, scan_error> scan(const Container&&, scan_context&) = delete;
     template <typename Container>
-    expected<scan_result, scan_error> scan_prefix(const Container&&) = delete;
+    expected<scan_result, scan_error> scan(const Container&&) = delete;
     template <typename Container>
-    expected<item, scan_error> parse_exact(const Container&&, scan_context&) = delete;
+    expected<item, scan_error> parse_item(const Container&&, scan_context&) = delete;
     template <typename Container>
-    expected<item, scan_error> parse_exact(const Container&&) = delete;
+    expected<item, scan_error> parse_item(const Container&&) = delete;
 
     // Deterministic encoding orders over the encoded bytes of items.
     // The *_compare forms return a three-way result; the *_less forms are
@@ -2006,12 +2018,12 @@ namespace view {
         Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
-        auto ra = scan_prefix(a, context);
+        auto ra = scan(a, context);
         if (!ra)
         {
             return expected<int, scan_error>(unexpect, ra.error());
         }
-        auto rb = scan_prefix(b, context);
+        auto rb = scan(b, context);
         if (!rb)
         {
             return expected<int, scan_error>(unexpect, rb.error());
@@ -2024,7 +2036,7 @@ namespace view {
         Order order = Order(), int max_nesting_depth = default_max_nesting_depth)
     {
         scan_context context(max_nesting_depth);
-        auto scanned = scan_prefix(input, context);
+        auto scanned = scan(input, context);
         if (!scanned)
         {
             return expected<bool, scan_error>(unexpect, scanned.error());

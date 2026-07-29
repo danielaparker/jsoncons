@@ -9,12 +9,12 @@
 The `cbor::view` namespace reads the *encoded* structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
 without copying it or building a data structure. Its checked-item layer
-borrows complete encodings; its move-only `navigator` owns reusable traversal
+borrows complete encodings; its move-only `walker` owns reusable traversal
 workspace while borrowing the same bytes. The data flow is:
-> owned bytes -> structural validation -> checked item or navigator -> application semantics
+> owned bytes -> structural validation -> checked item or walker -> application semantics
 
 Validation checks structural well-formedness once (framing only — not content
-validity such as UTF-8). Checked items and navigator movement then cannot fail
+validity such as UTF-8). Checked items and walker movement then cannot fail
 structurally. The last stage — what tag 2 bytes or a tag 25 string reference
 *mean* — belongs to [decode_cbor](decode_cbor.md) and
 [basic_cbor_cursor](basic_cbor_cursor.md), not here: tags are exposed, never
@@ -24,10 +24,10 @@ This namespace is experimental.
 
 #### Ownership and lifetime
 
-All views borrow the input bytes. An `item`, a `navigator`, and every span or
+All views borrow the input bytes. An `item`, a `walker`, and every span or
 string view obtained from them are
 invalidated by anything that invalidates those bytes: destroying the container,
-mutating it, or reallocation. A navigator owns only its mutable navigation and
+mutating it, or reallocation. A walker owns only its mutable traversal and
 validation workspace; it does not own the encoded bytes. Factory, reset, and
 `wire_cursor` entry points reject temporary owning containers at compile time.
 The copying item accessors (`text` into `std::string`, `bytes` into
@@ -50,49 +50,57 @@ struct scan_result
     span<const uint8_t> remainder;
 };
 
-expected<scan_result, scan_error> scan_prefix(span<const uint8_t> input);
-expected<scan_result, scan_error> scan_prefix(span<const uint8_t> input, scan_context& context);
+expected<scan_result, scan_error> scan(span<const uint8_t> input);
+expected<scan_result, scan_error> scan(span<const uint8_t> input, scan_context& context);
 
-expected<item, scan_error> parse_exact(span<const uint8_t> input);
-expected<item, scan_error> parse_exact(span<const uint8_t> input, scan_context& context);
+expected<item, scan_error> parse_item(span<const uint8_t> input);
+expected<item, scan_error> parse_item(span<const uint8_t> input, scan_context& context);
 ```
 
-`scan_prefix` validates and returns the first item in `input`, with the
+`scan` validates and returns the first item in `input`, with the
 bytes that follow it; scan a stream of items by looping on `remainder`.
-`parse_exact` requires `input` to be exactly one item, and reports
+`parse_item` requires `input` to be exactly one item, and reports
 anything after it as `cbor_errc::trailing_data`.
 
 Scanning enforces `scan_context::max_nesting_depth` (default
 `default_max_nesting_depth`, 1024) using constant call-stack space at
 any depth. It allocates only when nesting exceeds 32 open containers; a reused
-`scan_context`, `wire_cursor` with a supplied context, or navigator reset retains
+`scan_context`, `wire_cursor` with a supplied context, or walker reset retains
 that validation capacity.
 
-#### Structural navigation
+#### Structural traversal
 
 ```cpp
 enum class position_role { root, array_element, map_key, map_value };
 
-struct navigation_result
+struct prefix_t
 {
-    navigator first;
+    explicit constexpr prefix_t() = default;
+};
+class walker;
+constexpr prefix_t prefix{};
+
+struct walk_result
+{
+    walker first;
     span<const uint8_t> remainder;
 };
 
-expected<navigation_result, scan_error> navigate_prefix(
+expected<walker, scan_error> get_walker(
     span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth);
 
-expected<navigator, scan_error> navigate_exact(
+expected<walk_result, scan_error> get_walker(
     span<const uint8_t> input,
+    prefix_t,
     int max_nesting_depth = default_max_nesting_depth);
 
-class navigator
+class walker
 {
 public:
-    navigator(navigator&&) noexcept;
-    navigator& operator=(navigator&&) noexcept;
-    navigator(const navigator&) = delete;
+    walker(walker&&) noexcept;
+    walker& operator=(walker&&) noexcept;
+    walker(const walker&) = delete;
 
     item_kind kind() const noexcept;
     uint64_t argument() const noexcept;
@@ -116,16 +124,20 @@ public:
     item finish_item() noexcept;
     bool extent_known() const noexcept;
 
-    expected<span<const uint8_t>, scan_error> reset_prefix(
+    expected<span<const uint8_t>, scan_error> reset(
         span<const uint8_t> input,
         int max_nesting_depth = default_max_nesting_depth);
-    expected<span<const uint8_t>, scan_error> reset_exact(
+    expected<span<const uint8_t>, scan_error> reset(
         span<const uint8_t> input,
+        prefix_t,
         int max_nesting_depth = default_max_nesting_depth);
 };
 ```
 
-A navigator begins at the checked root. `enter()` moves into a nonempty array
+`get_walker(input)` requires exactly one item. Pass `prefix` to prepare a walker
+for the first item and receive the unconsumed bytes in a `walk_result`.
+
+A walker begins at the checked root. `enter()` moves into a nonempty array
 or map; maps expose raw children with alternating key/value roles. `next()`
 moves to the next raw sibling, skipping the current unopened container if
 necessary. At the end of the siblings it returns `false`; `leave()` restores
@@ -139,11 +151,12 @@ ordinary complete `item`. `extent_known()` makes that cost visible. Descent afte
 `finish_item()` is legal and revisits the subtree.
 
 Validation records the observed peak open-container depth, prepares that many
-navigation frames, and retains the validation scratch. Movement uses indexed
+container frames, and retains the validation scratch. Movement uses indexed
 frames; subtree skips reuse the retained scratch. Neither allocates after
 successful construction. Resets are transactional and retain both capacities.
-Both reset forms return the unconsumed remainder; it is empty after a
-successful exact reset.
+`reset(input)` requires exactly one item. Pass `prefix` to reset to the first
+item and receive the unconsumed bytes. Both overloads return the remainder;
+it is empty after a successful exact reset.
 
 A known parent boundary propagates to its final definite child. Consequently,
 the last payload in a definite transport tuple can be finished in O(1), even
@@ -200,7 +213,7 @@ item, measured once on the way past. The item's bytes are checked, so
 iteration cannot fail; the context, which must outlive the range, supplies
 skip workspace for container children and grows only past 32 open
 containers. `children` serves sibling iteration over checked bytes;
-`navigator` serves stateful traversal with retained parents and extents.
+`walker` serves stateful traversal with retained parents and extents.
 
 The typed accessors return `false`, leaving `value` untouched, exactly
 when the item is not of the requested kind; conversions are strict.
@@ -240,7 +253,7 @@ expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
 The order function objects compare encoded bytes and accept either two items
 or two raw spans. The `*_compare` forms return a three-way result; the `*_less`
 forms are predicates for sorting and ordered containers. The span-based
-`map_keys_sorted` validates once, then walks keys with a navigator; malformed
+`map_keys_sorted` validates once, then walks keys with a walker; malformed
 input returns the code and byte offset, and trailing bytes are tolerated.
 
 #### Low-level tier
@@ -293,46 +306,46 @@ int main()
         0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
     };
 
-    auto result = jsoncons::cbor::view::navigate_exact(
+    auto result = jsoncons::cbor::view::get_walker(
         jsoncons::span<const uint8_t>(data));
     if (!result)
     {
         return 1;
     }
 
-    auto nav = std::move(result.value());
-    if (!nav.enter())
+    auto walker = std::move(result.value());
+    if (!walker.enter())
     {
         return 0;
     }
     for (;;)
     {
         jsoncons::string_view name;
-        if (!nav.text(name) || !nav.next())
+        if (!walker.text(name) || !walker.next())
         {
             break;
         }
         std::cout << name << ":";
 
         uint64_t number = 0;
-        if (nav.uint64_value(number))
+        if (walker.uint64_value(number))
         {
             std::cout << " " << number;
         }
-        else if (nav.enter())
+        else if (walker.enter())
         {
             do
             {
-                if (nav.uint64_value(number))
+                if (walker.uint64_value(number))
                 {
                     std::cout << " " << number;
                 }
             }
-            while (nav.next());
-            nav.leave();
+            while (walker.next());
+            walker.leave();
         }
         std::cout << "\n";
-        if (!nav.next())
+        if (!walker.next())
         {
             break;
         }
@@ -352,7 +365,7 @@ scores: 1 2
 jsoncons::span<const uint8_t> rest(data.data(), data.size());
 while (!rest.empty())
 {
-    auto scanned = jsoncons::cbor::view::scan_prefix(rest);
+    auto scanned = jsoncons::cbor::view::scan(rest);
     if (!scanned.has_value())
     {
         break;   // scanned.error().code, scanned.error().offset
