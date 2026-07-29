@@ -911,7 +911,7 @@ else \
     } \
 }    
 
-#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Decode,Encode, NumTemplateParams, TypeName,NumMandatoryParams, ...)  \
+#define JSONCONS_MEMBER_NAME_TRAITS_BASE(ToJson,Decode,Encode, NumTemplateParams,TypeName,NumMandatoryParams, ...)  \
 namespace jsoncons { \
 namespace reflect { \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
