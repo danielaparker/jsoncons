@@ -938,7 +938,6 @@ namespace reflect { \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
-            static const char* class_name = # TypeName; \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
