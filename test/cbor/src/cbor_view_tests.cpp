@@ -1003,6 +1003,23 @@ TEST_CASE("cbor view wire cursor")
         CHECK(no_head.error().code == cbor::cbor_errc::unexpected_eof);
         CHECK(no_head.error().offset == 0);
         CHECK(empty.position() == 0);
+        CHECK(empty.remaining().empty());
+        CHECK(empty.skip(0));
+        CHECK_FALSE(empty.skip(1));
+
+        cbor::view::scan_context context;
+        static_assert(noexcept(empty.read_item(context)), "");
+        static_assert(noexcept(empty.skip_item(context)), "");
+
+        auto no_item = empty.read_item(context);
+        REQUIRE_FALSE(no_item.has_value());
+        CHECK(no_item.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(no_item.error().offset == 0);
+
+        auto no_skip = empty.skip_item(context);
+        REQUIRE_FALSE(no_skip.has_value());
+        CHECK(no_skip.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(no_skip.error().offset == 0);
 
         std::vector<uint8_t> truncated = {0x19,0x01};
         cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(truncated)};

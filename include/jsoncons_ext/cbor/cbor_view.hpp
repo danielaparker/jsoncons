@@ -258,7 +258,7 @@ namespace view {
 
         JSONCONS_FORCE_INLINE bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
         {
-            if (p >= end)
+            if (p == end)
             {
                 ec = cbor_errc::unexpected_eof;
                 return false;
@@ -725,7 +725,8 @@ namespace view {
     public:
 
         explicit wire_cursor(span<const uint8_t> input) noexcept
-            : begin_(input.data()), current_(input.data()), end_(input.data() + input.size())
+            : begin_(input.data()), current_(input.data()),
+              end_(input.empty() ? input.data() : input.data() + input.size())
         {
         }
 
@@ -734,19 +735,20 @@ namespace view {
 
         std::size_t position() const noexcept
         {
-            return static_cast<std::size_t>(current_ - begin_);
+            return current_ == begin_ ? 0 : static_cast<std::size_t>(current_ - begin_);
         }
 
         span<const uint8_t> remaining() const noexcept
         {
-            return span<const uint8_t>(current_, static_cast<std::size_t>(end_ - current_));
+            return span<const uint8_t>(current_,
+                current_ == end_ ? 0 : static_cast<std::size_t>(end_ - current_));
         }
 
         // Reads one head and advances past that head only. Tags are returned
         // as their own heads. On failure, position() is the reported offset.
         expected<item_head, scan_error> read_head() noexcept
         {
-            if (current_ >= end_)
+            if (current_ == end_)
             {
                 return expected<item_head, scan_error>(unexpect,
                     scan_error{cbor_errc::unexpected_eof, position()});
@@ -770,18 +772,22 @@ namespace view {
 
         // Reads and validates one complete item. This is the fallible boundary
         // at which the supplied scanning workspace may grow.
-        expected<item, scan_error> read_item(scan_context& context);
+        expected<item, scan_error> read_item(scan_context& context) noexcept;
 
         // Validates and passes over one complete item, returning its encoded
         // bytes unparsed. Costs and failure reporting match read_item.
-        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context) noexcept;
 
         // Advances past `count` bytes of already-measured content, such as a
         // definite string payload after its head. False, leaving the position
         // unchanged, when fewer bytes remain.
         bool skip(std::size_t count) noexcept
         {
-            if (static_cast<std::size_t>(end_ - current_) < count)
+            if (count == 0)
+            {
+                return true;
+            }
+            if (current_ == end_ || static_cast<std::size_t>(end_ - current_) < count)
             {
                 return false;
             }
@@ -1496,6 +1502,11 @@ namespace view {
     // holds the offending code and the offset at which scanning stopped.
     inline expected<scan_result, scan_error> scan(span<const uint8_t> input, scan_context& context)
     {
+        if (input.empty())
+        {
+            return expected<scan_result, scan_error>(unexpect,
+                scan_error{cbor_errc::unexpected_eof, 0});
+        }
         const uint8_t* p = input.data();
         const uint8_t* end = p + input.size();
         std::error_code ec;
@@ -1557,35 +1568,56 @@ namespace view {
         return parse_item(input, context);
     }
 
-    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
+    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context) noexcept
     {
-        const std::size_t start = position();
-        auto scanned = scan(remaining(), context);
-        if (!scanned)
+        JSONCONS_TRY
         {
-            scan_error error = scanned.error();
-            const std::size_t available = static_cast<std::size_t>(end_ - current_);
-            current_ += (std::min)(error.offset, available);
-            error.offset += start;
-            return expected<item, scan_error>(unexpect, error);
-        }
+            const std::size_t start = position();
+            auto scanned = scan(remaining(), context);
+            if (!scanned)
+            {
+                scan_error error = scanned.error();
+                const std::size_t available = current_ == end_
+                    ? 0 : static_cast<std::size_t>(end_ - current_);
+                const std::size_t advance = (std::min)(error.offset, available);
+                if (advance != 0)
+                {
+                    current_ += advance;
+                }
+                error.offset += start;
+                return expected<item, scan_error>(unexpect, error);
+            }
 
-        current_ += scanned.value().first.encoded_bytes().size();
-        return scanned.value().first;
+            current_ += scanned.value().first.encoded_bytes().size();
+            return scanned.value().first;
+        }
+        JSONCONS_CATCH(...)
+        {
+            return expected<item, scan_error>(unexpect,
+                scan_error{cbor_errc::source_error, position()});
+        }
     }
 
-    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context)
+    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context) noexcept
     {
         const uint8_t* const start = current_;
         std::error_code ec;
-        const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
-            detail_view::scan_access::workspace(context), ec);
-        if (!ok)
+        JSONCONS_TRY
+        {
+            const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
+                detail_view::scan_access::workspace(context), ec);
+            if (!ok)
+            {
+                return expected<span<const uint8_t>, scan_error>(unexpect,
+                    scan_error{detail_view::to_cbor_errc(ec), position()});
+            }
+            return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
+        }
+        JSONCONS_CATCH(...)
         {
             return expected<span<const uint8_t>, scan_error>(unexpect,
-                scan_error{detail_view::to_cbor_errc(ec), position()});
+                scan_error{cbor_errc::source_error, position()});
         }
-        return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
     }
 
 
