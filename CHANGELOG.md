@@ -56,6 +56,12 @@ master (1.9.0 preview)
   - JSONCONS_ALL_MEMBER_TRAITS and JSONCONS_N_MEMBER_TRAITS now generate
   decode traits that support decode without an intermediate `basic_json` value.
 
+Changes
+
+  - The type name `order_preserving_policy` has been renamed to `ordered_policy`. 
+  The old name is aliased to the new name but is deprecated and will be removed 
+  in a future release.
+
 Release 1.8.1
 -------------
 
