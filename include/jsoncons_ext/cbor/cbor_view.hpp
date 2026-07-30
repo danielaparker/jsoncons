@@ -25,11 +25,11 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 
 // A deliberately narrow, zero-copy facility for reading the *encoded*
-// structure of CBOR data in place. Scanning validates structural well-formedness
-// once; everything after that operates on checked items or traversal state and
-// cannot fail structurally. Semantic interpretation (tag 2 bignums,
-// string references, typed arrays, ...) belongs to the parser and
-// cursor layers, not here: tags are exposed, never interpreted.
+// structure of CBOR data in place. A fallible walker validates incrementally;
+// explicit validation produces checked items.
+// Semantic interpretation (tag 2 bignums, string references, typed arrays,
+// ...) belongs to the parser and cursor layers, not here: tags are exposed,
+// never interpreted.
 
 namespace jsoncons {
 namespace cbor {
@@ -76,6 +76,41 @@ namespace view {
     {
         cbor_errc code;
         std::size_t offset;
+    };
+
+    class walk_result
+    {
+    public:
+        bool has_value() const noexcept { return has_value_; }
+
+        bool value() const noexcept
+        {
+            assert(has_value_);
+            return moved_;
+        }
+
+        const scan_error& error() const noexcept
+        {
+            assert(!has_value_);
+            return error_;
+        }
+
+    private:
+        friend class walker;
+
+        walk_result(bool moved) noexcept
+            : moved_(moved), error_{cbor_errc::success, 0}, has_value_(true)
+        {
+        }
+
+        walk_result(const scan_error& error) noexcept
+            : moved_(false), error_(error), has_value_(false)
+        {
+        }
+
+        bool moved_;
+        scan_error error_;
+        bool has_value_;
     };
 
 
@@ -258,7 +293,7 @@ namespace view {
 
         JSONCONS_FORCE_INLINE bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, std::error_code& ec)
         {
-            if (p >= end)
+            if (p == end)
             {
                 ec = cbor_errc::unexpected_eof;
                 return false;
@@ -395,7 +430,6 @@ namespace view {
             uint64_t local_[local_capacity]{};
             std::vector<uint64_t> spill_;
             std::size_t size_{0};
-            std::size_t peak_size_{0};
         public:
             bool empty() const noexcept
             {
@@ -407,34 +441,23 @@ namespace view {
                 return size_;
             }
 
-            std::size_t peak_size() const noexcept
-            {
-                return peak_size_;
-            }
-
             void clear() noexcept
             {
                 spill_.clear();
                 size_ = 0;
-                peak_size_ = 0;
             }
 
-
-            void push(uint64_t count)
+            void push(uint64_t value)
             {
                 if (size_ < local_capacity)
                 {
-                    local_[size_] = count;
+                    local_[size_] = value;
                 }
                 else
                 {
-                    spill_.push_back(count);
+                    spill_.push_back(value);
                 }
                 ++size_;
-                if (size_ > peak_size_)
-                {
-                    peak_size_ = size_;
-                }
             }
 
             uint64_t pop() noexcept
@@ -442,9 +465,9 @@ namespace view {
                 --size_;
                 if (size_ >= local_capacity)
                 {
-                    const uint64_t count = spill_.back();
+                    const uint64_t value = spill_.back();
                     spill_.pop_back();
-                    return count;
+                    return value;
                 }
                 return local_[size_];
             }
@@ -586,7 +609,7 @@ namespace view {
 
     // A checked, zero-copy view of one complete, structurally well-formed CBOR
     // item: its leading semantic tags, head, and content. Obtained from
-    // scan, parse_item, wire_cursor, or walker::finish_item; never
+    // validation, scanning, wire_cursor, or walker::finish_item; never
     // constructed from unvalidated bytes. Borrows the scanned input, so it
     // must not outlive the bytes it was scanned from.
     class item
@@ -725,7 +748,8 @@ namespace view {
     public:
 
         explicit wire_cursor(span<const uint8_t> input) noexcept
-            : begin_(input.data()), current_(input.data()), end_(input.data() + input.size())
+            : begin_(input.data()), current_(input.data()),
+              end_(input.empty() ? input.data() : input.data() + input.size())
         {
         }
 
@@ -734,19 +758,20 @@ namespace view {
 
         std::size_t position() const noexcept
         {
-            return static_cast<std::size_t>(current_ - begin_);
+            return current_ == begin_ ? 0 : static_cast<std::size_t>(current_ - begin_);
         }
 
         span<const uint8_t> remaining() const noexcept
         {
-            return span<const uint8_t>(current_, static_cast<std::size_t>(end_ - current_));
+            return span<const uint8_t>(current_,
+                current_ == end_ ? 0 : static_cast<std::size_t>(end_ - current_));
         }
 
         // Reads one head and advances past that head only. Tags are returned
         // as their own heads. On failure, position() is the reported offset.
         expected<item_head, scan_error> read_head() noexcept
         {
-            if (current_ >= end_)
+            if (current_ == end_)
             {
                 return expected<item_head, scan_error>(unexpect,
                     scan_error{cbor_errc::unexpected_eof, position()});
@@ -770,18 +795,22 @@ namespace view {
 
         // Reads and validates one complete item. This is the fallible boundary
         // at which the supplied scanning workspace may grow.
-        expected<item, scan_error> read_item(scan_context& context);
+        expected<item, scan_error> read_item(scan_context& context) noexcept;
 
         // Validates and passes over one complete item, returning its encoded
         // bytes unparsed. Costs and failure reporting match read_item.
-        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+        expected<span<const uint8_t>, scan_error> skip_item(scan_context& context) noexcept;
 
         // Advances past `count` bytes of already-measured content, such as a
         // definite string payload after its head. False, leaving the position
         // unchanged, when fewer bytes remain.
         bool skip(std::size_t count) noexcept
         {
-            if (static_cast<std::size_t>(end_ - current_) < count)
+            if (count == 0)
+            {
+                return true;
+            }
+            if (current_ == end_ || static_cast<std::size_t>(end_ - current_) < count)
             {
                 return false;
             }
@@ -1080,24 +1109,17 @@ namespace view {
 
     using tag_range = item::tag_range;
 
-    struct prefix_t
-    {
-        explicit constexpr prefix_t() = default;
-    };
+    namespace detail_view {
 
-    constexpr prefix_t prefix{};
-
-    class walker
-    {
-        static constexpr std::size_t npos = (std::numeric_limits<std::size_t>::max)();
+        constexpr std::size_t unknown_extent = (std::numeric_limits<std::size_t>::max)();
 
         struct node_state
         {
             std::size_t begin{0};
             std::size_t head_begin{0};
             std::size_t content_begin{0};
-            std::size_t end{npos};
-            detail_view::item_head head{};
+            std::size_t end{unknown_extent};
+            item_head head{};
             position_role role{position_role::root};
         };
 
@@ -1107,174 +1129,100 @@ namespace view {
             uint64_t remaining{0};
         };
 
+        struct walker_access;
+
+    } // namespace detail_view
+
+    class walker
+    {
     public:
         walker(walker&&) noexcept = default;
         walker& operator=(walker&&) noexcept = default;
         walker(const walker&) = delete;
         walker& operator=(const walker&) = delete;
 
-        item_kind kind() const noexcept
-        {
-            return detail_view::kind(current_.head);
-        }
-
-        uint64_t argument() const noexcept
-        {
-            return current_.head.value;
-        }
-
-        bool indefinite() const noexcept
-        {
-            return current_.head.indefinite();
-        }
-
+        item_kind kind() const noexcept { return detail_view::kind(current_.head); }
+        uint64_t argument() const noexcept { return current_.head.value; }
+        bool indefinite() const noexcept { return current_.head.indefinite(); }
         tag_range tags() const noexcept
         {
             return tag_range(input_.data() + current_.begin,
                              input_.data() + current_.head_begin);
         }
-
-        position_role role() const noexcept
-        {
-            return current_.role;
-        }
-
-        std::size_t depth() const noexcept
-        {
-            return active_depth_;
-        }
-
+        position_role role() const noexcept { return current_.role; }
+        std::size_t depth() const noexcept { return frames_.size(); }
         bool uint64_value(uint64_t& value) const noexcept
         {
             return detail_view::uint64_value(current_.head, value);
         }
-
         bool int64_value(int64_t& value) const noexcept
         {
             return detail_view::int64_value(current_.head, value);
         }
-
         bool bool_value(bool& value) const noexcept
         {
             return detail_view::bool_value(current_.head, value);
         }
-
         bool double_value(double& value) const noexcept
         {
             return detail_view::double_value(current_.head, value);
         }
-
         bool text(string_view& value) const noexcept
         {
             return detail_view::text(current_.head,
                                      input_.data() + current_.content_begin, value);
         }
-
         bool bytes(span<const uint8_t>& value) const noexcept
         {
             return detail_view::bytes(current_.head,
                                       input_.data() + current_.content_begin, value);
         }
 
-        bool enter() noexcept;
-        bool next() noexcept;
-        bool leave() noexcept;
+        walk_result enter() noexcept;
+        walk_result next() noexcept;
+        walk_result leave() noexcept;
+        expected<item, scan_error> finish_item() noexcept;
 
         void rewind() noexcept
         {
             current_ = root_;
-            active_depth_ = 0;
+            frames_.clear();
         }
-
-        item finish_item() noexcept;
 
         bool extent_known() const noexcept
         {
-            return current_.end != npos;
+            return current_.end != detail_view::unknown_extent;
         }
-
-        expected<span<const uint8_t>, scan_error> reset(
-            span<const uint8_t> input,
-            int max_nesting_depth = default_max_nesting_depth);
-
-        expected<span<const uint8_t>, scan_error> reset(
-            span<const uint8_t> input,
-            prefix_t,
-            int max_nesting_depth = default_max_nesting_depth);
-
-        template <typename Container>
-        expected<span<const uint8_t>, scan_error> reset(
-            const Container&&,
-            int = default_max_nesting_depth) = delete;
-
-        template <typename Container>
-        expected<span<const uint8_t>, scan_error> reset(
-            const Container&&,
-            prefix_t,
-            int = default_max_nesting_depth) = delete;
 
     private:
         friend struct detail_view::walker_access;
 
-        node_state read_node(std::size_t begin, position_role role,
-                             std::size_t right_fence = npos) const noexcept;
-        void initialize_frame(container_frame& frame, const node_state& container) noexcept;
-        bool take_child(container_frame& frame, std::size_t& offset,
-                        position_role& role, std::size_t& right_fence) noexcept;
-        void establish_end(node_state& node) noexcept;
+        expected<detail_view::node_state, scan_error> read_node(
+            std::size_t begin, position_role role, std::size_t depth,
+            std::size_t right_fence = detail_view::unknown_extent) const noexcept;
+        expected<detail_view::container_frame, scan_error> initialize_frame(
+            const detail_view::node_state& container) const noexcept;
+        expected<bool, scan_error> take_child(detail_view::container_frame& frame,
+            std::size_t& offset, position_role& role, std::size_t& right_fence) const noexcept;
+        expected<std::size_t, scan_error> establish_end(
+            detail_view::node_state& node, std::size_t depth) noexcept;
 
-        walker(span<const uint8_t> root, std::size_t peak_depth,
-                  detail_view::pending_stack&& validation_workspace)
-            : input_(root), frames_(peak_depth),
-              validation_workspace_(std::move(validation_workspace)), active_depth_(0)
+        walker(span<const uint8_t> input, int max_nesting_depth,
+               const detail_view::node_state& root) noexcept
+            : input_(input), root_(root), current_(root),
+              max_nesting_depth_(max_nesting_depth > 0 ? max_nesting_depth : 0)
         {
-            initialize_root();
-        }
-
-        void initialize_root() noexcept
-        {
-            root_ = read_node(0, position_role::root, input_.size());
-            current_ = root_;
-            active_depth_ = 0;
-        }
-
-        void prepare_checked(span<const uint8_t> root, std::size_t peak_depth)
-        {
-            frames_.resize(peak_depth);
-            input_ = root;
-            initialize_root();
         }
 
         span<const uint8_t> input_;
-        node_state root_;
-        node_state current_;
-        std::vector<container_frame> frames_;
-        detail_view::pending_stack validation_workspace_;
-        std::size_t active_depth_;
+        detail_view::node_state root_;
+        detail_view::node_state current_;
+        std::vector<detail_view::container_frame> frames_;
+        detail_view::pending_stack workspace_;
+        int max_nesting_depth_;
     };
 
-    namespace detail_view {
-
-        struct walker_access
-        {
-            static walker make(span<const uint8_t> root, std::size_t peak_depth,
-                                  pending_stack&& validation_workspace)
-            {
-                return walker(root, peak_depth, std::move(validation_workspace));
-            }
-        };
-
-    } // namespace detail_view
-
-
-    struct walk_result
-    {
-        walker first;
-        span<const uint8_t> remainder;
-    };
-
-
-    // Reusable scanning state: the depth policy and the walker's workspace.
+    // Reusable scanning state: the depth policy and scanner workspace.
     // Scanning allocates only when nesting exceeds 32 open containers, and
     // a reused context retains that capacity.
     class scan_context
@@ -1309,11 +1257,6 @@ namespace view {
             static pending_stack& workspace(scan_context& context) noexcept
             {
                 return context.workspace_;
-            }
-
-            static std::size_t peak_depth(scan_context& context) noexcept
-            {
-                return context.workspace_.peak_size();
             }
         };
 
@@ -1496,6 +1439,11 @@ namespace view {
     // holds the offending code and the offset at which scanning stopped.
     inline expected<scan_result, scan_error> scan(span<const uint8_t> input, scan_context& context)
     {
+        if (input.empty())
+        {
+            return expected<scan_result, scan_error>(unexpect,
+                scan_error{cbor_errc::unexpected_eof, 0});
+        }
         const uint8_t* p = input.data();
         const uint8_t* end = p + input.size();
         std::error_code ec;
@@ -1557,213 +1505,241 @@ namespace view {
         return parse_item(input, context);
     }
 
-    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context)
+    inline expected<item, scan_error> wire_cursor::read_item(scan_context& context) noexcept
     {
-        const std::size_t start = position();
-        auto scanned = scan(remaining(), context);
-        if (!scanned)
+        JSONCONS_TRY
         {
-            scan_error error = scanned.error();
-            const std::size_t available = static_cast<std::size_t>(end_ - current_);
-            current_ += (std::min)(error.offset, available);
-            error.offset += start;
-            return expected<item, scan_error>(unexpect, error);
-        }
+            const std::size_t start = position();
+            auto scanned = scan(remaining(), context);
+            if (!scanned)
+            {
+                scan_error error = scanned.error();
+                const std::size_t available = current_ == end_
+                    ? 0 : static_cast<std::size_t>(end_ - current_);
+                const std::size_t advance = (std::min)(error.offset, available);
+                if (advance != 0)
+                {
+                    current_ += advance;
+                }
+                error.offset += start;
+                return expected<item, scan_error>(unexpect, error);
+            }
 
-        current_ += scanned.value().first.encoded_bytes().size();
-        return scanned.value().first;
+            current_ += scanned.value().first.encoded_bytes().size();
+            return scanned.value().first;
+        }
+        JSONCONS_CATCH(...)
+        {
+            return expected<item, scan_error>(unexpect,
+                scan_error{cbor_errc::source_error, position()});
+        }
     }
 
-    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context)
+    inline expected<span<const uint8_t>, scan_error> wire_cursor::skip_item(scan_context& context) noexcept
     {
         const uint8_t* const start = current_;
         std::error_code ec;
-        const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
-            detail_view::scan_access::workspace(context), ec);
-        if (!ok)
+        JSONCONS_TRY
+        {
+            const bool ok = detail_view::skip_item(current_, end_, context.max_nesting_depth(),
+                detail_view::scan_access::workspace(context), ec);
+            if (!ok)
+            {
+                return expected<span<const uint8_t>, scan_error>(unexpect,
+                    scan_error{detail_view::to_cbor_errc(ec), position()});
+            }
+            return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
+        }
+        JSONCONS_CATCH(...)
         {
             return expected<span<const uint8_t>, scan_error>(unexpect,
-                scan_error{detail_view::to_cbor_errc(ec), position()});
+                scan_error{cbor_errc::source_error, position()});
         }
-        return span<const uint8_t>(start, static_cast<std::size_t>(current_ - start));
     }
 
 
-    inline expected<walk_result, scan_error> get_walker(
-        span<const uint8_t> input,
-        prefix_t,
-        int max_nesting_depth = default_max_nesting_depth)
-    {
-        scan_context context(max_nesting_depth);
-        auto scanned = scan(input, context);
-        if (!scanned)
+    namespace detail_view {
+
+        inline expected<node_state, scan_error> read_node(span<const uint8_t> input,
+            std::size_t begin, position_role role, std::size_t depth,
+            int max_nesting_depth, std::size_t right_fence) noexcept
         {
-            return expected<walk_result, scan_error>(unexpect, scanned.error());
+            if (begin >= input.size())
+            {
+                return expected<node_state, scan_error>(unexpect,
+                    scan_error{cbor_errc::unexpected_eof, begin});
+            }
+
+            const uint8_t* const base = input.data();
+            const uint8_t* p = base + begin;
+            const uint8_t* const input_end = base + input.size();
+            item_head head;
+            std::error_code ec;
+            std::size_t head_begin = begin;
+            do
+            {
+                head_begin = static_cast<std::size_t>(p - base);
+                if (!detail_view::read_head(p, input_end, head, ec))
+                {
+                    return expected<node_state, scan_error>(unexpect,
+                        scan_error{detail_view::to_cbor_errc(ec),
+                            static_cast<std::size_t>(p - base)});
+                }
+            }
+            while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+
+            const std::size_t content_begin = static_cast<std::size_t>(p - base);
+            const bool is_container = head.major_type == cbor::detail::cbor_major_type::array ||
+                                      head.major_type == cbor::detail::cbor_major_type::map;
+            const std::size_t depth_limit = max_nesting_depth > 0
+                ? static_cast<std::size_t>(max_nesting_depth) : 0;
+            if (is_container && depth >= depth_limit)
+            {
+                return expected<node_state, scan_error>(unexpect,
+                    scan_error{cbor_errc::max_nesting_depth_exceeded, content_begin});
+            }
+
+            node_state node;
+            node.begin = begin;
+            node.head_begin = head_begin;
+            node.content_begin = content_begin;
+            node.head = head;
+            node.role = role;
+
+            switch (head.major_type)
+            {
+                case cbor::detail::cbor_major_type::unsigned_integer:
+                case cbor::detail::cbor_major_type::negative_integer:
+                case cbor::detail::cbor_major_type::simple:
+                    node.end = content_begin;
+                    break;
+                case cbor::detail::cbor_major_type::byte_string:
+                case cbor::detail::cbor_major_type::text_string:
+                    if (!head.indefinite())
+                    {
+                        if (head.value > static_cast<uint64_t>(input.size() - content_begin))
+                        {
+                            return expected<node_state, scan_error>(unexpect,
+                                scan_error{cbor_errc::unexpected_eof, content_begin});
+                        }
+                        node.end = content_begin + static_cast<std::size_t>(head.value);
+                    }
+                    else if (right_fence != unknown_extent)
+                    {
+                        node.end = right_fence;
+                    }
+                    else if (content_begin < input.size() && input[content_begin] == 0xff)
+                    {
+                        node.end = content_begin + 1;
+                    }
+                    break;
+                case cbor::detail::cbor_major_type::array:
+                case cbor::detail::cbor_major_type::map:
+                    if (right_fence != unknown_extent)
+                    {
+                        node.end = right_fence;
+                    }
+                    else if (!head.indefinite() && head.value == 0)
+                    {
+                        node.end = content_begin;
+                    }
+                    else if (head.indefinite() && content_begin < input.size() &&
+                             input[content_begin] == 0xff)
+                    {
+                        node.end = content_begin + 1;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return node;
         }
 
-        walker result = detail_view::walker_access::make(
-            scanned.value().first.encoded_bytes(),
-            detail_view::scan_access::peak_depth(context),
-            std::move(detail_view::scan_access::workspace(context)));
-        return walk_result{std::move(result), scanned.value().remainder};
+        struct walker_access
+        {
+            static walker make(span<const uint8_t> input, int max_nesting_depth,
+                               const node_state& root) noexcept
+            {
+                return walker(input, max_nesting_depth, root);
+            }
+        };
+
+    } // namespace detail_view
+
+    inline expected<walker, scan_error> get_walker(span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth) noexcept
+    {
+        auto root = detail_view::read_node(input, 0, position_role::root, 0,
+            max_nesting_depth, detail_view::unknown_extent);
+        if (!root)
+        {
+            return expected<walker, scan_error>(unexpect, root.error());
+        }
+        return detail_view::walker_access::make(input, max_nesting_depth, root.value());
     }
 
-    inline expected<walker, scan_error> get_walker(
-        span<const uint8_t> input,
-        int max_nesting_depth = default_max_nesting_depth)
+    inline expected<item, scan_error> validate(span<const uint8_t> input,
+        int max_nesting_depth = default_max_nesting_depth) noexcept
     {
-        auto result = get_walker(input, prefix, max_nesting_depth);
-        if (!result)
+        auto made = get_walker(input, max_nesting_depth);
+        if (!made)
         {
-            return expected<walker, scan_error>(unexpect, result.error());
+            return expected<item, scan_error>(unexpect, made.error());
         }
-        if (!result.value().remainder.empty())
+        auto root = made.value().finish_item();
+        if (!root)
         {
-            return expected<walker, scan_error>(unexpect,
-                scan_error{cbor_errc::trailing_data,
-                    input.size() - result.value().remainder.size()});
+            return expected<item, scan_error>(unexpect, root.error());
         }
-        return std::move(result.value().first);
+        if (root.value().encoded_bytes().size() != input.size())
+        {
+            return expected<item, scan_error>(unexpect,
+                scan_error{cbor_errc::trailing_data, root.value().encoded_bytes().size()});
+        }
+        return root.value();
     }
 
-    inline expected<span<const uint8_t>, scan_error> walker::reset(
-        span<const uint8_t> input, prefix_t, int max_nesting_depth)
+    inline expected<detail_view::node_state, scan_error> walker::read_node(
+        std::size_t begin, position_role role, std::size_t depth,
+        std::size_t right_fence) const noexcept
     {
-        scan_context context(max_nesting_depth);
-        detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
-        auto scanned = scan(input, context);
-        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
-        validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
-        if (!scanned)
-        {
-            return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
-        }
-
-        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
-        return scanned.value().remainder;
+        return detail_view::read_node(input_, begin, role, depth,
+            max_nesting_depth_, right_fence);
     }
 
-    inline expected<span<const uint8_t>, scan_error> walker::reset(
-        span<const uint8_t> input, int max_nesting_depth)
+    inline expected<detail_view::container_frame, scan_error> walker::initialize_frame(
+        const detail_view::node_state& container) const noexcept
     {
-        scan_context context(max_nesting_depth);
-        detail_view::scan_access::workspace(context) = std::move(validation_workspace_);
-        auto scanned = scan(input, context);
-        const std::size_t peak_depth = detail_view::scan_access::peak_depth(context);
-        validation_workspace_ = std::move(detail_view::scan_access::workspace(context));
-        if (!scanned)
-        {
-            return expected<span<const uint8_t>, scan_error>(unexpect, scanned.error());
-        }
-        if (!scanned.value().remainder.empty())
-        {
-            return expected<span<const uint8_t>, scan_error>(unexpect,
-                scan_error{cbor_errc::trailing_data,
-                    scanned.value().first.encoded_bytes().size()});
-        }
-
-        prepare_checked(scanned.value().first.encoded_bytes(), peak_depth);
-        return span<const uint8_t>();
-    }
-
-    inline walker::node_state walker::read_node(
-        std::size_t begin, position_role role, std::size_t right_fence) const noexcept
-    {
-        const uint8_t* const base = input_.data();
-        const uint8_t* p = base + begin;
-        const uint8_t* const input_end = base + input_.size();
-        detail_view::item_head head;
-        std::error_code ec;
-        std::size_t head_begin = begin;
-        bool ok;
-        do
-        {
-            head_begin = static_cast<std::size_t>(p - base);
-            ok = detail_view::read_head(p, input_end, head, ec);
-            assert(ok && !ec);
-        }
-        while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
-        (void)ok;
-
-        node_state node;
-        node.begin = begin;
-        node.head_begin = head_begin;
-        node.content_begin = static_cast<std::size_t>(p - base);
-        node.head = head;
-        node.role = role;
-
-        switch (head.major_type)
-        {
-            case cbor::detail::cbor_major_type::unsigned_integer:
-            case cbor::detail::cbor_major_type::negative_integer:
-            case cbor::detail::cbor_major_type::simple:
-                node.end = node.content_begin;
-                break;
-            case cbor::detail::cbor_major_type::byte_string:
-            case cbor::detail::cbor_major_type::text_string:
-                if (!head.indefinite())
-                {
-                    node.end = node.content_begin + static_cast<std::size_t>(head.value);
-                }
-                else if (right_fence != npos)
-                {
-                    node.end = right_fence;
-                }
-                else if (input_[node.content_begin] == 0xff)
-                {
-                    node.end = node.content_begin + 1;
-                }
-                break;
-            case cbor::detail::cbor_major_type::array:
-            case cbor::detail::cbor_major_type::map:
-                if (right_fence != npos)
-                {
-                    node.end = right_fence;
-                }
-                else if (!head.indefinite() && head.value == 0)
-                {
-                    node.end = node.content_begin;
-                }
-                else if (head.indefinite() && input_[node.content_begin] == 0xff)
-                {
-                    node.end = node.content_begin + 1;
-                }
-                break;
-            default:
-                assert(false);
-                break;
-        }
-        return node;
-    }
-
-    inline void walker::initialize_frame(
-        container_frame& frame, const node_state& container) noexcept
-    {
+        detail_view::container_frame frame;
         frame.container = container;
         if (container.head.indefinite())
         {
             frame.remaining = container.head.major_type == cbor::detail::cbor_major_type::map
                 ? detail_view::indefinite_map_key_marker
                 : detail_view::indefinite_array_marker;
+            return frame;
         }
-        else
+
+        const bool is_map = container.head.major_type == cbor::detail::cbor_major_type::map;
+        const uint64_t available = static_cast<uint64_t>(input_.size() - container.content_begin);
+        if (container.head.value > (is_map ? available / 2 : available))
         {
-            frame.remaining = container.head.major_type == cbor::detail::cbor_major_type::map
-                ? 2 * container.head.value
-                : container.head.value;
+            return expected<detail_view::container_frame, scan_error>(unexpect,
+                scan_error{cbor_errc::unexpected_eof, container.content_begin});
         }
+        frame.remaining = is_map ? 2 * container.head.value : container.head.value;
+        return frame;
     }
 
-    inline bool walker::take_child(
-        container_frame& frame, std::size_t& offset,
-        position_role& role, std::size_t& right_fence) noexcept
+    inline expected<bool, scan_error> walker::take_child(
+        detail_view::container_frame& frame, std::size_t& offset,
+        position_role& role, std::size_t& right_fence) const noexcept
     {
-        right_fence = npos;
+        right_fence = detail_view::unknown_extent;
         if (frame.remaining == 0)
         {
-            if (frame.container.end != npos)
+            if (frame.container.end != detail_view::unknown_extent)
             {
-                assert(offset == frame.container.end);
                 offset = frame.container.end;
             }
             else
@@ -1776,6 +1752,11 @@ namespace view {
         if (frame.remaining == detail_view::indefinite_array_marker ||
             frame.remaining == detail_view::indefinite_map_key_marker)
         {
+            if (offset >= input_.size())
+            {
+                return expected<bool, scan_error>(unexpect,
+                    scan_error{cbor_errc::unexpected_eof, offset});
+            }
             if (input_[offset] == 0xff)
             {
                 frame.container.end = ++offset;
@@ -1790,7 +1771,7 @@ namespace view {
                 ? ((frame.remaining & 1) == 0 ? position_role::map_key : position_role::map_value)
                 : position_role::array_element;
             --frame.remaining;
-            if (frame.remaining == 0 && frame.container.end != npos)
+            if (frame.remaining == 0 && frame.container.end != detail_view::unknown_extent)
             {
                 right_fence = frame.container.end;
             }
@@ -1812,11 +1793,12 @@ namespace view {
         return true;
     }
 
-    inline void walker::establish_end(node_state& node) noexcept
+    inline expected<std::size_t, scan_error> walker::establish_end(
+        detail_view::node_state& node, std::size_t depth) noexcept
     {
-        if (node.end != npos)
+        if (node.end != detail_view::unknown_extent)
         {
-            return;
+            return node.end;
         }
 
         const uint8_t* const base = input_.data();
@@ -1825,102 +1807,200 @@ namespace view {
         std::error_code ec;
         const bool is_container = node.head.major_type == cbor::detail::cbor_major_type::array ||
                                   node.head.major_type == cbor::detail::cbor_major_type::map;
-        const bool ok = is_container
-            ? detail_view::skip_container(p, end, node.head,
-                  (std::numeric_limits<int>::max)(), validation_workspace_, ec)
-            : detail_view::skip_scalar_or_string(node.head, p, end, ec);
-        assert(ok && !ec);
-        (void)ok;
-        node.end = static_cast<std::size_t>(p - base);
+        JSONCONS_TRY
+        {
+            const int remaining_depth = depth < static_cast<std::size_t>(max_nesting_depth_)
+                ? max_nesting_depth_ - static_cast<int>(depth) : 0;
+            const bool ok = is_container
+                ? detail_view::skip_container(p, end, node.head, remaining_depth, workspace_, ec)
+                : detail_view::skip_scalar_or_string(node.head, p, end, ec);
+            if (!ok)
+            {
+                return expected<std::size_t, scan_error>(unexpect,
+                    scan_error{detail_view::to_cbor_errc(ec),
+                        static_cast<std::size_t>(p - base)});
+            }
+            node.end = static_cast<std::size_t>(p - base);
+            return node.end;
+        }
+        JSONCONS_CATCH(...)
+        {
+            return expected<std::size_t, scan_error>(unexpect,
+                scan_error{cbor_errc::source_error, static_cast<std::size_t>(p - base)});
+        }
     }
 
-    inline bool walker::enter() noexcept
+    inline walk_result walker::enter() noexcept
     {
         if (current_.head.major_type != cbor::detail::cbor_major_type::array &&
             current_.head.major_type != cbor::detail::cbor_major_type::map)
         {
             return false;
         }
-        if ((!current_.head.indefinite() && current_.head.value == 0) ||
-            (current_.head.indefinite() && input_[current_.content_begin] == 0xff))
-        {
-            return false;
-        }
 
-        assert(active_depth_ < frames_.size());
-        container_frame& frame = frames_[active_depth_];
-        initialize_frame(frame, current_);
+        auto initialized = initialize_frame(current_);
+        if (!initialized)
+        {
+            return walk_result(initialized.error());
+        }
+        detail_view::container_frame frame = initialized.value();
         std::size_t offset = current_.content_begin;
         position_role child_role = position_role::array_element;
-        std::size_t right_fence = npos;
-        const bool has_child = take_child(frame, offset, child_role, right_fence);
-        assert(has_child);
-        (void)has_child;
-        current_ = read_node(offset, child_role, right_fence);
-        ++active_depth_;
-        return true;
-    }
-
-    inline bool walker::next() noexcept
-    {
-        if (active_depth_ == 0)
+        std::size_t right_fence = detail_view::unknown_extent;
+        auto child = take_child(frame, offset, child_role, right_fence);
+        if (!child)
         {
-            return false;
+            return walk_result(child.error());
         }
-
-        container_frame& frame = frames_[active_depth_ - 1];
-        if (frame.remaining == 0)
+        if (!child.value())
         {
-            if (frame.container.end == npos)
+            current_.end = frame.container.end;
+            if (frames_.empty())
             {
-                establish_end(current_);
-                frame.container.end = current_.end;
+                root_ = current_;
             }
             return false;
         }
-        establish_end(current_);
-        std::size_t offset = current_.end;
-        position_role child_role = position_role::array_element;
-        std::size_t right_fence = npos;
-        if (!take_child(frame, offset, child_role, right_fence))
-        {
-            return false;
-        }
 
-        current_ = read_node(offset, child_role, right_fence);
+        auto node = read_node(offset, child_role, frames_.size() + 1, right_fence);
+        if (!node)
+        {
+            return walk_result(node.error());
+        }
+        JSONCONS_TRY
+        {
+            frames_.push_back(frame);
+        }
+        JSONCONS_CATCH(...)
+        {
+            return walk_result(scan_error{cbor_errc::source_error, offset});
+        }
+        current_ = node.value();
         return true;
     }
 
-    inline bool walker::leave() noexcept
+    inline walk_result walker::next() noexcept
     {
-        if (active_depth_ == 0)
+        if (frames_.empty())
         {
             return false;
         }
 
-        container_frame& frame = frames_[active_depth_ - 1];
-        if (frame.container.end == npos)
+        detail_view::container_frame frame = frames_.back();
+        detail_view::node_state current = current_;
+        if (frame.remaining == 0)
         {
-            establish_end(current_);
-            std::size_t offset = current_.end;
-            position_role child_role = position_role::array_element;
-            std::size_t right_fence = npos;
-            while (take_child(frame, offset, child_role, right_fence))
+            if (frame.container.end == detail_view::unknown_extent)
             {
-                node_state unread = read_node(offset, child_role, right_fence);
-                establish_end(unread);
-                offset = unread.end;
+                auto end = establish_end(current, frames_.size());
+                if (!end)
+                {
+                    return walk_result(end.error());
+                }
+                frame.container.end = end.value();
+            }
+            frames_.back() = frame;
+            current_ = current;
+            return false;
+        }
+
+        auto end = establish_end(current, frames_.size());
+        if (!end)
+        {
+            return walk_result(end.error());
+        }
+        std::size_t offset = end.value();
+        position_role child_role = position_role::array_element;
+        std::size_t right_fence = detail_view::unknown_extent;
+        auto child = take_child(frame, offset, child_role, right_fence);
+        if (!child)
+        {
+            return walk_result(child.error());
+        }
+        if (!child.value())
+        {
+            frames_.back() = frame;
+            current_ = current;
+            return false;
+        }
+
+        auto node = read_node(offset, child_role, frames_.size(), right_fence);
+        if (!node)
+        {
+            return walk_result(node.error());
+        }
+        frames_.back() = frame;
+        current_ = node.value();
+        return true;
+    }
+
+    inline walk_result walker::leave() noexcept
+    {
+        if (frames_.empty())
+        {
+            return false;
+        }
+
+        detail_view::container_frame frame = frames_.back();
+        detail_view::node_state current = current_;
+        if (frame.container.end == detail_view::unknown_extent)
+        {
+            auto end = establish_end(current, frames_.size());
+            if (!end)
+            {
+                return walk_result(end.error());
+            }
+            std::size_t offset = end.value();
+            position_role child_role = position_role::array_element;
+            std::size_t right_fence = detail_view::unknown_extent;
+            for (;;)
+            {
+                auto child = take_child(frame, offset, child_role, right_fence);
+                if (!child)
+                {
+                    return walk_result(child.error());
+                }
+                if (!child.value())
+                {
+                    break;
+                }
+                auto unread = read_node(offset, child_role, frames_.size(), right_fence);
+                if (!unread)
+                {
+                    return walk_result(unread.error());
+                }
+                detail_view::node_state node = unread.value();
+                auto unread_end = establish_end(node, frames_.size());
+                if (!unread_end)
+                {
+                    return walk_result(unread_end.error());
+                }
+                offset = unread_end.value();
             }
         }
 
         current_ = frame.container;
-        --active_depth_;
+        frames_.pop_back();
+        if (frames_.empty())
+        {
+            root_ = current_;
+        }
         return true;
     }
 
-    inline item walker::finish_item() noexcept
+    inline expected<item, scan_error> walker::finish_item() noexcept
     {
-        establish_end(current_);
+        detail_view::node_state current = current_;
+        auto end = establish_end(current, frames_.size());
+        if (!end)
+        {
+            return expected<item, scan_error>(unexpect, end.error());
+        }
+        current_ = current;
+        if (frames_.empty())
+        {
+            root_ = current_;
+        }
         return detail_view::item_access::make(
             span<const uint8_t>(input_.data() + current_.begin,
                                 current_.end - current_.begin),
@@ -1928,13 +2008,12 @@ namespace view {
     }
 
     template <typename Container>
-    expected<walk_result, scan_error> get_walker(
+    expected<walker, scan_error> get_walker(
         const Container&&,
-        prefix_t,
         int = default_max_nesting_depth) = delete;
 
     template <typename Container>
-    expected<walker, scan_error> get_walker(
+    expected<item, scan_error> validate(
         const Container&&,
         int = default_max_nesting_depth) = delete;
 

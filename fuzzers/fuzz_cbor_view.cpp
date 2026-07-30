@@ -221,24 +221,36 @@ namespace {
 
     void exercise_walker(byte_span input, int depth)
     {
-        auto result = get_walker(input, prefix, depth);
+        auto result = get_walker(input, depth);
         scan_context context(depth);
         auto scanned = scan(input, context);
-        require(result.has_value() == scanned.has_value());
         if (!result.has_value())
         {
+            require(!scanned.has_value());
             return;
         }
 
-        auto walker = std::move(result.value().first);
-        require(result.value().remainder.size() == scanned.value().remainder.size());
+        auto raw = std::move(result.value());
+        auto finished = raw.finish_item();
+        require(finished.has_value() == scanned.has_value());
+        if (!finished.has_value())
+        {
+            require(finished.error().code == scanned.error().code);
+            require(finished.error().offset == scanned.error().offset);
+            return;
+        }
+        require(finished.value().encoded_bytes().data() == input.data());
+        require(finished.value().encoded_bytes().size() == scanned.value().first.encoded_bytes().size());
+
+        const byte_span root_bytes = finished.value().encoded_bytes();
+        auto checked = validate(root_bytes, depth);
+        require(checked.has_value());
+        require(checked.value().encoded_bytes().size() == root_bytes.size());
+
+        raw.rewind();
+        auto walker = std::move(raw);
         require(walker.role() == position_role::root);
         require(walker.depth() == 0);
-        require(walker.extent_known());
-
-        const item root = walker.finish_item();
-        require(root.encoded_bytes().data() == input.data());
-        require(root.encoded_bytes().size() == scanned.value().first.encoded_bytes().size());
 
         for (int steps = 0; steps < 256; ++steps)
         {
@@ -255,16 +267,22 @@ namespace {
             (void)walker.text(text);
             (void)walker.bytes(bytes);
 
-            if (walker.enter())
+            auto entered = walker.enter();
+            require(entered.has_value());
+            if (entered.value())
             {
                 require(walker.depth() > 0);
                 continue;
             }
-            if (walker.next())
+            auto advanced = walker.next();
+            require(advanced.has_value());
+            if (advanced.value())
             {
                 continue;
             }
-            if (!walker.leave())
+            auto left = walker.leave();
+            require(left.has_value());
+            if (!left.value())
             {
                 break;
             }
@@ -273,11 +291,72 @@ namespace {
         walker.rewind();
         require(walker.depth() == 0);
         require(walker.role() == position_role::root);
-        require(walker.finish_item().encoded_bytes().size() == root.encoded_bytes().size());
+        auto root = walker.finish_item();
+        require(root.has_value());
+        require(root.value().encoded_bytes().size() == root_bytes.size());
+    }
 
-        auto reset = walker.reset(input, prefix, depth);
-        require(reset.has_value());
-        require(reset.value().size() == result.value().remainder.size());
+    void exercise_raw_walker(byte_span input, int depth)
+    {
+        auto made = get_walker(input, depth);
+        if (!made.has_value())
+        {
+            return;
+        }
+        auto walker = std::move(made.value());
+        for (std::size_t step = 0; step < 64; ++step)
+        {
+            const item_kind kind = walker.kind();
+            const uint64_t argument = walker.argument();
+            const position_role role = walker.role();
+            const std::size_t walker_depth = walker.depth();
+            const bool extent_known = walker.extent_known();
+            const uint8_t operation = input.empty()
+                ? static_cast<uint8_t>(step)
+                : input[(step * 17) % input.size()];
+
+            bool failed = false;
+            switch (operation % 5)
+            {
+                case 0:
+                {
+                    auto result = walker.enter();
+                    failed = !result.has_value();
+                    break;
+                }
+                case 1:
+                {
+                    auto result = walker.next();
+                    failed = !result.has_value();
+                    break;
+                }
+                case 2:
+                {
+                    auto result = walker.leave();
+                    failed = !result.has_value();
+                    break;
+                }
+                case 3:
+                {
+                    auto result = walker.finish_item();
+                    failed = !result.has_value();
+                    break;
+                }
+                default:
+                    walker.rewind();
+                    break;
+            }
+
+            if (failed)
+            {
+                require(walker.kind() == kind);
+                require(walker.argument() == argument);
+                require(walker.role() == role);
+                require(walker.depth() == walker_depth);
+                require(walker.extent_known() == extent_known);
+                break;
+            }
+        }
     }
 
     // Children agree with walker movement over the same container.
@@ -290,12 +369,16 @@ namespace {
         }
         const item root = scanned.value().first;
 
-        auto result = get_walker(input, prefix);
+        auto result = get_walker(root.encoded_bytes());
         require(result.has_value());
-        auto walker = std::move(result.value().first);
+        auto walker = std::move(result.value());
+        require(walker.finish_item().has_value());
+        walker.rewind();
 
         auto it = root.children(context).begin();
-        if (!walker.enter())
+        auto entered = walker.enter();
+        require(entered.has_value());
+        if (!entered.value())
         {
             require(root.children(context).empty());
             require(it == item::child_iterator());
@@ -311,15 +394,18 @@ namespace {
             require(child.kind() == walker.kind());
             require(child.argument() == walker.argument());
             require(child.indefinite() == walker.indefinite());
-            const item finished = walker.finish_item();
-            require(finished.encoded_bytes().data() == child.encoded_bytes().data());
-            require(finished.encoded_bytes().size() == child.encoded_bytes().size());
+            auto finished = walker.finish_item();
+            require(finished.has_value());
+            require(finished.value().encoded_bytes().data() == child.encoded_bytes().data());
+            require(finished.value().encoded_bytes().size() == child.encoded_bytes().size());
             ++it;
             if (++count > 4096)
             {
                 return;
             }
-            if (!walker.next())
+            auto next = walker.next();
+            require(next.has_value());
+            if (!next.value())
             {
                 break;
             }
@@ -393,6 +479,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     {
         scan_context context(depth);
         exercise_input(input, context);
+        exercise_raw_walker(input, depth);
         exercise_walker(input, depth);
         exercise_children(input, context);
         exercise_input(byte_span(base, mid), context);
