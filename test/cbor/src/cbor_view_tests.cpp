@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 #include <catch/catch.hpp>
 
@@ -20,6 +21,12 @@ namespace {
     cbor::view::item parse(const std::vector<uint8_t>& data)
     {
         auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data.data(), data.size()));
+        REQUIRE(result.has_value());
+        return result.value();
+    }
+
+    bool moved(cbor::view::walk_result result)
+    {
         REQUIRE(result.has_value());
         return result.value();
     }
@@ -540,24 +547,34 @@ static_assert(std::is_move_constructible<cbor::view::walker>::value,
               "walker must be movable");
 static_assert(!std::is_copy_constructible<cbor::view::walker>::value,
               "walker must not be copyable");
+static_assert(!std::is_convertible<cbor::view::walk_result, bool>::value,
+              "walk_result must not be implicitly convertible to bool");
+static_assert(!std::is_constructible<bool, cbor::view::walk_result>::value,
+              "walk_result must not be contextually convertible to bool");
+static_assert(noexcept(std::declval<cbor::view::walker&>().enter()),
+              "walker enter must not throw");
+static_assert(noexcept(std::declval<cbor::view::walker&>().next()),
+              "walker next must not throw");
+static_assert(noexcept(std::declval<cbor::view::walker&>().leave()),
+              "walker leave must not throw");
+static_assert(noexcept(std::declval<cbor::view::walker&>().finish_item()),
+              "walker finish_item must not throw");
 
 TEST_CASE("cbor view walker construction and root access")
 {
-    SECTION("get_walker with prefix returns a checked root and remainder")
+    SECTION("get_walker reads only the root head")
     {
-        std::vector<uint8_t> data = {0xc1,0x18,0x2a,0x01};   // tag(1) 42, then 1
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data), cbor::view::prefix);
+        std::vector<uint8_t> data = {0xc1,0x18,0x2a,0x01};
+        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        CHECK(result.value().first.kind() == cbor::view::item_kind::unsigned_integer);
-        CHECK(result.value().first.argument() == 42);
-        CHECK(result.value().first.role() == cbor::view::position_role::root);
-        CHECK(result.value().first.depth() == 0);
-        CHECK(result.value().first.extent_known());
-        REQUIRE(result.value().remainder.size() == 1);
-        CHECK(result.value().remainder.data() == data.data() + 3);
+        CHECK(result.value().kind() == cbor::view::item_kind::unsigned_integer);
+        CHECK(result.value().argument() == 42);
+        CHECK(result.value().role() == cbor::view::position_role::root);
+        CHECK(result.value().depth() == 0);
+        CHECK(result.value().extent_known());
 
         std::vector<uint64_t> tags;
-        for (uint64_t tag : result.value().first.tags())
+        for (uint64_t tag : result.value().tags())
         {
             tags.push_back(tag);
         }
@@ -565,8 +582,11 @@ TEST_CASE("cbor view walker construction and root access")
         CHECK(tags[0] == 1);
 
         uint64_t value = 0;
-        CHECK(result.value().first.uint64_value(value));
+        CHECK(result.value().uint64_value(value));
         CHECK(value == 42);
+        auto finished = result.value().finish_item();
+        REQUIRE(finished.has_value());
+        CHECK(finished.value().encoded_bytes().size() == 3);
     }
 
     SECTION("get_walker exposes scalar and string content")
@@ -595,132 +615,89 @@ TEST_CASE("cbor view walker construction and root access")
         CHECK(boolean);
     }
 
-    SECTION("get_walker rejects trailing data")
+    SECTION("validate is the exact eager boundary")
     {
         std::vector<uint8_t> data = {0x01,0x02};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(cbor::view::get_walker(jsoncons::span<const uint8_t>(data)).has_value());
+        auto result = cbor::view::validate(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::trailing_data);
         CHECK(result.error().offset == 1);
-    }
 
-    SECTION("reset is transactional and reuses the walker")
-    {
-        std::vector<uint8_t> first = {0x01};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(first));
-        REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
-
-        std::vector<uint8_t> sequence = {0x02,0x03};
-        auto remainder = walker.reset(jsoncons::span<const uint8_t>(sequence), cbor::view::prefix);
-        REQUIRE(remainder.has_value());
-        REQUIRE(remainder.value().size() == 1);
-        uint64_t value = 0;
-        REQUIRE(walker.uint64_value(value));
-        CHECK(value == 2);
-
-        std::vector<uint8_t> malformed = {0x19,0x01};
-        auto malformed_result = walker.reset(jsoncons::span<const uint8_t>(malformed));
-        REQUIRE_FALSE(malformed_result.has_value());
-        value = 0;
-        REQUIRE(walker.uint64_value(value));
-        CHECK(value == 2);
-
-        auto trailing_result = walker.reset(jsoncons::span<const uint8_t>(sequence));
-        REQUIRE_FALSE(trailing_result.has_value());
-        CHECK(trailing_result.error().code == cbor::cbor_errc::trailing_data);
-        value = 0;
-        REQUIRE(walker.uint64_value(value));
-        CHECK(value == 2);
-
-        std::vector<uint8_t> replacement = {0x81,0x04};
-        auto exact_remainder = walker.reset(jsoncons::span<const uint8_t>(replacement));
-        REQUIRE(exact_remainder.has_value());
-        CHECK(exact_remainder.value().empty());
-        CHECK(walker.kind() == cbor::view::item_kind::array);
-        CHECK(walker.argument() == 1);
-        CHECK(walker.role() == cbor::view::position_role::root);
-        CHECK(walker.depth() == 0);
-        std::vector<uint8_t> deep(100, 0x81);
-        deep.push_back(0x05);
-        REQUIRE(walker.reset(jsoncons::span<const uint8_t>(deep), 200).has_value());
-        REQUIRE(walker.reset(jsoncons::span<const uint8_t>(replacement), 200).has_value());
-        REQUIRE(walker.reset(jsoncons::span<const uint8_t>(deep), 200).has_value());
-        for (std::size_t i = 0; i < 100; ++i)
-        {
-            REQUIRE(walker.enter());
-        }
-        CHECK(walker.argument() == 5);
-
+        std::vector<uint8_t> exact = {0x81,0x01};
+        auto checked = cbor::view::validate(jsoncons::span<const uint8_t>(exact));
+        REQUIRE(checked.has_value());
+        CHECK(checked.value().encoded_bytes().size() == exact.size());
+        CHECK(checked.value().kind() == cbor::view::item_kind::array);
     }
 }
 
 TEST_CASE("cbor view walker movement")
 {
-    SECTION("walks nested definite arrays without prefinishing parents")
+    SECTION("walks nested definite arrays incrementally")
     {
-        std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04}; // [1,[2,3],4]
+        std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04};
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
 
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 1);
         CHECK(walker.role() == cbor::view::position_role::array_element);
         CHECK(walker.argument() == 1);
 
-        REQUIRE(walker.next());
+        REQUIRE(moved(walker.next()));
         CHECK(walker.kind() == cbor::view::item_kind::array);
         CHECK_FALSE(walker.extent_known());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 2);
         CHECK(walker.argument() == 2);
-        REQUIRE(walker.next());
+        REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 3);
-        CHECK_FALSE(walker.next());
-        CHECK_FALSE(walker.next());
-        REQUIRE(walker.leave());
+        CHECK_FALSE(moved(walker.next()));
+        CHECK_FALSE(moved(walker.next()));
+        REQUIRE(moved(walker.leave()));
         CHECK(walker.depth() == 1);
         CHECK(walker.kind() == cbor::view::item_kind::array);
         CHECK(walker.extent_known());
 
-        REQUIRE(walker.next());
+        REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 4);
         CHECK(walker.extent_known());
-        CHECK_FALSE(walker.next());
-        REQUIRE(walker.leave());
+        CHECK_FALSE(moved(walker.next()));
+        REQUIRE(moved(walker.leave()));
         CHECK(walker.depth() == 0);
         CHECK(walker.kind() == cbor::view::item_kind::array);
-        CHECK_FALSE(walker.leave());
+        CHECK_FALSE(moved(walker.leave()));
     }
 
-    SECTION("next skips an unopened container once")
+    SECTION("next skips an unopened container")
     {
-        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.kind() == cbor::view::item_kind::array);
         CHECK_FALSE(walker.extent_known());
-        REQUIRE(walker.next());
+        REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 3);
         CHECK(walker.extent_known());
     }
 
     SECTION("early leave skips only the unread remainder")
     {
-        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
-        REQUIRE(walker.enter());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 1);
-        REQUIRE(walker.leave());
+        REQUIRE(moved(walker.leave()));
         CHECK(walker.kind() == cbor::view::item_kind::array);
         CHECK(walker.extent_known());
-        REQUIRE(walker.next());
+        REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 3);
     }
 
@@ -735,21 +712,21 @@ TEST_CASE("cbor view walker movement")
             auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
             REQUIRE(result.has_value());
             cbor::view::walker walker = std::move(result.value());
-            REQUIRE(walker.enter());
+            REQUIRE(moved(walker.enter()));
             CHECK(walker.role() == cbor::view::position_role::map_key);
             CHECK(walker.argument() == 1);
-            REQUIRE(walker.next());
+            REQUIRE(moved(walker.next()));
             CHECK(walker.role() == cbor::view::position_role::map_value);
             CHECK(walker.argument() == 2);
-            REQUIRE(walker.next());
+            REQUIRE(moved(walker.next()));
             CHECK(walker.role() == cbor::view::position_role::map_key);
             CHECK(walker.argument() == 3);
-            REQUIRE(walker.next());
+            REQUIRE(moved(walker.next()));
             CHECK(walker.role() == cbor::view::position_role::map_value);
             CHECK(walker.argument() == 4);
-            CHECK_FALSE(walker.next());
-            CHECK_FALSE(walker.next());
-            REQUIRE(walker.leave());
+            CHECK_FALSE(moved(walker.next()));
+            CHECK_FALSE(moved(walker.next()));
+            REQUIRE(moved(walker.leave()));
             CHECK(walker.role() == cbor::view::position_role::root);
         }
     }
@@ -765,7 +742,7 @@ TEST_CASE("cbor view walker movement")
             REQUIRE(result.has_value());
             cbor::view::walker walker = std::move(result.value());
             const cbor::view::item_kind kind = walker.kind();
-            CHECK_FALSE(walker.enter());
+            CHECK_FALSE(moved(walker.enter()));
             CHECK(walker.kind() == kind);
             CHECK(walker.depth() == 0);
         }
@@ -773,21 +750,22 @@ TEST_CASE("cbor view walker movement")
 
     SECTION("finish_item caches an unknown extent and descent remains legal")
     {
-        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03}; // [[1,2],3]
+        std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK_FALSE(walker.extent_known());
-        cbor::view::item nested = walker.finish_item();
+        auto nested = walker.finish_item();
+        REQUIRE(nested.has_value());
         CHECK(walker.extent_known());
-        CHECK(nested.encoded_bytes().data() == data.data() + 1);
-        CHECK(nested.encoded_bytes().size() == 3);
-        REQUIRE(walker.enter());
+        CHECK(nested.value().encoded_bytes().data() == data.data() + 1);
+        CHECK(nested.value().encoded_bytes().size() == 3);
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 1);
     }
 
-    SECTION("right fences make the final payload immediately finishable")
+    SECTION("lazy roots do not manufacture a right fence")
     {
         std::vector<uint8_t> data = {
             0x87,0x01,0x02,0x03,0x04,0x05,0x06,
@@ -796,43 +774,44 @@ TEST_CASE("cbor view walker movement")
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         for (int i = 0; i < 6; ++i)
         {
-            REQUIRE(walker.next());
+            REQUIRE(moved(walker.next()));
         }
         CHECK(walker.kind() == cbor::view::item_kind::array);
-        CHECK(walker.extent_known());
-        cbor::view::item payload = walker.finish_item();
-        CHECK(payload.encoded_bytes().data() == data.data() + 7);
-        CHECK(payload.encoded_bytes().size() == 5);
+        CHECK_FALSE(walker.extent_known());
+        auto payload = walker.finish_item();
+        REQUIRE(payload.has_value());
+        CHECK(payload.value().encoded_bytes().data() == data.data() + 7);
+        CHECK(payload.value().encoded_bytes().size() == 5);
 
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.kind() == cbor::view::item_kind::array);
         CHECK_FALSE(walker.extent_known());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 7);
         CHECK(walker.extent_known());
     }
 
-    SECTION("rewind restores the checked root")
+    SECTION("rewind restores the root")
     {
         std::vector<uint8_t> data = {0x81,0x81,0x01};
         auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::view::walker walker = std::move(result.value());
-        REQUIRE(walker.enter());
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 2);
         walker.rewind();
         CHECK(walker.depth() == 0);
         CHECK(walker.role() == cbor::view::position_role::root);
         CHECK(walker.kind() == cbor::view::item_kind::array);
-        REQUIRE(walker.enter());
+        REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 1);
     }
 
-    SECTION("deep movement uses the validation-sized workspace")
+    SECTION("deep movement retains spill capacity")
     {
         const std::size_t depth = 100;
         std::vector<uint8_t> data(depth, 0x81);
@@ -842,13 +821,186 @@ TEST_CASE("cbor view walker movement")
         cbor::view::walker walker = std::move(result.value());
         for (std::size_t i = 0; i < depth; ++i)
         {
-            REQUIRE(walker.enter());
+            REQUIRE(moved(walker.enter()));
             CHECK(walker.depth() == i + 1);
         }
         CHECK(walker.argument() == 1);
         for (std::size_t i = 0; i < depth; ++i)
         {
-            REQUIRE(walker.leave());
+            REQUIRE(moved(walker.leave()));
+        }
+        CHECK(walker.depth() == 0);
+    }
+}
+
+TEST_CASE("cbor view lazy walker errors")
+{
+    SECTION("enter reports a malformed first child transactionally")
+    {
+        std::vector<uint8_t> data = {0x81,0x1f};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        auto result = walker.enter();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 2);
+        CHECK(walker.role() == cbor::view::position_role::root);
+        CHECK(walker.depth() == 0);
+    }
+
+    SECTION("next reports a malformed sibling transactionally")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x1f};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto result = walker.next();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 3);
+        CHECK(walker.argument() == 1);
+        CHECK(walker.depth() == 1);
+    }
+
+    SECTION("next reports a malformed unopened subtree")
+    {
+        std::vector<uint8_t> data = {0x82,0x81,0x1f,0x01};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto result = walker.next();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 3);
+        CHECK(walker.kind() == cbor::view::item_kind::array);
+    }
+
+    SECTION("leave reports a malformed unread remainder")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x1f};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto result = walker.leave();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(walker.argument() == 1);
+        CHECK(walker.depth() == 1);
+    }
+
+    SECTION("an indefinite map cannot end between key and value")
+    {
+        std::vector<uint8_t> data = {0xbf,0x01,0xff};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto result = walker.next();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 3);
+        CHECK(walker.role() == cbor::view::position_role::map_key);
+    }
+
+    SECTION("depth errors occur when the nested container is reached")
+    {
+        std::vector<uint8_t> data = {0x81,0x81,0x81,0x01};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data), 2);
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto result = walker.enter();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
+        CHECK(result.error().offset == 3);
+        CHECK(walker.depth() == 1);
+    }
+
+    SECTION("finish_item reports malformed descendants transactionally")
+    {
+        std::vector<uint8_t> data = {0x82,0x01,0x1f};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        auto result = walker.finish_item();
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().offset == 3);
+        CHECK(walker.role() == cbor::view::position_role::root);
+        CHECK_FALSE(walker.extent_known());
+    }
+
+    SECTION("trailing bytes are not used as a lazy root fence")
+    {
+        std::vector<uint8_t> data = {0x81,0x80,0x01};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(moved(walker.enter()));
+        auto child = walker.finish_item();
+        REQUIRE(child.has_value());
+        CHECK(child.value().encoded_bytes().size() == 1);
+        CHECK_FALSE(moved(walker.next()));
+        REQUIRE(moved(walker.leave()));
+        auto root = walker.finish_item();
+        REQUIRE(root.has_value());
+        CHECK(root.value().encoded_bytes().size() == 2);
+    }
+}
+
+TEST_CASE("cbor view completed walker")
+{
+    SECTION("completion and rewind reuse the same walker")
+    {
+        std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04};
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        auto checked = walker.finish_item();
+        REQUIRE(checked.has_value());
+        CHECK(checked.value().encoded_bytes().size() == data.size());
+        walker.rewind();
+        CHECK(walker.extent_known());
+
+        REQUIRE(moved(walker.enter()));
+        CHECK(walker.argument() == 1);
+        REQUIRE(moved(walker.next()));
+        CHECK(walker.kind() == cbor::view::item_kind::array);
+        REQUIRE(moved(walker.enter()));
+        CHECK(walker.argument() == 2);
+        REQUIRE(moved(walker.next()));
+        CHECK(walker.argument() == 3);
+        CHECK_FALSE(moved(walker.next()));
+        REQUIRE(moved(walker.leave()));
+        REQUIRE(moved(walker.next()));
+        CHECK(walker.argument() == 4);
+        CHECK(walker.extent_known());
+        REQUIRE(moved(walker.leave()));
+        CHECK(walker.depth() == 0);
+    }
+
+    SECTION("deep completion and traversal reuse workspace")
+    {
+        const std::size_t depth = 100;
+        std::vector<uint8_t> data(depth, 0x81);
+        data.push_back(0x01);
+        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data), 200);
+        REQUIRE(made.has_value());
+        cbor::view::walker walker = std::move(made.value());
+        REQUIRE(walker.finish_item().has_value());
+        walker.rewind();
+        for (std::size_t i = 0; i < depth; ++i)
+        {
+            REQUIRE(moved(walker.enter()));
+        }
+        CHECK(walker.argument() == 1);
+        for (std::size_t i = 0; i < depth; ++i)
+        {
+            REQUIRE(moved(walker.leave()));
         }
         CHECK(walker.depth() == 0);
     }

@@ -6,94 +6,53 @@
 
 <br>
 
-The `cbor::view` namespace reads the *encoded* structure of
+The `cbor::view` namespace reads the encoded structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
-without copying it or building a data structure. Its checked-item layer
-borrows complete encodings; its move-only `walker` owns reusable traversal
-workspace while borrowing the same bytes. The data flow is:
-> owned bytes -> structural validation -> checked item or walker -> application semantics
+without copying it or building a data structure. It provides two orthogonal
+forms of access:
 
-Validation checks structural well-formedness once (framing only — not content
-validity such as UTF-8). Checked items and walker movement then cannot fail
-structurally. The last stage — what tag 2 bytes or a tag 25 string reference
-*mean* — belongs to [decode_cbor](decode_cbor.md) and
-[basic_cbor_cursor](basic_cbor_cursor.md), not here: tags are exposed, never
-interpreted.
+- `wire_cursor` for head-level sequential decoding;
+- `walker` for incremental traversal and validation.
+
+Structural validation covers CBOR framing, lengths, container balance and the
+configured nesting limit. It does not validate UTF-8, deterministic encoding,
+tag semantics, duplicate map keys or application schemas. Tags are exposed,
+never interpreted.
 
 This namespace is experimental.
 
 #### Ownership and lifetime
 
-All views borrow the input bytes. An `item`, a `walker`, and every span or
-string view obtained from them are
-invalidated by anything that invalidates those bytes: destroying the container,
-mutating it, or reallocation. A walker owns only its mutable traversal and
-validation workspace; it does not own the encoded bytes. Factory, reset, and
-`wire_cursor` entry points reject temporary owning containers at compile time.
-The copying item accessors (`text` into `std::string`, `bytes` into
-`std::vector`) retain content independently.
+Every view borrows the input bytes. Destroying, mutating or reallocating those
+bytes invalidates its items, walkers, spans and string views. View-producing
+entry points reject temporary owning containers at compile time, but an
+explicitly constructed span remains the caller's lifetime responsibility.
 
-#### Scanning
+#### Incremental traversal
 
 ```cpp
-class scan_context;                    // depth policy + reusable workspace
-
 struct scan_error
 {
     cbor_errc code;
-    std::size_t offset;                // bytes consumed when detected
+    std::size_t offset;
 };
 
-struct scan_result
+class walk_result
 {
-    item first;
-    span<const uint8_t> remainder;
+public:
+    bool has_value() const noexcept;
+    bool value() const noexcept;
+    const scan_error& error() const noexcept;
 };
 
-expected<scan_result, scan_error> scan(span<const uint8_t> input);
-expected<scan_result, scan_error> scan(span<const uint8_t> input, scan_context& context);
-
-expected<item, scan_error> parse_item(span<const uint8_t> input);
-expected<item, scan_error> parse_item(span<const uint8_t> input, scan_context& context);
-```
-
-`scan` validates and returns the first item in `input`, with the
-bytes that follow it; scan a stream of items by looping on `remainder`.
-`parse_item` requires `input` to be exactly one item, and reports
-anything after it as `cbor_errc::trailing_data`.
-
-Scanning enforces `scan_context::max_nesting_depth` (default
-`default_max_nesting_depth`, 1024) using constant call-stack space at
-any depth. It allocates only when nesting exceeds 32 open containers; a reused
-`scan_context`, `wire_cursor` with a supplied context, or walker reset retains
-that validation capacity.
-
-#### Structural traversal
-
-```cpp
-enum class position_role { root, array_element, map_key, map_value };
-
-struct prefix_t
+enum class position_role
 {
-    explicit constexpr prefix_t() = default;
-};
-class walker;
-constexpr prefix_t prefix{};
-
-struct walk_result
-{
-    walker first;
-    span<const uint8_t> remainder;
+    root, array_element, map_key, map_value
 };
 
 expected<walker, scan_error> get_walker(
     span<const uint8_t> input,
-    int max_nesting_depth = default_max_nesting_depth);
-
-expected<walk_result, scan_error> get_walker(
-    span<const uint8_t> input,
-    prefix_t,
-    int max_nesting_depth = default_max_nesting_depth);
+    int max_nesting_depth = default_max_nesting_depth) noexcept;
 
 class walker
 {
@@ -116,153 +75,178 @@ public:
     bool text(string_view&) const noexcept;
     bool bytes(span<const uint8_t>&) const noexcept;
 
-    bool enter() noexcept;
-    bool next() noexcept;
-    bool leave() noexcept;
+    walk_result enter() noexcept;
+    walk_result next() noexcept;
+    walk_result leave() noexcept;
+    expected<item, scan_error> finish_item() noexcept;
+
     void rewind() noexcept;
-
-    item finish_item() noexcept;
     bool extent_known() const noexcept;
-
-    expected<span<const uint8_t>, scan_error> reset(
-        span<const uint8_t> input,
-        int max_nesting_depth = default_max_nesting_depth);
-    expected<span<const uint8_t>, scan_error> reset(
-        span<const uint8_t> input,
-        prefix_t,
-        int max_nesting_depth = default_max_nesting_depth);
 };
 ```
 
-`get_walker(input)` requires exactly one item. Pass `prefix` to prepare a walker
-for the first item and receive the unconsumed bytes in a `walk_result`.
+`get_walker` reads the root's tags and immediate head. It does not scan the
+root's descendants or reject bytes following the first item. A definite string
+payload is bounds-checked before a zero-copy view can be exposed.
 
-A walker begins at the checked root. `enter()` moves into a nonempty array
-or map; maps expose raw children with alternating key/value roles. `next()`
-moves to the next raw sibling, skipping the current unopened container if
-necessary. At the end of the siblings it returns `false`; `leave()` restores
-the completed parent. Calling `leave()` early skips only the unread remainder.
-`rewind()` restores the root.
+Movement has three outcomes. An error reports malformed input or a resource
+failure. A successful `true` means movement occurred. A successful `false`
+means there was nowhere to move:
 
-The current position exposes its already parsed head and scalar/string content.
-A container child may not yet have a known end. `finish_item()` establishes and
-caches that end, walking the current subtree only when necessary, and returns an
-ordinary complete `item`. `extent_known()` makes that cost visible. Descent after
-`finish_item()` is legal and revisits the subtree.
+- `enter`: the current value has no child;
+- `next`: the current value has no next sibling;
+- `leave`: the current value is the root.
 
-Validation records the observed peak open-container depth, prepares that many
-container frames, and retains the validation scratch. Movement uses indexed
-frames; subtree skips reuse the retained scratch. Neither allocates after
-successful construction. Resets are transactional and retain both capacities.
-`reset(input)` requires exactly one item. Pass `prefix` to reset to the first
-item and receive the unconsumed bytes. Both overloads return the remainder;
-it is empty after a successful exact reset.
+`walk_result` deliberately has no boolean conversion. Inspect `has_value()` for
+an error and `value()` to distinguish movement from a successful end.
 
-A known parent boundary propagates to its final definite child. Consequently,
-the last payload in a definite transport tuple can be finished in O(1), even
-when it is a large container. Non-final arbitrary containers have the honest
-O(depth) tradeoff: descend immediately without a pre-walk, or establish/capture
-the exact span with one subtree walk.
+Maps expose keys and values as alternating raw children. `next` validates only
+the current subtree needed to locate its sibling. Calling `leave` before the end
+of a container validates and skips its unread remainder. A failed operation
+does not change the walker's logical position.
 
+The current head and definite scalar/string content are already available.
+`finish_item` validates and measures the complete current subtree, caches its
+end, and returns it as a checked `item`. `extent_known` reports whether that
+work is already complete. `rewind` returns to the root without rescanning it.
 
-#### The checked item
+The walker owns its parent frames and reusable skip workspace. Parent-frame and
+deep-scan capacity is retained, so traversal is amortized allocation-free.
+With exceptions enabled, allocation failures are returned as
+`cbor_errc::source_error`. No walker operation throws; exception-disabled builds
+follow jsoncons's process-termination policy on allocation failure.
+
+#### Eager validation
+
+```cpp
+expected<item, scan_error> validate(
+    span<const uint8_t> input,
+    int max_nesting_depth = default_max_nesting_depth) noexcept;
+```
+
+`validate` requires the supplied span to contain exactly one structurally valid
+item. It is a convenience wrapper over `get_walker` and `finish_item`; trailing
+bytes produce `cbor_errc::trailing_data`.
+
+```cpp
+auto made = get_walker(input);
+if (!made)
+{
+    return;
+}
+auto walker = std::move(made.value());
+auto checked = walker.finish_item();
+if (!checked || checked.value().encoded_bytes().size() != input.size())
+{
+    return;
+}
+walker.rewind();
+```
+
+This validates and traverses with the same walker. The root extent and reusable
+skip workspace remain cached after `rewind`; no second traversal engine or
+checked traversal type is required.
+
+#### Checked items
 
 ```cpp
 class item
 {
-    span<const uint8_t> encoded_bytes() const noexcept;  // tags included
-    item_kind kind() const noexcept;                     // of the untagged content
-    uint64_t argument() const noexcept;                  // RFC 8949 head argument
+    span<const uint8_t> encoded_bytes() const noexcept;
+    item_kind kind() const noexcept;
+    uint64_t argument() const noexcept;
     bool indefinite() const noexcept;
-    tag_range tags() const noexcept;                     // leading tags, outermost first
+    tag_range tags() const noexcept;
 
-    chunk_range chunks() const noexcept;                 // string content spans
-    child_range children(scan_context& context) const noexcept;   // raw children as items
+    chunk_range chunks() const noexcept;
+    child_range children(scan_context& context) const noexcept;
 
-    bool uint64_value(uint64_t& value) const noexcept;
-    bool int64_value(int64_t& value) const noexcept;
-    bool bool_value(bool& value) const noexcept;
-    bool double_value(double& value) const noexcept;
-    bool text(string_view& value) const noexcept;        // definite only, zero copy
-    bool bytes(span<const uint8_t>& value) const noexcept;
-    bool text(std::string& value) const;                 // assembles chunks
-    bool bytes(std::vector<uint8_t>& value) const;
+    bool uint64_value(uint64_t&) const noexcept;
+    bool int64_value(int64_t&) const noexcept;
+    bool bool_value(bool&) const noexcept;
+    bool double_value(double&) const noexcept;
+    bool text(string_view&) const noexcept;
+    bool bytes(span<const uint8_t>&) const noexcept;
+    bool text(std::string&) const;
+    bool bytes(std::vector<uint8_t>&) const;
 };
-
-enum class item_kind
-{
-    unsigned_integer, negative_integer, byte_string, text_string,
-    array, map, simple
-};
-
 ```
 
-An `item` is one complete, structurally well-formed encoded item: its leading
-semantic tags, head, and content. `kind()` classifies the content after
-tags (`simple` covers major type 7: simple values and floating point);
-`argument()` is the head's argument — an integer's value, a string's
-length, a container's count, a simple value's number, or the bit
-pattern of a floating-point value.
+An `item` is one complete structurally valid encoding. Its leading tags are
+included in `encoded_bytes`; `kind` and `argument` describe the untagged head.
+Strict typed accessors leave their destination unchanged on a kind or range
+mismatch. Zero-copy string access requires definite-length content. `chunks`
+exposes definite content as one span and indefinite content as one span per
+chunk. The copying overloads assemble chunked strings transactionally.
 
-`chunks()` yields the contiguous spans of a string's content, one per chunk
-for indefinite-length strings.
-
-`children(context)` yields a container's raw children in order — array
-elements, or a map's keys and values alternating — each a complete checked
-item, measured once on the way past. The item's bytes are checked, so
-iteration cannot fail; the context, which must outlive the range, supplies
-skip workspace for container children and grows only past 32 open
-containers. `children` serves sibling iteration over checked bytes;
-`walker` serves stateful traversal with retained parents and extents.
-
-The typed accessors return `false`, leaving `value` untouched, exactly
-when the item is not of the requested kind; conversions are strict.
-The copying `text` and `bytes` overloads are transactional — `value`
-is replaced on success and untouched on failure — and `value` may
-alias the scanned bytes themselves. Tags are never silently dropped:
-they are visible on every item via `tags()`, and reading the value of
-a tagged item is the caller's explicit decision.
+`children` yields array elements or alternating map keys and values as complete
+checked items. Its context supplies reusable skip workspace and must outlive
+the range and its iterators.
 
 ```cpp
-bool validate_text(const item& text_item) noexcept;
+bool validate_text(const item&) noexcept;
 ```
 
-True if `text_item` is a text string whose content is well-formed
-UTF-8; each chunk of an indefinite-length text string must itself be
-well-formed (RFC 8949 3.2.3). No other function in this namespace
-validates text content.
+`validate_text` checks a text item's UTF-8. Each chunk of an indefinite text
+string is checked independently as required by RFC 8949 section 3.2.3.
+
+#### Scanning checked items
+
+```cpp
+class scan_context
+{
+public:
+    scan_context() noexcept;
+    explicit scan_context(int max_nesting_depth) noexcept;
+    int max_nesting_depth() const noexcept;
+};
+
+struct scan_result
+{
+    item first;
+    span<const uint8_t> remainder;
+};
+
+expected<scan_result, scan_error> scan(span<const uint8_t> input);
+expected<scan_result, scan_error> scan(
+    span<const uint8_t> input, scan_context& context);
+
+expected<item, scan_error> parse_item(span<const uint8_t> input);
+expected<item, scan_error> parse_item(
+    span<const uint8_t> input, scan_context& context);
+```
+
+`scan` checks the first item and returns the remaining bytes. `parse_item`
+requires exactly one item. A reusable context retains deep-scan capacity.
 
 #### Deterministic encoding orders
 
 ```cpp
-struct bytewise_compare;       // RFC 8949 4.2.1 order, three-way
-struct length_first_compare;   // RFC 8949 4.2.3 order, three-way
-struct bytewise_less;          // strict weak orders for sorting
+struct bytewise_compare;
+struct length_first_compare;
+struct bytewise_less;
 struct length_first_less;
 
-// Span overloads for raw-span consumers; validate input, then order.
 template <typename Order = bytewise_compare>
-expected<int, scan_error> compare(span<const uint8_t> a, span<const uint8_t> b,
-    Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
+expected<int, scan_error> compare(
+    span<const uint8_t> a, span<const uint8_t> b,
+    Order order = Order(),
+    int max_nesting_depth = default_max_nesting_depth);
 
 template <typename Order = bytewise_compare>
-expected<bool, scan_error> map_keys_sorted(span<const uint8_t> input,
-    Order order = Order(), int max_nesting_depth = default_max_nesting_depth);
+expected<bool, scan_error> map_keys_sorted(
+    span<const uint8_t> input,
+    Order order = Order(),
+    int max_nesting_depth = default_max_nesting_depth);
 ```
 
-The order function objects compare encoded bytes and accept either two items
-or two raw spans. The `*_compare` forms return a three-way result; the `*_less`
-forms are predicates for sorting and ordered containers. The span-based
-`map_keys_sorted` validates once, then walks keys with a walker; malformed
-input returns the code and byte offset, and trailing bytes are tolerated.
+Bytewise order implements RFC 8949 section 4.2.1; length-first order implements
+section 4.2.3. Span entry points validate the first item and tolerate trailing
+bytes. Item overloads operate directly on checked encodings.
 
-#### Low-level tier
+#### Low-level cursor
 
 ```cpp
-enum class major_type;   // CBOR major types 0-7
-
-struct item_head { major_type major_type; uint8_t additional_info; uint64_t value; bool indefinite(); };
-
 class wire_cursor
 {
 public:
@@ -271,106 +255,59 @@ public:
     std::size_t position() const noexcept;
     span<const uint8_t> remaining() const noexcept;
     expected<item_head, scan_error> read_head() noexcept;
-    expected<item, scan_error> read_item(scan_context& context);
-    expected<span<const uint8_t>, scan_error> skip_item(scan_context& context);
+    expected<item, scan_error> read_item(scan_context&) noexcept;
+    expected<span<const uint8_t>, scan_error> skip_item(scan_context&) noexcept;
     bool skip(std::size_t count) noexcept;
 };
 ```
 
-`wire_cursor` is the offset-based low-level tier for consumers that need
-sub-item head access. It borrows one input span and exposes its position and
-remaining bytes without a mutable pointer/end pair. `read_head` advances past
-one head only (tags are returned as their own heads); `read_item` validates and
-returns one complete checked item; `skip_item` validates and passes over one
-complete item, returning its encoded bytes unparsed; `skip` advances past
-`count` bytes of already-measured content, such as a definite string payload
-after its head, refusing when fewer bytes remain. Errors report offsets from
-the beginning of the cursor's input.
+`read_head` advances past one head and exposes tags individually. `read_item`
+and `skip_item` validate one complete item. `skip` advances over an already
+measured payload. Errors carry offsets from the beginning of the cursor input.
 
-### Examples
-
-#### Reading a message without copying it
+### Example
 
 ```cpp
-#include <jsoncons_ext/cbor/cbor_view.hpp>
-#include <iostream>
-#include <utility>
-#include <vector>
+const std::vector<uint8_t> data = {
+    0xa2,
+    0x62,'i','d', 0x18,0x2a,
+    0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
+};
 
-int main()
+auto made = jsoncons::cbor::view::get_walker(
+    jsoncons::span<const uint8_t>(data));
+if (!made)
 {
-    // {"id": 42, "scores": [1, 2]}
-    const std::vector<uint8_t> data = {
-        0xa2,
-        0x62,'i','d', 0x18,0x2a,
-        0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
-    };
-
-    auto result = jsoncons::cbor::view::get_walker(
-        jsoncons::span<const uint8_t>(data));
-    if (!result)
-    {
-        return 1;
-    }
-
-    auto walker = std::move(result.value());
-    if (!walker.enter())
-    {
-        return 0;
-    }
-    for (;;)
-    {
-        jsoncons::string_view name;
-        if (!walker.text(name) || !walker.next())
-        {
-            break;
-        }
-        std::cout << name << ":";
-
-        uint64_t number = 0;
-        if (walker.uint64_value(number))
-        {
-            std::cout << " " << number;
-        }
-        else if (walker.enter())
-        {
-            do
-            {
-                if (walker.uint64_value(number))
-                {
-                    std::cout << " " << number;
-                }
-            }
-            while (walker.next());
-            walker.leave();
-        }
-        std::cout << "\n";
-        if (!walker.next())
-        {
-            break;
-        }
-    }
+    return;
 }
-```
 
-Output:
-```
-id: 42
-scores: 1 2
-```
-
-#### Splitting a stream of items
-
-```cpp
-jsoncons::span<const uint8_t> rest(data.data(), data.size());
-while (!rest.empty())
+auto walker = std::move(made.value());
+auto entered = walker.enter();
+if (!entered.has_value() || !entered.value())
 {
-    auto scanned = jsoncons::cbor::view::scan(rest);
-    if (!scanned.has_value())
+    return;
+}
+
+for (;;)
+{
+    jsoncons::string_view key;
+    if (!walker.text(key))
     {
-        break;   // scanned.error().code, scanned.error().offset
+        return;
     }
-    handle(scanned.value().first);
-    rest = scanned.value().remainder;
+
+    auto value = walker.next();
+    if (!value.has_value() || !value.value())
+    {
+        return;
+    }
+
+    handle(key, walker);
+
+    auto next = walker.next();
+    if (!next.has_value() || !next.value())
+    {
+        break;
+    }
 }
 ```
