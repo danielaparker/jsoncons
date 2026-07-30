@@ -325,7 +325,7 @@ JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 {
-   std::string an_author = "Haruki Murakami"; 
+    std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
