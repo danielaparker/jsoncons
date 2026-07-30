@@ -519,9 +519,9 @@ is_optional_value_set(const T&)
         } \
         if (is_end) \
         { \
-            std::size_t index = find_first_not_set(indices); \
-            if (index < num_mandatory_params) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index), \
+            std::size_t idx = find_first_not_set(indices); \
+            if (idx < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -546,9 +546,9 @@ is_optional_value_set(const T&)
         } \
         if (is_end) \
         { \
-            std::size_t index = find_first_not_set(indices); \
-            if (index < num_mandatory_params) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index), \
+            std::size_t idx = find_first_not_set(indices); \
+            if (idx < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -626,10 +626,10 @@ namespace reflect { \
         static std::string msg_arg(std::size_t index) \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-            static std::array<std::string,num_params> what_args = { \
+            static std::array<std::string,num_params> msg_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return msg_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -696,9 +696,9 @@ namespace reflect { \
             } \
             if (is_end) \
             { \
-            std::size_t index = find_first_not_set(indices); \
-            if (index < num_mandatory_params) { \
-                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index), \
+            std::size_t idx = find_first_not_set(indices); \
+            if (idx < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
                     cursor.line(), cursor.column()); \
             } \
             return result_type{std::move(val)}; \
@@ -843,7 +843,65 @@ else \
 #define JSONCONS_GENERATE_MSG_ARG_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_GENERATE_MSG_ARG_NAME_6(Member, Name, Mode, Match, Into, From) generate_msg_arg(class_name, # Member),
 
-#define JSONCONS_N_MEMBER_NAME_DECODE
+#define JSONCONS_N_MEMBER_NAME_DECODE(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_N_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_DECODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_DECODE_2(Member, Name) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
+#define JSONCONS_N_MEMBER_NAME_DECODE_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode,always_true(),,))
+#define JSONCONS_N_MEMBER_NAME_DECODE_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match,,)
+#define JSONCONS_N_MEMBER_NAME_DECODE_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into,)
+#define JSONCONS_N_MEMBER_NAME_DECODE_6(Member, Name, Mode, Match, Into, From) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From)
+#define JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_N_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From))
+
+#define JSONCONS_N_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From) \
+    if (count++ >= num_params) { \
+        is_end = read_next_or_end(cursor, ec); \
+        if (ec) \
+        { \
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+        } \
+        if (is_end) \
+        { \
+            std::size_t idx = find_first_not_set(indices); \
+            if (idx < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
+                    cursor.line(), cursor.column()); \
+            } \
+            return result_type{std::move(val)}; \
+        } \
+    } \
+    else if (!indices[index] && key == Name) { \
+        cursor.next(ec); \
+        if (JSONCONS_UNLIKELY(ec)) \
+        { \
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+        } \
+        auto r1 = decode_traits<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
+        if (!r1) { \
+            return result_type{jsoncons::unexpect, r1.error()}; \
+        } \
+        set_member(From(std::move(*r1)), val.Member); \
+        indices[index] = true; \
+        is_end = read_next_or_end(cursor, ec); \
+        if (ec) \
+        { \
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+        } \
+        if (is_end) \
+        { \
+            std::size_t idx = find_first_not_set(indices); \
+            if (idx < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
+                    cursor.line(), cursor.column()); \
+            } \
+            return result_type{std::move(val)}; \
+        } \
+        key = get_key(cursor, ec); \
+        if (ec) { \
+            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+        } \
+        count = 0; \
+    } \
+/**/
 
 #define JSONCONS_N_MEMBER_NAME_ENCODE(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
@@ -871,7 +929,66 @@ else \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }    
 
-#define JSONCONS_ALL_MEMBER_NAME_DECODE
+
+#define JSONCONS_ALL_MEMBER_NAME_DECODE(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_DECODE_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name,Mode,always_true(),,))
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match,,)
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into,)
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_6(Member, Name, Mode, Match, Into, From) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From)
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_ALL_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From)) 
+
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From) \
+   if (count++ >= num_params) { \
+       is_end = read_next_or_end(cursor, ec); \
+       if (ec) \
+       { \
+           return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+       } \
+       if (is_end) \
+       { \
+           std::size_t idx = find_first_not_set(indices); \
+           if (idx < num_mandatory_params) { \
+               return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
+                   cursor.line(), cursor.column()); \
+           } \
+           return result_type{std::move(val)}; \
+       } \
+   } \
+   else if (!indices[index] && key == Name) { \
+       cursor.next(ec); \
+       if (JSONCONS_UNLIKELY(ec)) \
+       { \
+           return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+       } \
+       auto r1 = decode_traits<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
+       if (!r1) { \
+           return result_type{jsoncons::unexpect, r1.error()}; \
+       } \
+       set_member(From(std::move(*r1)), val.Member); \
+       indices[index] = true; \
+       is_end = read_next_or_end(cursor, ec); \
+       if (ec) \
+       { \
+           return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+       } \
+       if (is_end) \
+       { \
+           std::size_t idx = find_first_not_set(indices); \
+           if (idx < num_mandatory_params) { \
+               return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(idx), \
+                   cursor.line(), cursor.column()); \
+           } \
+           return result_type{std::move(val)}; \
+       } \
+       key = get_key(cursor, ec); \
+       if (ec) { \
+           return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+       } \
+       count = 0; \
+   } \
+/**/
 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_ENCODE_NAME_,JSONCONS_NARGS Seq) Seq)
@@ -921,10 +1038,10 @@ namespace reflect { \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
             static constexpr const char* class_name = # TypeName; \
-            static std::array<std::string,num_params> what_args = { \
+            static std::array<std::string,num_params> msg_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG_NAME,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return msg_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -966,6 +1083,50 @@ namespace reflect { \
             Json ajson = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg, semantic_tag::none); \
             JSONCONS_VARIADIC_FOR_EACH(ToJson,,,, __VA_ARGS__) \
             return ajson; \
+        } \
+    }; \
+    template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct decode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    { \
+        using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using result_type = read_result<value_type>; \
+        constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
+        template <typename Alloc,typename TempAlloc,typename CharT> \
+        static result_type try_decode(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
+        { \
+            using char_type = CharT; \
+            value_type val{jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator())}; \
+            std::error_code ec; \
+            std::bitset<num_params> indices; \
+            std::size_t count = 0; \
+            if (cursor.current().event_type() != staj_events::begin_object) \
+            { \
+                return result_type{jsoncons::unexpect, conv_errc::not_map, cursor.line(), cursor.column()}; \
+            } \
+            bool is_end = read_next_or_end(cursor, ec); \
+            if (ec) \
+            { \
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+            } \
+            if (is_end) \
+            { \
+            std::size_t index = find_first_not_set(indices); \
+            if (index < num_mandatory_params) { \
+                return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index), \
+                    cursor.line(), cursor.column()); \
+            } \
+            return result_type{std::move(val)}; \
+            } \
+            auto key = get_key(cursor, ec); \
+            if (ec) { \
+                return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
+            } \
+            std::size_t index = 0; \
+            while (true) \
+            { \
+                JSONCONS_VARIADIC_FOR_EACH(Decode, ,,, __VA_ARGS__) \
+            } \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -1105,10 +1266,10 @@ namespace reflect { \
         static std::string msg_arg(std::size_t index) \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-            static std::array<std::string,num_params> what_args = { \
+            static std::array<std::string,num_params> msg_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return msg_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
@@ -1444,10 +1605,10 @@ namespace reflect { \
         static std::string msg_arg(std::size_t index) \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-            static std::array<std::string,num_params> what_args = { \
+            static std::array<std::string,num_params> msg_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return msg_args[index]; \
         } \
     }; \
     template<> \
@@ -1919,10 +2080,10 @@ namespace reflect { \
         static std::string msg_arg(std::size_t index) \
         { \
             static constexpr std::size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
-            static std::array<std::string,num_params> what_args = { \
+            static std::array<std::string,num_params> msg_args = { \
                 JSONCONS_VARIADIC_FOR_EACH(JSONCONS_GENERATE_MSG_ARG,TypeName,,, __VA_ARGS__)\
             }; \
-            return what_args[index]; \
+            return msg_args[index]; \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
