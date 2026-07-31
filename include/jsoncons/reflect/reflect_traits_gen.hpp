@@ -879,6 +879,7 @@ else \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
+        if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
         set_member(From(std::move(*r1)), val.Member); \
         indices[index] = true; \
         is_end = read_next_or_end(cursor, ec); \
@@ -966,6 +967,7 @@ else \
        if (!r1) { \
            return result_type{jsoncons::unexpect, r1.error()}; \
        } \
+       if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
        set_member(From(std::move(*r1)), val.Member); \
        indices[index] = true; \
        is_end = read_next_or_end(cursor, ec); \
