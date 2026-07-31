@@ -56,8 +56,10 @@ master (1.9.0 preview)
 
   - Reduced allocations when parsing BSON, CBOR, MessagePack and UBJSON. 
 
-  - JSONCONS_ALL_MEMBER_TRAITS and JSONCONS_N_MEMBER_TRAITS now generate
-  decode traits that support decode without an intermediate `basic_json` value.
+  - JSONCONS_ALL_MEMBER_TRAITS, JSONCONS_N_MEMBER_TRAITS, 
+  JSONCONS_ALL_MEMBER_NAME_TRAITS, and JSONCONS_N_MEMBER_NAME_TRAITS now 
+  generate decode traits that support decode without an intermediate 
+  `basic_json` value.
 
 Release 1.8.1
 -------------
