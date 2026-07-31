@@ -846,13 +846,11 @@ else \
 #define JSONCONS_N_MEMBER_NAME_DECODE(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_DECODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_DECODE_2(Member, Name) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
-#define JSONCONS_N_MEMBER_NAME_DECODE_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode,always_true(),,))
+#define JSONCONS_N_MEMBER_NAME_DECODE_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode,always_true(),,)
 #define JSONCONS_N_MEMBER_NAME_DECODE_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match,,)
 #define JSONCONS_N_MEMBER_NAME_DECODE_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into,)
 #define JSONCONS_N_MEMBER_NAME_DECODE_6(Member, Name, Mode, Match, Into, From) JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From)
-#define JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_N_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From))
-
-#define JSONCONS_N_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From) \
+#define JSONCONS_N_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) \
     if (count++ >= num_params) { \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
@@ -880,7 +878,7 @@ else \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
         if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
-        set_member(From(std::move(*r1)), val.Member); \
+        Mode(set_member(From(std::move(*r1)), val.Member)); \
         indices[index] = true; \
         is_end = read_next_or_end(cursor, ec); \
         if (ec) \
@@ -934,13 +932,11 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_DECODE(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_DECODE_LAST(P1, P2, P3, Seq, Count) index = num_params-Count; JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_NAME_DECODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_DECODE_2(Member, Name) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name,JSONCONS_RDWR,always_true(),,)  
-#define JSONCONS_ALL_MEMBER_NAME_DECODE_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name,Mode,always_true(),,))
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_3(Member, Name, Mode) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name,Mode,always_true(),,)
 #define JSONCONS_ALL_MEMBER_NAME_DECODE_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_MEMBER_NAME_DECODE_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into,)
 #define JSONCONS_ALL_MEMBER_NAME_DECODE_6(Member, Name, Mode, Match, Into, From) JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From)
-#define JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) Mode(JSONCONS_ALL_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From)) 
-
-#define JSONCONS_ALL_MEMBER_NAME_DECODE_8(Member, Name, Mode, Match, Into, From) \
+#define JSONCONS_ALL_MEMBER_NAME_DECODE_7(Member, Name, Mode, Match, Into, From) \
    if (count++ >= num_params) { \
        is_end = read_next_or_end(cursor, ec); \
        if (ec) \
@@ -968,7 +964,7 @@ else \
            return result_type{jsoncons::unexpect, r1.error()}; \
        } \
        if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
-       set_member(From(std::move(*r1)), val.Member); \
+       Mode(set_member(From(std::move(*r1)), val.Member)); \
        indices[index] = true; \
        is_end = read_next_or_end(cursor, ec); \
        if (ec) \
