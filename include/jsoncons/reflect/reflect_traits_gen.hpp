@@ -784,7 +784,7 @@ namespace reflect { \
   else \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
-    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
+    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::match_failed, error_context<value_type>::msg_arg(index));} \
     Mode(JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }}
 #define JSONCONS_N_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
     if (result) { \
@@ -804,7 +804,7 @@ namespace reflect { \
   if (it == ajson.object_range().end()) \
     {return result_type(unexpect, conv_errc::missing_required_member, error_context<value_type>::msg_arg(index));} \
   auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Member))>::type>(aset, it->value()); \
-  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
+  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::match_failed, error_context<value_type>::msg_arg(index));} \
   Mode(JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From)) }
 
 #define JSONCONS_ALL_MEMBER_NAME_AS_8(Member, Name, Mode, Match, Into, From) \
@@ -877,7 +877,7 @@ else \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
-        if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
+        if (!Match(*r1)) {return result_type(jsoncons::unexpect, conv_errc::match_failed, error_context<value_type>::msg_arg(index));} \
         Mode(set_member(From(std::move(*r1)), val.Member)); \
         indices[index] = true; \
         is_end = read_next_or_end(cursor, ec); \
@@ -963,7 +963,7 @@ else \
        if (!r1) { \
            return result_type{jsoncons::unexpect, r1.error()}; \
        } \
-       if (!Match(*r1)) {result_type(jsoncons::unexpect, conv_errc::conversion_failed, error_context<value_type>::msg_arg(index));} \
+       if (!Match(*r1)) {return result_type(jsoncons::unexpect, conv_errc::match_failed, error_context<value_type>::msg_arg(index));} \
        Mode(set_member(From(std::move(*r1)), val.Member)); \
        indices[index] = true; \
        is_end = read_next_or_end(cursor, ec); \
@@ -1367,7 +1367,7 @@ namespace reflect { \
   if (it != ajson.object_range().end()) \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into((std::declval<value_type*>())->Getter()))>::type>(aset, it->value()); \
-    if (result && !Match(* result)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+    if (result && !Match(* result)) {return result_type(jsoncons::unexpect, conv_errc::match_failed, class_name);} \
   } \
 }
 
@@ -1389,7 +1389,7 @@ namespace reflect { \
   { \
     _r ## Getter = json_traits_helper<Json>::template try_as_value<typename decltype(_r ## Getter)::value_type>(aset, it->value()); \
     if (!_r ## Getter) {return result_type(jsoncons::unexpect, _r ## Getter.error().code(), class_name);} \
-    if (!Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+    if (!Match(* _r ## Getter)) {return result_type(jsoncons::unexpect, conv_errc::match_failed, class_name);} \
   }} 
 
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
@@ -2190,7 +2190,7 @@ namespace reflect { \
   else \
   { \
     auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, it->value()); \
-    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+    if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::match_failed, class_name);} \
     Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) }}
 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From) \
@@ -2220,7 +2220,7 @@ namespace reflect { \
   if (it == ajson.object_range().end()) \
     {return result_type(unexpect, conv_errc::missing_required_member, class_name);} \
   auto result = json_traits_helper<Json>::template try_as_value<typename std::decay<decltype(Into(class_instance.Getter()))>::type>(aset, it->value()); \
-  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::conversion_failed, class_name);} \
+  if (result && !Match(From(* result))) {return result_type(jsoncons::unexpect, conv_errc::match_failed, class_name);} \
   Mode(JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From)) }
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_8(Getter, Setter, Name, Mode, Match, Into, From) \
