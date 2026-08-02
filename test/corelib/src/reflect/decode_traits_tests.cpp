@@ -7,13 +7,13 @@
 #include <utility>
 #include <vector>
 
-#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/deserializer.hpp>
 
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
 
-TEST_CASE("decode_traits primitive")
+TEST_CASE("deserializer primitive")
 {
     SECTION("is_primitive")
     {
@@ -26,7 +26,7 @@ TEST_CASE("decode_traits primitive")
         std::error_code ec;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<uint64_t>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<uint64_t>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK(result.value() == 1000);
@@ -36,7 +36,7 @@ TEST_CASE("decode_traits primitive")
         std::string input = R"([1000,1001,1002])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<std::vector<uint64_t>>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<std::vector<uint64_t>>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         std::vector<uint64_t>& val(*result);
@@ -47,7 +47,7 @@ TEST_CASE("decode_traits primitive")
     }
 }
 
-TEST_CASE("decode_traits std::string")
+TEST_CASE("deserializer std::string")
 {
     SECTION("is_string")
     {
@@ -58,14 +58,14 @@ TEST_CASE("decode_traits std::string")
         std::string input = R"("Hello World")";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<std::string>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<std::string>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK((*result == "Hello World"));
     }
 }
 
-TEST_CASE("decode_traits std::pair")
+TEST_CASE("deserializer std::pair")
 {
     SECTION("std::pair<std::string,std::string>")
     {
@@ -74,7 +74,7 @@ TEST_CASE("decode_traits std::pair")
         std::string input = R"(["first","second"])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -86,7 +86,7 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::vector<std::pair<std::string,std::string>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -101,7 +101,7 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -120,13 +120,13 @@ TEST_CASE("decode_traits std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(conv_errc::not_pair == result.error().code());
     }
 }
 
-TEST_CASE("decode_traits deserialization errors")
+TEST_CASE("deserializer deserialization errors")
 {
     SECTION("Expected comma or right brace")
     {
@@ -134,7 +134,7 @@ TEST_CASE("decode_traits deserialization errors")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::decode_traits<value_type>::try_decode(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(json_errc::expected_comma_or_rbrace == result.error().code());
     }

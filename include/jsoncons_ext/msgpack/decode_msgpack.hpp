@@ -15,7 +15,7 @@
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/deserializer.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
@@ -67,7 +67,7 @@ try_decode_msgpack(const BytesViewLike& v,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T>
@@ -109,7 +109,7 @@ try_decode_msgpack(std::istream& is,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -151,7 +151,7 @@ try_decode_msgpack(InputIt first, InputIt last,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -199,7 +199,7 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -247,7 +247,7 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T, typename... Args>

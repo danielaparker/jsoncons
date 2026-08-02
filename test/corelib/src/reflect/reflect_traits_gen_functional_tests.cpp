@@ -193,10 +193,10 @@ TEST_CASE("reflect_traits_gen match tests")
 
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::match_AMN>();
-        if (!result1)
-        {
-            std::cout << "(1) " << result1.error().message() << "\n";
-        }
+        //if (!result1)
+        //{
+        //    std::cout << "(1) " << result1.error().message() << "\n";
+        //}
         REQUIRE_FALSE(result1);
 
         auto result2 = jsoncons::try_decode_json<ns::match_AMN>(str);

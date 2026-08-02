@@ -18,7 +18,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/ser_utils.hpp>
-#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/deserializer.hpp>
 
 namespace jsoncons {
 
@@ -65,7 +65,7 @@ try_decode_json(const StringViewLike& s,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename CharT>
@@ -105,7 +105,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -150,7 +150,7 @@ try_decode_json(InputIt first, InputIt last,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -200,7 +200,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
@@ -251,7 +251,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<value_type>::try_decode(aset, cursor);
+    return reflect::deserializer<value_type>::try_deserialize(aset, cursor);
 }
 
 template <typename T, typename... Args>

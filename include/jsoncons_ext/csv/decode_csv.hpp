@@ -14,7 +14,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/deserializer.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
 
@@ -69,7 +69,7 @@ try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename 
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename CharT>
@@ -111,7 +111,7 @@ try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<Cha
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -158,7 +158,7 @@ try_decode_csv(InputIt first, InputIt last,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -211,7 +211,7 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
@@ -261,7 +261,7 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T, typename... Args>

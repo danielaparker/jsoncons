@@ -16,7 +16,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/reflect/encode_traits.hpp>
+#include <jsoncons/reflect/serializer.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -48,7 +48,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
-        return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+        return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
     }
 
     template <typename T>
@@ -70,7 +70,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         msgpack_stream_encoder encoder(os, options);
-        return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+        return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
     }
 
     // with temp_allocator_arg_t
@@ -96,7 +96,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-        return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+        return reflect::serializer<T>::try_serialize(aset, val, encoder);
     }
 
     template <typename T,typename Alloc,typename TempAlloc >
@@ -120,7 +120,7 @@ namespace msgpack {
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+        return reflect::serializer<T>::try_serialize(aset, val, encoder);
     }
 
 template <typename... Args>
