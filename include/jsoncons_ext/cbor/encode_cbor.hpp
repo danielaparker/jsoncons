@@ -14,7 +14,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/reflect/encode_traits.hpp>
+#include <jsoncons/reflect/encoder.hpp>
 #include <jsoncons/ser_utils.hpp>
 
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
@@ -44,7 +44,7 @@ try_encode_cbor(const T& val, BytesLike& cont,
             const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
-    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    return reflect::encoder<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 // stream
@@ -68,7 +68,7 @@ try_encode_cbor(const T& val,
     const cbor_encode_options& options = cbor_encode_options())
 {
     cbor_stream_encoder encoder(os, options);
-    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    return reflect::encoder<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 // to bytes 
@@ -96,7 +96,7 @@ try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    return reflect::encoder<T>::try_encode(aset, val, encoder);
 }
 
 // stream
@@ -122,7 +122,7 @@ try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const cbor_encode_options& options = cbor_encode_options())
 {
     basic_cbor_encoder<binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    return reflect::encoder<T>::try_encode(aset, val, encoder);
 }
 
 template <typename... Args>

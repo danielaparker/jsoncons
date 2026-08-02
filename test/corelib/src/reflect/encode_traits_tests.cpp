@@ -39,7 +39,7 @@ namespace ns = encode_traits_tests;
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
-TEST_CASE("decode_traits string tests")
+TEST_CASE("decoder string tests")
 {
     SECTION("test 1")
     {
@@ -65,7 +65,7 @@ TEST_CASE("decode_traits string tests")
     }
 }
 
-TEST_CASE("decode_traits vector of string tests")
+TEST_CASE("decoder vector of string tests")
 {
     SECTION("test 1")
     {
@@ -91,7 +91,7 @@ TEST_CASE("decode_traits vector of string tests")
     }
 }
 
-TEST_CASE("decode_traits std::pair tests")
+TEST_CASE("decoder std::pair tests")
 {
     SECTION("test 1")
     {

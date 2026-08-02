@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_ENCODE_TRAITS_HPP
-#define JSONCONS_REFLECT_ENCODE_TRAITS_HPP
+#ifndef JSONCONS_REFLECT_ENCODER_HPP
+#define JSONCONS_REFLECT_ENCODER_HPP
 
 #include <array>
 #include <cstddef>
@@ -28,20 +28,20 @@
 namespace jsoncons {
 namespace reflect {
 
-// encode_traits
+// encoder
 
 template <typename T, typename Enable = void>
-struct encode_traits
+struct encoder
 {
 public:
     template <typename CharT, typename Alloc, typename TempAlloc>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         auto j = json_conv_traits<basic_json<CharT,ordered_policy,TempAlloc>,T>::to_json(
             make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), val);
-        return j.try_dump(encoder);
+        return j.try_dump(visitor);
     }
 };
 
@@ -49,16 +49,16 @@ public:
 
 // bool
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<ext_traits::is_bool<T>::value 
 >::type>
 {
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.bool_value(val,semantic_tag::none,ser_context(),ec);
+        visitor.bool_value(val,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -66,16 +66,16 @@ struct encode_traits<T,
 
 // uint
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<ext_traits::is_u8_u16_u32_or_u64<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.uint64_value(val,semantic_tag::none,ser_context(),ec);
+        visitor.uint64_value(val,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -83,16 +83,16 @@ struct encode_traits<T,
 
 // int
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<ext_traits::is_i8_i16_i32_or_i64<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.int64_value(val,semantic_tag::none,ser_context(),ec);
+        visitor.int64_value(val,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -100,16 +100,16 @@ struct encode_traits<T,
 
 // float or double
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<ext_traits::is_float_or_double<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.double_value(val,semantic_tag::none,ser_context(),ec);
+        visitor.double_value(val,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -117,7 +117,7 @@ struct encode_traits<T,
 
 // string
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<ext_traits::is_string<T>::value /*&&
                             std::is_same<typename T::value_type,CharT>::value*/ 
 >::type>
@@ -126,10 +126,10 @@ struct encode_traits<T,
     static
     typename std::enable_if<std::is_same<typename T::value_type, CharT>::value,write_result>::type
     try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.string_value(val,semantic_tag::none,ser_context(),ec);
+        visitor.string_value(val,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -138,13 +138,13 @@ struct encode_traits<T,
     static
     typename std::enable_if<!std::is_same<typename T::value_type, CharT>::value,write_result>::type
         try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val,
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
         using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
         std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
         unicode_traits::convert(val.data(), val.size(), s);
-        encoder.string_value(basic_string_view<CharT>(s.data(), s.length()), semantic_tag::none, ser_context(), ec);
+        visitor.string_value(basic_string_view<CharT>(s.data(), s.length()), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -153,22 +153,22 @@ struct encode_traits<T,
 // std::pair
 
 template <typename T1,typename T2>
-struct encode_traits<std::pair<T1, T2>>
+struct encoder<std::pair<T1, T2>>
 {
     using value_type = std::pair<T1, T2>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
+        visitor.begin_array(2,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
-        auto r1 = encode_traits<T1>::try_encode(aset, val.first, encoder);
+        auto r1 = encoder<T1>::try_encode(aset, val.first, visitor);
         if (JSONCONS_UNLIKELY(!r1)) {return r1;}
-        auto r2 = encode_traits<T2>::try_encode(aset, val.second, encoder);
+        auto r2 = encoder<T2>::try_encode(aset, val.second, visitor);
         if (JSONCONS_UNLIKELY(!r2)) {return r2;}
-        encoder.end_array(ser_context(),ec);
+        visitor.end_array(ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -186,11 +186,11 @@ namespace detail
 
         template <typename Alloc,typename TempAlloc,typename CharT>
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const Tuple& tuple,
-            basic_json_visitor<CharT>& encoder)
+            basic_json_visitor<CharT>& visitor)
         {
-            auto r1 = encode_traits<element_type>::try_encode(aset, std::get<Size-Pos>(tuple), encoder);
+            auto r1 = encoder<element_type>::try_encode(aset, std::get<Size-Pos>(tuple), visitor);
             if (JSONCONS_UNLIKELY(!r1)) {return r1;}
-            auto r2 = next::try_encode(aset, tuple, encoder);
+            auto r2 = next::try_encode(aset, tuple, visitor);
             if (JSONCONS_UNLIKELY(!r2)) {return r2;}
             return write_result{};
         }
@@ -210,23 +210,23 @@ namespace detail
 
 
 template <typename... E>
-struct encode_traits<std::tuple<E...>>
+struct encoder<std::tuple<E...>>
 {
     using value_type = std::tuple<E...>;
     static constexpr std::size_t size = sizeof...(E);
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         using helper = detail::json_serialize_tuple_helper<size, size, std::tuple<E...>>;
 
         std::error_code ec;
-        encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
+        visitor.begin_array(size,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
-        auto r = helper::try_encode(aset, val, encoder);
+        auto r = helper::try_encode(aset, val, visitor);
         if (JSONCONS_UNLIKELY(!r)) {return r;}
-        encoder.end_array(ser_context(),ec);
+        visitor.end_array(ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -234,7 +234,7 @@ struct encode_traits<std::tuple<E...>>
 
 // vector like
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like_with_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
@@ -244,25 +244,25 @@ struct encode_traits<T,
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
 
-        encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
+        visitor.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = encode_traits<value_type>::try_encode(aset, *it, encoder);
+            auto r = encoder<value_type>::try_encode(aset, *it, visitor);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
-        encoder.end_array(ser_context(), ec);
+        visitor.end_array(ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
 };
 
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like_without_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
@@ -272,24 +272,24 @@ struct encode_traits<T,
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.begin_array(std::distance(val.begin(), val.end()), semantic_tag::none,ser_context(),ec);
+        visitor.begin_array(std::distance(val.begin(), val.end()), semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = encode_traits<value_type>::try_encode(aset, *it, encoder);
+            auto r = encoder<value_type>::try_encode(aset, *it, visitor);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
-        encoder.end_array(ser_context(), ec);
+        visitor.end_array(ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
 };
 
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_typed_array<T>::value 
@@ -299,10 +299,10 @@ struct encode_traits<T,
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.typed_array(jsoncons::span<const value_type>(val), semantic_tag::none, ser_context(), ec);
+        visitor.typed_array(jsoncons::span<const value_type>(val), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -311,23 +311,23 @@ struct encode_traits<T,
 // std::array
 
 template <typename T, std::size_t N>
-struct encode_traits<std::array<T,N>>
+struct encoder<std::array<T,N>>
 {
     using value_type = typename std::array<T,N>::value_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const std::array<T, N>& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
+        visitor.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = encode_traits<value_type>::try_encode(aset, *it, encoder);
+            auto r = encoder<value_type>::try_encode(aset, *it, visitor);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
-        encoder.end_array(ser_context(),ec);
+        visitor.end_array(ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -336,7 +336,7 @@ struct encode_traits<std::array<T,N>>
 // map like
 
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -348,25 +348,25 @@ struct encode_traits<T,
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
+        visitor.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            encoder.key((*it).first);
-            auto r = encode_traits<mapped_type>::try_encode(aset, (*it).second, encoder);
+            visitor.key((*it).first);
+            auto r = encoder<mapped_type>::try_encode(aset, (*it).second, visitor);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
-        encoder.end_object(ser_context(), ec);
+        visitor.end_object(ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
 };
 
 template <typename T>
-struct encode_traits<T,
+struct encoder<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             std::is_integral<typename T::key_type>::value
@@ -378,21 +378,21 @@ struct encode_traits<T,
 
     template <typename Alloc,typename TempAlloc,typename CharT>
     static write_result try_encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
-        basic_json_visitor<CharT>& encoder)
+        basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
+        visitor.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<CharT>;
             std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
             jsoncons::from_integer((*it).first,s);
-            encoder.key(basic_string_view<CharT>(s.data(), s.size()));
-            auto r = encode_traits<mapped_type>::try_encode(aset, (*it).second, encoder);
+            visitor.key(basic_string_view<CharT>(s.data(), s.size()));
+            auto r = encoder<mapped_type>::try_encode(aset, (*it).second, visitor);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
-        encoder.end_object(ser_context(), ec);
+        visitor.end_object(ser_context(), ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         return write_result{};
     }
@@ -401,5 +401,5 @@ struct encode_traits<T,
 } // namespace reflect
 } // namespace jsoncons
 
-#endif // JSONCONS_REFLECT_ENCODE_TRAITS_HPP
+#endif // JSONCONS_REFLECT_ENCODER_HPP
 

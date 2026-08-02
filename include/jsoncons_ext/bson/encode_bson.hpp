@@ -16,7 +16,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/reflect/encode_traits.hpp>
+#include <jsoncons/reflect/encoder.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -49,7 +49,7 @@ try_encode_bson(const T& val,
 {
     basic_bson_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
     std::error_code ec;
-    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    return reflect::encoder<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 template <typename T>
@@ -72,7 +72,7 @@ try_encode_bson(const T& val,
 {
     bson_stream_encoder encoder(os, options);
     std::error_code ec;
-    return reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    return reflect::encoder<T>::try_encode(make_alloc_set(), val, encoder);
 }
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
@@ -99,7 +99,7 @@ try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 {
     basic_bson_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     std::error_code ec;
-    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    return reflect::encoder<T>::try_encode(aset, val, encoder);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -124,7 +124,7 @@ try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 {
     basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     std::error_code ec;
-    return reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    return reflect::encoder<T>::try_encode(aset, val, encoder);
 }
 
 template <typename... Args>
