@@ -16,8 +16,8 @@
 #include <jsoncons/conversion_result.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/reflect/decoder.hpp>
-#include <jsoncons/reflect/encoder.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
+#include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/reflect/json_conv_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -156,52 +156,52 @@ struct json_traits_helper
 };
 
 template <typename CharT, typename T> 
-write_result try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& visitor) 
+write_result try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
-    visitor.key(key);
-    return encoder<T>::try_encode(make_alloc_set(), val, visitor); 
+    encoder.key(key);
+    return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
 } 
 
 template <typename CharT, typename T> 
-write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& visitor) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::shared_ptr<T>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val) 
     {
-        visitor.key(key);
-        return encoder<T>::try_encode(make_alloc_set(), *val, visitor); 
+        encoder.key(key);
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 }
  
 template <typename CharT, typename T,typename Deleter> 
-write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T,Deleter>& val, basic_json_visitor<CharT>& visitor) 
+write_result try_encode_optional_member(const basic_string_view<CharT>& key, const std::unique_ptr<T,Deleter>& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val)
     {
-        visitor.key(key);
-        return encoder<T>::try_encode(make_alloc_set(), *val, visitor); 
+        encoder.key(key);
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 }
  
 template <typename CharT, typename T> 
 typename std::enable_if<ext_traits::is_optional<T>::value, write_result>::type
-try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& visitor) 
+try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val.has_value())
     {
-        visitor.key(key);
-        return encoder<T>::try_encode(make_alloc_set(), *val, visitor); 
+        encoder.key(key);
+        return encode_traits<T>::try_encode(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 } 
 
 template <typename CharT, typename T> 
 typename std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
-try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& visitor)
+try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder)
 { 
-    visitor.key(key);
-    return encoder<T>::try_encode(make_alloc_set(), val, visitor); 
+    encoder.key(key);
+    return encode_traits<T>::try_encode(make_alloc_set(), val, encoder); 
 } 
 
 template <typename T> 
@@ -327,17 +327,17 @@ is_optional_value_set(const T&)
     template <typename JSON,typename T,typename Enable> \
     friend struct jsoncons::reflect::json_conv_traits; \
     template <typename T,typename Enable> \
-    friend struct jsoncons::reflect::encoder; \
+    friend struct jsoncons::reflect::encode_traits; \
     template <typename T,typename Enable> \
-    friend struct jsoncons::reflect::decoder;
+    friend struct jsoncons::reflect::decode_traits;
 
 #define JSONCONS_CONV_TRAITS_FRIEND \
     template <typename JSON,typename T,typename Enable> \
     friend struct jsoncons::reflect::json_conv_traits; \
     template <typename T,typename Enable> \
-    friend struct jsoncons::reflect::encoder; \
+    friend struct jsoncons::reflect::encode_traits; \
     template <typename T,typename Enable> \
-    friend struct jsoncons::reflect::decoder;
+    friend struct jsoncons::reflect::decode_traits;
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_PP_EXPAND(Call(Expr, Id))
 
@@ -482,7 +482,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = decoder<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
+        auto r1 = decode_traits<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -533,7 +533,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = decoder<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
+        auto r1 = decode_traits<typename std::decay<decltype(val.Member)>::type>::try_decode(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -565,18 +565,18 @@ is_optional_value_set(const T&)
 #define JSONCONS_N_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count) \
 if ((num_params-Count) < num_mandatory_params) \
     { \
-        auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, visitor); \
+        auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, encoder); \
         if (JSONCONS_UNLIKELY(!r)) {return r;} \
     } \
     else \
     { \
-        auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, visitor); \
+        auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, encoder); \
         if (JSONCONS_UNLIKELY(!r)) {return r;} \
     }
 
 #define JSONCONS_ALL_MEMBER_ENCODE(Prefix, P2, P3, Member, Count) JSONCONS_ALL_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_LAST(Prefix, P2, P3, Member, Count) \
-    {auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, visitor); \
+    {auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Member, encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 
 #define JSONCONS_MEMBER_COUNT(Prefix, P2, P3, Member, Count) JSONCONS_MEMBER_COUNT_LAST(Prefix, P2, P3, Member, Count)
@@ -671,7 +671,7 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct decoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct decode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = read_result<value_type>; \
@@ -714,24 +714,24 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             std::error_code ec; \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params; (void)num_mandatory_params; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_COUNT, ,,, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \
@@ -873,7 +873,7 @@ else \
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = decoder<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
+        auto r1 = decode_traits<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -906,12 +906,12 @@ else \
 #define JSONCONS_N_MEMBER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_MEMBER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name) \
     { \
-        auto r = try_encode_member(string_view_type(Name), val.Member, visitor); \
+        auto r = try_encode_member(string_view_type(Name), val.Member, encoder); \
         if (JSONCONS_UNLIKELY(!r)) {return r;} \
     } \
     else \
     { \
-        auto r = try_encode_optional_member(string_view_type(Name), val.Member, visitor); \
+        auto r = try_encode_optional_member(string_view_type(Name), val.Member, encoder); \
         if (JSONCONS_UNLIKELY(!r)) {return r;} \
     }    
 #define JSONCONS_N_MEMBER_NAME_ENCODE_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_ENCODE_2(Member, Name)
@@ -919,12 +919,12 @@ else \
 #define JSONCONS_N_MEMBER_NAME_ENCODE_5(Member, Name, Mode, Match, Into) JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_N_MEMBER_NAME_ENCODE_6(Member, Name, Mode, Match, Into, From) \
 { \
-    auto r = try_encode_member(string_view_type(Name), Into(val.Member), visitor); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Member), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Member), visitor); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Member), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }    
 
@@ -959,7 +959,7 @@ else \
        { \
            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
        } \
-       auto r1 = decoder<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
+       auto r1 = decode_traits<typename std::decay<decltype(Into(val.Member))>::type>::try_decode(aset, cursor); \
        if (!r1) { \
            return result_type{jsoncons::unexpect, r1.error()}; \
        } \
@@ -991,12 +991,12 @@ else \
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_LAST(P1, P2, P3, Seq, Count) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_ALL_MEMBER_ENCODE_NAME_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name) \
-     {auto r = try_encode_member(string_view_type(Name), val.Member, visitor); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
+     {auto r = try_encode_member(string_view_type(Name), val.Member, encoder); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_3(Member, Name, Mode) JSONCONS_ALL_MEMBER_ENCODE_NAME_2(Member, Name)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_5(Member, Name, Mode, Match, Into) JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, )
 #define JSONCONS_ALL_MEMBER_ENCODE_NAME_6(Member, Name, Mode, Match, Into, From) \
-    {auto r = try_encode_member(string_view_type(Name), Into(val.Member), visitor); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
+    {auto r = try_encode_member(string_view_type(Name), Into(val.Member), encoder); if (JSONCONS_UNLIKELY(!r)) {return r;}} 
 
 #define JSONCONS_MEMBER_NAME_COUNT(P1, P2, P3, Seq, Count) JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_MEMBER_NAME_COUNT_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_MEMBER_NAME_COUNT_,JSONCONS_NARGS Seq) Seq)
@@ -1084,7 +1084,7 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct decoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct decode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = read_result<value_type>; \
@@ -1127,14 +1127,14 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1142,10 +1142,10 @@ namespace reflect { \
             std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_MEMBER_NAME_COUNT, ,,, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(Encode, ,,, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \
@@ -1221,12 +1221,12 @@ else \
 #define JSONCONS_CTOR_GETTER_ENCODE_LAST(Prefix, P2, P3, Getter, Count) \
 if ((num_params-Count) < num_mandatory_params) \
 { \
-    auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), visitor); \
+    auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), visitor); \
+    auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
@@ -1300,24 +1300,24 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params; (void)num_mandatory_params; \
             std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_COUNT, ,,, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_ENCODE, ,,, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \
@@ -1460,12 +1460,12 @@ else \
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_CTOR_GETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name) \
 { \
-    auto r = try_encode_member(string_view_type(Name), val.Getter(), visitor); \
+    auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), visitor); \
+    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_ENCODE_2(Getter, Name)
@@ -1473,12 +1473,12 @@ else \
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_5(Getter, Name, Mode, Match, Into) JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, )
 #define JSONCONS_CTOR_GETTER_NAME_ENCODE_6(Getter, Name, Mode, Match, Into, From) \
 { \
-    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), visitor); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), visitor); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
@@ -1519,14 +1519,14 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1534,10 +1534,10 @@ namespace reflect { \
             std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_COUNT,,,, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_CTOR_GETTER_NAME_ENCODE,,,, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \
@@ -1709,13 +1709,13 @@ namespace reflect { \
             return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), (*it).second, semantic_tag::none); \
         } \
     }; \
-    template <> struct encoder<EnumType> \
+    template <> struct encode_traits<EnumType> \
     { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1731,7 +1731,7 @@ namespace reflect { \
             { \
                 if (val == value_type()) \
                 { \
-                    visitor.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                    encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
                     if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
                     return write_result{}; \
                 } \
@@ -1740,11 +1740,11 @@ namespace reflect { \
                     return write_result{unexpect, conv_errc::conversion_failed}; \
                 } \
             } \
-            visitor.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
+            encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
             return write_result{}; \
         } \
     }; \
-    template <> struct decoder<EnumType> \
+    template <> struct decode_traits<EnumType> \
     { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
@@ -1897,13 +1897,13 @@ namespace reflect { \
             return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), (*it).second, semantic_tag::none); \
         } \
     }; \
-    template <> struct encoder<EnumType> \
+    template <> struct encode_traits<EnumType> \
     { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1919,7 +1919,7 @@ namespace reflect { \
             { \
                 if (val == value_type()) \
                 { \
-                    visitor.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
+                    encoder.string_value(empty_string, semantic_tag::none, ser_context(), ec); \
                     if (JSONCONS_UNLIKELY(ec)) return write_result{unexpect, ec}; \
                     return write_result{}; \
                 } \
@@ -1928,11 +1928,11 @@ namespace reflect { \
                     return write_result{unexpect, conv_errc::conversion_failed}; \
                 } \
             } \
-            visitor.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
+            encoder.string_value((*it).second, semantic_tag::none, ser_context(), ec); \
             return write_result{}; \
         } \
     }; \
-    template <> struct decoder<EnumType> \
+    template <> struct decode_traits<EnumType> \
     { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
@@ -2035,12 +2035,12 @@ else \
 #define JSONCONS_N_GETTER_SETTER_ENCODE_(Prefix, Getter, Setter, Property, Count) \
 if ((num_params-Count) < num_mandatory_params) \
 { \
-    auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), visitor); \
+    auto r = try_encode_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), visitor); \
+    auto r = try_encode_optional_member(object_names<value_type,char_type>::name(num_params-Count), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } 
 
@@ -2122,24 +2122,24 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             (void)num_params; (void)num_mandatory_params; (void)num_mandatory_params; \
             std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_COUNT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_ENCODE, ,GetPrefix,SetPrefix, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \
@@ -2273,12 +2273,12 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params) JSONCONS_PP_EXPAND(JSONCONS_PP_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_ENCODE_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_3(Getter, Setter, Name) \
 { \
-    auto r = try_encode_member(string_view_type(Name), val.Getter(), visitor); \
+    auto r = try_encode_member(string_view_type(Name), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), visitor); \
+    auto r = try_encode_optional_member(string_view_type(Name), val.Getter(), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
  
@@ -2286,12 +2286,12 @@ else \
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_6(Getter, Setter, Name, Mode, Match, Into) JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, )
 #define JSONCONS_N_GETTER_SETTER_NAME_ENCODE_7(Getter, Setter, Name, Mode, Match, Into, From) \
 { \
-    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), visitor); \
+    auto r = try_encode_member(string_view_type(Name), Into(val.Getter()), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 } \
 else \
 { \
-    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), visitor); \
+    auto r = try_encode_optional_member(string_view_type(Name), Into(val.Getter()), encoder); \
     if (JSONCONS_UNLIKELY(!r)) {return r;} \
 }
 
@@ -2340,14 +2340,14 @@ namespace reflect { \
         } \
     }; \
     template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
-    struct encoder<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct encode_traits<TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
         static write_result try_encode(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
-            basic_json_visitor<CharT>& visitor) \
+            basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -2355,10 +2355,10 @@ namespace reflect { \
             std::error_code ec; \
             std::size_t member_count{0}; \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_COUNT,,,, __VA_ARGS__) \
-            visitor.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
+            encoder.begin_object(member_count, semantic_tag::none, ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             JSONCONS_VARIADIC_FOR_EACH(JSONCONS_N_GETTER_SETTER_NAME_ENCODE,,,, __VA_ARGS__) \
-            visitor.end_object(ser_context(), ec); \
+            encoder.end_object(ser_context(), ec); \
             if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};} \
             return write_result{}; \
         } \

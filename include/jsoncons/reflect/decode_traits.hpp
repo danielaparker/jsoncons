@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_DECODER_HPP
-#define JSONCONS_REFLECT_DECODER_HPP
+#ifndef JSONCONS_REFLECT_DECODE_TRAITS_HPP
+#define JSONCONS_REFLECT_DECODE_TRAITS_HPP
 
 #include <array>
 #include <cstddef>
@@ -36,10 +36,10 @@
 namespace jsoncons {
 namespace reflect {
 
-// decoder
+// decode_traits
 
 template <typename T,typename Enable = void>
-struct decoder
+struct decode_traits
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -68,7 +68,7 @@ struct decoder
 };
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<ext_traits::is_basic_json<T>::value
 >::type>
 {
@@ -92,7 +92,7 @@ struct decoder<T,
 // primitive
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<ext_traits::is_primitive<T>::value
 >::type>
 {
@@ -112,7 +112,7 @@ struct decoder<T,
 // string
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<ext_traits::is_string<T>::value>::type>
 {
     using value_type = T;
@@ -160,7 +160,7 @@ struct decoder<T,
 // std::pair
 
 template <typename T1,typename T2>
-struct decoder<std::pair<T1, T2>>
+struct decode_traits<std::pair<T1, T2>>
 {
     using value_type = std::pair<T1, T2>;
     using result_type = read_result<value_type>;
@@ -185,7 +185,7 @@ struct decoder<std::pair<T1, T2>>
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
 
-        auto r1 = decoder<T1>::try_decode(aset, cursor);
+        auto r1 = decode_traits<T1>::try_decode(aset, cursor);
         if (JSONCONS_UNLIKELY(!r1))
         {
             return result_type(jsoncons::unexpect, r1.error());
@@ -195,7 +195,7 @@ struct decoder<std::pair<T1, T2>>
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        auto r2 = decoder<T2>::try_decode(aset, cursor);
+        auto r2 = decode_traits<T2>::try_decode(aset, cursor);
         if (JSONCONS_UNLIKELY(!r2)) 
         {
             return result_type(jsoncons::unexpect, r2.error());
@@ -216,7 +216,7 @@ struct decoder<std::pair<T1, T2>>
 
 // vector like
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -246,7 +246,7 @@ struct decoder<T,
         if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         while (cursor.current().event_type() != staj_events::end_array && !ec)
         {
-            auto r = decoder<element_type>::try_decode(aset, cursor);
+            auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error()); 
@@ -260,7 +260,7 @@ struct decoder<T,
 };
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable_byte_container<T>::value &&
@@ -322,7 +322,7 @@ struct decoder<T,
                     cursor.next(ec);
                     while (cursor.current().event_type() != staj_events::end_array && !ec)
                     {
-                        auto r = decoder<element_type>::try_decode(aset, cursor);
+                        auto r = decode_traits<element_type>::try_decode(aset, cursor);
                         if (!r)
                         {
                             return result_type(jsoncons::unexpect, r.error());
@@ -357,7 +357,7 @@ struct decoder<T,
 };
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
@@ -390,7 +390,7 @@ struct decoder<T,
                 cursor.next(ec);
                 while (cursor.current().event_type() != staj_events::end_array && !ec)
                 {
-                    auto r = decoder<element_type>::try_decode(aset, cursor);
+                    auto r = decode_traits<element_type>::try_decode(aset, cursor);
                     if (!r)
                     {
                         return result_type(jsoncons::unexpect, r.error());
@@ -423,7 +423,7 @@ struct decoder<T,
 
 // set like
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              !ext_traits::is_back_insertable<T>::value &&
@@ -456,7 +456,7 @@ struct decoder<T,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_events::end_array && !ec)
         {
-            auto r = decoder<element_type>::try_decode(aset, cursor);
+            auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -481,7 +481,7 @@ struct decoder<T,
 
 // std::forward_list
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              !ext_traits::is_back_insertable<T>::value &&
@@ -518,7 +518,7 @@ struct decoder<T,
         auto it = v.begin();
         while (cursor.current().event_type() != staj_events::end_array)
         {
-            auto r = decoder<element_type>::try_decode(aset, cursor);
+            auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -551,7 +551,7 @@ struct decoder<T,
 // std::array
 
 template <typename T, std::size_t N>
-struct decoder<std::array<T,N>>
+struct decode_traits<std::array<T,N>>
 {
     using element_type = typename std::array<T,N>::value_type;
     using value_type = typename std::array<T,N>;
@@ -575,7 +575,7 @@ struct decoder<std::array<T,N>>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
         {
-            auto r = decoder<element_type>::try_decode(aset, cursor);
+            auto r = decode_traits<element_type>::try_decode(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -594,7 +594,7 @@ struct decoder<std::array<T,N>>
 // map like
 
 template <typename T>
-struct decoder<T,
+struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_conv_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value
 >::type>
@@ -626,7 +626,7 @@ struct decoder<T,
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }
-            auto r0 = decoder<key_type>::try_decode(aset, cursor);
+            auto r0 = decode_traits<key_type>::try_decode(aset, cursor);
             if (!r0)
             {
                 return result_type(jsoncons::unexpect, r0.error());
@@ -637,7 +637,7 @@ struct decoder<T,
             {
                 return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
             }
-            auto r1 = decoder<mapped_type>::try_decode(aset, cursor);
+            auto r1 = decode_traits<mapped_type>::try_decode(aset, cursor);
             if (!r1)
             {
                 return result_type(jsoncons::unexpect, r1.error());
@@ -665,5 +665,5 @@ struct decoder<T,
 } // namespace reflect
 } // namespace jsoncons
 
-#endif // JSONCONS_REFLECT_DECODER_HPP
+#endif // JSONCONS_REFLECT_DECODE_TRAITS_HPP
 

@@ -99,10 +99,10 @@ TEST_CASE("reflect_traits_gen mode tests")
 
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::mode_AMN>();
-        //if (!result1)
-        //{
-        //    std::cout << "(1) " << result1.error().message() << "\n";
-        //}
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
         REQUIRE(result1);
         ns::mode_AMN& val1(*result1);
         CHECK(val1.username == "john");
@@ -129,10 +129,10 @@ TEST_CASE("reflect_traits_gen mode tests")
 
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::mode_NMN>();
-        //if (!result1)
-        //{
-        //    std::cout << "(1) " << result1.error().message() << "\n";
-        //}
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
         REQUIRE(result1);
         ns::mode_NMN& val1(*result1);
         CHECK(val1.username == "john");
@@ -163,10 +163,10 @@ TEST_CASE("reflect_traits_gen match tests")
 
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::match_AMN>();
-        //if (!result1)
-        //{
-        //    std::cout << "(1) " << result1.error().message() << "\n";
-        //}
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
         REQUIRE(result1);
         ns::match_AMN& val1(*result1);
         CHECK(val1.username == "john");
@@ -193,10 +193,10 @@ TEST_CASE("reflect_traits_gen match tests")
 
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::match_AMN>();
-        //if (!result1)
-        //{
-        //    std::cout << "(1) " << result1.error().message() << "\n";
-        //}
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
         REQUIRE_FALSE(result1);
 
         auto result2 = jsoncons::try_decode_json<ns::match_AMN>(str);
@@ -218,9 +218,9 @@ TEST_CASE("reflect_traits_gen match tests")
         auto j = jsoncons::json::parse(str);
         auto result1 = j.try_as<ns::match_NMN>();
         if (!result1)
-        //{
-        //    std::cout << "(1) " << result1.error().message() << "\n";
-        //}
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
         REQUIRE(result1);
         ns::match_NMN& val1(*result1);
         CHECK(val1.username == "john");
