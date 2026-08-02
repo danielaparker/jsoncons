@@ -41,7 +41,7 @@ try_encode_csv(const T& val, CharContainer& cont, const basic_csv_encode_options
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(cont,options);
-    return reflect::serializer<T,char_type>::try_serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T,char_type>::serialize(make_alloc_set(), val, encoder);
 }
 
 template <typename T,typename CharT>
@@ -59,7 +59,7 @@ try_encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_enco
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
-    return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
 }
 
 // with aset.get_temp_allocator()ator_arg_t
@@ -83,7 +83,7 @@ try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using char_type = typename CharContainer::value_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    return reflect::serializer<T,char_type>::try_serialize(aset, val, encoder);
+    return reflect::serializer<T,char_type>::serialize(aset, val, encoder);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
@@ -103,7 +103,7 @@ try_encode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 {
     using char_type = CharT;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    return reflect::serializer<T>::try_serialize(aset, val, encoder);
+    return reflect::serializer<T>::serialize(aset, val, encoder);
 }
 
 template <typename... Args>

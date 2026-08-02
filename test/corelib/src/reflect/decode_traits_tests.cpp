@@ -26,7 +26,7 @@ TEST_CASE("deserializer primitive")
         std::error_code ec;
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<uint64_t>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<uint64_t>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK(result.value() == 1000);
@@ -36,7 +36,7 @@ TEST_CASE("deserializer primitive")
         std::string input = R"([1000,1001,1002])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<std::vector<uint64_t>>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<std::vector<uint64_t>>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         std::vector<uint64_t>& val(*result);
@@ -58,7 +58,7 @@ TEST_CASE("deserializer std::string")
         std::string input = R"("Hello World")";
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<std::string>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<std::string>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         CHECK((*result == "Hello World"));
@@ -74,7 +74,7 @@ TEST_CASE("deserializer std::pair")
         std::string input = R"(["first","second"])";
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -86,7 +86,7 @@ TEST_CASE("deserializer std::pair")
         using value_type = std::vector<std::pair<std::string,std::string>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -101,7 +101,7 @@ TEST_CASE("deserializer std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::deserialize(make_alloc_set(), cursor);
         REQUIRE(result);
 
         value_type& val(*result);
@@ -120,7 +120,7 @@ TEST_CASE("deserializer std::pair")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::deserialize(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(conv_errc::not_pair == result.error().code());
     }
@@ -134,7 +134,7 @@ TEST_CASE("deserializer deserialization errors")
         using value_type = std::map<std::string,std::pair<int,double>>;
 
         json_string_cursor cursor(input);
-        auto result = reflect::deserializer<value_type>::try_deserialize(make_alloc_set(), cursor);
+        auto result = reflect::deserializer<value_type>::deserialize(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
         CHECK(json_errc::expected_comma_or_rbrace == result.error().code());
     }

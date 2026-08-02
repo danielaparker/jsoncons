@@ -45,7 +45,7 @@ struct deserializer
     using result_type = read_result<value_type>;
     
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset,
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset,
         basic_staj_cursor<CharT>& cursor)
     {
         std::size_t line = cursor.line(); 
@@ -76,7 +76,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
     
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         auto j_result = try_to_json<T>(aset, cursor);
         if (JSONCONS_UNLIKELY(!j_result))
@@ -100,7 +100,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         
@@ -121,7 +121,7 @@ struct deserializer<T,
     using string_view_type = basic_string_view<char_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
         basic_staj_cursor<CharT>& cursor,
         typename std::enable_if<std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
@@ -137,7 +137,7 @@ struct deserializer<T,
     }
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
         basic_staj_cursor<CharT>& cursor,
         typename std::enable_if<!std::is_same<typename T::value_type,CharT>::value,int>::type = 0)
     {
@@ -166,7 +166,7 @@ struct deserializer<std::pair<T1, T2>>
     using result_type = read_result<value_type>;
     
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -185,7 +185,7 @@ struct deserializer<std::pair<T1, T2>>
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
 
-        auto r1 = deserializer<T1>::try_deserialize(aset, cursor);
+        auto r1 = deserializer<T1>::deserialize(aset, cursor);
         if (JSONCONS_UNLIKELY(!r1))
         {
             return result_type(jsoncons::unexpect, r1.error());
@@ -195,7 +195,7 @@ struct deserializer<std::pair<T1, T2>>
         {
             return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
         }
-        auto r2 = deserializer<T2>::try_deserialize(aset, cursor);
+        auto r2 = deserializer<T2>::deserialize(aset, cursor);
         if (JSONCONS_UNLIKELY(!r2)) 
         {
             return result_type(jsoncons::unexpect, r2.error());
@@ -228,7 +228,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         T v(jsoncons::make_obj_using_allocator<T>(aset.get_allocator()));
@@ -246,7 +246,7 @@ struct deserializer<T,
         if (JSONCONS_UNLIKELY(ec)) { return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column()); }
         while (cursor.current().event_type() != staj_events::end_array && !ec)
         {
-            auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+            auto r = deserializer<element_type>::deserialize(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error()); 
@@ -272,7 +272,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, 
         basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
@@ -322,7 +322,7 @@ struct deserializer<T,
                     cursor.next(ec);
                     while (cursor.current().event_type() != staj_events::end_array && !ec)
                     {
-                        auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+                        auto r = deserializer<element_type>::deserialize(aset, cursor);
                         if (!r)
                         {
                             return result_type(jsoncons::unexpect, r.error());
@@ -370,7 +370,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -390,7 +390,7 @@ struct deserializer<T,
                 cursor.next(ec);
                 while (cursor.current().event_type() != staj_events::end_array && !ec)
                 {
-                    auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+                    auto r = deserializer<element_type>::deserialize(aset, cursor);
                     if (!r)
                     {
                         return result_type(jsoncons::unexpect, r.error());
@@ -435,7 +435,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
         T v{jsoncons::make_obj_using_allocator<T>(aset.get_allocator())};
@@ -456,7 +456,7 @@ struct deserializer<T,
         cursor.next(ec);
         while (cursor.current().event_type() != staj_events::end_array && !ec)
         {
-            auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+            auto r = deserializer<element_type>::deserialize(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -494,7 +494,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -518,7 +518,7 @@ struct deserializer<T,
         auto it = v.begin();
         while (cursor.current().event_type() != staj_events::end_array)
         {
-            auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+            auto r = deserializer<element_type>::deserialize(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -558,7 +558,7 @@ struct deserializer<std::array<T,N>>
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -575,7 +575,7 @@ struct deserializer<std::array<T,N>>
         cursor.next(ec);
         for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
         {
-            auto r = deserializer<element_type>::try_deserialize(aset, cursor);
+            auto r = deserializer<element_type>::deserialize(aset, cursor);
             if (!r)
             {
                 return result_type(jsoncons::unexpect, r.error());
@@ -605,7 +605,7 @@ struct deserializer<T,
     using result_type = read_result<value_type>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
+    static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor)
     {
         std::error_code ec;
 
@@ -626,7 +626,7 @@ struct deserializer<T,
             {
                 return result_type{jsoncons::unexpect, json_errc::expected_key, cursor.line(), cursor.column()}; 
             }
-            auto r0 = deserializer<key_type>::try_deserialize(aset, cursor);
+            auto r0 = deserializer<key_type>::deserialize(aset, cursor);
             if (!r0)
             {
                 return result_type(jsoncons::unexpect, r0.error());
@@ -637,7 +637,7 @@ struct deserializer<T,
             {
                 return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; 
             }
-            auto r1 = deserializer<mapped_type>::try_deserialize(aset, cursor);
+            auto r1 = deserializer<mapped_type>::deserialize(aset, cursor);
             if (!r1)
             {
                 return result_type(jsoncons::unexpect, r1.error());

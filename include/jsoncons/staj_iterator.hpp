@@ -170,7 +170,7 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            auto result = reflect::deserializer<T>::try_deserialize(make_alloc_set(), *cursor_ptr_);
+            auto result = reflect::deserializer<T>::deserialize(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();
@@ -346,7 +346,7 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            auto result = reflect::deserializer<T>::try_deserialize(make_alloc_set(), *cursor_ptr_);
+            auto result = reflect::deserializer<T>::deserialize(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();

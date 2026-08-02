@@ -42,7 +42,7 @@ try_encode_ubjson(const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
-    return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
 }
 
 template <typename T>
@@ -64,7 +64,7 @@ try_encode_ubjson(const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     ubjson_stream_encoder encoder(os, options);
-    return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
 }
 
 // with temp_allocator_arg_t
@@ -90,7 +90,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-    return reflect::serializer<T>::try_serialize(aset, val, encoder);
+    return reflect::serializer<T>::serialize(aset, val, encoder);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -114,7 +114,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,
     const ubjson_encode_options& options = ubjson_encode_options())
 {
     basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-    return reflect::serializer<T>::try_serialize(aset, val, encoder);
+    return reflect::serializer<T>::serialize(aset, val, encoder);
 }
 
 template <typename... Args>
