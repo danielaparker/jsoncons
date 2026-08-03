@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/reflect/deserializer.hpp>
+#include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
@@ -170,7 +170,7 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            auto result = reflect::deserializer<T>::try_deserialize(make_alloc_set(), *cursor_ptr_);
+            auto result = reflect::decode_traits<T>::decode(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();
@@ -346,7 +346,7 @@ namespace jsoncons {
                 done_ = true;
                 return;
             }
-            auto result = reflect::deserializer<T>::try_deserialize(make_alloc_set(), *cursor_ptr_);
+            auto result = reflect::decode_traits<T>::decode(make_alloc_set(), *cursor_ptr_);
             if (JSONCONS_UNLIKELY(!result))
             {
                 ec = result.error().code();

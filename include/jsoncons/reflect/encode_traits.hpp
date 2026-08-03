@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_REFLECT_SERIALIZER_HPP
-#define JSONCONS_REFLECT_SERIALIZER_HPP
+#ifndef JSONCONS_REFLECT_ENCODE_TRAITS_HPP
+#define JSONCONS_REFLECT_ENCODE_TRAITS_HPP
 
 #include <array>
 #include <cstddef>
@@ -28,14 +28,14 @@
 namespace jsoncons {
 namespace reflect {
 
-// serializer
+// encode_traits
 
 template <typename T, typename Enable = void>
-struct serializer
+struct encode_traits
 {
 public:
     template <typename CharT, typename Alloc, typename TempAlloc>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset,
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset,
         const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
@@ -49,12 +49,12 @@ public:
 
 // bool
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<ext_traits::is_bool<T>::value 
 >::type>
 {
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -66,12 +66,12 @@ struct serializer<T,
 
 // uint
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<ext_traits::is_u8_u16_u32_or_u64<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -83,12 +83,12 @@ struct serializer<T,
 
 // int
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<ext_traits::is_i8_i16_i32_or_i64<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val,
+    static write_result encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -100,12 +100,12 @@ struct serializer<T,
 
 // float or double
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<ext_traits::is_float_or_double<T>::value 
 >::type>
 {
     template <typename CharT, typename Alloc, typename TempAlloc>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val,
+    static write_result encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -117,7 +117,7 @@ struct serializer<T,
 
 // string
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<ext_traits::is_string<T>::value /*&&
                             std::is_same<typename T::value_type,CharT>::value*/ 
 >::type>
@@ -125,7 +125,7 @@ struct serializer<T,
     template <typename CharT, typename Alloc, typename TempAlloc>
     static
     typename std::enable_if<std::is_same<typename T::value_type, CharT>::value,write_result>::type
-    try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val,
+    encode(const allocator_set<Alloc,TempAlloc>&, const T& val,
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -137,7 +137,7 @@ struct serializer<T,
     template <typename CharT, typename Alloc, typename TempAlloc>
     static
     typename std::enable_if<!std::is_same<typename T::value_type, CharT>::value,write_result>::type
-        try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const T& val,
+        encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val,
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -153,20 +153,20 @@ struct serializer<T,
 // std::pair
 
 template <typename T1,typename T2>
-struct serializer<std::pair<T1, T2>>
+struct encode_traits<std::pair<T1, T2>>
 {
     using value_type = std::pair<T1, T2>;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
         encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
-        auto r1 = serializer<T1>::try_serialize(aset, val.first, encoder);
+        auto r1 = encode_traits<T1>::encode(aset, val.first, encoder);
         if (JSONCONS_UNLIKELY(!r1)) {return r1;}
-        auto r2 = serializer<T2>::try_serialize(aset, val.second, encoder);
+        auto r2 = encode_traits<T2>::encode(aset, val.second, encoder);
         if (JSONCONS_UNLIKELY(!r2)) {return r2;}
         encoder.end_array(ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
@@ -185,12 +185,12 @@ namespace detail
         using next = json_serialize_tuple_helper<Pos-1, Size, Tuple>;
 
         template <typename Alloc,typename TempAlloc,typename CharT>
-        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const Tuple& tuple,
+        static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const Tuple& tuple,
             basic_json_visitor<CharT>& encoder)
         {
-            auto r1 = serializer<element_type>::try_serialize(aset, std::get<Size-Pos>(tuple), encoder);
+            auto r1 = encode_traits<element_type>::encode(aset, std::get<Size-Pos>(tuple), encoder);
             if (JSONCONS_UNLIKELY(!r1)) {return r1;}
-            auto r2 = next::try_serialize(aset, tuple, encoder);
+            auto r2 = next::encode(aset, tuple, encoder);
             if (JSONCONS_UNLIKELY(!r2)) {return r2;}
             return write_result{};
         }
@@ -200,7 +200,7 @@ namespace detail
     struct json_serialize_tuple_helper<0, Size, Tuple>
     {
         template <typename Alloc,typename TempAlloc,typename CharT>
-        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const Tuple&,
+        static write_result encode(const allocator_set<Alloc,TempAlloc>&, const Tuple&,
             basic_json_visitor<CharT>&)
         {
             return write_result{};
@@ -210,13 +210,13 @@ namespace detail
 
 
 template <typename... E>
-struct serializer<std::tuple<E...>>
+struct encode_traits<std::tuple<E...>>
 {
     using value_type = std::tuple<E...>;
     static constexpr std::size_t size = sizeof...(E);
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const value_type& val, 
         basic_json_visitor<CharT>& encoder)
     {
         using helper = detail::json_serialize_tuple_helper<size, size, std::tuple<E...>>;
@@ -224,7 +224,7 @@ struct serializer<std::tuple<E...>>
         std::error_code ec;
         encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
-        auto r = helper::try_serialize(aset, val, encoder);
+        auto r = helper::encode(aset, val, encoder);
         if (JSONCONS_UNLIKELY(!r)) {return r;}
         encoder.end_array(ser_context(),ec);
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
@@ -234,7 +234,7 @@ struct serializer<std::tuple<E...>>
 
 // vector like
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like_with_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
@@ -243,7 +243,7 @@ struct serializer<T,
     using value_type = typename T::value_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -252,7 +252,7 @@ struct serializer<T,
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = serializer<value_type>::try_serialize(aset, *it, encoder);
+            auto r = encode_traits<value_type>::encode(aset, *it, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
         encoder.end_array(ser_context(), ec);
@@ -262,7 +262,7 @@ struct serializer<T,
 };
 
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like_without_size<T>::value &&
              !ext_traits::is_typed_array<T>::value 
@@ -271,7 +271,7 @@ struct serializer<T,
     using value_type = typename T::value_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -279,7 +279,7 @@ struct serializer<T,
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = serializer<value_type>::try_serialize(aset, *it, encoder);
+            auto r = encode_traits<value_type>::encode(aset, *it, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
         encoder.end_array(ser_context(), ec);
@@ -289,7 +289,7 @@ struct serializer<T,
 };
 
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_typed_array<T>::value 
@@ -298,7 +298,7 @@ struct serializer<T,
     using value_type = typename T::value_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>&, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -311,12 +311,12 @@ struct serializer<T,
 // std::array
 
 template <typename T, std::size_t N>
-struct serializer<std::array<T,N>>
+struct encode_traits<std::array<T,N>>
 {
     using value_type = typename std::array<T,N>::value_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const std::array<T, N>& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const std::array<T, N>& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -324,7 +324,7 @@ struct serializer<std::array<T,N>>
         if (JSONCONS_UNLIKELY(ec)) {return write_result{unexpect, ec};}
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            auto r = serializer<value_type>::try_serialize(aset, *it, encoder);
+            auto r = encode_traits<value_type>::encode(aset, *it, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
         encoder.end_array(ser_context(),ec);
@@ -336,7 +336,7 @@ struct serializer<std::array<T,N>>
 // map like
 
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             ext_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -347,7 +347,7 @@ struct serializer<T,
     using key_type = typename T::key_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -356,7 +356,7 @@ struct serializer<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             encoder.key((*it).first);
-            auto r = serializer<mapped_type>::try_serialize(aset, (*it).second, encoder);
+            auto r = encode_traits<mapped_type>::encode(aset, (*it).second, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
         encoder.end_object(ser_context(), ec);
@@ -366,7 +366,7 @@ struct serializer<T,
 };
 
 template <typename T>
-struct serializer<T,
+struct encode_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                             ext_traits::is_map_like<T>::value &&
                             std::is_integral<typename T::key_type>::value
@@ -377,7 +377,7 @@ struct serializer<T,
     using key_type = typename T::key_type;
 
     template <typename Alloc,typename TempAlloc,typename CharT>
-    static write_result try_serialize(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
@@ -389,7 +389,7 @@ struct serializer<T,
             std::basic_string<CharT,std::char_traits<CharT>,temp_alloc_type> s(aset.get_temp_allocator());
             jsoncons::from_integer((*it).first,s);
             encoder.key(basic_string_view<CharT>(s.data(), s.size()));
-            auto r = serializer<mapped_type>::try_serialize(aset, (*it).second, encoder);
+            auto r = encode_traits<mapped_type>::encode(aset, (*it).second, encoder);
             if (JSONCONS_UNLIKELY(!r)) {return r;}
         }
         encoder.end_object(ser_context(), ec);
@@ -401,5 +401,5 @@ struct serializer<T,
 } // namespace reflect
 } // namespace jsoncons
 
-#endif // JSONCONS_REFLECT_SERIALIZER_HPP
+#endif // JSONCONS_REFLECT_ENCODE_TRAITS_HPP
 
