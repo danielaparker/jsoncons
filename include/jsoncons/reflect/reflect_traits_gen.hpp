@@ -159,7 +159,7 @@ template <typename CharT, typename T>
 write_result try_encode_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     encoder.key(key);
-    return serializer<T>::serialize(make_alloc_set(), val, encoder); 
+    return serializer<T>::try_serialize(make_alloc_set(), val, encoder); 
 } 
 
 template <typename CharT, typename T> 
@@ -168,7 +168,7 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
     if (val) 
     {
         encoder.key(key);
-        return serializer<T>::serialize(make_alloc_set(), *val, encoder); 
+        return serializer<T>::try_serialize(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 }
@@ -179,7 +179,7 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
     if (val)
     {
         encoder.key(key);
-        return serializer<T>::serialize(make_alloc_set(), *val, encoder); 
+        return serializer<T>::try_serialize(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 }
@@ -191,7 +191,7 @@ try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, ba
     if (val.has_value())
     {
         encoder.key(key);
-        return serializer<T>::serialize(make_alloc_set(), *val, encoder); 
+        return serializer<T>::try_serialize(make_alloc_set(), *val, encoder); 
     }
     return write_result{}; 
 } 
@@ -201,7 +201,7 @@ typename std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
 try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder)
 { 
     encoder.key(key);
-    return serializer<T>::serialize(make_alloc_set(), val, encoder); 
+    return serializer<T>::try_serialize(make_alloc_set(), val, encoder); 
 } 
 
 template <typename T> 
@@ -482,7 +482,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = deserializer<typename std::decay<decltype(val.Member)>::type>::deserialize(aset, cursor); \
+        auto r1 = deserializer<typename std::decay<decltype(val.Member)>::type>::try_deserialize(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -533,7 +533,7 @@ is_optional_value_set(const T&)
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = deserializer<typename std::decay<decltype(val.Member)>::type>::deserialize(aset, cursor); \
+        auto r1 = deserializer<typename std::decay<decltype(val.Member)>::type>::try_deserialize(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -678,7 +678,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
+        static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
             value_type val{jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator())}; \
@@ -720,7 +720,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             std::error_code ec; \
@@ -873,7 +873,7 @@ else \
         { \
             return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
         } \
-        auto r1 = deserializer<typename std::decay<decltype(Into(val.Member))>::type>::deserialize(aset, cursor); \
+        auto r1 = deserializer<typename std::decay<decltype(Into(val.Member))>::type>::try_deserialize(aset, cursor); \
         if (!r1) { \
             return result_type{jsoncons::unexpect, r1.error()}; \
         } \
@@ -959,7 +959,7 @@ else \
        { \
            return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()}; \
        } \
-       auto r1 = deserializer<typename std::decay<decltype(Into(val.Member))>::type>::deserialize(aset, cursor); \
+       auto r1 = deserializer<typename std::decay<decltype(Into(val.Member))>::type>::try_deserialize(aset, cursor); \
        if (!r1) { \
            return result_type{jsoncons::unexpect, r1.error()}; \
        } \
@@ -1091,7 +1091,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static result_type deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
+        static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>& aset, basic_staj_cursor<CharT>& cursor) \
         { \
             value_type val{jsoncons::make_obj_using_allocator<value_type>(aset.get_allocator())}; \
             std::error_code ec; \
@@ -1133,7 +1133,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1306,7 +1306,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1525,7 +1525,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1714,7 +1714,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1749,7 +1749,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static result_type deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
+        static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -1902,7 +1902,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = conversion_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -1937,7 +1937,7 @@ namespace reflect { \
         using value_type = EnumType; \
         using result_type = read_result<value_type>; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static result_type deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
+        static result_type try_deserialize(const allocator_set<Alloc,TempAlloc>&, basic_staj_cursor<CharT>& cursor) \
         { \
             using char_type = CharT; \
             using string_view_type = basic_string_view<char_type>; \
@@ -2128,7 +2128,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \
@@ -2346,7 +2346,7 @@ namespace reflect { \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         template <typename Alloc,typename TempAlloc,typename CharT> \
-        static write_result serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
+        static write_result try_serialize(const allocator_set<Alloc,TempAlloc>&, const value_type& val, \
             basic_json_visitor<CharT>& encoder) \
         { \
             using char_type = CharT; \

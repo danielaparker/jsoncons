@@ -48,7 +48,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
-        return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
+        return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
     }
 
     template <typename T>
@@ -70,7 +70,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         msgpack_stream_encoder encoder(os, options);
-        return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
+        return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
     }
 
     // with temp_allocator_arg_t
@@ -96,7 +96,7 @@ namespace msgpack {
         const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
-        return reflect::serializer<T>::serialize(aset, val, encoder);
+        return reflect::serializer<T>::try_serialize(aset, val, encoder);
     }
 
     template <typename T,typename Alloc,typename TempAlloc >
@@ -120,7 +120,7 @@ namespace msgpack {
                    const msgpack_encode_options& options = msgpack_encode_options())
     {
         basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
-        return reflect::serializer<T>::serialize(aset, val, encoder);
+        return reflect::serializer<T>::try_serialize(aset, val, encoder);
     }
 
 template <typename... Args>

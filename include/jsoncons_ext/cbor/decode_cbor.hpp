@@ -68,7 +68,7 @@ try_decode_cbor(const BytesViewLike& v,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::deserializer<T>::deserialize(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T>
@@ -110,7 +110,7 @@ try_decode_cbor(std::istream& is,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::deserializer<T>::deserialize(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -152,7 +152,7 @@ try_decode_cbor(InputIt first, InputIt last,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::deserializer<T>::deserialize(make_alloc_set(), cursor);
+    return reflect::deserializer<T>::try_deserialize(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -200,7 +200,7 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::deserializer<T>::deserialize(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -247,7 +247,7 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
 
-    return reflect::deserializer<T>::deserialize(aset, cursor);
+    return reflect::deserializer<T>::try_deserialize(aset, cursor);
 }
 
 template <typename T, typename... Args>

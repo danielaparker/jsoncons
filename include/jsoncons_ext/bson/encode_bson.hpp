@@ -49,7 +49,7 @@ try_encode_bson(const T& val,
 {
     basic_bson_encoder<jsoncons::bytes_sink<BytesLike>> encoder(cont, options);
     std::error_code ec;
-    return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
 }
 
 template <typename T>
@@ -72,7 +72,7 @@ try_encode_bson(const T& val,
 {
     bson_stream_encoder encoder(os, options);
     std::error_code ec;
-    return reflect::serializer<T>::serialize(make_alloc_set(), val, encoder);
+    return reflect::serializer<T>::try_serialize(make_alloc_set(), val, encoder);
 }
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
@@ -99,7 +99,7 @@ try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 {
     basic_bson_encoder<jsoncons::bytes_sink<BytesLike>,TempAlloc> encoder(cont, options, aset.get_temp_allocator());
     std::error_code ec;
-    return reflect::serializer<T>::serialize(aset, val, encoder);
+    return reflect::serializer<T>::try_serialize(aset, val, encoder);
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
@@ -124,7 +124,7 @@ try_encode_bson(const allocator_set<Alloc,TempAlloc>& aset,
 {
     basic_bson_encoder<jsoncons::binary_stream_sink,TempAlloc> encoder(os, options, aset.get_temp_allocator());
     std::error_code ec;
-    return reflect::serializer<T>::serialize(aset, val, encoder);
+    return reflect::serializer<T>::try_serialize(aset, val, encoder);
 }
 
 template <typename... Args>
