@@ -16,11 +16,16 @@ struct json_traits
     static constexpr bool is(const Json& j) noexcept;
 
     template<typename Alloc,typename TempAlloc>
-    static conversion_result<T> try_as(const allocator_set<Alloc,TempAlloc>&, const Json& j);
-
+    static conversion_result<T> try_as(const allocator_set<Alloc,TempAlloc>& aset, 
+        const Json& j);
+                                                                                      (since 1.9.0)
     template <typename Alloc, typename TempAlloc>
-    static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const T& val);
+    static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, 
+        const T& val);
 };
+
+template <typename Json,typename T,typename Enable=void>
+using json_conv_traits = json_traits<Json,T,Enable>;   // for backwards compatibility
 ```
 
 The function 
