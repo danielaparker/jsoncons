@@ -20,7 +20,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -39,7 +39,7 @@ public:
         const T& val, 
         basic_json_visitor<CharT>& encoder)
     {
-        auto j = json_conv_traits<basic_json<CharT,ordered_policy,TempAlloc>,T>::to_json(
+        auto j = json_traits<basic_json<CharT,ordered_policy,TempAlloc>,T>::to_json(
             make_alloc_set(aset.get_temp_allocator(), aset.get_temp_allocator()), val);
         return j.try_dump(encoder);
     }

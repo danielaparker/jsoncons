@@ -18,7 +18,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
-#include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -325,7 +325,7 @@ is_optional_value_set(const T&)
     template <typename JSON,typename T,typename Enable> \
     friend struct jsoncons::json_type_traits; \
     template <typename JSON,typename T,typename Enable> \
-    friend struct jsoncons::reflect::json_conv_traits; \
+    friend struct jsoncons::reflect::json_traits; \
     template <typename T,typename Enable> \
     friend struct jsoncons::reflect::encode_traits; \
     template <typename T,typename Enable> \
@@ -333,7 +333,7 @@ is_optional_value_set(const T&)
 
 #define JSONCONS_CONV_TRAITS_FRIEND \
     template <typename JSON,typename T,typename Enable> \
-    friend struct jsoncons::reflect::json_conv_traits; \
+    friend struct jsoncons::reflect::json_traits; \
     template <typename T,typename Enable> \
     friend struct jsoncons::reflect::encode_traits; \
     template <typename T,typename Enable> \
@@ -633,7 +633,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -1043,7 +1043,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -1270,7 +1270,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -1486,7 +1486,7 @@ else \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -1625,7 +1625,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json> \
-    struct json_conv_traits<Json, EnumType> \
+    struct json_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using value_type = EnumType; \
@@ -1816,7 +1816,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json> \
-    struct json_conv_traits<Json, EnumType> \
+    struct json_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using value_type = EnumType; \
@@ -2084,7 +2084,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -2299,7 +2299,7 @@ else \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_conv_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    struct json_traits<Json, TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using value_type = TypeName JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using result_type = conversion_result<value_type>; \
@@ -2427,7 +2427,7 @@ namespace reflect { \
 namespace jsoncons { \
 namespace reflect { \
     template <typename Json> \
-    struct json_conv_traits<Json, std::shared_ptr<BaseClass>> { \
+    struct json_traits<Json, std::shared_ptr<BaseClass>> { \
         using value_type = std::shared_ptr<BaseClass>; \
         using result_type = conversion_result<value_type>; \
         static bool is(const Json& ajson) noexcept { \
@@ -2451,7 +2451,7 @@ namespace reflect { \
         } \
     }; \
     template <typename Json,typename Deleter> \
-    struct json_conv_traits<Json, std::unique_ptr<BaseClass,Deleter>> { \
+    struct json_traits<Json, std::unique_ptr<BaseClass,Deleter>> { \
         using value_type = std::unique_ptr<BaseClass,Deleter>; \
         using result_type = conversion_result<value_type>; \
         static bool is(const Json& ajson) noexcept { \
