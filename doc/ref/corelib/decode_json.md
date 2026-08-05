@@ -57,7 +57,7 @@ read_result<T> try_decode_json(Iterator first, Iterator last,
 
 (1) Reads JSON from a contiguous character sequence provided by `s` into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [reflection traits](./reflect.md).
+or support [reflection traits](./reflection-traits.md).
 
 (2) Reads JSON from an input stream into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
@@ -68,7 +68,7 @@ provides allocators for result data and temporary allocations.
 
 (5) Reads JSON from the range [first,last) into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [reflection traits](./reflect.md).
+or support [reflection traits](./reflection-traits.md).
 
 (6)-(10) Non-throwing versions of (1)-(5)
 

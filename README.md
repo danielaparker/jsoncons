@@ -15,7 +15,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
 But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
 And it supports incremental parsing into a user's preferred types, using
-information about user types provided by specializations of [reflection traits](doc/ref/corelib/reflect.md).
+information about user types provided by specializations of [reflection traits](doc/ref/corelib/reflection-traits.md).
 
 The [jsoncons data model](doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
@@ -218,7 +218,7 @@ The functions [decode_json](doc/ref/corelib/decode_json.md) and [encode_json](do
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that implement jsoncons reflection traits.
 defined. jsoncons already supports many types in the standard library, 
-and your own types will be supported too if you specialize [reflection traits](doc/ref/corelib/reflect.md)
+and your own types will be supported too if you specialize [reflection traits](doc/ref/corelib/reflection-traits.md)
 in the `jsoncons` namespace. 
 
 ```cpp
@@ -338,7 +338,7 @@ Marilyn C, 0.9, 1514862245
 ```
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`,
 `JSONCONS_N_CTOR_GETTER_TRAITS`, and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[reflection traits](doc/ref/corelib/reflect.md) for the enum type
+[reflection traits](doc/ref/corelib/reflection-traits.md) for the enum type
 `ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
 `ns::hiking_reputation` (with all mandatory members.)
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -521,7 +521,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [reflection traits](doc/ref/corelib/reflect.md)
+- As a strongly typed C++ data structure that implements [reflection traits](doc/ref/corelib/reflection-traits.md)
 
 - With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 
