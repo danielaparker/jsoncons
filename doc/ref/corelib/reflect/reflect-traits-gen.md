@@ -1,7 +1,7 @@
 ### Convenience Macros
 
-The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
-for a user-defined class.
+The `jsoncons` library provides a number of macros that can be used to generate the code to specialize [json_traits](./json_traits.md)
+and additional streaming traits for a user-defined class.
 
 Macro names follow naming conventions.
 
