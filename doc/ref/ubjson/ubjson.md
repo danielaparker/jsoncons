@@ -1,7 +1,7 @@
 ## ubjson extension
 
 The ubjson extension implements encode to and decode from the [Universal Binary JSON Specification](http://ubjson.org/) data format.
-You can either parse into or serialize from a [basic_json](../corelib/basic_json.md), a variant-like data structure, or your own
+You can either parse into or serialize from a [basic_json](../corelib/basic_json.md), or your own
 types that have [reflection traits](../corelib/reflection-traits.md) defined.
 
 [decode_ubjson, try_decode_json](decode_ubjson.md)

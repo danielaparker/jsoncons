@@ -26,11 +26,11 @@ read_result<T> try_decode_toon(std::istream& is,
 
 (1) Reads JSON from a contiguous character sequence provided by `s` into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [json_type_traits](../json_type_traits/json_type_traits.md).
+or support [json_traits](../reflect/json_traits.md).
 
 (2) Reads JSON from an input stream into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [json_type_traits](../json_type_traits/json_type_traits.md).
+or have [json_traits](../corelib/reflect/json_traits.md) defined.
 
 (3)-(4) Non-throwing versions of (1)-(2)
 
