@@ -1,6 +1,6 @@
 ### Reflection traits
 
-jsoncons supports two kinds of reflection traits
+jsoncons supports two kinds of reflection traits:
 
 - json variant traits
 
@@ -9,18 +9,20 @@ jsoncons supports two kinds of reflection traits
 ### json variant traits
 
 jsoncons json variant traits define a compile time template based interface for conversion between a `basic_json` value
-and a value of some other type. They are used in `basic_json` template constructors, `basic_json::is<T>`, `basic_json::as<T>`, 
-and `basic_json::try_as<T>` with the requirement that type `T` have `json_traits` defined. 
+and a value of some other type `T`. They are used in `basic_json` template constructors, 
+`basic_json::is<T>`, `basic_json::as<T>`, and `basic_json::try_as<T>` with the requirement that type `T` have 
+`json_traits` defined. 
 
 #### jsoncons::reflect::json_traits 
 
-Since 1.4.0. jsoncons introduces new trait definitions, [json_conv_traits](reflect/json_conv_traits.md), that support
+Since 1.4.0, jsoncons defines an interface for traits that support
 non-throwing conversions and [uses-allocator construction](https://en.cppreference.com/w/cpp/memory/uses_allocator.html). 
+Until 1.9.0, these were named [json_conv_traits](json_conv_traits](reflect/json_conv_traits.md), since
+1.9.0, they have been renamed to [json_traits](json_conv_traits](reflect/json_traits.md).
+For backwards compatibility, the old name is aliased to the new name.
 
-`json_traits` defaults to the legacy [json_type_traits](json_type_traits/json_type_traits.md) if a type conversion is undefined.  
-
-Since 1.9.0, `json_conv_traits` has been renamed to [json_traits](json_conv_traits](reflect/json_traits.md),
-for backwards compatibility, the old name is aliased to the new name.
+`json_traits` defaults to the legacy [json_type_traits](json_type_traits/json_type_traits.md) if a type conversion is undefined,
+these traits do not support non-throwing conversions and uses-allocator construction.  
 
 See [Eigen::Matrix example](reflect/Eigen-Matrix-example.md) for an example of specializing `json_traits` for an [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
 
