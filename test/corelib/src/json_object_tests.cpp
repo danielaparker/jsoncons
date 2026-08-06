@@ -1164,11 +1164,11 @@ TEST_CASE("test_json_merge_or_update_move")
     )");
 
     json expected = json::parse(R"(
-    {
-        "a" : "2",
-        "b" : [1,2,3],
-        "c" : [4,5,6]
-    }
+{
+    "a" : "2",
+    "b" : [1,2,3],
+    "c" : [4,5,6]
+}
     )");
 
     SECTION("test 1")
@@ -1212,10 +1212,10 @@ TEST_CASE("json_object_iterator_adaptor tests")
     SECTION("test 1")
     {
         auto j = json::parse(R"(
-        {
-            "a" : "1",
-            "b" : [1,2,3]
-        }
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
         )");
 
 
