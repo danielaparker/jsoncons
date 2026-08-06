@@ -33,7 +33,11 @@ See [Eigen::Matrix example](json_type_traits/Eigen-Matrix-example.md) for an exa
 
 #### decode_traits
 
+[decode_traits](./reflect/decode_traits.md)
+
 #### encode_traits
+
+[encode_traits](./reflect/encode_traits.md)
 
 ### Convenience macros
 
