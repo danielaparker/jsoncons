@@ -9,7 +9,7 @@ jsoncons supports two kinds of reflection traits:
 ### json variant traits
 
 The json variant traits define a compile time template based interface for conversion between a `basic_json` value
-and a value of some other type `T`. They are used in `basic_json` template constructors, 
+and a data structure of type `T`. They are used in `basic_json` template constructors, 
 `basic_json::is<T>`, `basic_json::as<T>`, and `basic_json::try_as<T>` with the requirement that type `T` have 
 `json_traits` defined. 
 
