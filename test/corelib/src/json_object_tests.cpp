@@ -1164,11 +1164,11 @@ TEST_CASE("test_json_merge_or_update_move")
     )");
 
     json expected = json::parse(R"(
-    {
-        "a" : "2",
-        "b" : [1,2,3],
-        "c" : [4,5,6]
-    }
+{
+    "a" : "2",
+    "b" : [1,2,3],
+    "c" : [4,5,6]
+}
     )");
 
     SECTION("test 1")
