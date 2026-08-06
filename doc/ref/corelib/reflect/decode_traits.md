@@ -6,9 +6,8 @@
 
 <br>
 
-`json_decode` defines a compile time template based interface for streaming
-JSON and other data formats. `json_traits` implementations must specialize 
-a traits class for a type `T`,
+`decode_traits` define a compile time template based interface for converting a stream of [staj_events](../staj_events.md) 
+into a C++ data structure. They are used in the `decode_<format>` functions such as [decode_json](../decode_json.md). 
 
 ```cpp
 template <typename T,typename Enable = void>

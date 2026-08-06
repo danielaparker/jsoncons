@@ -8,7 +8,7 @@ jsoncons supports two kinds of reflection traits:
 
 ### json variant traits
 
-jsoncons json variant traits define a compile time template based interface for conversion between a `basic_json` value
+The json variant traits define a compile time template based interface for conversion between a `basic_json` value
 and a value of some other type `T`. They are used in `basic_json` template constructors, 
 `basic_json::is<T>`, `basic_json::as<T>`, and `basic_json::try_as<T>` with the requirement that type `T` have 
 `json_traits` defined. 
@@ -17,8 +17,8 @@ and a value of some other type `T`. They are used in `basic_json` template const
 
 Since 1.4.0, jsoncons defines an interface for traits that support
 non-throwing conversions and [uses-allocator construction](https://en.cppreference.com/w/cpp/memory/uses_allocator.html). 
-Until 1.9.0, these were named [json_conv_traits](json_conv_traits](reflect/json_conv_traits.md), since
-1.9.0, they have been renamed to [json_traits](json_conv_traits](reflect/json_traits.md).
+Until 1.9.0, these were named [json_conv_traits](./reflect/json_conv_traits.md), since
+1.9.0, they have been renamed to [json_traits](./reflect/json_traits.md).
 For backwards compatibility, the old name is aliased to the new name.
 
 `json_traits` defaults to the legacy [json_type_traits](json_type_traits/json_type_traits.md) if a type conversion is undefined,
@@ -37,15 +37,14 @@ See [Eigen::Matrix example](json_type_traits/Eigen-Matrix-example.md) for an exa
 
 ### Streaming traits
 
-jsoncons decode traits define a compile time template based interface for converting a stream of [staj_events](./staj_events.md) 
+The decode streaming traits define a compile time template based interface for converting a stream of [staj_events](./staj_events.md) 
 into a C++ data structure. They are used in the `decode_<format>` functions such as [decode_json](./decode_json.md). 
 
-jsoncons encode traits define a compile time template based interface for converting 
-a C++ data structure into a container of characters or an output stream. They are used in the 
+The encode streaming traits define a compile time template based interface for converting 
+a C++ data structure into a character buffer or an output stream. They are used in the 
 `encode_<format>` functions such as [encode_json](./encode_json.md).
 
-The jsoncons decode and encode traits fall back on the json variant traits if they have no
-specialization for type `T`.
+In the case that the jsoncons decode and encode traits have no specialization for type `T`, they fall back on the json variant traits.
 
 #### decode_traits
 

@@ -6,9 +6,9 @@
 
 <br>
 
-`json_decode` defines a compile time template based interface for streaming
-JSON and other data formats. `json_traits` implementations must specialize 
-a traits class for a type `T`,
+`encode_traits` define a compile time template based interface for converting 
+a C++ data structure into a character buffer or an output stream. They are used in the 
+`encode_<format>` functions such as [encode_json](./encode_json.md).
 
 ```cpp
 template <typename T, typename Enable = void>
