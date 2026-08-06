@@ -10,8 +10,8 @@
 #include <ostream>
     
 #define JSONCONS_VERSION_MAJOR 1
-#define JSONCONS_VERSION_MINOR 8
-#define JSONCONS_VERSION_PATCH 1
+#define JSONCONS_VERSION_MINOR 9
+#define JSONCONS_VERSION_PATCH 0
 
 #define JSONCONS_VERSION_CONCAT_EX(major, minor, patch) \
     # major ## "." ## # minor ## "." ## # patch

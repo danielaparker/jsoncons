@@ -1,4 +1,4 @@
-master (1.9.0 preview)
+Release 1.9.0
 ------
 
 - Fixed bugs:
