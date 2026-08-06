@@ -1212,10 +1212,10 @@ TEST_CASE("json_object_iterator_adaptor tests")
     SECTION("test 1")
     {
         auto j = json::parse(R"(
-        {
-            "a" : "1",
-            "b" : [1,2,3]
-        }
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
         )");
 
 
