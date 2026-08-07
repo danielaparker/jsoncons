@@ -31,7 +31,7 @@ template <typename T,typename CharT>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type
     try_encode_json(const T& val, basic_json_visitor<CharT>& encoder)
 {
-    auto r = reflect::encode_traits<T>::try_encode(make_alloc_set(), val, encoder);
+    auto r = reflect::encode_traits<T>::encode(make_alloc_set(), val, encoder);
     encoder.flush();
     return r;
 }
@@ -49,7 +49,7 @@ typename std::enable_if<!ext_traits::is_basic_json<T>::value, write_result>::typ
     try_encode_json(const allocator_set<Alloc, TempAlloc>& aset,
     const T& val, basic_json_visitor<CharT>& encoder)
 {
-    auto r = reflect::encode_traits<T>::try_encode(aset, val, encoder);
+    auto r = reflect::encode_traits<T>::encode(aset, val, encoder);
     encoder.flush();
     return r;
 }

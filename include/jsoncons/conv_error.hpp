@@ -47,6 +47,7 @@ namespace jsoncons {
     {
         success = 0,
         conversion_failed,
+        match_failed,
         not_utf8,
         not_wide_char,
         not_vector,
@@ -103,6 +104,8 @@ namespace detail {
             {
                 case conv_errc::conversion_failed:
                     return "Unable to convert into the provided type";
+                case conv_errc::match_failed:
+                    return "Unable to match expected value";
                 case conv_errc::not_utf8:
                     return "Cannot convert string to UTF-8";
                 case conv_errc::not_wide_char:

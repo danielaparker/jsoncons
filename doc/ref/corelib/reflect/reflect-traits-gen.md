@@ -1,7 +1,7 @@
 ### Convenience Macros
 
-The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
-for a user-defined class.
+The `jsoncons` library provides a number of macros that can be used to generate the code to specialize [json_traits](./json_traits.md)
+and additional streaming traits for a user-defined class.
 
 Macro names follow naming conventions.
 
@@ -24,7 +24,7 @@ The maximum number of parameters allowed in macros is 70 (since 0.168.4).
 Previously it was 50.
 
 ```cpp
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/reflect_traits_gen.hpp>
 
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
                          member0,member1,...) (1)
@@ -132,14 +132,14 @@ JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) (27)
 ```
 
-(1)-(4) generate the code to specialize `json_type_traits` for a class from member data. 
+(1)-(4) generate the code to specialize `json_traits` for a class from member data. 
 The serialized names are the stringified member names. 
 When decoding to a C++ data structure, 
 (1) and (3) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (2) and (4)
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
-will make them accessible to `json_type_traits`, used so
+will make them accessible to `json_traits`, used so
  
 ```cpp
 class MyClass
@@ -149,9 +149,9 @@ class MyClass
 };
 ```
 
-(3)-(4) generate the code to specialize `json_type_traits` for a class template from member data. 
+(3)-(4) generate the code to specialize `json_traits` for a class template from member data. 
 
-(5)-(8) generate the code to specialize `json_type_traits` for a class from member data.
+(5)-(8) generate the code to specialize `json_traits` for a class from member data.
 The serialized names are the provided names. The sequence of `(memberN,serialized_nameN)`
 pairs declares the member name and provided name for each of the class members
 that are part of the sequence.
@@ -160,27 +160,27 @@ When decoding to a C++ data structure,
 the rest can have default values. (6) and (8) 
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
-will make them accessible to `json_type_traits`.
-(7)-(8) generate the code to specialize `json_type_traits` for a class template from member data. 
+will make them accessible to `json_traits`.
+(7)-(8) generate the code to specialize `json_traits` for a class template from member data. 
 
-(9) generates the code to specialize `json_type_traits` for an enumerated type from its enumerators.
+(9) generates the code to specialize `json_traits` for an enumerated type from its enumerators.
 The serialized name is the stringified enumerator name. 
 
-(10) generates the code to specialize `json_type_traits` for an enumerated type from its enumerators.
+(10) generates the code to specialize `json_traits` for an enumerated type from its enumerators.
 The serialized name is the provided name. The sequence of `(enumeratorN,serialized_nameN)`
 pairs declares the named constant and provided name for each of the enumerators
 that are part of the sequence.
 
-(11)-(14) generate the code to specialize `json_type_traits` for a class from a constructor and get functions. 
+(11)-(14) generate the code to specialize `json_traits` for a class from a constructor and get functions. 
 The serialized names are the stringified field names. 
 When decoding to a C++ data structure, 
 (11) and (13) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (12) and (14) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
-(13)-(14) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
+(13)-(14) generate the code to specialize `json_traits` for a class template from a constructor and get functions.  
 
-(15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions.
+(15)-(18) generate the code to specialize `json_traits` for a class from a constructor and get functions.
 The serialized names are the provided names. The sequence of `(getterN,serialized_nameN)`
 pairs declares the get function and provided name for each of the class members
 that are part of the sequence. 
@@ -189,29 +189,29 @@ When decoding to a C++ data structure,
 the rest can have default values. (16) and (18) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
-(17)-(18) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
+(17)-(18) generate the code to specialize `json_traits` for a class template from a constructor and get functions.  
 
-(19)-(22) generate the code to specialize `json_type_traits` for a class from get and set functions.
+(19)-(22) generate the code to specialize `json_traits` for a class from get and set functions.
 The serialized names are the stringified field names. The get and set function names are
 formed from the concatenation of `get_prefix` and `set_prefix` with field name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (20) and (22) 
-require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
+require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_traits` 
 for a class template from get and set functions.
 
-(23)-(26) generate the code to specialize `json_type_traits` for a class from get and set functions.
+(23)-(26) generate the code to specialize `json_traits` for a class from get and set functions.
 The serialized names are the provided names. The sequence of `(getterN,setterN,serialized_nameN)`
 triples declares the get and set functions and provided name for each of the class members
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (24) and (26) 
 require that all member names be present in the JSON. The class must have a default constructor. 
-(25)-(26) generate the code to specialize `json_type_traits` for a class template from get and set functions.
+(25)-(26) generate the code to specialize `json_traits` for a class template from get and set functions.
 
-(27) generates the code to specialize `json_type_traits` for `std::shared_ptr<base_class>` and `std::unique_ptr<base_class>`.
-Each derived class must have a `json_type_traits<Json,derived_class_name>` specialization.
-The type selection strategy is based on `json_type_traits<Json,derived_class_name>::is(const Json& j)`.
-In the case that `json_type_traits<Json,derived_class_name>` has been generated by one of the
+(27) generates the code to specialize `json_traits` for `std::shared_ptr<base_class>` and `std::unique_ptr<base_class>`.
+Each derived class must have a `json_traits<Json,derived_class_name>` specialization.
+The type selection strategy is based on `json_traits<Json,derived_class_name>::is(const Json& j)`.
+In the case that `json_traits<Json,derived_class_name>` has been generated by one of the
 conveniences macros (1)-(26), the type selection strategy is based on the presence of members
 in the derived classes.
 
@@ -266,7 +266,7 @@ Read-only data members are serialized but not de-serialized. (since 0.157.0)</td
   </tr>
   <tr>
     <td><code>matchN</code></td>
-    <td>A function object that checks if a type that has <code>json_type_traits</code> specialization
+    <td>A function object that checks if a type that has <code>json_traits</code> specialization
 can be converted into a user value. 
 It must have function call signature equivalent to
 <br/><br/><code>
@@ -280,7 +280,7 @@ It returns <code>true</code> if the argument provided matches an allowed value,
   </tr>
   <tr>
     <td><code>intoN</code></td>
-    <td>A function object that converts a user value into a type that has <code>json_type_traits</code> specialization. 
+    <td>A function object that converts a user value into a type that has <code>json_traits</code> specialization. 
 It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
@@ -293,7 +293,7 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
   </tr>
   <tr>
     <td><code>fromN</code></td>
-    <td>A function object that gets a user value from a type that has <code>json_type_traits</code> specialization. 
+    <td>A function object that gets a user value from a type that has <code>json_traits</code> specialization. 
 It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
@@ -308,20 +308,20 @@ Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</
   </tr>
   <tr>
     <td><code>derived_class_nameN</code></td>
-    <td>A class that is derived from the base class, and that has a <code>json_type_traits<Json,derived_class_nameN></code> specialization.</td> 
+    <td>A class that is derived from the base class, and that has a <code>json_traits<Json,derived_class_nameN></code> specialization.</td> 
   </tr>
 </table>
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name`, 
 `base_class_name` and `derived_class_nameN` must be a fully namespace qualified names.
 
-All of the `json_type_traits` specializations for type `T` generated by the convenience macros include a specialization of
-`is_json_type_traits_declared<T>` with member constant `value` equal **true**.
+All of the `json_traits` specializations for type `T` generated by the convenience macros include a specialization of
+`is_json_traits_declared<T>` with member constant `value` equal **true**.
 
 ### Examples
 
-[Specialize json_type_traits to support a book class](#A1)  
-[Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits](#A2)  
+[Specialize json_traits to support a book class](#A1)  
+[Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_traits](#A2)  
 [Example with std::shared_ptr, std::unique_ptr and std::optional](#A3)  
 [Serialize a polymorphic type based on the presence of members](#A4)  
 [Ensuring type selection is possible](#A5)  
@@ -334,7 +334,7 @@ All of the `json_type_traits` specializations for type `T` generated by the conv
 
 <div id="A1"/> 
 
-#### Specialize json_type_traits to support a book class.
+#### Specialize json_traits to support a book class.
 
 ```cpp
 #include <iostream>
@@ -410,9 +410,9 @@ Charles Bukowski, Pulp, 22.48
 
 <div id="A2"/> 
 
-#### Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits 
+#### Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_traits 
 
-The macro `JSONCONS_ALL_CTOR_GETTER_TRAITS` will generate the `json_type_traits` boilerplate
+The macro `JSONCONS_ALL_CTOR_GETTER_TRAITS` will generate the `json_traits` boilerplate
 for your own types from a constructor and getter functions.
 
 ```cpp
@@ -627,8 +627,8 @@ Output:
 #### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_CTOR_GETTER_TRAITS`
-to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
-derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
+to generate the `json_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
 `HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` members of a `CommissionedEmployee`.
@@ -1239,9 +1239,9 @@ Fabric size: 28, material: cotton
 For classes supported through the convenience macros, e.g. `Fruit` and `Fabric` from the previous example, 
 the type selection strategy is the same as for polymorphic types, and is based 
 on the presence of mandatory members in the classes. More generally, 
-the type selection strategy is based on the `json_type_traits<Json,T>::is(const Json& j)` 
+the type selection strategy is based on the `json_traits<Json,T>::is(const Json& j)` 
 function, checking each type in the variant from left to right, and stopping when 
-`json_type_traits<Json,T>::is(j)` returns **true**. 
+`json_traits<Json,T>::is(j)` returns **true**. 
 
 Now consider 
 

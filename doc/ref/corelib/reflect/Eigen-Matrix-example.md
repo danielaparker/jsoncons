@@ -1,7 +1,7 @@
 ### Eigen::Matrix examples
 
-This example shows how to specialize [json_conv_traits](json_conv_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
-It defines separate `json_conv_traits` class templates for the dynamic and fixed sized row/column cases.
+This example shows how to specialize [json_traits](json_traits.md) for an  [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+It defines separate `json_traits` class templates for the dynamic and fixed sized row/column cases.
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -15,7 +15,7 @@ namespace reflect {
 // fixed sized row/columns
 
 template <typename Json, typename Scalar, std::size_t RowsAtCompileTime, std::size_t ColsAtCompileTime>
-struct json_conv_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>>
+struct json_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>>
 {
     using allocator_type = typename Json::allocator_type;
     using matrix_type = Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>;
@@ -91,7 +91,7 @@ struct json_conv_traits<Json, Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCom
 // dynamic sized row/columns
 
 template <typename Json, typename Scalar>
-struct json_conv_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>>
+struct json_traits<Json, Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>>
 {
     using allocator_type = typename Json::allocator_type;
     using matrix_type = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;

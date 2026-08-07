@@ -65,7 +65,7 @@ try_decode_json(const StringViewLike& s,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::decode_traits<T>::decode(make_alloc_set(), cursor);
 }
 
 template <typename T,typename CharT>
@@ -105,7 +105,7 @@ try_decode_json(std::basic_istream<CharT>& is,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::decode_traits<T>::decode(make_alloc_set(), cursor);
 }
 
 template <typename T,typename InputIt>
@@ -150,7 +150,7 @@ try_decode_json(InputIt first, InputIt last,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(make_alloc_set(), cursor);
+    return reflect::decode_traits<T>::decode(make_alloc_set(), cursor);
 }
 
 // With leading allocator_set parameter
@@ -200,7 +200,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<T>::try_decode(aset, cursor);
+    return reflect::decode_traits<T>::decode(aset, cursor);
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
@@ -251,7 +251,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     {
         return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};
     }
-    return reflect::decode_traits<value_type>::try_decode(aset, cursor);
+    return reflect::decode_traits<value_type>::decode(aset, cursor);
 }
 
 template <typename T, typename... Args>
@@ -260,7 +260,7 @@ T decode_json(Args&& ... args)
     auto result = try_decode_json<T>(std::forward<Args>(args)...); 
     if (!result)
     {
-        JSONCONS_THROW(ser_error(result.error().code(), result.error().message_arg(), result.error().line(), result.error().column()));
+        JSONCONS_THROW(ser_error(result.error().code(), result.error().msg_arg(), result.error().line(), result.error().column()));
     }
     return std::move(*result);
 }

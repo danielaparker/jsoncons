@@ -41,7 +41,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/reflect/json_conv_traits.hpp>
+#include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -269,7 +269,7 @@ namespace jsoncons {
         using member_key = std::basic_string<CharT, CharTraits, Allocator>;
     };
 
-    struct order_preserving_policy
+    struct ordered_policy
     {
         template <typename KeyT,typename Json>
         using object = ordered_json_object<KeyT,Json,std::vector>;
@@ -280,6 +280,11 @@ namespace jsoncons {
         template <typename CharT,typename CharTraits,typename Allocator>
         using member_key = std::basic_string<CharT, CharTraits, Allocator>;
     };
+
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    using order_preserving_policy = ordered_policy;
+#endif
 
     template <typename Policy,typename KeyT,typename Json,typename Enable=void>
     struct object_iterator_typedefs
@@ -2509,13 +2514,13 @@ namespace jsoncons {
 
         template <typename T>
         basic_json(const T& val)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(), val))
+            : basic_json(reflect::json_traits<basic_json,T>::to_json(make_alloc_set(), val))
         {
         }
 
         template <typename T>
         basic_json(const T& val, const Allocator& alloc)
-            : basic_json(reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(alloc), val))
+            : basic_json(reflect::json_traits<basic_json,T>::to_json(make_alloc_set(alloc), val))
         {
         }
 
@@ -2773,7 +2778,7 @@ namespace jsoncons {
         template <typename T>
         basic_json& operator=(const T& val)
         {
-            *this = reflect::json_conv_traits<basic_json,T>::to_json(make_alloc_set(), val);
+            *this = reflect::json_traits<basic_json,T>::to_json(make_alloc_set(), val);
             return *this;
         }
 
@@ -3224,7 +3229,7 @@ namespace jsoncons {
         template <typename T,typename... Args>
         bool is(Args&&... args) const noexcept
         {
-            return reflect::json_conv_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
+            return reflect::json_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
         }
 
         bool is_string() const noexcept
@@ -3532,34 +3537,34 @@ namespace jsoncons {
         }
 
         template <typename T>
-        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,T>::type
+        typename std::enable_if<reflect::is_json_traits_specialized<basic_json,T>::value,T>::type
         as() const
         {
-            auto r = reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
+            auto r = reflect::json_traits<basic_json,T>::try_as(make_alloc_set(), *this);
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
+                JSONCONS_THROW(conv_error(r.error().code(), r.error().msg_arg()));
             }
             return std::move(r.value());
         }
 
         template <typename T, typename Alloc, typename TempAlloc>
-        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,T>::type
+        typename std::enable_if<reflect::is_json_traits_specialized<basic_json,T>::value,T>::type
         as(const allocator_set<Alloc,TempAlloc>& aset) const
         {
-            auto r = reflect::json_conv_traits<basic_json,T>::try_as(aset, *this);
+            auto r = reflect::json_traits<basic_json,T>::try_as(aset, *this);
             if (!r)
             {
-                JSONCONS_THROW(conv_error(r.error().code(), r.error().message_arg()));
+                JSONCONS_THROW(conv_error(r.error().code(), r.error().msg_arg()));
             }
             return std::move(r.value());
         }
 
         template <typename T>
-        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
+        typename std::enable_if<reflect::is_json_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
         try_as() const
         {
-            return reflect::json_conv_traits<basic_json,T>::try_as(make_alloc_set(), *this);
+            return reflect::json_traits<basic_json,T>::try_as(make_alloc_set(), *this);
         }
 
         bool is_null() const noexcept
@@ -3578,10 +3583,10 @@ namespace jsoncons {
         }
 
         template <typename T, typename Alloc, typename TempAlloc>
-        typename std::enable_if<reflect::is_json_conv_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
+        typename std::enable_if<reflect::is_json_traits_specialized<basic_json,T>::value,conversion_result<T>>::type
         try_as(const allocator_set<Alloc,TempAlloc>& aset) const
         {
-            return reflect::json_conv_traits<basic_json,T>::try_as(aset, *this);
+            return reflect::json_traits<basic_json,T>::try_as(aset, *this);
         }
 
         template <typename T>
@@ -5154,8 +5159,8 @@ namespace jsoncons {
 
     using json = basic_json<char,sorted_policy,std::allocator<char>>;
     using wjson = basic_json<wchar_t,sorted_policy,std::allocator<char>>;
-    using ojson = basic_json<char, order_preserving_policy, std::allocator<char>>;
-    using wojson = basic_json<wchar_t, order_preserving_policy, std::allocator<char>>;
+    using ojson = basic_json<char, ordered_policy, std::allocator<char>>;
+    using wojson = basic_json<wchar_t, ordered_policy, std::allocator<char>>;
 
     inline namespace literals {
 
@@ -5191,8 +5196,8 @@ namespace jsoncons {
         using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
         using json = basic_json<char,sorted_policy>;
         using wjson = basic_json<wchar_t,sorted_policy>;
-        using ojson = basic_json<char, order_preserving_policy>;
-        using wojson = basic_json<wchar_t, order_preserving_policy>;
+        using ojson = basic_json<char, ordered_policy>;
+        using wojson = basic_json<wchar_t, ordered_policy>;
     } // namespace pmr
     #endif
 

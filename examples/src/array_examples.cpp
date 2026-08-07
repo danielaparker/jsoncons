@@ -27,7 +27,7 @@ void array_example1()
     }
     {
         std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
-        json j(m);
+        json j{m};
         std::cout << j << '\n';
     }
     {

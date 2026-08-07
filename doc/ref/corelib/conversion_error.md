@@ -12,7 +12,7 @@ class conversion_error;
     std::error_code code() const noexcept;
 Returns an error code.
 
-    const std::string& message_arg() const noexcept
+    const std::string& msg_arg() const noexcept
 Returns an explanatory string
 
     std::string message() const;

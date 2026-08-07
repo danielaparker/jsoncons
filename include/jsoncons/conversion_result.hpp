@@ -44,7 +44,7 @@ public:
         return ec_;
     }
     
-    const std::string& message_arg() const 
+    const std::string& msg_arg() const 
     {
         return message_arg_;
     }

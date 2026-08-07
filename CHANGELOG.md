@@ -1,4 +1,4 @@
-master (1.9.0 preview)
+Release 1.9.0
 ------
 
 - Fixed bugs:
@@ -14,6 +14,13 @@ master (1.9.0 preview)
 
   - The class `binary_iterator_source` has been removed (replaced by `iterator_source`).
 
+  - The type name `order_preserving_policy` has been deprecated and renamed to 
+  `ordered_policy`. For backwards compatibility the old name is aliased to the new name but 
+  will be removed in a future release.
+
+  - The type name `json_conv_traits` has been deprecated and renamed to `json_traits`. 
+  For backwards compatibility the old name is aliased to the new name but 
+  will be removed in a future release. 
 
 - Enhancements:
 
@@ -53,8 +60,10 @@ master (1.9.0 preview)
 
   - Reduced allocations when parsing BSON, CBOR, MessagePack and UBJSON. 
 
-  - JSONCONS_ALL_MEMBER_TRAITS and JSONCONS_N_MEMBER_TRAITS now generate
-  decode traits that support decode without an intermediate `basic_json` value.
+  - JSONCONS_ALL_MEMBER_TRAITS, JSONCONS_N_MEMBER_TRAITS, 
+  JSONCONS_ALL_MEMBER_NAME_TRAITS, and JSONCONS_N_MEMBER_NAME_TRAITS now 
+  generate decode traits that support decode without an intermediate 
+  `basic_json` value.
 
 Release 1.8.1
 -------------

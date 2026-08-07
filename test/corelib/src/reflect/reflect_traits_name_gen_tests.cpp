@@ -325,7 +325,7 @@ JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 {
-   std::string an_author = "Haruki Murakami"; 
+    std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
@@ -391,7 +391,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
         auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::missing_required_member == result.error().code());
-        CHECK("ns::book_all_m" == result.error().message_arg());
+        CHECK("ns::book_all_m::price" == result.error().msg_arg());
     }
     SECTION("invalid JSON value")
     {
@@ -620,7 +620,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
         //CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        //CHECK("ns::book_all_cg" == result.error().message_arg());
+        //CHECK("ns::book_all_cg" == result.error().msg_arg());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("invalid JSON value")
@@ -760,7 +760,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
         REQUIRE_FALSE(result);
         //CHECK(result.error().code() == jsoncons::conv_errc::missing_required_member);
-        //CHECK("ns::book_all_cg" == result.error().message_arg());
+        //CHECK("ns::book_all_cg" == result.error().msg_arg());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("invalid JSON value")
@@ -877,7 +877,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
         auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
         REQUIRE_FALSE(result);
         CHECK(jsoncons::conv_errc::missing_required_member == result.error().code());
-        CHECK("ns::book_2_gs" == result.error().message_arg());
+        CHECK("ns::book_2_gs" == result.error().msg_arg());
     }
     SECTION("invalid JSON value")
     {
@@ -891,7 +891,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_2_gs>(input);
         REQUIRE_FALSE(result);
-        CHECK("ns::book_2_gs" == result.error().message_arg());
+        CHECK("ns::book_2_gs" == result.error().msg_arg());
         CHECK(conv_errc::not_double == result.error().code());
         //std::cout << result.error() .message() << "\n";
     }

@@ -37,7 +37,7 @@
 [Serialize with the C++ member names of the class](#G2)  
 [Serialize with provided names using the `_NAME_` macros](#G3)  
 [Mapping to C++ data structures with and without defaults allowed](#G4)  
-[Specialize json_type_traits explicitly](#G1)  
+[Specialize json_traits explicitly](#G1)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G5)  
 [An example with std::shared_ptr and std::unique_ptr](#G6)  
 [Serialize a templated class with the `_TPL_` macros](#G7)  
@@ -117,7 +117,7 @@ json j = R"(
 )"_json;
 ```
 
-See [basic_json::parse](ref/json/parse.md). 
+See [basic_json::parse](./ref/corelib/json/parse.md). 
 
 <div id="A2"/> 
 
@@ -129,7 +129,7 @@ std::ifstream is("myfile.json");
 json j = json::parse(is);
 ```
 
-See [basic_json::parse](ref/json/parse.md). 
+See [basic_json::parse](./ref/corelib/json/parse.md). 
 
 <div id="A10"/> 
 
@@ -293,7 +293,7 @@ Output:
 ["foo","bar"]
 ```
 
-See [basic_json::parse](ref/json/parse.md). 
+See [basic_json::parse](./ref/corelib/json/parse.md). 
 
 <div id="A8"/> 
 
@@ -971,7 +971,7 @@ begin_object
 end_array
 ```
 
-See [basic_json_cursor](ref/basic_json_cursor.md) 
+See [basic_json_cursor](./ref/corelib/basic_json_cursor.md) 
 
 <div id="I4"/> 
 
@@ -1009,7 +1009,7 @@ Output:
 }
 ```
 
-See [staj_array_iterator](ref/staj_array_iterator.md) 
+See [staj_array_iterator](./ref/corelib/staj_array_iterator.md) 
 
 <div id="I5"/> 
 
@@ -1052,7 +1052,7 @@ Haruki Murakami, Hard-Boiled Wonderland and the End of the World
 Graham Greene, The Comedians
 ```
 
-See [staj_array_iterator](ref/staj_array_iterator.md) 
+See [staj_array_iterator](./ref/corelib/staj_array_iterator.md) 
 
 <div id="G0"/>
 
@@ -1525,7 +1525,7 @@ The output for (2), (3) and (4) is the same.
 #### Mapping to C++ data structures with and without defaults allowed
 
 `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
+the code to specialize `json_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
 does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
 More generaly, the qualifier _N_ in the macro name indicates that only a specified number of members
 must be present in the JSON.
@@ -1538,22 +1538,23 @@ must be present in the JSON.
 
 namespace ns {
 
-    class Person
-    {
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND
+class Person
+{
+    // Make reflection traits specializations friends to give accesses to private members
+    JSONCONS_TYPE_TRAITS_FRIEND
 
-        std::string name;
-        std::string surname;
-        std::string ssn;
-        unsigned int age{0};
-    public:
-        Person() = default;
+    std::string name;
+    std::string surname;
+    std::string ssn;
+    unsigned int age{0};
+public:
+    Person() = default;
 
-        Person(const std::string& name, const std::string& surname,
-               const std::string& ssn, unsigned int age)
-           : name(name), surname(surname), ssn(ssn), age(age) { }
-    };
+    Person(const std::string& name, const std::string& surname,
+        const std::string& ssn, unsigned int age)
+        : name(name), surname(surname), ssn(ssn), age(age) {
+    }
+};
 
 } // namespace ns
 
@@ -1568,9 +1569,9 @@ int main()
         std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
         auto person = jsoncons::decode_json<ns::Person>(data);
 
-        std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
-        std::cout << s << "\n";
+        std::string buffer;
+        jsoncons::encode_json_pretty(person, buffer);
+        std::cout << buffer << "\n";
     }
     catch (const std::exception& e)
     {
@@ -1592,70 +1593,95 @@ If all members of the JSON data must be present, use
 ```
 JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
-instead. This will cause a [jsoncons::conv_error](ref/conv_error.md) to be thrown with the message
+instead. This will cause a [jsoncons::conv_error](./ref/corelib/conv_error.md) to be thrown with the message
 ```
 Key not found: 'ssn' 
 ```
 
 <div id="G1"/>
 
-#### Specialize json_type_traits explicitly
+#### Specialize jsoncons::reflect::json_traits explicitly
 
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](ref/decode_json.md) 
-and [encode_json](ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](./ref/corelib/decode_json.md) 
+and [encode_json](./ref/corelib/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits/json_type_traits.md) 
+[reflection traits](./ref/corelib/reflection-traits.md) 
 defined. jsoncons already supports many types in the standard library, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
+and your own types will be supported too if you specialize [json_conv_traits](./ref/corelib/reflect/json_conv_traits.md)
+(since 1.4.0, rename to json_traits in 1.9.0) or [json_type_traits](./ref/corelib/legacy_reflect/json_type_traits.md). 
 
 ```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
 
 namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price{0};
-    };
+struct book
+{
+    std::string author;
+    std::string title;
+    double price{0};
+};
 } // namespace ns
 
 namespace jsoncons {
+namespace reflect {
 
-    template <typename Json>
-    struct json_type_traits<Json, ns::book>
+template <typename Json>
+struct json_traits<Json, ns::book>  // since 1.9.0
+{
+    using allocator_type = Json::allocator_type;
+    using result_type = conversion_result<ns::book>;
+
+    static bool is(const Json& j) noexcept
     {
-        using allocator_type = Json::allocator_type;
+        return j.is_object() && j.contains("author") &&
+            j.contains("title") && j.contains("price");
+    }
 
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
+    template<typename Alloc, typename TempAlloc>
+    static ns::book try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
+    {
+        ns::book val = jsoncons::make_obj_using_allocator<ns::book>(aset.get_allocator());
+        val.author = j.at("author").template as<std::string>();
+        val.title = j.at("title").template as<std::string>();
+        val.price = j.at("price").template as<double>();
+        return val;
+    }
+
+    template<typename Alloc, typename TempAlloc>
+    static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const ns::book& val)
+    {
+        Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg);
+        j.try_emplace("author", val.author);
+        j.try_emplace("title", val.title);
+        j.try_emplace("price", val.price);
+        return j;
+    }
+};
+
+} // namespace reflect
 } // namespace jsoncons
+
+int main()
+{
+    std::string data = R"({"author":"Arthur Koestler","title":"Darkness at Noon","price":25.0})";
+    auto r1 = jsoncons::try_decode_json<ns::book>(data);
+    if (!r1)
+    {
+        std::cerr << r1.error().message() << "\n";
+        return 1;
+    }
+
+    std::string buffer;
+    ns::book& book(*r1);
+    auto r2 = jsoncons::try_encode_json_pretty(book, buffer);
+    if (!r2)
+    {
+        std::cerr << r2.error().message() << "\n";
+        return 2;
+    }
+    std::cout << buffer << "\n";
+}
 ```
 
 To save typing and enhance readability, the jsoncons library defines macros, 
@@ -1727,7 +1753,7 @@ Charles Bukowski, Pulp, 22.48
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-The jsoncons library includes a [json_type_traits](ref/json_type_traits/json_type_traits.md) specialization for 
+The jsoncons library includes a [reflection traits](./ref/corelib/reflection-traits.md) specialization for 
 `jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
 [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
@@ -1832,7 +1858,7 @@ Output:
 
 #### An example with std::shared_ptr and std::unique_ptr
 
-The jsoncons library includes [json_type_traits](ref/json_type_traits/json_type_traits.md) specializations for 
+The jsoncons library includes [reflection traits](./ref/corelib/reflection-traits.md) specializations for 
 `std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
 i.e., does not have any virtual functions, and if `T` is also specialized. Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
 In addition, users can implement `json_type_traits` for `std::shared_ptr` and `std::unique_ptr`
@@ -1956,7 +1982,7 @@ int main()
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[json_type_traits](ref/json_type_traits/json_type_traits.md) for the enum type
+[reflection traits](./ref/corelib/reflection-traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -2083,7 +2109,7 @@ Marilyn C, 0.9, 1514862245
 #### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_CTOR_GETTER_TRAITS`
-to generate the [json_type_traits](ref/json_type_traits/json_type_traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+to generate the [reflection traits](./ref/corelib/reflection-traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
@@ -2996,7 +3022,7 @@ we use the function object `ns::rectangle_marker` to ouput the value
 this position cannot be a lambda expression (at least until C++20), 
 because jsoncons uses it in an unevaluated context, so it is
 provided as a variable containing a lambda expression instead.
-See [convenience macros](ref/json_type_traits/reflect/reflect-traits-gen.md)
+See [convenience macros](./ref/corelib/legacy_reflect/reflect/reflect-traits-gen.md)
 for full details.   
 
 <div id="G13"/>
@@ -3582,10 +3608,10 @@ Output:
 
 #### Merge two json objects
 
-[json::merge](ref/json/merge.md) inserts another json object's key-value pairs into a json object,
+[json::merge](./ref/corelib/json/merge.md) inserts another json object's key-value pairs into a json object,
 unless they already exist with an equivalent key.
 
-[json::merge_or_update](ref/json/merge_or_update.md) inserts another json object's key-value pairs 
+[json::merge_or_update](./ref/corelib/json/merge_or_update.md) inserts another json object's key-value pairs 
 into a json object, or assigns them if they already exist.
 
 The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
@@ -3769,7 +3795,7 @@ Output:
 
 #### Search for and repace an object member key
 
-You can rename object members with the built in filter [rename_object_key_filter](ref/rename_object_key_filter.md)
+You can rename object members with the built in filter [rename_object_key_filter](./ref/corelib/rename_object_key_filter.md)
 
 ```cpp
 #include <sstream>

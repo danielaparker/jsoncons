@@ -70,7 +70,8 @@ namespace jsoncons {
             return multiprecision_type(val.template as<std::string>());
         }
 
-        static Json to_json(multiprecision_type val)
+        static Json to_json(multiprecision_type val,
+            typename Json::allocator_type alloc = Json::allocator_type())
         {
             return Json(val.str(), semantic_tag::bigdec);
         }
@@ -174,7 +175,7 @@ namespace ns {
 
         double rate() const {return rate_;}
     };
-} namespace ns
+} // namespace ns
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::fixing, index_id, observation_date, rate)
 
@@ -285,7 +286,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     //std::cout << v[0]["observation_date"].as<boost::gregorian::date>() << "\n";
 }
 
-void extensibility_examples()
+int main()
 {
     std::cout << "extensibility examples\n\n";
 

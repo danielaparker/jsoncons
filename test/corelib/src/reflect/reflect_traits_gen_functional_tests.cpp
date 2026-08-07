@@ -15,6 +15,253 @@
 #include <functional>
 #include <iostream>
 
+// Mode tests
+
+namespace {
+namespace ns {
+
+struct mode_AMN
+{
+    std::string username;
+    std::string email;
+
+    mode_AMN()
+        : username("john")
+    {
+    }
+};
+
+struct mode_NMN
+{
+    std::string username;
+    std::string email;
+
+    mode_NMN()
+        : username("john")
+    {
+    }
+};
+
+struct match_AMN
+{
+    std::string username;
+    std::string email;
+
+    match_AMN()
+        : username("john")
+    {
+    }
+};
+
+struct match_NMN
+{
+    std::string username;
+    std::string email;
+
+    match_NMN()
+        : username("john")
+    {
+    }
+};
+
+} // namespace ns
+}
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::mode_AMN,
+    (username, "UserName", JSONCONS_RDONLY),
+    (email, "Email")
+)
+
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::mode_NMN,1,
+    (username, "UserName", JSONCONS_RDONLY),
+    (email, "Email")
+)
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::match_AMN,
+    (username, "UserName", JSONCONS_RDONLY, [](const std::string& value) noexcept {return value == "john"; }),
+    (email, "Email", JSONCONS_RDWR, [](const std::string& value) noexcept {return value == "john@acme.com"; })
+)
+
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::match_NMN,1,
+    (username, "UserName", JSONCONS_RDONLY, [](const std::string& username) noexcept{return username == "john";}),
+    (email, "Email", JSONCONS_RDWR, [](const std::string& value) noexcept {return value == "john@acme.com"; })
+)
+
+TEST_CASE("reflect_traits_gen mode tests")
+{
+    SECTION("AMN")
+    {
+        std::string str = R"(
+{
+    "UserName" : "bill",
+    "Email" : "bill@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::mode_AMN>();
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
+        REQUIRE(result1);
+        ns::mode_AMN& val1(*result1);
+        CHECK(val1.username == "john");
+        CHECK(val1.email == "bill@acme.com");
+
+        auto result2 = jsoncons::try_decode_json<ns::mode_AMN>(str);
+        if (!result2)
+        {
+            std::cout << "(2) " << result2.error().message() << "\n";
+        }
+        REQUIRE(result2);
+        ns::mode_AMN& val2(*result2);
+        CHECK(val2.username == "john");
+        CHECK(val2.email == "bill@acme.com");
+    }
+    SECTION("NMN")
+    {
+        std::string str = R"(
+{
+    "UserName" : "bill",
+    "Email" : "bill@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::mode_NMN>();
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
+        REQUIRE(result1);
+        ns::mode_NMN& val1(*result1);
+        CHECK(val1.username == "john");
+        CHECK(val1.email == "bill@acme.com");
+
+        auto result2 = jsoncons::try_decode_json<ns::mode_NMN>(str);
+        if (!result2)
+        {
+            std::cout << "(2) " << result2.error().message() << "\n";
+        }
+        REQUIRE(result2);
+        ns::mode_NMN& val2(*result2);
+        CHECK(val2.username == "john");
+        CHECK(val2.email == "bill@acme.com");
+    }
+}
+
+TEST_CASE("reflect_traits_gen match tests")
+{
+    SECTION("AMN success")
+    {
+        std::string str = R"(
+{
+    "UserName" : "john",
+    "Email" : "john@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::match_AMN>();
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
+        REQUIRE(result1);
+        ns::match_AMN& val1(*result1);
+        CHECK(val1.username == "john");
+        CHECK(val1.email == "john@acme.com");
+
+        auto result2 = jsoncons::try_decode_json<ns::match_AMN>(str);
+        if (!result2)
+        {
+            std::cout << "(2) " << result2.error().message() << "\n";
+        }
+        REQUIRE(result2);
+        ns::match_AMN& val2(*result2);
+        CHECK(val2.username == "john");
+        CHECK(val2.email == "john@acme.com");
+    }
+    SECTION("AMN failure")
+    {
+        std::string str = R"(
+{
+    "UserName" : "john",
+    "Email" : "bill@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::match_AMN>();
+        //if (!result1)
+        //{
+        //    std::cout << "(1) " << result1.error().message() << "\n";
+        //}
+        REQUIRE_FALSE(result1);
+
+        auto result2 = jsoncons::try_decode_json<ns::match_AMN>(str);
+        //if (!result2)
+        //{
+        //    std::cout << "(2) " << result2.error().message() << "\n";
+        //}
+        REQUIRE_FALSE(result2);
+    }
+    SECTION("NMN success")
+    {
+        std::string str = R"(
+{
+    "UserName" : "john",
+    "Email" : "john@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::match_NMN>();
+        if (!result1)
+        {
+            std::cout << "(1) " << result1.error().message() << "\n";
+        }
+        REQUIRE(result1);
+        ns::match_NMN& val1(*result1);
+        CHECK(val1.username == "john");
+        CHECK(val1.email == "john@acme.com");
+
+        auto result2 = jsoncons::try_decode_json<ns::match_NMN>(str);
+        //if (!result2)
+        //{
+        //   std::cout << "(2) " << result2.error().message() << "\n";
+        //}
+        REQUIRE(result2);
+        ns::match_NMN& val2(*result2);
+        CHECK(val2.username == "john");
+        CHECK(val2.email == "john@acme.com");
+    }
+    SECTION("NMN failure")
+    {
+        std::string str = R"(
+{
+    "UserName" : "john",
+    "Email" : "bill@acme.com"
+}
+        )";
+
+        auto j = jsoncons::json::parse(str);
+        auto result1 = j.try_as<ns::match_NMN>();
+        //if (!result1)
+        //{
+        //    std::cout << "(1) " << result1.error().message() << "\n";
+        //}
+        REQUIRE_FALSE(result1);
+
+        auto result2 = jsoncons::try_decode_json<ns::match_NMN>(str);
+        //if (!result2)
+        //{
+        //    std::cout << "(2) " << result2.error().message() << "\n";
+        //}
+        REQUIRE_FALSE(result2);
+    }
+}
+
 namespace {
 namespace ns {
  
@@ -1671,4 +1918,3 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     }
 #endif
 } 
-

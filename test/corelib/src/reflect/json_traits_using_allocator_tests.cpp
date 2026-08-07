@@ -29,7 +29,7 @@ template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 using cust_json = basic_json<char,sorted_policy,cust_allocator<char>>;
 
-TEST_CASE("json_conv_traits using allocator tests")
+TEST_CASE("json_traits using allocator tests")
 {
     SECTION("std::map")
     {
@@ -117,7 +117,7 @@ TEST_CASE("json_conv_traits using allocator tests")
         cust_json j{byte_string{'H','e','l','l','o'}, aset.get_allocator()};
         REQUIRE(j.is<byte_string_type>());
 
-        auto result = jsoncons::reflect::json_conv_traits<cust_json,byte_string_type>::try_as(aset, j);
+        auto result = jsoncons::reflect::json_traits<cust_json,byte_string_type>::try_as(aset, j);
         REQUIRE(result);
         auto r = j.try_as<byte_string_type>(aset);
         REQUIRE(r);

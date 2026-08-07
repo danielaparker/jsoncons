@@ -126,10 +126,10 @@ add_executable(unit_tests
                corelib/src/polymorphic_allocator_tests.cpp
                corelib/src/reflect/decode_traits_tests.cpp
                corelib/src/reflect/encode_traits_tests.cpp
-               corelib/src/reflect/json_conv_traits_chrono_tests.cpp
-               corelib/src/reflect/json_conv_traits_string_tests.cpp
-               corelib/src/reflect/json_conv_traits_tests.cpp
-               corelib/src/reflect/json_conv_traits_using_allocator_tests.cpp
+               corelib/src/reflect/json_traits_chrono_tests.cpp
+               corelib/src/reflect/json_traits_string_tests.cpp
+               corelib/src/reflect/json_traits_tests.cpp
+               corelib/src/reflect/json_traits_using_allocator_tests.cpp
                corelib/src/reflect/reflect_traits_container_tests.cpp
                corelib/src/reflect/reflect_traits_gen_functional_tests.cpp
                corelib/src/reflect/reflect_traits_gen_limit_tests.cpp
