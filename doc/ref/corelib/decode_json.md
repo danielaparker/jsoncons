@@ -61,7 +61,7 @@ or support [reflection traits](./reflection-traits.md).
 
 (2) Reads JSON from an input stream into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](basic_json.md) 
-or support [json_type_traits](../json_type_traits/json_type_traits.md).
+or support [json_type_traits](../legacy_reflect/json_type_traits.md).
 
 (3)-(4) are identical to (1)-(2) except an [allocator_set](allocator_set.md) is passed as an additional argument and
 provides allocators for result data and temporary allocations.

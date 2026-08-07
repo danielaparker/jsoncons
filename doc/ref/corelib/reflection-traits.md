@@ -21,7 +21,7 @@ Until 1.9.0, these were named [json_conv_traits](./reflect/json_conv_traits.md),
 1.9.0, they have been renamed to [json_traits](./reflect/json_traits.md).
 For backwards compatibility, the old name is aliased to the new name.
 
-`json_traits` defaults to the legacy [json_type_traits](json_type_traits/json_type_traits.md) if a type conversion is undefined,
+`json_traits` defaults to the legacy [json_type_traits](./legacy_reflect/json_type_traits.md) if a type conversion is undefined,
 these traits do not support non-throwing conversions and uses-allocator construction.  
 
 See [Eigen::Matrix example](reflect/Eigen-Matrix-example.md) for an example of specializing `json_traits` for an [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
@@ -30,10 +30,10 @@ See [User-allocator construction example](reflect/uses-allocator-construction-ex
 
 #### Legacy jsoncons::json_type_traits
 
-[json_type_traits](json_type_traits/json_type_traits.md) defines a compile time template based interface for conversion between a `basic_json` value
+[json_type_traits](./legacy_reflect/json_type_traits.md) defines a compile time template based interface for conversion between a `basic_json` value
 and a value of some other type. 
 
-See [Eigen::Matrix example](json_type_traits/Eigen-Matrix-example.md) for an example of specializing `json_type_traits` for an [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
+See [Eigen::Matrix example](./legacy_reflect/Eigen-Matrix-example.md) for an example of specializing `json_type_traits` for an [Eigen matrix class](https://eigen.tuxfamily.org/dox-devel/group__TutorialMatrixClass.html).
 
 ### Streaming traits
 
@@ -57,6 +57,6 @@ In the case that the jsoncons decode and encode traits have no specialization fo
 ### Convenience macros
 
 jsoncons includes some [convenience macros](reflect/reflect-traits-gen.md) for generating reflection traits classes.
-Until 1.4.0, these macros generated [json_type_traits](json_type_traits/json_type_traits.md) class templates. Since 1.4.0, they
+Until 1.4.0, these macros generated [json_type_traits](./legacy_reflect/json_type_traits.md) class templates. Since 1.4.0, they
 generate [json_traits](reflect/json_traits.md) class templates, as well as some additional traits that support streaming.
 
