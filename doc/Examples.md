@@ -37,7 +37,7 @@
 [Serialize with the C++ member names of the class](#G2)  
 [Serialize with provided names using the `_NAME_` macros](#G3)  
 [Mapping to C++ data structures with and without defaults allowed](#G4)  
-[Specialize json_type_traits explicitly](#G1)  
+[Specialize json_traits explicitly](#G1)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G5)  
 [An example with std::shared_ptr and std::unique_ptr](#G6)  
 [Serialize a templated class with the `_TPL_` macros](#G7)  
@@ -1525,7 +1525,7 @@ The output for (2), (3) and (4) is the same.
 #### Mapping to C++ data structures with and without defaults allowed
 
 `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
+the code to specialize `json_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
 does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
 More generaly, the qualifier _N_ in the macro name indicates that only a specified number of members
 must be present in the JSON.
@@ -1538,22 +1538,23 @@ must be present in the JSON.
 
 namespace ns {
 
-    class Person
-    {
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND
+class Person
+{
+    // Make json_type_traits specializations friends to give accesses to private members
+    JSONCONS_TYPE_TRAITS_FRIEND
 
-        std::string name;
-        std::string surname;
-        std::string ssn;
-        unsigned int age{0};
-    public:
-        Person() = default;
+    std::string name;
+    std::string surname;
+    std::string ssn;
+    unsigned int age{0};
+public:
+    Person() = default;
 
-        Person(const std::string& name, const std::string& surname,
-               const std::string& ssn, unsigned int age)
-           : name(name), surname(surname), ssn(ssn), age(age) { }
-    };
+    Person(const std::string& name, const std::string& surname,
+        const std::string& ssn, unsigned int age)
+        : name(name), surname(surname), ssn(ssn), age(age) {
+    }
+};
 
 } // namespace ns
 
@@ -1568,9 +1569,9 @@ int main()
         std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
         auto person = jsoncons::decode_json<ns::Person>(data);
 
-        std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
-        std::cout << s << "\n";
+        std::string buffer;
+        jsoncons::encode_json_pretty(person, buffer);
+        std::cout << buffer << "\n";
     }
     catch (const std::exception& e)
     {
@@ -1599,63 +1600,89 @@ Key not found: 'ssn'
 
 <div id="G1"/>
 
-#### Specialize json_type_traits explicitly
+#### Specialize jsoncons::reflect::json_traits explicitly
 
 jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](ref/decode_json.md) 
 and [encode_json](ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits/json_type_traits.md) 
+[reflection traits](./ref/corelib/reflection_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
+and your own types will be supported too if you specialize `json_traits`
+in the `jsoncons::reflect` namespace. 
 
 
 ```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
 
 namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price{0};
-    };
+struct book
+{
+    std::string author;
+    std::string title;
+    double price{0};
+};
 } // namespace ns
 
 namespace jsoncons {
+namespace reflect {
 
-    template <typename Json>
-    struct json_type_traits<Json, ns::book>
+template <typename Json>
+struct json_traits<Json, ns::book>  // since 1.9.0, use json_conv_traits until 1.9.0
+{
+    using allocator_type = Json::allocator_type;
+    using result_type = conversion_result<ns::book>;
+
+    static bool is(const Json& j) noexcept
     {
-        using allocator_type = Json::allocator_type;
+        return j.is_object() && j.contains("author") &&
+            j.contains("title") && j.contains("price");
+    }
 
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
+    template<typename Alloc, typename TempAlloc>
+    static ns::book try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
+    {
+        ns::book val = jsoncons::make_obj_using_allocator<ns::book>(aset.get_allocator());
+        val.author = j.at("author").template as<std::string>();
+        val.title = j.at("title").template as<std::string>();
+        val.price = j.at("price").template as<double>();
+        return val;
+    }
+
+    template<typename Alloc, typename TempAlloc>
+    static Json to_json(const allocator_set<Alloc,TempAlloc>& aset, const ns::book& val)
+    {
+        Json j = jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), json_object_arg);
+        j.try_emplace("author", val.author);
+        j.try_emplace("title", val.title);
+        j.try_emplace("price", val.price);
+        return j;
+    }
+};
+
+} // namespace reflect
 } // namespace jsoncons
+
+int main()
+{
+    std::string data = R"({"author":"Arthur Koestler","title":"Darkness at Noon","price":25.0})";
+    auto r1 = jsoncons::try_decode_json<ns::book>(data);
+    if (!r1)
+    {
+        std::cerr << r1.error().message() << "\n";
+        return 1;
+    }
+
+    std::string buffer;
+    ns::book& book(*r1);
+    auto r2 = jsoncons::try_encode_json_pretty(book, buffer);
+    if (!r2)
+    {
+        std::cerr << r2.error().message() << "\n";
+        return 2;
+    }
+    std::cout << buffer << "\n";
+}
 ```
 
 To save typing and enhance readability, the jsoncons library defines macros, 
