@@ -111,16 +111,6 @@ namespace jsonpointer {
         {
         }
 
-        basic_json_pointer(const std::vector<string_type>& tokens)
-            : tokens_(tokens)
-        {
-        }
-
-        basic_json_pointer(std::vector<string_type>&& tokens)
-            : tokens_(std::move(tokens))
-        {
-        }
-
         explicit basic_json_pointer(const string_view_type& s)
         {
             std::error_code ec;
@@ -147,7 +137,7 @@ namespace jsonpointer {
 
         static basic_json_pointer parse(const string_view_type& input, std::error_code& ec)
         {
-            std::vector<string_type> tokens;
+            basic_json_pointer<char_type> pointer;
             if (input.empty())
             {
                 return basic_json_pointer<CharT>();
@@ -183,7 +173,7 @@ namespace jsonpointer {
                             switch (*p)
                             {
                                 case '/':
-                                    tokens.push_back(buffer);
+                                    pointer.append(buffer);
                                     buffer.clear();
                                     state = jsonpointer::detail::pointer_state::part; 
                                     break;
@@ -221,9 +211,9 @@ namespace jsonpointer {
             }
             if (state == jsonpointer::detail::pointer_state::new_token || state == jsonpointer::detail::pointer_state::part)
             {
-                tokens.push_back(buffer);
+                pointer.append(buffer);
             }
-            return basic_json_pointer(std::move(tokens));
+            return pointer;
         }
 
         const std::vector<string_type>& tokens() const

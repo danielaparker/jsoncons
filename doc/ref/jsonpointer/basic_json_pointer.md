@@ -33,8 +33,8 @@ iterator    | An alias to `const_iterator`
 
     explicit basic_json_pointer(const string_view_type& str);  
 
-    explicit basic_json_pointer(const string_view_type& str, 
-                                std::error_code& ec);          (2)
+    explicit basic_json_pointer(const string_view_type& str,   (2)
+        std::error_code& ec);                                  
 
     basic_json_pointer(const basic_json_pointer&);             (3)
 

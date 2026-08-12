@@ -101,12 +101,11 @@ namespace detail {
             return location;
         }
 
-        std::vector<string_type> tokens;
+        jsonpointer::basic_json_pointer<char_type> pointer;
         for (auto it = location.begin(); it != location.rbegin().base()-1; ++it)
         {
-            tokens.push_back(*it);
+            pointer.append(*it);
         }
-        jsonpointer::basic_json_pointer<char_type> pointer(std::move(tokens));
 
         std::error_code ec;
 
