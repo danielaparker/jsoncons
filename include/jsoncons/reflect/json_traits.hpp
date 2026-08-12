@@ -1729,7 +1729,7 @@ namespace variant_detail
                         }
                         Rep n{0};
                         auto result = jsoncons::dec_to_integer((*res).data(), (*res).size(), n);
-                        if (!result)
+                        if (JSONCONS_UNLIKELY(!result))
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_epoch);
                         }

@@ -12,6 +12,7 @@
 
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>
+#include <jsoncons_ext/toon/toon_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/ser_utils.hpp>
@@ -31,11 +32,9 @@ namespace detail {
 enum class format_number_state{value_sign,digits,fraction,exponent_sign,exponent_value,err};
 
 inline
-std::string exponential_to_decimal_notation(jsoncons::string_view str)
+write_result exponential_to_decimal_notation(jsoncons::string_view str, std::string& dec_str)
 {
-    std::string result;
-
-    std::string num_str;
+    write_result result{};
     std::string exponent_str;
 
     bool neg_value = false;
@@ -60,7 +59,7 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
             case format_number_state::digits:
                 if ((c >= '0' && c <= '9') || c == '-')
                 {
-                    num_str.push_back(c);
+                    dec_str.push_back(c);
                     ++i;
                 }
                 else if (c == 'e' || c == 'E')
@@ -69,7 +68,7 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
                     ++i;
                 }
                 else if (c == '.')
-                { 
+                {
                     state = format_number_state::fraction;
                     ++i;
                 }
@@ -78,7 +77,7 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
                 if ((c >= '0' && c <= '9'))
                 {
                     ++decimal_places;
-                    num_str.push_back(c);
+                    dec_str.push_back(c);
                     ++i;
                 }
                 else if (c == 'e' || c == 'E')
@@ -117,44 +116,49 @@ std::string exponential_to_decimal_notation(jsoncons::string_view str)
         }
     }
 
-    std::size_t exponent;
-    dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
+    std::size_t exponent{0};
+    auto r = dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
+    if (!r)
+    {
+        return write_result{jsoncons::unexpect, toon_errc::invalid_value};
+    }
 
-    std::size_t n = num_str.size();
+    std::size_t n = dec_str.size();
 
     if (neg_exp) // shift decimal point left
     {
-        if ((exponent+decimal_places+1) > n)
+        if ((exponent + decimal_places + 1) > n)
         {
-            num_str.insert(num_str.begin(), ((exponent+decimal_places+1) - n), '0');
+            dec_str.insert(dec_str.begin(), ((exponent + decimal_places + 1) - n), '0');
         }
-        std::size_t pos = num_str.size()-(decimal_places+exponent);
-        auto first_non_zero = num_str.find_first_not_of('0', pos);
-        if (first_non_zero ==  std::string::npos)
+        std::size_t pos = dec_str.size() - (decimal_places + exponent);
+        auto first_non_zero = dec_str.find_first_not_of('0', pos);
+        if (first_non_zero == std::string::npos)
         {
-            num_str.erase(num_str.begin()+pos, num_str.end());
+            dec_str.erase(dec_str.begin() + pos, dec_str.end());
         }
         else
         {
-            num_str.insert(num_str.begin()+(num_str.size()-decimal_places-exponent), '.');
+            dec_str.insert(dec_str.begin() + (dec_str.size() - decimal_places - exponent), '.');
         }
     }
     else // shift decimal point right
     {
         if (exponent > decimal_places)
         {
-            num_str.append(exponent - decimal_places, '0');
+            dec_str.append(exponent - decimal_places, '0');
         }
         if (decimal_places > exponent)
         {
-            num_str.insert(num_str.begin() + (num_str.size() - exponent), '.');
+            dec_str.insert(dec_str.begin() + (dec_str.size() - exponent), '.');
         }
     }
     if (neg_value)
     {
-        num_str.insert(num_str.begin(), '-');
+        dec_str.insert(dec_str.begin(), '-');
     }
-    return num_str;
+
+    return result;
 }
 
 inline
@@ -635,6 +639,8 @@ std::vector<jsoncons::string_view> try_get_tabular_header(const Json& val)
 template <typename Json, typename Sink>
 write_result encode_primitive(const Json& val, char delimiter, Sink& sink)
 {
+    write_result result{};
+
     if (val.is_null())
     {
         sink.append(null_literal.data(), null_literal.size());
@@ -664,7 +670,12 @@ write_result encode_primitive(const Json& val, char delimiter, Sink& sink)
         }
         if (exponential_notation)
         {
-            auto dec_str = detail::exponential_to_decimal_notation(s);
+            std::string dec_str;
+            result = detail::exponential_to_decimal_notation(s, dec_str);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
             sink.append(dec_str.data(), dec_str.size());
         }
         else
@@ -676,13 +687,14 @@ write_result encode_primitive(const Json& val, char delimiter, Sink& sink)
     {
         detail::encode_string(val.as_string_view(), delimiter, sink);
     }
-    return write_result{};
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_array_of_arrays(const Json& val, const toon_encode_options& options, 
+write_result encode_array_of_arrays(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (line != 0)
@@ -729,21 +741,31 @@ void encode_array_of_arrays(const Json& val, const toon_encode_options& options,
                 {
                     first2 = false;
                 }
-                encode_primitive(item2, delimiter, sink);
+                result = encode_primitive(item2, delimiter, sink);
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
         }
         else
         {
-            encode_array(item, options, sink, depth+1, line, jsoncons::optional<jsoncons::string_view>{});
+            result = encode_array(item, options, sink, depth+1, line, jsoncons::optional<jsoncons::string_view>{});
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         ++line;
     }
+    return write_result{};
 }
 
 template <typename Json, typename Sink>
-void encode_array_content(const Json& val, const toon_encode_options& options, 
+write_result encode_array_content(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (is_array_of_primitives(val))
@@ -760,7 +782,11 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 sink.push_back(' ');
                 first_item = false;
             }
-            encode_primitive(item, delimiter, sink);
+            result = encode_primitive(item, delimiter, sink);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
     }
     else if (is_array_of_arrays(val))
@@ -801,12 +827,20 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                     {
                         first2 = false;
                     }
-                    encode_primitive(item2, delimiter, sink);
+                    result = encode_primitive(item2, delimiter, sink);
+                    if (JSONCONS_UNLIKELY(!result))
+                    {
+                        return result;
+                    }
                 }
             }
             else
             {
-                encode_array(item, options, sink, depth+1, line, jsoncons::optional<jsoncons::string_view>{});
+                result = encode_array(item, options, sink, depth+1, line, jsoncons::optional<jsoncons::string_view>{});
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
             ++line;
         }
@@ -831,7 +865,11 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                     {
                         first_item = false;
                     }
-                    encode_primitive(row.at(field), delimiter, sink);
+                    result = encode_primitive(row.at(field), delimiter, sink);
+                    if (JSONCONS_UNLIKELY(!result))
+                    {
+                        return result;
+                    }
                 }
                 ++line;
             }
@@ -840,7 +878,11 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
         {
             for (const auto& item : val.array_range())
             {
-                encode_object_as_list_item(item, options, sink, depth+1, line);
+                result = encode_object_as_list_item(item, options, sink, depth+1, line);
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
                 ++line;
             }
         }
@@ -851,11 +893,19 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
         {
             if (is_json_object(item))
             {
-                encode_object_as_list_item(item, options, sink, depth+1, line);
+                result = encode_object_as_list_item(item, options, sink, depth+1, line);
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
             else if (is_json_array(item))
             {
-                encode_array(item, options, sink, depth + 1, line, jsoncons::optional<jsoncons::string_view>{});
+                result = encode_array(item, options, sink, depth + 1, line, jsoncons::optional<jsoncons::string_view>{});
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
             else
             {
@@ -863,19 +913,25 @@ void encode_array_content(const Json& val, const toon_encode_options& options,
                 sink.append((depth+1)*options.indent(), ' ');
                 sink.push_back('-');
                 sink.push_back(' ');
-                encode_primitive(item, delimiter, sink);
+                result = encode_primitive(item, delimiter, sink);
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
             ++line;
         }
     }
+    return write_result{};
 }
 
 template <typename Json, typename Sink>
-void encode_array_of_objects_as_tabular(const Json& val, 
+write_result encode_array_of_objects_as_tabular(const Json& val, 
     const jsoncons::span<const jsoncons::string_view>& fields,
     const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (line != 0)
@@ -902,16 +958,22 @@ void encode_array_of_objects_as_tabular(const Json& val,
             {
                 first_item = false;
             }
-            encode_primitive(row.at(field), delimiter, sink);
+            result = encode_primitive(row.at(field), delimiter, sink);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         ++line;
     }
+    return write_result{};
 }
 
 template <typename Json, typename Sink>
-void encode_object_as_list_item(const Json& val, const toon_encode_options& options, 
+write_result encode_object_as_list_item(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (val.empty())
@@ -922,7 +984,7 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         }
         sink.append(depth*options.indent(), ' ');
         sink.push_back('-');
-        return;
+        return write_result{};
     }
     auto first = val.object_range().begin();
     auto last = val.object_range().end();
@@ -939,7 +1001,11 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         detail::encode_key(first->key(), sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(first->value(), delimiter, sink);
+        result = encode_primitive(first->value(), delimiter, sink);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else if (is_json_array(first->value()))
     {
@@ -955,7 +1021,11 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             write_header(first->key(), first->value().size(), 
                 jsoncons::span<const jsoncons::string_view>{},
                 options, sink);
-            encode_array_content(first->value(), options, sink, depth, line);
+            result = encode_array_content(first->value(), options, sink, depth, line);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         else
         {
@@ -974,7 +1044,11 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
             }
             write_header(first->key(), first->value().size(), 
                 fields, options, sink);
-            encode_array_content(first->value(), options, sink, depth+1, line);
+            result = encode_array_content(first->value(), options, sink, depth+1, line);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         ++line;
     }
@@ -986,21 +1060,31 @@ void encode_object_as_list_item(const Json& val, const toon_encode_options& opti
         }
         sink.append(depth*options.indent(), ' ');
         sink.push_back('-');
-        encode_key_value_pair(first->key(), first->value(), options, sink, depth + 1, line);
+        result = encode_key_value_pair(first->key(), first->value(), options, sink, depth + 1, line);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
         ++line;
     }
     ++line;
     for (auto it = first+1; it != last; ++it)
     {
-        encode_key_value_pair(it->key(), it->value(), options, sink, depth + 1, line);
+        result = encode_key_value_pair(it->key(), it->value(), options, sink, depth + 1, line);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
         ++line;
     }
+    return write_result{};
 }
 
 template <typename Json, typename Sink>
-void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options& options, 
+write_result encode_mixed_array_as_list_items(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (line != 0)
@@ -1020,11 +1104,19 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
             sink.append((depth+1)*options.indent(), ' ');
             sink.push_back('-');
             sink.push_back(' ');
-            encode_primitive(item, delimiter, sink);
+            result = encode_primitive(item, delimiter, sink);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         else if (is_json_object(item))
         {
-            encode_object_as_list_item(item, options, sink, depth+1, line);
+            result = encode_object_as_list_item(item, options, sink, depth+1, line);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         else if (is_json_array(item))
         {
@@ -1040,7 +1132,11 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(), 
                     jsoncons::span<const jsoncons::string_view>{},
                     options, sink);
-                encode_array_content(item, options, sink, depth, line); // +2 in toon-pthon
+                result = encode_array_content(item, options, sink, depth, line); // +2 in toon-pthon
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
             else
             {
@@ -1060,17 +1156,23 @@ void encode_mixed_array_as_list_items(const Json& val, const toon_encode_options
                 write_header(jsoncons::optional<jsoncons::string_view>{}, item.size(),
                     fields,
                     options, sink);
-                encode_array_content(item, options, sink, depth+1, line); // +2 in toon-pthon
+                result = encode_array_content(item, options, sink, depth+1, line); // +2 in toon-pthon
+                if (JSONCONS_UNLIKELY(!result))
+                {
+                    return result;
+                }
             }
         }
         ++line;
     }
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_inline_primitive_array(const Json& val, const toon_encode_options& options, 
+write_result encode_inline_primitive_array(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (line != 0)
@@ -1093,14 +1195,20 @@ void encode_inline_primitive_array(const Json& val, const toon_encode_options& o
             sink.push_back(' ');
             first_item = false;
         }
-        encode_primitive(item, delimiter, sink);
+        result = encode_primitive(item, delimiter, sink);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_array(const Json& val, const toon_encode_options& options, 
+write_result encode_array(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     if (val.empty())
     {
         if (line != 0)
@@ -1110,50 +1218,80 @@ void encode_array(const Json& val, const toon_encode_options& options,
         sink.append(depth*options.indent(), ' ');
         write_header(key, 0, jsoncons::span<const jsoncons::string_view>{}, options, sink);
         ++line;
-        return;
+        return result;
     }
 
     if (is_array_of_primitives(val))
     {
-        encode_inline_primitive_array(val, options, sink, depth, line, key);
+        result = encode_inline_primitive_array(val, options, sink, depth, line, key);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else if (is_array_of_arrays(val))
     {
-        encode_array_of_arrays(val, options, sink, depth, line, key);
+        result = encode_array_of_arrays(val, options, sink, depth, line, key);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else if (is_array_of_objects(val))
     {
         auto fields = try_get_tabular_header(val);
         if (!fields.empty())
         {
-            encode_array_of_objects_as_tabular(val, jsoncons::span<const jsoncons::string_view>(fields.data(), fields.size()), 
+            result = encode_array_of_objects_as_tabular(val, jsoncons::span<const jsoncons::string_view>(fields.data(), fields.size()), 
                 options, sink, depth, line, key);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
         else
         {
-            encode_mixed_array_as_list_items(val, options, sink, depth, line, key);
+            result = encode_mixed_array_as_list_items(val, options, sink, depth, line, key);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
         }
     }
     else
     {
-        encode_mixed_array_as_list_items(val, options, sink, depth, line, key);
+        result = encode_mixed_array_as_list_items(val, options, sink, depth, line, key);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_key_value_pair(string_view key, const Json& val, 
+write_result encode_key_value_pair(string_view key, const Json& val, 
     const toon_encode_options& options, 
     Sink& sink, int depth, int& line )
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     if (is_json_array(val))
     {
-        encode_array(val, options, sink, depth, line, key);
+        result = encode_array(val, options, sink, depth, line, key);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else if (is_json_object(val))
     {
-        encode_object(val, options, sink, depth, line, key);
+        result = encode_object(val, options, sink, depth, line, key);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else
     {
@@ -1165,14 +1303,20 @@ void encode_key_value_pair(string_view key, const Json& val,
         detail::encode_key(key, sink);
         sink.push_back(':');
         sink.push_back(' ');
-        encode_primitive(val, delimiter, sink);
+        result = encode_primitive(val, delimiter, sink);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_object(const Json& val, const toon_encode_options& options, 
+write_result encode_object(const Json& val, const toon_encode_options& options, 
     Sink& sink, int depth, int& line , jsoncons::optional<string_view> key)
 {
+    write_result result{};
     if (key)
     {
         if (line != 0)
@@ -1185,7 +1329,11 @@ void encode_object(const Json& val, const toon_encode_options& options,
         ++line;
         for (const auto& item : val.object_range())
         {
-            encode_key_value_pair(item.key(), item.value(), options, sink, depth+1, line);
+            result = encode_key_value_pair(item.key(), item.value(), options, sink, depth+1, line);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
             ++line;
         }
     }
@@ -1193,31 +1341,50 @@ void encode_object(const Json& val, const toon_encode_options& options,
     {
         for (const auto& item : val.object_range())
         {
-            encode_key_value_pair(item.key(), item.value(), options, sink, depth, line);
+            result = encode_key_value_pair(item.key(), item.value(), options, sink, depth, line);
+            if (JSONCONS_UNLIKELY(!result))
+            {
+                return result;
+            }
             ++line;
         }
     }
+    return result;
 }
 
 template <typename Json, typename Sink>
-void encode_value(const Json& val, const toon_encode_options& options, Sink& sink, int depth)
+write_result encode_value(const Json& val, const toon_encode_options& options, Sink& sink, int depth)
 {
+    write_result result{};
     char delimiter = static_cast<char>(options.delimiter());
 
     int line{0};
     if (is_json_array(val))
     {
-        encode_array(val, options, sink, depth, line, jsoncons::optional<jsoncons::string_view>{});
+        result = encode_array(val, options, sink, depth, line, jsoncons::optional<jsoncons::string_view>{});
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else if (is_json_object(val))
     {
-        encode_object(val, options, sink, depth, line, jsoncons::optional<jsoncons::string_view>{});
+        result = encode_object(val, options, sink, depth, line, jsoncons::optional<jsoncons::string_view>{});
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
     else
     {
         sink.append(depth*options.indent(), ' ');
-        encode_primitive(val, delimiter, sink);
+        result = encode_primitive(val, delimiter, sink);
+        if (JSONCONS_UNLIKELY(!result))
+        {
+            return result;
+        }
     }
+    return result;
 }
 
 template <typename T, typename Alloc, typename TempAlloc, typename Sink>
@@ -1225,8 +1392,7 @@ typename std::enable_if<ext_traits::is_basic_json<T>::value, write_result>::type
 try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink& sink, 
     const toon_encode_options& options)
 {
-    encode_value(val, options, sink, 0);
-    return write_result{};
+    return encode_value(val, options, sink, 0);
 }
 
 template <typename T,typename CharContainer>
@@ -1235,8 +1401,7 @@ try_encode_toon(const T& val, CharContainer& cont,
     const toon_encode_options& options = toon_encode_options())
 {
     string_sink<CharContainer> sink{cont};
-    encode_value(val, options, sink, 0);
-    return write_result{};
+    return encode_value(val, options, sink, 0);
 }
 
 template <typename T>
@@ -1244,15 +1409,14 @@ write_result try_encode_toon(const T& val, std::basic_ostream<char>& os,
     const toon_encode_options& options = toon_encode_options())
 {
     stream_sink<char> sink{os};
-    encode_value(val, options, sink);
-    return write_result{};
+    return encode_value(val, options, sink);
 }
 
 template <typename... Args>
 void encode_toon(Args&& ... args)
 {
     auto result = try_encode_toon(std::forward<Args>(args)...); 
-    if (!result)
+    if (JSONCONS_UNLIKELY(!result))
     {
         JSONCONS_THROW(ser_error(result.error()));
     }

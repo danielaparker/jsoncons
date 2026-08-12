@@ -369,7 +369,7 @@ public:
     {
         if (other)
         {
-            assign(*other);
+            // do nothing, T is void
         }
         else
         {
@@ -383,7 +383,7 @@ public:
     {
         if (other)
         {
-            assign(std::move(*other));
+            // do nothing, T is void
         }
         else
         {
