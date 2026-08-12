@@ -104,6 +104,7 @@ namespace jsonpointer {
         using const_reverse_iterator = typename std::vector<string_type>::const_reverse_iterator;
         using reverse_iterator = const_reverse_iterator;
     private:
+        std::vector<char_type> buffer_;
         std::vector<string_type> tokens_;
     public:
         // Constructors
@@ -119,7 +120,7 @@ namespace jsonpointer {
             {
                 JSONCONS_THROW(jsonpointer_error(ec));
             }
-            tokens_ = std::move(jp.tokens_);
+            *this = std::move(jp);
         }
 
         explicit basic_json_pointer(const string_view_type& s, std::error_code& ec)
@@ -127,7 +128,7 @@ namespace jsonpointer {
             auto jp = parse(s, ec);
             if (!ec)
             {
-                tokens_ = std::move(jp.tokens_);
+                *this = std::move(jp);
             }
         }
 
@@ -221,7 +222,7 @@ namespace jsonpointer {
             return tokens_;
         }
 
-        const string_type& back() const
+        string_view_type back() const
         {
             return tokens_.back();
         }
@@ -236,10 +237,12 @@ namespace jsonpointer {
         void clear()
         {
             tokens_.clear();
+            buffer_.clear();
         }
 
         basic_json_pointer& append(const char_type* s) 
         {
+            buffer_.insert(buffer_.end(), s, s+std::char_traits<char_type>::length(s));
             tokens_.push_back(s);
             return *this;
         }
@@ -248,6 +251,7 @@ namespace jsonpointer {
         typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
         append(const StringViewLike& s) 
         {
+            buffer_.insert(buffer_.end(), s.begin(), s.end());
             tokens_.emplace_back(s.data(), s.size());
             return *this;
         }
@@ -259,6 +263,7 @@ namespace jsonpointer {
             string_type s;
             jsoncons::from_integer(val, s);
             tokens_.push_back(s);
+            buffer_.insert(buffer_.end(), s.begin(), s.end());
 
             return *this;
         }
@@ -279,18 +284,14 @@ namespace jsonpointer {
         typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         operator/=(IntegerType val)
         {
-            string_type s;
-            jsoncons::from_integer(val, s);
-            tokens_.push_back(s);
-
-            return *this;
+            return append(val);
         }
 
         basic_json_pointer& operator+=(const basic_json_pointer& p)
         {
             for (const auto& s : p.tokens_)
             {
-                tokens_.push_back(s);
+                append(s);
             }
             return *this;
         }
