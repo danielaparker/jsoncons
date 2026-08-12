@@ -29,6 +29,7 @@ void check_contains(const basic_json<CharT,Policy,Allocator>& example, const std
         std::cout << "contains failed\n";
         std::cout << "    given: " << example << "\n";
         std::cout << "    pointer: " << pointer << "\n";
+        std::cout << "    result: " << result << "\n";
     }
     CHECK(expected == result);
 }
@@ -285,7 +286,7 @@ TEST_CASE("jsonpointer path tests")
     }
 }
 
-TEST_CASE("wjsonpointer path tests")
+TEST_CASE("wjson_pointer path tests")
 {
     SECTION("/a~1b")
     {
@@ -300,7 +301,7 @@ TEST_CASE("wjsonpointer path tests")
     }
 }
 
-TEST_CASE("jsonpointer concatenation")
+TEST_CASE("json_pointer concatenation")
 {
     // Example from RFC 6901
     json example = json::parse(R"(
@@ -340,7 +341,9 @@ TEST_CASE("jsonpointer concatenation")
         auto it = ptr.begin();
         auto end = ptr.end();
 
+        CHECK_FALSE(it == end);
         CHECK((*it++ == "m~n"));
+        CHECK_FALSE(it == end);
         CHECK((*it++ == "1"));
         CHECK(it == end);
 

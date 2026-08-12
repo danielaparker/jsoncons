@@ -89,6 +89,75 @@ namespace jsonpointer {
         return result;
     }
 
+    template <typename CharT>
+    class json_pointer_iterator 
+    {
+    public:
+        using char_type = CharT;
+        using string_view_type = jsoncons::basic_string_view<char_type>;
+    private:
+        using token_type = std::pair<std::size_t,std::size_t>;
+        using base_iterator_type = std::vector<token_type>::const_iterator;  
+        jsoncons::span<const char_type> buffer_;
+        base_iterator_type it_;
+        base_iterator_type last_;
+    public:
+        typedef std::input_iterator_tag iterator_category;
+        using value_type = string_view_type;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const value_type*;
+        using reference = string_view_type; // Returns by value
+
+        // Constructor
+        json_pointer_iterator(jsoncons::span<const char_type> buffer, 
+            base_iterator_type first, base_iterator_type last) : 
+            buffer_(buffer), it_(first), last_(last) 
+        {
+        }
+
+        json_pointer_iterator(const json_pointer_iterator&) = default;
+        json_pointer_iterator(json_pointer_iterator&&) = default;
+        json_pointer_iterator& operator=(const json_pointer_iterator&) = default;
+        json_pointer_iterator& operator=(json_pointer_iterator&&) = default;
+
+        // 1. Dereference
+        reference operator*() const 
+        {
+            return string_view_type{buffer_.data() + (*it_).first, (*it_).second};
+        }
+
+        // 2. Pre-increment (++it)
+        json_pointer_iterator& operator++() 
+        {
+            if (it_ != last_)
+            {
+                ++it_;
+            }
+            return *this;
+        }
+
+        // 3. Post-increment (it++)
+        // C++11 legacy input iterators must return a copy of the old state
+        json_pointer_iterator operator++(int) 
+        {
+            json_pointer_iterator temp = *this;
+            if (it_ != last_)
+            {
+                ++it_;
+            }
+            return temp;
+        }
+
+        // 4. Equality Operators
+        bool operator==(const json_pointer_iterator& other) const {
+            return it_ == other.it_;
+        }
+
+        bool operator!=(const json_pointer_iterator& other) const {
+            return !(*this == other);
+        }
+    };
+
     // basic_json_pointer
 
     template <typename CharT>
@@ -99,20 +168,19 @@ namespace jsonpointer {
         using char_type = CharT;
         using string_type = std::basic_string<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type>;
-        using const_iterator = typename std::vector<string_type>::const_iterator;
+        using const_iterator = json_pointer_iterator<char_type>;
         using iterator = const_iterator;
-        using const_reverse_iterator = typename std::vector<string_type>::const_reverse_iterator;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
         using reverse_iterator = const_reverse_iterator;
     private:
+        using token_type = std::pair<std::size_t,std::size_t>;
         std::vector<char_type> buffer_;
-        std::vector<string_type> tokens_;
+        std::vector<token_type> tokens_;
     public:
         // Constructors
-        basic_json_pointer()
-        {
-        }
+        basic_json_pointer() = default;
 
-        explicit basic_json_pointer(const string_view_type& s)
+        explicit basic_json_pointer(string_view_type s)
         {
             std::error_code ec;
             auto jp = parse(s, ec);
@@ -123,7 +191,7 @@ namespace jsonpointer {
             *this = std::move(jp);
         }
 
-        explicit basic_json_pointer(const string_view_type& s, std::error_code& ec)
+        explicit basic_json_pointer(string_view_type s, std::error_code& ec)
         {
             auto jp = parse(s, ec);
             if (!ec)
@@ -132,11 +200,33 @@ namespace jsonpointer {
             }
         }
 
-        basic_json_pointer(const basic_json_pointer&) = default;
+        basic_json_pointer(const basic_json_pointer& other) :
+            buffer_(other.buffer_),
+            tokens_(other.tokens_)
+        {
+        }
 
-        basic_json_pointer(basic_json_pointer&&) = default;
+        basic_json_pointer(basic_json_pointer&& other) :
+            buffer_(std::move(other.buffer_)),
+            tokens_(std::move(other.tokens_))
+        {
+        }
 
-        static basic_json_pointer parse(const string_view_type& input, std::error_code& ec)
+        basic_json_pointer& operator=(const basic_json_pointer& other)
+        {
+            buffer_ = other.buffer_;
+            tokens_ = other.tokens_;
+            return *this;
+        }
+
+        basic_json_pointer& operator=(basic_json_pointer&& other)
+        {
+            buffer_ = std::move(other.buffer_);
+            tokens_ = std::move(other.tokens_);
+            return *this;
+        }
+
+        static basic_json_pointer parse(string_view_type input, std::error_code& ec)
         {
             basic_json_pointer<char_type> pointer;
             if (input.empty())
@@ -216,21 +306,16 @@ namespace jsonpointer {
             }
             return pointer;
         }
-
-        const std::vector<string_type>& tokens() const
+/*
+        const std::vector<string_view_type>& tokens() const
         {
             return tokens_;
         }
-
+*/
         string_view_type back() const
         {
             return tokens_.back();
         }
-
-        // operator=
-        basic_json_pointer& operator=(const basic_json_pointer&) = default;
-
-        basic_json_pointer& operator=(basic_json_pointer&&) = default;
 
         // Modifiers
 
@@ -242,8 +327,9 @@ namespace jsonpointer {
 
         basic_json_pointer& append(const char_type* s) 
         {
+            std::size_t pos = buffer_.size();
             buffer_.insert(buffer_.end(), s, s+std::char_traits<char_type>::length(s));
-            tokens_.push_back(s);
+            tokens_.emplace_back(pos, buffer_.size() - pos);
             return *this;
         }
 
@@ -251,8 +337,9 @@ namespace jsonpointer {
         typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
         append(const StringViewLike& s) 
         {
+            std::size_t pos = buffer_.size();
             buffer_.insert(buffer_.end(), s.begin(), s.end());
-            tokens_.emplace_back(s.data(), s.size());
+            tokens_.emplace_back(pos, buffer_.size() - pos);
             return *this;
         }
 
@@ -260,11 +347,9 @@ namespace jsonpointer {
         typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         append(IntegerType val)
         {
-            string_type s;
-            jsoncons::from_integer(val, s);
-            tokens_.push_back(s);
-            buffer_.insert(buffer_.end(), s.begin(), s.end());
-
+            std::size_t pos = buffer_.size();
+            jsoncons::from_integer(val, buffer_);
+            tokens_.emplace_back(pos, buffer_.size() - pos);
             return *this;
         }
 
@@ -289,9 +374,12 @@ namespace jsonpointer {
 
         basic_json_pointer& operator+=(const basic_json_pointer& p)
         {
-            for (const auto& s : p.tokens_)
+            std::size_t pos = buffer_.size();
+            buffer_.insert(buffer_.end(), p.buffer_.begin(), p.buffer_.end());
+            for (auto token : p.tokens_)
             {
-                append(s);
+                tokens_.insert(tokens_.end(), token_type{pos, token.second});
+                pos += token.second;
             }
             return *this;
         }
@@ -310,10 +398,11 @@ namespace jsonpointer {
         string_type to_string() const
         {
             string_type buffer;
-            for (const auto& token : tokens_)
+            auto last = end();
+            for (auto it = begin(); it != last; ++it)
             {
                 buffer.push_back('/');
-                for (auto c : token)
+                for (auto c : *it)
                 {
                     switch (c)
                     {
@@ -337,20 +426,22 @@ namespace jsonpointer {
         // Iterators
         iterator begin() const
         {
-            return tokens_.begin();
+            return json_pointer_iterator<char_type>{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+                tokens_.begin(), tokens_.end()};
         }
         iterator end() const
         {
-            return tokens_.end();
+            return json_pointer_iterator<char_type>{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+                tokens_.end(), tokens_.end()};
         }
 
         reverse_iterator rbegin() const
         {
-            return tokens_.rbegin();
+            return std::make_reverse_iterator(begin());
         }
         reverse_iterator rend() const
         {
-            return tokens_.rend();
+            return std::make_reverse_iterator(end());
         }
 
         // Non-member functions
@@ -381,7 +472,7 @@ namespace jsonpointer {
 
         friend bool operator==( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
-            return lhs.tokens_ == rhs.tokens_;
+            return lhs.buffer_ == rhs.buffer_ && lhs.tokens_ == rhs.tokens_;
         }
 
         friend bool operator!=( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
@@ -444,7 +535,7 @@ namespace jsonpointer {
     namespace detail {
 
     template <typename Json>
-    const Json* resolve(const Json* current, const typename Json::string_view_type& buffer, std::error_code& ec)
+    const Json* resolve(const Json* current, typename Json::string_view_type buffer, std::error_code& ec)
     {
         if (current->is_array())
         {
@@ -485,7 +576,7 @@ namespace jsonpointer {
     }
 
     template <typename Json>
-    Json* resolve(Json* current, const typename Json::string_view_type& buffer, bool create_if_missing, std::error_code& ec)
+    Json* resolve(Json* current, typename Json::string_view_type buffer, bool create_if_missing, std::error_code& ec)
     {
         if (current->is_array())
         {
