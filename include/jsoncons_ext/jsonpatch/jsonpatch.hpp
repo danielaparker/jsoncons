@@ -102,9 +102,10 @@ namespace detail {
         }
 
         jsonpointer::basic_json_pointer<char_type> pointer;
-        for (auto it = location.begin(); it != location.rbegin().base()-1; ++it)
+        std::size_t till = location.empty() ? 0 : (location.size() - 1);
+        for (std::size_t i = 0; i < till; ++i)
         {
-            pointer.append(*it);
+            pointer.append(location[i]);
         }
 
         std::error_code ec;

@@ -306,12 +306,7 @@ namespace jsonpointer {
             }
             return pointer;
         }
-/*
-        const std::vector<string_view_type>& tokens() const
-        {
-            return tokens_;
-        }
-*/
+
         string_view_type back() const
         {
             return tokens_.back();
