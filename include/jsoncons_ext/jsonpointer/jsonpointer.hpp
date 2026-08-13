@@ -487,27 +487,35 @@ namespace jsonpointer {
 
         friend bool operator!=( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
-            return lhs.tokens_ != rhs.tokens_;
+            return !(lhs == rhs);
         }
 
         friend bool operator<(const basic_json_pointer& lhs, const basic_json_pointer& rhs)
         {
+            if (lhs.buffer_ < rhs.buffer_)
+            {
+                return true;
+            }
+            if (lhs.buffer_ > rhs.buffer_)
+            {
+                return false;
+            }
             return lhs.tokens_ < rhs.tokens_;
         }
 
         friend bool operator<=(const basic_json_pointer& lhs, const basic_json_pointer& rhs)
         {
-            return lhs.tokens_ <= rhs.tokens_;
+            return lhs < rhs || lhs == rhs;
         }
 
         friend bool operator>(const basic_json_pointer& lhs, const basic_json_pointer& rhs)
         {
-            return lhs.tokens_ > rhs.tokens_;
+            return !(lhs <= rhs);
         }
 
         friend bool operator>=(const basic_json_pointer& lhs, const basic_json_pointer& rhs)
         {
-            return lhs.tokens_ >= rhs.tokens_;
+            return !(lhs < rhs);
         }
 
         friend std::basic_ostream<CharT>&
