@@ -828,23 +828,23 @@ namespace jsonpointer {
 
         Json* current = std::addressof(root);
 
-        std::basic_string<typename Json::char_type> buffer;
+        jsoncons::basic_string_view<typename Json::char_type> token;
         auto it = location.begin();
         auto end = location.end();
         while (it != end)
         {
-            buffer = *it;
+            token = *it;
             ++it;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, token, create_if_missing, ec);
                 if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
         if (current->is_array())
         {
-            if (buffer.size() == 1 && buffer[0] == '-')
+            if (token.size() == 1 && token[0] == '-')
             {
                 current->emplace_back(std::forward<T>(value));
                 current = std::addressof(current->at(current->size()-1));
@@ -852,7 +852,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(token.data(), token.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -877,7 +877,7 @@ namespace jsonpointer {
         }
         else if (current->is_object())
         {
-            auto r = current->insert_or_assign(buffer,std::forward<T>(value));
+            auto r = current->insert_or_assign(token,std::forward<T>(value));
             current = std::addressof(r.first->value());
         }
         else
@@ -968,24 +968,24 @@ namespace jsonpointer {
         }
         Json* current = std::addressof(root);
 
-        std::basic_string<typename Json::char_type> buffer;
+        jsoncons::basic_string_view<typename Json::char_type> token;
         auto it = location.begin();
         auto end = location.end();
 
         while (it != end)
         {
-            buffer = *it;
+            token = *it;
             ++it;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, token, create_if_missing, ec);
                 if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
         if (current->is_array())
         {
-            if (buffer.size() == 1 && buffer[0] == '-')
+            if (token.size() == 1 && token[0] == '-')
             {
                 current->emplace_back(std::forward<T>(value));
                 current = std::addressof(current->at(current->size()-1));
@@ -993,7 +993,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(token.data(), token.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1018,14 +1018,14 @@ namespace jsonpointer {
         }
         else if (current->is_object())
         {
-            if (current->contains(buffer))
+            if (current->contains(token))
             {
                 ec = jsonpointer_errc::key_already_exists;
                 return;
             }
             else
             {
-                auto r = current->try_emplace(buffer,std::forward<T>(value));
+                auto r = current->try_emplace(token,std::forward<T>(value));
                 current = std::addressof(r.first->value());
             }
         }
@@ -1113,24 +1113,24 @@ namespace jsonpointer {
 
         Json* current = std::addressof(root);
 
-        std::basic_string<typename Json::char_type> buffer;
+        jsoncons::basic_string_view<typename Json::char_type> token;
         auto it = location.begin();
         auto end = location.end();
 
         while (it != end)
         {
-            buffer = *it;
+            token = *it;
             ++it;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, token, false, ec);
                 if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
         if (current->is_array())
         {
-            if (buffer.size() == 1 && buffer[0] == '-')
+            if (token.size() == 1 && token[0] == '-')
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
                 return;
@@ -1138,7 +1138,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(token.data(), token.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1154,14 +1154,14 @@ namespace jsonpointer {
         }
         else if (current->is_object())
         {
-            if (!current->contains(buffer))
+            if (!current->contains(token))
             {
                 ec = jsonpointer_errc::key_not_found;
                 return;
             }
             else
             {
-                current->erase(buffer);
+                current->erase(token);
             }
         }
         else
@@ -1222,24 +1222,24 @@ namespace jsonpointer {
         }
         Json* current = std::addressof(root);
 
-        std::basic_string<typename Json::char_type> buffer;
+        jsoncons::basic_string_view<typename Json::char_type> token;
         auto it = location.begin();
         auto end = location.end();
 
         while (it != end)
         {
-            buffer = *it;
+            token = *it;
             ++it;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, token, create_if_missing, ec);
                 if (JSONCONS_UNLIKELY(ec))
                     return;
             }
         }
         if (current->is_array())
         {
-            if (buffer.size() == 1 && buffer[0] == '-')
+            if (token.size() == 1 && token[0] == '-')
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
                 return;
@@ -1247,7 +1247,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
+                auto result = jsoncons::dec_to_integer(token.data(), token.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -1263,11 +1263,11 @@ namespace jsonpointer {
         }
         else if (current->is_object())
         {
-            if (!current->contains(buffer))
+            if (!current->contains(token))
             {
                 if (create_if_missing)
                 {
-                    current->try_emplace(buffer,std::forward<T>(value));
+                    current->try_emplace(token,std::forward<T>(value));
                 }
                 else
                 {
@@ -1277,7 +1277,7 @@ namespace jsonpointer {
             }
             else
             {
-                auto r = current->insert_or_assign(buffer,std::forward<T>(value));
+                auto r = current->insert_or_assign(token,std::forward<T>(value));
                 current = std::addressof(r.first->value());
             }
         }
@@ -1378,9 +1378,9 @@ namespace jsonpointer {
     // flatten
 
     template <typename Json>
-    void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
-                  const Json& parent_value,
-                  Json& result)
+    void flatten_(std::basic_string<typename Json::char_type>& parent_key,
+        const Json& parent_value,
+        Json& result)
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
