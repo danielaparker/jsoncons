@@ -390,6 +390,16 @@ namespace jsonpointer {
           return tokens_.empty();
         }
 
+        std::size_t size() const
+        {
+            return tokens_.size();
+        }
+
+        string_view_type operator[](std::size_t index) const
+        {
+            return string_view_type{buffer_.data() + tokens_[index].first, tokens_[index].second};
+        }
+
         string_type string() const
         {
             return to_string();
@@ -1443,7 +1453,7 @@ namespace jsonpointer {
     Iterator find_inner_last(Iterator first, Iterator last, std::size_t offset, const StringT& token)
     {
         Iterator it = first;
-        while (it != last && *(it->first.tokens().begin() + offset) == token)
+        while (it != last && it->first[offset] == token)
         {
             ++it;
         }
@@ -1463,44 +1473,44 @@ namespace jsonpointer {
         auto it = first;
         while (it != last)
         {
-            if (it->first.tokens().size() == offset && length == 1)
+            if (it->first.size() == offset && length == 1)
             {
                 return *(it->second);
             }
-            if (it->first.tokens().size() == offset)
+            if (it->first.size() == offset)
             {
                 ++it;
             }
-            else if (it->first.tokens().size() < offset)
+            else if (it->first.size() < offset)
             {
                 return jsoncons::optional<Json>{};
             }
             else
             {
-                auto jt = it->first.tokens().begin() + offset;
-                if (offset + 1 == it->first.tokens().size())
+                auto s = it->first[offset];
+                if (offset + 1 == it->first.size())
                 {
-                    jo.try_emplace(*jt, *(it->second));
+                    jo.try_emplace(s, *(it->second));
                     ++it;
                 }
                 else 
                 {
-                    auto inner_last = find_inner_last(it, last, offset, *jt);
+                    auto inner_last = find_inner_last(it, last, offset, s);
                     if (options == unflatten_options{})
                     {
                         auto res = try_unflatten_array<Json,Iterator>(it, inner_last, offset+1);
                         if (!res)
                         {
-                            jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
+                            jo.try_emplace(s, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
                         }
                         else
                         {
-                            jo.try_emplace(*jt, std::move(*res));
+                            jo.try_emplace(s, std::move(*res));
                         }
                     }
                     else
                     {
-                        jo.try_emplace(*jt, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
+                        jo.try_emplace(s, unflatten_object<Json,Iterator>(it, inner_last, offset+1, options));
                     }
                     it = inner_last;
                 }
@@ -1517,26 +1527,25 @@ namespace jsonpointer {
         auto it = first;
         while (it != last)
         {
-            if (offset >= it->first.tokens().size())
+            if (offset >= it->first.size())
             {
                 return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
             }
-            auto jt = it->first.tokens().begin() + offset;
-            const auto& s = *jt;
+            auto s = it->first[offset];
             std::size_t n;
             auto r = jsoncons::dec_to_integer(s.data(), s.size(), n);
             if (r.ec != std::errc{})
             {
                 return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
             }
-            if (offset + 1 == it->first.tokens().size())
+            if (offset + 1 == it->first.size())
             {
                 m.emplace(std::make_pair(n,*(it->second)));
                 ++it;
             }
             else 
             {
-                auto inner_last = find_inner_last(it, last, offset, *jt);
+                auto inner_last = find_inner_last(it, last, offset, s);
                 auto res = try_unflatten_array<Json,Iterator>(it, inner_last, offset+1);
                 if (!res)
                 {
