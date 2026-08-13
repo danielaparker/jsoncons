@@ -22,6 +22,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
+#include <jsoncons/detail/a5hash.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
@@ -225,6 +226,11 @@ namespace jsonpointer {
             buffer_ = std::move(other.buffer_);
             tokens_ = std::move(other.tokens_);
             return *this;
+        }
+
+        jsoncons::span<const char_type> buffer() const
+        {
+            return buffer_;
         }
 
         static basic_json_pointer parse(string_view_type input, std::error_code& ec)
@@ -1392,8 +1398,6 @@ namespace jsonpointer {
                 if (parent_value.empty())
                 {
                     // Flatten empty array to null
-                    //result.try_emplace(parent_key, null_type{});
-                    //result[parent_key] = parent_value;
                     result.try_emplace(parent_key, parent_value);
                 }
                 else
@@ -1414,8 +1418,6 @@ namespace jsonpointer {
                 if (parent_value.empty())
                 {
                     // Flatten empty object to null
-                    //result.try_emplace(parent_key, null_type{});
-                    //result[parent_key] = parent_value;
                     result.try_emplace(parent_key, parent_value);
                 }
                 else
@@ -1434,7 +1436,6 @@ namespace jsonpointer {
             default:
             {
                 // add primitive parent_value with its reference string
-                //result[parent_key] = parent_value;
                 result.try_emplace(parent_key, parent_value);
                 break;
             }
@@ -1625,17 +1626,7 @@ namespace std {
     {
         std::size_t operator()(const jsoncons::jsonpointer::basic_json_pointer<CharT>& ptr) const noexcept
         {
-            constexpr std::uint64_t prime{0x100000001B3};
-            std::uint64_t result{0xcbf29ce484222325};
-             
-            for (const auto& str : ptr)
-            {
-                for (std::size_t i = 0; i < str.length(); ++i)
-                {
-                    result = (result * prime) ^ str[i];
-                }
-            }
-            return result;
+            return jsoncons::detail::a5hash(ptr.buffer().data(), ptr.buffer().size(), 0);
         }
     };   
     
