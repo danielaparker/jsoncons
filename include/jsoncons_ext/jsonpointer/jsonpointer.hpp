@@ -89,7 +89,7 @@ namespace jsonpointer {
         return result;
     }
 
-    template <typename CharT>
+    template <typename CharT, typename BaseIterator>
     class json_pointer_iterator 
     {
     public:
@@ -97,7 +97,7 @@ namespace jsonpointer {
         using string_view_type = jsoncons::basic_string_view<char_type>;
     private:
         using token_type = std::pair<std::size_t,std::size_t>;
-        using base_iterator_type = std::vector<token_type>::const_iterator;  
+        using base_iterator_type = BaseIterator;  
         jsoncons::span<const char_type> buffer_;
         base_iterator_type it_;
         base_iterator_type last_;
@@ -168,15 +168,16 @@ namespace jsonpointer {
         using char_type = CharT;
         using string_type = std::basic_string<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type>;
-        using const_iterator = json_pointer_iterator<char_type>;
-        using iterator = const_iterator;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = const_reverse_iterator;
     private:
         using token_type = std::pair<std::size_t,std::size_t>;
         std::vector<char_type> buffer_;
         std::vector<token_type> tokens_;
     public:
+        using const_iterator = json_pointer_iterator<char_type,std::vector<token_type>::const_iterator>;
+        using iterator = const_iterator;
+        using const_reverse_iterator = json_pointer_iterator<char_type,std::vector<token_type>::const_reverse_iterator>;
+        using reverse_iterator = const_reverse_iterator;
+
         // Constructors
         basic_json_pointer() = default;
 
@@ -431,22 +432,24 @@ namespace jsonpointer {
         // Iterators
         iterator begin() const
         {
-            return json_pointer_iterator<char_type>{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+            return iterator{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
                 tokens_.begin(), tokens_.end()};
         }
         iterator end() const
         {
-            return json_pointer_iterator<char_type>{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+            return iterator{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
                 tokens_.end(), tokens_.end()};
         }
 
         reverse_iterator rbegin() const
         {
-            return std::make_reverse_iterator(begin());
+            return reverse_iterator{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+                tokens_.rbegin(), tokens_.rend()};
         }
         reverse_iterator rend() const
         {
-            return std::make_reverse_iterator(end());
+            return reverse_iterator{jsoncons::span<const char_type>{buffer_.data(), buffer_.size()}, 
+                tokens_.rend(), tokens_.rend()};
         }
 
         // Non-member functions
