@@ -1,3 +1,9 @@
+master
+
+- Fixed bugs:
+
+  - Git PR ##738: fixed analyzer warning about possible uninitialized variable in encode_toon.hpp. 
+
 Release 1.9.0
 ------
 
