@@ -124,8 +124,9 @@ public:
     using string_view_type = jsoncons::basic_string_view<char_type>;
 private:
     using token_type = std::pair<std::size_t,std::size_t>;
-    std::vector<char_type> buffer_;
-    std::vector<token_type> tokens_;
+    using token_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<token_type>;
+    std::vector<char_type,char_allocator_type> buffer_;
+    std::vector<token_type,token_allocator_type> tokens_;
 public:
     using const_iterator = json_pointer_iterator<char_type,std::vector<token_type>::const_iterator>;
     using iterator = const_iterator;
@@ -159,7 +160,8 @@ public:
         }
     }
 
-    basic_json_pointer(std::vector<char_type>&& buffer, std::vector<token_type>&& tokens)
+    basic_json_pointer(std::vector<char_type,char_allocator_type>&& buffer, 
+        std::vector<token_type,token_allocator_type>&& tokens)
         : buffer_(std::move(buffer)), tokens_(std::move(tokens))
     {
     }
@@ -182,7 +184,7 @@ public:
         return parse(std::allocator_arg, allocator_type{}, input, ec);
     }
 
-    static basic_json_pointer parse(std::allocator_arg_t, const allocator_type&, string_view_type input, std::error_code& ec)
+    static basic_json_pointer parse(std::allocator_arg_t, const allocator_type& alloc, string_view_type input, std::error_code& ec)
     {
         if (input.empty())
         {
@@ -193,8 +195,8 @@ public:
         const char_type* pend = input.data() + input.size();
 
         auto state = jsonpointer::detail::pointer_state::start;
-        std::vector<char_type> buffer;
-        std::vector<token_type> tokens;
+        std::vector<char_type,char_allocator_type> buffer{alloc};
+        std::vector<token_type,token_allocator_type> tokens;
         std::size_t pos = 0;
 
         while (p < pend)
