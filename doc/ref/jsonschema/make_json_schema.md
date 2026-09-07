@@ -27,6 +27,13 @@ json_schema<Json> make_json_schema(Json root_schema,
 
 Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
 
+All overloads require `Json::char_type` to be `char` and `Json::allocator_type`
+to be default constructible. For `std::scoped_allocator_adaptor`, this requirement
+also applies to its outer allocator and all inner allocators. Overloads do not
+participate in overload resolution when these requirements are not met.
+`json`, `ojson`, and their `jsoncons::pmr` variants are supported;
+wide-character types such as `wjson` and `wojson` are not supported.
+
 #### Parameters
 
 <table>

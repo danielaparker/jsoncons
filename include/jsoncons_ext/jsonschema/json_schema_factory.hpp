@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #include <jsoncons/config/compiler_support.hpp>
@@ -225,7 +226,9 @@ namespace jsonschema {
     }
 
     template <typename Json,typename SchemaResolver>
-    typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
+        detail::is_default_constructible_allocator<typename Json::allocator_type>::value &&
+        ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const std::string& retrieval_uri, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
@@ -242,7 +245,9 @@ namespace jsonschema {
     }
 
     template <typename Json>
-    json_schema<Json> make_json_schema(Json root_schema, const std::string& retrieval_uri, 
+    typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
+        detail::is_default_constructible_allocator<typename Json::allocator_type>::value,json_schema<Json>>::type
+    make_json_schema(Json root_schema, const std::string& retrieval_uri,
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -258,7 +263,9 @@ namespace jsonschema {
     }
 
     template <typename Json,typename SchemaResolver>
-    typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
+        detail::is_default_constructible_allocator<typename Json::allocator_type>::value &&
+        ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
@@ -275,7 +282,9 @@ namespace jsonschema {
     }
  
     template <typename Json>
-    json_schema<Json> make_json_schema(Json root_schema, 
+    typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
+        detail::is_default_constructible_allocator<typename Json::allocator_type>::value,json_schema<Json>>::type
+    make_json_schema(Json root_schema,
         const evaluation_options& options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;

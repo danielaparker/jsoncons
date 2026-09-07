@@ -8,6 +8,8 @@
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_HPP
 
 #include <functional>
+#include <scoped_allocator>
+#include <type_traits>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -18,6 +20,30 @@
 
 namespace jsoncons {
 namespace jsonschema {
+
+namespace detail {
+
+template <typename Allocator>
+struct is_default_constructible_allocator : std::is_default_constructible<Allocator>
+{
+};
+
+// scoped_allocator_adaptor's default constructor may be unconstrained even
+// when an underlying allocator cannot be default constructed.
+template <typename OuterAllocator>
+struct is_default_constructible_allocator<std::scoped_allocator_adaptor<OuterAllocator>>
+    : is_default_constructible_allocator<OuterAllocator>
+{
+};
+
+template <typename OuterAllocator,typename InnerAllocator,typename... InnerAllocators>
+struct is_default_constructible_allocator<std::scoped_allocator_adaptor<OuterAllocator,InnerAllocator,InnerAllocators...>>
+    : std::integral_constant<bool, is_default_constructible_allocator<OuterAllocator>::value &&
+        is_default_constructible_allocator<std::scoped_allocator_adaptor<InnerAllocator,InnerAllocators...>>::value>
+{
+};
+
+} // namespace detail
 
 class validation_message_to_json_events 
 {
@@ -192,6 +218,11 @@ private:
 template <typename Json>
 class json_schema
 {
+    static_assert(std::is_same<typename Json::char_type,char>::value,
+        "json_schema requires Json::char_type to be char");
+    static_assert(detail::is_default_constructible_allocator<typename Json::allocator_type>::value,
+        "json_schema requires a default-constructible allocator (including scoped allocators)");
+
     using keyword_validator_ptr_type = std::unique_ptr<keyword_validator<Json>>;
     using document_schema_validator_type = std::unique_ptr<document_schema_validator<Json>>;
 
