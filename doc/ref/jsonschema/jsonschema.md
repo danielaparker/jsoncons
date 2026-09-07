@@ -3,6 +3,12 @@
 Since 0.174.0, the jsonschema extension implements Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification).
 Previous versions supported Draft 7.
 
+The extension requires a `basic_json` type with `char_type` equal to `char`
+and a default-constructible allocator, including any underlying scoped allocators.
+It supports `json`, `ojson`, and their `jsoncons::pmr` variants, but not
+wide-character types such as `wjson` and `wojson` or allocators without a default
+constructor. See [json_schema](json_schema.md) for the type requirements.
+
 The documentation below describes the new features for the jsonschema extension since 0.174.0.
 For earlier releases, please refer to [jsonschema (until 0.174.0)](https://github.com/danielaparker/jsoncons/tree/main).
 
