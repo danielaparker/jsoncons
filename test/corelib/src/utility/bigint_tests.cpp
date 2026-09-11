@@ -50,6 +50,31 @@ TEST_CASE("basic_bigint tests")
         CHECK(0 == quot);
         CHECK(num == rem);
     }
+    SECTION("is_zero")
+    {
+        bigint x(0);
+        CHECK(x.is_zero());
+        bigint y(1);
+        CHECK_FALSE(y.is_zero());
+    }
+    SECTION("is_even")
+    {
+        bigint x(0);
+        CHECK(x.is_even());
+        bigint y(1);
+        CHECK_FALSE(y.is_even());
+        bigint z(2);
+        CHECK(z.is_even());
+    }
+    SECTION("is_odd")
+    {
+        bigint x(0);
+        CHECK_FALSE(x.is_odd());
+        bigint y(1);
+        CHECK(y.is_odd());
+        bigint z(2);
+        CHECK_FALSE(z.is_odd());
+    }
 }
 
 TEST_CASE("test_positive_bignum")

@@ -24,7 +24,6 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-//#include <jsoncons/conversion_result.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 
 namespace jsoncons {
@@ -732,6 +731,24 @@ public:
     void set_negative(bool value) 
     {
         storage_.set_negative(value);
+    }
+
+    bool is_zero() const 
+    {
+        auto this_view = get_storage_view();
+        return this_view.size() == 0;
+    }
+
+    bool is_even() const
+    {
+        auto this_view = get_storage_view();
+        return this_view.size() == 0 ? true : ((this_view[this_view.size() - 1] & std::size_t(1)) == 0);
+    }
+
+    bool is_odd() const
+    {
+        auto this_view = get_storage_view();
+        return this_view.size() == 0 ? false : ((this_view[this_view.size() - 1] & std::size_t(1)) == 1);
     }
 
     template <typename CharT>
