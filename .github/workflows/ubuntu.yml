@@ -252,7 +252,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['15', 'latest']
+        compiler: ['latest']
     container: gcc:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
