@@ -18,7 +18,7 @@
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
-#include <jsoncons/utility/write_number.hpp> // from_integer
+#include <jsoncons/utility/number_writers.hpp> // from_integer
 
 namespace jsoncons {
 

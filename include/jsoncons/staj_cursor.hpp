@@ -27,7 +27,7 @@
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 

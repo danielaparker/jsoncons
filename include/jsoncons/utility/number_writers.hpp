@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UTILITY_WRITE_NUMBER_HPP
-#define JSONCONS_UTILITY_WRITE_NUMBER_HPP
+#ifndef JSONCONS_UTILITY_NUMBER_WRITERS_HPP
+#define JSONCONS_UTILITY_NUMBER_WRITERS_HPP
 
 #include <clocale>
 #include <cmath>
@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/grisu3.hpp>
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
@@ -578,4 +578,4 @@ public:
 
 } // namespace jsoncons
 
-#endif // JSONCONS_UTILITY_WRITE_NUMBER_HPP
+#endif // JSONCONS_UTILITY_NUMBER_WRITERS_HPP

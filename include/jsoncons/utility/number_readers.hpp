@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UTILITY_READ_NUMBER_HPP
-#define JSONCONS_UTILITY_READ_NUMBER_HPP
+#ifndef JSONCONS_UTILITY_NUMBER_READERS_HPP
+#define JSONCONS_UTILITY_NUMBER_READERS_HPP
 
 #include <cctype>
 #include <cstddef>
@@ -1034,4 +1034,4 @@ inline to_number_result<wchar_t> hexstr_to_double(const wchar_t* s, std::size_t 
         
 } // namespace jsoncons
 
-#endif // JSONCONS_UTILITY_READ_NUMBER_HPP
+#endif // JSONCONS_UTILITY_NUMBER_READERS_HPP

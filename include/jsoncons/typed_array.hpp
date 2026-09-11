@@ -14,7 +14,7 @@
 #include <ios>
 #include <system_error>
 
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_error.hpp>

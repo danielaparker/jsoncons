@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 

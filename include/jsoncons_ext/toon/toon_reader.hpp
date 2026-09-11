@@ -22,7 +22,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_utils.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 #include <jsoncons_ext/toon/toon_error.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>

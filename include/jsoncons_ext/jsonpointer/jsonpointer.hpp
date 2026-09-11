@@ -18,7 +18,7 @@
 #include <vector>
 #include <map>
 
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
