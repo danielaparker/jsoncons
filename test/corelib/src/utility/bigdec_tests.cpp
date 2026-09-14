@@ -11,6 +11,9 @@ TEST_CASE("basic_bigdec tests")
 {
     SECTION("0")
     {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "123456";
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
     }
 }
 

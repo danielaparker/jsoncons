@@ -24,27 +24,27 @@
 
 namespace jsoncons { 
 
-// Inspired by yyjson https://github.com/ibireme/yyjson
+// Follows yyjson https://github.com/ibireme/yyjson
 
 // Digit: '0'.
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_ZERO       = 1 << 0;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_zero       = 1 << 0;
 
 // Digit: [1-9]. 
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_NONZERO    = 1 << 1;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_nonzero    = 1 << 1;
 
 // Plus sign (positive): '+'. 
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_POS        = 1 << 2;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_pos        = 1 << 2;
 
 // Minus sign (negative): '-'. 
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_NEG        = 1 << 3;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_neg        = 1 << 3;
 
 // Decimal point: '.' 
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_DOT        = 1 << 4;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_dot        = 1 << 4;
 
 // Exponent sign: 'e, 'E'. 
-JSONCONS_INLINE_CONSTEXPR uint8_t DIGIT_TYPE_EXP        = 1 << 5;
+JSONCONS_INLINE_CONSTEXPR uint8_t digit_type_exp        = 1 << 5;
 
-// Digit type table (generate with misc/make_tables.c) 
+// Digit type table 
 JSONCONS_INLINE_CONSTEXPR uint8_t digi_table[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -71,33 +71,33 @@ constexpr bool is_type(uint8_t d, uint8_t type) {
 
 // Match a sign: '+', '-' 
 constexpr bool is_sign(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_POS | DIGIT_TYPE_NEG));
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_pos | digit_type_neg));
 }
 
 // Match a none zero digit: [1-9] 
 constexpr bool is_nonzero_digit(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_NONZERO);
+    return is_type(static_cast<uint8_t>(d), (uint8_t)digit_type_nonzero);
 }
 
 // Match a digit: [0-9] 
-constexpr bool is_digit(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO));
+constexpr bool is_digit_char(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_zero | digit_type_nonzero));
 }
 
 // Match an exponent sign: 'e', 'E'. 
-constexpr bool is_exp(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)DIGIT_TYPE_EXP);
+constexpr bool is_exp_char(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)digit_type_exp);
 }
 
 // Match a floating point indicator: '.', 'e', 'E'. 
-constexpr bool is_fp_indicator(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+constexpr bool is_dot_or_exp_char(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_dot | digit_type_exp));
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
-constexpr bool is_digit_or_fp(char d) {
-    return is_type(static_cast<uint8_t>(d), (uint8_t)(DIGIT_TYPE_ZERO | DIGIT_TYPE_NONZERO |
-                                       DIGIT_TYPE_DOT | DIGIT_TYPE_EXP));
+constexpr bool is_float_char(char d) {
+    return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_zero | digit_type_nonzero |
+                                       digit_type_dot | digit_type_exp));
 }
 constexpr bool is_sign(wchar_t d) {
     return d == '+' || d == '-';
@@ -109,12 +109,12 @@ constexpr bool is_nonzero_digit(wchar_t d) {
 }
 
 // Match a digit: [0-9] 
-constexpr bool is_digit(wchar_t d) {
+constexpr bool is_digit_char(wchar_t d) {
     return d >= '0' && d <= '9';
 }
 
 // Match an exponent sign: 'e', 'E'. 
-constexpr bool is_exp(wchar_t d) {
+constexpr bool is_exp_char(wchar_t d) {
     return d == 'e' || d == 'E';
 }
 
@@ -124,8 +124,8 @@ constexpr bool is_fp(wchar_t d) {
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
-constexpr bool is_digit_or_fp(wchar_t d) {
-    return is_digit(d) || is_fp(d);
+constexpr bool is_float_char(wchar_t d) {
+    return is_digit_char(d) || is_fp(d);
 }
 
 template <typename CharT>
@@ -300,7 +300,7 @@ dec_to_integer(const CharT* s, std::size_t length, T& value)
     {
         return to_number_result<CharT>(cur, std::errc::result_out_of_range);
     }
-    if (is_digit(*cur))
+    if (is_digit_char(*cur))
     {
         if (num > max_value_div_10)
         {
