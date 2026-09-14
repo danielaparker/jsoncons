@@ -2148,6 +2148,12 @@ to_bigint_result<CharT> to_bigint(const CharT* data, std::size_t length,
     }
 }
 
+template <typename Allocator>
+std::string to_string(const basic_bigint<Allocator>& value)
+{
+    return value.to_string();
+}
+
 using bigint = basic_bigint<std::allocator<uint64_t>>;
 
 } // namespace jsoncons

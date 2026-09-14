@@ -27,6 +27,16 @@ public:
     {
     }
 
+    basic_bigint<Allocator> unscaled() const
+    {
+        return unscaled_;
+    }
+
+    int64_t scale() const
+    {
+        return scale_;
+    }
+
     friend bool operator==(const basic_bigdec& lhs, const basic_bigdec& rhs)
     {
         if (&lhs == &rhs)
@@ -146,6 +156,41 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
         value = basic_bigdec<Allocator>{basic_bigint<Allocator>{buf.data(), buf.size()}, scale};
     }
     return to_number_result<CharT>(cur);
+}
+
+template <typename Alloc,typename CharT,typename BAlloc>
+void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+{
+    buf.clear();
+    if (value.scale() == 0)
+    {
+        buf = to_string(value.unscaled());
+        return;
+    }
+    if (value.unscaled().is_negative())
+    {
+        buf.push_back('-');
+    }
+    std::string coeff = to_string(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled());
+    std::size_t coeffLen = coeff.size();
+    int64_t adjusted = -value.scale() + (int64_t)(coeffLen-1);
+    if ((value.scale() >= 0) && (adjusted >= -6)) 
+    { // plain number
+        int64_t pad = value.scale() - coeffLen;         // count of padding zeros
+        if (pad >= 0) {                     // 0.xxx form
+            buf.push_back('0');
+            buf.push_back('.');
+            for (; pad>0; pad--) {
+                buf.push_back('0');
+            }
+            buf.append(coeff.data(), coeffLen);
+        } else 
+        {                         // xx.xx form
+            buf.append(coeff.data(), -pad);
+            buf.push_back('.');
+            buf.append(coeff.data() -pad, value.scale());
+        }
+    }
 }
 
 using bigdec = basic_bigdec<std::allocator<uint64_t>>;
