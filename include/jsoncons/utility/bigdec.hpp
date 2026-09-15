@@ -9,6 +9,7 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/number_readers.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/utility/bigint.hpp>
 
 namespace jsoncons {
@@ -91,6 +92,7 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
             return to_number_result<CharT>(cur);
         }
     }
+    const CharT* mark1 = cur;
     const CharT* mark = cur;
     if (cur != end && *cur == '.')
     {
@@ -104,15 +106,16 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
         {
             cur++;
         }
+        mark++;
     }
-    std::basic_string<CharT> buf{s, std::size_t(mark-s)};
-    mark++;
+    std::basic_string<CharT> buf{s, std::size_t(mark1-s)};
     scale = static_cast<int64_t>(cur - mark);
     buf.append(mark, cur-mark);
     if (cur != end && is_exp_char(*cur))
     {
+        ++cur;
         bool negexp = false;
-        if (*cur == '-')
+        if (cur != end && *cur == '-')
         {
             negexp = true;
             ++cur;
@@ -159,7 +162,8 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 }
 
 template <typename Alloc,typename CharT,typename BAlloc>
-void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf,
+    bool sci = true)
 {
     buf.clear();
     if (value.scale() == 0)
@@ -189,6 +193,27 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
             buf.append(coeff.data(), -pad);
             buf.push_back('.');
             buf.append(coeff.data() -pad, value.scale());
+        }
+    }
+    else
+    {
+        if (sci)
+        {
+            buf.push_back(coeff[0]);   // first character
+            if (coeffLen > 1) 
+            {
+                buf.push_back('.');
+                buf.append(coeff.data() + 1, coeffLen - 1);
+            }
+        }
+        else
+        {
+
+        }
+        if (adjusted != 0) 
+        {             
+            buf.push_back('e');
+            from_integer(adjusted, buf);
         }
     }
 }

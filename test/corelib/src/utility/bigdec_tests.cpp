@@ -10,7 +10,7 @@
 
 TEST_CASE("basic_bigdec tests")
 {
-    SECTION("123456")
+    /*SECTION("123456")
     {
         jsoncons::bigdec value;
         jsoncons::string_view sv = "123456";
@@ -48,6 +48,30 @@ TEST_CASE("basic_bigdec tests")
 
         std::string buf;
         to_buffer(value, buf);
+        std::cout << buf << "\n";
+    }*/
+    SECTION("123456e5")
+    {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "123456e5";
+
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
+
+        std::string buf;
+        to_buffer(value, buf);
+        std::cout << "scale: " << value.scale() << "\n";
+        std::cout << buf << "\n";
+    }
+    SECTION("123456e-5")
+    {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "123456e-5";
+
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
+
+        std::string buf;
+        to_buffer(value, buf);
+        std::cout << "scale: " << value.scale() << "\n";
         std::cout << buf << "\n";
     }
 }
