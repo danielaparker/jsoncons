@@ -167,10 +167,8 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 }
 
 template <typename Alloc,typename CharT,typename BAlloc>
-void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf,
-    bool sci = false)
+void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
 {
-    buf.clear();
     if (value.scale() == 0)
     {
         buf = to_string(value.unscaled());
@@ -184,17 +182,18 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
     std::size_t coeffLen = coeff.size();
     int64_t adjusted = -value.scale() + (int64_t)(coeffLen-1);
     if ((value.scale() >= 0) && (adjusted >= -6)) 
-    { // plain number
-        int64_t pad = value.scale() - coeffLen;         // count of padding zeros
-        if (pad >= 0) {                     // 0.xxx form
+    { 
+        int64_t pad = value.scale() - coeffLen;         // padding zeros
+        if (pad >= 0) {                                 // 0.xxx form
             buf.push_back('0');
             buf.push_back('.');
             for (; pad>0; pad--) {
                 buf.push_back('0');
             }
             buf.append(coeff.data(), coeffLen);
-        } else 
-        {                         // xx.xx form
+        } 
+        else 
+        {
             buf.append(coeff.data(), -pad);
             buf.push_back('.');
             buf.append(coeff.data() -pad, value.scale());
@@ -202,55 +201,11 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
     }
     else
     {
-        if (sci)
+        buf.push_back(coeff[0]);   // first character
+        if (coeffLen > 1) 
         {
-            buf.push_back(coeff[0]);   // first character
-            if (coeffLen > 1) 
-            {
-                buf.push_back('.');
-                buf.append(coeff.data() + 1, coeffLen - 1);
-            }
-        }
-        else
-        {
-            int sig = (int)(adjusted % 3);
-            if (sig < 0)
-                sig += 3;                // [adjusted was negative]
-            adjusted -= sig;             // now a multiple of 3
-            sig++;
-            if (value.signum() == 0) 
-            {
-                switch (sig) 
-                {
-                case 1:
-                    buf.push_back('0'); // exponent is a multiple of three
-                    break;
-                case 2:
-                    buf.append("0.00");
-                    adjusted += 3;
-                    break;
-                case 3:
-                    buf.append("0.0");
-                    adjusted += 3;
-                    break;
-                default:
-                    JSONCONS_ASSERT("Unexpected sig value " + sig);
-                }
-            } 
-            else if (sig >= coeffLen) 
-            {   // significand all in integer
-                buf.append(coeff.data(), coeffLen);
-                // may need some zeros, too
-                for (std::size_t i = sig - coeffLen; i > 0; i--) {
-                    buf.push_back('0');
-                }
-            } 
-            else 
-            {                     // xx.xxE form
-                buf.append(coeff.data(), sig);
-                buf.push_back('.');
-                buf.append(coeff.data() + sig, coeffLen - sig);
-            }
+            buf.push_back('.');
+            buf.append(coeff.data() + 1, coeffLen - 1);
         }
         if (adjusted != 0) 
         {             
