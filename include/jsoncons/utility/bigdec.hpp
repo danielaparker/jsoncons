@@ -71,14 +71,14 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     int64_t scale = 0;
 
     cur += (*cur == '-');
-    if (JSONCONS_UNLIKELY(cur == end || !is_digit_char(*cur)))
+    if (JSONCONS_UNLIKELY(cur == end || !is_char_digit(*cur)))
     {
         return to_number_result<CharT>{s, std::errc::invalid_argument};
     }
     if (*cur == '0')
     {
         cur++;
-        if (JSONCONS_UNLIKELY(cur < end && is_digit_char(*cur)))
+        if (JSONCONS_UNLIKELY(cur < end && is_char_digit(*cur)))
         {
             return to_number_result<CharT>{s, std::errc::invalid_argument};
         }
@@ -87,11 +87,11 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     }
     else
     {
-        while (cur != end && is_digit_char(*cur))
+        while (cur != end && is_char_digit(*cur))
         {
             cur++;
         }
-        if (cur == end || !is_float_char(*cur))
+        if (cur == end || !is_char_float(*cur))
         {
             value = basic_bigdec<Allocator>{basic_bigint<Allocator>{s,std::size_t(cur-s)}, 0};
             return to_number_result<CharT>(cur);
@@ -102,12 +102,12 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     if (cur != end && *cur == '.')
     {
         cur++;
-        if (cur != end && !is_digit_char(*cur))
+        if (cur != end && !is_char_digit(*cur))
         {
             return to_number_result<CharT>{cur, std::errc::invalid_argument};
         }
         cur++;
-        while (cur != end && is_digit_char(*cur))
+        while (cur != end && is_char_digit(*cur))
         {
             cur++;
         }
@@ -116,7 +116,7 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     std::basic_string<CharT> buf{s, std::size_t(mark1-s)};
     scale = static_cast<int64_t>(cur - mark);
     buf.append(mark, cur-mark);
-    if (cur != end && is_exp_char(*cur))
+    if (cur != end && is_char_exp(*cur))
     {
         ++cur;
         bool negexp = false;
@@ -124,14 +124,14 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
         {
             negexp = true;
             ++cur;
-            if (cur == end || !is_digit_char(*cur))
+            if (cur == end || !is_char_digit(*cur))
             {
                 return to_number_result<CharT>{cur, std::errc::invalid_argument};
             }
         }
         mark = cur;
         ++cur;
-        while (cur != end && is_digit_char(*cur))
+        while (cur != end && is_char_digit(*cur))
         {
             cur++;
         }

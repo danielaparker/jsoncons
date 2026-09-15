@@ -75,27 +75,27 @@ constexpr bool is_sign(char d) {
 }
 
 // Match a none zero digit: [1-9] 
-constexpr bool is_nonzero_digit(char d) {
+constexpr bool is_char_nonzero_digit(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)digit_type_nonzero);
 }
 
 // Match a digit: [0-9] 
-constexpr bool is_digit_char(char d) {
+constexpr bool is_char_digit(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_zero | digit_type_nonzero));
 }
 
 // Match an exponent sign: 'e', 'E'. 
-constexpr bool is_exp_char(char d) {
+constexpr bool is_char_exp(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)digit_type_exp);
 }
 
 // Match a floating point indicator: '.', 'e', 'E'. 
-constexpr bool is_dot_or_exp_char(char d) {
+constexpr bool is_char_dot_or_exp(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_dot | digit_type_exp));
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
-constexpr bool is_float_char(char d) {
+constexpr bool is_char_float(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_zero | digit_type_nonzero |
                                        digit_type_dot | digit_type_exp));
 }
@@ -104,17 +104,17 @@ constexpr bool is_sign(wchar_t d) {
 }
 
 // Match a none zero digit: [1-9] 
-constexpr bool is_nonzero_digit(wchar_t d) {
+constexpr bool is_char_nonzero_digit(wchar_t d) {
     return d >= '1' && d <= '9';
 }
 
 // Match a digit: [0-9] 
-constexpr bool is_digit_char(wchar_t d) {
+constexpr bool is_char_digit(wchar_t d) {
     return d >= '0' && d <= '9';
 }
 
 // Match an exponent sign: 'e', 'E'. 
-constexpr bool is_exp_char(wchar_t d) {
+constexpr bool is_char_exp(wchar_t d) {
     return d == 'e' || d == 'E';
 }
 
@@ -124,8 +124,8 @@ constexpr bool is_fp(wchar_t d) {
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
-constexpr bool is_float_char(wchar_t d) {
-    return is_digit_char(d) || is_fp(d);
+constexpr bool is_char_float(wchar_t d) {
+    return is_char_digit(d) || is_fp(d);
 }
 
 template <typename CharT>
@@ -300,7 +300,7 @@ dec_to_integer(const CharT* s, std::size_t length, T& value)
     {
         return to_number_result<CharT>(cur, std::errc::result_out_of_range);
     }
-    if (is_digit_char(*cur))
+    if (is_char_digit(*cur))
     {
         if (num > max_value_div_10)
         {
