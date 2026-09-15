@@ -38,6 +38,11 @@ public:
         return scale_;
     }
 
+    int signum() const
+    {
+        return unscaled_.signum();
+    }
+
     friend bool operator==(const basic_bigdec& lhs, const basic_bigdec& rhs)
     {
         if (&lhs == &rhs)
@@ -163,7 +168,7 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 
 template <typename Alloc,typename CharT,typename BAlloc>
 void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf,
-    bool sci = true)
+    bool sci = false)
 {
     buf.clear();
     if (value.scale() == 0)
@@ -208,7 +213,44 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
         }
         else
         {
-
+            int sig = (int)(adjusted % 3);
+            if (sig < 0)
+                sig += 3;                // [adjusted was negative]
+            adjusted -= sig;             // now a multiple of 3
+            sig++;
+            if (value.signum() == 0) 
+            {
+                switch (sig) 
+                {
+                case 1:
+                    buf.push_back('0'); // exponent is a multiple of three
+                    break;
+                case 2:
+                    buf.append("0.00");
+                    adjusted += 3;
+                    break;
+                case 3:
+                    buf.append("0.0");
+                    adjusted += 3;
+                    break;
+                default:
+                    JSONCONS_ASSERT("Unexpected sig value " + sig);
+                }
+            } 
+            else if (sig >= coeffLen) 
+            {   // significand all in integer
+                buf.append(coeff.data(), coeffLen);
+                // may need some zeros, too
+                for (std::size_t i = sig - coeffLen; i > 0; i--) {
+                    buf.push_back('0');
+                }
+            } 
+            else 
+            {                     // xx.xxE form
+                buf.append(coeff.data(), sig);
+                buf.push_back('.');
+                buf.append(coeff.data() + sig, coeffLen - sig);
+            }
         }
         if (adjusted != 0) 
         {             

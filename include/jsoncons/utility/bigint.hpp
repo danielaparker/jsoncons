@@ -729,6 +729,11 @@ public:
         return storage_.is_negative();
     }
 
+    int signum() const
+    {
+        return is_negative() ? -1 : (*this > 0 ? 1 : 0); 
+    }
+
     void set_negative(bool value) 
     {
         storage_.set_negative(value);
