@@ -138,6 +138,45 @@ TEST_CASE("jmespath let with operator binding expression")
     }
 }
 
+TEST_CASE("jmespath let with operator in evaluation expression")
+{
+    SECTION("Test 1 binary or operator with two variables")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(let $f = foo, $b = bar in $f || $b)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 2 binary or operator with two variables and parenthesis")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"(let $f = foo, $b = bar in ($f || $b))";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 3 binary or operator with two variables and parenthesis")
+    {
+        std::error_code ec;
+        std::string query = R"((let $f = foo, $b = bar in $f) || $b)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        expr.evaluate(doc, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
+    }
+}
+
 TEST_CASE("jmespath let as valid identifiers")
 {
     auto doc = jsoncons::json::parse(R"(
@@ -330,7 +369,7 @@ TEST_CASE("jmespath let errors")
 
         expr.evaluate(doc, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
-    }    
+    }
 
     SECTION("test 2")
     {

@@ -41,6 +41,7 @@ namespace jmespath {
         default_op, // Identifier, CurrentNode, Index, MultiSelectList, MultiSelectHash, FunctionExpression
         projection_op,
         flatten_projection_op, // FlattenProjection
+        in_op, // let $var = expr in
         or_op,
         and_op,
         eq_op,
@@ -58,6 +59,8 @@ namespace jmespath {
         {
             switch (oper)
             {
+                case operator_kind::in_op:
+                    return 10;
                 case operator_kind::or_op:
                     return 9;
                 case operator_kind::and_op:
@@ -85,11 +88,10 @@ namespace jmespath {
             switch (oper)
             {
                 case operator_kind::not_op:
-                    return true;
                 case operator_kind::projection_op:
                     return true;
                 case operator_kind::flatten_projection_op:
-                    return false;
+                case operator_kind::in_op:
                 case operator_kind::or_op:
                 case operator_kind::and_op:
                 case operator_kind::eq_op:
@@ -119,7 +121,7 @@ namespace jmespath {
         using pointer = typename Json::pointer;
     public:
         std::vector<std::unique_ptr<Json>>& temp_storage_;
-        std::map<string_type,const Json*> variables_;
+        std::map<string_type,const Json*>& variables_;
 
     public:
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage)
@@ -128,13 +130,18 @@ namespace jmespath {
         }
 
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage, 
-            const std::map<string_type,const Json*>& variables)
+            std::map<string_type,const Json*>& variables)
             : temp_storage_(temp_storage), variables_(variables)
         {
         }
-        
+
         ~eval_context() noexcept = default;
-        
+
+        std::map<string_type, const Json*> get_variables()
+        {
+            return variables_;
+        }
+
         void set_variable(const string_type& key, const Json& value)
         {
             variables_[key] = std::addressof(value);
@@ -151,42 +158,42 @@ namespace jmespath {
             return *it->second;
         }
 
-        reference number_type_name() 
+        reference number_type_name() const
         {
             static Json number_type_name(JSONCONS_STRING_CONSTANT(char_type, "number"));
 
             return number_type_name;
         }
 
-        reference boolean_type_name()
+        reference boolean_type_name() const
         {
             static Json boolean_type_name(JSONCONS_STRING_CONSTANT(char_type, "boolean"));
 
             return boolean_type_name;
         }
 
-        reference string_type_name()
+        reference string_type_name() const
         {
             static Json string_type_name(JSONCONS_STRING_CONSTANT(char_type, "string"));
 
             return string_type_name;
         }
 
-        reference object_type_name()
+        reference object_type_name() const
         {
             static Json object_type_name(JSONCONS_STRING_CONSTANT(char_type, "object"));
 
             return object_type_name;
         }
 
-        reference array_type_name()
+        reference array_type_name() const
         {
             static Json array_type_name(JSONCONS_STRING_CONSTANT(char_type, "array"));
 
             return array_type_name;
         }
 
-        reference null_type_name()
+        reference null_type_name() const
         {
             static Json null_type_name(JSONCONS_STRING_CONSTANT(char_type, "null"));
 
@@ -447,7 +454,7 @@ namespace jmespath {
     };
 
     // function_base
-    
+
     template <typename Json>
     class function_base
     {
@@ -476,7 +483,7 @@ namespace jmespath {
         {
             return false;
         }
-    };  
+    };
 
     template <typename Json>
     class function_wrapper : public function_base<Json>
@@ -2673,6 +2680,28 @@ namespace detail {
 
         // Implementations
 
+        class in_operator : public operator_base<Json>
+        {
+        public:
+            using reference = const Json&;
+            using expression_type = expr_base_impl<Json>;
+        public:
+            in_operator()
+                : operator_base<Json>(operator_kind::in_op)
+            {}
+
+            reference evaluate(reference val, const std::vector<expression_type*>& expressions, eval_context<Json>& context, std::error_code& ec) const override final
+            {
+                JSONCONS_ASSERT(expressions.size() == 2);
+
+                auto new_variables = context.get_variables();
+                eval_context<Json> new_context{ context.temp_storage_, new_variables };
+                expressions[0]->evaluate(val, new_context, ec);
+                reference rhs = expressions[1]->evaluate(val, new_context, ec);
+                return rhs;
+            }
+        };
+
         class or_operator final : public logical_operator<Json>
         {
         public:
@@ -3305,7 +3334,7 @@ namespace detail {
 
             std::unordered_map<string_type,std::unique_ptr<function_base<Json>>,MyHash> custom_functions_;
             std::vector<std::unique_ptr<expr_base<Json>>> expr_storage_;
-            
+
         public:
 
             static_resources() = default;
@@ -3407,6 +3436,13 @@ namespace detail {
                 return it2->second.get();
             }
 
+            const operator_base<Json>* get_in_operator() const
+            {
+                static const in_operator in_oper;
+
+                return &in_oper;
+            }
+
             const operator_base<Json>* get_not_operator() const
             {
                 static const not_expression not_oper;
@@ -3462,6 +3498,11 @@ namespace detail {
             {
                 static const gte_operator gte_oper;
                 return &gte_oper;
+            }
+
+            expression_type* create_in_operation()
+            {
+                return create_expression(operation_expression(operator_kind::in_op, get_in_operator()));
             }
 
             expression_type* create_not_operation()
@@ -3571,7 +3612,8 @@ namespace detail {
                     return Json::null();
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
-                eval_context<Json> context{temp_storage};
+                std::map<string_type, const Json*> variables;
+                eval_context<Json> context{temp_storage, variables};
                 return Json(evaluate_tokens(doc, output_stack_, context, ec));
             }
 
@@ -3584,7 +3626,8 @@ namespace detail {
                     return Json::null();
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
-                eval_context<Json> context{temp_storage};
+                std::map<string_type, const Json*> variables;
+                eval_context<Json> context{temp_storage, variables };
                 for (const auto& param : params)
                 {
                     context.set_variable(param.first, param.second);
@@ -3957,6 +4000,8 @@ namespace detail {
                         else if (*p_ == 'i' && (p_ + 1) < input_end_ && *(p_ + 1) == 'n')
                         {
                             push_token(token<Json>(variable_expression_arg), resources, output_stack, ec);
+                            if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
+                            push_token(token<Json>(operation_arg, resources.create_in_operation()), resources, output_stack, ec);
                             if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                             state_stack.pop_back();
                             p_ += 2;
@@ -5471,7 +5516,7 @@ namespace detail {
                     }
                 case token_kind::operation:
                 {
-                    if (!operator_stack_.empty() && !operator_stack_.back().is_lparen())
+                    if (!operator_stack_.empty())
                     {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend() && (*it).is_operator()
