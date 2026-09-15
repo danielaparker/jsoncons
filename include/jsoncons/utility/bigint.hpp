@@ -1995,6 +1995,49 @@ private:
         }
         return to_bigint_result<CharT>(cur, std::errc{});
     }
+
+    template <typename CharT, typename BAlloc>
+    friend void to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
+    {
+        basic_bigint v(value);
+        auto v_view = v.get_storage_view();
+
+        size_type len = (v_view.size() * word_type_bits / 3) + 2;
+        buf.reserve(len);
+
+        if (v_view.size() == 0)
+        {
+            buf.push_back('0');
+        }
+        else
+        {
+            word_type r;
+            basic_bigint R(value.get_allocator());
+            basic_bigint LP10(max_unsigned_power_10, value.get_allocator());
+
+            do
+            {
+                v.divide(LP10, v, R, true);
+                v_view = v.get_storage_view();
+
+                auto R_view = R.get_storage_view();
+                r = (R_view.size() ? R_view[0] : 0);
+                for (size_type j = 0; j < imax_unsigned_power_10; j++)
+                {
+                    buf.push_back(char(r % 10u + '0'));
+                    r /= 10u;
+                    if (r + v_view.size() == 0)
+                        break;
+                }
+            } while (v_view.size() > 0);
+
+            if (value.is_negative())
+            {
+                buf.push_back('-');
+            }
+            std::reverse(buf.begin(), buf.end());
+        }
+    }
 };
 
 template <typename Allocator>

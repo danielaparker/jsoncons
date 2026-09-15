@@ -171,14 +171,15 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
 {
     if (value.scale() == 0)
     {
-        buf = to_string(value.unscaled());
+        to_buffer(value.unscaled(), buf);
         return;
     }
     if (value.unscaled().is_negative())
     {
         buf.push_back('-');
     }
-    std::string coeff = to_string(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled());
+    std::basic_string<CharT> coeff;
+    to_buffer(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
     int64_t adjusted = -value.scale() + (int64_t)(coeffLen-1);
     if ((value.scale() >= 0) && (adjusted >= -6)) 
