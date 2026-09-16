@@ -121,7 +121,7 @@ namespace jmespath {
         using pointer = typename Json::pointer;
     public:
         std::vector<std::unique_ptr<Json>>& temp_storage_;
-        std::map<string_type,const Json*>& variables_;
+        std::map<string_type,const Json*> variables_;
 
     public:
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage)
@@ -130,17 +130,12 @@ namespace jmespath {
         }
 
         eval_context(std::vector<std::unique_ptr<Json>>& temp_storage, 
-            std::map<string_type,const Json*>& variables)
+            const std::map<string_type, const Json*>& variables)
             : temp_storage_(temp_storage), variables_(variables)
         {
         }
 
         ~eval_context() noexcept = default;
-
-        std::map<string_type, const Json*> get_variables()
-        {
-            return variables_;
-        }
 
         void set_variable(const string_type& key, const Json& value)
         {
@@ -239,7 +234,7 @@ namespace jmespath {
         virtual ~expr_base() = default;
 
         virtual reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const = 0;
-    };  
+    };
 
     template <typename Json>
     class expr_wrapper : public expr_base<Json>
@@ -2561,9 +2556,9 @@ namespace detail {
             }
         };
 
-        static reference evaluate_tokens(reference doc, 
-            const std::vector<token<Json>>& output_stack, 
-            eval_context<Json>& context, 
+        static reference evaluate_tokens(reference doc,
+            const std::vector<token<Json>>& output_stack,
+            eval_context<Json>& context,
             std::error_code& ec)
         {
             pointer root_ptr = std::addressof(doc);
@@ -2694,8 +2689,7 @@ namespace detail {
             {
                 JSONCONS_ASSERT(expressions.size() == 2);
 
-                auto new_variables = context.get_variables();
-                eval_context<Json> new_context{ context.temp_storage_, new_variables };
+                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
                 expressions[0]->evaluate(val, new_context, ec);
                 reference rhs = expressions[1]->evaluate(val, new_context, ec);
                 return rhs;
@@ -3107,8 +3101,7 @@ namespace detail {
             {
                 if (!val.is_array())
                 {
-                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ptr_arg, &evaluate_tokens(val, token_list_, new_context, ec));
+                    Json j(const_json_ptr_arg, &evaluate_tokens(val, token_list_, context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(val, context, ec);
@@ -3123,8 +3116,7 @@ namespace detail {
 
                 for (auto& item : val.array_range())
                 {
-                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    Json j(const_json_ptr_arg, &evaluate_tokens(item, token_list_, new_context, ec));
+                    Json j(const_json_ptr_arg, &evaluate_tokens(item, token_list_, context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(item, context, ec);
@@ -3206,8 +3198,7 @@ namespace detail {
 
                 for (auto& list : token_lists_)
                 {
-                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    result->emplace_back(const_json_ptr_arg, &evaluate_tokens(val, list, new_context, ec));
+                    result->emplace_back(const_json_ptr_arg, &evaluate_tokens(val, list, context, ec));
                 }
                 return *result;
             }
@@ -3227,8 +3218,7 @@ namespace detail {
             {
                 pointer root_ptr = std::addressof(val);
 
-                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                auto& ref = evaluate_tokens(val, tokens_, new_context, ec);
+                auto& ref = evaluate_tokens(val, tokens_, context, ec);
                 context.set_variable(variable_.key_, ref);
 
                 return *root_ptr;
@@ -3266,8 +3256,7 @@ namespace detail {
                 resultp->reserve(key_toks_.size());
                 for (auto& item : key_toks_)
                 {
-                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                    resultp->try_emplace(item.key, const_json_ptr_arg, &evaluate_tokens(val, item.tokens, new_context, ec));
+                    resultp->try_emplace(item.key, const_json_ptr_arg, &evaluate_tokens(val, item.tokens, context, ec));
                 }
 
                 return *resultp;
@@ -3286,8 +3275,7 @@ namespace detail {
 
             reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
             {
-                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                return evaluate_tokens(val, toks_, new_context, ec);
+                return evaluate_tokens(val, toks_, context, ec);
             }
         };
 
@@ -3612,8 +3600,7 @@ namespace detail {
                     return Json::null();
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
-                std::map<string_type, const Json*> variables;
-                eval_context<Json> context{temp_storage, variables};
+                eval_context<Json> context{temp_storage};
                 return Json(evaluate_tokens(doc, output_stack_, context, ec));
             }
 
@@ -3626,8 +3613,7 @@ namespace detail {
                     return Json::null();
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
-                std::map<string_type, const Json*> variables;
-                eval_context<Json> context{temp_storage, variables };
+                eval_context<Json> context{temp_storage};
                 for (const auto& param : params)
                 {
                     context.set_variable(param.first, param.second);
