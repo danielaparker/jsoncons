@@ -15,7 +15,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 

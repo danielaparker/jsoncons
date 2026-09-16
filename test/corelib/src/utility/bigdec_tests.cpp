@@ -202,3 +202,17 @@ TEST_CASE("basic_bigdec end tests")
         CHECK(expected == buf);
     }
 }
+
+TEST_CASE("basic_bigdec multiply tests")
+{
+    SECTION("123456.123456 * 123456789.123456789")
+    {
+        jsoncons::bigdec a(jsoncons::string_view("123456.123456"));
+        jsoncons::bigdec b(jsoncons::string_view("123456789.123456789"));
+        jsoncons::bigdec expected(jsoncons::string_view("15241496599506.839368265342784"));
+        jsoncons::bigdec c;
+        auto r = jsoncons::multiply(a, b, c);
+        REQUIRE(r);
+        CHECK(expected == c);
+    }
+}

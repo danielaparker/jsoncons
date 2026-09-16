@@ -20,7 +20,7 @@
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/function_objects.hpp>
 

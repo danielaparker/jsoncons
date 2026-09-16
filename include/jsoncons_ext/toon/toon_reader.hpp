@@ -20,7 +20,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/utility/string_utils.hpp>

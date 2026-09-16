@@ -15,7 +15,7 @@
 #include <jsoncons_ext/toon/toon_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/json_encoders.hpp>
 #include <set>

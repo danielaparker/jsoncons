@@ -10,9 +10,16 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/utility/number_writers.hpp>
+#include <jsoncons/utility/bignum_common.hpp>
 #include <jsoncons/utility/bigint.hpp>
 
 namespace jsoncons {
+
+template <typename Allocator>
+class basic_bigdec;
+
+template <typename CharT, typename Allocator>
+to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigdec<Allocator>& value);
 
 template <typename Allocator>
 class basic_bigdec
@@ -22,10 +29,24 @@ class basic_bigdec
 
 public:
     basic_bigdec() = default;
-
-    basic_bigdec(basic_bigint<Allocator>&& unscaled_value, int64_t scale)
-        : unscaled_{unscaled_value}, scale_{scale}
+    explicit basic_bigdec(basic_bigint<Allocator>&& unscaled)
+        : unscaled_{unscaled}, scale_{0}
     {
+    }
+
+    basic_bigdec(basic_bigint<Allocator>&& unscaled, int64_t scale)
+        : unscaled_{unscaled}, scale_{scale}
+    {
+    }
+
+    template <typename CharT>
+    basic_bigdec(jsoncons::basic_string_view<CharT> sv)
+    {
+        auto r = to_bigdec(sv.data(), sv.size(), *this);
+        if (!r)
+        {
+            JSONCONS_THROW(std::runtime_error(r.error_code().message()));
+        }
     }
 
     basic_bigint<Allocator> unscaled() const
@@ -55,11 +76,20 @@ public:
         }
         return lhs.unscaled_ == rhs.unscaled_;
     }
-
-    friend void multiply(const bigdec& lhs, const bigdec& rhs, bigdec& result)
-    {
-    }
 };
+
+template <typename Alloc>
+bignum_result multiply(const basic_bigdec<Alloc>& lhs, const basic_bigdec<Alloc>& rhs, basic_bigdec<Alloc>& value)
+{
+    if (add_overflow(lhs.scale(), rhs.scale()))
+    {
+        return bignum_result{bignum_errc::result_out_of_range};
+    }
+    int64_t scale = lhs.scale() + rhs.scale();
+    value = basic_bigdec<Alloc>(lhs.unscaled() * rhs.unscaled(), scale);
+
+    return bignum_result{};
+}
 
 template <typename CharT, typename Allocator>
 to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigdec<Allocator>& value)
