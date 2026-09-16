@@ -40,7 +40,7 @@ public:
     }
 
     template <typename CharT>
-    basic_bigdec(jsoncons::basic_string_view<CharT> sv)
+    explicit basic_bigdec(jsoncons::basic_string_view<CharT> sv)
     {
         auto r = to_bigdec(sv.data(), sv.size(), *this);
         if (!r)
@@ -48,6 +48,22 @@ public:
             JSONCONS_THROW(std::runtime_error(r.error_code().message()));
         }
     }
+
+    template <typename CharT>
+    explicit basic_bigdec(const CharT* s)
+    {
+        auto r = to_bigdec(s, std::char_traits<CharT>::length(s), *this);
+        if (!r)
+        {
+            JSONCONS_THROW(std::runtime_error(r.error_code().message()));
+        }
+    }
+
+    basic_bigdec(const basic_bigdec&) = default;
+    basic_bigdec(basic_bigdec&&) = default;
+
+    basic_bigdec& operator=(const basic_bigdec&) = default;
+    basic_bigdec& operator=(basic_bigdec&&) = default;
 
     basic_bigint<Allocator> unscaled() const
     {
