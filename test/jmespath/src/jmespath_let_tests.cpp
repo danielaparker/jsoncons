@@ -25,7 +25,8 @@ TEST_CASE("jmespath let tests")
 
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
-    }    
+    }
+
     SECTION("Test 2")
     {
         auto doc = jsoncons::json::parse(R"({"foo": {"bar": "baz"}})");
@@ -36,7 +37,8 @@ TEST_CASE("jmespath let tests")
 
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
-    }    
+    }
+
     SECTION("Test 3")
     {
         auto doc = jsoncons::json::parse(R"({"foo": "bar"})");
@@ -47,7 +49,8 @@ TEST_CASE("jmespath let tests")
 
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
-    }    
+    }
+
     SECTION("Nested bindings")
     {
         auto doc = jsoncons::json::parse(R"({"a": "topval", "b": [{"a": "inner1"}, {"a": "inner2"}]})");
@@ -177,18 +180,30 @@ TEST_CASE("jmespath let with operator in evaluation expression")
     }
 }
 
-TEST_CASE("jmespath let nesting")
+TEST_CASE("jmespath let scoping")
 {
-    SECTION("Test 1 nested let in let in let in")
+    SECTION("Test 1 nested let in let in let in: variables are available in inner scopes")
     {
         auto doc = jsoncons::json::parse(R"({"one": 1, "two": 2})");
-        auto expected = jsoncons::json::parse(R"(6)");
+        auto expected = jsoncons::json::parse(R"(11)");
 
-        std::string query = R"(let $one = one in let $two = two in let $three = `3` in sum([$one, $two, $three]))";
+        std::string query = R"(let $one = one in let $three = sum([$one, two]) in let $seven = sum([$one, $three, `3`]) in sum([$one, $three, $seven]))";
         auto expr = jmespath::make_expression<jsoncons::json>(query);
 
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
+    }
+
+    SECTION("Test 2 let $a =, $b = in: variables are not available in multiple bindings")
+    {
+        std::error_code ec;
+        std::string query = R"(let $one = one, $three = sum([$one, two]) in sum([$one, $three]))";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        auto doc = jsoncons::json::parse(R"({"one": 1, "two": 2})");
+        expr.evaluate(doc, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
     }
 }
 
