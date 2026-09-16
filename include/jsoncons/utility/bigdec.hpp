@@ -55,6 +55,10 @@ public:
         }
         return lhs.unscaled_ == rhs.unscaled_;
     }
+
+    friend void multiply(const bigdec& lhs, const bigdec& rhs, bigdec& result)
+    {
+    }
 };
 
 template <typename CharT, typename Allocator>
