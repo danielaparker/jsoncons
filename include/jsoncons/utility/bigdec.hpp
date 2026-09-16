@@ -107,6 +107,12 @@ bignum_result multiply(const basic_bigdec<Alloc>& lhs, const basic_bigdec<Alloc>
     return bignum_result{};
 }
 
+template <typename Alloc>
+bignum_result divide(const basic_bigdec<Alloc>& lhs, const basic_bigdec<Alloc>& rhs, basic_bigdec<Alloc>& value)
+{
+    return bignum_result{};
+}
+
 template <typename CharT, typename Allocator>
 to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigdec<Allocator>& value)
 {

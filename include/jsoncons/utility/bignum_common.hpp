@@ -16,18 +16,28 @@
 
 namespace jsoncons { 
 
-inline
-bool add_overflow(int64_t a, int64_t b) 
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,bool>::type
+add_overflow(T a, T b) 
 {
-    if (a > 0 && b > 0 && a > (std::numeric_limits<int64_t>::max)() - b) 
+    if (a > 0 && b > 0 && a > (std::numeric_limits<T>::max)() - b) 
     {
         return true; // Positive overflow
     }
-    if (a < 0 && b < 0 && a < (std::numeric_limits<int64_t>::min)() - b) 
+    if (a < 0 && b < 0 && a < (std::numeric_limits<T>::min)() - b) 
     {
         return true; // Negative overflow
     }
     return false; // ok
+}
+
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,bool>::type
+subtract_overflow(T a, T b) 
+{
+    if (b < 0 && a > (std::numeric_limits<T>::max)() + b) return true;
+    if (b > 0 && a < (std::numeric_limits<T>::min)() + b) return true;
+    return false;
 }
 
 enum class bignum_errc
