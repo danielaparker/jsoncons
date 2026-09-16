@@ -346,7 +346,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("27315.0"));
+        CHECK(std::string("27315") == j.as<std::string>());
     }
     SECTION("2 27315")
     {
@@ -357,7 +357,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("2731500.0"));
+        CHECK(std::string("2.7315e6") == j.as<std::string>());
     }
     SECTION("-2 18446744073709551616")
     {
@@ -368,7 +368,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("1.8446744073709551616e+17"));
+        CHECK(std::string("184467440737095516.16") == j.as<std::string>());
     }
     SECTION("-2 -65537")
     {

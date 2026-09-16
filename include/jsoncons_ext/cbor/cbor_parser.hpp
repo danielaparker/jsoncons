@@ -25,6 +25,7 @@
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/binary.hpp>
+#include <jsoncons/utility/bigdec.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
@@ -1629,7 +1630,7 @@ private:
             more_ = false;
             return;
         }
-        int32_t exponent = 0;
+        int64_t exponent = 0;
         switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -1639,13 +1640,13 @@ private:
                 {
                     return;
                 }
-                if (u > static_cast<uint64_t>((std::numeric_limits<int>::max)()))
+                if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
                     ec = cbor_errc::invalid_decimal_fraction;
                     more_ = false;
                     return;
                 }
-                exponent = static_cast<int>(u);
+                exponent = static_cast<int64_t>(u);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1655,13 +1656,7 @@ private:
                 {
                     return;
                 }
-                if (u < static_cast<int64_t>((std::numeric_limits<int>::min)()) || u > static_cast<int64_t>((std::numeric_limits<int>::max)()))
-                {
-                    ec = cbor_errc::invalid_decimal_fraction;
-                    more_ = false;
-                    return;
-                }
-                exponent = static_cast<int>(u);
+                exponent = u;
                 break;
             }
             default:
@@ -1672,8 +1667,6 @@ private:
             }
         }
 
-        string_type str(alloc_);
-
         c = source_.peek();
         if (JSONCONS_UNLIKELY(c.eof))
         {
@@ -1682,6 +1675,7 @@ private:
             return;
         }
 
+        bigint unscaled;
         switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -1691,7 +1685,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::from_integer(val, str);
+                unscaled = bigint(val);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1701,7 +1695,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::from_integer(val, str);
+                unscaled = bigint(val);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1733,14 +1727,12 @@ private:
                     }
                     if (tag == 2)
                     {
-                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        n.write_string(str);
+                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     }
                     else if (tag == 3)
                     {
-                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        n = -1 - n;
-                        n.write_string(str);
+                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                        unscaled = -1 - unscaled;
                     }
                 }
                 break;
@@ -1753,31 +1745,8 @@ private:
             }
         }
 
-        if (str.size() > static_cast<std::size_t>((std::numeric_limits<int>::max)()))
-        {
-            ec = cbor_errc::invalid_decimal_fraction;
-            more_ = false;
-            return;
-        }
-        int length = static_cast<int>(str.size());
-        if (length > 0)
-        {
-            if (str[0] == '-')
-            {
-                result.push_back('-');
-                jsoncons::prettify_string(str.data()+1, length-1, exponent, -4, 17, result);
-            }
-            else
-            {
-                jsoncons::prettify_string(str.data(), length, exponent, -4, 17, result);
-            }
-        }
-        else
-        {
-            ec = cbor_errc::invalid_decimal_fraction;
-            more_ = false;
-            return;
-        }
+        bigdec dec(std::move(unscaled), -exponent);
+        to_buffer(dec, result);
     }
 
     void read_bigfloat(string_type& str, std::error_code& ec)

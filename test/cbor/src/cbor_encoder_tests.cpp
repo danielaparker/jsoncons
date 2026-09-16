@@ -287,7 +287,7 @@ TEST_CASE("serialize bigdec to cbor")
         JSONCONS_TRY
         {
             json result = cbor::decode_cbor<json>(v);
-            CHECK(result.as<std::string>() == std::string("1.84467440737095516160e+19"));
+            CHECK(std::string("18446744073709551616.0") == result.as<std::string>());
         }
         JSONCONS_CATCH (const std::exception& e)
         {
@@ -335,7 +335,7 @@ TEST_CASE("serialize bigdec to cbor")
         JSONCONS_TRY
         {
             json result = cbor::decode_cbor<json>(v);
-            CHECK(result.as<std::string>() == std::string("-1.8446744073709551616e+24"));
+            CHECK(std::string("-1.8446744073709551616e24") == result.as<std::string>());
         }
         JSONCONS_CATCH (const std::exception& e)
         {
