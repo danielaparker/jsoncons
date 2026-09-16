@@ -89,9 +89,9 @@ namespace jmespath {
             {
                 case operator_kind::not_op:
                 case operator_kind::projection_op:
+                case operator_kind::in_op:
                     return true;
                 case operator_kind::flatten_projection_op:
-                case operator_kind::in_op:
                 case operator_kind::or_op:
                 case operator_kind::and_op:
                 case operator_kind::eq_op:

@@ -177,6 +177,21 @@ TEST_CASE("jmespath let with operator in evaluation expression")
     }
 }
 
+TEST_CASE("jmespath let nesting")
+{
+    SECTION("Test 1 nested let in let in let in")
+    {
+        auto doc = jsoncons::json::parse(R"({"one": 1, "two": 2})");
+        auto expected = jsoncons::json::parse(R"(6)");
+
+        std::string query = R"(let $one = one in let $two = two in let $three = `3` in sum([$one, $two, $three]))";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+}
+
 TEST_CASE("jmespath let as valid identifiers")
 {
     auto doc = jsoncons::json::parse(R"(
