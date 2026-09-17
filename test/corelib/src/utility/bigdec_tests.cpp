@@ -8,159 +8,75 @@
 #include <iostream>
 #include <catch/catch.hpp>
 
+namespace {
+
+void test_bigdec(jsoncons::string_view sv, jsoncons::string_view expected)
+{
+    jsoncons::bigdec value;
+    auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
+    CHECK(result);
+    CHECK(sv.data() + sv.length() == result.ptr);
+
+    std::string buf;
+    to_buffer(value, buf);
+    CHECK(expected == buf);
+}
+
+void test_bigdec(jsoncons::wstring_view sv, jsoncons::wstring_view expected)
+{
+    jsoncons::bigdec value;
+    auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
+    CHECK(result);
+    CHECK(sv.data() + sv.length() == result.ptr);
+
+    std::wstring buf;
+    to_buffer(value, buf);
+    CHECK(expected == buf);
+}
+
+} // namespace
+
 TEST_CASE("basic_bigdec success tests")
 {
-    SECTION("0")
+    SECTION("char")
     {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "0";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
+        test_bigdec("0", "0");
+        test_bigdec("123456", "123456");
+        test_bigdec("123456.123456", "123456.123456");
+        test_bigdec("-123456", "-123456");
+        test_bigdec("-123456.123456", "-123456.123456");
+        test_bigdec("123456e5", "1.23456e10");
+        test_bigdec("123456e+5", "1.23456e10");
+        test_bigdec("123456E5", "1.23456e10");
+        test_bigdec("123456E+5", "1.23456e10");
+        test_bigdec("123456e-5", "1.23456");
+        test_bigdec("123456E-5", "1.23456");
+        test_bigdec("123456e-6", "0.123456");
+        test_bigdec("123456e-7", "0.0123456");
+        test_bigdec("123456.123456e7", "1.23456123456e12");
+        test_bigdec("123456.123456e-7", "0.0123456123456");
     }
-    SECTION("123456")
+    SECTION("wchar_t")
     {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
-    }
-    SECTION("123456.123456")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456.123456";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
-    }
-    SECTION("-123456")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "-123456";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
-    }
-    SECTION("-123456.123456")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "-123456.123456";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
-    }
-    SECTION("123456e5")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456e5";
-        jsoncons::string_view expected = "1.23456e10";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
-    }
-    SECTION("123456e-5")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456e-5";
-        jsoncons::string_view expected = "1.23456";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
-    }
-    SECTION("123456e-6")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456e-6";
-        jsoncons::string_view expected = "0.123456";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
-    }
-    SECTION("123456e-7")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456e-7";
-        jsoncons::string_view expected = "0.0123456";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
-    }
-    SECTION("123456.123456e7")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456.123456e7";
-        jsoncons::string_view expected = "1.23456123456e12";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
-    }
-    SECTION("123456.123456e-7")
-    {
-        jsoncons::bigdec value;
-        jsoncons::string_view sv = "123456.123456e-7";
-        jsoncons::string_view expected = "0.0123456123456";
-
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::string buf;
-        to_buffer(value, buf);
-        CHECK(expected == buf);
+        test_bigdec(L"0", L"0");
+        test_bigdec(L"123456", L"123456");
+        test_bigdec(L"123456.123456", L"123456.123456");
+        test_bigdec(L"-123456", L"-123456");
+        test_bigdec(L"-123456.123456", L"-123456.123456");
+        test_bigdec(L"123456e5", L"1.23456e10");
+        test_bigdec(L"123456e+5", L"1.23456e10");
+        test_bigdec(L"123456E5", L"1.23456e10");
+        test_bigdec(L"123456E+5", L"1.23456e10");
+        test_bigdec(L"123456e-5", L"1.23456");
+        test_bigdec(L"123456E-5", L"1.23456");
+        test_bigdec(L"123456e-6", L"0.123456");
+        test_bigdec(L"123456e-7", L"0.0123456");
+        test_bigdec(L"123456.123456e7", L"1.23456123456e12");
+        test_bigdec(L"123456.123456e-7", L"0.0123456123456");
     }
 }
 
-TEST_CASE("basic_bigdec wchar_t success tests")
-{
-    SECTION("0")
-    {
-        jsoncons::bigdec value;
-        jsoncons::wstring_view sv = L"0";
-        auto result = jsoncons::to_bigdec(sv.data(), sv.size(), value);
-        CHECK(result);
-
-        std::wstring buf;
-        to_buffer(value, buf);
-        CHECK(sv == buf);
-    }
-}
-
-TEST_CASE("basic_bigdec end tests")
+TEST_CASE("basic_bigdec terminal tests")
 {
     SECTION("10[1]")
     {

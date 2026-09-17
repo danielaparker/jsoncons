@@ -70,7 +70,7 @@ constexpr bool is_type(uint8_t d, uint8_t type) {
 }
 
 // Match a sign: '+', '-' 
-constexpr bool is_sign(char d) {
+constexpr bool is_char_sign(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_pos | digit_type_neg));
 }
 
@@ -99,7 +99,7 @@ constexpr bool is_char_float(char d) {
     return is_type(static_cast<uint8_t>(d), (uint8_t)(digit_type_zero | digit_type_nonzero |
                                        digit_type_dot | digit_type_exp));
 }
-constexpr bool is_sign(wchar_t d) {
+constexpr bool is_char_sign(wchar_t d) {
     return d == '+' || d == '-';
 }
 

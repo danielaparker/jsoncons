@@ -112,14 +112,7 @@ bignum_result divide(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b,
 {
     if (b.signum() == 0)
     {
-        if (a.signum() == 0)
-        {
-            return bignum_result{bignum_errc::division_undefined};
-        }
-        else
-        {
-            return bignum_result{bignum_errc::division_by_zero};
-        }
+        return bignum_result{bignum_errc::division_by_zero};
     }
     if (subtract_overflow(a.scale(), b.scale()))
     {
@@ -200,10 +193,13 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     {
         ++cur;
         bool negexp = false;
-        if (cur != end && *cur == '-')
+        if (cur != end)
         {
-            negexp = true;
-            ++cur;
+            if (*cur == '-')
+            {
+                negexp = true;
+            }
+            cur += is_char_sign(*cur);
             if (cur == end || !is_char_digit(*cur))
             {
                 return to_number_result<CharT>{cur, std::errc::invalid_argument};
