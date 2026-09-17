@@ -92,6 +92,24 @@ public:
         }
         return lhs.unscaled_ == rhs.unscaled_;
     }
+
+    static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& bdividend, 
+        const basic_bigint<Allocator>& bdivisor, int roundingMode) 
+    {
+        basic_bigint<Allocator> mdividend(bdividend.mag);
+        basic_bigint<Allocator> mq();
+        basic_bigint<Allocator> mdivisor(bdivisor.mag);
+        basic_bigint<Allocator> mr;
+        mdividend.divide(mdivisor, mq, mr, true);
+        bool isRemainderZero = mr.signum() == 0;
+        int qsign = (bdividend.signum() != bdivisor.signum()) ? -1 : 1;
+        if (!isRemainderZero) {
+            if (needIncrement(mdivisor, roundingMode, qsign, mq, mr)) {
+                mq += basic_bigint<Allocator>(1);
+            }
+        }
+        return mq.toBigInteger(qsign);
+    }
 };
 
 template <typename Alloc>
