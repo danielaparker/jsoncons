@@ -95,21 +95,45 @@ public:
 };
 
 template <typename Alloc>
-bignum_result multiply(const basic_bigdec<Alloc>& lhs, const basic_bigdec<Alloc>& rhs, basic_bigdec<Alloc>& value)
+bignum_result multiply(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b, basic_bigdec<Alloc>& c)
 {
-    if (add_overflow(lhs.scale(), rhs.scale()))
+    if (add_overflow(a.scale(), b.scale()))
     {
         return bignum_result{bignum_errc::result_out_of_range};
     }
-    int64_t scale = lhs.scale() + rhs.scale();
-    value = basic_bigdec<Alloc>(lhs.unscaled() * rhs.unscaled(), scale);
+    int64_t scale = a.scale() + b.scale();
+    c = basic_bigdec<Alloc>(a.unscaled() * b.unscaled(), scale);
 
     return bignum_result{};
 }
 
 template <typename Alloc>
-bignum_result divide(const basic_bigdec<Alloc>& lhs, const basic_bigdec<Alloc>& rhs, basic_bigdec<Alloc>& value)
+bignum_result divide(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b, basic_bigdec<Alloc>& c)
 {
+    if (b.signum() == 0)
+    {
+        if (a.signum() == 0)
+        {
+            return bignum_result{bignum_errc::division_undefined};
+        }
+        else
+        {
+            return bignum_result{bignum_errc::division_by_zero};
+        }
+    }
+    if (subtract_overflow(a.scale(), b.scale()))
+    {
+        return bignum_result{bignum_errc::result_out_of_range};
+    }
+    int64_t scale = a.scale() - b.scale();
+
+    if (a.signum() == 0)
+    {
+        c = basic_bigdec<Alloc>{basic_bigint<Alloc>{}, scale};
+    }
+    else
+    {
+    }
     return bignum_result{};
 }
 
