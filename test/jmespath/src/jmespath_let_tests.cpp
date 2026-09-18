@@ -180,6 +180,45 @@ TEST_CASE("jmespath let with operator in evaluation expression")
     }
 }
 
+TEST_CASE("jmespath operator with let at right hand side")
+{
+    SECTION("Test 1 no parenthesis")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(false)");
+
+        std::string query = R"(foo && let $a = bar in $a || bar)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 2 parenthesis around the left")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(true)");
+
+        std::string query = R"((foo && let $a = bar in $a) || bar)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 3 parenthesis around the right")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": false, "bar": true})");
+        auto expected = jsoncons::json::parse(R"(false)");
+
+        std::string query = R"(foo && let $a = bar in ($a || bar))";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+}
+
 TEST_CASE("jmespath let scoping")
 {
     SECTION("Test 1 nested let in let in let in: variables are available in inner scopes")
@@ -203,6 +242,42 @@ TEST_CASE("jmespath let scoping")
 
         auto doc = jsoncons::json::parse(R"({"one": 1, "two": 2})");
         expr.evaluate(doc, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
+    }
+
+    SECTION("Test 3 pipe in evaluation expression: scope does not end at pipe")
+    {
+        auto doc = jsoncons::json::parse(R"([1, 2, 3])");
+        auto expected = jsoncons::json::parse(R"([2,3])");
+
+        std::string query = R"(let $a = @, $b = @ in $a[?@>`1`] | [length(@),length($b)])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 4 pipe in evaluation expression: parenthesized evaluation expression")
+    {
+        auto doc = jsoncons::json::parse(R"([1, 2, 3])");
+        auto expected = jsoncons::json::parse(R"([2,3])");
+
+        std::string query = R"(let $a = @, $b = @ in ( $a[?@>`1`] | [length(@),length($b)] ))";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }
+
+    SECTION("Test 5 pipe in evaluation expression: parenthesized let expression, scope ends at end of parentheses")
+    {
+        std::error_code ec;
+        std::string query = R"(( let $a = @, $b = @ in $a[?@>`1`] ) | [length(@),length($b)])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        auto doc = jsoncons::json::parse(R"([1, 2, 3])");
+        jsoncons::json result = expr.evaluate(doc, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
     }
 }

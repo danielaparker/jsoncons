@@ -41,7 +41,6 @@ namespace jmespath {
         default_op, // Identifier, CurrentNode, Index, MultiSelectList, MultiSelectHash, FunctionExpression
         projection_op,
         flatten_projection_op, // FlattenProjection
-        in_op, // let $var = expr in
         or_op,
         and_op,
         eq_op,
@@ -59,8 +58,6 @@ namespace jmespath {
         {
             switch (oper)
             {
-                case operator_kind::in_op:
-                    return 10;
                 case operator_kind::or_op:
                     return 9;
                 case operator_kind::and_op:
@@ -89,7 +86,6 @@ namespace jmespath {
             {
                 case operator_kind::not_op:
                 case operator_kind::projection_op:
-                case operator_kind::in_op:
                     return true;
                 case operator_kind::flatten_projection_op:
                 case operator_kind::or_op:
@@ -672,6 +668,7 @@ namespace detail {
         variable,
         variable_ref,
         begin_let,
+        begin_in,
         end_in
     };
 
@@ -686,6 +683,7 @@ namespace detail {
             case token_kind::begin_multi_select_hash:
             case token_kind::begin_expression_type:
             case token_kind::begin_let:
+            case token_kind::begin_in:
             case token_kind::variable:
             case token_kind::key:
             case token_kind::function:
@@ -830,6 +828,12 @@ namespace detail {
         explicit begin_let_arg_t() = default;
     };
     JSONCONS_INLINE_CONSTEXPR begin_let_arg_t begin_let_arg{};
+
+    struct begin_in_arg_t
+    {
+        explicit begin_in_arg_t() = default;
+    };
+    JSONCONS_INLINE_CONSTEXPR begin_in_arg_t begin_in_arg{};
 
     struct end_in_arg_t
     {
@@ -1061,6 +1065,10 @@ namespace detail {
             : type_(token_kind::begin_let)
         {}
 
+        token(begin_in_arg_t) noexcept
+            : type_(token_kind::begin_in)
+        {}
+        
         token(end_in_arg_t) noexcept
             : type_(token_kind::end_in)
         {}
@@ -1207,7 +1215,7 @@ namespace detail {
             switch (type_)
             {
                 case token_kind::variable:
-                case token_kind::variable_binding:
+                case token_kind::variable_ref:
                 case token_kind::key:
                     key_ = other.key_;
                     break;
@@ -1296,7 +1304,8 @@ namespace detail {
         variable_ref,
         expect_assign,
         expect_in_or_comma,
-        substitute_variable
+        substitute_variable,
+        lexical_scoped_expression
     };
     
     template <typename Json>
@@ -2693,27 +2702,6 @@ namespace detail {
 
         // Implementations
 
-        class in_operator : public operator_base<Json>
-        {
-        public:
-            using reference = const Json&;
-            using expression_type = expr_base_impl<Json>;
-        public:
-            in_operator()
-                : operator_base<Json>(operator_kind::in_op)
-            {}
-
-            reference evaluate(reference val, const std::vector<expression_type*>& expressions, eval_context<Json>& context, std::error_code& ec) const override final
-            {
-                JSONCONS_ASSERT(expressions.size() == 2);
-
-                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
-                expressions[0]->evaluate(val, new_context, ec);
-                reference rhs = expressions[1]->evaluate(val, new_context, ec);
-                return rhs;
-            }
-        };
-
         class or_operator final : public logical_operator<Json>
         {
         public:
@@ -3293,6 +3281,27 @@ namespace detail {
             }
         };
 
+        class lexical_scoped_expression : public basic_expression
+        {
+        public:
+            expression_type* bindings_;
+            std::vector<token<Json>> toks_;
+
+            lexical_scoped_expression(expression_type* bindings, std::vector<token<Json>>&& toks)
+                : basic_expression(), bindings_(bindings), toks_(std::move(toks))
+            {}
+
+            reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(bindings_);
+
+                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                bindings_->evaluate(val, new_context, ec);
+                reference rhs = evaluate_tokens(val, toks_, new_context, ec);
+                return rhs;
+            }
+        };
+
         class function_expression final : public basic_expression
         {
         public:
@@ -3454,13 +3463,6 @@ namespace detail {
                 return it2->second.get();
             }
 
-            const operator_base<Json>* get_in_operator() const
-            {
-                static const in_operator in_oper;
-
-                return &in_oper;
-            }
-
             const operator_base<Json>* get_not_operator() const
             {
                 static const not_expression not_oper;
@@ -3516,11 +3518,6 @@ namespace detail {
             {
                 static const gte_operator gte_oper;
                 return &gte_oper;
-            }
-
-            expression_type* create_in_operation()
-            {
-                return create_expression(operation_expression(operator_kind::in_op, get_in_operator()));
             }
 
             expression_type* create_not_operation()
@@ -4002,6 +3999,11 @@ namespace detail {
                                 break;
                         }
                         break;
+                    case expr_state::lexical_scoped_expression:
+                        push_token(end_in_arg, resources, output_stack, ec);
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
+                        state_stack.pop_back();
+                        break;
                     case expr_state::expect_in_or_comma:
                     {
                         advance_past_space_character();
@@ -4015,11 +4017,11 @@ namespace detail {
                         }
                         else if (*p_ == 'i' && (p_ + 1) < input_end_ && *(p_ + 1) == 'n')
                         {
-                            push_token(end_in_arg, resources, output_stack, ec);
+                            push_token(begin_in_arg, resources, output_stack, ec);
                             if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
-                            push_token(token<Json>(operation_arg, resources.create_in_operation()), resources, output_stack, ec);
-                            if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
-                            state_stack.pop_back();
+                            state_stack.back() = expr_state::lexical_scoped_expression;
+                            state_stack.push_back(expr_state::rhs_expression);
+                            state_stack.push_back(expr_state::lhs_expression);
                             p_ += 2;
                             column_ += 2;
                         }
@@ -4132,8 +4134,7 @@ namespace detail {
                                 if (buffer.size() == 3 && buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
                                     push_token(begin_let_arg, resources, output_stack, ec);
-                                    state_stack.back() = expr_state::lhs_expression;
-                                    state_stack.push_back(expr_state::variable_binding);
+                                    state_stack.back() = expr_state::variable_binding;
                                     buffer.clear();
                                 }
                                 else
@@ -5119,26 +5120,28 @@ namespace detail {
                     case expr_state::substitute_variable:
                     {
                         push_token(token<Json>{variable_ref_arg, buffer}, resources, output_stack, ec);
-                        if (JSONCONS_UNLIKELY(ec))
-                        {
-                            return jmespath_expression{};
-                        }
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         buffer.clear();
                         state_stack.pop_back();
                         break;
                     }
                     case expr_state::val_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         state_stack.pop_back(); 
                         break;
                     case expr_state::identifier_or_function_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                        if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
                         state_stack.pop_back(); 
                         break;
                     case expr_state::unquoted_string: 
                         state_stack.pop_back(); 
+                        break;
+                    case expr_state::lexical_scoped_expression:
+                        push_token(end_in_arg, resources, output_stack, ec);
+                        if (JSONCONS_UNLIKELY(ec)) { return jmespath_expression{}; }
+                        state_stack.pop_back();
                         break;
                     default:
                         ec = jmespath_errc::syntax_error;
@@ -5403,7 +5406,7 @@ namespace detail {
                 case token_kind::variable:
                     output_stack.push_back(std::move(tok));
                     break;
-                case token_kind::end_in:
+                case token_kind::begin_in:
                 {
                     unwind_rparen(resources, output_stack, ec);
                     std::vector<key_tokens> key_toks;
@@ -5430,21 +5433,37 @@ namespace detail {
                         std::reverse(toks.begin(), toks.end());
                         key_toks.emplace_back(std::move(key), std::move(toks));
                     }
-                    JSONCONS_ASSERT(it != output_stack.rend())
+                    JSONCONS_ASSERT(it != output_stack.rend());
                     std::reverse(key_toks.begin(), key_toks.end());
                     ++it;
                     output_stack.erase(it.base(), output_stack.end());
 
-                    if (!output_stack.empty() && output_stack.back().is_projection() &&
-                        (tok.precedence_level() < output_stack.back().precedence_level() ||
-                            (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
+                    output_stack.push_back(resources.create_expression(variable_bindings(std::move(key_toks))));
+                    output_stack.push_back(std::move(tok));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
+                    break;
+                }
+                case token_kind::end_in:
+                {
+                    unwind_rparen(resources, output_stack, ec);
+                    std::vector<token<Json>> toks;
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && (*it).type() != token_kind::begin_in)
                     {
-                        output_stack.back().expression_->add_expression(resources.create_expression(variable_bindings(std::move(key_toks))));
+                        toks.emplace_back(std::move(*it));
+                        ++it;
                     }
-                    else
+                    JSONCONS_ASSERT(it != output_stack.rend());
+                    if (toks.back().type() != token_kind::literal)
                     {
-                        output_stack.push_back(resources.create_expression(variable_bindings(std::move(key_toks))));
+                        toks.emplace_back(current_node_arg);
                     }
+                    std::reverse(toks.begin(), toks.end());
+                    ++it;
+                    auto bindings = std::move(*it);
+                    ++it;
+                    output_stack.erase(it.base(), output_stack.end());
+                    output_stack.push_back(resources.create_expression(lexical_scoped_expression(bindings.expression_, std::move(toks))));
                     break;
                 }
                 case token_kind::literal:
