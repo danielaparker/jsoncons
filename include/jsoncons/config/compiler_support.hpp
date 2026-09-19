@@ -37,6 +37,7 @@
     #define JSONCONS_TRY try
     #define JSONCONS_CATCH(exception) catch(exception)
 #else
+    #include <exception>
     #define JSONCONS_THROW(exception) std::terminate()
     #define JSONCONS_RETHROW std::terminate()
     #define JSONCONS_TRY if (true)
