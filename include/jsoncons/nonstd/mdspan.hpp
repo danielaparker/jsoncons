@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_MDSPAN_HPP
-#define JSONCONS_DETAIL_MDSPAN_HPP
+#ifndef JSONCONS_NONSTD_MDSPAN_HPP
+#define JSONCONS_NONSTD_MDSPAN_HPP
 
 #include <array>
 #include <cstddef>
@@ -14,7 +14,7 @@
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace detail {
@@ -43,4 +43,4 @@ class mdspan
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_MDSPAN_HPP
+#endif // JSONCONS_NONSTD_MDSPAN_HPP

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_ENDIAN_HPP
-#define JSONCONS_DETAIL_ENDIAN_HPP
+#ifndef JSONCONS_NONSTD_ENDIAN_HPP
+#define JSONCONS_NONSTD_ENDIAN_HPP
 
 #if defined(__sun)
 #  include <sys/byteorder.h>
@@ -41,4 +41,4 @@ namespace detail {
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_ENDIAN_HPP
+#endif // JSONCONS_NONSTD_ENDIAN_HPP

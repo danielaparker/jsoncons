@@ -17,7 +17,7 @@
 #include <system_error>
 #include <utility> // std::move
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_common.hpp>

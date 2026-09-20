@@ -4,16 +4,16 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_OPTIONAL_HPP
-#define JSONCONS_DETAIL_OPTIONAL_HPP
+#ifndef JSONCONS_NONSTD_OPTIONAL_HPP
+#define JSONCONS_NONSTD_OPTIONAL_HPP
 
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <utility> // std::swap
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/utility.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/utility.hpp>
 
 namespace jsoncons 
 { 
@@ -493,4 +493,4 @@ namespace detail
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_OPTIONAL_HPP
+#endif // JSONCONS_NONSTD_OPTIONAL_HPP

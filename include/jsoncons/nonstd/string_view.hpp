@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_STRING_VIEW_HPP
-#define JSONCONS_DETAIL_STRING_VIEW_HPP
+#ifndef JSONCONS_NONSTD_STRING_VIEW_HPP
+#define JSONCONS_NONSTD_STRING_VIEW_HPP
 
 #include <algorithm> // std::find, std::min, std::reverse
 #include <cmath>
@@ -16,8 +16,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/a5hash.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/a5hash.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -549,4 +549,4 @@ namespace std {
     };
 } // namespace std
 
-#endif // JSONCONS_DETAIL_STRING_VIEW_HPP
+#endif // JSONCONS_NONSTD_STRING_VIEW_HPP

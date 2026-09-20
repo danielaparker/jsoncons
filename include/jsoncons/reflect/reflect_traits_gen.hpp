@@ -10,7 +10,7 @@
 #include <utility>
 #include <bitset>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_PP_EXPAND, JSONCONS_PP_QUOTE
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/conversion_result.hpp>
@@ -21,7 +21,7 @@
 #include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_common.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/function_objects.hpp>
 
 #define JSONCONS_RDONLY(X)

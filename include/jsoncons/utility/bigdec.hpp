@@ -93,8 +93,33 @@ public:
         return lhs.unscaled_ == rhs.unscaled_;
     }
 
+    bool common_need_increment(int32_t cmp_frac_half, bool oddQuot) 
+    {
+        // half_even rounding
+        if (cmp_frac_half < 0 ) // We're closer to higher digit
+        {
+            return false;
+        }
+        else if (cmp_frac_half > 0 ) // We're closer to lower digit
+        {
+            return true;
+        }
+        else // half-way 
+        { 
+            return oddQuot;
+        }       
+    }
+
+    static bool need_increment(basic_bigint<Allocator> mdivisor, 
+        basic_bigint<Allocator> mq, basic_bigint<Allocator> mr) 
+    {
+        JSONCONS_ASSRT(mr != 0);
+        int32_t cmp_frac_half = mr.compareHalf(mdivisor);
+        return common_need_increment(cmp_frac_half, mq.is_odd());
+    }
+
     static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& bdividend, 
-        const basic_bigint<Allocator>& bdivisor, int roundingMode) 
+        const basic_bigint<Allocator>& bdivisor) 
     {
         basic_bigint<Allocator> mdividend(bdividend.mag);
         basic_bigint<Allocator> mq();
@@ -104,11 +129,12 @@ public:
         bool isRemainderZero = mr.signum() == 0;
         int qsign = (bdividend.signum() != bdivisor.signum()) ? -1 : 1;
         if (!isRemainderZero) {
-            if (needIncrement(mdivisor, roundingMode, qsign, mq, mr)) {
+            if (need_increment(mdivisor, mq, mr)) {
                 mq += basic_bigint<Allocator>(1);
             }
         }
-        return mq.toBigInteger(qsign);
+
+        return mq;
     }
 };
 

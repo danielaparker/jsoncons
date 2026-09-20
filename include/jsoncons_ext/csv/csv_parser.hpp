@@ -17,7 +17,7 @@
 #include <system_error>
 #include <vector>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_exception.hpp>

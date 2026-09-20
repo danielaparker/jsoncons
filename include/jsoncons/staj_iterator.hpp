@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
 #include <jsoncons/json_exception.hpp>

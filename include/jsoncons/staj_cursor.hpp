@@ -28,7 +28,7 @@
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/number_writers.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 
 namespace jsoncons {

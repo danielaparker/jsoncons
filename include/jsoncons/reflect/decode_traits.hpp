@@ -19,7 +19,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
@@ -31,7 +31,7 @@
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {

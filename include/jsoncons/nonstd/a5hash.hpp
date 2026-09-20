@@ -37,10 +37,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef JSONCONS_DETAIL_UTILITY_A5HASH_HPP
-#define JSONCONS_DETAIL_UTILITY_A5HASH_HPP
+#ifndef JSONCONS_NONSTD_UTILITY_A5HASH_HPP
+#define JSONCONS_NONSTD_UTILITY_A5HASH_HPP
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <cstring>
 #include <cstdint> 
 
@@ -456,4 +456,4 @@ JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const wchar_t* Msg0, size_t MsgL
 
 #undef JSONCONS_A5HASH_FORCE_INLINE
 
-#endif // JSONCONS_DETAIL_UTILITY_A5HASH_HPP
+#endif // JSONCONS_NONSTD_UTILITY_A5HASH_HPP

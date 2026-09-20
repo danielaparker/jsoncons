@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
-#define JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#ifndef JSONCONS_NONSTD_COMPILER_SUPPORT_HPP
+#define JSONCONS_NONSTD_COMPILER_SUPPORT_HPP
 
 #include <cmath>
 #include <cstdint>
@@ -601,4 +601,4 @@ namespace binary {
 	#endif // BMI2
 #endif // defined( _MSC_VER )
 
-#endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#endif // JSONCONS_NONSTD_COMPILER_SUPPORT_HPP

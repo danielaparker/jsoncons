@@ -9,7 +9,7 @@
 
 #include <functional>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

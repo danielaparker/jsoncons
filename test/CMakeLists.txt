@@ -77,9 +77,9 @@ add_executable(unit_tests
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
-               corelib/src/detail/optional_tests.cpp
-               corelib/src/detail/span_tests.cpp
-               corelib/src/detail/string_view_tests.cpp
+               corelib/src/nonstd/optional_tests.cpp
+               corelib/src/nonstd/span_tests.cpp
+               corelib/src/nonstd/string_view_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp

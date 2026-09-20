@@ -12,7 +12,7 @@
 #include <system_error>
 #include <utility> // std::move
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/source.hpp>
 

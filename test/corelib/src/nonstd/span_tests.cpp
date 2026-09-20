@@ -1,7 +1,7 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/detail/span.hpp>
+#include <jsoncons/nonstd/span.hpp>
 #include <iostream>
 #include <vector>
 #include <catch/catch.hpp>

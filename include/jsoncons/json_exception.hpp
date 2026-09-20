@@ -13,8 +13,8 @@
 #include <string> // std::string
 #include <system_error> // std::error_code
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
 namespace jsoncons {

@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <unordered_map>
-#include <jsoncons/detail/string_view.hpp>
+#include <jsoncons/nonstd/string_view.hpp>
 #include <catch/catch.hpp>
 
 TEST_CASE("string_view tests")

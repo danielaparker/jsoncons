@@ -17,7 +17,7 @@
 #include <system_error>
 #include <type_traits> // std::enable_if
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/generic_visitor.hpp>
@@ -29,7 +29,7 @@
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 #include <jsoncons/utility/conversion.hpp>
 

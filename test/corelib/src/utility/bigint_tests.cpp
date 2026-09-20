@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -735,6 +735,46 @@ TEST_CASE("bigint operator+= tests")
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }    
+}
+
+TEST_CASE("basic_bigint compare_half")
+{
+    SECTION("test half equal")
+    {
+        bigint a(1);
+        bigint b(2);
+
+        for (std::size_t i = 0; i < 10000; ++i)
+        {
+            a *= 2;
+            b *= 2;
+            CHECK(a.compare_half(b) == 0);
+        }
+    }
+    SECTION("test half greater")
+    {
+        bigint a(2);
+        bigint b(3);
+
+        for (std::size_t i = 0; i < 10000; ++i)
+        {
+            a *= 2;
+            b *= 2;
+            CHECK(a.compare_half(b) > 0);
+        }
+    }
+    SECTION("test half less")
+    {
+        bigint a(2);
+        bigint b(5);
+
+        for (std::size_t i = 0; i < 10000; ++i)
+        {
+            a *= 2;
+            b *= 2;
+            CHECK(a.compare_half(b) < 0);
+        }
+    }
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1

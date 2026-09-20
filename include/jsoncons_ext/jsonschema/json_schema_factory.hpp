@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonschema/draft201909/schema_validator_factory_201909.hpp>

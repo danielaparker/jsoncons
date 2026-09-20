@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>

@@ -13,7 +13,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/token_evaluator.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>

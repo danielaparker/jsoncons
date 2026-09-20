@@ -1,10 +1,10 @@
-#ifndef JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR
-#define JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR 
+#ifndef JSONCONS_NONSTD_MAKE_OBJ_USING_ALLOCATOR
+#define JSONCONS_NONSTD_MAKE_OBJ_USING_ALLOCATOR 
 
 #include <new>			// for placement operator new
 #include <tuple>		// for tuple, make_tuple, make_from_tuple
 #include <utility>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace detail {
@@ -73,4 +73,4 @@ make_obj_using_allocator(const Alloc& alloc, std::pair<U,V>&& pr)
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_MAKE_OBJ_USING_ALLOCATOR
+#endif // JSONCONS_NONSTD_MAKE_OBJ_USING_ALLOCATOR

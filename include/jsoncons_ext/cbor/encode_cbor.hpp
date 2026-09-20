@@ -11,7 +11,7 @@
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>

@@ -15,8 +15,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/a5hash.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/a5hash.hpp>
 
 namespace jsoncons {
 
@@ -51,7 +51,7 @@ namespace jsoncons {
             JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
 
-#include <jsoncons/detail/utility.hpp>
+#include <jsoncons/nonstd/utility.hpp>
 namespace jsoncons {
 using jsoncons::detail::in_place_t;
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
@@ -66,7 +66,7 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
   JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
   } // namespace jsoncons
 #else
-  #include <jsoncons/detail/expected.hpp>
+  #include <jsoncons/nonstd/expected.hpp>
   namespace jsoncons {
   using jsoncons::detail::expected;
   using jsoncons::detail::unexpect_t;
@@ -74,13 +74,13 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
   } // namespace jsoncons
 #endif
         
-#include <jsoncons/detail/make_obj_using_allocator.hpp>
+#include <jsoncons/nonstd/make_obj_using_allocator.hpp>
 namespace jsoncons {
 using jsoncons::detail::make_obj_using_allocator;
 } // namespace jsoncons
 
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
-#include <jsoncons/detail/string_view.hpp>
+#include <jsoncons/nonstd/string_view.hpp>
 namespace jsoncons {
 using jsoncons::detail::basic_string_view;
 using string_view = jsoncons::detail::string_view;
@@ -101,7 +101,7 @@ namespace jsoncons {
 using std::span;
 }
 #else
-#include <jsoncons/detail/span.hpp>
+#include <jsoncons/nonstd/span.hpp>
 namespace jsoncons {
 using jsoncons::detail::span;
 }
@@ -118,14 +118,14 @@ using jsoncons::detail::span;
     using boost::optional;
     }
 #else 
-    #include <jsoncons/detail/optional.hpp>
+    #include <jsoncons/nonstd/optional.hpp>
     namespace jsoncons {
     using jsoncons::detail::optional;
 }
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
 #if !defined(JSONCONS_HAS_STD_ENDIAN)
-#include <jsoncons/detail/endian.hpp>
+#include <jsoncons/nonstd/endian.hpp>
 namespace jsoncons {
 using jsoncons::detail::endian;
 }
@@ -251,6 +251,26 @@ namespace jsoncons {
     }
 
 } // namespace jsoncons
+
+#if defined(__cplusplus) && __cplusplus >= 202002L && __has_include(<bit>)
+#include <bit>
+namespace jsoncons {
+template <typename T>
+int bit_width(T x) noexcept
+{
+    return std::bit_width(x);
+}
+} // namespace jsoncons
+#else
+#include <jsoncons/nonstd/bit.hpp>
+namespace jsoncons {
+template <typename T>
+int bit_width(T x) noexcept
+{
+    return jsoncons::nonstd::bit_width(x);
+}
+} // namespace jsoncons
+#endif
 
 // Preprocessor macros
 

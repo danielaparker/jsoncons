@@ -11,7 +11,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_cursor.hpp>

@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>

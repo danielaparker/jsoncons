@@ -11,10 +11,10 @@
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 
