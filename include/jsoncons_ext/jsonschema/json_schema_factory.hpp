@@ -225,7 +225,7 @@ namespace jsonschema {
     }
 
     template <typename Json,typename SchemaResolver>
-    typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    typename std::enable_if<nonstd::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const std::string& retrieval_uri, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
@@ -258,7 +258,7 @@ namespace jsonschema {
     }
 
     template <typename Json,typename SchemaResolver>
-    typename std::enable_if<ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    typename std::enable_if<nonstd::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {

@@ -14,7 +14,7 @@
 #include <cassert>
 
 namespace jsoncons {
-namespace detail {
+namespace nonstd {
     
 struct unexpect_t
 {
@@ -55,7 +55,7 @@ public:
     }
 
     template <typename... Args>    
-    expected(jsoncons::detail::in_place_t, Args&& ... args) noexcept
+    expected(jsoncons::nonstd::in_place_t, Args&& ... args) noexcept
         : has_value_(true)
     {
         ::new (&value_) T(std::forward<Args>(args)...);
@@ -464,7 +464,7 @@ swap(expected<T,E>& lhs, expected<T,E>& rhs) noexcept
     lhs.swap(rhs);
 }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #endif // JSONCONS_NONSTD_EXPECTED_HPP

@@ -132,3 +132,21 @@ TEST_CASE("basic_bigdec multiply tests")
         CHECK(expected == c);
     }
 }
+
+TEST_CASE("basic_bigdec divide tests")
+{
+    SECTION("test")
+    {
+        jsoncons::bigdec a("4.0");
+        jsoncons::bigdec b("2.0");
+        jsoncons::bigint expected("2");
+        jsoncons::bigdec c;
+
+        jsoncons::bigint x(4);
+        jsoncons::bigint y(2);
+        jsoncons::bigint z;
+        auto r = jsoncons::bigdec::divide_and_round(x,y);
+        REQUIRE(r);
+        CHECK(expected == r);
+    }
+}

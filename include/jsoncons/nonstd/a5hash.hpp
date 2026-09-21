@@ -45,7 +45,7 @@
 #include <cstdint> 
 
 namespace jsoncons {
-namespace detail {
+namespace nonstd {
 
 #if defined( __LP64__ ) || defined( _LP64 ) || \
 	!( SIZE_MAX <= 0xFFFFFFFFU ) || ( defined( UINTPTR_MAX ) && \
@@ -451,7 +451,7 @@ JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const wchar_t* Msg0, size_t MsgL
 	return a5hash32((const unsigned char*)Msg0, MsgLen*sizeof(wchar_t), UseSeed);
 }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #undef JSONCONS_A5HASH_FORCE_INLINE

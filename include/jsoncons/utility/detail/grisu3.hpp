@@ -31,8 +31,8 @@ minor modifications.
   OTHER DEALINGS IN THE SOFTWARE.
   */
 
-#ifndef JSONCONS_NONSTD_GRISU3_HPP
-#define JSONCONS_NONSTD_GRISU3_HPP 
+#ifndef JSONCONS_UTILITY_DETAIL_GRISU3_HPP
+#define JSONCONS_UTILITY_DETAIL_GRISU3_HPP 
 
 #include <cassert>
 #include <cinttypes>
@@ -309,4 +309,4 @@ bool grisu3(double v, char *buffer, int *length, int *K)
 } // namespace detail
 } // namespace jsoncons
 
-#endif // JSONCONS_NONSTD_GRISU3_HPP
+#endif // JSONCONS_UTILITY_DETAIL_GRISU3_HPP

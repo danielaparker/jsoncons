@@ -29,7 +29,7 @@
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 #include <jsoncons/utility/conversion.hpp>
 
@@ -319,7 +319,7 @@ public:
     }
 
     template <typename T,typename Allocator,typename CharT_ = CharT>
-    typename std::enable_if<ext_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<nonstd::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get_(Allocator alloc,std::error_code& ec) const
     {
         constexpr const char_type* true_literal = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
@@ -382,7 +382,7 @@ public:
     }
 
     template <typename T,typename Allocator,typename CharT_ = CharT>
-    typename std::enable_if<ext_traits::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<nonstd::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
         T s;
@@ -416,7 +416,7 @@ public:
     }
 
     template <typename T,typename Allocator>
-    typename std::enable_if<ext_traits::is_array_like<T>::value &&
+    typename std::enable_if<nonstd::is_array_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get_(Allocator alloc, std::error_code& ec) const
     {
@@ -446,7 +446,7 @@ public:
     }
 
     template <typename IntegerType,typename Allocator>
-    typename std::enable_if<ext_traits::is_integer<IntegerType>::value, IntegerType>::type
+    typename std::enable_if<nonstd::is_integer<IntegerType>::value, IntegerType>::type
     get_(Allocator, std::error_code& ec) const
     {
         switch (storage_tag())
@@ -486,7 +486,7 @@ public:
     }
 
     template <typename T,typename Allocator>
-    typename std::enable_if<ext_traits::is_bool<T>::value, T>::type
+    typename std::enable_if<nonstd::is_bool<T>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
         return as_bool(ec);

@@ -25,8 +25,8 @@ namespace jsoncons {
 // try_decode_json
 
 template <typename T,typename StringViewLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const StringViewLike& s,
     const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
@@ -50,8 +50,8 @@ try_decode_json(const StringViewLike& s,
 }
 
 template <typename T,typename StringViewLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+    nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_json(const StringViewLike& s,
     const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
 {
@@ -69,7 +69,7 @@ try_decode_json(const StringViewLike& s,
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
@@ -92,7 +92,7 @@ try_decode_json(std::basic_istream<CharT>& is,
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
@@ -109,7 +109,7 @@ try_decode_json(std::basic_istream<CharT>& is,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -134,7 +134,7 @@ try_decode_json(InputIt first, InputIt last,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(InputIt first, InputIt last,
     const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
     basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -156,8 +156,8 @@ try_decode_json(InputIt first, InputIt last,
 // With leading allocator_set parameter
 
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const StringViewLike& s,
     const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
@@ -183,8 +183,8 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-     ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+     nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     const StringViewLike& s,
     const basic_json_decode_options<typename StringViewLike::value_type>& options = basic_json_decode_options<typename StringViewLike::value_type>())
@@ -204,7 +204,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -232,7 +232,7 @@ try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_json(const allocator_set<Alloc,TempAlloc>& aset,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())

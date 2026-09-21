@@ -13,7 +13,7 @@
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons {
 namespace heap {
@@ -72,8 +72,8 @@ struct heap_string : public heap_string_base<Extra,Allocator>
 
     ~heap_string() = default;
 
-    const char_type* c_str() const { return ext_traits::to_plain_pointer(p_); }
-    const char_type* data() const { return ext_traits::to_plain_pointer(p_); }
+    const char_type* c_str() const { return nonstd::to_plain_pointer(p_); }
+    const char_type* data() const { return nonstd::to_plain_pointer(p_); }
     std::size_t length() const { return length_; }
     Extra extra() const { return this->extra_; }
 
@@ -134,7 +134,7 @@ public:
 
         if (align <= 8) {
             byte_pointer ptr = byte_alloc.allocate(len);
-            q = ext_traits::to_plain_pointer(ptr);
+            q = nonstd::to_plain_pointer(ptr);
 
             if (reinterpret_cast<uintptr_t>(q) % align == 0) {
                 storage = q;
@@ -146,7 +146,7 @@ public:
         if (storage == nullptr) {
             align_pad = uint8_t(align-1);
             byte_pointer ptr = byte_alloc.allocate(align_pad+len);
-            q = ext_traits::to_plain_pointer(ptr);
+            q = nonstd::to_plain_pointer(ptr);
             storage = align_up(q, align);
             JSONCONS_ASSERT(storage >= q);
         }
@@ -169,7 +169,7 @@ public:
     {
         if (ptr != nullptr)
         {
-            heap_string_type* rawp = ext_traits::to_plain_pointer(ptr);
+            heap_string_type* rawp = nonstd::to_plain_pointer(ptr);
 
             char* q = launder_cast<char*>(rawp);
 

@@ -28,7 +28,7 @@
 #include <jsoncons/typed_array.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/number_writers.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 
 namespace jsoncons {
@@ -619,7 +619,7 @@ public:
     }
 
     template <typename T>
-    typename std::enable_if<ext_traits::is_back_insertable<T>::value,void>::type
+    typename std::enable_if<nonstd::is_back_insertable<T>::value,void>::type
     read_typed_array(T& v)
     {
         using value_type = typename T::value_type;

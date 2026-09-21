@@ -21,7 +21,7 @@
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/utility/byte_string.hpp> // jsoncons::byte_traits
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons { 
 
@@ -488,14 +488,14 @@ public:
 
     template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_byte<ChT>::value && ext_traits::is_byte<typename Sourceable::value_type>::value>::type* = 0)
+        typename std::enable_if<nonstd::is_byte<ChT>::value && nonstd::is_byte<typename Sourceable::value_type>::value>::type* = 0)
         : data_end_(reinterpret_cast<const value_type*>(s.data())), current_(data_end_), end_(data_end_+s.size())
     {
     }
 
     template <typename Sourceable,typename ChT=CharT>
     chars_source(const Sourceable& s,
-        typename std::enable_if<ext_traits::is_wide_character<ChT>::value && ext_traits::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
+        typename std::enable_if<nonstd::is_wide_character<ChT>::value && nonstd::is_wide_character<typename Sourceable::value_type>::value>::type* = 0)
         : data_end_(s.data()), current_(s.data()), end_(s.data()+s.size())
     {
     }
@@ -740,8 +740,8 @@ struct source_reader
 
     template <typename Buffer>
     static
-    typename std::enable_if<ext_traits::is_byte<value_type>::value &&
-        ext_traits::is_byte<typename Buffer::value_type>::value, std::size_t>::type
+    typename std::enable_if<nonstd::is_byte<value_type>::value &&
+        nonstd::is_byte<typename Buffer::value_type>::value, std::size_t>::type
     read(Source& source, Buffer& buffer, std::size_t length)
     {
         std::size_t unread = length;
@@ -778,9 +778,9 @@ struct source_reader
 
     template <typename Buffer>
     static
-    typename std::enable_if<!ext_traits::is_byte<value_type>::value &&
-                            ext_traits::has_reserve<Buffer>::value &&
-                            ext_traits::has_data_exact<value_type*,Buffer>::value, std::size_t>::type
+    typename std::enable_if<!nonstd::is_byte<value_type>::value &&
+                            nonstd::has_reserve<Buffer>::value &&
+                            nonstd::has_data_exact<value_type*,Buffer>::value, std::size_t>::type
     read(Source& source, Buffer& buffer, std::size_t length)
     {
         std::size_t unread = length;

@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -49,6 +49,19 @@ TEST_CASE("basic_bigint tests")
         num.divide(denom, quot, rem, true);
         CHECK(0 == quot);
         CHECK(num == rem);
+    }
+    SECTION("is_odd, is_even")
+    {
+        bigint b(0);
+        for (std::size_t i = 0; i < 10000; ++i)
+        {
+            CHECK_FALSE(b.is_odd());
+            CHECK(b.is_even());
+            ++b;;
+            CHECK(b.is_odd());
+            CHECK_FALSE(b.is_even());
+            ++b;;
+        }
     }
 }
 

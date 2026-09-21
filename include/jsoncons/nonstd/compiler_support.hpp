@@ -106,7 +106,7 @@
 #endif
 #endif
 
-// Following boost/atomic/detail/config.hpp
+// Following boost/atomic/nonstd/config.hpp
 #if !defined(JSONCONS_DEPRECATED_MSG) && (\
     (defined(__GNUC__) && ((__GNUC__ + 0) * 100 + (__GNUC_MINOR__ + 0)) >= 405) ||\
     (defined(__SUNPRO_CC) && (__SUNPRO_CC + 0) >= 0x5130))
@@ -393,7 +393,7 @@
 #   endif
 #endif
 
-// Follows boost config/detail/suffix.hpp
+// Follows boost config/nonstd/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
 namespace jsoncons{
 #  ifdef __GNUC__

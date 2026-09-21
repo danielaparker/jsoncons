@@ -80,6 +80,7 @@ add_executable(unit_tests
                corelib/src/nonstd/optional_tests.cpp
                corelib/src/nonstd/span_tests.cpp
                corelib/src/nonstd/string_view_tests.cpp
+               corelib/src/nonstd/type_traits_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
@@ -148,7 +149,6 @@ add_executable(unit_tests
                corelib/src/utility/bigdec_tests.cpp
                corelib/src/utility/byte_string_tests.cpp
                corelib/src/utility/conversion_tests.cpp
-               corelib/src/utility/more_type_traits_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
                corelib/src/utility/number_readers_tests.cpp
                corelib/src/utility/string_utils_tests.cpp

@@ -58,7 +58,7 @@ public:
         std::error_code& ec) = 0;
 protected:
     template <typename ValueType>
-    static typename std::enable_if<ext_traits::is_signed_integer<ValueType>::value, void>::type
+    static typename std::enable_if<nonstd::is_signed_integer<ValueType>::value, void>::type
         write_value(ValueType val, semantic_tag tag, generic_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {
@@ -66,7 +66,7 @@ protected:
     }
 
     template <typename ValueType>
-    static typename std::enable_if<ext_traits::is_unsigned_integer<ValueType>::value, void>::type
+    static typename std::enable_if<nonstd::is_unsigned_integer<ValueType>::value, void>::type
         write_value(ValueType val, semantic_tag tag, generic_visitor& visitor,
             const ser_context& context, std::error_code& ec)
     {

@@ -1388,7 +1388,7 @@ write_result encode_value(const Json& val, const toon_encode_options& options, S
 }
 
 template <typename T, typename Alloc, typename TempAlloc, typename Sink>
-typename std::enable_if<ext_traits::is_basic_json<T>::value, write_result>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value, write_result>::type
 try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink& sink, 
     const toon_encode_options& options)
 {
@@ -1396,7 +1396,7 @@ try_encode_toon(const allocator_set<Alloc, TempAlloc>&, const T& val, Sink& sink
 }
 
 template <typename T,typename CharContainer>
-typename std::enable_if<ext_traits::is_back_insertable_char_container<CharContainer>::value,write_result>::type
+typename std::enable_if<nonstd::is_back_insertable_char_container<CharContainer>::value,write_result>::type
 try_encode_toon(const T& val, CharContainer& cont, 
     const toon_encode_options& options = toon_encode_options())
 {

@@ -17,7 +17,7 @@
 
 namespace jsoncons 
 { 
-namespace detail 
+namespace nonstd 
 { 
     template <typename T>
     class optional;
@@ -156,7 +156,7 @@ namespace detail
 
         template<typename... Args, 
             typename = typename std::enable_if<std::is_constructible<T, Args...>::value,int>::type>
-        optional(jsoncons::detail::in_place_t, Args&&... args) 
+        optional(jsoncons::nonstd::in_place_t, Args&&... args) 
           : has_value_(true), value_(std::forward<Args>(args)...)
         {
         }
@@ -490,7 +490,7 @@ namespace detail
         return rhs ? lhs >= *rhs : true;
     }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #endif // JSONCONS_NONSTD_OPTIONAL_HPP

@@ -1,7 +1,7 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 #include <vector>
 #include <catch/catch.hpp>

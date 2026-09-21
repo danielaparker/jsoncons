@@ -32,7 +32,7 @@
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)

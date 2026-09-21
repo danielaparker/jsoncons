@@ -20,7 +20,7 @@
 #include <jsoncons/nonstd/a5hash.hpp>
 
 namespace jsoncons { 
-namespace detail {
+namespace nonstd {
 
     template <typename CharT,typename Traits = std::char_traits<CharT>>
     class basic_string_view
@@ -535,16 +535,16 @@ namespace detail {
     using string_view = basic_string_view<char>;
     using wstring_view = basic_string_view<wchar_t>;
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 namespace std {
     template <typename CharT,typename Traits>
-    struct hash<jsoncons::detail::basic_string_view<CharT, Traits>>
+    struct hash<jsoncons::nonstd::basic_string_view<CharT, Traits>>
     {
-        std::size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept
+        std::size_t operator()(const jsoncons::nonstd::basic_string_view<CharT, Traits>& s) const noexcept
         {
-            return jsoncons::detail::a5hash(s.data(), s.size(), 0);
+            return jsoncons::nonstd::a5hash(s.data(), s.size(), 0);
         }
     };
 } // namespace std

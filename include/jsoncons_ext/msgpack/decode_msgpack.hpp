@@ -12,7 +12,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/nonstd/compiler_support.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
@@ -27,8 +27,8 @@ namespace jsoncons {
 namespace msgpack {
 
 template <typename T,typename BytesViewLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -52,8 +52,8 @@ try_decode_msgpack(const BytesViewLike& v,
 }
 
 template <typename T,typename BytesViewLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -71,7 +71,7 @@ try_decode_msgpack(const BytesViewLike& v,
 }
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(std::istream& is, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -95,7 +95,7 @@ try_decode_msgpack(std::istream& is,
 }
 
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(std::istream& is, 
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -113,7 +113,7 @@ try_decode_msgpack(std::istream& is,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(InputIt first, InputIt last,
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -137,7 +137,7 @@ try_decode_msgpack(InputIt first, InputIt last,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(InputIt first, InputIt last,
     const msgpack_decode_options& options = msgpack_decode_options())
 {
@@ -157,8 +157,8 @@ try_decode_msgpack(InputIt first, InputIt last,
 // With leading allocator_set parameter
 
 template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
@@ -183,8 +183,8 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesViewLike& v, 
     const msgpack_decode_options& options = msgpack_decode_options())
@@ -203,7 +203,7 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is, 
     const msgpack_decode_options& options = msgpack_decode_options())
@@ -231,7 +231,7 @@ try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_msgpack(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is, 
     const msgpack_decode_options& options = msgpack_decode_options())

@@ -26,8 +26,8 @@ namespace toon {
 // try_decode_toon
 
 template <typename T,typename StringViewLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type
 try_decode_toon(const StringViewLike& s,
     const toon_decode_options& options = toon_decode_options())
 {
@@ -47,8 +47,8 @@ try_decode_toon(const StringViewLike& s,
 
 /*
 template <typename T,typename StringViewLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+    nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_toon(const StringViewLike& s,
     const toon_decode_options& options = toon_decode_options())
 {
@@ -60,7 +60,7 @@ try_decode_toon(const StringViewLike& s,
 */
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_toon(std::istream& is,
     const toon_decode_options& options = toon_decode_options())
 {
@@ -81,7 +81,7 @@ try_decode_toon(std::istream& is,
 
 /*
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_toon(std::istream& is,
     const toon_decode_options& options = toon_decode_options())
 {
@@ -96,8 +96,8 @@ try_decode_toon(std::istream& is,
 
 /*
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_sequence_of<StringViewLike,char>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_sequence_of<StringViewLike,char>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     const StringViewLike& s,
     const toon_decode_options& options = toon_decode_options())
@@ -109,8 +109,8 @@ try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-     ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+     nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     const StringViewLike& s,
     const toon_decode_options& options = toon_decode_options())
@@ -122,7 +122,7 @@ try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is,
     const toon_decode_options& options = toon_decode_options())
@@ -134,7 +134,7 @@ try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_toon(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is,
     const toon_decode_options& options = toon_decode_options())

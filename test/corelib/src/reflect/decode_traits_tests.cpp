@@ -17,7 +17,7 @@ TEST_CASE("decode_traits primitive")
 {
     SECTION("is_primitive")
     {
-        CHECK(ext_traits::is_primitive<uint64_t>::value);
+        CHECK(nonstd::is_primitive<uint64_t>::value);
     }
     SECTION("uint64_t")
     {
@@ -51,7 +51,7 @@ TEST_CASE("decode_traits std::string")
 {
     SECTION("is_string")
     {
-        CHECK(ext_traits::is_string<std::string>::value);
+        CHECK(nonstd::is_string<std::string>::value);
     }
     SECTION("string")
     {

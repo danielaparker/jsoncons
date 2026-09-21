@@ -12,7 +12,7 @@
 #endif
 
 namespace jsoncons { 
-namespace detail {
+namespace nonstd {
 
     enum class endian
     {
@@ -38,7 +38,7 @@ namespace detail {
     #endif
     };
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #endif // JSONCONS_NONSTD_ENDIAN_HPP

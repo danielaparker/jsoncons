@@ -27,8 +27,8 @@ namespace jsoncons {
 namespace csv {
 
 template <typename T,typename StringViewLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
 try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
     using char_type = typename StringViewLike::value_type;
@@ -53,8 +53,8 @@ try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename 
 }
 
 template <typename T,typename StringViewLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
 try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
 {
     using char_type = typename StringViewLike::value_type;
@@ -73,7 +73,7 @@ try_decode_csv(const StringViewLike& s, const basic_csv_decode_options<typename 
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     using char_type = CharT;
@@ -98,7 +98,7 @@ try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<Cha
 }
 
 template <typename T,typename CharT>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     using value_type = T;
@@ -115,7 +115,7 @@ try_decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<Cha
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_csv(InputIt first, InputIt last,
             const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                 basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -141,7 +141,7 @@ try_decode_csv(InputIt first, InputIt last,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type
 try_decode_csv(InputIt first, InputIt last,
            const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
                 basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
@@ -164,8 +164,8 @@ try_decode_csv(InputIt first, InputIt last,
 // With leading allocator_set parameter
 
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_sequence_of<StringViewLike,typename T::char_type>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
            const StringViewLike& s, 
            const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
@@ -192,8 +192,8 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename StringViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_string_view_like<StringViewLike>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
            const StringViewLike& s, 
            const basic_csv_decode_options<typename StringViewLike::value_type>& options = basic_csv_decode_options<typename StringViewLike::value_type>())
@@ -215,7 +215,7 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
     std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
@@ -245,7 +245,7 @@ try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename CharT,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_csv(const allocator_set<Alloc,TempAlloc>& aset,
            std::basic_istream<CharT>& is, 
            const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())

@@ -20,11 +20,11 @@
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/grisu3.hpp>
+#include <jsoncons/utility/detail/grisu3.hpp>
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons { 
 
@@ -37,7 +37,7 @@ char to_hex_character(uint8_t c)
 // from_integer
 
 template <typename Integer,typename Result>
-typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
+typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
 from_integer(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;
@@ -84,7 +84,7 @@ from_integer(Integer value, Result& result)
 // integer_to_hex
 
 template <typename Integer,typename Result>
-typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
+typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
 integer_to_hex(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;

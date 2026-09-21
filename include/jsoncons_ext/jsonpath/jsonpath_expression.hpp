@@ -19,7 +19,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/token_evaluator.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
@@ -72,7 +72,7 @@ namespace jsonpath {
         jsonpath_expression& operator=(jsonpath_expression&&) = default;
 
         template <typename BinaryCallback>
-        typename std::enable_if<ext_traits::is_function_object<BinaryCallback,const string_type&,const_reference>::value,void>::type
+        typename std::enable_if<nonstd::is_function_object<BinaryCallback,const string_type&,const_reference>::value,void>::type
         evaluate(const_reference root, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::eval_context<Json,const_reference> context{alloc_};
@@ -120,7 +120,7 @@ namespace jsonpath {
         }
 
         template <typename BinaryCallback>
-        typename std::enable_if<ext_traits::is_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
+        typename std::enable_if<nonstd::is_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
         select(const_reference root, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::eval_context<value_type,const_reference> context{alloc_};
@@ -128,7 +128,7 @@ namespace jsonpath {
         }
 
         template <typename BinaryCallback>
-        typename std::enable_if<ext_traits::is_function_object<BinaryCallback,const path_node_type&,value_type&>::value,void>::type
+        typename std::enable_if<nonstd::is_function_object<BinaryCallback,const path_node_type&,value_type&>::value,void>::type
         update(reference root, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::eval_context<value_type,reference> context{alloc_};

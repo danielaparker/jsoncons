@@ -24,7 +24,7 @@
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/utility/bignum_common.hpp>
 
 namespace jsoncons {
@@ -217,7 +217,7 @@ public:
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
             JSONCONS_TRY
             {
-                std::allocator_traits<real_allocator_type>::construct(alloc, ext_traits::to_plain_pointer(data_));
+                std::allocator_traits<real_allocator_type>::construct(alloc, nonstd::to_plain_pointer(data_));
             }
             JSONCONS_CATCH(...)
             {
@@ -593,6 +593,8 @@ public:
     using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<word_type>;
     using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const word_type>;
 
+    static constexpr word_type word_twos_complement = detail::bigint_storage<Allocator>::word_twos_complement;
+
     static constexpr size_type inlined_capacity = 2;
 
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
@@ -667,7 +669,7 @@ public:
     {
     }
 
-    template <typename StringViewLike,typename=typename std::enable_if<ext_traits::is_string_or_string_view<StringViewLike>::value>::type>
+    template <typename StringViewLike,typename=typename std::enable_if<nonstd::is_string_or_string_view<StringViewLike>::value>::type>
     basic_bigint(const StringViewLike& s)
     {
         auto r = jsoncons::to_bigint(s.data(), s.size(), *this);
@@ -702,6 +704,17 @@ public:
         return storage_.is_negative();
     }
 
+    bool is_odd() const 
+    {
+        auto view = get_storage_view();
+        return view.size() == 0 ? false : ((view[0] & 1) == 1);
+    }
+
+    bool is_even() const 
+    {
+        return !is_odd();
+    }
+
     int signum() const
     {
         return is_negative() ? -1 : (*this > 0 ? 1 : 0); 
@@ -712,7 +725,7 @@ public:
         storage_.set_negative(value);
     }
 
-    int compare_half(const basic_bigint<Allocator>& y) 
+    int compare_half(const basic_bigint<Allocator>& y) const
     {
         auto y_view = y.get_storage_view();
         auto view = get_storage_view();
@@ -860,7 +873,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
         operator+=(IntegerType y)
     {
         if ( is_negative() != (y < 0))
@@ -899,7 +912,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
         operator+=(IntegerType y)
     {
         if ( is_negative())
@@ -998,7 +1011,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
     operator*=(IntegerType y)
     {
         *this *= word_type(y < 0 ? -y : y);
@@ -1008,7 +1021,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
     operator*=(IntegerType y)
     {
         auto view = get_storage_view();

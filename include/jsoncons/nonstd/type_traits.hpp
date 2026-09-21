@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
-#define JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
+#ifndef JSONCONS_NONSTD_TYPE_TRAITS_HPP
+#define JSONCONS_NONSTD_TYPE_TRAITS_HPP
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
@@ -26,7 +26,7 @@
 #endif
 
 namespace jsoncons {
-namespace ext_traits {
+namespace nonstd {
   
     template <typename T>
     struct is_std_pair : public std::false_type {};
@@ -980,7 +980,7 @@ namespace impl {
     > : std::true_type{};
 
     
-} // ext_traits
+} // nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
+#endif // JSONCONS_NONSTD_TYPE_TRAITS_HPP

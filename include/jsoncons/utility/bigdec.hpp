@@ -93,8 +93,11 @@ public:
         return lhs.unscaled_ == rhs.unscaled_;
     }
 
-    bool common_need_increment(int32_t cmp_frac_half, bool oddQuot) 
+    static bool need_increment(const basic_bigint<Allocator>& divisor, 
+        const basic_bigint<Allocator>& q, const basic_bigint<Allocator>& r) 
     {
+        JSONCONS_ASSERT(r != 0);
+        int32_t cmp_frac_half = r.compare_half(divisor);
         // half_even rounding
         if (cmp_frac_half < 0 ) // We're closer to higher digit
         {
@@ -106,35 +109,28 @@ public:
         }
         else // half-way 
         { 
-            return oddQuot;
+            return q.is_odd();
         }       
     }
-
-    static bool need_increment(basic_bigint<Allocator> mdivisor, 
-        basic_bigint<Allocator> mq, basic_bigint<Allocator> mr) 
+public:
+    static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& dividend, 
+        const basic_bigint<Allocator>& divisor) 
     {
-        JSONCONS_ASSRT(mr != 0);
-        int32_t cmp_frac_half = mr.compareHalf(mdivisor);
-        return common_need_increment(cmp_frac_half, mq.is_odd());
-    }
+        basic_bigint<Allocator> adividend = dividend >= 0 ? dividend : -dividend;
+        basic_bigint<Allocator> adivisor = divisor >= 0 ? divisor : -divisor;
 
-    static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& bdividend, 
-        const basic_bigint<Allocator>& bdivisor) 
-    {
-        basic_bigint<Allocator> mdividend(bdividend.mag);
-        basic_bigint<Allocator> mq();
-        basic_bigint<Allocator> mdivisor(bdivisor.mag);
-        basic_bigint<Allocator> mr;
-        mdividend.divide(mdivisor, mq, mr, true);
-        bool isRemainderZero = mr.signum() == 0;
-        int qsign = (bdividend.signum() != bdivisor.signum()) ? -1 : 1;
+        basic_bigint<Allocator> q;
+        basic_bigint<Allocator> r;
+
+        adividend.divide(adivisor, q, r, true);
+        bool isRemainderZero = r.signum() == 0;
         if (!isRemainderZero) {
-            if (need_increment(mdivisor, mq, mr)) {
-                mq += basic_bigint<Allocator>(1);
+            if (need_increment(adivisor, q, r)) {
+                q += basic_bigint<Allocator>(1);
             }
         }
 
-        return mq;
+        return (dividend.signum() != divisor.signum()) ? -q : q;
     }
 };
 

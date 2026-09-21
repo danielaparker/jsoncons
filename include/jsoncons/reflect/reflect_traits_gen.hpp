@@ -21,7 +21,7 @@
 #include <jsoncons/reflect/json_traits.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/ser_common.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <jsoncons/utility/function_objects.hpp>
 
 #define JSONCONS_RDONLY(X)
@@ -141,14 +141,14 @@ struct json_traits_helper
     } 
     template <typename U> 
     static 
-    typename std::enable_if<ext_traits::is_optional<U>::value, void>::type
+    typename std::enable_if<nonstd::is_optional<U>::value, void>::type
     set_optional_json_member(string_view_type key, const U& val, Json& j) 
     { 
         if (val.has_value()) j.try_emplace(key, val); 
     } 
     template <typename U> 
     static         
-    typename std::enable_if<!ext_traits::is_optional<U>::value, void>::type
+    typename std::enable_if<!nonstd::is_optional<U>::value, void>::type
     set_optional_json_member(string_view_type key, const U& val, Json& j) 
     { 
         j.try_emplace(key, val); 
@@ -185,7 +185,7 @@ write_result try_encode_optional_member(const basic_string_view<CharT>& key, con
 }
  
 template <typename CharT, typename T> 
-typename std::enable_if<ext_traits::is_optional<T>::value, write_result>::type
+typename std::enable_if<nonstd::is_optional<T>::value, write_result>::type
 try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder) 
 { 
     if (val.has_value())
@@ -197,7 +197,7 @@ try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, ba
 } 
 
 template <typename CharT, typename T> 
-typename std::enable_if<!ext_traits::is_optional<T>::value, write_result>::type
+typename std::enable_if<!nonstd::is_optional<T>::value, write_result>::type
 try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, basic_json_visitor<CharT>& encoder)
 { 
     encoder.key(key);
@@ -215,13 +215,13 @@ bool is_optional_value_set(const std::unique_ptr<T,Deleter>& val)
     return val ? true : false;
 } 
 template <typename T> 
-typename std::enable_if<ext_traits::is_optional<T>::value, bool>::type
+typename std::enable_if<nonstd::is_optional<T>::value, bool>::type
 is_optional_value_set(const T& val) 
 { 
     return val.has_value();
 } 
 template <typename T> 
-typename std::enable_if<!ext_traits::is_optional<T>::value, bool>::type
+typename std::enable_if<!nonstd::is_optional<T>::value, bool>::type
 is_optional_value_set(const T&) 
 {
     return true; 

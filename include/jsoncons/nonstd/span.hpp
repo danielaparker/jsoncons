@@ -14,10 +14,10 @@
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons {
-namespace detail {
+namespace nonstd {
 
     constexpr std::size_t dynamic_extent = (std::numeric_limits<std::size_t>::max)();
 
@@ -64,7 +64,7 @@ namespace detail {
 
         template <typename C>
         constexpr span(C& c,
-                       typename std::enable_if<!is_span<C>::value && !ext_traits::is_std_array<C>::value && ext_traits::is_compatible_element<C,element_type>::value && ext_traits::has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !nonstd::is_std_array<C>::value && nonstd::is_compatible_element<C,element_type>::value && nonstd::has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
@@ -91,7 +91,7 @@ namespace detail {
 
         template <typename C>
         constexpr span(const C& c,
-                       typename std::enable_if<!is_span<C>::value && !ext_traits::is_std_array<C>::value && ext_traits::is_compatible_element<C,element_type>::value && ext_traits::has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !nonstd::is_std_array<C>::value && nonstd::is_compatible_element<C,element_type>::value && nonstd::has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
@@ -187,7 +187,7 @@ namespace detail {
         }
     };
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #endif // JSONCONS_NONSTD_SPAN_HPP

@@ -25,8 +25,8 @@ namespace cbor {
 // to bytes 
 
 template <typename T,typename BytesLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_cbor(const T& j, 
     BytesLike& cont, 
     const cbor_encode_options& options = cbor_encode_options())
@@ -38,8 +38,8 @@ try_encode_cbor(const T& j,
 }
 
 template <typename T,typename BytesLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+    nonstd::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_cbor(const T& val, BytesLike& cont, 
             const cbor_encode_options& options = cbor_encode_options())
 {
@@ -50,7 +50,7 @@ try_encode_cbor(const T& val, BytesLike& cont,
 // stream
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,write_result>::type 
 try_encode_cbor(const T& j, 
     std::ostream& os, 
     const cbor_encode_options& options = cbor_encode_options())
@@ -62,7 +62,7 @@ try_encode_cbor(const T& j,
 }
 
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,write_result>::type 
 try_encode_cbor(const T& val, 
     std::ostream& os, 
     const cbor_encode_options& options = cbor_encode_options())
@@ -74,8 +74,8 @@ try_encode_cbor(const T& val,
 // to bytes 
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+    nonstd::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const T& j, 
     BytesLike& cont, 
@@ -88,8 +88,8 @@ try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-    ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+    nonstd::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, 
     BytesLike& cont, 
@@ -102,7 +102,7 @@ try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 // stream
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,write_result>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,write_result>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const T& j, 
     std::ostream& os, 
@@ -115,7 +115,7 @@ try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,write_result>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,write_result>::type 
 try_encode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const T& val, 
     std::ostream& os, 

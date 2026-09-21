@@ -4,7 +4,7 @@
 #include <jsoncons/decode_json.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 #include <vector>
 #include <iostream>
 

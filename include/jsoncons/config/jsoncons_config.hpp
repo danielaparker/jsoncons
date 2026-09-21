@@ -20,8 +20,8 @@
 
 namespace jsoncons {
 
-    using jsoncons::detail::a5hash;
-    using jsoncons::detail::a5hash32;
+    using jsoncons::nonstd::a5hash;
+    using jsoncons::nonstd::a5hash32;
 
     class assertion_error : public std::runtime_error
     {
@@ -53,7 +53,7 @@ namespace jsoncons {
 
 #include <jsoncons/nonstd/utility.hpp>
 namespace jsoncons {
-using jsoncons::detail::in_place_t;
+using jsoncons::nonstd::in_place_t;
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 } // namespace jsoncons
 
@@ -68,23 +68,23 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 #else
   #include <jsoncons/nonstd/expected.hpp>
   namespace jsoncons {
-  using jsoncons::detail::expected;
-  using jsoncons::detail::unexpect_t;
-  using jsoncons::detail::unexpect;
+  using jsoncons::nonstd::expected;
+  using jsoncons::nonstd::unexpect_t;
+  using jsoncons::nonstd::unexpect;
   } // namespace jsoncons
 #endif
         
 #include <jsoncons/nonstd/make_obj_using_allocator.hpp>
 namespace jsoncons {
-using jsoncons::detail::make_obj_using_allocator;
+using jsoncons::nonstd::make_obj_using_allocator;
 } // namespace jsoncons
 
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/nonstd/string_view.hpp>
 namespace jsoncons {
-using jsoncons::detail::basic_string_view;
-using string_view = jsoncons::detail::string_view;
-using wstring_view = jsoncons::detail::wstring_view;
+using jsoncons::nonstd::basic_string_view;
+using string_view = jsoncons::nonstd::string_view;
+using wstring_view = jsoncons::nonstd::wstring_view;
 } // namespace jsoncons
 #else 
 #include <string_view>
@@ -103,7 +103,7 @@ using std::span;
 #else
 #include <jsoncons/nonstd/span.hpp>
 namespace jsoncons {
-using jsoncons::detail::span;
+using jsoncons::nonstd::span;
 }
 #endif
 
@@ -120,14 +120,14 @@ using jsoncons::detail::span;
 #else 
     #include <jsoncons/nonstd/optional.hpp>
     namespace jsoncons {
-    using jsoncons::detail::optional;
+    using jsoncons::nonstd::optional;
 }
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
 #if !defined(JSONCONS_HAS_STD_ENDIAN)
 #include <jsoncons/nonstd/endian.hpp>
 namespace jsoncons {
-using jsoncons::detail::endian;
+using jsoncons::nonstd::endian;
 }
 #else
 #include <bit>

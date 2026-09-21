@@ -26,7 +26,7 @@
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons { 
 namespace unicode_traits {
@@ -61,7 +61,7 @@ namespace unicode_traits {
     };
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
+    typename std::enable_if<nonstd::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
     detect_encoding_from_bom(const CharT* data, std::size_t length)
     {
         static constexpr uint8_t bom_utf8[] = {0xef,0xbb,0xbf}; 
@@ -97,14 +97,14 @@ namespace unicode_traits {
     }
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value || ext_traits::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
+    typename std::enable_if<nonstd::is_char16<CharT>::value || nonstd::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
     detect_encoding_from_bom(const CharT* data, std::size_t)
     {
         return detect_encoding_result<CharT>{data,encoding_kind::undetected};
     }
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
+    typename std::enable_if<nonstd::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
     detect_json_encoding(const CharT* data, std::size_t length)
     {
         detect_encoding_result<CharT> r = detect_encoding_from_bom(data,length);
@@ -139,7 +139,7 @@ namespace unicode_traits {
     }
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value || ext_traits::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
+    typename std::enable_if<nonstd::is_char16<CharT>::value || nonstd::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
     detect_json_encoding(const CharT* data, std::size_t)
     {
         return detect_encoding_result<CharT>{data,encoding_kind::undetected};
@@ -381,7 +381,7 @@ namespace unicode_traits {
     // to_codepoint
 
     template <typename CharT,typename CodepointT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value && ext_traits::is_char32<CodepointT>::value,
+    typename std::enable_if<nonstd::is_char8<CharT>::value && nonstd::is_char32<CodepointT>::value,
                             unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
@@ -466,7 +466,7 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename CodepointT>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value && ext_traits::is_char32<CodepointT>::value,
+    typename std::enable_if<nonstd::is_char16<CharT>::value && nonstd::is_char32<CodepointT>::value,
                             unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
@@ -521,7 +521,7 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename CodepointT>
-    typename std::enable_if<ext_traits::is_char32<CharT>::value && ext_traits::is_char32<CodepointT>::value,
+    typename std::enable_if<nonstd::is_char32<CharT>::value && nonstd::is_char32<CodepointT>::value,
                             unicode_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
@@ -557,9 +557,9 @@ namespace unicode_traits {
     // convert
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char8<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char8<CharT>::value
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char8<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, Container& target, strict_flag flags=strict_flag::strict) 
     {
@@ -595,9 +595,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char16<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char8<CharT>::value
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char16<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -674,9 +674,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char32<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char8<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char32<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -760,9 +760,9 @@ namespace unicode_traits {
     // utf16
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char8<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char16<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char8<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
                      Container& target, 
@@ -860,9 +860,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char16<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char16<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char16<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -917,9 +917,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char32<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char16<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char32<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -970,9 +970,9 @@ namespace unicode_traits {
     // utf32
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char32<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char8<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char32<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char8<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -1056,9 +1056,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char32<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char16<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char32<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char16<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -1101,9 +1101,9 @@ namespace unicode_traits {
     }
 
     template <typename CharT,typename Container>
-    typename std::enable_if<ext_traits::is_char32<CharT>::value                            
-                            && ext_traits::is_back_insertable<Container>::value
-                            && ext_traits::is_char32<typename Container::value_type>::value,
+    typename std::enable_if<nonstd::is_char32<CharT>::value                            
+                            && nonstd::is_back_insertable<Container>::value
+                            && nonstd::is_char32<typename Container::value_type>::value,
                             unicode_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
             Container& target, 
@@ -1141,7 +1141,7 @@ namespace unicode_traits {
     // validate
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value,
+    typename std::enable_if<nonstd::is_char8<CharT>::value,
                             unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length) noexcept
     {
@@ -1174,7 +1174,7 @@ namespace unicode_traits {
     // utf16
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char16<CharT>::value,
+    typename std::enable_if<nonstd::is_char16<CharT>::value,
                             unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length)  noexcept
     {
@@ -1220,7 +1220,7 @@ namespace unicode_traits {
     // utf32
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char32<CharT>::value,
+    typename std::enable_if<nonstd::is_char32<CharT>::value,
                             unicode_result<CharT>>::type 
     validate(const CharT* data, std::size_t length) noexcept
     {
@@ -1324,7 +1324,7 @@ namespace unicode_traits {
     // count_codepoints
 
     template <typename CharT>
-    typename std::enable_if<ext_traits::is_char8<CharT>::value || ext_traits::is_char16<CharT>::value || ext_traits::is_char32<CharT>::value, std::size_t>::type 
+    typename std::enable_if<nonstd::is_char8<CharT>::value || nonstd::is_char16<CharT>::value || nonstd::is_char32<CharT>::value, std::size_t>::type 
     count_codepoints(const CharT* data, std::size_t length, 
                      strict_flag flags = strict_flag::strict) noexcept
     {

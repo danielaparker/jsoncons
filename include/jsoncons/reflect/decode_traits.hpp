@@ -31,7 +31,7 @@
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/nonstd/type_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {
@@ -69,7 +69,7 @@ struct decode_traits
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<ext_traits::is_basic_json<T>::value
+    typename std::enable_if<nonstd::is_basic_json<T>::value
 >::type>
 {
     using value_type = T;
@@ -93,7 +93,7 @@ struct decode_traits<T,
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<ext_traits::is_primitive<T>::value
+    typename std::enable_if<nonstd::is_primitive<T>::value
 >::type>
 {
     using value_type = T;
@@ -113,7 +113,7 @@ struct decode_traits<T,
 
 template <typename T>
 struct decode_traits<T,
-    typename std::enable_if<ext_traits::is_string<T>::value>::type>
+    typename std::enable_if<nonstd::is_string<T>::value>::type>
 {
     using value_type = T;
     using result_type = read_result<value_type>;
@@ -218,9 +218,9 @@ struct decode_traits<std::pair<T1, T2>>
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             ext_traits::is_back_insertable<T>::value &&
-             !ext_traits::is_typed_array<T>::value 
+             nonstd::is_array_like<T>::value &&
+             nonstd::is_back_insertable<T>::value &&
+             !nonstd::is_typed_array<T>::value 
 >::type>
 {
     using element_type = typename T::value_type;
@@ -262,9 +262,9 @@ struct decode_traits<T,
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             ext_traits::is_back_insertable_byte_container<T>::value &&
-             ext_traits::is_typed_array<T>::value
+             nonstd::is_array_like<T>::value &&
+             nonstd::is_back_insertable_byte_container<T>::value &&
+             nonstd::is_typed_array<T>::value
 >::type>
 {
     using element_type = typename T::value_type;
@@ -292,7 +292,7 @@ struct decode_traits<T,
                     T v{jsoncons::make_obj_using_allocator<T>(aset.get_allocator())};
                     if (cursor.current().size() > 0)
                     {
-                        reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                        reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), v, cursor.current().size());
                     }
                     for (auto ch : bytes)
                     {
@@ -317,7 +317,7 @@ struct decode_traits<T,
                 {
                     if (cursor.current().size() > 0)
                     {
-                        reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                        reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), v, cursor.current().size());
                     }
                     cursor.next(ec);
                     while (cursor.current().event_type() != staj_events::end_array && !ec)
@@ -359,10 +359,10 @@ struct decode_traits<T,
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             ext_traits::is_back_insertable<T>::value &&
-             !ext_traits::is_back_insertable_byte_container<T>::value &&
-             ext_traits::is_typed_array<T>::value
+             nonstd::is_array_like<T>::value &&
+             nonstd::is_back_insertable<T>::value &&
+             !nonstd::is_back_insertable_byte_container<T>::value &&
+             nonstd::is_typed_array<T>::value
 >::type>
 {
     using element_type = typename T::value_type;
@@ -385,7 +385,7 @@ struct decode_traits<T,
             {
                 if (cursor.current().size() > 0)
                 {
-                    reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                    reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), v, cursor.current().size());
                 }
                 cursor.next(ec);
                 while (cursor.current().event_type() != staj_events::end_array && !ec)
@@ -425,9 +425,9 @@ struct decode_traits<T,
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             !ext_traits::is_back_insertable<T>::value &&
-             ext_traits::is_insertable<T>::value 
+             nonstd::is_array_like<T>::value &&
+             !nonstd::is_back_insertable<T>::value &&
+             nonstd::is_insertable<T>::value 
 >::type>
 {
     using element_type = typename T::value_type;
@@ -451,7 +451,7 @@ struct decode_traits<T,
         }
         if (cursor.current().size() > 0)
         {
-            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+            reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), v, cursor.current().size());
         }
         cursor.next(ec);
         while (cursor.current().event_type() != staj_events::end_array && !ec)
@@ -483,10 +483,10 @@ struct decode_traits<T,
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-             ext_traits::is_array_like<T>::value &&
-             !ext_traits::is_back_insertable<T>::value &&
-             !ext_traits::is_insertable<T>::value &&
-             ext_traits::is_front_insertable<T>::value 
+             nonstd::is_array_like<T>::value &&
+             !nonstd::is_back_insertable<T>::value &&
+             !nonstd::is_insertable<T>::value &&
+             nonstd::is_front_insertable<T>::value 
 >::type>
 {
     using element_type = typename T::value_type;
@@ -511,7 +511,7 @@ struct decode_traits<T,
         }
         if (cursor.current().size() > 0)
         {
-            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+            reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), v, cursor.current().size());
         }
         cursor.next(ec);
         if (JSONCONS_UNLIKELY(ec)) {return result_type{jsoncons::unexpect, ec, cursor.line(), cursor.column()};}
@@ -596,7 +596,7 @@ struct decode_traits<std::array<T,N>>
 template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
-                            ext_traits::is_map_like<T>::value
+                            nonstd::is_map_like<T>::value
 >::type>
 {
     using mapped_type = typename T::mapped_type;
@@ -616,7 +616,7 @@ struct decode_traits<T,
         }
         if (cursor.current().size() > 0)
         {
-            reserve_storage(typename std::integral_constant<bool, ext_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
+            reserve_storage(typename std::integral_constant<bool, nonstd::has_reserve<T>::value>::type(), val, cursor.current().size());
         }
         cursor.next(ec);
 
