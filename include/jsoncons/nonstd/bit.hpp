@@ -16,9 +16,10 @@ namespace jsoncons {
 namespace nonstd {
     
 template <typename T>
-typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value,int>::type
-countl_zero(T x) 
+int countl_zero(T x) 
 {
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Type must be unsigned integer");
+
     if (x == 0) return std::numeric_limits<T>::digits;
 #if defined(__GNUC__) || defined(__clang__)
     if (sizeof(T) <= sizeof(unsigned int)) {
@@ -36,6 +37,42 @@ countl_zero(T x)
         x <<= 1;
     }
     return leading_zeros;
+}
+
+template <typename T>
+int countr_zero(T value) {
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Type must be unsigned integer");
+    
+    if (value == 0) {
+        return sizeof(T) * 8; // Or std::numeric_limits<T>::digits
+    }
+    
+    #if defined(__GNUC__) || defined(__clang__)
+        if (sizeof(T) <= sizeof(unsigned int)) {
+            return __builtin_ctz(static_cast<unsigned int>(value));
+        } else if (sizeof(T) <= sizeof(unsigned long)) {
+            return __builtin_ctzl(static_cast<unsigned long>(value));
+        } else {
+            return __builtin_ctzll(static_cast<unsigned long long>(value));
+        }
+    #elif defined(_MSC_VER)
+        unsigned long index;
+        #if defined(_M_X64) || defined(_M_ARM64)
+            if (sizeof(T) == 8) {
+                _BitScanForward64(&index, static_cast<unsigned __int64>(value));
+                return static_cast<int>(index);
+            }
+        #endif
+        _BitScanForward(&index, static_cast<unsigned long>(value));
+        return static_cast<int>(index);
+    #else
+        int count = 0;
+        while ((value & 1) == 0) {
+            count++;
+            value >>= 1;
+        }
+        return count;
+    #endif
 }
 
 template <typename T>

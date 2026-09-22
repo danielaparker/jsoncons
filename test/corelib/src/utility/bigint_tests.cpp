@@ -630,19 +630,19 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK((a != b));
         CHECK_FALSE((a == b));
     }
-    SECTION("babs")
+    SECTION("absb")
     {
-        bigint c = jsoncons::babs(b);
+        bigint c = jsoncons::absb(b);
         CHECK(bigint("60820564691661355463515465564664568") == c);
     }
-    SECTION("bpow")
+    SECTION("powb")
     {
-        bigint c = jsoncons::bpow(a, 2u);
+        bigint c = jsoncons::powb(a, 2u);
         CHECK(bigint("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
     }
-    SECTION("bsqrt")
+    SECTION("sqrtb")
     {
-        bigint c = jsoncons::bsqrt(a);
+        bigint c = jsoncons::sqrtb(a);
         CHECK(bigint("7526901790514881921") == c);
     }
 }
@@ -787,6 +787,21 @@ TEST_CASE("basic_bigint compare_half")
             b *= 2;
             CHECK(a.compare_half(b) < 0);
         }
+    }
+}
+
+TEST_CASE("basic_bigint bit_width")
+{
+    SECTION("test 1")
+    {
+        bigint b1("0");
+        CHECK(0 == b1.bit_width());
+        bigint b2("100");
+        CHECK(7 == b2.bit_width());
+        bigint b3("1234567890123456789");
+        CHECK(61 == b3.bit_width());
+        bigint b4("1234567890123456789000000");
+        CHECK(81 == b4.bit_width());
     }
 }
 

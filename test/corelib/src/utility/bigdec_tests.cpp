@@ -135,6 +135,11 @@ TEST_CASE("basic_bigdec multiply tests")
 
 TEST_CASE("basic_bigdec divide tests")
 {
+    SECTION("precision()")
+    {
+        jsoncons::bigdec b1{"123456789.123456789"};
+        CHECK(18 == b1.precision());
+    }
     SECTION("test")
     {
         jsoncons::bigdec a("4.0");

@@ -260,6 +260,16 @@ int bit_width(T x) noexcept
 {
     return std::bit_width(x);
 }
+template <typename T>
+int countl_zero(T x) noexcept
+{
+    return std::countl_zero(x);
+}
+template <typename T>
+int countr_zero(T x) noexcept
+{
+    return std::countr_zero(x);
+}
 } // namespace jsoncons
 #else
 #include <jsoncons/nonstd/bit.hpp>
@@ -268,6 +278,16 @@ template <typename T>
 int bit_width(T x) noexcept
 {
     return jsoncons::nonstd::bit_width(x);
+}
+template <typename T>
+int countl_zero(T x) noexcept
+{
+    return jsoncons::nonstd::countl_zero(x);
+}
+template <typename T>
+int countr_zero(T x) noexcept
+{
+    return jsoncons::nonstd::countr_zero(x);
 }
 } // namespace jsoncons
 #endif

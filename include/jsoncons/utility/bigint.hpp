@@ -1699,6 +1699,66 @@ public:
         return is_negative() ? -code : code;
     }
 
+    size_type bit_width() const
+    {
+        auto view = get_storage_view();
+        size_type len = view.size();
+        if (len == 0)
+        {
+            return 0;
+        }
+        size_type n = 0;
+        size_type mag_bit_width = ((len - 1) << 6) + static_cast<size_type>(64 - jsoncons::countl_zero(view[len-1]));
+        if (is_negative())
+        {
+            bool pow2 =  jsoncons::bit_width(view[len-1]) == 1;
+            for (std::size_t i=len; i-- > 1 && pow2; )
+            {
+                pow2 = (view[i] == 0);
+            }
+
+            n = (pow2 ? mag_bit_width - 1 : mag_bit_width);
+        }
+        else
+        {
+            n = mag_bit_width;
+        }
+
+        return n;
+    }
+
+    int compare_magnitude(const basic_bigint& y) const noexcept
+    {
+        auto view = get_storage_view();
+        auto y_view = y.get_storage_view();
+
+        const size_type y_size = y_view.size();
+        if ( view.size() == 0 && y_size == 0 )
+            return 0;
+        int code = 0;
+        if ( view.size() < y_size)
+            code = -1;
+        else if ( view.size() > y_size)
+            code = 1;
+        else
+        {
+            for (size_type i = view.size(); i-- > 0; )
+            {
+                if (view[i] > y_view[i])
+                {
+                    code = 1;
+                    break;
+                }
+                else if (view[i] < y_view[i])
+                {
+                    code = -1;
+                    break;
+                }
+            }
+        }
+        return code;
+    }
+
     void divide(const basic_bigint& denom_, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
         basic_bigint<Allocator> denom(denom_, get_allocator());
@@ -2064,7 +2124,7 @@ private:
 };
 
 template <typename Allocator>
-basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
+basic_bigint<Allocator> absb( const basic_bigint<Allocator>& a )
 {
     if ( a.is_negative())
     {
@@ -2074,7 +2134,7 @@ basic_bigint<Allocator> babs( const basic_bigint<Allocator>& a )
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> bpow(basic_bigint<Allocator> x, unsigned n)
+basic_bigint<Allocator> powb(basic_bigint<Allocator> x, std::size_t n)
 {
     basic_bigint<Allocator> y = 1;
 
@@ -2092,7 +2152,7 @@ basic_bigint<Allocator> bpow(basic_bigint<Allocator> x, unsigned n)
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> bsqrt(const basic_bigint<Allocator>& a)
+basic_bigint<Allocator> sqrtb(const basic_bigint<Allocator>& a)
 {
     basic_bigint<Allocator> x = a;
     basic_bigint<Allocator> b = a;

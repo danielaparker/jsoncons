@@ -13,6 +13,8 @@
 #include <jsoncons/utility/bignum_common.hpp>
 #include <jsoncons/utility/bigint.hpp>
 
+#include <array>
+
 namespace jsoncons {
 
 template <typename Allocator>
@@ -78,6 +80,33 @@ public:
     int signum() const
     {
         return unscaled_.signum();
+    }
+
+    static basic_bigint<Allocator> big_ten_to_the(std::size_t n) 
+    {
+        if (n == 0)
+        {
+            return basic_bigint<Allocator>{0};
+        }
+
+        if (n < uint64_pow10_table.size())
+        {
+            return uint64_pow10_table[n];
+        }       
+
+        return powb(basic_bigint<Allocator>(10), n);
+    }
+
+    static std::size_t big_digit_length(const basic_bigint<Allocator>& b) {
+        if (b.signum() == 0)
+            return 1;
+        std::size_t r = ((b.bit_width() + 1) * 646456993u) >> 31;
+        return b.compare_magnitude(big_ten_to_the(r)) < 0u ? r : r+1;
+    }
+
+    std::size_t precision() const
+    {
+        return big_digit_length(unscaled_);
     }
 
     friend bool operator==(const basic_bigdec& lhs, const basic_bigdec& rhs)
@@ -158,14 +187,17 @@ bignum_result divide(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b,
     {
         return bignum_result{bignum_errc::result_out_of_range};
     }
-    int64_t scale = a.scale() - b.scale();
+    int64_t preferred_scale = a.scale() - b.scale();
 
     if (a.signum() == 0)
     {
-        c = basic_bigdec<Alloc>{basic_bigint<Alloc>{}, scale};
+        c = basic_bigdec<Alloc>{basic_bigint<Alloc>{}, preferred_scale};
     }
     else
     {
+        int xscale = a.precision();
+        int yscale = b.precision();
+        basic_bigdec<Alloc> quotient;
     }
     return bignum_result{};
 }
