@@ -595,6 +595,7 @@ public:
 
     static constexpr word_type word_twos_complement = detail::bigint_storage<Allocator>::word_twos_complement;
 
+    static constexpr size_type npos = size_type(-1);
     static constexpr size_type inlined_capacity = 2;
 
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
@@ -1856,6 +1857,28 @@ public:
             unnormalize(rem, x, second_done);
             rem.set_negative(rem_neg);
         }
+    }
+
+    word_type get_lowest_set_bit() const
+    {
+        auto view = get_storage_view();
+        size_type len = view.size();
+        if (len == 0)
+        {
+            return npos;
+        }
+
+        // Search for lowest order nonzero int
+        size_type i = len - 1;
+        word_type b;
+        while ((b = view[i]) == 0)
+        {
+            --i;
+        }
+        std::cout << "i: " << i << ", b: " << b << ", " << jsoncons::countr_zero(b) << "\n";
+        word_type lsb = ((len-(i+1)) << 6) + jsoncons::countr_zero(b);
+
+        return lsb;
     }
 private:
 

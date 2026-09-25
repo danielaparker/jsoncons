@@ -91,20 +91,20 @@ public:
 
         if (n < uint64_pow10_table.size())
         {
-            return uint64_pow10_table[n];
+            return basic_bigint<Allocator>(uint64_pow10_table[n]);
         }       
 
         return powb(basic_bigint<Allocator>(10), n);
     }
 
-    static std::size_t big_digit_length(const basic_bigint<Allocator>& b) {
+    static uint64_t big_digit_length(const basic_bigint<Allocator>& b) {
         if (b.signum() == 0)
             return 1;
-        std::size_t r = ((b.bit_width() + 1) * 646456993u) >> 31;
+        uint64_t r = ((b.bit_width() + 1) * 646456993u) >> 31;
         return b.compare_magnitude(big_ten_to_the(r)) < 0u ? r : r+1;
     }
 
-    std::size_t precision() const
+    uint64_t precision() const
     {
         return big_digit_length(unscaled_);
     }
@@ -161,6 +161,121 @@ public:
 
         return (dividend.signum() != divisor.signum()) ? -q : q;
     }
+/*
+    if (checkScale(dividend,(long)scale + divisorScale) > dividendScale) {
+        int newScale = scale + divisorScale;
+        int raise = newScale - dividendScale;
+        BigInteger scaledDividend = bigMultiplyPowerTen(dividend, raise);
+        return divideAndRound(scaledDividend, divisor, scale, roundingMode, scale);
+    } else {
+        int newScale = checkScale(divisor,(long)dividendScale - scale);
+        int raise = newScale - divisorScale;
+        BigInteger scaledDivisor = bigMultiplyPowerTen(divisor, raise);
+        return divideAndRound(dividend, scaledDivisor, scale, roundingMode, scale);
+    }
+ 
+    if (add_overflow(a.scale(), b.scale()))
+    {
+        return bignum_result{bignum_errc::result_out_of_range};
+    }
+
+*/
+
+    /*static int checkScale(BigInteger intVal, long val) {
+        int asInt = (int)val;
+        if (asInt != val) {
+            asInt = val>Integer.MAX_VALUE ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            if (intVal.signum() != 0)
+                throw new ArithmeticException(asInt>0 ? "Underflow":"Overflow");
+        }
+        return asInt;
+    }*/
+
+    static bignum_result create_and_strip_zeros_to_match_scale(const basic_bigint<Allocator>& intVal, 
+        int64_t scale, int64_t preferred_scale, basic_bigint<Allocator>& result) 
+    {
+        if (subtract_overflow(scale, preferred_scale))
+        {
+            return bignum_result{bignum_errc::result_out_of_range};
+        }
+/*
+        // avoid overflow of scale - preferred_scale
+ 
+ 
+        preferred_scale = Math.clamp(preferred_scale, Integer.MIN_VALUE - 1L, Integer.MAX_VALUE);
+        int powsOf2 = intVal.getLowestSetBit();
+        // scale - preferred_scale >= remainingZeros >= max{n : (intVal % 10^n) == 0 && n <= scale - preferred_scale}
+        // a multiple of 10^n must be a multiple of 2^n
+        long remainingZeros = Math.min(scale - preferred_scale, powsOf2);
+        if (remainingZeros <= 0L)
+            return valueOf(intVal, scale, 0);
+
+        final int sign = intVal.signum;
+        if (sign < 0)
+            intVal = intVal.negate(); // speed up computation of shiftRight() and bitLength()
+
+        intVal = intVal.shiftRight(powsOf2); // remove powers of 2
+        // Let k = max{n : (intVal % 5^n) == 0}, m = max{n : 5^n <= intVal}, so m >= k.
+        // Let b = intVal.bitLength(). It can be shown that
+        // | b * LOG_5_OF_2 - b log5(2) | < 2^(-21) (fp viz. real arithmetic),
+        // which entails m <= maxPowsOf5 <= m + 1, where maxPowsOf5 is as below.
+        // Hence, maxPowsOf5 >= k.
+        long maxPowsOf5 = Math.round(intVal.bitLength() * LOG_5_OF_2);
+        remainingZeros = Math.min(remainingZeros, maxPowsOf5);
+
+        basic_bigint<Allocator>         [] qr; // quotient-remainder pair
+        // Remove 5^(2^i) from the factors of intVal, until 5^remainingZeros < 5^(2^i).
+        // Let z = max{n >= 0 : ((intVal * 2^powsOf2) % 10^n) == 0 && n <= scale - preferred_scale},
+        // then the condition min(scale - preferred_scale, powsOf2) >= remainingZeros >= z
+        // and the values ((intVal * 2^powsOf2) / 10^z) and (scale - z)
+        // are preserved invariants after each iteration.
+        // Note that if intVal % 5^(2^i) != 0, the loop condition will become false.
+        for (int i = 0; remainingZeros >= 1L << i; i++) {
+            final int exp = 1 << i;
+            qr = intVal.divideAndRemainder(fiveToTwoToThe(i));
+            if (qr[1].signum != 0) { // non-0 remainder
+                remainingZeros = exp - 1;
+            } else {
+                intVal = qr[0];
+                scale = checkScale(intVal, (long) scale - exp); // could Overflow
+                remainingZeros -= exp;
+                powsOf2 -= exp;
+            }
+        }
+
+        // bitLength(remainingZeros) == min{n >= 0 : 5^(2^n) > 5^remainingZeros}
+        // so, while the loop condition is true,
+        // the invariant i == max{n : 5^(2^n) <= 5^remainingZeros},
+        // which is equivalent to i == bitLength(remainingZeros) - 1,
+        // is preserved at the beginning of each iteration.
+        // Note that the loop stops exactly when remainingZeros == 0.
+        // Using the same definition of z for the first loop, the invariants
+        // min(scale - preferred_scale, powsOf2) >= remainingZeros >= z,
+        // ((intVal * 2^powsOf2) / 10^z) and (scale - z)
+        // are preserved in this loop as well, so, when the loop ends,
+        // remainingZeros == 0 implies z == 0, hence (intVal * 2^powsOf2) and scale
+        // have the correct values to return.
+        for (int i = basic_bigint<Allocator>::bitLengthForLong(remainingZeros) - 1; i >= 0; i--) {
+            final int exp = 1 << i;
+            qr = intVal.divideAndRemainder(fiveToTwoToThe(i));
+            if (qr[1].signum != 0) { // non-0 remainder
+                remainingZeros = exp - 1;
+            } else {
+                intVal = qr[0];
+                scale = checkScale(intVal, (long) scale - exp); // could Overflow
+                remainingZeros -= exp;
+                powsOf2 -= exp;
+
+                if (remainingZeros < exp >> 1) // else i == bitLength(remainingZeros) already
+                    i = basic_bigint<Allocator>         .bitLengthForLong(remainingZeros);
+            }
+        }
+
+        intVal = intVal.shiftLeft(powsOf2); // restore remaining powers of 2
+        return valueOf(sign >= 0 ? intVal : intVal.negate(), scale, 0);
+ */
+        return bignum_result{};
+    }
 };
 
 template <typename Alloc>
@@ -176,6 +291,119 @@ bignum_result multiply(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& 
     return bignum_result{};
 }
 
+/*
+private static BigDecimal divideAndRound(BigInteger bdividend, BigInteger bdivisor, int scale, int roundingMode,
+                                         int preferred_scale) {
+    boolean isRemainderZero; // record remainder is zero or not
+    int qsign; // quotient sign
+    // Descend into mutables for faster remainder checks
+    MutableBigInteger mdividend = new MutableBigInteger(bdividend.mag);
+    MutableBigInteger mq = new MutableBigInteger();
+    MutableBigInteger mdivisor = new MutableBigInteger(bdivisor.mag);
+    MutableBigInteger mr = mdividend.divide(mdivisor, mq);
+    isRemainderZero = mr.isZero();
+    qsign = (bdividend.signum != bdivisor.signum) ? -1 : 1;
+    if (!isRemainderZero) {
+        if (needIncrement(mdivisor, roundingMode, qsign, mq, mr)) {
+            mq.add(MutableBigInteger.ONE);
+        }
+        return mq.toBigDecimal(qsign, scale);
+    } else {
+        if (preferred_scale != scale) {
+            long compactVal = mq.toCompactValue(qsign);
+            if (compactVal != INFLATED) {
+                return create_and_strip_zeros_to_match_scale(compactVal, scale, preferred_scale);
+            }
+            BigInteger intVal = mq.toBigInteger(qsign);
+            return create_and_strip_zeros_to_match_scale(intVal, scale, preferred_scale);
+        } else {
+            return mq.toBigDecimal(qsign, scale);
+        }
+    }
+}
+private static BigDecimal create_and_strip_zeros_to_match_scale(BigInteger intVal, int scale, long preferred_scale) {
+    // avoid overflow of scale - preferred_scale
+    preferred_scale = Math.clamp(preferred_scale, Integer.MIN_VALUE - 1L, Integer.MAX_VALUE);
+    int powsOf2 = intVal.getLowestSetBit();
+    // scale - preferred_scale >= remainingZeros >= max{n : (intVal % 10^n) == 0 && n <= scale - preferred_scale}
+    // a multiple of 10^n must be a multiple of 2^n
+    long remainingZeros = Math.min(scale - preferred_scale, powsOf2);
+    if (remainingZeros <= 0L)
+        return valueOf(intVal, scale, 0);
+
+    final int sign = intVal.signum;
+    if (sign < 0)
+        intVal = intVal.negate(); // speed up computation of shiftRight() and bitLength()
+
+    intVal = intVal.shiftRight(powsOf2); // remove powers of 2
+    // Let k = max{n : (intVal % 5^n) == 0}, m = max{n : 5^n <= intVal}, so m >= k.
+    // Let b = intVal.bitLength(). It can be shown that
+    // | b * LOG_5_OF_2 - b log5(2) | < 2^(-21) (fp viz. real arithmetic),
+    // which entails m <= maxPowsOf5 <= m + 1, where maxPowsOf5 is as below.
+    // Hence, maxPowsOf5 >= k.
+    long maxPowsOf5 = Math.round(intVal.bitLength() * LOG_5_OF_2);
+    remainingZeros = Math.min(remainingZeros, maxPowsOf5);
+
+    BigInteger[] qr; // quotient-remainder pair
+    // Remove 5^(2^i) from the factors of intVal, until 5^remainingZeros < 5^(2^i).
+    // Let z = max{n >= 0 : ((intVal * 2^powsOf2) % 10^n) == 0 && n <= scale - preferred_scale},
+    // then the condition min(scale - preferred_scale, powsOf2) >= remainingZeros >= z
+    // and the values ((intVal * 2^powsOf2) / 10^z) and (scale - z)
+    // are preserved invariants after each iteration.
+    // Note that if intVal % 5^(2^i) != 0, the loop condition will become false.
+    for (int i = 0; remainingZeros >= 1L << i; i++) {
+        final int exp = 1 << i;
+        qr = intVal.divideAndRemainder(fiveToTwoToThe(i));
+        if (qr[1].signum != 0) { // non-0 remainder
+            remainingZeros = exp - 1;
+        } else {
+            intVal = qr[0];
+            scale = checkScale(intVal, (long) scale - exp); // could Overflow
+            remainingZeros -= exp;
+            powsOf2 -= exp;
+        }
+    }
+
+    // bitLength(remainingZeros) == min{n >= 0 : 5^(2^n) > 5^remainingZeros}
+    // so, while the loop condition is true,
+    // the invariant i == max{n : 5^(2^n) <= 5^remainingZeros},
+    // which is equivalent to i == bitLength(remainingZeros) - 1,
+    // is preserved at the beginning of each iteration.
+    // Note that the loop stops exactly when remainingZeros == 0.
+    // Using the same definition of z for the first loop, the invariants
+    // min(scale - preferred_scale, powsOf2) >= remainingZeros >= z,
+    // ((intVal * 2^powsOf2) / 10^z) and (scale - z)
+    // are preserved in this loop as well, so, when the loop ends,
+    // remainingZeros == 0 implies z == 0, hence (intVal * 2^powsOf2) and scale
+    // have the correct values to return.
+    for (int i = BigInteger.bitLengthForLong(remainingZeros) - 1; i >= 0; i--) {
+        final int exp = 1 << i;
+        qr = intVal.divideAndRemainder(fiveToTwoToThe(i));
+        if (qr[1].signum != 0) { // non-0 remainder
+            remainingZeros = exp - 1;
+        } else {
+            intVal = qr[0];
+            scale = checkScale(intVal, (long) scale - exp); // could Overflow
+            remainingZeros -= exp;
+            powsOf2 -= exp;
+
+            if (remainingZeros < exp >> 1) // else i == bitLength(remainingZeros) already
+                i = BigInteger.bitLengthForLong(remainingZeros);
+        }
+    }
+
+    intVal = intVal.shiftLeft(powsOf2); // restore remaining powers of 2
+    return valueOf(sign >= 0 ? intVal : intVal.negate(), scale, 0);
+}
+public BigDecimal[] divideAndRemainder(BigDecimal divisor) {
+    // we use the identity  x = i * y + r to determine r
+    BigDecimal[] result = new BigDecimal[2];
+
+    result[0] = this.divideToIntegralValue(divisor);
+    result[1] = this.subtract(result[0].multiply(divisor));
+    return result;
+}
+*/
 template <typename Alloc>
 bignum_result divide(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b, basic_bigdec<Alloc>& c)
 {
@@ -195,9 +423,28 @@ bignum_result divide(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& b,
     }
     else
     {
-        int xscale = a.precision();
-        int yscale = b.precision();
-        basic_bigdec<Alloc> quotient;
+        uint64_t mcp = 34;
+        uint64_t dividend_scale = a.precision();
+        uint64_t divisor_scale = b.precision();
+
+        if (!add_overflow(preferred_scale, divisor_scale) && preferred_scale > divisor_scale)
+        {
+            uint64_t new_scale = preferred_scale + divisor_scale;
+            uint64_t n = new_scale - dividend_scale;
+            basic_bigint<Alloc> scaled_dividend = a * big_ten_to_the(n);
+            return divide_and_round(scaled_dividend, b);
+        }
+        else if (!subtract_overflow(dividend_scale, preferred_scale))
+        {
+            uint64_t new_scale = dividend_scale - preferred_scale;
+            uint64_t n = new_scale - divisor_scale;
+            basic_bigint<Alloc> scaled_divisor = b * big_ten_to_the(n);
+            return divide_and_round(a, scaled_divisor);
+        }
+        else
+        {
+            return bignum_result{bignum_errc::result_out_of_range};
+        }
     }
     return bignum_result{};
 }
