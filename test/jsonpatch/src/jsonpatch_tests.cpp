@@ -205,8 +205,8 @@ TEST_CASE("from diff with null and lossless number")
     const char* json1 = "{\"hello\":123.4, \"hello2\":null}";
     const char* json2 = "{\"hello\":null,  \"hello2\":123.4 }";
 
-    jsoncons::ojson j1 = jsoncons::ojson::parse(jsoncons::json1, options);
-    jsoncons::ojson j2 = jsoncons::ojson::parse(jsoncons::json2, options);
+    jsoncons::ojson j1 = jsoncons::ojson::parse(json1, options);
+    jsoncons::ojson j2 = jsoncons::ojson::parse(json2, options);
 
     jsoncons::ojson patch = jsonpatch::from_diff(j1, j2);
     
