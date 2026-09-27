@@ -350,6 +350,7 @@ namespace Catch {
   #  endif // __has_include(<variant>) && defined(CATCH_CPP17_OR_GREATER)
 #endif // defined(__has_include)
 
+#   define CATCH_CONFIG_COUNTER // JSONCONS
 #if defined(CATCH_INTERNAL_CONFIG_COUNTER) && !defined(CATCH_CONFIG_NO_COUNTER) && !defined(CATCH_CONFIG_COUNTER)
 #   define CATCH_CONFIG_COUNTER
 #endif
