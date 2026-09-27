@@ -140,7 +140,7 @@ TEST_CASE("jsonpath flatten escape")
             R"(})"
         R"(})" };
 
-    jsoncons::json doc = jsoncons::json::parse(jsoncons::json);
+    jsoncons::json doc = jsoncons::json::parse(json);
 
     auto flat_doc = jsoncons::jsonpath::flatten(doc);
 
