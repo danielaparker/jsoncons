@@ -34,7 +34,7 @@ TEST_CASE("json constructor with pmr allocator")
     const char* long_string2 = "Another string too long for short string";
     const char* long_string2_end = long_string2 + strlen(long_string2);
 
-    std::vector<uint8_t> jsoncons::byte_string1 = { 'H','e','l','l','o' };
+    std::vector<uint8_t> bstr1 = { 'H','e','l','l','o' };
 
     SECTION("long string copy constructor")
     {
@@ -72,9 +72,9 @@ TEST_CASE("json constructor with pmr allocator")
 
     SECTION("byte string copy constructor")
     {
-        jsoncons::pmr::json j1{byte_string_arg, jsoncons::byte_string1, jsoncons::semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, jsoncons::byte_string1.data(), jsoncons::byte_string1.data()+byte_string1.size());
+        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+byte_string1.size());
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{j1};
@@ -88,9 +88,9 @@ TEST_CASE("json constructor with pmr allocator")
 
     SECTION("byte string move constructor")
     {
-        jsoncons::pmr::json j1{byte_string_arg, jsoncons::byte_string1, jsoncons::semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, jsoncons::byte_string1.data(), jsoncons::byte_string1.data()+byte_string1.size());
+        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+byte_string1.size());
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{std::move(j1)};
@@ -227,7 +227,7 @@ TEST_CASE("json constructor with scoped_allocator")
     const char* long_string1 = "String too long for short string";
     const char* long_string2 = "Another string too long for short string";
 
-    std::vector<uint8_t> jsoncons::byte_string1 = { 'H','e','l','l','o' };
+    std::vector<uint8_t> bstr1 = { 'H','e','l','l','o' };
     
     SECTION("long string copy constructor")
     {
@@ -257,7 +257,7 @@ TEST_CASE("json constructor with scoped_allocator")
 
     SECTION("byte string copy constructor")
     {
-        cust_json j1{byte_string_arg, jsoncons::byte_string1, jsoncons::semantic_tag::none, alloc1};
+        cust_json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator()); 
 
         cust_json j2{j1};
@@ -270,7 +270,7 @@ TEST_CASE("json constructor with scoped_allocator")
 
     SECTION("byte string move constructor")
     {
-        cust_json j1{byte_string_arg, jsoncons::byte_string1, jsoncons::semantic_tag::none, alloc1};
+        cust_json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator()); 
 
         cust_json j2{std::move(j1)};
