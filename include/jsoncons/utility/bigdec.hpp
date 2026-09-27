@@ -289,11 +289,11 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 }
 
 template <typename Alloc,typename CharT,typename BAlloc>
-void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+void append_chars(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
 {
     if (value.scale() == 0)
     {
-        to_buffer(value.unscaled(), buf);
+        append_chars(value.unscaled(), buf);
         return;
     }
     if (value.unscaled().is_negative())
@@ -301,7 +301,7 @@ void to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::ch
         buf.push_back('-');
     }
     std::basic_string<CharT> coeff;
-    to_buffer(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
+    append_chars(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
     int64_t adjusted = -value.scale() + (int64_t)(coeffLen-1);
     if ((value.scale() >= 0) && (adjusted >= -6)) 

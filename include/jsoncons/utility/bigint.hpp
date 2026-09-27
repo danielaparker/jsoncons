@@ -2082,13 +2082,13 @@ private:
     }
 
     template <typename CharT, typename BAlloc>
-    friend void to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
+    friend void append_chars(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
         basic_bigint v(value);
         auto v_view = v.get_storage_view();
 
         size_type len = (v_view.size() * word_bits / 3) + 2;
-        buf.reserve(len);
+        buf.reserve(buf.size()+len);
 
         if (v_view.size() == 0)
         {

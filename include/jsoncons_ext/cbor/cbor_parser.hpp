@@ -1746,7 +1746,7 @@ private:
         }
 
         bigdec dec(std::move(unscaled), -exponent);
-        to_buffer(dec, result);
+        append_chars(dec, result);
     }
 
     void read_bigfloat(string_type& str, std::error_code& ec)

@@ -18,7 +18,7 @@ void test_bigdec(jsoncons::string_view sv, jsoncons::string_view expected)
     CHECK(sv.data() + sv.length() == result.ptr);
 
     std::string buf;
-    to_buffer(value, buf);
+    append_chars(value, buf);
     CHECK(expected == buf);
 }
 
@@ -30,7 +30,7 @@ void test_bigdec(jsoncons::wstring_view sv, jsoncons::wstring_view expected)
     CHECK(sv.data() + sv.length() == result.ptr);
 
     std::wstring buf;
-    to_buffer(value, buf);
+    append_chars(value, buf);
     CHECK(expected == buf);
 }
 
@@ -88,7 +88,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        to_buffer(value, buf);
+        append_chars(value, buf);
         CHECK(expected == buf);
     }
     SECTION("1[.]")
@@ -101,7 +101,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        to_buffer(value, buf);
+        append_chars(value, buf);
         CHECK(expected == buf);
     }
     SECTION("12.12[e]")
@@ -114,7 +114,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        to_buffer(value, buf);
+        append_chars(value, buf);
         CHECK(expected == buf);
     }
 }

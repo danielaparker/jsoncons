@@ -5,7 +5,7 @@
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 
-using jsoncons::detail::optional;
+using jsoncons::nonstd::optional;
 using jsoncons::json;
 
 TEST_CASE("optional constructor tests")
