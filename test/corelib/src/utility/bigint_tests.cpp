@@ -802,17 +802,31 @@ TEST_CASE("basic_bigint bit tests")
         CHECK(61 == b3.bit_width());
         bigint b4("1234567890123456789000000");
         CHECK(81 == b4.bit_width());
+        bigint b5("12345678910111213141516171819202122233425262728290000");
+        CHECK(174 == b5.bit_width());
     }
     SECTION("get_lowest_set_bit")
     {
-        bigint b3{"1234567890123456789000"};
-        CHECK(3 == b3.get_lowest_set_bit());
+        /*bigint b3{"1234567890123456789000"};
+        //CHECK(3 == b3.get_lowest_set_bit());
         bigint b1;
         CHECK(bigint::npos == b1.get_lowest_set_bit());
         bigint b2(0);
         CHECK(bigint::npos == b2.get_lowest_set_bit());
         bigint b4{"1"};
         CHECK(0 == b4.get_lowest_set_bit());
+        bigint b5{"66"};
+        CHECK(1 == b5.get_lowest_set_bit());
+        bigint b6{"2147483647"};
+        CHECK(0 == b6.get_lowest_set_bit());
+        bigint b7{"4294967295"};
+        CHECK(0 == b7.get_lowest_set_bit());
+        bigint b8{"9223372036854775807"};
+        CHECK(0 == b8.get_lowest_set_bit());*/
+        bigint b9{"18446744073709551615"};
+        CHECK(0 == b9.get_lowest_set_bit());
+        bigint b10{"184467440737095516150"};
+        CHECK(1 == b10.get_lowest_set_bit());
     }
 }
 

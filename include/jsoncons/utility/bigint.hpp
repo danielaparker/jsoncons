@@ -1875,6 +1875,16 @@ public:
         {
             --i;
         }
+
+        for (std::size_t i = 0; i < len; ++i)
+        {
+            if (i > 0)
+            {
+                std::cout << ", ";
+            }
+            std::cout << view[i];
+        }
+        std::cout << "\n\n";
         std::cout << "i: " << i << ", b: " << b << ", " << jsoncons::countr_zero(b) << "\n";
         word_type lsb = ((len-(i+1)) << 6) + jsoncons::countr_zero(b);
 
