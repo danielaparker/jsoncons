@@ -38,8 +38,8 @@ TEST_CASE("json assignment with pmr allocator")
     const char* long_string2 = "Another string too long for short string";
     const char* long_string2_end = long_string2 + strlen(long_string2);
 
-    std::vector<uint8_t> jsoncons::byte_string = { 'H','e','l','l','o' };
-    std::vector<uint8_t> jsoncons::byte_string2 = { 'W','o','r','l','d' };
+    std::vector<uint8_t> bstr = { 'H','e','l','l','o' };
+    std::vector<uint8_t> bstr2 = { 'W','o','r','l','d' };
 
     SECTION("long string to long string assignment")
     {
@@ -83,37 +83,37 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("byte string to byte string assignment")
     {
-        jsoncons::pmr::json j1{byte_string_arg, jsoncons::byte_string, jsoncons::semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, bstr, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, jsoncons::byte_string.data(), jsoncons::byte_string.data()+byte_string.size());
+        auto it = std::search(buffer1, last1, bstr.data(), bstr.data()+bstr.size());
         CHECK(it != last1);
 
-        jsoncons::pmr::json j2{byte_string_arg, jsoncons::byte_string2, jsoncons::semantic_tag::none, alloc2};
+        jsoncons::pmr::json j2{byte_string_arg, bstr2, jsoncons::semantic_tag::none, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
-        it = std::search(buffer2, last2, jsoncons::byte_string2.data(), jsoncons::byte_string2.data()+byte_string2.size());
+        it = std::search(buffer2, last2, bstr2.data(), bstr2.data()+bstr2.size());
         CHECK(it != last2);
 
         j1 = j2;
         REQUIRE(&pool1 == j1.get_allocator().resource());
-        it = std::search(buffer1, last1, jsoncons::byte_string.data(), jsoncons::byte_string.data()+byte_string.size());
+        it = std::search(buffer1, last1, bstr.data(), bstr.data()+bstr.size());
         CHECK(j1 == j2);
 
         j2 = j1;
         REQUIRE(&pool2 == j2.get_allocator().resource());
-        it = std::search(buffer2, last2, jsoncons::byte_string2.data(), jsoncons::byte_string2.data()+byte_string2.size());
+        it = std::search(buffer2, last2, bstr2.data(), bstr2.data()+bstr2.size());
         CHECK(j1 == j2);
     }
 
     SECTION("byte string to byte string move assignment")
     {
-        jsoncons::pmr::json j1{byte_string_arg, jsoncons::byte_string, jsoncons::semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, bstr, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, jsoncons::byte_string.data(), jsoncons::byte_string.data()+byte_string.size());
+        auto it = std::search(buffer1, last1, bstr.data(), bstr.data()+bstr.size());
         CHECK(it != last1);
 
-        jsoncons::pmr::json j2{byte_string_arg, jsoncons::byte_string2, jsoncons::semantic_tag::none, alloc2};
+        jsoncons::pmr::json j2{byte_string_arg, bstr2, jsoncons::semantic_tag::none, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
-        it = std::search(buffer2, last2, jsoncons::byte_string2.data(), jsoncons::byte_string2.data()+byte_string2.size());
+        it = std::search(buffer2, last2, bstr2.data(), bstr2.data()+bstr2.size());
         CHECK(it != last2);
 
         j1 = std::move(j2);
