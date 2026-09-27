@@ -315,8 +315,8 @@ TEST_CASE("json assignment with scoped allocator")
     const char* long_string1 = "String too long for short string";
     const char* long_string2 = "Another string too long for short string";
 
-    std::vector<uint8_t> jsoncons::byte_string = { 'H','e','l','l','o' };
-    std::vector<uint8_t> jsoncons::byte_string2 = { 'W','o','r','l','d' };
+    std::vector<uint8_t> bstr = { 'H','e','l','l','o' };
+    std::vector<uint8_t> bstr2 = { 'W','o','r','l','d' };
 
     SECTION("long string to long string assignment")
     {
@@ -348,10 +348,10 @@ TEST_CASE("json assignment with scoped allocator")
 
     SECTION("byte string to byte string assignment")
     {
-        cust_json j1{byte_string_arg, jsoncons::byte_string, jsoncons::semantic_tag::none, alloc1};
+        cust_json j1{byte_string_arg, bstr, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator()); 
 
-        cust_json j2{byte_string_arg, jsoncons::byte_string2, jsoncons::semantic_tag::none, alloc2};
+        cust_json j2{byte_string_arg, bstr2, jsoncons::semantic_tag::none, alloc2};
         REQUIRE(alloc2 == j2.get_allocator()); 
 
         j1 = j2;
@@ -363,10 +363,10 @@ TEST_CASE("json assignment with scoped allocator")
 
     SECTION("byte string to byte string move assignment")
     {
-        cust_json j1{byte_string_arg, jsoncons::byte_string, jsoncons::semantic_tag::none, alloc1};
+        cust_json j1{byte_string_arg, bstr, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator()); 
 
-        cust_json j2{byte_string_arg, jsoncons::byte_string2, jsoncons::semantic_tag::none, alloc2};
+        cust_json j2{byte_string_arg, bstr2, jsoncons::semantic_tag::none, alloc2};
         REQUIRE(alloc2 == j2.get_allocator()); 
 
         j1 = std::move(j2);
