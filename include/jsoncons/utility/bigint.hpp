@@ -1859,37 +1859,6 @@ public:
         }
     }
 
-    word_type get_lowest_set_bit() const
-    {
-        auto view = get_storage_view();
-        size_type len = view.size();
-        if (len == 0)
-        {
-            return npos;
-        }
-
-        // Search for lowest order nonzero int
-        size_type i = len - 1;
-        word_type b;
-        while ((b = view[i]) == 0)
-        {
-            --i;
-        }
-
-        for (std::size_t i = 0; i < len; ++i)
-        {
-            if (i > 0)
-            {
-                std::cout << ", ";
-            }
-            std::cout << view[i];
-        }
-        std::cout << "\n\n";
-        std::cout << "i: " << i << ", b: " << b << ", " << jsoncons::countr_zero(b) << "\n";
-        word_type lsb = ((len-(i+1)) << 6) + jsoncons::countr_zero(b);
-
-        return lsb;
-    }
 private:
 
     void destroy() noexcept
