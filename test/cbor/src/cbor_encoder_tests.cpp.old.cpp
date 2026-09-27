@@ -20,7 +20,7 @@
 #include <iostream>
 #include <catch/catch.hpp>
 
-namespace cbor = jsoncons::cbor;
+using namespace jsoncons;
 
 TEST_CASE("cbor_options tests")
 {
@@ -78,7 +78,7 @@ TEST_CASE("cbor encode multi dim array test")
     encoder.end_array();
     encoder.end_multi_dim();
 
-    jsoncons::byte_string_view bstr(v);
+    byte_string_view bstr(v);
     //std::cout << "bstr: " << bstr << "\n\n";
 
     //for (auto ch : bstr)
@@ -87,14 +87,14 @@ TEST_CASE("cbor encode multi dim array test")
     //}
     //std::cout << "\n\n";
 
-    auto j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<json>(v);
     //std::cout << pretty_print(j) << "\n\n";
 
 }
 
 TEST_CASE("test_encode_to_stream")
 {
-    jsoncons::json j = jsoncons::json::parse(R"(
+json j = json::parse(R"(
 {
    "application": "hiking",
    "reputons": [
@@ -116,7 +116,7 @@ TEST_CASE("test_encode_to_stream")
     std::ifstream is;
     is.open("./corelib/output/store.cbor", std::ios::binary | std::ios::in);
 
-    auto j2 = cbor::decode_cbor<jsoncons::json>(is);
+    json j2 = cbor::decode_cbor<json>(is);
 
     //std::cout << pretty_print(j2) << '\n'; 
 
@@ -134,8 +134,8 @@ TEST_CASE("serialize array to cbor")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json result;
-    REQUIRE_NOTHROW(result = cbor::decode_cbor<jsoncons::json>(v));
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
 }
 
 TEST_CASE("test_serialize_indefinite_length_array")
@@ -152,8 +152,8 @@ TEST_CASE("test_serialize_indefinite_length_array")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json result;
-    REQUIRE_NOTHROW(result = cbor::decode_cbor<jsoncons::json>(v));
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
 }
  
 TEST_CASE("serialize object to cbor")
@@ -169,8 +169,8 @@ TEST_CASE("serialize object to cbor")
         encoder.string_value("value2");
         REQUIRE_NOTHROW(encoder.end_object());
         encoder.flush();
-        jsoncons::json result;
-        REQUIRE_NOTHROW(result = cbor::decode_cbor<jsoncons::json>(v));
+        json result;
+        REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
     }
 }
  
@@ -181,14 +181,14 @@ TEST_CASE("test_serialize_bignum")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
     std::string s = n.to_string();
-    encoder.string_value(s, jsoncons::semantic_tag::bigint);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json result;
-    REQUIRE_NOTHROW(result = cbor::decode_cbor<jsoncons::json>(v));
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
     CHECK(result[0].as<std::string>() == std::string("18446744073709551616"));
 } 
 
@@ -199,16 +199,16 @@ TEST_CASE("test_serialize_negative_bignum1")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s = n.to_string();
-    encoder.string_value(s, jsoncons::semantic_tag::bigint);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
     JSONCONS_TRY
     {
-        auto result = cbor::decode_cbor<jsoncons::json>(v);
+        json result = cbor::decode_cbor<json>(v);
         CHECK(result[0].as<std::string>() == std::string("-18446744073709551617"));
     }
     JSONCONS_CATCH (const std::exception& e)
@@ -224,18 +224,18 @@ TEST_CASE("test_serialize_negative_bignum2")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s = n.to_string();
-    encoder.string_value(s, jsoncons::semantic_tag::bigint);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
     JSONCONS_TRY
     {
-        auto result = cbor::decode_cbor<jsoncons::json>(v);
-        auto options = jsoncons::json_options{}
-            .bignum_format(jsoncons::bignum_format_kind::raw);
+        json result = cbor::decode_cbor<json>(v);
+        auto options = json_options{}
+            .bignum_format(bignum_format_kind::raw);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[-18446744073709551617]"));
@@ -254,18 +254,18 @@ TEST_CASE("test_serialize_negative_bignum3")
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s = n.to_string();
-    encoder.string_value(s, jsoncons::semantic_tag::bigint);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
     JSONCONS_TRY
     {
-        auto result = cbor::decode_cbor<jsoncons::json>(v);
-        auto options = jsoncons::json_options{}
-            .bignum_format(jsoncons::bignum_format_kind::base64url);
+        json result = cbor::decode_cbor<json>(v);
+        auto options = json_options{}
+            .bignum_format(bignum_format_kind::base64url);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[\"~AQAAAAAAAAAA\"]"));
@@ -282,11 +282,11 @@ TEST_CASE("serialize bigdec to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("18446744073709551616.0", jsoncons::semantic_tag::bigdec);
+        encoder.string_value("18446744073709551616.0", semantic_tag::bigdec);
         encoder.flush();
         JSONCONS_TRY
         {
-            auto result = cbor::decode_cbor<jsoncons::json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(std::string("18446744073709551616.0") == result.as<std::string>());
         }
         JSONCONS_CATCH (const std::exception& e)
@@ -298,11 +298,11 @@ TEST_CASE("serialize bigdec to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("18446744073709551616e-5", jsoncons::semantic_tag::bigdec);
+        encoder.string_value("18446744073709551616e-5", semantic_tag::bigdec);
         encoder.flush();
         JSONCONS_TRY
         {
-            auto result = cbor::decode_cbor<jsoncons::json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("184467440737095.51616"));
         }
         JSONCONS_CATCH (const std::exception& e)
@@ -314,11 +314,11 @@ TEST_CASE("serialize bigdec to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("-18446744073709551616e-5", jsoncons::semantic_tag::bigdec);
+        encoder.string_value("-18446744073709551616e-5", semantic_tag::bigdec);
         encoder.flush();
         JSONCONS_TRY
         {
-            auto result = cbor::decode_cbor<jsoncons::json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("-184467440737095.51616"));
         }
         JSONCONS_CATCH (const std::exception& e)
@@ -330,11 +330,11 @@ TEST_CASE("serialize bigdec to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("-18446744073709551616e5", jsoncons::semantic_tag::bigdec);
+        encoder.string_value("-18446744073709551616e5", semantic_tag::bigdec);
         encoder.flush();
         JSONCONS_TRY
         {
-            auto result = cbor::decode_cbor<jsoncons::json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(std::string("-1.8446744073709551616e24") == result.as<std::string>());
         }
         JSONCONS_CATCH (const std::exception& e)
@@ -415,8 +415,8 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         encoder.begin_array(4); // a fixed length array
         encoder.string_value("foo");
         encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
-        encoder.string_value("-18446744073709551617", jsoncons::semantic_tag::bigint);
-        encoder.string_value("273.15", jsoncons::semantic_tag::bigdec);
+        encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+        encoder.string_value("273.15", semantic_tag::bigdec);
         encoder.end_array();
         CHECK_FALSE(ec);
         encoder.flush();
@@ -425,7 +425,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
 
 TEST_CASE("encode stringref")
 {
-    jsoncons::ojson j = jsoncons::ojson::parse(R"(
+    ojson j = ojson::parse(R"(
 [
      {
        "name" : "Cocktail",
@@ -451,22 +451,22 @@ TEST_CASE("encode stringref")
 
     cbor::encode_cbor(j, buf, options);
 
-    jsoncons::ojson j2 = cbor::decode_cbor<jsoncons::ojson>(buf);
+    ojson j2 = cbor::decode_cbor<ojson>(buf);
     CHECK(j2 == j);
 }
 
-TEST_CASE("cbor encode with jsoncons::semantic_tags")
+TEST_CASE("cbor encode with semantic_tags")
 {
     SECTION("string")
     {
-        jsoncons::json original;
-        original["uri"] = jsoncons::json("https://gmail.com/", jsoncons::semantic_tag::uri);
-        original["base64url"] = jsoncons::json("Zm9vYmFy", jsoncons::semantic_tag::base64url);
-        original["base64"] = jsoncons::json("Zm9vYmE=", jsoncons::semantic_tag::base64);
+        json original;
+        original["uri"] = json("https://gmail.com/", semantic_tag::uri);
+        original["base64url"] = json("Zm9vYmFy", semantic_tag::base64url);
+        original["base64"] = json("Zm9vYmE=", semantic_tag::base64);
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(original, buffer);
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(buffer);
+        json j = cbor::decode_cbor<json>(buffer);
 
         CHECK(j == original);
     }
@@ -476,14 +476,14 @@ TEST_CASE("cbor encode with jsoncons::semantic_tags")
         const std::vector<uint8_t> s2 = {'f','o','o','b','a'};
         const std::vector<uint8_t> s3 = {'f','o','o','b','a','r'};
 
-        jsoncons::json original;
-        original["base64url"] = jsoncons::json(jsoncons::byte_string_arg, s1, jsoncons::semantic_tag::base64url);
-        original["base64"] = jsoncons::json(jsoncons::byte_string_arg, s2, jsoncons::semantic_tag::base64);
-        original["base16"] = jsoncons::json(jsoncons::byte_string_arg, s3, jsoncons::semantic_tag::base16);
+        json original;
+        original["base64url"] = json(byte_string_arg, s1, semantic_tag::base64url);
+        original["base64"] = json(byte_string_arg, s2, semantic_tag::base64);
+        original["base16"] = json(byte_string_arg, s3, semantic_tag::base16);
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(original, buffer);
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(buffer);
+        json j = cbor::decode_cbor<json>(buffer);
 
         CHECK(j == original);
     }
