@@ -436,7 +436,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     expected.emplace_back(-1431027667, jsoncons::semantic_tag::epoch_second);
     expected.emplace_back(1431027667.5, jsoncons::semantic_tag::epoch_second);
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(bytes);
+    auto j = cbor::decode_cbor<jsoncons::json>(bytes);
 
     REQUIRE(expected == j);
     for (std::size_t i = 0; i < j.size(); ++i)
@@ -729,7 +729,7 @@ TEST_CASE("CBOR stringref tag 3")
             0x00           // unsigned(0)
     };
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     jsoncons::json expected = jsoncons::json::parse(R"(
         ["aaa","aaa",["bbb","aaa","aaa"],["ccc","ccc"],"aaa"]

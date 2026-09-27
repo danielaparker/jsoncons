@@ -466,7 +466,7 @@ TEST_CASE("cbor encode with jsoncons::semantic_tags")
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(original, buffer);
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(buffer);
+        auto j = cbor::decode_cbor<jsoncons::json>(buffer);
 
         CHECK(j == original);
     }
@@ -483,7 +483,7 @@ TEST_CASE("cbor encode with jsoncons::semantic_tags")
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(original, buffer);
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(buffer);
+        auto j = cbor::decode_cbor<jsoncons::json>(buffer);
 
         CHECK(j == original);
     }

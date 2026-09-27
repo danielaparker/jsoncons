@@ -124,7 +124,7 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
     expected.emplace_back("foo");
     expected.emplace_back(jsoncons::byte_string{ 'b','a','r' });
 
-    jsoncons::json j = msgpack::decode_msgpack<jsoncons::json>(bytes);
+    auto j = msgpack::decode_msgpack<jsoncons::json>(bytes);
 
     REQUIRE(expected == j);
 }
@@ -136,7 +136,7 @@ TEST_CASE("decode msgpack from source")
         std::vector<uint8_t> v = {0x91,0xa5,'H','e','l','l','o'};
         std::string s(reinterpret_cast<const char*>(v.data()),v.size());
 
-        jsoncons::json j = msgpack::decode_msgpack<jsoncons::json>(s);
+        auto j = msgpack::decode_msgpack<jsoncons::json>(s);
 
         REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));
@@ -145,7 +145,7 @@ TEST_CASE("decode msgpack from source")
     {
         std::vector<uint8_t> v = {0x91,0xa5,'H','e','l','l','o'};
 
-        jsoncons::json j = msgpack::decode_msgpack<jsoncons::json>(v.begin(), v.end());
+        auto j = msgpack::decode_msgpack<jsoncons::json>(v.begin(), v.end());
 
         REQUIRE(1 == j.size());
         CHECK(j[0].as<std::string>() == std::string("Hello"));

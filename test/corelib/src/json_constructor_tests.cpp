@@ -74,7 +74,7 @@ TEST_CASE("json constructor with pmr allocator")
     {
         jsoncons::pmr::json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+byte_string1.size());
+        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+bstr1.size());
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{j1};
@@ -90,7 +90,7 @@ TEST_CASE("json constructor with pmr allocator")
     {
         jsoncons::pmr::json j1{byte_string_arg, bstr1, jsoncons::semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+byte_string1.size());
+        auto it = std::search(buffer1, last1, bstr1.data(), bstr1.data()+bstr1.size());
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{std::move(j1)};

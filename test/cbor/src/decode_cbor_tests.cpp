@@ -86,7 +86,7 @@ TEST_CASE("cbor_view_test")
     std::vector<uint8_t> c;
     cbor::encode_cbor(j1, c);
 
-    jsoncons::json v = cbor::decode_cbor<jsoncons::json>(c); 
+    auto v = cbor::decode_cbor<jsoncons::json>(c); 
     CHECK(v.is_object());
     CHECK_FALSE(v.is_array());
 
@@ -140,7 +140,7 @@ TEST_CASE("jsonpointer_test")
     std::vector<uint8_t> v;
     cbor::encode_cbor(j, v);
 
-    jsoncons::json jdoc = cbor::decode_cbor<jsoncons::json>(v);
+    auto jdoc = cbor::decode_cbor<jsoncons::json>(v);
     std::string s;
     jdoc.dump(s);
     jsoncons::json j1 = jsoncons::json::parse(s);
@@ -179,7 +179,7 @@ TEST_CASE("as_string_test")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::string s0;
     j[0].dump(s0);
@@ -251,7 +251,7 @@ TEST_CASE("dump cbor to string test")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::string s0;
     j.dump(s0);
@@ -293,7 +293,7 @@ TEST_CASE("test_dump_to_stream")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::ostringstream os0;
     j.dump(os0);
@@ -333,7 +333,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
     encoder.string_value("Ontario");
     encoder.end_object(); 
     encoder.flush();
-    jsoncons::json bv2 = cbor::decode_cbor<jsoncons::json>(v);
+    auto bv2 = cbor::decode_cbor<jsoncons::json>(v);
 
     auto it2 = bv2.object_range().begin();
     CHECK_FALSE((it2 == bv2.object_range().end()));
@@ -350,7 +350,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     encoder.string_value("Ontario");
     encoder.end_array(); 
     encoder.flush();
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     CHECK(2 == j.size());
 
@@ -515,7 +515,7 @@ TEST_CASE("cbor member tests")
 
     encoder.end_object(); 
     encoder.flush();
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     SECTION("contains")
     {
@@ -554,7 +554,7 @@ TEST_CASE("cbor conversion tests")
     encoder.end_array();
     encoder.flush();
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
     REQUIRE(1 == j.size());
 
     auto range1 = j.array_range();
@@ -628,7 +628,7 @@ TEST_CASE("cbor array as<> test")
     //}
     //std::cout << "\n\n";
 
-    jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v); // a non-owning view of the CBOR v
+    auto j = cbor::decode_cbor<jsoncons::json>(v); // a non-owning view of the CBOR v
 
     CHECK(8 == j.size());
 
@@ -686,7 +686,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x03 // 3 
                                  };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
 
         //std::cout << j << "\n";
 
@@ -701,7 +701,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x22 // -3
                                  };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         //std::string s = j.as<std::string>();
         //CHECK(s == std::string("-1.5"));
 
@@ -716,7 +716,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -9223372036854775808
                                  };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
 
         CHECK(j.as<std::string>() == std::string("-0x8000000000000000p-8000000000000000"));
     }

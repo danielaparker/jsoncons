@@ -124,7 +124,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x00,0x01,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 65\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -151,7 +151,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 66\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -179,7 +179,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 67\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -205,7 +205,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x01,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 68\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         CHECK(j.tag() == jsoncons::semantic_tag::clamped);
@@ -232,7 +232,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x01,0x00,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 69\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -279,7 +279,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 70\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -320,7 +320,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 71\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -350,7 +350,7 @@ TEST_CASE("cbor typed array tests")
                 0x80,0x01,0x7f
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 72\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -378,7 +378,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0xff        
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 73\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -423,7 +423,7 @@ TEST_CASE("cbor typed array tests")
             0x7f,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 74\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -461,7 +461,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 75\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -495,7 +495,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0x7f
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 77\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -541,7 +541,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0x7f
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 78\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -582,7 +582,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x7f
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 79\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -616,7 +616,7 @@ TEST_CASE("cbor typed array tests")
                 0x7b,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 80\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(4 == j.size());
@@ -636,7 +636,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0x7f,0xff,0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 81\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -663,7 +663,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         REQUIRE(j.is_array());
         //std::cout << pretty_print(j) << "\n";
 
@@ -689,7 +689,7 @@ TEST_CASE("cbor typed array tests")
                 0x3f,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
         };
 
-        //jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        //auto j = cbor::decode_cbor<jsoncons::json>(data);
         //REQUIRE(j.is_array());
         //REQUIRE(2 == j.size());
 
@@ -711,7 +711,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0x7b
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 84\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(4 == j.size());
@@ -732,7 +732,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0x7f,0x7f 
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 85\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -763,7 +763,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
         };
 
-        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        auto j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 86\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -797,7 +797,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x3f 
         };
 
-        //jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
+        //auto j = cbor::decode_cbor<jsoncons::json>(data);
         //REQUIRE(j.is_array());
         //REQUIRE(2 == j.size());
     }
