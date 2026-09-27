@@ -13,9 +13,9 @@
 
 using namespace jsoncons;
 
-void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
+void check_decode_bson(const std::vector<uint8_t>& v, const jsoncons::json& expected)
 {
-    json result = bson::decode_bson<json>(v);
+    auto result = bson::decode_bson<jsoncons::json>(v);
     REQUIRE(result == expected);
 
     std::string s;
@@ -24,7 +24,7 @@ void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
         s.push_back(c);
     }
     std::istringstream is(s);
-    json j2 = bson::decode_bson<json>(is);
+    jsoncons::json j2 = bson::decode_bson<jsoncons::json>(is);
     REQUIRE(j2 == expected);
 }
 
@@ -36,6 +36,6 @@ TEST_CASE("bson hello world")
                        0x06,0x00,0x00,0x00, // size of value
                        'w','o','r','l','d',0x00, // field value and null terminator
                        0x00 // end of document
-                      },json::parse("{\"hello\":\"world\"}"));
+                      },jsoncons::json::parse("{\"hello\":\"world\"}"));
 }
 

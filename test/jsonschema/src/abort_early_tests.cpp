@@ -75,9 +75,9 @@ TEST_CASE("jsonschema stop early tests")
 }
     )";
 
-    ojson schema = ojson::parse(schema_str);
-    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
-    ojson data = ojson::parse(data_str);
+    jsoncons::ojson schema = jsoncons::ojson::parse(schema_str);
+    jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+    jsoncons::ojson data = jsoncons::ojson::parse(data_str);
 
     SECTION("test 1")
     {
@@ -88,8 +88,8 @@ TEST_CASE("jsonschema stop early tests")
 }
         )";
 
-        ojson expected = ojson::parse(expected_str);
-        ojson results{ jsoncons::json_object_arg };
+        jsoncons::ojson expected = jsoncons::ojson::parse(expected_str);
+        jsoncons::ojson results{ jsoncons::json_object_arg };
         auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_state
             {
                 results.try_emplace(message.instance_location().string(), message.message());
@@ -108,8 +108,8 @@ TEST_CASE("jsonschema stop early tests")
 }
         )";
 
-        ojson expected = ojson::parse(expected_str);
-        ojson results{jsoncons::json_object_arg};
+        jsoncons::ojson expected = jsoncons::ojson::parse(expected_str);
+        jsoncons::ojson results{jsoncons::json_object_arg};
         auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_state
             {
                 results.try_emplace(message.instance_location().string(), message.message());

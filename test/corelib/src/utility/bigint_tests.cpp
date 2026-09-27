@@ -20,8 +20,8 @@ TEST_CASE("basic_bigint tests")
 {
     SECTION("0")
     {
-        bigint a{0};
-        bigint b{};
+        jsoncons::bigint a{0};
+        jsoncons::bigint b{};
         CHECK(0 == a.get_storage_view().size());
         CHECK(a.get_storage_view().size() == b.get_storage_view().size());
         CHECK(a == b);
@@ -29,30 +29,30 @@ TEST_CASE("basic_bigint tests")
     }
     SECTION("0 denom")
     {
-        bigint denom{0};
-        bigint num{1000};
+        jsoncons::bigint denom{0};
+        jsoncons::bigint num{1000};
         REQUIRE_THROWS(num / denom);
     }
     SECTION("0 num")
     {
-        bigint denom{1000};
-        bigint num{0};
+        jsoncons::bigint denom{1000};
+        jsoncons::bigint num{0};
         auto quot = num / denom;
         CHECK(0 == quot);
     }
     SECTION("Dividend less than divisor")
     {
-        bigint num{10};
-        bigint denom{1000};
-        bigint quot{};
-        bigint rem{};
+        jsoncons::bigint num{10};
+        jsoncons::bigint denom{1000};
+        jsoncons::bigint quot{};
+        jsoncons::bigint rem{};
         num.divide(denom, quot, rem, true);
         CHECK(0 == quot);
         CHECK(num == rem);
     }
     SECTION("is_odd, is_even")
     {
-        bigint b(0);
+        jsoncons::bigint b(0);
         for (std::size_t i = 0; i < 10000; ++i)
         {
             CHECK_FALSE(b.is_odd());
@@ -69,16 +69,16 @@ TEST_CASE("test_positive_bignum")
 {
     std::string expected = "18446744073709551616";
     std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
-    bigint x = bigint::from_bytes_be(1, v.data(),v.size());
+    jsoncons::bigint x = jsoncons::bigint::from_bytes_be(1, v.data(),v.size());
 
     std::string sx = x.to_string();
     CHECK(expected == sx);
 
-    bigint y(x);
+    jsoncons::bigint y(x);
     std::string sy = y.to_string();
     CHECK(expected == sy);
 
-    bigint z;
+    jsoncons::bigint z;
     z = x;
     std::string sz = y.to_string();
     CHECK(expected == sz);
@@ -96,8 +96,8 @@ TEST_CASE("test_positive_bignum")
 TEST_CASE("bignums are equal")
 {
     std::string s = "18446744073709551616";
-    bigint x(s);
-    bigint y(s);
+    jsoncons::bigint x(s);
+    jsoncons::bigint y(s);
 
     bool test = x == y;
     CHECK(test);
@@ -107,17 +107,17 @@ TEST_CASE("test_negative_bignum")
 {
     std::string expected = "-18446744073709551617";
     std::vector<uint8_t> b = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(1, b.data(),b.size());
-    bigint x2 = -1 - x;
+    jsoncons::bigint x = jsoncons::bigint::from_bytes_be(1, b.data(),b.size());
+    jsoncons::bigint x2 = -1 - x;
 
     std::string sx = x2.to_string();
     CHECK(expected == sx);
 
-    bigint y(x2);
+    jsoncons::bigint y(x2);
     std::string sy = y.to_string();
     CHECK(expected == sy);
 
-    bigint z;
+    jsoncons::bigint z;
     z = x2;
     std::string sz = z.to_string();
     CHECK(expected == sz);
@@ -146,7 +146,7 @@ TEST_CASE("test_longlong")
 {
     constexpr auto n = (std::numeric_limits<long long>::max)();
 
-    bigint val(n);
+    jsoncons::bigint val(n);
 
     //std::cout << "long long " << n << " == " << val << '\n';
     //std::cout << val.to_string(16) << '\n';
@@ -155,17 +155,17 @@ TEST_CASE("test_longlong")
 TEST_CASE("test_bignum2")
 {
     std::string v = "10000000000000000";
-    bigint (v.data());
+    jsoncons::bigint (v.data());
 
     //std::cout << val << '\n';
 }
 
 TEST_CASE("test_logical_operations")
 {
-    bigint x( "888888888888888888" );
-    bigint y( "888888888888888888" );
+    jsoncons::bigint x( "888888888888888888" );
+    jsoncons::bigint y( "888888888888888888" );
 
-    bigint z = x & y;
+    jsoncons::bigint z = x & y;
 
     bool test = z == x;
     CHECK(test);
@@ -173,21 +173,21 @@ TEST_CASE("test_logical_operations")
 
 TEST_CASE("test_addition")
 {
-    bigint x( "4444444444444444444444444444444" );
-    bigint y( "4444444444444444444444444444444" );
-    bigint a( "8888888888888888888888888888888" );
+    jsoncons::bigint x( "4444444444444444444444444444444" );
+    jsoncons::bigint y( "4444444444444444444444444444444" );
+    jsoncons::bigint a( "8888888888888888888888888888888" );
 
-    bigint z = x + y;
+    jsoncons::bigint z = x + y;
     bool test = z == a;
     CHECK(test);
 }
 
 TEST_CASE("test_multiplication")
 {
-    bigint x( "4444444444444444444444444444444" );
-    bigint a( "8888888888888888888888888888888" );
+    jsoncons::bigint x( "4444444444444444444444444444444" );
+    jsoncons::bigint a( "8888888888888888888888888888888" );
 
-    bigint z = 2*x;
+    jsoncons::bigint z = 2*x;
     bool test = z == a;
     CHECK(test);
 
@@ -199,11 +199,11 @@ TEST_CASE("test_multiplication")
 
 TEST_CASE("test_conversion_0")
 {
-    bigint x;
+    jsoncons::bigint x;
 
-    json j(x);
+    jsoncons::json j(x);
 
-    bigint y = j.as<bigint>();
+    jsoncons::bigint y = j.as<jsoncons::bigint>();
     CHECK(bool(x == y));
 
     std::string s = y.to_string();
@@ -214,11 +214,11 @@ TEST_CASE("test_conversion_0")
 TEST_CASE("test_traits1")
 {
     std::vector<uint8_t> data = {0x01,0x00};
-    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
+    jsoncons::bigint x = jsoncons::bigint::from_bytes_be(1, data.data(), data.size());
 
-    json j(x);
+    jsoncons::json j(x);
 
-    bigint y = j.as<bigint>();
+    jsoncons::bigint y = j.as<jsoncons::bigint>();
     CHECK(bool(x == y));
 
     std::string s = y.to_string();
@@ -229,11 +229,11 @@ TEST_CASE("test_traits1")
 TEST_CASE("test_traits2")
 {
     std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
+    jsoncons::bigint x = jsoncons::bigint::from_bytes_be(1, data.data(), data.size());
 
-    json j(x);
+    jsoncons::json j(x);
 
-    bigint y = j.as<bigint>();
+    jsoncons::bigint y = j.as<jsoncons::bigint>();
     CHECK(bool(x == y));
 
     std::string s = y.to_string();
@@ -244,7 +244,7 @@ TEST_CASE("test_traits2")
 TEST_CASE("test_traits3")
 {
     std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
+    jsoncons::bigint x = jsoncons::bigint::from_bytes_be(1, data.data(), data.size());
 
     x = -1 - x;
 
@@ -259,9 +259,9 @@ TEST_CASE("test_traits3")
     //}
     //std::cout << '\n';
 
-    json j(x);
+    jsoncons::json j(x);
 
-    bigint y = j.as<bigint>();
+    jsoncons::bigint y = j.as<jsoncons::bigint>();
     CHECK(bool(x == y));
 
     std::string s = y.to_string();
@@ -273,22 +273,22 @@ TEST_CASE("test shift left")
 {
     SECTION("n << 1")
     {
-        bigint n("1");
-        bigint x = n << 1;
+        jsoncons::bigint n("1");
+        jsoncons::bigint x = n << 1;
         std::string s = x.to_string();
         CHECK(s == "2");
     }
     SECTION("n << 100")
     {
-        bigint n(1);
-        bigint x = n << 100;
+        jsoncons::bigint n(1);
+        jsoncons::bigint x = n << 100;
         std::string s = x.to_string();
         CHECK(s == "1267650600228229401496703205376");
     }
     SECTION("n << 100, += 1")
     {
-        bigint n(1);
-        bigint x = n << 100;
+        jsoncons::bigint n(1);
+        jsoncons::bigint x = n << 100;
         x += 1;
         std::string s = x.to_string();
         CHECK(s == "1267650600228229401496703205377");
@@ -299,15 +299,15 @@ TEST_CASE("times 10")
 {
     SECTION("1")
     {
-        bigint n("1234");
-        bigint m = n * 10;
+        jsoncons::bigint n("1234");
+        jsoncons::bigint m = n * 10;
         std::string s = m.to_string();
         CHECK(s == "12340");
     }
     SECTION("31")
     {
         std::string expected("1234");
-        bigint n(expected);
+        jsoncons::bigint n(expected);
 
         for (std::size_t i = 0; i < 31; ++i)
         {
@@ -321,7 +321,7 @@ TEST_CASE("times 10")
     SECTION("32")
     {
         std::string expected("1234");
-        bigint n(expected);
+        jsoncons::bigint n(expected);
         for (std::size_t i = 0; i < 32; ++i)
         {
             n *= (uint64_t)10;
@@ -338,32 +338,32 @@ TEST_CASE("bigint div")
 #if (defined(_MSC_VER) && _MSC_VER >= 1910) || !defined(_MSC_VER) 
     SECTION("bigint")
     {
-        bigint big_pos("18364494661702398480");
-        bigint small_pos("65535");
-        bigint res_pos("280224226164681");
-        bigint big_neg = -big_pos;
-        bigint small_neg = -small_pos;
-        bigint res_neg = -res_pos;
+        jsoncons::bigint big_pos("18364494661702398480");
+        jsoncons::bigint small_pos("65535");
+        jsoncons::bigint res_pos("280224226164681");
+        jsoncons::bigint big_neg = -big_pos;
+        jsoncons::bigint small_neg = -small_pos;
+        jsoncons::bigint res_neg = -res_pos;
 
-        CHECK((big_neg / big_neg) == bigint(1));
+        CHECK((big_neg / big_neg) == jsoncons::bigint(1));
         CHECK((big_neg / small_neg) == res_pos);
         CHECK((big_neg / small_pos) == res_neg);
-        CHECK((big_neg / big_pos) == bigint(-1));
+        CHECK((big_neg / big_pos) == jsoncons::bigint(-1));
 
-        CHECK((small_neg / big_neg) == bigint(0));
-        CHECK((small_neg / small_neg) == bigint(1));
-        CHECK((small_neg / small_pos) == bigint(-1));
-        CHECK((small_neg / big_pos) == bigint(0));
+        CHECK((small_neg / big_neg) == jsoncons::bigint(0));
+        CHECK((small_neg / small_neg) == jsoncons::bigint(1));
+        CHECK((small_neg / small_pos) == jsoncons::bigint(-1));
+        CHECK((small_neg / big_pos) == jsoncons::bigint(0));
 
-        CHECK((small_pos / big_neg) == bigint(0));
-        CHECK((small_pos / small_neg) == bigint(-1));
-        CHECK((small_pos / small_pos) == bigint(1));
-        CHECK((small_pos / big_pos) == bigint(0));
+        CHECK((small_pos / big_neg) == jsoncons::bigint(0));
+        CHECK((small_pos / small_neg) == jsoncons::bigint(-1));
+        CHECK((small_pos / small_pos) == jsoncons::bigint(1));
+        CHECK((small_pos / big_pos) == jsoncons::bigint(0));
 
-        CHECK((big_pos / big_neg) == bigint(-1));
+        CHECK((big_pos / big_neg) == jsoncons::bigint(-1));
         CHECK((big_pos / small_neg) == res_neg);
         CHECK((big_pos / small_pos) == res_pos);
-        CHECK((big_pos / big_pos) == bigint(1));
+        CHECK((big_pos / big_pos) == jsoncons::bigint(1));
     }
 #endif
 }
@@ -374,48 +374,48 @@ TEST_CASE("bigint operations")
 {
     SECTION("plus")
     {
-        bigint a("20178175244496647895629245678926563358862835685868092718528786189298896755892724096350318132354654969715294305656279188466948605121492948268400884893722767401972695174353441");
-        bigint b("93976986297275963857794534313022836860642008364607162222395304627737845003599751108876721426146679370149373711095582235633733294240624814097369771481147215472578762824607080");
-        bigint c = a + b;
-        bigint expected("114155161541772611753423779991949400219504844050475254940924090817036741759492475205227039558501334339864668016751861424100681899362117762365770656374869982874551457998960521");
+        jsoncons::bigint a("20178175244496647895629245678926563358862835685868092718528786189298896755892724096350318132354654969715294305656279188466948605121492948268400884893722767401972695174353441");
+        jsoncons::bigint b("93976986297275963857794534313022836860642008364607162222395304627737845003599751108876721426146679370149373711095582235633733294240624814097369771481147215472578762824607080");
+        jsoncons::bigint c = a + b;
+        jsoncons::bigint expected("114155161541772611753423779991949400219504844050475254940924090817036741759492475205227039558501334339864668016751861424100681899362117762365770656374869982874551457998960521");
 
         CHECK(expected == (c));
     }
 
     SECTION("minus")
     {
-        bigint a("63584976221895260406245934266037944699776129516216688813405106853198139417759498415735161100030933326522675347686646219695144553808051168706779408804756208386011014197185296");
-        bigint b("75761734353628069683913529566109295493116360791340046058510920764479664838827482335858563500856417188227416490721063436557647698896399869016678013515043471880323279258685478");
-        bigint c = a - b;
-        bigint expected("-12176758131732809277667595300071350793340231275123357245105813911281525421067983920123402400825483861704741143034417216862503145088348700309898604710287263494312265061500182");
+        jsoncons::bigint a("63584976221895260406245934266037944699776129516216688813405106853198139417759498415735161100030933326522675347686646219695144553808051168706779408804756208386011014197185296");
+        jsoncons::bigint b("75761734353628069683913529566109295493116360791340046058510920764479664838827482335858563500856417188227416490721063436557647698896399869016678013515043471880323279258685478");
+        jsoncons::bigint c = a - b;
+        jsoncons::bigint expected("-12176758131732809277667595300071350793340231275123357245105813911281525421067983920123402400825483861704741143034417216862503145088348700309898604710287263494312265061500182");
 
         CHECK(expected == (c));
     }
 
     SECTION("mult")
     {
-        bigint a("43359329001059048967113581928625959342654930666632400867978208429224464941890190751598229305718587280094852374898291386268967561418738958337632249177044975686477011571044266");
-        bigint b("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377");
-        bigint c = a * b;
-        bigint expected("55409001364124857587521411422210474638575227552776047085010157327559891765943209923363557763419730972781537530948429788352886919273214132899346769031695550850320602049507618052164677667378189154076988316301237199538599598044906690917691500474146296751848053320011822980888915807952984822080201739642211593661864443811046346990267512628848918282");
+        jsoncons::bigint a("43359329001059048967113581928625959342654930666632400867978208429224464941890190751598229305718587280094852374898291386268967561418738958337632249177044975686477011571044266");
+        jsoncons::bigint b("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377");
+        jsoncons::bigint c = a * b;
+        jsoncons::bigint expected("55409001364124857587521411422210474638575227552776047085010157327559891765943209923363557763419730972781537530948429788352886919273214132899346769031695550850320602049507618052164677667378189154076988316301237199538599598044906690917691500474146296751848053320011822980888915807952984822080201739642211593661864443811046346990267512628848918282");
 
         CHECK(expected == (c));
     }
 
     SECTION("div")
     {
-        bigint a("43359329001059048967113581928625959342654930666632400867978208429224464941890190751598229305718587280094852374898291386268967561418738958337632249177044975686477011571044266");
-        bigint b("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377");
-        bigint c = a / b;
-        bigint expected("33");
+        jsoncons::bigint a("43359329001059048967113581928625959342654930666632400867978208429224464941890190751598229305718587280094852374898291386268967561418738958337632249177044975686477011571044266");
+        jsoncons::bigint b("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377");
+        jsoncons::bigint c = a / b;
+        jsoncons::bigint expected("33");
 
         CHECK(expected == (c));
     }
 
     SECTION("&=")
     {
-        bigint a{0};
-        bigint b;
+        jsoncons::bigint a{0};
+        jsoncons::bigint b;
         auto r = to_bigint("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377", b);
         REQUIRE(r);
         b &= a;
@@ -425,11 +425,11 @@ TEST_CASE("bigint operations")
 
     SECTION("|=")
     {
-        bigint a{0};
-        bigint b;
+        jsoncons::bigint a{0};
+        jsoncons::bigint b;
         auto r = to_bigint("1277902648419017187919156692641295109476255233737630537760832794503886212911067061184379695097643279217271150419129022856601771338794256383410400076210073482253089544155377", b);
         REQUIRE(r);
-        bigint expected = b;
+        jsoncons::bigint expected = b;
         b |= a;
 
         CHECK(expected == b);
@@ -440,37 +440,37 @@ TEST_CASE("bigint cast")
 {
     SECTION("to short")
     {
-        bigint b{(std::numeric_limits<short>::lowest)()};
+        jsoncons::bigint b{(std::numeric_limits<short>::lowest)()};
         auto val = (short)b;
         CHECK((std::numeric_limits<short>::lowest)() == val);
     }
     SECTION("to int")
     {
-        bigint b{(std::numeric_limits<int>::lowest)()};
+        jsoncons::bigint b{(std::numeric_limits<int>::lowest)()};
         auto val = (int)b;
         CHECK((std::numeric_limits<int>::lowest)() == val);
     }
     SECTION("to long")
     {
-        bigint b{(std::numeric_limits<long>::lowest)()};
+        jsoncons::bigint b{(std::numeric_limits<long>::lowest)()};
         auto val = (long)b;
         CHECK((std::numeric_limits<long>::lowest)() == val);
     }
     SECTION("to long long")
     {
-        bigint b{(std::numeric_limits<long long>::max)()};
+        jsoncons::bigint b{(std::numeric_limits<long long>::max)()};
         auto val = (long long)b;
         CHECK((std::numeric_limits<long long>::max)() == val);
     }
     SECTION("to unsigned long")
     {
-        bigint b{(std::numeric_limits<unsigned long>::max)()};
+        jsoncons::bigint b{(std::numeric_limits<unsigned long>::max)()};
         auto val = (unsigned long)b;
         CHECK((std::numeric_limits<unsigned long>::max)() == val);
     }
     SECTION("to unsigned long long")
     {
-        bigint b{(std::numeric_limits<unsigned long long>::max)()};
+        jsoncons::bigint b{(std::numeric_limits<unsigned long long>::max)()};
         auto val = (unsigned long long)b;
         CHECK((std::numeric_limits<unsigned long long>::max)() == val);
     }
@@ -478,18 +478,18 @@ TEST_CASE("bigint cast")
 
 TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 {
-    bigint a("56654250564056135415631554531554513813"); 
-    bigint b("60820564691661355463515465564664568");
+    jsoncons::bigint a("56654250564056135415631554531554513813"); 
+    jsoncons::bigint b("60820564691661355463515465564664568");
     //bigint d(956486133);
 
     SECTION("Addition")
     {
-        bigint c = a + b;
-        bigint expected("56715071128747796771095069997119178381");
+        jsoncons::bigint c = a + b;
+        jsoncons::bigint expected("56715071128747796771095069997119178381");
         CHECK(expected == c);
 
         c = a + 56242;
-        expected = bigint("56654250564056135415631554531554570055");
+        expected = jsoncons::bigint("56654250564056135415631554531554570055");
         CHECK(expected == c);
 
         c = 52 + 98;
@@ -497,18 +497,18 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
 
         c = c + a + b;
-        expected = bigint("56715071128747796771095069997119178531");
+        expected = jsoncons::bigint("56715071128747796771095069997119178531");
         CHECK(expected == c);
     }
 
     SECTION("Subtraction")
     {
-        bigint c = a - b;
-        bigint expected("56593429999364474060168039065989849245");
+        jsoncons::bigint c = a - b;
+        jsoncons::bigint expected("56593429999364474060168039065989849245");
         CHECK(expected == c);
 
         c = a - 56242;
-        expected = bigint("56654250564056135415631554531554457571");
+        expected = jsoncons::bigint("56654250564056135415631554531554457571");
         CHECK(expected == c);
 
         c = 52 - 98;
@@ -516,18 +516,18 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
 
         c = c - a - b; 
-        expected = bigint("-56715071128747796771095069997119178427");
+        expected = jsoncons::bigint("-56715071128747796771095069997119178427");
         CHECK(expected == c);
     }
 
     SECTION("Multiplication")
     {
-        bigint c = a * b;
-        bigint expected("3445743511488768021543787806860750328299778111849236444610289955667677784");
+        jsoncons::bigint c = a * b;
+        jsoncons::bigint expected("3445743511488768021543787806860750328299778111849236444610289955667677784");
         CHECK(expected == c);
 
         c = a * 56242;
-        expected = bigint("3186348360223645168045949889963688965870746");
+        expected = jsoncons::bigint("3186348360223645168045949889963688965870746");
         CHECK(expected == c);
 
         c = 52 * 98;
@@ -535,18 +535,18 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
         CHECK(expected == c);
 
         c = c * a * b; 
-        expected = bigint("17559508934546761837787142663762383673015669257983708921734037614082485987264");
+        expected = jsoncons::bigint("17559508934546761837787142663762383673015669257983708921734037614082485987264");
         CHECK(expected == c);
     }
 
     SECTION("Division")
     {
-        bigint c = a / b;
-        bigint expected = 931;
+        jsoncons::bigint c = a / b;
+        jsoncons::bigint expected = 931;
         CHECK(expected == c);
 
         c = a / 56242;
-        expected = bigint("1007329941397107773827949833426167");
+        expected = jsoncons::bigint("1007329941397107773827949833426167");
         CHECK(expected == c);
 
         c = 98 / 56;
@@ -560,24 +560,24 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 
     SECTION("divide with remainder")
     {
-        bigint c;
-        bigint r;
+        jsoncons::bigint c;
+        jsoncons::bigint r;
 
         a.divide(b, c, r, true);
 
-        bigint c_expected = 931;
-        bigint r_expected("30304836119413479098656090851801005");
+        jsoncons::bigint c_expected = 931;
+        jsoncons::bigint r_expected("30304836119413479098656090851801005");
         //std::cout << expected << "\n";
         //std::cout << r << "\n";
         CHECK(c_expected == c);
         CHECK(r_expected == r);
     }
 
-    SECTION("bigint % bigint")
+    SECTION("bigint % jsoncons::bigint")
     {
-        bigint c = a % b;
+        jsoncons::bigint c = a % b;
 
-        bigint expected("30304836119413479098656090851801005");
+        jsoncons::bigint expected("30304836119413479098656090851801005");
         CHECK(expected == c);
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
@@ -585,33 +585,33 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
 
     SECTION("bigint % integer")
     {
-        bigint c = a % 56242;
+        jsoncons::bigint c = a % 56242;
 
-        bigint expected(29399);
+        jsoncons::bigint expected(29399);
         CHECK(expected == c);
     }
 
     SECTION("integer % integer")
     {
-        bigint c = 98 % 56;
+        jsoncons::bigint c = 98 % 56;
 
-        bigint expected(42);
+        jsoncons::bigint expected(42);
         CHECK(expected == c);
     }
 
     SECTION("a % b % c")
     {
-        bigint c = 98 % 56;
-        bigint d = a % b % c;
+        jsoncons::bigint c = 98 % 56;
+        jsoncons::bigint d = a % b % c;
 
-        bigint expected(41);
+        jsoncons::bigint expected(41);
         CHECK(expected == d);
     }
 
     SECTION("modulus with second_done")
     {
-        b = bigint("4253529586511730793019062996110615940069384017080242667520");
-        bigint c = a % b;
+        b = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint c = a % b;
 
         CHECK(a == c);
         //std::cout << expected << "\n";
@@ -632,65 +632,65 @@ TEST_CASE("https://github.com/rgroshanrg/bigint SampleTest.cpp")
     }
     SECTION("absb")
     {
-        bigint c = jsoncons::absb(b);
-        CHECK(bigint("60820564691661355463515465564664568") == c);
+        jsoncons::bigint c = jsoncons::absb(b);
+        CHECK(jsoncons::bigint("60820564691661355463515465564664568") == c);
     }
     SECTION("powb")
     {
-        bigint c = jsoncons::powb(a, 2u);
-        CHECK(bigint("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
+        jsoncons::bigint c = jsoncons::powb(a, 2u);
+        CHECK(jsoncons::bigint("3209704106974854937901411896655926267350648828646359016173511958974807798969") == c);
     }
     SECTION("sqrtb")
     {
-        bigint c = jsoncons::sqrtb(a);
-        CHECK(bigint("7526901790514881921") == c);
+        jsoncons::bigint c = jsoncons::sqrtb(a);
+        CHECK(jsoncons::bigint("7526901790514881921") == c);
     }
 }
 
 TEST_CASE("bigint operator+= tests")
 {
-    bigint a("56654250564056135415631554531554513813"); 
-    bigint b("60820564691661355463515465564664568");
+    jsoncons::bigint a("56654250564056135415631554531554513813"); 
+    jsoncons::bigint b("60820564691661355463515465564664568");
 
     SECTION("a += b")
     {
         a += b;
-        bigint expected("56715071128747796771095069997119178381");
+        jsoncons::bigint expected("56715071128747796771095069997119178381");
         CHECK(expected == a);
     }
 
     SECTION("a += 56242")
     {
         a += 56242;
-        auto expected = bigint("56654250564056135415631554531554570055");
+        auto expected = jsoncons::bigint("56654250564056135415631554531554570055");
         CHECK(expected == a);
     }
 
     SECTION("a += 56242u")
     {
         a += 56242u;
-        auto expected = bigint("56654250564056135415631554531554570055");
+        auto expected = jsoncons::bigint("56654250564056135415631554531554570055");
         CHECK(expected == a);
     }
 
     SECTION("a += -b")
     {
         a += -b;
-        bigint expected("56593429999364474060168039065989849245");
+        jsoncons::bigint expected("56593429999364474060168039065989849245");
         CHECK(expected == a);
     }
 
     SECTION("a += -56242")
     {
         a += -56242;
-        auto expected = bigint("56654250564056135415631554531554457571");
+        auto expected = jsoncons::bigint("56654250564056135415631554531554457571");
         CHECK(expected == a);
     }
 
     SECTION("pos number += 5")
     {
-        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667525");
-        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint expected = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint c        = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667520");
         c += 5;
 
         CHECK(expected == c);
@@ -699,8 +699,8 @@ TEST_CASE("bigint operator+= tests")
     }
     SECTION("pos number += -5")
     {
-        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
-        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint expected = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint c        = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667525");
         c += -5;
 
         CHECK(expected == c);
@@ -709,8 +709,8 @@ TEST_CASE("bigint operator+= tests")
     }
     SECTION("pos number += -5")
     {
-        bigint expected = bigint("4253529586511730793019062996110615940069384017080242667520");
-        bigint c        = bigint("4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint expected = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint c        = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667525");
         c += -5;
 
         CHECK(expected == c);
@@ -720,8 +720,8 @@ TEST_CASE("bigint operator+= tests")
 
     SECTION("neg number += 5")
     {
-        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667520");
-        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint expected = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint c        = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667525");
         c += 5;
 
         CHECK(expected == c);
@@ -730,8 +730,8 @@ TEST_CASE("bigint operator+= tests")
     }
     SECTION("neg number += -5")
     {
-        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
-        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
+        jsoncons::bigint expected = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint c        = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667520");
         c += -5;
 
         CHECK(expected == c);
@@ -740,9 +740,9 @@ TEST_CASE("bigint operator+= tests")
     }    
     SECTION("neg number += -5")
     {
-        bigint expected = bigint("-4253529586511730793019062996110615940069384017080242667525");
-        bigint c        = bigint("-4253529586511730793019062996110615940069384017080242667520");
-        c += bigint(-5);
+        jsoncons::bigint expected = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667525");
+        jsoncons::bigint c        = jsoncons::bigint("-4253529586511730793019062996110615940069384017080242667520");
+        c += jsoncons::bigint(-5);
 
         CHECK(expected == c);
         //std::cout << expected << "\n";
@@ -754,8 +754,8 @@ TEST_CASE("basic_bigint compare_half")
 {
     SECTION("test half equal")
     {
-        bigint a(1);
-        bigint b(2);
+        jsoncons::bigint a(1);
+        jsoncons::bigint b(2);
 
         for (std::size_t i = 0; i < 10000; ++i)
         {
@@ -766,8 +766,8 @@ TEST_CASE("basic_bigint compare_half")
     }
     SECTION("test half greater")
     {
-        bigint a(2);
-        bigint b(3);
+        jsoncons::bigint a(2);
+        jsoncons::bigint b(3);
 
         for (std::size_t i = 0; i < 10000; ++i)
         {
@@ -778,8 +778,8 @@ TEST_CASE("basic_bigint compare_half")
     }
     SECTION("test half less")
     {
-        bigint a(2);
-        bigint b(5);
+        jsoncons::bigint a(2);
+        jsoncons::bigint b(5);
 
         for (std::size_t i = 0; i < 10000; ++i)
         {
@@ -794,15 +794,15 @@ TEST_CASE("basic_bigint bit tests")
 {
     SECTION("bit_width")
     {
-        bigint b1("0");
+        jsoncons::bigint b1("0");
         CHECK(0 == b1.bit_width());
-        bigint b2("100");
+        jsoncons::bigint b2("100");
         CHECK(7 == b2.bit_width());
-        bigint b3("1234567890123456789");
+        jsoncons::bigint b3("1234567890123456789");
         CHECK(61 == b3.bit_width());
-        bigint b4("1234567890123456789000000");
+        jsoncons::bigint b4("1234567890123456789000000");
         CHECK(81 == b4.bit_width());
-        bigint b5("12345678910111213141516171819202122233425262728290000");
+        jsoncons::bigint b5("12345678910111213141516171819202122233425262728290000");
         CHECK(174 == b5.bit_width());
     }
 }

@@ -23,10 +23,10 @@ using namespace jsoncons;
 
 TEST_CASE("test replace tests")
 {
-    json j;
+    jsoncons::json j;
     JSONCONS_TRY
     {
-        j = json::parse(R"(
+        j = jsoncons::json::parse(R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -68,7 +68,7 @@ TEST_CASE("test replace tests")
 
         // make a discount on all books
         jsonpath::json_replace(j, expr,
-            [](const std::string&,json& price) { price = std::round(price.as<double>() - 1.0); });
+            [](const std::string&,jsoncons::json& price) { price = std::round(price.as<double>() - 1.0); });
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
         CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
@@ -81,7 +81,7 @@ TEST_CASE("test replace tests")
 
         // make a discount on all books
         jsonpath::json_replace(j, expr,
-            [](const json& price) { return std::round(price.as<double>() - 1.0); });
+            [](const jsoncons::json& price) { return std::round(price.as<double>() - 1.0); });
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
         CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));

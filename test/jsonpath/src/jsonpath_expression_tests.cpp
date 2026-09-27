@@ -233,10 +233,10 @@ TEST_CASE("jsonpath_expression::select_path tests")
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
         REQUIRE(4 == paths.size());
-        CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
-        CHECK(jsonpath::to_string(paths[1]) == "$['books'][1]");
-        CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]");
-        CHECK(jsonpath::to_string(paths[3]) == "$['books'][3]");
+        CHECK(jsoncons::jsonpath::to_string(paths[0]) == "$['books'][0]");
+        CHECK(jsoncons::jsonpath::to_string(paths[1]) == "$['books'][1]");
+        CHECK(jsoncons::jsonpath::to_string(paths[2]) == "$['books'][2]");
+        CHECK(jsoncons::jsonpath::to_string(paths[3]) == "$['books'][3]");
     }
 
     SECTION("Return locations of selected values")
@@ -245,17 +245,17 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]['category','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsoncons::jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
         REQUIRE(8 == paths.size());
-        CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
-        CHECK(jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
-        CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
-        CHECK(jsonpath::to_string(paths[3]) == "$['books'][2]['category']");
-        CHECK(jsonpath::to_string(paths[4]) == "$['books'][1]['title']");
-        CHECK(jsonpath::to_string(paths[5]) == "$['books'][1]['category']");
-        CHECK(jsonpath::to_string(paths[6]) == "$['books'][0]['title']");
-        CHECK(jsonpath::to_string(paths[7]) == "$['books'][0]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[3]) == "$['books'][2]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[4]) == "$['books'][1]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[5]) == "$['books'][1]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[6]) == "$['books'][0]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[7]) == "$['books'][0]['category']");
 
         //for (const auto& path : paths)
         //{
@@ -269,17 +269,17 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]['category','category','title','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsoncons::jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
         REQUIRE(8 == paths.size());
-        CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
-        CHECK(jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
-        CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
-        CHECK(jsonpath::to_string(paths[3]) == "$['books'][2]['category']");
-        CHECK(jsonpath::to_string(paths[4]) == "$['books'][1]['title']");
-        CHECK(jsonpath::to_string(paths[5]) == "$['books'][1]['category']");
-        CHECK(jsonpath::to_string(paths[6]) == "$['books'][0]['title']");
-        CHECK(jsonpath::to_string(paths[7]) == "$['books'][0]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[1]) == "$['books'][3]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[2]) == "$['books'][2]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[3]) == "$['books'][2]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[4]) == "$['books'][1]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[5]) == "$['books'][1]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[6]) == "$['books'][0]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[7]) == "$['books'][0]['category']");
 
         //for (const auto& path : paths)
         //{
@@ -296,22 +296,22 @@ TEST_CASE("jsonpath_expression::select_path tests")
         std::vector<jsonpath::json_location> paths = expr.select_paths(root, jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 16);
-        CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
-        CHECK(jsonpath::to_string(paths[1]) == "$['books'][3]['title']");
-        CHECK(jsonpath::to_string(paths[2]) == "$['books'][3]['category']");
-        CHECK(jsonpath::to_string(paths[3]) == "$['books'][3]['category']");
-        CHECK(jsonpath::to_string(paths[4]) == "$['books'][2]['title']");
-        CHECK(jsonpath::to_string(paths[5]) == "$['books'][2]['title']");
-        CHECK(jsonpath::to_string(paths[6]) == "$['books'][2]['category']");
-        CHECK(jsonpath::to_string(paths[7]) == "$['books'][2]['category']");
-        CHECK(jsonpath::to_string(paths[8]) == "$['books'][1]['title']");
-        CHECK(jsonpath::to_string(paths[9]) == "$['books'][1]['title']");
-        CHECK(jsonpath::to_string(paths[10]) == "$['books'][1]['category']");
-        CHECK(jsonpath::to_string(paths[11]) == "$['books'][1]['category']");
-        CHECK(jsonpath::to_string(paths[12]) == "$['books'][0]['title']");
-        CHECK(jsonpath::to_string(paths[13]) == "$['books'][0]['title']");
-        CHECK(jsonpath::to_string(paths[14]) == "$['books'][0]['category']");
-        CHECK(jsonpath::to_string(paths[15]) == "$['books'][0]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[1]) == "$['books'][3]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[2]) == "$['books'][3]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[3]) == "$['books'][3]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[4]) == "$['books'][2]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[5]) == "$['books'][2]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[6]) == "$['books'][2]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[7]) == "$['books'][2]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[8]) == "$['books'][1]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[9]) == "$['books'][1]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[10]) == "$['books'][1]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[11]) == "$['books'][1]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[12]) == "$['books'][0]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[13]) == "$['books'][0]['title']");
+        CHECK(jsoncons::jsonpath::to_string(paths[14]) == "$['books'][0]['category']");
+        CHECK(jsoncons::jsonpath::to_string(paths[15]) == "$['books'][0]['category']");
 
         //for (const auto& path : paths)
         //{
@@ -382,10 +382,10 @@ TEST_CASE("jsonpath_expression::update tests")
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
         REQUIRE(4 == paths.size());
-        CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
-        CHECK(jsonpath::to_string(paths[1]) == "$['books'][1]");
-        CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]");
-        CHECK(jsonpath::to_string(paths[3]) == "$['books'][3]");
+        CHECK(jsoncons::jsonpath::to_string(paths[0]) == "$['books'][0]");
+        CHECK(jsoncons::jsonpath::to_string(paths[1]) == "$['books'][1]");
+        CHECK(jsoncons::jsonpath::to_string(paths[2]) == "$['books'][2]");
+        CHECK(jsoncons::jsonpath::to_string(paths[3]) == "$['books'][3]");
         //for (const auto& path : paths)
         //{
         //    std::cout << jsonpath::to_string(path) << "\n";

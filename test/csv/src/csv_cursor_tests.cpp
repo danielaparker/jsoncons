@@ -50,61 +50,61 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -117,59 +117,59 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
         jsoncons::json_decoder<jsoncons::json> decoder;
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.read_to(decoder);
 
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -180,55 +180,55 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             .assume_header(true)
             .mapping_kind(csv::csv_mapping_kind::m_columns);
             
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
 
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -253,39 +253,39 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             const auto& event = cursor.current();
             switch (event.event_type())
             {
-                case staj_events::begin_array:
+                case jsoncons::staj_events::begin_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_array:
+                case jsoncons::staj_events::end_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::begin_object:
+                case jsoncons::staj_events::begin_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_object:
+                case jsoncons::staj_events::end_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::key:
+                case jsoncons::staj_events::key:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::string_value:
+                case jsoncons::staj_events::string_value:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::null_value:
+                case jsoncons::staj_events::null_value:
                     std::cout << event.event_type() << "\n";
                     break;
-                case staj_events::bool_value:
+                case jsoncons::staj_events::bool_value:
                     std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
                     break;
-                case staj_events::int64_value:
+                case jsoncons::staj_events::int64_value:
                     std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
                     break;
-                case staj_events::uint64_value:
+                case jsoncons::staj_events::uint64_value:
                     std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
                     break;
-                case staj_events::double_value:
+                case jsoncons::staj_events::double_value:
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
@@ -294,57 +294,57 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             }
         }*/
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
-        cursor.next();
-
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
-        cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
-        cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
-        cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
-        cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -370,39 +370,39 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             const auto& event = cursor.current();
             switch (event.event_type())
             {
-                case staj_events::begin_array:
+                case jsoncons::staj_events::begin_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_array:
+                case jsoncons::staj_events::end_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::begin_object:
+                case jsoncons::staj_events::begin_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_object:
+                case jsoncons::staj_events::end_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::key:
+                case jsoncons::staj_events::key:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::string_value:
+                case jsoncons::staj_events::string_value:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::null_value:
+                case jsoncons::staj_events::null_value:
                     std::cout << event.event_type() << "\n";
                     break;
-                case staj_events::bool_value:
+                case jsoncons::staj_events::bool_value:
                     std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
                     break;
-                case staj_events::int64_value:
+                case jsoncons::staj_events::int64_value:
                     std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
                     break;
-                case staj_events::uint64_value:
+                case jsoncons::staj_events::uint64_value:
                     std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
                     break;
-                case staj_events::double_value:
+                case jsoncons::staj_events::double_value:
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
@@ -411,70 +411,70 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             }
         }
 */
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("rate"));
         cursor.next();
-        REQUIRE(staj_events::double_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -503,39 +503,39 @@ NY,LON,TOR;LON
             const auto& event = cursor.current();
             switch (event.event_type())
             {
-                case staj_events::begin_array:
+                case jsoncons::staj_events::begin_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_array:
+                case jsoncons::staj_events::end_array:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::begin_object:
+                case jsoncons::staj_events::begin_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::end_object:
+                case jsoncons::staj_events::end_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_events::key:
+                case jsoncons::staj_events::key:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::string_value:
+                case jsoncons::staj_events::string_value:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
-                case staj_events::null_value:
+                case jsoncons::staj_events::null_value:
                     std::cout << event.event_type() << "\n";
                     break;
-                case staj_events::bool_value:
+                case jsoncons::staj_events::bool_value:
                     std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
                     break;
-                case staj_events::int64_value:
+                case jsoncons::staj_events::int64_value:
                     std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
                     break;
-                case staj_events::uint64_value:
+                case jsoncons::staj_events::uint64_value:
                     std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
                     break;
-                case staj_events::double_value:
+                case jsoncons::staj_events::double_value:
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
@@ -545,130 +545,130 @@ NY,LON,TOR;LON
         } 
         */ 
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("NY"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("TOR"));
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("LON"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done()); 
 
@@ -686,18 +686,18 @@ TEST_CASE("csv_cursor n_rows, no header test")
             .assume_header(false);
 
         csv::csv_string_cursor cursor(data, options);
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("b"));
         cursor.next();
 
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done()); 
     }
@@ -714,22 +714,22 @@ TEST_CASE("csv_cursor n_objects, header test")
 
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
 
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("4"));
         cursor.next();
 
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -747,30 +747,30 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
             .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::uint64_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         CHECK(4 == cursor.current().get<int>());
         cursor.next();
-        REQUIRE(staj_events::int64_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -782,28 +782,28 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
             .subfield_delimiter(';');
         csv::csv_string_cursor cursor(data, options);
 
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::begin_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::key == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
         CHECK(cursor.current().get<std::string>() == std::string("a"));
         cursor.next();
-        REQUIRE(staj_events::begin_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::uint64_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         CHECK(4 == cursor.current().get<int>());
         cursor.next();
-        REQUIRE(staj_events::int64_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::int64_value == cursor.current().event_type());
         CHECK(cursor.current().get<int>() == -5);
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
 
-        REQUIRE(staj_events::end_object == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
-        REQUIRE(staj_events::end_array == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -812,9 +812,9 @@ struct remove_mark_csv_filter
 {
     bool reject_next_ = false;
 
-    bool operator()(const staj_event& event, const ser_context&) 
+    bool operator()(const jsoncons::staj_event& event, const jsoncons::ser_context&) 
     {
-        if (event.event_type()  == staj_events::key &&
+        if (event.event_type()  == jsoncons::staj_events::key &&
             event.get<jsoncons::string_view>() == "mark")
         {
             reject_next_ = true;
@@ -834,7 +834,7 @@ struct remove_mark_csv_filter
 
 TEST_CASE("csv_cursor with filter tests")
 {
-    auto j = ojson::parse(R"(
+    auto j = jsoncons::ojson::parse(R"(
     [
         {
             "enrollmentNo" : 100,
@@ -866,89 +866,89 @@ TEST_CASE("csv_cursor with filter tests")
     auto filtered_c = cursor | remove_mark_csv_filter();
 
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_array);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_array);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_array);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_array);
     filtered_c.next();
     CHECK(filtered_c.done());
 }
 
 TEST_CASE("test_csv_parser_reinitialization")
 {
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     auto options = csv::csv_options()
         .assume_header(true)
         .max_lines(2);
@@ -968,8 +968,8 @@ TEST_CASE("test_csv_parser_reinitialization")
     REQUIRE(parser.stopped());
     decoder.end_array();
     REQUIRE(decoder.is_valid());
-    json j = decoder.get_result();
-    json expected = json::parse(R"([{"h1":3,"h2":4}])");
+    jsoncons::json j = decoder.get_result();
+    jsoncons::json expected = jsoncons::json::parse(R"([{"h1":3,"h2":4}])");
     CHECK(expected == j);
 
     parser.reinitialize();
@@ -986,7 +986,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     decoder.end_array();
     REQUIRE(decoder.is_valid());
     j = decoder.get_result();
-    expected = json::parse(R"([{"h7":9,"h8":10}])");
+    expected = jsoncons::json::parse(R"([{"h7":9,"h8":10}])");
     CHECK(expected == j);
 }
 
@@ -997,29 +997,29 @@ void check_csv_cursor_table(std::string info, CursorType& cursor,
     INFO(info);
 
     REQUIRE_FALSE(cursor.done());
-    REQUIRE(staj_events::begin_array == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(staj_events::begin_object == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::begin_object == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(staj_events::key == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::key == cursor.current().event_type());
     CHECK(cursor.current().template get<std::string>() == expected_key);
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(staj_events::uint64_value == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::uint64_value == cursor.current().event_type());
     CHECK(cursor.current().template get<unsigned>() == expected_value);
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(staj_events::end_object == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::end_object == cursor.current().event_type());
 
     CHECK_FALSE(cursor.done());
     cursor.next();
-    REQUIRE(staj_events::end_array == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::end_array == cursor.current().event_type());
 
     cursor.next();
     CHECK(cursor.done());

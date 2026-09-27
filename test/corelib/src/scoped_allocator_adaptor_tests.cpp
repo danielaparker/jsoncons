@@ -28,7 +28,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 {
     MyScopedAllocator<char> alloc1(1);
 
-    using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+    using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
     using cust_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
 
     const char* long_string = "String too long for short string";
@@ -43,7 +43,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     SECTION("try_emplace")
     {
-        cust_json j(json_object_arg, alloc1);
+        cust_json j(jsoncons::json_object_arg, alloc1);
 
         cust_string key1{"foo", alloc1};
         cust_string key2{"bar", alloc1};
@@ -58,7 +58,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     SECTION("insert_or_assign")
     {
-        cust_json j(json_object_arg, alloc1);
+        cust_json j(jsoncons::json_object_arg, alloc1);
 
         j.insert_or_assign("foo", cust_json{});
         j.insert_or_assign("bar", long_string);
@@ -70,7 +70,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     SECTION("emplace_back")
     {
-        cust_json j(json_array_arg, alloc1);
+        cust_json j(jsoncons::json_array_arg, alloc1);
         j.emplace_back(1);
         j.emplace_back(long_string);
         j.emplace_back(jsoncons::json_array_arg);
@@ -82,7 +82,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     SECTION("push_back")
     {
-        cust_json j(json_array_arg, alloc1);
+        cust_json j(jsoncons::json_array_arg, alloc1);
         j.push_back(1);
         j.push_back(long_string);
 
@@ -93,7 +93,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     SECTION("insert")
     {
-        cust_json j(json_array_arg, alloc1);
+        cust_json j(jsoncons::json_array_arg, alloc1);
 
         j.insert(j.array_range().end(), cust_json{});
         j.insert(j.array_range().end(), long_string);
@@ -106,7 +106,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
 TEST_CASE("scoped allocator adaptor parse tests")
 {
-    using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+    using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
     using cust_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
 
     CHECK_FALSE(std::allocator_traits<MyScopedAllocator<char>>::is_always_equal::value);
@@ -128,7 +128,7 @@ TEST_CASE("scoped allocator adaptor parse tests")
 
     SECTION("parse")
     {
-        json_decoder<cust_json,MyScopedAllocator<char>> decoder(alloc1, alloc2);
+        jsoncons::json_decoder<cust_json,MyScopedAllocator<char>> decoder(alloc1, alloc2);
         JSONCONS_TRY
         {
             json_string_reader reader(data,decoder);

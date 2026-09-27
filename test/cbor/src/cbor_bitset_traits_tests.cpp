@@ -9,7 +9,7 @@
 
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
 
 TEST_CASE("CBOR std::bitset tests")
 {

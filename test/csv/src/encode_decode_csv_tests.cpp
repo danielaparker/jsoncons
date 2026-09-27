@@ -84,12 +84,12 @@ TEST_CASE("encode decode csv source")
         std::string s2;
         csv::encode_csv(v, s2, options);
 
-        json j1 = csv::decode_csv<json>(input);
-        json j2 = csv::decode_csv<json>(s2);
+        jsoncons::json j1 = csv::decode_csv<jsoncons::json>(input);
+        jsoncons::json j2 = csv::decode_csv<jsoncons::json>(s2);
 
         CHECK(j2 == j1); //-V521
 
-        json j3 = csv::decode_csv<json>(s2.begin(), s2.end());
+        jsoncons::json j3 = csv::decode_csv<jsoncons::json>(s2.begin(), s2.end());
         CHECK(j3 == j1); //-V521
     }
 
@@ -106,9 +106,9 @@ TEST_CASE("encode decode csv source")
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
 
-        json j1 = csv::decode_csv<json>(input);
+        jsoncons::json j1 = csv::decode_csv<jsoncons::json>(input);
 
-        json j2 = csv::decode_csv<json>(ss2);
+        jsoncons::json j2 = csv::decode_csv<jsoncons::json>(ss2);
         CHECK(j2 == j1); //-V521
     }
 
@@ -124,8 +124,8 @@ TEST_CASE("encode decode csv source")
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
 
-        json j1 = csv::decode_csv<json>(input);
-        json j2 = csv::decode_csv<json>(ss2);
+        jsoncons::json j1 = csv::decode_csv<jsoncons::json>(input);
+        jsoncons::json j2 = csv::decode_csv<jsoncons::json>(ss2);
 
         CHECK(j2 == j1); //-V521
     }
@@ -145,8 +145,8 @@ TEST_CASE("encode decode csv source")
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
 
-        json j1 = csv::decode_csv<json>(input);
-        json j2 = csv::decode_csv<json>(ss2);
+        jsoncons::json j1 = csv::decode_csv<jsoncons::json>(input);
+        jsoncons::json j2 = csv::decode_csv<jsoncons::json>(ss2);
 
         CHECK(j2 == j1); //-V521
     }
@@ -154,7 +154,7 @@ TEST_CASE("encode decode csv source")
 
 TEST_CASE("decode_csv non-numeric string into double reports error")
 {
-    // Regression test for staj_event::as_double silently returning 0.0
+    // Regression test for as_double silently returning 0.0
     // when a string_value event is decoded into a floating-point type.
     // Introduced in caacd258a ("Remove chars_to, replace with to_double"):
     // the new to_double API's return code was not propagated to ec, so
@@ -287,11 +287,11 @@ TEST_CASE("encode_csv allocator_set overloads")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    //auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);
+    //auto aset = make_alloc_set(jsoncons::temp_alloc_arg, temp_alloc);
 
-    json persons(json_array_arg);
+    jsoncons::json persons(jsoncons::json_array_arg);
 
-    json person(json_object_arg);
+    jsoncons::json person(jsoncons::json_object_arg);
     person.try_emplace("name", "John Smith");
 
     persons.emplace_back(std::move(person));
@@ -305,7 +305,7 @@ TEST_CASE("encode_csv allocator_set overloads")
             .assume_header(true);
         options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
         csv::encode_csv(/*aset,*/ persons, ss, options);
-        json other = csv::decode_csv<json>(/*aset,*/ ss, options);
+        jsoncons::json other = csv::decode_csv<jsoncons::json>(/*aset,*/ ss, options);
         CHECK(other == persons);
     }
     SECTION("custom, stream")

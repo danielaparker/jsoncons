@@ -590,7 +590,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS with wstring tests")
     SECTION("test 1")
     {
         ns::wstring_example ex{L"test", 200};
-        wjson j = wjson(ex);
+        jsoncons::wjson j = jsoncons::wjson(ex);
         //std::wcout << L"Serialized: " << j.as<std::wstring>() << std::endl;
 
         ns::wstring_example decoded = j.as<ns::wstring_example>();
@@ -616,7 +616,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 
         encode_json(book, s);
 
-        json j = decode_json<json>(s);
+        jsoncons::json j = decode_json<jsoncons::json>(s);
 
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); // isbn is optional
@@ -625,7 +625,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
         CHECK(a_title == j["title"].as<std::string>()       );
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
 
-        json j2(book);
+        jsoncons::json j2(book);
 
         CHECK(j == j2);
 
@@ -663,7 +663,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_m>(input);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_colon == result.error().code()                         );
+        CHECK(jsoncons::json_errc::expected_colon == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("unexpected JSON")
@@ -708,7 +708,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 
         encode_json(book, s);
 
-        json j = decode_json<json>(s);
+        jsoncons::json j = decode_json<jsoncons::json>(s);
 
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); // isbn is optional
@@ -718,7 +718,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         CHECK(Approx(a_price).epsilon(0.001) == j["price"].as<double>()                              );
         CHECK_FALSE(j.contains("isbn"));
 
-        json j2(book);
+        jsoncons::json j2(book);
 
         CHECK(j == j2);
 
@@ -739,7 +739,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 
         encode_json(book, s);
 
-        json j = decode_json<json>(s);
+        jsoncons::json j = decode_json<jsoncons::json>(s);
 
         REQUIRE(j.is<ns::book_all_m>() == true);
         REQUIRE(j.is<ns::bool_all_m_a>() == true); 
@@ -750,7 +750,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         REQUIRE(j.contains("isbn"));
         CHECK(j["isbn"].as<std::string>() == an_isbn);
 
-        json j2(book);
+        jsoncons::json j2(book);
 
         CHECK(j == j2);
 
@@ -775,7 +775,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
 
         auto result = jsoncons::try_decode_json<ns::book_3_m_a>(input);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_colon == result.error().code()                         );
+        CHECK(jsoncons::json_errc::expected_colon == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("unexpected JSON")
@@ -826,7 +826,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
     SECTION("is")
     {
-        json j;
+        jsoncons::json j;
         j["author"] = an_author;
         j["title"] = a_title;
         j["price"] = a_price;
@@ -838,7 +838,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
     {
         ns::book_all_cg book(an_author,a_title,a_price);
 
-        json j(book);
+        jsoncons::json j(book);
 
         CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
@@ -847,7 +847,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
     SECTION("as")
     {
-        json j;
+        jsoncons::json j;
         j["author"] = an_author;
         j["title"] = a_title;
         j["price"] = a_price;
@@ -870,7 +870,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_cg>(input);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_colon == result.error().code());
+        CHECK(jsoncons::json_errc::expected_colon == result.error().code());
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("unexpected JSON")
@@ -923,7 +923,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
 
     SECTION("is")
     {
-        json j;
+        jsoncons::json j;
         j["author"] = an_author;
         j["title"] = a_title;
 
@@ -938,7 +938,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
     {
         ns::book_2_cg book(an_author,a_title,a_price,an_isbn,jsoncons::optional<std::string>());
 
-        json j(book);
+        jsoncons::json j(book);
 
         CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
@@ -948,7 +948,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
 
     SECTION("as")
     {
-        json j;
+        jsoncons::json j;
         j["author"] = an_author;
         j["title"] = a_title;
         j["price"] = a_price;
@@ -961,7 +961,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
     }
     SECTION("decode")
     {
-        json j;
+        jsoncons::json j;
         j["author"] = an_author;
         j["title"] = a_title;
 
@@ -981,7 +981,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_TRAITS tests")
         std::string buffer;
         encode_json(book, buffer, indenting::indent);
 
-        json j = json::parse(buffer);
+        jsoncons::json j = jsoncons::json::parse(buffer);
 
         CHECK(an_author == j["author"].as<std::string>());
         CHECK(a_title == j["title"].as<std::string>()       );
@@ -1175,7 +1175,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
 
         jsoncons::json j(v);
 
-        json expected = json::parse(input);
+        jsoncons::json expected = jsoncons::json::parse(input);
         CHECK(expected == j);
     }
     SECTION("encode vector of unique_ptr test")
@@ -1187,7 +1187,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
 
         jsoncons::json j(v);
 
-        json expected = json::parse(input);
+        jsoncons::json expected = jsoncons::json::parse(input);
         CHECK(expected == j);
     }
 }
@@ -1200,7 +1200,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 
     SECTION("is")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
         j["Price"] = a_price;
@@ -1215,7 +1215,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
         book.setTitle(a_title);
         book.setPrice(a_price);
 
-        json j(book);
+        jsoncons::json j(book);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -1224,7 +1224,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 
     SECTION("as")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
         j["Price"] = a_price;
@@ -1237,7 +1237,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
     }
     SECTION("decode")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
         j["Price"] = a_price;
@@ -1261,7 +1261,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 
         auto result = jsoncons::try_decode_json<ns::book_all_gs>(input);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_colon == result.error().code()                         );
+        CHECK(jsoncons::json_errc::expected_colon == result.error().code()                         );
         //std::cout << result.error() .message() << "\n";
     }
     SECTION("unexpected JSON")
@@ -1314,7 +1314,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS tests")
 
     SECTION("is")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
 
@@ -1334,7 +1334,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS tests")
         book.setPrice(a_price);
         book.setIsbn(an_isbn);
 
-        json j(book);
+        jsoncons::json j(book);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -1344,7 +1344,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS tests")
 
     SECTION("as")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
         j["Price"] = a_price;
@@ -1357,7 +1357,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS tests")
     }
     SECTION("decode")
     {
-        json j;
+        jsoncons::json j;
         j["Author"] = an_author;
         j["Title"] = a_title;
 
@@ -1439,7 +1439,7 @@ TEST_CASE("hiking_reputation")
     SECTION("3")
     {
         std::string s;
-        auto options = json_options{};
+        auto options = jsoncons::json_options{};
         encode_json(val, s, options, indenting::indent);
         auto val2 = decode_json<ns::hiking_reputation>(s, options);
         CHECK(val2 == val);
@@ -1449,7 +1449,7 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         encode_json_pretty(val, s);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1), s);
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1), s);
         CHECK(val2 == val);
     }
 
@@ -1457,17 +1457,17 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         encode_json_pretty(val, s);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
-                                                       s, json_options());
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1),
+                                                       s, jsoncons::json_options());
         CHECK(val2 == val);
     }
 
     SECTION("6")
     {
         std::string s;
-        auto options = json_options{};
+        auto options = jsoncons::json_options{};
         encode_json(val, s, options, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1),
                                                        s, options);
         CHECK(val2 == val);
     }
@@ -1491,7 +1491,7 @@ TEST_CASE("hiking_reputation")
     SECTION("os 3")
     {
         std::stringstream os;
-        auto options = json_options{};
+        auto options = jsoncons::json_options{};
         encode_json_pretty(val, os);
         auto val2 = decode_json<ns::hiking_reputation>(os, options);
         CHECK(val2 == val);
@@ -1501,8 +1501,8 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         encode_json_pretty(val, os);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
-                                                       os, json_options());
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1),
+                                                       os, jsoncons::json_options());
         CHECK(val2 == val);
     }
 
@@ -1510,17 +1510,17 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         encode_json_pretty(val, os);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
-                                                       os, json_options());
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1),
+                                                       os, jsoncons::json_options());
         CHECK(val2 == val);
     }
 
     SECTION("os 6")
     {
         std::stringstream os;
-        auto options = json_options{};
+        auto options = jsoncons::json_options{};
         encode_json_pretty(val, os, options);
-        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(temp_alloc_arg, alloc1),
+        auto val2 = decode_json<ns::hiking_reputation>(make_alloc_set(jsoncons::temp_alloc_arg, alloc1),
                                                        os, options);
         CHECK(val2 == val);
     }
@@ -1548,7 +1548,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
         encode_json(val, buf, indenting::indent);
         //std::cout << buf << "\n";
 
-        json j = decode_json<json>(buf);
+        jsoncons::json j = decode_json<jsoncons::json>(buf);
         CHECK(j.contains("field1"));
         CHECK(j.contains("field2"));
         CHECK(j.contains("field3"));

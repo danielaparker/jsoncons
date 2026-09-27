@@ -171,7 +171,7 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   2,Ridge Overlook,9.2,540,luis,false
   3,Wildflower Loop,5.1,180,sam,true)";
 
-      jsoncons::json_decoder<json> decoder;
+      jsoncons::json_decoder<jsoncons::json> decoder;
       toon::toon_string_reader reader(data, decoder);
       reader.read();  
 
@@ -212,7 +212,7 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   2,Ridge Overlook,9.2,540,luis,false  
   3,Wildflower Loop,5.1,180,sam,true    )";
 
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         toon::toon_string_reader reader(data, decoder);
         reader.read();
 

@@ -21,7 +21,7 @@ using namespace jsoncons;
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 
-using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpath stateful allocator test")
 {
@@ -51,7 +51,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
+        jsoncons::json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
 
@@ -70,7 +70,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 1")
     {
-        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        jsoncons::json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
@@ -89,7 +89,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 2")
     {
-        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        jsoncons::json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
@@ -110,7 +110,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 1")
     {
-        json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
+        jsoncons::json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
 
@@ -133,7 +133,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 2")
     {
-        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        jsoncons::json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        

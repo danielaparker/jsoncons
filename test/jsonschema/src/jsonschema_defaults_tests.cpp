@@ -23,7 +23,7 @@ TEST_CASE("jsonschema defaults tests")
 {
     SECTION("Basic")
     {
-        json schema = json::parse(R"(
+        jsoncons::json schema = jsoncons::json::parse(R"(
 {
     "properties": {
         "bar": {
@@ -38,18 +38,18 @@ TEST_CASE("jsonschema defaults tests")
         try
         {
             // Data
-            json data = json::parse("{}");
+            jsoncons::json data = jsoncons::json::parse("{}");
 
             // will throw schema_error if JSON Schema compilation fails 
-            jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
+            jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema); 
 
             // will throw a validation_error when a schema violation happens 
-            json patch;
+            jsoncons::json patch;
             compiled.validate(data, patch); 
 
             jsonpatch::apply_patch(data, patch);
 
-            json expected = json::parse(R"(
+            jsoncons::json expected = jsoncons::json::parse(R"(
             {"bar":"bad"}
  )");
 

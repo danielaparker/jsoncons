@@ -186,7 +186,7 @@ TEST_CASE("jmespath custom function test")
               }        
         )";
         
-        auto expected = json::parse(R"(
+        auto expected = jsoncons::json::parse(R"(
 [
     {
         "id": "id-xxx",
@@ -271,10 +271,10 @@ TEST_CASE("jmespath custom function test")
 ]
         )");
 
-        auto expr = jmespath::make_expression<json>("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
-            myspace::my_custom_functions<json>{});
+        auto expr = jmespath::make_expression<jsoncons::json>("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
+            myspace::my_custom_functions<jsoncons::json>{});
 
-        auto doc = json::parse(jtext);
+        auto doc = jsoncons::json::parse(jtext);
 
         auto result = expr.evaluate(doc);
 

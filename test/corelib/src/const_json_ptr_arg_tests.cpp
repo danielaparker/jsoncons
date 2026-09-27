@@ -15,18 +15,18 @@ using namespace jsoncons;
 
 TEST_CASE("const_json_ref array tests")
 {
-    json j = json::parse(R"( ["one", "two", "three"] )");
+    jsoncons::json j = jsoncons::json::parse(R"( ["one", "two", "three"] )");
 
     SECTION("size()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_array());
         CHECK(3 == v.size());
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_array());
         REQUIRE_THROWS(v.at(1));
     }
@@ -38,7 +38,7 @@ TEST_CASE("const_json_ref array tests")
     }
     SECTION("operator[]()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_array());
         REQUIRE_THROWS(v[1]);
     }
@@ -50,18 +50,18 @@ TEST_CASE("const_json_ref array tests")
     }
     SECTION("copy")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         CHECK(v.storage_kind() == json_storage_kind::const_json_ref);
 
-        json j2(v);
+        jsoncons::json j2(v);
         CHECK(j2.storage_kind() == json_storage_kind::array);
     }
     SECTION("assignment")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         CHECK(v.storage_kind() == json_storage_kind::const_json_ref);
 
-        json j2;
+        jsoncons::json j2;
         j2 = v;
         CHECK(j2.storage_kind() == json_storage_kind::array);
     }
@@ -69,18 +69,18 @@ TEST_CASE("const_json_ref array tests")
 
 TEST_CASE("const_json_ref object tests")
 {
-    json j = json::parse(R"( {"one" : 1, "two" : 2, "three" : 3} )");
+    jsoncons::json j = jsoncons::json::parse(R"( {"one" : 1, "two" : 2, "three" : 3} )");
 
     SECTION("size()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_object());
         CHECK(3 == v.size());
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_object());
         REQUIRE_THROWS(v.at("two"));
         CHECK(v.contains("two"));
@@ -104,11 +104,11 @@ TEST_CASE("const_json_ref object tests")
 
 TEST_CASE("const_json_ref string tests")
 {
-    json j = json("Hello World");
+    jsoncons::json j = jsoncons::json("Hello World");
 
     SECTION("is_string()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_string());
         REQUIRE(v.is_string_view());
 
@@ -116,14 +116,14 @@ TEST_CASE("const_json_ref string tests")
     }
 }
 
-TEST_CASE("const_json_ref byte_string tests")
+TEST_CASE("const_json_ref jsoncons::byte_string tests")
 {
     std::string data = "abcdefghijk";
-    json j(byte_string_arg, data);
+    jsoncons::json j(jsoncons::byte_string_arg, data);
 
     SECTION("is_byte_string()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_byte_string());
         REQUIRE(v.is_byte_string_view());
     }
@@ -131,18 +131,18 @@ TEST_CASE("const_json_ref byte_string tests")
 
 TEST_CASE("const_json_ref bool tests")
 {
-    json tru(true);
-    json fal(false);
+    jsoncons::json tru(true);
+    jsoncons::json fal(false);
 
     SECTION("true")
     {
-        json v(const_json_ptr_arg, &tru);
+        jsoncons::json v(const_json_ptr_arg, &tru);
         REQUIRE(v.is_bool());
         CHECK(v.as_bool());
     }
     SECTION("false")
     {
-        json v(const_json_ptr_arg, &fal);
+        jsoncons::json v(const_json_ptr_arg, &fal);
         REQUIRE(v.is_bool());
         CHECK_FALSE(v.as_bool());
     }
@@ -150,11 +150,11 @@ TEST_CASE("const_json_ref bool tests")
 
 TEST_CASE("const_json_ref int64 tests")
 {
-    json j(-100);
+    jsoncons::json j(-100);
 
     SECTION("is_int64()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_int64());
         CHECK(v.as<int64_t>() == -100);
     }
@@ -162,11 +162,11 @@ TEST_CASE("const_json_ref int64 tests")
 
 TEST_CASE("const_json_ref uint64 tests")
 {
-    json j(100);
+    jsoncons::json j(100);
 
     SECTION("is_uint64()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_uint64());
         CHECK(v.as<uint64_t>() == 100);
     }
@@ -174,11 +174,11 @@ TEST_CASE("const_json_ref uint64 tests")
 
 TEST_CASE("const_json_ref half tests")
 {
-    json j(half_arg, 100);
+    jsoncons::json j(half_arg, 100);
 
     SECTION("is_half()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_half());
         CHECK(v.as<uint16_t>() == 100);
     }
@@ -186,11 +186,11 @@ TEST_CASE("const_json_ref half tests")
 
 TEST_CASE("const_json_ref double tests")
 {
-    json j(123.456);
+    jsoncons::json j(123.456);
 
     SECTION("is_double()")
     {
-        json v(const_json_ptr_arg, &j);
+        jsoncons::json v(const_json_ptr_arg, &j);
         REQUIRE(v.is_double());
 
         CHECK(v.as_double() == 123.456);
@@ -199,11 +199,11 @@ TEST_CASE("const_json_ref double tests")
 
 namespace {
 
-    void flatten(const json& source, 
+    void flatten(const jsoncons::json& source, 
                  const std::string& identifier, 
-                 json& result)
+                 jsoncons::json& result)
     {
-        json temp(json_array_arg);
+        jsoncons::json temp(jsoncons::json_array_arg);
         for (auto& item : source.array_range())
         {
             if (item.is_array())
@@ -222,7 +222,7 @@ namespace {
         {
             if (!item.is_null())
             {
-                const auto& j = item.contains(identifier) ? item.at(identifier) : json::null();
+                const auto& j = item.contains(identifier) ? item.at(identifier) : jsoncons::json::null();
                 if (!j.is_null())
                 {
                     result.emplace_back(const_json_ptr_arg, &j);
@@ -234,7 +234,7 @@ namespace {
 
 TEST_CASE("const_json_ref identifier tests")
 {
-    json source = json::parse(R"(
+    jsoncons::json source = jsoncons::json::parse(R"(
     {"reservations": [{
         "instances": [
             {"foo": [{"bar": 1}, {"bar": 2}, {"notbar": 3}, {"bar": 4}]},
@@ -261,11 +261,11 @@ TEST_CASE("const_json_ref identifier tests")
 
     SECTION("test1")
     {
-        json target;
-        json j1(json_array_arg);
-        json j2(json_array_arg);
-        json j3(json_array_arg);
-        json expected = json::parse("[1,2,4,5,6,8]");
+        jsoncons::json target;
+        jsoncons::json j1(jsoncons::json_array_arg);
+        jsoncons::json j2(jsoncons::json_array_arg);
+        jsoncons::json j3(jsoncons::json_array_arg);
+        jsoncons::json expected = jsoncons::json::parse("[1,2,4,5,6,8]");
         const json v1(const_json_ptr_arg, &source.at("reservations"));
         flatten(v1, "instances", j1);
 
@@ -281,12 +281,12 @@ TEST_CASE("const_json_ref identifier tests")
 
     SECTION("test2")
     {
-        json expected = json::parse("[1,2,4,5,6,8]");
-        json target;
+        jsoncons::json expected = jsoncons::json::parse("[1,2,4,5,6,8]");
+        jsoncons::json target;
         {
-            json j1(json_array_arg);
-            json j2(json_array_arg);
-            json j3(json_array_arg);
+            jsoncons::json j1(jsoncons::json_array_arg);
+            jsoncons::json j2(jsoncons::json_array_arg);
+            jsoncons::json j3(jsoncons::json_array_arg);
             const json v1(const_json_ptr_arg, &source.at("reservations"));
             flatten(v1, "instances", j1);
 
@@ -296,7 +296,7 @@ TEST_CASE("const_json_ref identifier tests")
             const json v3(const_json_ptr_arg, &j2);
             flatten(v3, "bar", j3);
 
-            target = json(j3);
+            target = jsoncons::json(j3);
         }
         CHECK(expected == target);
         CHECK(target.storage_kind() == json_storage_kind::array);

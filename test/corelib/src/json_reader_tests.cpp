@@ -24,7 +24,7 @@ TEST_CASE("test json_reader buffered read")
         input.push_back('"');
         std::stringstream is(input);
 
-        auto j = json::parse(is);
+        auto j = jsoncons::json::parse(is);
         REQUIRE(j.is_string());
         CHECK(j.as<std::string>() == str);
     }
@@ -45,7 +45,7 @@ TEST_CASE("test json_reader buffered read")
 
         std::stringstream is(input);
 
-        auto j = json::parse(is);
+        auto j = jsoncons::json::parse(is);
 
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -65,7 +65,7 @@ TEST_CASE("test json_reader buffered read")
 
         std::stringstream is(str);
 
-        auto j = json::parse(is);
+        auto j = jsoncons::json::parse(is);
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
         CHECK_FALSE(j[1].as<bool>());
@@ -84,7 +84,7 @@ TEST_CASE("test json_reader buffered read")
 
         std::stringstream is(str);
 
-        auto j = json::parse(is);
+        auto j = jsoncons::json::parse(is);
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
         CHECK(j[1].as<bool>());
@@ -103,7 +103,7 @@ TEST_CASE("test json_reader buffered read")
 
         std::stringstream is(str);
 
-        auto j = json::parse(is);
+        auto j = jsoncons::json::parse(is);
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
         CHECK(j[1].is_null());
@@ -112,10 +112,10 @@ TEST_CASE("test json_reader buffered read")
 
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
 {
-    REQUIRE_THROWS(json::parse(text));
+    REQUIRE_THROWS(jsoncons::json::parse(text));
     JSONCONS_TRY
     {
-        json::parse(text);
+        jsoncons::json::parse(text);
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -133,7 +133,7 @@ void test_json_reader_ec(const std::string& text, const std::error_code& expecte
     std::error_code ec;
 
     std::istringstream is(text);
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_stream_reader reader(is,decoder);
 
     reader.read(ec);
@@ -184,7 +184,7 @@ TEST_CASE("test_read_escaped_characters")
     std::string input("[\"\\n\\b\\f\\r\\t\"]");
     std::string expected("\n\b\f\r\t");
 
-    json o = json::parse(input);
+    jsoncons::json o = jsoncons::json::parse(input);
     CHECK(expected == o[0].as<std::string>());
 }
 
@@ -219,24 +219,24 @@ TEST_CASE("test_read_expected_value")
 
 TEST_CASE("test_read_primitive_pass")
 {
-    json val;
+    jsoncons::json val;
     CHECK_NOTHROW((val=json::parse("null")));
-    CHECK(val == json::null());
+    CHECK(val == jsoncons::json::null());
     CHECK_NOTHROW((val=json::parse("false")));
-    CHECK(val == json(false));
+    CHECK(val == jsoncons::json(false));
     CHECK_NOTHROW((val=json::parse("true")));
-    CHECK(val == json(true));
+    CHECK(val == jsoncons::json(true));
     CHECK_NOTHROW((val=json::parse("10")));
-    CHECK(val == json(10));
+    CHECK(val == jsoncons::json(10));
     CHECK_NOTHROW((val=json::parse("1.999")));
-    CHECK(val == json(1.999));
+    CHECK(val == jsoncons::json(1.999));
     CHECK_NOTHROW((val=json::parse("\"string\"")));
-    CHECK(val == json("string"));
+    CHECK(val == jsoncons::json("string"));
 }
 
 TEST_CASE("test_read_empty_structures")
 {
-    json val;
+    jsoncons::json val;
     CHECK_NOTHROW((val=json::parse("{}")));
     CHECK_NOTHROW((val=json::parse("[]")));
     CHECK_NOTHROW((val=json::parse("{\"object\":{},\"array\":[]}")));
@@ -268,16 +268,16 @@ TEST_CASE("test_read_multiple")
 
     std::istringstream is(in);
 
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_stream_reader reader(is,decoder);
 
     REQUIRE_FALSE(reader.eof());
     reader.read_next();
-    json val = decoder.get_result();
+    jsoncons::json val = decoder.get_result();
     CHECK(1 == val["a"].as<int>());
     REQUIRE_FALSE(reader.eof());
     reader.read_next();
-    json val2 = decoder.get_result();
+    jsoncons::json val2 = decoder.get_result();
     CHECK(4 == val2["a"].as<int>());
     CHECK(reader.eof());
 }
@@ -305,10 +305,10 @@ TEST_CASE("json_reader read from string test")
 }
 )";
 
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_string_reader reader(s, decoder);
     reader.read();
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 
     REQUIRE(j.is_object());
     REQUIRE(1 == j.size());
@@ -333,12 +333,12 @@ TEST_CASE("json_reader json lines")
         )";
 
         std::stringstream is(data);
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         json_stream_reader reader(is, decoder);
 
         REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(decoder.get_result() == json::parse(R"(["Name", "Session", "Score", "Completed"])"));
+        CHECK(decoder.get_result() == jsoncons::json::parse(R"(["Name", "Session", "Score", "Completed"])"));
         REQUIRE(!reader.eof());
         reader.read_next();
         REQUIRE(!reader.eof());
@@ -347,7 +347,7 @@ TEST_CASE("json_reader json lines")
         reader.read_next();
         REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(decoder.get_result() == json::parse(R"(["Deloise", "2012A", 19, true])"));
+        CHECK(decoder.get_result() == jsoncons::json::parse(R"(["Deloise", "2012A", 19, true])"));
         CHECK(reader.eof());
     }
 }
@@ -385,11 +385,11 @@ TEST_CASE("json_reader stateful allocator tests")
 
     SECTION("stateful allocator")
     {
-        using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+        using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
 
         MyScopedAllocator<char> my_allocator{1}; 
 
-        json_decoder<cust_json,MyScopedAllocator<char>> decoder(my_allocator,
+        jsoncons::json_decoder<cust_json,MyScopedAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
         basic_json_reader<char,chars_source<char>,MyScopedAllocator<char>> reader(input, decoder, my_allocator);
         reader.read();

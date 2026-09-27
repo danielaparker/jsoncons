@@ -1371,7 +1371,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NGSN>());
         CHECK(j.is<ns::Company_AGSN>());
     }
@@ -1393,7 +1393,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NGSN>());
         CHECK(j.is<ns::Company_AGSN>());
     }
@@ -1412,7 +1412,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS transform tests")
         encode_json(employees2, output2, indenting::indent);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<std::vector<ns::Employee_NCGN>>());
     }
     SECTION("test 2")
@@ -1429,7 +1429,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NCGN>());
         CHECK(j.is<ns::Company_ACGN>());
     }
@@ -1451,7 +1451,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NCGN>());
         CHECK(j.is<ns::Company_ACGN>());
     }
@@ -1473,7 +1473,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NMN>());
         CHECK(j.is<ns::Company_AMN>());
     }
@@ -1495,7 +1495,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS transform tests")
         encode_json(company, output2);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<ns::Company_NMN>());
         CHECK(j.is<ns::Company_AMN>());
     }
@@ -1515,7 +1515,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS validation tests")
         encode_json(persons2, output2, indenting::indent);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<std::vector<ns::Person_NCGN>>());
     }
 } 
@@ -1533,7 +1533,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         encode_json(persons2, output2, indenting::indent);
         CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output2);
+        auto j = decode_json<jsoncons::json>(output2);
         CHECK(j.is<std::vector<ns::Person_ACGN>>());    
     }
     SECTION("failure")
@@ -1562,7 +1562,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
     SECTION("test 1")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
-        auto j = json::parse(s);
+        auto j = jsoncons::json::parse(s);
 
         CHECK(j.is<ns::Rectangle_ACGN>() == j.try_as<ns::Rectangle_ACGN>().has_value());
         CHECK(j.is<ns::Triangle_ACGN>() == j.try_as<ns::Triangle_ACGN>().has_value());
@@ -1577,7 +1577,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
 
         encode_json(shapes, output, indenting::indent);
 
-        auto j = decode_json<json>(input);
+        auto j = decode_json<jsoncons::json>(input);
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_ACGN>());
@@ -1590,7 +1590,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         CHECK_FALSE(j[2].is<ns::Rectangle_ACGN>());
         CHECK_FALSE(j[2].is<ns::Triangle_ACGN>());
 
-        auto j2 = decode_json<json>(output);
+        auto j2 = decode_json<jsoncons::json>(output);
         CHECK(j2 == j);
     }
 
@@ -1636,7 +1636,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
     SECTION("test 1")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
-        auto j = json::parse(s);
+        auto j = jsoncons::json::parse(s);
 
         CHECK(j.is<ns::Rectangle_AGSN>() == j.try_as<ns::Rectangle_AGSN>().has_value());
         CHECK(j.is<ns::Triangle_AGSN>() == j.try_as<ns::Triangle_AGSN>().has_value());
@@ -1651,7 +1651,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
 
         encode_json(shapes, output, indenting::indent);
 
-        auto j = decode_json<json>(input);
+        auto j = decode_json<jsoncons::json>(input);
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_AGSN>());
@@ -1664,7 +1664,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         CHECK_FALSE(j[2].is<ns::Rectangle_AGSN>());
         CHECK_FALSE(j[2].is<ns::Triangle_AGSN>());
 
-        auto j2 = decode_json<json>(output);
+        auto j2 = decode_json<jsoncons::json>(output);
         CHECK(j2 == j);
     }
 
@@ -1710,7 +1710,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
     SECTION("test 1")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
-        auto j = json::parse(s);
+        auto j = jsoncons::json::parse(s);
 
         CHECK(j.is<ns::Rectangle_NGSN>() == j.try_as<ns::Rectangle_NGSN>().has_value());
         CHECK(j.is<ns::Triangle_NGSN>() == j.try_as<ns::Triangle_NGSN>().has_value());
@@ -1725,7 +1725,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
 
         encode_json(shapes, output, indenting::indent);
 
-        auto j = decode_json<json>(input);
+        auto j = decode_json<jsoncons::json>(input);
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_NGSN>());
@@ -1738,7 +1738,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         CHECK_FALSE(j[2].is<ns::Rectangle_NGSN>());
         CHECK_FALSE(j[2].is<ns::Triangle_NGSN>());
 
-        auto j2 = decode_json<json>(output);
+        auto j2 = decode_json<jsoncons::json>(output);
         CHECK(j2 == j);
     }
 
@@ -1784,7 +1784,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
     SECTION("test 1")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
-        auto j = json::parse(s);
+        auto j = jsoncons::json::parse(s);
 
         CHECK(j.is<ns::Rectangle_AMN>() == j.try_as<ns::Rectangle_AMN>().has_value());
         CHECK(j.is<ns::Triangle_AMN>() == j.try_as<ns::Triangle_AMN>().has_value());
@@ -1799,7 +1799,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
 
         encode_json(shapes, output, indenting::indent);
 
-        auto j = decode_json<json>(input);
+        auto j = decode_json<jsoncons::json>(input);
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_AMN>());
@@ -1812,7 +1812,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         CHECK_FALSE(j[2].is<ns::Rectangle_AMN>());
         CHECK_FALSE(j[2].is<ns::Triangle_AMN>());
 
-        auto j2 = decode_json<json>(output);
+        auto j2 = decode_json<jsoncons::json>(output);
         CHECK(j2 == j);
     }
 
@@ -1858,7 +1858,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     SECTION("test 1")
     {
         std::string s = R"({"type" : "rectangle", "width" : 2.0, "height" : 1.5 })";
-        auto j = json::parse(s);
+        auto j = jsoncons::json::parse(s);
 
         CHECK(j.is<ns::Rectangle_NMN>() == j.try_as<ns::Rectangle_NMN>().has_value());
         CHECK(j.is<ns::Triangle_NMN>() == j.try_as<ns::Triangle_NMN>().has_value());
@@ -1873,7 +1873,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
 
         encode_json(shapes, output, indenting::indent);
 
-        auto j = decode_json<json>(input);
+        auto j = decode_json<jsoncons::json>(input);
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
         CHECK(j[0].is<ns::Rectangle_NMN>());
@@ -1886,7 +1886,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         CHECK_FALSE(j[2].is<ns::Rectangle_NMN>());
         CHECK_FALSE(j[2].is<ns::Triangle_NMN>());
 
-        auto j2 = decode_json<json>(output);
+        auto j2 = decode_json<jsoncons::json>(output);
         CHECK(j2 == j);
     }
 

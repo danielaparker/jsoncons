@@ -19,7 +19,7 @@
 #include <ctime>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
 
 TEST_CASE("cbor cursor exposes definite strings as views")
 {
@@ -28,7 +28,7 @@ TEST_CASE("cbor cursor exposes definite strings as views")
         std::vector<uint8_t> data = {'\x65','h','e','l','l','o'};
         cbor::cbor_bytes_cursor cursor(data);
 
-        REQUIRE(staj_events::string_value == cursor.current().event_type());
+        REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
         auto sv = cursor.current().get<jsoncons::string_view>();
         CHECK(sv == jsoncons::string_view("hello", 5));
         CHECK(sv.data() == reinterpret_cast<const char*>(data.data() + 1));
@@ -39,8 +39,8 @@ TEST_CASE("cbor cursor exposes definite strings as views")
         std::vector<uint8_t> data = {'\x43',0x01,0x02,0x03};
         cbor::cbor_bytes_cursor cursor(data);
 
-        REQUIRE(staj_events::byte_string_value == cursor.current().event_type());
-        auto bytes = cursor.current().get<byte_string_view>();
+        REQUIRE(jsoncons::staj_events::byte_string_value == cursor.current().event_type());
+        auto bytes = cursor.current().get<jsoncons::byte_string_view>();
         CHECK(bytes.size() == 3);
         CHECK(bytes.data() == data.data() + 1);
         CHECK(bytes[0] == 0x01);
@@ -59,7 +59,7 @@ TEST_CASE("cbor stream source spans straddled strings")
     cbor::cbor_stream_cursor cursor(std::move(source), ec);
 
     REQUIRE_FALSE(ec);
-    REQUIRE(staj_events::string_value == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
     CHECK(cursor.current().get<std::string>() == "hello");
 }
 
@@ -70,7 +70,7 @@ TEST_CASE("cbor stream rejects truncated huge byte string length")
     data.push_back('\xf6');
     std::istringstream is(data);
 
-    CHECK_THROWS_AS(cbor::decode_cbor<json>(is), ser_error);
+    CHECK_THROWS_AS(cbor::decode_cbor<jsoncons::json>(is), jsoncons::ser_error);
 }
 
 TEST_CASE("cbor stream source spans consecutive straddled strings")
@@ -87,14 +87,14 @@ TEST_CASE("cbor stream source spans consecutive straddled strings")
     cbor::cbor_stream_cursor cursor(std::move(source), ec);
 
     REQUIRE_FALSE(ec);
-    REQUIRE(staj_events::begin_array == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::begin_array == cursor.current().event_type());
     cursor.next(ec);
     REQUIRE_FALSE(ec);
-    REQUIRE(staj_events::string_value == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
     CHECK(cursor.current().get<std::string>() == "abcde");
     cursor.next(ec);
     REQUIRE_FALSE(ec);
-    REQUIRE(staj_events::string_value == cursor.current().event_type());
+    REQUIRE(jsoncons::staj_events::string_value == cursor.current().event_type());
     CHECK(cursor.current().get<std::string>() == "fghij");
 }
 
@@ -103,13 +103,13 @@ TEST_CASE("cbor iterator source rejects a huge claimed byte string cleanly")
     const std::vector<uint8_t> data = {0x5b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00};
     std::list<uint8_t> input(data.begin(), data.end());
 
-    auto result = cbor::try_decode_cbor<json>(input.begin(), input.end());
+    auto result = cbor::try_decode_cbor<jsoncons::json>(input.begin(), input.end());
     REQUIRE_FALSE(result);
 }
 
 TEST_CASE("cbor_cursor reputon test")
 {
-    ojson j = ojson::parse(R"(
+    jsoncons::ojson j = jsoncons::ojson::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -130,41 +130,41 @@ TEST_CASE("cbor_cursor reputon test")
     {
         cbor::cbor_bytes_cursor cursor(data);
 
-        CHECK(staj_events::begin_object == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_object == cursor.current().event_type());
         CHECK(2 == cursor.current().size());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(1 == cursor.current().size());
         cursor.next();
-        CHECK(staj_events::begin_object == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_object == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::key == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::key == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::double_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::double_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::end_object == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::end_object == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_object == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -177,41 +177,41 @@ TEST_CASE("cbor_cursor indefinite array of array test")
     SECTION("test 1")
     {
         cbor::cbor_bytes_cursor cursor(data);
-        CHECK(staj_events::begin_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::begin_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::byte_string_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::byte_string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::bigint == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::bigint == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::end_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::begin_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::byte_string_value == cursor.current().event_type());
-        CHECK(semantic_tag::base64 == cursor.current().tag());
+        CHECK(jsoncons::staj_events::byte_string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::base64 == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::bigdec == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::bigdec == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::end_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(staj_events::end_array == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -221,9 +221,9 @@ struct remove_mark_cbor_filter
 {
     bool reject_next_ = false;
 
-    bool operator()(const staj_event& event, const ser_context&) 
+    bool operator()(const jsoncons::staj_event& event, const jsoncons::ser_context&) 
     {
-        if (event.event_type()  == staj_events::key &&
+        if (event.event_type()  == jsoncons::staj_events::key &&
             event.get<jsoncons::string_view>() == "mark")
         {
             reject_next_ = true;
@@ -243,7 +243,7 @@ struct remove_mark_cbor_filter
 
 TEST_CASE("cbor_cursor with filter tests")
 {
-    auto j = ojson::parse(R"(
+    auto j = jsoncons::ojson::parse(R"(
     [
         {
             "enrollmentNo" : 100,
@@ -274,82 +274,82 @@ TEST_CASE("cbor_cursor with filter tests")
     auto filtered_c = cursor | remove_mark_cbor_filter();
 
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_array);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_array);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::begin_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::begin_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::uint64_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::uint64_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::key);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::key);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::string_value);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_object);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_object);
     filtered_c.next();
     REQUIRE_FALSE(filtered_c.done());
-    CHECK(filtered_c.current().event_type() == staj_events::end_array);
+    CHECK(filtered_c.current().event_type() == jsoncons::staj_events::end_array);
     filtered_c.next();
     CHECK(filtered_c.done());
 }
@@ -399,8 +399,8 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         cursor_type cursor(std::move(source));
 
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         CHECK(std::string("Tom") == cursor.current().template get<std::string>());
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
@@ -409,8 +409,8 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
 
         cursor.reset();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::int64_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::int64_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         CHECK(-100 == cursor.current().template get<int>());
         cursor.next();
         CHECK(cursor.done());
@@ -418,8 +418,8 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::null_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::null_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
         CHECK(cursor.done());
@@ -445,8 +445,8 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
 
         // Reset to valid input1
         cursor.reset(input1);
-        CHECK(staj_events::string_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::string_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         CHECK(std::string("Tom") == cursor.current().template get<std::string>());
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
@@ -466,8 +466,8 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         ec = cbor::cbor_errc::success;
         cursor.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(staj_events::int64_value == cursor.current().event_type());
-        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(jsoncons::staj_events::int64_value == cursor.current().event_type());
+        CHECK(jsoncons::semantic_tag::none == cursor.current().tag());
         CHECK(-100 == cursor.current().template get<int>());
         REQUIRE_FALSE(cursor.done());
         cursor.next(ec);
@@ -479,7 +479,7 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
 
 TEST_CASE("cbor_event_reader reputon test")
 {
-    ojson j = ojson::parse(R"(
+    jsoncons::ojson j = jsoncons::ojson::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -500,41 +500,41 @@ TEST_CASE("cbor_event_reader reputon test")
     {
         cbor::cbor_bytes_cursor reader(data);
 
-        CHECK(reader.current().event_type() == staj_events::begin_object);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::begin_object);
         CHECK(2 == reader.current().size());
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::begin_array);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::begin_array);
         CHECK(1 == reader.current().size());
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::begin_object);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::begin_object);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::string_value);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
         reader.next();
-        CHECK(reader.current().event_type() == (staj_events::string_value | staj_events::key_flag));  // key
+        CHECK(reader.current().event_type() == (jsoncons::staj_events::string_value | jsoncons::staj_events::key_flag));  // key
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::double_value);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::double_value);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::end_object);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::end_object);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::end_array);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::end_array);
         reader.next();
-        CHECK(reader.current().event_type() == staj_events::end_object);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::end_object);
         reader.next();
         CHECK(reader.done());
     }
@@ -585,8 +585,8 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
         event_reader_type reader(std::move(source));
 
         REQUIRE_FALSE(reader.done());
-        CHECK(reader.current().event_type() == staj_events::string_value);
-        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
+        CHECK(reader.current().tag() == jsoncons::semantic_tag::none);
         CHECK(reader.current().template get<std::string>() == std::string("Tom"));
         CHECK(reader.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
@@ -595,8 +595,8 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
 
         reader.reset();
         REQUIRE_FALSE(reader.done());
-        CHECK(reader.current().event_type() == staj_events::int64_value);
-        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::int64_value);
+        CHECK(reader.current().tag() == jsoncons::semantic_tag::none);
         CHECK(reader.current().template get<int>() == -100);
         reader.next();
         CHECK(reader.done());
@@ -604,8 +604,8 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
         reader.reset(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(reader.done());
-        CHECK(reader.current().event_type() == staj_events::null_value);
-        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::null_value);
+        CHECK(reader.current().tag() == jsoncons::semantic_tag::none);
         reader.next(ec);
         REQUIRE_FALSE(ec);
         CHECK(reader.done());
@@ -631,8 +631,8 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
 
         // Reset to valid input1
         reader.reset(input1);
-        CHECK(reader.current().event_type() == staj_events::string_value);
-        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::string_value);
+        CHECK(reader.current().tag() == jsoncons::semantic_tag::none);
         CHECK(reader.current().template get<std::string>() == std::string("Tom"));
         CHECK(reader.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
@@ -651,8 +651,8 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
         ec = cbor::cbor_errc::success;
         reader.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(reader.current().event_type() == staj_events::int64_value);
-        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().event_type() == jsoncons::staj_events::int64_value);
+        CHECK(reader.current().tag() == jsoncons::semantic_tag::none);
         CHECK(reader.current().template get<int>() == -100);
         REQUIRE_FALSE(reader.done());
         reader.next(ec);

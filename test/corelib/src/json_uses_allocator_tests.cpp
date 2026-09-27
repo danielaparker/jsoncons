@@ -20,7 +20,7 @@ TEST_CASE("jsoncons::make_obj_using_allocator tests")
 
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_json = basic_json<char,sorted_policy,cust_allocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,cust_allocator<char>>;
 
 TEST_CASE("jsoncons::make_obj_using_allocator with stateful allocator tests")
 {
@@ -34,7 +34,7 @@ TEST_CASE("jsoncons::make_obj_using_allocator with stateful allocator tests")
     SECTION("test 2")
     {
         cust_allocator<char> alloc(1);
-        auto j = jsoncons::make_obj_using_allocator<json>(alloc,10);
+        auto j = jsoncons::make_obj_using_allocator<jsoncons::json>(alloc,10);
         REQUIRE(j.is_uint64());
         CHECK(10 == j.as<int>());
     }

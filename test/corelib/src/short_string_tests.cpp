@@ -15,15 +15,15 @@ using namespace jsoncons;
 
 TEST_CASE("test_small_string")
 {
-    json s("ABCD");
+    jsoncons::json s("ABCD");
     CHECK(s.storage_kind() == jsoncons::json_storage_kind::short_str);
     CHECK(s.as<std::string>() == std::string("ABCD"));
 
-    json t(s);
+    jsoncons::json t(s);
     CHECK(t.storage_kind() == jsoncons::json_storage_kind::short_str);
     CHECK(t.as<std::string>() == std::string("ABCD"));
 
-    json q;
+    jsoncons::json q;
     q = s;
     CHECK(q.storage_kind() == jsoncons::json_storage_kind::short_str);
     CHECK(q.as<std::string>() == std::string("ABCD"));

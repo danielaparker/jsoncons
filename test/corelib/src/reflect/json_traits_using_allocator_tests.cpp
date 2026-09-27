@@ -27,7 +27,7 @@ using namespace jsoncons;
 
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_json = basic_json<char,sorted_policy,cust_allocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,cust_allocator<char>>;
 
 TEST_CASE("json_traits using allocator tests")
 {
@@ -109,20 +109,20 @@ TEST_CASE("json_traits using allocator tests")
     }
     SECTION("basic_byte_string")
     {
-        using byte_string_type = basic_byte_string<cust_allocator<uint8_t>>;
+        using jsoncons::byte_string_type = basic_byte_string<cust_allocator<uint8_t>>;
 
         cust_allocator<uint8_t> alloc(1);
         auto aset = make_alloc_set(alloc);
 
         cust_json j{byte_string{'H','e','l','l','o'}, aset.get_allocator()};
-        REQUIRE(j.is<byte_string_type>());
+        REQUIRE(j.is<jsoncons::byte_string_type>());
 
         auto result = jsoncons::reflect::json_traits<cust_json,byte_string_type>::try_as(aset, j);
         REQUIRE(result);
-        auto r = j.try_as<byte_string_type>(aset);
+        auto r = j.try_as<jsoncons::byte_string_type>(aset);
         REQUIRE(r);
         CHECK(*r == *result);
-        CHECK(j.as<byte_string_type>(aset) == *result);
+        CHECK(j.as<jsoncons::byte_string_type>(aset) == *result);
         //std::cout << result.error() .message() << "\n\n";
     }
 }

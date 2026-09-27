@@ -15,7 +15,7 @@ using namespace jsoncons;
 
 TEST_CASE("test_wjson")
 {
-    wjson root;
+    jsoncons::wjson root;
     root[L"field1"] = L"test";
     root[L"field2"] = 3.9;
     root[L"field3"] = true;
@@ -33,7 +33,7 @@ TEST_CASE("test_wjson_escape_u")
     std::wstring input = L"[\"\\uABCD\"]";
     std::wistringstream is(input);
 
-    wjson root = wjson::parse(is);
+    jsoncons::wjson root = jsoncons::wjson::parse(is);
 
     std::wstring s = root[0].as<std::wstring>();
     CHECK( s.length() == 1 );
@@ -79,7 +79,7 @@ TEST_CASE("wjson test case")
 "params":{"data":{"cash":0,"coupons":0,"creditcard":0,"debit":0,"discounts":0,"name":null,"neworder":true,"operator":"","orders":[{"active":"1","addtoitem":"0","bar":"1","cat":"Beer","cooking":"","id":"7","kitchen":"0","modifier":"0","name":"Budwiser","noqty":"1","oneof":"[]","operator":"robert","options":"[]","price":"5","print":"","qty":1,"server":"robert","sideprice":"0","subtotal":5,"type":"Bar","uid":"0242.7559"}],"outstanding":5.25,"payments":[],"server":"robert","status":"0","subtotal":5,"tableid":"quickserv","taxes":0.25,"tip":0,"total":5.25,"uid":"2822.7128","voiditems":[]},"posstation":{"printers":{"kitchen":[{"arguments":{"baud":"9600","bits":"8","nparity":"0","port":"3","stopbit":"0","xonxoff":"5"},"model":"epson","path":"localhost","type":"com"},{"arguments":{"baud":"","bits":"","nparity":"","port":"","stopbit":"","xonxoff":""},"model":"screen","path":"temp-pc","type":"screen"}],"receipt":[{"arguments":{"baud":"9600","bits":"8","nparity":"0","port":"3","stopbit":"0","xonxoff":"5"},"model":"epson","path":"Temp-PC","type":"com"},{"arguments":{"baud":"","bits":"","nparity":"","port":"","stopbit":"","xonxoff":""},"model":"screen","path":"localhost","type":"screen"}]}}},"plugin":"clib"}
     )";
 
-    wjson j = wjson::parse(data);
+    jsoncons::wjson j = jsoncons::wjson::parse(data);
 
     std::wstring s = j[L"params"].to_string();
 

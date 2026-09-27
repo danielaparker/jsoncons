@@ -497,8 +497,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -536,8 +536,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -565,8 +565,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -604,8 +604,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -633,8 +633,8 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -673,8 +673,8 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -707,8 +707,8 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -746,8 +746,8 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -780,8 +780,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -819,8 +819,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -853,8 +853,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 
@@ -892,8 +892,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS using allocator tests")
         std::string output;
         encode_json(aset, *r, output);
 
-        auto j1 = ojson::parse(input);
-        auto j2 = ojson::parse(output);
+        auto j1 = jsoncons::ojson::parse(input);
+        auto j2 = jsoncons::ojson::parse(output);
         CHECK(j1 == j2);
     }
 }
@@ -1032,7 +1032,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
 
         jsoncons::json j(v);
 
-        json expected = json::parse(input);
+        jsoncons::json expected = jsoncons::json::parse(input);
         CHECK(expected == j);
     }
     SECTION("encode vector of unique_ptr test")
@@ -1044,7 +1044,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS using allocator tests")
 
         jsoncons::json j(v);
 
-        json expected = json::parse(input);
+        jsoncons::json expected = jsoncons::json::parse(input);
         CHECK(expected == j);
     }
     */

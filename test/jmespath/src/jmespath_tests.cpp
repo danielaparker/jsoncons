@@ -26,10 +26,10 @@ void jmespath_tests(const std::string& fpath)
     std::fstream is(fpath);
     REQUIRE(is); //-V521
 
-    json tests = json::parse(is);
+    jsoncons::json tests = jsoncons::json::parse(is);
     for (const auto& test_group : tests.array_range())
     {
-        const json& root = test_group["given"];
+        const jsoncons::json& root = test_group["given"];
 
         for (const auto& test_case : test_group["cases"].array_range())
         {
@@ -37,10 +37,10 @@ void jmespath_tests(const std::string& fpath)
             //std::cout << (fpath + "-" + expr) << "\n";
             try
             {
-                json actual = jmespath::search(root, expr);
+                jsoncons::json actual = jmespath::search(root, expr);
                 if (test_case.contains("result"))
                 {
-                    const json& expected = test_case["result"];
+                    const jsoncons::json& expected = test_case["result"];
                     if (actual != expected)
                     {
                         if (test_case.contains("comment"))
@@ -72,7 +72,7 @@ void jmespath_tests(const std::string& fpath)
             {
                 if (test_case.contains("result"))
                 {
-                    const json& expected = test_case["result"];
+                    const jsoncons::json& expected = test_case["result"];
                     std::cout << e.what() << "\n";
                     if (test_case.contains("comment"))
                     {

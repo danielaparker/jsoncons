@@ -25,12 +25,12 @@ TEST_CASE("Test cyrillic.json")
         std::cout << "Cannot open " << path << '\n';
     }
     REQUIRE(is);
-    json j = json::parse(is);
+    jsoncons::json j = jsoncons::json::parse(is);
 }
 
 TEST_CASE("test_object2")
 {
-json source = json::parse(R"(
+json source = jsoncons::json::parse(R"(
 {
     "a" : "2",
     "c" : [4,5,6]
@@ -43,7 +43,7 @@ json source = json::parse(R"(
 TEST_CASE("test_object_with_three_members")
 {
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
-    json val = json::parse(input);
+    jsoncons::json val = jsoncons::json::parse(input);
 
     CHECK(true == val.is_object());
     CHECK(3 == val.size());
@@ -51,18 +51,18 @@ TEST_CASE("test_object_with_three_members")
 
 TEST_CASE("test_double")
 {
-    json val = json::parse("42.229999999999997");
+    jsoncons::json val = jsoncons::json::parse("42.229999999999997");
 }
 
 TEST_CASE("test_array_of_integer")
 {
     std::string s = "[1,2,3]";
-    json j1 = json::parse(s);
+    jsoncons::json j1 = jsoncons::json::parse(s);
     CHECK(true == j1.is_array());
     CHECK(3 == j1.size());
 
     std::istringstream is(s);
-    json j2 = json::parse(is);
+    jsoncons::json j2 = jsoncons::json::parse(is);
     CHECK(true == j2.is_array());
     CHECK(3 == j2.size());
 }
@@ -70,19 +70,19 @@ TEST_CASE("test_array_of_integer")
 TEST_CASE("test_skip_bom")
 {
     std::string s = "\xEF\xBB\xBF[1,2,3]";
-    json j1 = json::parse(s);
+    jsoncons::json j1 = jsoncons::json::parse(s);
     CHECK(true == j1.is_array());
     CHECK(3 == j1.size());
 
     std::istringstream is(s);
-    json j2 = json::parse(is);
+    jsoncons::json j2 = jsoncons::json::parse(is);
     CHECK(true == j2.is_array());
     CHECK(3 == j2.size());
 }
 
 TEST_CASE("test_parse_empty_object")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -94,12 +94,12 @@ TEST_CASE("test_parse_empty_object")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_array")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -111,12 +111,12 @@ TEST_CASE("test_parse_array")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_string")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -128,12 +128,12 @@ TEST_CASE("test_parse_string")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_integer")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -145,12 +145,12 @@ TEST_CASE("test_parse_integer")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_integer_space")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -162,12 +162,12 @@ TEST_CASE("test_parse_integer_space")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_double_space")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -179,12 +179,12 @@ TEST_CASE("test_parse_double_space")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_false")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -196,12 +196,12 @@ TEST_CASE("test_parse_false")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_true")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -213,12 +213,12 @@ TEST_CASE("test_parse_true")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test_parse_null")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -230,14 +230,14 @@ TEST_CASE("test_parse_null")
     parser.finish_parse(decoder);
     CHECK(parser.done());
 
-    json j = decoder.get_result();
+    jsoncons::json j = decoder.get_result();
 }
 
 TEST_CASE("test incremental parsing")
 {
     SECTION("array of bool")
     {
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         json_parser parser;
 
         parser.reset();
@@ -252,7 +252,7 @@ TEST_CASE("test incremental parsing")
         parser.finish_parse(decoder);
         CHECK(parser.done());
 
-        json j = decoder.get_result();
+        jsoncons::json j = decoder.get_result();
         REQUIRE(j.is_array());
         CHECK_FALSE(j[0].as<bool>());
     }
@@ -260,7 +260,7 @@ TEST_CASE("test incremental parsing")
 
 TEST_CASE("test_parser_reinitialization")
 {
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_parser parser;
 
     parser.reset();
@@ -268,7 +268,7 @@ TEST_CASE("test_parser_reinitialization")
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK_FALSE(parser.source_exhausted());
-    json j1 = decoder.get_result();
+    jsoncons::json j1 = decoder.get_result();
     REQUIRE(j1.is_bool());
     CHECK_FALSE(j1.as<bool>());
 
@@ -277,7 +277,7 @@ TEST_CASE("test_parser_reinitialization")
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK(parser.source_exhausted());
-    json j2 = decoder.get_result();
+    jsoncons::json j2 = decoder.get_result();
     REQUIRE(j2.is_int64());
     CHECK(j2.as<int64_t>() == -42);
 }
@@ -307,7 +307,7 @@ TEST_CASE("test_diagnostics_visitor", "")
     {
         std::wostringstream os;
         wtracing_json_visitor visitor(os, L"  ");
-        wjson_parser parser;
+        jsoncons::wjson_parser parser;
         std::wstring input(LR"({"foo":[42,null]})");
         parser.update(input.data(), input.size());
         parser.finish_parse(visitor);
@@ -327,7 +327,7 @@ TEST_CASE("json_parser skip space tests")
 {
     SECTION("test 1")
     {
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         json_parser parser;
         
         std::string line1 = "[false\r";
@@ -348,7 +348,7 @@ TEST_CASE("json_parser skip space tests")
     }
     SECTION("test 2")
     {
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         json_parser parser;
 
         std::string line1 = "[false\r";
@@ -369,7 +369,7 @@ TEST_CASE("json_parser skip space tests")
     }
     SECTION("test 3")
     {
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         json_parser parser;
 
         std::string line1 = "[false\n";

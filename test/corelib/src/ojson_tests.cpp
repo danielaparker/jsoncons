@@ -14,7 +14,7 @@ using namespace jsoncons;
 
 TEST_CASE("test_index")
 {
-    ojson o = ojson::parse(R"(
+    jsoncons::ojson o = jsoncons::ojson::parse(R"(
     {
         "street_number" : "100",
         "street_name" : "Queen St W",
@@ -36,7 +36,7 @@ TEST_CASE("test_index")
 
 TEST_CASE("test_object")
 {
-    ojson o = ojson::parse(R"(
+    jsoncons::ojson o = jsoncons::ojson::parse(R"(
     {
         "street_number" : "100",
         "street_name" : "Queen St W",
@@ -47,10 +47,10 @@ TEST_CASE("test_object")
 
     o.insert_or_assign("postal_code", "M5H 2N2");
 
-    ojson o2 = o;
+    jsoncons::ojson o2 = o;
     CHECK(o == o2);
 
-    ojson o3 = o;
+    jsoncons::ojson o3 = o;
     o3["street_name"] = "Queen St W";
     //CHECK(o == o3);
 
@@ -69,7 +69,7 @@ TEST_CASE("test_object")
 
 TEST_CASE("test_object_emplace")
 {
-    ojson o = ojson::parse(R"(
+    jsoncons::ojson o = jsoncons::ojson::parse(R"(
     {
         "street_number" : "100",
         "street_name" : "Queen St W",
@@ -80,10 +80,10 @@ TEST_CASE("test_object_emplace")
 
     o.try_emplace("postal_code", "M5H 2N2");
 
-    ojson o2 = o;
+    jsoncons::ojson o2 = o;
     CHECK(o == o2);
 
-    ojson o3 = o;
+    jsoncons::ojson o3 = o;
     o3["street_name"] = "Queen St W";
     //CHECK(o == o3);
 

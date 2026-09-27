@@ -17,7 +17,6 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using namespace jsoncons;
 namespace cbor = jsoncons::cbor;
 
 static void check_native(std::true_type, 
@@ -61,7 +60,7 @@ TEST_CASE("cbor typed array cursor tests")
         };
 
         cbor::cbor_bytes_cursor cursor(data);
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_typed_array());
 
         std::vector<double> v;
@@ -83,7 +82,7 @@ TEST_CASE("cbor typed array cursor tests")
         };
 
         cbor::cbor_bytes_cursor cursor(data);
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_typed_array());
 
         std::vector<double> v1;
@@ -125,7 +124,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x00,0x01,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 65\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -152,7 +151,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 66\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -180,7 +179,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 67\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -206,10 +205,10 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x01,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 68\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
-        CHECK(j.tag() == semantic_tag::clamped);
+        CHECK(j.tag() == jsoncons::semantic_tag::clamped);
         REQUIRE(3 == j.size());
         CHECK(j[0].as<uint8_t>() == std::numeric_limits<uint8_t>::lowest());
         CHECK(j[1].as<uint8_t>() == uint8_t(1));
@@ -233,7 +232,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x01,0x00,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 69\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -280,7 +279,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 70\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -321,7 +320,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 71\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -351,7 +350,7 @@ TEST_CASE("cbor typed array tests")
                 0x80,0x01,0x7f
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 72\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -379,7 +378,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0xff        
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 73\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -424,7 +423,7 @@ TEST_CASE("cbor typed array tests")
             0x7f,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 74\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -462,7 +461,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 75\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -496,7 +495,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0x7f
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 77\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -542,7 +541,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0x7f
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 78\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -583,7 +582,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x7f
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 79\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(3 == j.size());
@@ -617,7 +616,7 @@ TEST_CASE("cbor typed array tests")
                 0x7b,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 80\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(4 == j.size());
@@ -637,7 +636,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f,0x7f,0xff,0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 81\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -664,7 +663,7 @@ TEST_CASE("cbor typed array tests")
                 0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         REQUIRE(j.is_array());
         //std::cout << pretty_print(j) << "\n";
 
@@ -690,7 +689,7 @@ TEST_CASE("cbor typed array tests")
                 0x3f,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
         };
 
-        //json j = cbor::decode_cbor<json>(data);
+        //jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //REQUIRE(j.is_array());
         //REQUIRE(2 == j.size());
 
@@ -712,7 +711,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0x7b
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 84\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(4 == j.size());
@@ -733,7 +732,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0x7f,0x7f 
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 85\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -764,7 +763,7 @@ TEST_CASE("cbor typed array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
         };
 
-        json j = cbor::decode_cbor<json>(data);
+        jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //std::cout << "Tag 86\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
         REQUIRE(2 == j.size());
@@ -798,7 +797,7 @@ TEST_CASE("cbor typed array tests")
                 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x3f 
         };
 
-        //json j = cbor::decode_cbor<json>(data);
+        //jsoncons::json j = cbor::decode_cbor<jsoncons::json>(data);
         //REQUIRE(j.is_array());
         //REQUIRE(2 == j.size());
     }
@@ -831,41 +830,41 @@ TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(parser_expected == result);
     }
     SECTION("cursor test")
     {
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         CHECK_FALSE(cursor.is_typed_array());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
     }
@@ -875,11 +874,11 @@ TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
 
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         CHECK_FALSE(cursor.is_typed_array());
         cursor.read_to(decoder);
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
         REQUIRE(decoder.is_valid());
@@ -900,7 +899,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         };
 
         std::error_code ec;
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
@@ -917,7 +916,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         };
 
         std::error_code ec;
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
@@ -934,7 +933,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         };
 
         std::error_code ec;
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
@@ -952,7 +951,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         };
 
         std::error_code ec;
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
@@ -1001,12 +1000,12 @@ TEST_CASE("cbor multi-dim indefinite length extents tests")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
         REQUIRE_FALSE(ec);
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(expected == result);
     }
 }
@@ -1037,11 +1036,11 @@ TEST_CASE("cbor multi-dim typed array parse tests")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(expected == result);
     }
 }
@@ -1065,11 +1064,11 @@ TEST_CASE("cbor multi-dim typed array parse tests 2")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(expected == result);
     }
 }
@@ -1100,12 +1099,12 @@ TEST_CASE("cbor multi-dim typed array row-major, uint64, little endian")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
         CHECK(decoder.is_valid());
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(expected == result);
     }
 
@@ -1113,27 +1112,27 @@ TEST_CASE("cbor multi-dim typed array row-major, uint64, little endian")
     {
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         cursor.next();
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
-        cursor.next();
-        REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
         /*for (; !cursor.done(); cursor.next())
@@ -1165,27 +1164,27 @@ TEST_CASE("cbor multi-dim typed array column-major, cursor tests 2")
 
         cbor::cbor_bytes_cursor cursor(v);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         cursor.next();
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
-        cursor.next();
-        REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
+        cursor.next();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
         /*for (; !cursor.done(); cursor.next())
@@ -1221,7 +1220,7 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
     {
         //std::cout << "CBOR multi-dim typed array Tag 86, uint16, big endian" << '\n';
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
 
         std::error_code ec;
         cbor::cbor_bytes_reader reader(data, decoder);
@@ -1236,11 +1235,11 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
 
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         CHECK_FALSE(cursor.is_typed_array());
         cursor.read_to(decoder);
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
         REQUIRE(decoder.is_valid());
@@ -1269,11 +1268,11 @@ TEST_CASE("cbor multi-dim, column-major, classical indefinite array tests")
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         cbor::cbor_bytes_reader reader(v, decoder);
         reader.read(ec);
         REQUIRE(decoder.is_valid());
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
         CHECK(expected == result);
     }
 }
@@ -1300,30 +1299,30 @@ TEST_CASE("cbor multi-dim classical array cursor tests")
 
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         CHECK_FALSE(cursor.is_typed_array());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
     }
@@ -1345,30 +1344,30 @@ TEST_CASE("cbor multi-dim classical array cursor tests")
 
         cbor::cbor_bytes_cursor cursor(data);
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::begin_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::begin_array == cursor.current().event_type());
         CHECK(cursor.is_multi_dim());
         CHECK_FALSE(cursor.is_typed_array());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::uint64_value == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::uint64_value == cursor.current().event_type());
         cursor.next();
         REQUIRE_FALSE(cursor.done());
-        CHECK(staj_events::end_array == cursor.current().event_type());
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
         cursor.next();
         REQUIRE(cursor.done());
     }
@@ -1400,13 +1399,13 @@ TEST_CASE("multi-dim classical array and typed array")
         };
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
 
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
         REQUIRE(decoder.is_valid());
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
 
         REQUIRE(expected == result);
     }

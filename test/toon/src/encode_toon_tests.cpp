@@ -123,7 +123,7 @@ TEST_CASE("toon array")
     {
         std::string expected = R"([0]:)";
         std::string buffer;
-        ojson j{json_array_arg};
+        jsoncons::ojson j{jsoncons::json_array_arg};
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
     }
@@ -133,14 +133,14 @@ TEST_CASE("toon array")
   - [0]:
   - [0]:)";
         std::string buffer;
-        auto j = ojson::parse(R"([[],[]])");
+        auto j = jsoncons::ojson::parse(R"([[],[]])");
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
     }
     SECTION("array of arrays of primitives")
     {
         std::string str = R"([["Foo","Bar"],[1,2,3]])";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"([2]:
   - [2]: Foo,Bar
@@ -152,7 +152,7 @@ TEST_CASE("toon array")
     SECTION("array of objects of primitives")
     {
         std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4}])";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"([2]{foo,bar}:
   1,2
@@ -164,7 +164,7 @@ TEST_CASE("toon array")
     SECTION("mixed array as list items")
     {
         std::string str = R"([{"foo":1,"bar":2},{"foo":3,"bar":4,"baz":5}])";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"([2]:
   - foo: 1
@@ -184,7 +184,7 @@ TEST_CASE("toon array")
     - id:)";
 
         std::string buffer;
-        auto j = ojson::parse(R"([{"id": 1},[{"id": {}}]])");
+        auto j = jsoncons::ojson::parse(R"([{"id": 1},[{"id": {}}]])");
         toon::encode_toon(j, buffer);
         std::cout << j << "\n\n";
         CHECK(expected == buffer);
@@ -196,7 +196,7 @@ TEST_CASE("toon object")
     SECTION("object")
     {
         std::string str = R"({"foo":{}})";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"(foo:)";
         std::string buffer;
@@ -206,7 +206,7 @@ TEST_CASE("toon object")
     SECTION("empty key")
     {
         std::string str = R"({"" : 1})";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"("": 1)";
         std::string buffer;
@@ -222,7 +222,7 @@ TEST_CASE("toon object")
   },
   "quux": [1, 2, 3]
 })";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"(foo:
   bar: 1
@@ -275,7 +275,7 @@ TEST_CASE("toon examples")
   ]
 }
         )";
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
 
         std::string expected = R"(context:
   task: Our favorite hikes together

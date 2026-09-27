@@ -98,12 +98,12 @@ TEST_CASE("json_traits single error tests")
     }
     SECTION("byte_string")
     {
-        json j{byte_string{'H','e','l','l','o'}};
-        REQUIRE(j.is<byte_string>());
+        jsoncons::json j{byte_string{'H','e','l','l','o'}};
+        REQUIRE(j.is<jsoncons::byte_string>());
 
         auto result = jsoncons::reflect::json_traits<jsoncons::json,byte_string>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE(result);
-        CHECK(j.as<byte_string>() == *result);
+        CHECK(j.as<jsoncons::byte_string>() == *result);
         //std::cout << result.error() .message() << "\n\n";
     }
 }
@@ -381,7 +381,7 @@ TEST_CASE("json_traits shared_ptr")
     SECTION("test1")
     {
         auto a = std::make_shared<ns::A>(42.0, 32.0);
-        ojson j{a}; // Fails in compilation here
+        jsoncons::ojson j{a}; // Fails in compilation here
         //std::cout << jsoncons::pretty_print(j) << "\n";
         auto serializedA = j.as<std::shared_ptr<ns::A>>();
         CHECK(serializedA->a == 42.0);

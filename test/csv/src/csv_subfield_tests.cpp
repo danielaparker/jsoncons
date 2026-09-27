@@ -32,7 +32,7 @@ NY,LON,TOR;LON
         .assume_header(true)
         .subfield_delimiter(';');
 
-    json expected = R"(
+    jsoncons::json expected = R"(
 [
     {
         "calculationPeriodCenters": ["NY","LON"],
@@ -59,7 +59,7 @@ NY,LON,TOR;LON
 
     JSONCONS_TRY
     {
-        json j = csv::decode_csv<json>(s,options);
+        jsoncons::json j = csv::decode_csv<jsoncons::json>(s,options);
         CHECK(expected == j);
         //std::cout << pretty_print(j) << '\n';
     }
@@ -81,7 +81,7 @@ NY,LON,TOR;LON
         .mapping_kind(csv::csv_mapping_kind::n_rows)
         .subfield_delimiter(';');
 
-    json expected = R"(
+    jsoncons::json expected = R"(
 [
     ["calculationPeriodCenters","paymentCenters","resetCenters"],
     [
@@ -101,7 +101,7 @@ NY,LON,TOR;LON
 
     JSONCONS_TRY
     {
-        json j = csv::decode_csv<json>(s,options);
+        jsoncons::json j = csv::decode_csv<jsoncons::json>(s,options);
         CHECK(expected == j);
         //std::cout << pretty_print(j) << '\n';
     }
@@ -124,7 +124,7 @@ NY,LON,TOR;LON
         .mapping_kind(csv::csv_mapping_kind::m_columns)
         .subfield_delimiter(';');
 
-    json expected = R"(
+    jsoncons::json expected = R"(
 {
     "calculationPeriodCenters": [
         ["NY","LON"],"NY",
@@ -138,7 +138,7 @@ NY,LON,TOR;LON
 }
     )"_json;
 
-    json j = csv::decode_csv<json>(s,options);
+    jsoncons::json j = csv::decode_csv<jsoncons::json>(s,options);
     CHECK(expected == j);
 }
 

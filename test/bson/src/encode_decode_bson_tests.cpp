@@ -75,7 +75,7 @@ TEST_CASE("encode decode bson source uint8_t")
 
     SECTION("from bytes")
     {
-        ojson j = bson::decode_bson<ojson>(input);
+        jsoncons::ojson j = bson::decode_bson<jsoncons::ojson>(input);
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(j, buffer);
@@ -87,7 +87,7 @@ TEST_CASE("encode decode bson source uint8_t")
         std::string s(reinterpret_cast<const char*>(input.data()), input.size());
         std::stringstream is(std::move(s));
 
-        ojson j = bson::decode_bson<ojson>(is);
+        jsoncons::ojson j = bson::decode_bson<jsoncons::ojson>(is);
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(j, buffer);
@@ -96,7 +96,7 @@ TEST_CASE("encode decode bson source uint8_t")
 
     SECTION("from iterator source")
     {
-        ojson j = bson::decode_bson<ojson>(input.begin(), input.end());
+        jsoncons::ojson j = bson::decode_bson<jsoncons::ojson>(input.begin(), input.end());
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(j, buffer);
@@ -108,7 +108,7 @@ TEST_CASE("encode decode bson source uint8_t")
         MyIterator it(input.data());
         MyIterator end(input.data() + input.size());
 
-        ojson j = bson::decode_bson<ojson>(it, end);
+        jsoncons::ojson j = bson::decode_bson<jsoncons::ojson>(it, end);
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(j, buffer);
@@ -131,13 +131,13 @@ TEST_CASE("encode_bson overloads")
 {
     SECTION("json, stream")
     {
-        json person;
+        jsoncons::json person;
         person.try_emplace("name", "John Smith");
 
         std::string s;
         std::stringstream ss(s);
         bson::encode_bson(person, ss);
-        json other = bson::decode_bson<json>(ss);
+        jsoncons::json other = bson::decode_bson<jsoncons::json>(ss);
         CHECK(other == person);
     }
     SECTION("custom, stream")
@@ -185,7 +185,7 @@ TEST_CASE("bson encode array")
 
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("encode decode bson source with temp_allocator")
 {
@@ -205,11 +205,11 @@ TEST_CASE("encode decode bson source with temp_allocator")
             0x00};
 
     MyScopedAllocator<char> temp_alloc(2);
-    auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);    
+    auto aset = make_alloc_set(jsoncons::temp_alloc_arg, temp_alloc);    
 
     SECTION("from bytes")
     {
-        auto j = bson::decode_bson<ojson>(aset, input);
+        auto j = bson::decode_bson<jsoncons::ojson>(aset, input);
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(aset, j, buffer);
@@ -221,7 +221,7 @@ TEST_CASE("encode decode bson source with temp_allocator")
         std::string s(reinterpret_cast<const char*>(input.data()), input.size());
         std::stringstream is(std::move(s));
 
-        auto j = bson::decode_bson<ojson>(aset, is);
+        auto j = bson::decode_bson<jsoncons::ojson>(aset, is);
 
         std::vector<uint8_t> buffer;
         bson::encode_bson(aset, j, buffer);

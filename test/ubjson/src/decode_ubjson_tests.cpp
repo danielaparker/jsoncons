@@ -19,9 +19,9 @@
 
 using namespace jsoncons;
 
-void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
+void check_decode_ubjson(const std::vector<uint8_t>& v, const jsoncons::json& expected)
 {
-    json j1 = ubjson::decode_ubjson<json>(v);
+    jsoncons::json j1 = ubjson::decode_ubjson<jsoncons::json>(v);
     REQUIRE(j1 == expected);
 
     std::string s;
@@ -30,10 +30,10 @@ void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
         s.push_back(c);
     }
     std::istringstream is(s);
-    json j2 = ubjson::decode_ubjson<json>(is);
+    jsoncons::json j2 = ubjson::decode_ubjson<jsoncons::json>(is);
     REQUIRE(j2 == expected);
 
-    json j3 = ubjson::decode_ubjson<json>(v.begin(), v.end());
+    jsoncons::json j3 = ubjson::decode_ubjson<jsoncons::json>(v.begin(), v.end());
     REQUIRE(j3 == expected);
 }
 
@@ -63,58 +63,58 @@ TEST_CASE("decode_number_ubjson_test")
 {
     SECTION("null, true, false")
     {
-        check_decode_ubjson({'Z'},json::null()); 
-        check_decode_ubjson({'T'},json(true)); 
-        check_decode_ubjson({'F'},json(false)); 
+        check_decode_ubjson({'Z'},jsoncons::json::null()); 
+        check_decode_ubjson({'T'},jsoncons::json(true)); 
+        check_decode_ubjson({'F'},jsoncons::json(false)); 
     }
     SECTION("uint8")
     {
-        check_decode_ubjson({'U',0x00},json(0U));
-        check_decode_ubjson({'U',0x01},json(1U));
-        check_decode_ubjson({'U',0x0a},json(10U));
-        check_decode_ubjson({'U',0x17},json(23U));
-        check_decode_ubjson({'U',0x18},json(24U));
-        check_decode_ubjson({'U',0x7f},json(127U)); 
-        check_decode_ubjson({'U',0xff},json(255U));
+        check_decode_ubjson({'U',0x00},jsoncons::json(0U));
+        check_decode_ubjson({'U',0x01},jsoncons::json(1U));
+        check_decode_ubjson({'U',0x0a},jsoncons::json(10U));
+        check_decode_ubjson({'U',0x17},jsoncons::json(23U));
+        check_decode_ubjson({'U',0x18},jsoncons::json(24U));
+        check_decode_ubjson({'U',0x7f},jsoncons::json(127U)); 
+        check_decode_ubjson({'U',0xff},jsoncons::json(255U));
     }
     SECTION("int8,int16,int32,int64")
     {
-        check_decode_ubjson({'i',0xff},json(-1));
-        check_decode_ubjson({'I',0x01,0x00},json(256));
-        check_decode_ubjson({'l',0,0,0xff,0xff},json(65535));
-        check_decode_ubjson({'l',0,1,0x00,0x00},json(65536));
-        check_decode_ubjson({'L',0,0,0,0,0xff,0xff,0xff,0xff},json(4294967295));
-        check_decode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296));
-        check_decode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
+        check_decode_ubjson({'i',0xff},jsoncons::json(-1));
+        check_decode_ubjson({'I',0x01,0x00},jsoncons::json(256));
+        check_decode_ubjson({'l',0,0,0xff,0xff},jsoncons::json(65535));
+        check_decode_ubjson({'l',0,1,0x00,0x00},jsoncons::json(65536));
+        check_decode_ubjson({'L',0,0,0,0,0xff,0xff,0xff,0xff},jsoncons::json(4294967295));
+        check_decode_ubjson({'L',0,0,0,1,0,0,0,0},jsoncons::json(4294967296));
+        check_decode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},jsoncons::json((std::numeric_limits<int64_t>::max)()));
         // negative integers
-        check_decode_ubjson({'I',0xff,0},json(-256));
-        check_decode_ubjson({'I',0xfe,0xff},json(-257));
-        check_decode_ubjson({'l',0xff,0xff,0,0},json(-65536));
-        check_decode_ubjson({'l',0xff,0xfe,0xff,0xff},json(-65537));
-        check_decode_ubjson({'L',0xff,0xff,0xff,0xff,0,0,0,0},json(-4294967296));
-        check_decode_ubjson({'L',0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},json(-4294967297));
+        check_decode_ubjson({'I',0xff,0},jsoncons::json(-256));
+        check_decode_ubjson({'I',0xfe,0xff},jsoncons::json(-257));
+        check_decode_ubjson({'l',0xff,0xff,0,0},jsoncons::json(-65536));
+        check_decode_ubjson({'l',0xff,0xfe,0xff,0xff},jsoncons::json(-65537));
+        check_decode_ubjson({'L',0xff,0xff,0xff,0xff,0,0,0,0},jsoncons::json(-4294967296));
+        check_decode_ubjson({'L',0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},jsoncons::json(-4294967297));
     }
 
     SECTION("float32,float64")
     {
-        check_decode_ubjson({'D',0,0,0,0,0,0,0,0},json(0.0));
-        check_decode_ubjson({'D',0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
-        check_decode_ubjson({'D',0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+        check_decode_ubjson({'D',0,0,0,0,0,0,0,0},jsoncons::json(0.0));
+        check_decode_ubjson({'D',0xbf,0xf0,0,0,0,0,0,0},jsoncons::json(-1.0));
+        check_decode_ubjson({'D',0xc1,0x6f,0xff,0xff,0xe0,0,0,0},jsoncons::json(-16777215.0));
     }
 
     SECTION("array")
     {
-        check_decode_ubjson({'[',']'},json::parse("[]"));
-        check_decode_ubjson({'[', 'Z', 'T', 'F', ']'},json::parse("[null,true,false]"));
-        check_decode_ubjson({'[','#','i',0},json::parse("[]"));
-        check_decode_ubjson({'[','#','i',1,'I',0xff,0},json::parse("[-256]"));
+        check_decode_ubjson({'[',']'},jsoncons::json::parse("[]"));
+        check_decode_ubjson({'[', 'Z', 'T', 'F', ']'},jsoncons::json::parse("[null,true,false]"));
+        check_decode_ubjson({'[','#','i',0},jsoncons::json::parse("[]"));
+        check_decode_ubjson({'[','#','i',1,'I',0xff,0},jsoncons::json::parse("[-256]"));
     }
     SECTION("ubjson array optimized with type and count")
     {
         check_decode_ubjson({'[','$','I','#','i',2,
                              0x01,0x00, // 256
                              0xff,0}, // -256
-                             json::parse("[256,-256]"));
+                             jsoncons::json::parse("[256,-256]"));
     }
     SECTION("ubjson object optimized with type and count")
     {
@@ -123,23 +123,23 @@ TEST_CASE("decode_number_ubjson_test")
                              0x01,0x00, // 256
                              'i',6,'s','e','c','o','n','d',
                              0xff,0}, // -256
-                             json::parse("{\"first\":256,\"second\":-256}"));
+                             jsoncons::json::parse("{\"first\":256,\"second\":-256}"));
     }
 }
 
 TEST_CASE("decode_ubjson_arrays_and_maps")
 {
-    check_decode_ubjson({'[','#','U',0x00}, json(json_array_arg));
-    check_decode_ubjson({ '{','#','U',0x00 }, json());
+    check_decode_ubjson({'[','#','U',0x00}, jsoncons::json(jsoncons::json_array_arg));
+    check_decode_ubjson({ '{','#','U',0x00 }, jsoncons::json());
     
-    check_decode_ubjson({'[','#','U',0x01,'U',0x00},json::parse("[0]"));
-    check_decode_ubjson({'[','#','U',0x02,'U',0x00,'U',0x00},json::parse("[0,0]"));
+    check_decode_ubjson({'[','#','U',0x01,'U',0x00},jsoncons::json::parse("[0]"));
+    check_decode_ubjson({'[','#','U',0x02,'U',0x00,'U',0x00},jsoncons::json::parse("[0,0]"));
     check_decode_ubjson({'[','#','U',0x02,
                          '[','#','U',0x01,'U',0x00,
-                         'U',0x00},json::parse("[[0],0]"));
-    check_decode_ubjson({'[','#','U',0x01,'S','U',0x05,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
-    check_decode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x01,'U',0x00}, json::parse("{\"oc\": [0]}"));
-    check_decode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x04,'U',0x00,'U',0x01,'U',0x02,'U',0x03}, json::parse("{\"oc\": [0,1,2,3]}"));
+                         'U',0x00},jsoncons::json::parse("[[0],0]"));
+    check_decode_ubjson({'[','#','U',0x01,'S','U',0x05,'H','e','l','l','o'},jsoncons::json::parse("[\"Hello\"]"));
+    check_decode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x01,'U',0x00}, jsoncons::json::parse("{\"oc\": [0]}"));
+    check_decode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x04,'U',0x00,'U',0x01,'U',0x02,'U',0x03}, jsoncons::json::parse("{\"oc\": [0,1,2,3]}"));
 }
 
 TEST_CASE("decode indefinite length ubjson arrays and maps")

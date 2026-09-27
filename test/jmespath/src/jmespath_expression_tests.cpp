@@ -41,12 +41,12 @@ TEST_CASE("jmespath_expression tests")
             }
         )";
 
-        auto expr = jmespath::make_expression<json>("sum(people[].age)");
+        auto expr = jmespath::make_expression<jsoncons::json>("sum(people[].age)");
 
-        json doc = json::parse(jtext);
+        jsoncons::json doc = jsoncons::json::parse(jtext);
 
-        json result = expr.evaluate(doc);
-        CHECK(result == json(75.0));
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(result == jsoncons::json(75.0));
     }    
     SECTION("Test 2")
     {
@@ -61,19 +61,19 @@ TEST_CASE("jmespath_expression tests")
 }
         )";
 
-        json doc = json::parse(jtext);
+        jsoncons::json doc = jsoncons::json::parse(jtext);
 
-        auto expr1 = jmespath::make_expression<json>("group.value");
-        json result1 = expr1.evaluate(doc);
-        CHECK(json(1) == result1);
+        auto expr1 = jmespath::make_expression<jsoncons::json>("group.value");
+        jsoncons::json result1 = expr1.evaluate(doc);
+        CHECK(jsoncons::json(1) == result1);
 
-        auto expr2 = jmespath::make_expression<json>("array[0].value");
-        json result2 = expr2.evaluate(doc);
-        CHECK(json(2) == result2);
+        auto expr2 = jmespath::make_expression<jsoncons::json>("array[0].value");
+        jsoncons::json result2 = expr2.evaluate(doc);
+        CHECK(jsoncons::json(2) == result2);
 
-        auto expr3 = jmespath::make_expression<json>("nullable.value");
-        json result3 = expr3.evaluate(doc);
-        CHECK(result3 == json::null());
+        auto expr3 = jmespath::make_expression<jsoncons::json>("nullable.value");
+        jsoncons::json result3 = expr3.evaluate(doc);
+        CHECK(result3 == jsoncons::json::null());
     }
 }
 
@@ -99,7 +99,7 @@ TEST_CASE("jmespath issue")
         }
         )";
 
-        auto doc = ojson::parse(jtext);
+        auto doc = jsoncons::ojson::parse(jtext);
 
         auto result = jmespath::search(doc, expr);
 
@@ -131,8 +131,8 @@ to_array("gw:GWallInfo"."gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGr
     "gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGroup")
 )";
 
-        auto expr = jsoncons::jmespath::make_expression<json>(query);
-        json j;
+        auto expr = jsoncons::jmespath::make_expression<jsoncons::json>(query);
+        jsoncons::json j;
         j["gw:DocumentStatistics"]["gw:ContentGroups"]["gw:ContentGroup"] = 9;
         auto result = expr.evaluate(j);
         REQUIRE(result.is_array());
@@ -145,8 +145,8 @@ to_array("gw:GWallInfo"."gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGr
     {
         std::string query = R"(starts_with(B || A,null || 'a'))";
 
-        auto expr = jsoncons::jmespath::make_expression<json>(query);
-        json j;
+        auto expr = jsoncons::jmespath::make_expression<jsoncons::json>(query);
+        jsoncons::json j;
         j["A"] = "ab";
         //auto result = jsoncons::jmespath::search(j, expr);
         auto result = expr.evaluate(j);
@@ -158,8 +158,8 @@ to_array("gw:GWallInfo"."gw:DocumentStatistics"."gw:ContentGroups"."gw:ContentGr
     {
         std::string query = R"(starts_with(A || B,null || 'a'))";
 
-        auto expr = jsoncons::jmespath::make_expression<json>(query);
-        json j;
+        auto expr = jsoncons::jmespath::make_expression<jsoncons::json>(query);
+        jsoncons::json j;
         j["A"] = "ab";
         //auto result = jsoncons::jmespath::search(j, expr);
         auto result = expr.evaluate(j);

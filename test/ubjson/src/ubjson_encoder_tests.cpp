@@ -104,7 +104,7 @@ TEST_CASE("serialize array to ubjson")
 
     JSONCONS_TRY
     {
-        json result = decode_ubjson<json>(v);
+        auto result = decode_ubjson<jsoncons::json>(v);
         std::cout << result << '\n';
     }
     JSONCONS_CATCH (const std::exception& e)

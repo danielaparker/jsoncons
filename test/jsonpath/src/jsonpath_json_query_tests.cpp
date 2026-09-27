@@ -23,10 +23,10 @@ using namespace jsoncons;
 
 TEST_CASE("jsonpath json_query json test")
 {
-    json j;
+    jsoncons::json j;
     JSONCONS_TRY
     {
-        j = json::parse(R"(
+        j = jsoncons::json::parse(R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -58,7 +58,7 @@ TEST_CASE("jsonpath json_query json test")
     SECTION("test 1")
     {
         auto result = jsonpath::json_query(j,"$..book[?(@.category == 'fiction')].title");
-        auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
+        auto expected = jsoncons::json::parse(R"(["Sword of Honour","Moby Dick"])");
         CHECK(expected == (result));
     }
 
@@ -66,7 +66,7 @@ TEST_CASE("jsonpath json_query json test")
     {
         std::string expr = "$..book[?(@.category == 'fiction')].title";
         auto result = jsonpath::json_query(j,expr);
-        auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
+        auto expected = jsoncons::json::parse(R"(["Sword of Honour","Moby Dick"])");
         CHECK(expected == (result));
     }
 
@@ -74,15 +74,15 @@ TEST_CASE("jsonpath json_query json test")
     {
         std::string expr = "$..book[?(@.title == 'Sword of Honour')].title";
 
-        json expected("Sword of Honour");
+        jsoncons::json expected("Sword of Honour");
         jsonpath::json_query(j, expr, 
-            [expected](const jsoncons::string_view&, const json& title) {CHECK(expected == (title));});
+            [expected](const jsoncons::string_view&, const jsoncons::json& title) {CHECK(expected == (title));});
     }
 }
 
 TEST_CASE("jsonpath normalized path test")
 {
-   const json j = json::parse(R"({"\\":0})");
+   const json j = jsoncons::json::parse(R"({"\\":0})");
 
    const std::string path = R"($['\\'])";
    auto paths = jsonpath::json_query(j, path, jsonpath::result_options::path);
@@ -94,12 +94,12 @@ TEST_CASE("jsonpath normalized path test")
    CHECK(0 == result[0].as<int>());
 }
 
-TEST_CASE("jsonpath json_query wjson test")
+TEST_CASE("jsonpath json_query jsoncons::wjson test")
 {
-    wjson j;
+    jsoncons::wjson j;
     JSONCONS_TRY
     {
-        j = wjson::parse(LR"(
+        j = jsoncons::wjson::parse(LR"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -131,7 +131,7 @@ TEST_CASE("jsonpath json_query wjson test")
     SECTION("test 1")
     {
         auto result = jsonpath::json_query(j,L"$..book[?(@.category == 'fiction')].title");
-        auto expected = wjson::parse(LR"(["Sword of Honour","Moby Dick"])");
+        auto expected = jsoncons::wjson::parse(LR"(["Sword of Honour","Moby Dick"])");
         CHECK(expected == (result));
     }
 }

@@ -42,7 +42,7 @@ bool are_equal(const std::string& s1, const std::string& s2)
 
 TEST_CASE("json_encoder line split tests")
 {
-    json val = json::parse(R"(
+    jsoncons::json val = jsoncons::json::parse(R"(
     {
         "header" : {"properties": {}},
         "data":
@@ -66,7 +66,7 @@ std::string expected = R"({
         "properties": {}
     }
 })";
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .object_array_line_splits(line_split_kind::same_line)
             .array_array_line_splits(line_split_kind::new_line);
@@ -77,7 +77,7 @@ std::string expected = R"({
 
     SECTION("array_array same_line")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .object_array_line_splits(line_split_kind::same_line)
             .array_array_line_splits(line_split_kind::same_line);
@@ -100,7 +100,7 @@ std::string expected = R"({
 
     SECTION("array_array new_line")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .array_array_line_splits(line_split_kind::new_line)
             .object_array_line_splits(line_split_kind::same_line);
@@ -123,7 +123,7 @@ std::string expected = R"({
 
     SECTION("array_array multi_line")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .array_array_line_splits(line_split_kind::multi_line)
             .object_array_line_splits(line_split_kind::same_line);
@@ -145,7 +145,7 @@ std::string expected = R"({
 
     SECTION("object_array same_line")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .object_array_line_splits(line_split_kind::same_line)
             .array_array_line_splits(line_split_kind::new_line);
@@ -167,7 +167,7 @@ std::string expected = R"({
 
     SECTION("object_array new_line")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .object_array_line_splits(line_split_kind::new_line)
             .array_array_line_splits(line_split_kind::new_line);
@@ -195,7 +195,7 @@ std::string expected = R"({
 
     SECTION("")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .spaces_around_comma(spaces_option::no_spaces)
             .object_array_line_splits(line_split_kind::multi_line)
             .array_array_line_splits(line_split_kind::same_line);
@@ -226,7 +226,7 @@ std::string expected = R"({
 
 TEST_CASE("test_array_of_array_of_string_string_array")
 {
-    json j = R"(
+    jsoncons::json j = R"(
 [
     ["NY","LON",
         ["TOR","LON"]

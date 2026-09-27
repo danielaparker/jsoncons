@@ -22,7 +22,7 @@ using namespace jsoncons;
 
 TEST_CASE("jsonpath flatten test")
 {
-    json input = json::parse(R"(
+    jsoncons::json input = jsoncons::json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -44,7 +44,7 @@ TEST_CASE("jsonpath flatten test")
 
     SECTION("flatten")
     {
-        json result = jsonpath::flatten(input);
+        jsoncons::json result = jsonpath::flatten(input);
 
         REQUIRE(result.is_object()); //-V521
         REQUIRE(9 == result.size()); //-V521
@@ -66,10 +66,10 @@ TEST_CASE("jsonpath flatten test")
 
     SECTION("unflatten")
     {
-        json result = jsonpath::flatten(input);
+        jsoncons::json result = jsonpath::flatten(input);
         //std::cout << pretty_print(result) << "\n";
 
-        json original = jsonpath::unflatten(result);
+        jsoncons::json original = jsonpath::unflatten(result);
         //std::cout << pretty_print(original) << "\n";
         CHECK(original == input); //-V521
     }
@@ -77,14 +77,14 @@ TEST_CASE("jsonpath flatten test")
 
 TEST_CASE("jsonpath flatten array test")
 {
-    json input = json::parse(R"([1,2,3,"4\u0027s"])");
+    jsoncons::json input = jsoncons::json::parse(R"([1,2,3,"4\u0027s"])");
 
     SECTION("flatten array and unflatten")
     {
-        json result = jsonpath::flatten(input);
+        jsoncons::json result = jsonpath::flatten(input);
         //std::cout << pretty_print(result) << "\n";
 
-        json original = jsonpath::unflatten(result);
+        jsoncons::json original = jsonpath::unflatten(result);
         //std::cout << pretty_print(original) << "\n";
         CHECK(original == input); //-V521
     }
@@ -93,7 +93,7 @@ TEST_CASE("jsonpath flatten array test")
 
 TEST_CASE("jsonpath flatten with single quote test")
 {
-    json input = json::parse(R"(
+    jsoncons::json input = jsoncons::json::parse(R"(
     {
        "like'd": "pizza"
     }
@@ -101,9 +101,9 @@ TEST_CASE("jsonpath flatten with single quote test")
 
     SECTION("flatten array and unflatten")
     {
-        json result = jsonpath::flatten(input);
+        jsoncons::json result = jsonpath::flatten(input);
 
-        json original = jsonpath::unflatten(result);
+        jsoncons::json original = jsonpath::unflatten(result);
         CHECK(original == input); //-V521
     }
 }
@@ -140,7 +140,7 @@ TEST_CASE("jsonpath flatten escape")
             R"(})"
         R"(})" };
 
-    jsoncons::json doc = jsoncons::json::parse(json);
+    jsoncons::json doc = jsoncons::json::parse(jsoncons::json);
 
     auto flat_doc = jsoncons::jsonpath::flatten(doc);
 

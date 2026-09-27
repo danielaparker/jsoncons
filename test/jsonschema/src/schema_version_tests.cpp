@@ -17,7 +17,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema version tests")
 {
-    json schema_03 = json::parse(R"(
+    jsoncons::json schema_03 = jsoncons::json::parse(R"(
 {
     "$schema": "http://json-schema.org/draft-03/schema#",
     "description": "A product from Acme's catalog",
@@ -50,7 +50,7 @@ TEST_CASE("jsonschema version tests")
   }
       )");
 
-    json schema_07 = json::parse(R"(
+    jsoncons::json schema_07 = jsoncons::json::parse(R"(
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "description": "A product from Acme's catalog",
@@ -85,12 +85,12 @@ TEST_CASE("jsonschema version tests")
 
     SECTION("test 3")
     {
-        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_03), "Unsupported schema version http://json-schema.org/draft-03/schema#");
+        REQUIRE_THROWS_WITH(jsoncons::jsonschema::make_json_schema(schema_03), "Unsupported schema version http://json-schema.org/draft-03/schema#");
     }
 
     SECTION("test 7")
     {
-        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_07), "https://jsoncons.com#/properties/price/exclusiveMinimum: exclusiveMinimum must be a number value");
+        REQUIRE_THROWS_WITH(jsoncons::jsonschema::make_json_schema(schema_07), "https://jsoncons.com#/properties/price/exclusiveMinimum: exclusiveMinimum must be a number value");
     }
 }
 

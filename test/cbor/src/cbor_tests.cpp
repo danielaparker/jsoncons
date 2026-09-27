@@ -13,31 +13,31 @@
 #include <limits>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
 
 TEST_CASE("cbor_test_floating_point")
 {
-    json j1;
+    jsoncons::json j1;
     j1["max double"] = (std::numeric_limits<double>::max)();
     j1["max float"] = (std::numeric_limits<float>::max)();
 
     std::vector<uint8_t> v;
     cbor::encode_cbor(j1, v);
 
-    json j2 = cbor::decode_cbor<json>(v);
+    jsoncons::json j2 = cbor::decode_cbor<jsoncons::json>(v);
     CHECK(j2 == j1);
 
-    json j3 = cbor::decode_cbor<json>(v.begin(), v.end());
+    jsoncons::json j3 = cbor::decode_cbor<jsoncons::json>(v.begin(), v.end());
     CHECK(j3 == j1);
 } 
 
 TEST_CASE("cbor_test")
 {
-    json j1;
+    jsoncons::json j1;
     j1["zero"] = 0;
     j1["one"] = 1;
     j1["two"] = 2;
-    j1["null"] = null_type();
+    j1["null"] = jsoncons::null_type();
     j1["true"] = true;
     j1["false"] = false;
     j1["max int64_t"] = (std::numeric_limits<int64_t>::max)();
@@ -59,11 +59,11 @@ TEST_CASE("cbor_test")
     j1["min float"] = (std::numeric_limits<float>::lowest)();
     j1["String too long for small string optimization"] = "String too long for small string optimization";
 
-    json ja(json_array_arg);
+    jsoncons::json ja(jsoncons::json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);
-    ja.push_back(null_type());
+    ja.push_back(jsoncons::null_type());
     ja.push_back(true);
     ja.push_back(false);
     ja.push_back((std::numeric_limits<int64_t>::max)());
@@ -90,20 +90,20 @@ TEST_CASE("cbor_test")
     std::vector<uint8_t> v;
     cbor::encode_cbor(j1, v);
 
-    json j2 = cbor::decode_cbor<json>(v);
+    jsoncons::json j2 = cbor::decode_cbor<jsoncons::json>(v);
     CHECK(j2 == j1);
 
-    json j3 = cbor::decode_cbor<json>(v.begin(), v.end());
+    jsoncons::json j3 = cbor::decode_cbor<jsoncons::json>(v.begin(), v.end());
     CHECK(j3 == j1);
 } 
 
 TEST_CASE("cbor_test2")
 {
-    wjson j1;
+    jsoncons::wjson j1;
     j1[L"zero"] = 0;
     j1[L"one"] = 1;
     j1[L"two"] = 2;
-    j1[L"null"] = null_type();
+    j1[L"null"] = jsoncons::null_type();
     j1[L"true"] = true;
     j1[L"false"] = false;
     j1[L"max int64_t"] = (std::numeric_limits<int64_t>::max)();
@@ -126,11 +126,11 @@ TEST_CASE("cbor_test2")
     j1[L"S"] = L"S";
     j1[L"String too long for small string optimization"] = L"String too long for small string optimization";
 
-    wjson ja(json_array_arg);
+    jsoncons::wjson ja(jsoncons::json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);
-    ja.push_back(null_type());
+    ja.push_back(jsoncons::null_type());
     ja.push_back(true);
     ja.push_back(false);
     ja.push_back((std::numeric_limits<int64_t>::max)());
@@ -158,16 +158,16 @@ TEST_CASE("cbor_test2")
     std::vector<uint8_t> v;
     cbor::encode_cbor(j1, v);
 
-    wjson j2 = cbor::decode_cbor<wjson>(v);
+    jsoncons::wjson j2 = cbor::decode_cbor<jsoncons::wjson>(v);
     CHECK(j2 == j1);
 
-    wjson j3 = cbor::decode_cbor<wjson>(v.begin(), v.end());
+    jsoncons::wjson j3 = cbor::decode_cbor<jsoncons::wjson>(v.begin(), v.end());
     CHECK(j3 == j1);
 }
 
 TEST_CASE("cbor_reputon_test")
 {
-ojson j1 = ojson::parse(R"(
+    jsoncons::ojson j1 = jsoncons::ojson::parse(R"(
 {
    "application": "hiking",
    "reputons": [
@@ -184,10 +184,10 @@ ojson j1 = ojson::parse(R"(
     std::vector<uint8_t> v;
     cbor::encode_cbor(j1, v);
 
-    ojson j2 = cbor::decode_cbor<ojson>(v);
+    auto j2 = cbor::decode_cbor<jsoncons::ojson>(v);
     CHECK(j2 == j1);
 
-    ojson j3 = cbor::decode_cbor<ojson>(v.begin(), v.end());
+    auto j3 = cbor::decode_cbor<jsoncons::ojson>(v.begin(), v.end());
     CHECK(j3 == j1);
 }
 
@@ -198,7 +198,7 @@ TEST_CASE("cbor json constructor __int64 tests")
 {
     SECTION("test 1")
     {
-        json j1("-18446744073709551617", semantic_tag::bigint);
+        jsoncons::json j1("-18446744073709551617", jsoncons::semantic_tag::bigint);
 
         __int128 val1 = j1.as<__int128>();
 
@@ -216,7 +216,7 @@ TEST_CASE("cbor json constructor unsigned __int64 tests")
 {
     SECTION("test 1")
     {
-        json j1("18446744073709551616", semantic_tag::bigint);
+        jsoncons::json j1("18446744073709551616", jsoncons::semantic_tag::bigint);
 
         auto val1 = j1.as<unsigned __int128>();
 
