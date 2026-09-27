@@ -293,7 +293,7 @@ TEST_CASE("decode_json with work allocator")
         std::vector<double> v = {1,2,3,4,5,6};
 
         std::string json_text;
-        jsoncons::encode_json(aset, v,jsoncons::json_text);
+        jsoncons::encode_json(aset, v,json_text);
 
         auto result = jsoncons::decode_json<std::vector<double>>(aset, json_text);
 
@@ -309,7 +309,7 @@ TEST_CASE("decode_json with work allocator")
         std::map<std::string,double> m = {{"a",1},{"b",2}};
 
         std::string json_text;
-        jsoncons::encode_json(aset, m,jsoncons::json_text);
+        jsoncons::encode_json(aset, m,json_text);
         auto result = jsoncons::decode_json<std::map<std::string,double>>(aset, json_text);
         REQUIRE(result.size() == m.size());
         CHECK(m["a"] == result["a"]);
@@ -322,7 +322,7 @@ TEST_CASE("decode_json with work allocator")
         std::vector<std::vector<double>> v{u,u};
 
         std::string json_text;
-        jsoncons::encode_json(aset, v,jsoncons::json_text);
+        jsoncons::encode_json(aset, v,json_text);
         auto result = jsoncons::decode_json<std::vector<std::vector<double>>>(aset, json_text);
         REQUIRE(result.size() == v.size());
         for (const auto& item : result)
