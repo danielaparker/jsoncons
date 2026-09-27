@@ -253,9 +253,9 @@ jobs:
         compiler: ['13', '15', 'latest']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
-      - name: Install unzip and git
-        run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
       - name: cmake
