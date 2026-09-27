@@ -25,7 +25,7 @@ using namespace jsoncons;
 TEST_CASE("jsonpath.jsonpath select_paths test")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -49,7 +49,7 @@ TEST_CASE("jsonpath.jsonpath select_paths test")
 }
     )";
 
-    jsoncons::json doc = jsoncons::json::parse(jsoncons::json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("test 1")
     {

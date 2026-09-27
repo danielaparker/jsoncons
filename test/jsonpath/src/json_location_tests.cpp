@@ -41,7 +41,7 @@ TEST_CASE("json_location parse tests")
 TEST_CASE("json_location remove tests")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -65,7 +65,7 @@ TEST_CASE("json_location remove tests")
 }
     )";
 
-    jsoncons::json doc = jsoncons::json::parse(jsoncons::json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
@@ -186,7 +186,7 @@ TEST_CASE("json_location remove tests")
 TEST_CASE("json_location select tests")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -210,7 +210,7 @@ TEST_CASE("json_location select tests")
 }
     )";
 
-    jsoncons::json doc = jsoncons::json::parse(jsoncons::json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
@@ -317,7 +317,7 @@ TEST_CASE("test json_location from path_node")
 
 TEST_CASE("json_location replace tests")
 {
-    std::string json_string = R"(
+    std::string jstr = R"(
 {"books": [ 
     { "category": "reference",
       "author": "Nigel Rees",
@@ -338,7 +338,7 @@ TEST_CASE("json_location replace tests")
 }
     )";
 
-    jsoncons::json doc = jsoncons::json::parse(jsoncons::json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
