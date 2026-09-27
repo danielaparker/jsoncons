@@ -1728,7 +1728,7 @@ public:
         return n;
     }
 
-    int compare_magnitude(const basic_bigint& y) const noexcept
+    int compare_abs(const basic_bigint& y) const noexcept
     {
         auto view = get_storage_view();
         auto y_view = y.get_storage_view();

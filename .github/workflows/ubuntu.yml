@@ -227,7 +227,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['11','12', '13', '14', '15-bullseye']
+        compiler: ['11','12', '13', '14', '15', 'latest']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
@@ -248,7 +248,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['13', '15-bullseye']
+        compiler: ['13', '15', 'latest']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
