@@ -101,7 +101,7 @@ public:
         if (b.signum() == 0)
             return 1;
         uint64_t r = ((b.bit_width() + 1) * 646456993u) >> 31;
-        return b.compare_magnitude(big_ten_to_the(r)) < 0u ? r : r+1;
+        return b.compare_magnitude(big_ten_to_the(r)) < 0 ? r : r+1;
     }
 
     uint64_t precision() const
