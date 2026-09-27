@@ -232,8 +232,6 @@ jobs:
         compiler: ['7', '8', '9', '10', '11', '12', '13', '14', '15', 'latest']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
-      - name: Install unzip and git
-        run: apt-get update ; apt-get install -y unzip git
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
