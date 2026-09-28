@@ -109,20 +109,20 @@ TEST_CASE("json_traits using allocator tests")
     }
     SECTION("basic_byte_string")
     {
-        using jsoncons::byte_string_type = basic_byte_string<cust_allocator<uint8_t>>;
+        using byte_string_type = basic_byte_string<cust_allocator<uint8_t>>;
 
         cust_allocator<uint8_t> alloc(1);
         auto aset = make_alloc_set(alloc);
 
         cust_json j{byte_string{'H','e','l','l','o'}, aset.get_allocator()};
-        REQUIRE(j.is<jsoncons::byte_string_type>());
+        REQUIRE(j.is<byte_string_type>());
 
         auto result = jsoncons::reflect::json_traits<cust_json,byte_string_type>::try_as(aset, j);
         REQUIRE(result);
-        auto r = j.try_as<jsoncons::byte_string_type>(aset);
+        auto r = j.try_as<byte_string_type>(aset);
         REQUIRE(r);
         CHECK(*r == *result);
-        CHECK(j.as<jsoncons::byte_string_type>(aset) == *result);
+        CHECK(j.as<byte_string_type>(aset) == *result);
         //std::cout << result.error() .message() << "\n\n";
     }
 }
