@@ -22,10 +22,10 @@ int countl_zero(T x)
 
     if (x == 0) return std::numeric_limits<T>::digits;
 #if defined(__GNUC__) || defined(__clang__)
-    if (sizeof(T) <= sizeof(unsigned int)) {
+    JSONCONS_IF_CONSTEXPR (sizeof(T) <= sizeof(unsigned int)) {
         return __builtin_clz(x) - (sizeof(unsigned int) - sizeof(T)) * 8;
     }
-    else if (sizeof(T) <= sizeof(unsigned long long)) {
+    else JSONCONS_IF_CONSTEXPR (sizeof(T) <= sizeof(unsigned long long)) {
         return __builtin_clzll(x) - (sizeof(unsigned long long) - sizeof(T)) * 8;
     }
 #endif
@@ -58,13 +58,20 @@ int countr_zero(T value) {
     #elif defined(_MSC_VER)
         unsigned long index;
         #if defined(_M_X64) || defined(_M_ARM64)
-            if (sizeof(T) == 8) {
+            JSONCONS_IF_CONSTEXPR (sizeof(T) == 8) 
+            {
                 _BitScanForward64(&index, static_cast<unsigned __int64>(value));
                 return static_cast<int>(index);
             }
+            else
+            {
+                _BitScanForward(&index, static_cast<unsigned long>(value));
+                return static_cast<int>(index);
+            }
+        #else
+            _BitScanForward(&index, static_cast<unsigned long>(value));
+            return static_cast<int>(index);
         #endif
-        _BitScanForward(&index, static_cast<unsigned long>(value));
-        return static_cast<int>(index);
     #else
         int count = 0;
         while ((value & 1) == 0) {
