@@ -49,7 +49,7 @@
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/heap_string.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)

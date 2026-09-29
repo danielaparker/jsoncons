@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_NONSTD_TYPE_TRAITS_HPP
-#define JSONCONS_NONSTD_TYPE_TRAITS_HPP
+#ifndef JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
@@ -983,4 +983,4 @@ namespace impl {
 } // nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_NONSTD_TYPE_TRAITS_HPP
+#endif // JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP

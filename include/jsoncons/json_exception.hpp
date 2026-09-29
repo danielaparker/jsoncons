@@ -14,7 +14,7 @@
 #include <system_error> // std::error_code
 
 #include <jsoncons/nonstd/compiler_support.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
 namespace jsoncons {

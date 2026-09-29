@@ -4,7 +4,7 @@
 #include <new>			// for placement operator new
 #include <tuple>		// for tuple, make_tuple, make_from_tuple
 #include <utility>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace nonstd {

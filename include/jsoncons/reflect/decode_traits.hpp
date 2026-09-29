@@ -31,7 +31,7 @@
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/typed_array.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace reflect {

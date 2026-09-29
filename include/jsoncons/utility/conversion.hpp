@@ -16,7 +16,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/number_writers.hpp> // from_integer
 

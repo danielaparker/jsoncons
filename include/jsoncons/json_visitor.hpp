@@ -22,7 +22,7 @@
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/function_objects.hpp>
 
 namespace jsoncons {

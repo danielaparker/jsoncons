@@ -12,7 +12,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/nonstd/compiler_support.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>

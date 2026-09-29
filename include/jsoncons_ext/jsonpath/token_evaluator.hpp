@@ -24,7 +24,7 @@
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>

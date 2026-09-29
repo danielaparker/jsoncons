@@ -24,7 +24,7 @@
 #include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons { 
 

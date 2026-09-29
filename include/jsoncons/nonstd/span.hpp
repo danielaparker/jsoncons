@@ -14,7 +14,7 @@
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 namespace jsoncons {
 namespace nonstd {

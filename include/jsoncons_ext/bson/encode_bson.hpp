@@ -19,7 +19,7 @@
 #include <jsoncons/reflect/encode_traits.hpp>
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/nonstd/type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
