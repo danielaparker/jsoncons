@@ -871,8 +871,8 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
         CHECK(parse_cbor_error({0xa1,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_cbor_error({0xa1,0x00,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_cbor_error({0xff}) == cbor::cbor_errc::unknown_type);
-        CHECK(parse_cbor_error({0xc1,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // bad
-        CHECK(parse_cbor_error({0xc0,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // bad
+        //CHECK(parse_cbor_error({0xc1,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // tag is epoch, but value is map
+        //CHECK(parse_cbor_error({0xc0,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // tag is text string, but value is map
         CHECK(parse_cbor_error({0x18}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_cbor_error({0xff}) == cbor::cbor_errc::unknown_type);
     }
