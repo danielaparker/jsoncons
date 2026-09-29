@@ -21,6 +21,7 @@ enum class cbor_errc
     success = 0,
     unexpected_eof,
     source_error,
+    reserved_additional_info_value,
     invalid_decimal_fraction,
     invalid_bigfloat,
     invalid_utf8_text_string,
@@ -49,6 +50,8 @@ public:
         {
             case cbor_errc::unexpected_eof:
                 return "Unexpected end of file";
+            case cbor_errc::reserved_additional_info_value:
+                return "Additional-information values 0x1c–0x1e are reserved";
             case cbor_errc::source_error:
                 return "Source error";
             case cbor_errc::invalid_decimal_fraction:
