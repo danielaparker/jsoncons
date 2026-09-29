@@ -196,12 +196,22 @@ public:
                     if (type != 0x00)
                     {
                         read_e_name(visitor,jsoncons::bson::bson_container_type::document,ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
                         state_stack_.back().mode = parse_mode::value;
                         state_stack_.back().type = type;
                     }
                     else
                     {
                         end_document(visitor,ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
                     }
                     break;
                 }
@@ -219,17 +229,37 @@ public:
                     if (type != 0x00)
                     {
                         read_e_name(visitor,jsoncons::bson::bson_container_type::array,ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
                         read_value(visitor, type, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
                     }
                     else
                     {
                         end_array(visitor,ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
                     }
                     break;
                 }
                 case parse_mode::value:
                     state_stack_.back().mode = parse_mode::document;
                     read_value(visitor,state_stack_.back().type,ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        more_ = false;
+                        return;
+                    }
                     break;
                 case parse_mode::accept:
                 {
@@ -471,6 +501,12 @@ private:
                 if (JSONCONS_UNLIKELY(n != 1))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                if (JSONCONS_UNLIKELY(!(c == 0 || c == 1)))
+                {
+                    ec = bson_errc::expected_boolean;
                     more_ = false;
                     return;
                 }

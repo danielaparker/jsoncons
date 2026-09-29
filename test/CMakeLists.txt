@@ -65,6 +65,7 @@ add_executable(unit_tests
                bson/src/bson_decimal128_tests.cpp
                bson/src/bson_encoder_tests.cpp
                bson/src/bson_oid_tests.cpp
+               bson/src/bson_compliance_tests.cpp
                bson/src/bson_reader_tests.cpp
                bson/src/bson_test_suite.cpp
                bson/src/encode_decode_bson_tests.cpp
@@ -74,6 +75,7 @@ add_executable(unit_tests
                cbor/src/cbor_event_visitor_tests.cpp
                cbor/src/cbor_reader_tests.cpp
                cbor/src/cbor_tests.cpp
+               cbor/src/cbor_compliance_tests.cpp
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
@@ -203,6 +205,7 @@ add_executable(unit_tests
                msgpack/src/msgpack_cursor_tests.cpp
                msgpack/src/msgpack_encoder_tests.cpp
                msgpack/src/msgpack_tests.cpp
+               msgpack/src/msgpack_compliance_tests.cpp
                msgpack/src/msgpack_timestamp_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp

@@ -15,6 +15,20 @@
 
 namespace cbor = jsoncons::cbor;
 
+namespace {
+
+std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
+{
+    std::error_code ec;
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    cbor::cbor_bytes_reader reader(v, decoder);
+    reader.read(ec);
+
+    return ec;
+}
+
+} // namespace
+
 TEST_CASE("cbor_test_floating_point")
 {
     jsoncons::json j1;
@@ -233,3 +247,71 @@ TEST_CASE("cbor json constructor unsigned __int64 tests")
 #pragma GCC diagnostic pop
 #endif
 
+TEST_CASE("cbor GLD.SerializerBenchmark tests")
+{
+    SECTION("test 1")
+    {
+        CHECK(parse_cbor_error({0x18}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x19}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x19,0x00}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1a}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1a,0x00}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1a,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1a,0x00,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1b,0x00,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1c}) == cbor::cbor_errc::reserved_additional_info_value); // bad
+        CHECK(parse_cbor_error({0x1d}) == cbor::cbor_errc::reserved_additional_info_value); // bad
+        CHECK(parse_cbor_error({0x1e}) == cbor::cbor_errc::reserved_additional_info_value); // bad
+        CHECK(parse_cbor_error({0xfc}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xfd}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xfe}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0x44,01,02,03}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x5f}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x5f,0x01,0xff}) == cbor::cbor_errc::illegal_chunked_string);
+        CHECK(parse_cbor_error({0x64,0x49,0x45,0x54}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x74,0x32,0x30,0x31,0x33}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x7f,0x01,0xff}) == cbor::cbor_errc::illegal_chunked_string);
+        CHECK(parse_cbor_error({0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x62,0xc0,0xae}) == cbor::cbor_errc::invalid_utf8_text_string);
+        CHECK(parse_cbor_error({0x81}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x82,0x01}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x81,0x81,0x81,0x81,0x81}) == cbor::cbor_errc::unexpected_eof);
+
+        CHECK(parse_cbor_error({
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81,
+            0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81
+        }) == cbor::cbor_errc::unexpected_eof);
+
+        CHECK(parse_cbor_error({0x81,0xFE}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0x9f}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x9f,0x01}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x9f,0xFE,0xff}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0x91,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_cbor_error({0xa1}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xa1,0xfe,0x01}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xa1,0x61,0x61}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xa1,0x61,0x61,0xfe}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xa2,0x01,0x02}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xbf}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xbf,0x00,0x01,0x03,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_cbor_error({0xbf,0x61,0x61}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xbf,0x61,0x61,0x01}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xbf,0xFE,0x01}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xbf,0x01,0xFE}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_cbor_error({0xa1,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_cbor_error({0xa1,0x00,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_cbor_error({0xff}) == cbor::cbor_errc::unknown_type);
+        //CHECK(parse_cbor_error({0xc1,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // tag is epoch, but value is map
+        //CHECK(parse_cbor_error({0xc0,0xa1,0x61,0x61,0x00}) == cbor::cbor_errc::unexpected_eof); // tag is text string, but value is map
+        CHECK(parse_cbor_error({0x18}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xff}) == cbor::cbor_errc::unknown_type);
+    }
+}

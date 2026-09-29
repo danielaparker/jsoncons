@@ -327,7 +327,7 @@ private:
                 std::size_t last = sv.find_last_of('/');
                 if (first == string_view::npos || last == string_view::npos || first == last)
                 {
-                    ec = bson_errc::invalid_regex_string;
+                    ec = bson_errc::bad_regex;
                     JSONCONS_VISITOR_RETURN;
                 }
                 string_view regex = sv.substr(first+1,last-1);
