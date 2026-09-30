@@ -852,7 +852,7 @@ public:
                     {
                         case 0x04:
                             text_buffer_.clear();
-                            read_decimal_fraction(text_buffer_, ec);
+                            read_bigdecimal(text_buffer_, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -1657,7 +1657,7 @@ private:
         return val;
     }
 
-    void read_decimal_fraction(string_type& result, std::error_code& ec)
+    void read_bigdecimal(string_type& result, std::error_code& ec)
     {
         std::size_t size = read_size(ec);
         if (JSONCONS_UNLIKELY(ec))
@@ -1666,7 +1666,7 @@ private:
         }
         if (size != 2)
         {
-            ec = cbor_errc::invalid_decimal_fraction;
+            ec = cbor_errc::invalid_bigdecimal;
             more_ = false;
             return;
         }
@@ -1690,7 +1690,7 @@ private:
                 }
                 if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
-                    ec = cbor_errc::invalid_decimal_fraction;
+                    ec = cbor_errc::invalid_bigdecimal;
                     more_ = false;
                     return;
                 }
@@ -1709,7 +1709,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal_fraction;
+                ec = cbor_errc::invalid_bigdecimal;
                 more_ = false;
                 return;
             }
@@ -1793,7 +1793,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal_fraction;
+                ec = cbor_errc::invalid_bigdecimal;
                 more_ = false;
                 return;
             }

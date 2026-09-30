@@ -1471,7 +1471,7 @@ private:
         }
         if (size != 2)
         {
-            ec = cbor_errc::invalid_decimal_fraction;
+            ec = cbor_errc::invalid_bigdecimal;
             more_ = false;
             return;
         }
@@ -1506,7 +1506,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal_fraction;
+                ec = cbor_errc::invalid_bigdecimal;
                 more_ = false;
                 return;
             }
@@ -1587,7 +1587,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal_fraction;
+                ec = cbor_errc::invalid_bigdecimal;
                 more_ = false;
                 return;
             }
@@ -1597,7 +1597,7 @@ private:
             exponent >= (std::numeric_limits<int32_t>::max)() || 
             exponent <= (std::numeric_limits<int32_t>::min)())
         {
-            ec = cbor_errc::invalid_decimal_fraction;
+            ec = cbor_errc::invalid_bigdecimal;
             more_ = false;
             return;
         }
@@ -1615,7 +1615,7 @@ private:
         }
         else
         {
-            ec = cbor_errc::invalid_decimal_fraction;
+            ec = cbor_errc::invalid_bigdecimal;
             more_ = false;
             return;
         }

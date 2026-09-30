@@ -22,7 +22,7 @@ enum class cbor_errc
     unexpected_eof,
     source_error,
     reserved_additional_info_value,
-    invalid_decimal_fraction,
+    invalid_bigdecimal,
     invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
@@ -54,10 +54,10 @@ public:
                 return "Additional-information values 30-32 are reserved";
             case cbor_errc::source_error:
                 return "Source error";
-            case cbor_errc::invalid_decimal_fraction:
-                return "Invalid decimal fraction";
+            case cbor_errc::invalid_bigdecimal:
+                return "Invalid DigDecimal value";
             case cbor_errc::invalid_bigfloat:
-                return "Invalid bigfloat";
+                return "Invalid BigFloat value";
             case cbor_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case cbor_errc::too_many_items:

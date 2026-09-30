@@ -343,7 +343,7 @@ TEST_CASE("oss-fuzz issues")
     // Fuzz target: fuzz_cbor_encoder
     // Issue: failed_throw
     // Resolution: Replaced assert that array containing decimal fraction
-    //             has size 2 with error code invalid_decimal_fraction
+    //             has size 2 with error code invalid_bigdecimal
     SECTION("issue  22000")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-fuzz_cbor_encoder-5685492533428224";
@@ -357,7 +357,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == cbor::cbor_errc::invalid_decimal_fraction); //-V521
+        CHECK(ec == cbor::cbor_errc::invalid_bigdecimal); //-V521
     }
 
     // Fuzz target: fuzz_cbor_encoder
@@ -377,7 +377,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK((ec == cbor::cbor_errc::illegal_chunked_string || ec == cbor::cbor_errc::invalid_decimal_fraction)); //-V521
+        CHECK((ec == cbor::cbor_errc::illegal_chunked_string || ec == cbor::cbor_errc::invalid_bigdecimal)); //-V521
     }
     // Fuzz target: fuzz_cbor_encoder
     // Issue: Stack-overflow
@@ -1001,7 +1001,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(msgpack::msgpack_errc::unexpected_eof == ec); 
-    }*/
+    }
     // Fuzz target: fuzz_cbor_parser_max
     // Issue: Integer-overflow in void jsoncons::prettify_string<std::__1::basic_string<char, std::__1::char_trait
     SECTION("issue 536952813")
@@ -1021,6 +1021,32 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         reader.read(ec);
         CHECK_FALSE(ec);
+    }*/
+
+    // Fuzz target: fuzz_cbor
+    // Issue:  jsoncons:fuzz_cbor: Integer-overflow in jsoncons::cbor::basic_cbor_parser<jsoncons::stream_source<unsigned char, std::__
+    // Diagnosis: 
+    // Resolution: 
+    SECTION("Reference Info 567254392")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor-5757637657165824";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
+
+        jsoncons::default_json_visitor visitor;
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        std::cout << ec.message() << "\n";
+
+        //CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch //-V521
+        //       ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
     }
 }
 

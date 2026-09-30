@@ -549,7 +549,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_decimal_fraction;
+                            ec = cbor_errc::invalid_bigdecimal;
                             return;
                         }
                     }
@@ -570,7 +570,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_decimal_fraction;
+                            ec = cbor_errc::invalid_bigdecimal;
                             return;
                         }
                     }
@@ -590,7 +590,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_decimal_fraction;
+                            ec = cbor_errc::invalid_bigdecimal;
                             return;
                         }
                     }
@@ -605,7 +605,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_decimal_fraction;
+                            ec = cbor_errc::invalid_bigdecimal;
                             return;
                         }
                     }
@@ -624,7 +624,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_decimal_fraction;
+                            ec = cbor_errc::invalid_bigdecimal;
                             return;
                         }
                     }
