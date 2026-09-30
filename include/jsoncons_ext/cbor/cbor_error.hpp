@@ -21,7 +21,7 @@ enum class cbor_errc
     success = 0,
     unexpected_eof,
     source_error,
-    reserved_additional_info_value,
+    reserved_additional_info,
     invalid_bigdecimal,
     invalid_bigfloat,
     invalid_utf8_text_string,
@@ -50,7 +50,7 @@ public:
         {
             case cbor_errc::unexpected_eof:
                 return "Unexpected end of file";
-            case cbor_errc::reserved_additional_info_value:
+            case cbor_errc::reserved_additional_info:
                 return "Additional-information values 30-32 are reserved";
             case cbor_errc::source_error:
                 return "Source error";

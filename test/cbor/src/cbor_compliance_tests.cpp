@@ -41,12 +41,12 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
         CHECK(parse_error({0x1a,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x1a,0x00,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x1b,0x00,0x00,0x00}) == cbor::cbor_errc::unexpected_eof);
-        CHECK(parse_error({0x1c}) == cbor::cbor_errc::reserved_additional_info_value); // bad
-        CHECK(parse_error({0x1d}) == cbor::cbor_errc::reserved_additional_info_value); // bad
-        CHECK(parse_error({0x1e}) == cbor::cbor_errc::reserved_additional_info_value); // bad
-        CHECK(parse_error({0xfc}) == cbor::cbor_errc::reserved_additional_info_value);
-        CHECK(parse_error({0xfd}) == cbor::cbor_errc::reserved_additional_info_value);
-        CHECK(parse_error({0xfe}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0x1c}) == cbor::cbor_errc::reserved_additional_info); // bad
+        CHECK(parse_error({0x1d}) == cbor::cbor_errc::reserved_additional_info); // bad
+        CHECK(parse_error({0x1e}) == cbor::cbor_errc::reserved_additional_info); // bad
+        CHECK(parse_error({0xfc}) == cbor::cbor_errc::reserved_additional_info);
+        CHECK(parse_error({0xfd}) == cbor::cbor_errc::reserved_additional_info);
+        CHECK(parse_error({0xfe}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0x44,01,02,03}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x5f}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x5f,0x01,0xff}) == cbor::cbor_errc::illegal_chunked_string);
@@ -72,22 +72,22 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
             0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81
         }) == cbor::cbor_errc::unexpected_eof);
 
-        CHECK(parse_error({0x81,0xFE}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0x81,0xFE}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0x9f}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x9f,0x01}) == cbor::cbor_errc::unexpected_eof);
-        CHECK(parse_error({0x9f,0xFE,0xff}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0x9f,0xFE,0xff}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0x91,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_error({0xa1}) == cbor::cbor_errc::unexpected_eof);
-        CHECK(parse_error({0xa1,0xfe,0x01}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0xa1,0xfe,0x01}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0xa1,0x61,0x61}) == cbor::cbor_errc::unexpected_eof);
-        CHECK(parse_error({0xa1,0x61,0x61,0xfe}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0xa1,0x61,0x61,0xfe}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0xa2,0x01,0x02}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0xbf}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0xbf,0x00,0x01,0x03,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_error({0xbf,0x61,0x61}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0xbf,0x61,0x61,0x01}) == cbor::cbor_errc::unexpected_eof);
-        CHECK(parse_error({0xbf,0xFE,0x01}) == cbor::cbor_errc::reserved_additional_info_value);
-        CHECK(parse_error({0xbf,0x01,0xFE}) == cbor::cbor_errc::reserved_additional_info_value);
+        CHECK(parse_error({0xbf,0xFE,0x01}) == cbor::cbor_errc::reserved_additional_info);
+        CHECK(parse_error({0xbf,0x01,0xFE}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0xa1,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_error({0xa1,0x00,0xff}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_error({0xff}) == cbor::cbor_errc::unknown_type);

@@ -618,7 +618,7 @@ public:
         uint8_t info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
@@ -697,26 +697,12 @@ public:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = read_int64(ec);
+                source_.ignore(1);
+                read_negative_integer(info, visitor, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
-                semantic_tag tag = semantic_tag::none;
-                if (other_tags_[item_tag])
-                {
-                    if (raw_tag_ == 1)
-                    {
-                        tag = semantic_tag::epoch_second;
-                    }
-                    other_tags_[item_tag] = false;
-                }
-                visitor.int64_value(val, tag, *this, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
@@ -1136,7 +1122,7 @@ private:
         uint8_t info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return string_view_type();
         }
@@ -1188,7 +1174,7 @@ private:
         uint8_t info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
@@ -1236,7 +1222,7 @@ private:
         uint8_t info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return byte_string_view();
         }
@@ -1306,7 +1292,7 @@ private:
         uint8_t info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
@@ -1422,7 +1408,7 @@ private:
         uint8_t info = get_additional_information_value(initial_b);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return val;
         }
@@ -1507,7 +1493,7 @@ private:
         uint8_t info = get_additional_information_value(ch.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return val;
         }
@@ -1573,6 +1559,12 @@ private:
                                 return val;
                             }
                             auto x = binary::big_to_native<uint64_t>(buf, sizeof(buf));
+                            if (x > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                            {
+                                ec = cbor_errc::invalid_bigdecimal;
+                                more_ = false;
+                                return val;
+                            }
                             val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
                             break;
                         }
@@ -1605,6 +1597,98 @@ private:
         return val;
     }
 
+    void read_negative_integer(uint8_t info, generic_visitor& visitor, std::error_code& ec)
+    {
+        semantic_tag tag = semantic_tag::none;
+        if (other_tags_[item_tag])
+        {
+            if (raw_tag_ == 1)
+            {
+                tag = semantic_tag::epoch_second;
+            }
+            other_tags_[item_tag] = false;
+        }
+
+        switch (info)
+        {
+            case JSONCONS_EXT_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+            {
+                int64_t val = static_cast<int8_t>(- 1 - info);
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
+                break;
+            }
+            case 0x18: // Negative integer (one-byte uint8_t follows)
+            {
+                uint8_t b;
+                if (source_.read(&b, 1) == 0)
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                int64_t val = static_cast<int64_t>(-1) - static_cast<int64_t>(b);
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
+                break;
+            }
+            case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
+            {
+                uint8_t buf[sizeof(uint16_t)];
+                if (source_.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                auto x = binary::big_to_native<uint16_t>(buf, sizeof(buf));
+                int64_t val = static_cast<int64_t>(-1)- x;
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
+                break;
+            }
+            case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
+            {
+                uint8_t buf[sizeof(uint32_t)];
+                if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                auto x = binary::big_to_native<uint32_t>(buf, sizeof(buf));
+                int64_t val = static_cast<int64_t>(-1)- x;
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
+                break;
+            }
+            case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
+            {
+                uint8_t buf[sizeof(uint64_t)];
+                if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                auto x = binary::big_to_native<uint64_t>(buf, sizeof(buf));
+                if (x > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                {
+                    ec = cbor_errc::invalid_bigdecimal;
+                    more_ = false;
+                    return;
+                }
+                int64_t val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
+                break;
+            }
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+        }
+    }
+
     double read_double(std::error_code& ec)
     {
         double val = 0;
@@ -1619,7 +1703,7 @@ private:
         uint8_t info = get_additional_information_value(b);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return val; 
         }
@@ -1758,7 +1842,7 @@ private:
                 uint8_t info = get_additional_information_value(b);
                 if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
                 {
-                    ec = cbor_errc::reserved_additional_info_value;
+                    ec = cbor_errc::reserved_additional_info;
                     more_ = false;
                     return;
                 }
@@ -1899,7 +1983,7 @@ private:
                 uint8_t tag = get_additional_information_value(b);
                 if (JSONCONS_UNLIKELY(tag >= 0x1C && tag <= 0x1E))
                 {
-                    ec = cbor_errc::reserved_additional_info_value;
+                    ec = cbor_errc::reserved_additional_info;
                     more_ = false;
                     return;
                 }
@@ -2664,7 +2748,7 @@ private:
         uint8_t info = get_additional_information_value(b);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
@@ -2691,7 +2775,7 @@ private:
         info = get_additional_information_value(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
@@ -2770,7 +2854,7 @@ private:
         uint8_t info = get_additional_information_value(b.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
-            ec = cbor_errc::reserved_additional_info_value;
+            ec = cbor_errc::reserved_additional_info;
             more_ = false;
             return;
         }
