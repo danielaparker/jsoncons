@@ -1530,8 +1530,8 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = binary::big_to_native<uint16_t>(buf, sizeof(buf));
-                            val = static_cast<int64_t>(-1)- x;
+                            auto u = binary::big_to_native<uint16_t>(buf, sizeof(buf));
+                            val = static_cast<int64_t>(-1)- u;
                             break;
                         }
 
@@ -1544,8 +1544,8 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = binary::big_to_native<uint32_t>(buf, sizeof(buf));
-                            val = static_cast<int64_t>(-1)- x;
+                            auto u = binary::big_to_native<uint32_t>(buf, sizeof(buf));
+                            val = static_cast<int64_t>(-1)- u;
                             break;
                         }
 
@@ -1558,14 +1558,21 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = binary::big_to_native<uint64_t>(buf, sizeof(buf));
-                            if (x > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                            auto u = binary::big_to_native<uint64_t>(buf, sizeof(buf));
+                            if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                             {
                                 ec = cbor_errc::invalid_bigdecimal;
                                 more_ = false;
                                 return val;
                             }
-                            val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                            if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
+                            {
+                                val = (std::numeric_limits<int64_t>::min)();
+                            }
+                            else
+                            {
+                                val = static_cast<int64_t>(-1)- static_cast<int64_t>(u);
+                            }
                             break;
                         }
                 }
@@ -1573,14 +1580,14 @@ private:
 
                 case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
                 {
-                    uint64_t x = read_uint64(ec);
+                    uint64_t u = read_uint64(ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return 0;
                     }
-                    if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                    if (u <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                     {
-                        val = x;
+                        val = u;
                     }
                     else
                     {
@@ -1641,8 +1648,8 @@ private:
                     more_ = false;
                     return;
                 }
-                auto x = binary::big_to_native<uint16_t>(buf, sizeof(buf));
-                int64_t val = static_cast<int64_t>(-1)- x;
+                auto u = binary::big_to_native<uint16_t>(buf, sizeof(buf));
+                int64_t val = static_cast<int64_t>(-1)- u;
                 visitor.int64_value(val, tag, *this, ec);
                 more_ = !cursor_mode_;
                 break;
@@ -1656,8 +1663,8 @@ private:
                     more_ = false;
                     return;
                 }
-                auto x = binary::big_to_native<uint32_t>(buf, sizeof(buf));
-                int64_t val = static_cast<int64_t>(-1)- x;
+                auto u = binary::big_to_native<uint32_t>(buf, sizeof(buf));
+                int64_t val = static_cast<int64_t>(-1)- u;
                 visitor.int64_value(val, tag, *this, ec);
                 more_ = !cursor_mode_;
                 break;
@@ -1671,15 +1678,27 @@ private:
                     more_ = false;
                     return;
                 }
-                auto x = binary::big_to_native<uint64_t>(buf, sizeof(buf));
-                if (x > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                auto u = binary::big_to_native<uint64_t>(buf, sizeof(buf));
+                if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
-                    ec = cbor_errc::invalid_bigdecimal;
-                    more_ = false;
-                    return;
+                    //ec = cbor_errc::invalid_negative_integer;
+                    //more_ = false;
+                    //return;
+                    bigint b(u);
+                    bigint b2 = -1 - b;
+                    text_buffer_.clear();
+                    b2.write_string(text_buffer_);
+                    visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                 }
-                int64_t val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
-                visitor.int64_value(val, tag, *this, ec);
+                else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
+                {
+                    visitor.int64_value((std::numeric_limits<int64_t>::min)(), tag, *this, ec);
+                }
+                else
+                {
+                    int64_t val = static_cast<int64_t>(-1) - static_cast<int64_t>(u);
+                    visitor.int64_value(val, tag, *this, ec);
+                }
                 more_ = !cursor_mode_;
                 break;
             }
@@ -1973,14 +1992,14 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                uint8_t b;
-                if (source_.read(&b, 1) == 0)
+                uint8_t x;
+                if (source_.read(&x, 1) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                uint8_t tag = get_additional_information_value(b);
+                uint8_t tag = get_additional_information_value(x);
                 if (JSONCONS_UNLIKELY(tag >= 0x1C && tag <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;
@@ -2009,16 +2028,16 @@ private:
                     {
                         str.push_back('0');
                         str.push_back('x');
-                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        n.write_string_hex(str);
+                        bigint b = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                        b.write_string_hex(str);
                     }
                     else if (tag == 3)
                     {
                         str.push_back('-');
                         str.push_back('0');
-                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        n = -1 - n;
-                        n.write_string_hex(str);
+                        bigint b = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                        b = -1 - b;
+                        b.write_string_hex(str);
                         str[2] = 'x'; // overwrite minus
                     }
                 }
@@ -2156,9 +2175,9 @@ private:
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+                    bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
                     text_buffer_.clear();
-                    n.write_string(text_buffer_);
+                    b.write_string(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;
@@ -2171,10 +2190,10 @@ private:
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
-                    n = -1 - n;
+                    bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+                    b = -1 - b;
                     text_buffer_.clear();
-                    n.write_string(text_buffer_);
+                    b.write_string(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;
