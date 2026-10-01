@@ -14,6 +14,16 @@ namespace
 {
     namespace jsonschema = jsoncons::jsonschema;
 
+    template <typename T>
+    class default_constructible_stateful_allocator : public mock_stateful_allocator<T>
+    {
+    public:
+        default_constructible_stateful_allocator() : mock_stateful_allocator<T>(0) {}
+
+        template <typename U>
+        struct rebind { using other = default_constructible_stateful_allocator<U>; };
+    };
+
     template <typename Json, typename... Args>
     using make_schema_result = decltype(jsonschema::make_json_schema(
         std::declval<Json>(), std::declval<Args>()...));
@@ -83,4 +93,12 @@ TEST_CASE("jsonschema unsupported JSON types")
     using inner_stateful_json = jsoncons::basic_json<char, jsoncons::sorted_policy,
         std::scoped_allocator_adaptor<std::allocator<char>, mock_stateful_allocator<char>>>;
     check_schema_overloads<inner_stateful_json>(false);
+    using default_stateful_json = jsoncons::basic_json<char, jsoncons::sorted_policy,
+        std::scoped_allocator_adaptor<default_constructible_stateful_allocator<char>>>;
+    static_assert(std::is_default_constructible<typename default_stateful_json::allocator_type>::value,
+        "This case must distinguish default construction from always-equal allocation");
+    check_schema_overloads<default_stateful_json>(false);
+#if defined(__cpp_char8_t)
+    check_schema_overloads<jsoncons::basic_json<char8_t>>(false);
+#endif
 }
