@@ -25,6 +25,8 @@ namespace csv {
         invalid_escaped_char,
         unexpected_char_between_fields,
         max_nesting_depth_exceeded,
+        unmatched_end_array,
+        unmatched_end_object,
         invalid_number
     };
 

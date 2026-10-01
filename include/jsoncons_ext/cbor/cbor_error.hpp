@@ -30,6 +30,8 @@ enum class cbor_errc
     number_too_large,
     stringref_too_large,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,

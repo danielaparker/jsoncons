@@ -30,6 +30,8 @@ enum class ubjson_errc
     too_few_items,
     number_too_large,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     key_expected,
     max_items_exceeded
 };

@@ -25,6 +25,8 @@ enum class msgpack_errc
     too_many_items,
     too_few_items,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     length_is_negative,
     invalid_timestamp,
     unknown_type

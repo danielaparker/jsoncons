@@ -23,6 +23,8 @@ namespace jsoncons {
         syntax_error,
         extra_character,
         max_nesting_depth_exceeded,
+        unmatched_end_array,
+        unmatched_end_object,
         single_quote,
         illegal_character_in_string,
         extra_comma,

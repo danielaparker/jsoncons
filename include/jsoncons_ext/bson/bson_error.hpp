@@ -21,6 +21,8 @@ enum class bson_errc
     source_error,
     invalid_utf8_text_string,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     string_length_is_non_positive,
     length_is_negative,
     number_too_large,
