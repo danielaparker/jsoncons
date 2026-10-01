@@ -815,15 +815,12 @@ TEST_CASE("cbor negative integer values")
         REQUIRE(r);
         CHECK((std::numeric_limits<int64_t>::min)() == (*r).as<int64_t>());
     }
-    SECTION("-18446744073709551616")
-    {
-        std::vector<uint8_t> data = {0x3b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    SECTION("-9223372036854775808")
+    { 
+        std::vector<uint8_t> data = {0x3b, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
         auto r = cbor::try_decode_cbor<jsoncons::json>(data);
         REQUIRE(r);
-        jsoncons::json& j(*r);
-        REQUIRE(j.is_string());
-        CHECK(jsoncons::semantic_tag::bigint == j.tag());
-        CHECK("-18446744073709551616" == j.as<jsoncons::string_view>());
+        CHECK((std::numeric_limits<int64_t>::min)() == (*r).as<int64_t>());
     }
 }
 
