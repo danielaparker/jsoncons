@@ -34,7 +34,7 @@
 namespace jsoncons { 
 namespace ubjson {
 
-enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_ubjson_encoder final : public basic_json_visitor<char>
@@ -49,11 +49,11 @@ public:
 private:
     struct stack_item
     {
-        ubjson_container_type type_;
+        container_type type_;
         std::size_t length_{0};
         std::size_t count_{0};
 
-        stack_item(ubjson_container_type type, std::size_t length = 0) noexcept
+        stack_item(container_type type, std::size_t length = 0) noexcept
            : type_(type), length_(length)
         {
         }
@@ -72,12 +72,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == ubjson_container_type::object || type_ == ubjson_container_type::indefinite_length_object;
+            return type_ == container_type::object || type_ == container_type::indefinite_length_object;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == ubjson_container_type::indefinite_length_array || type_ == ubjson_container_type::indefinite_length_object;
+            return type_ == container_type::indefinite_length_array || type_ == container_type::indefinite_length_object;
         }
 
     };
@@ -150,7 +150,7 @@ private:
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::indefinite_length_object);
+        stack_.emplace_back(container_type::indefinite_length_object);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
 
         JSONCONS_VISITOR_RETURN;
@@ -163,7 +163,7 @@ private:
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::object, length);
+        stack_.emplace_back(container_type::object, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
@@ -205,7 +205,7 @@ private:
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::indefinite_length_array);
+        stack_.emplace_back(container_type::indefinite_length_array);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
 
         JSONCONS_VISITOR_RETURN;
@@ -218,7 +218,7 @@ private:
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::array, length);
+        stack_.emplace_back(container_type::array, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);

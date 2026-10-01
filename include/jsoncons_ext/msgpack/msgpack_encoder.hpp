@@ -37,7 +37,7 @@
 namespace jsoncons { 
 namespace msgpack {
 
-    enum class msgpack_container_type {object, array};
+    enum class container_type {object, array};
 
     template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
     class basic_msgpack_encoder final : public basic_json_visitor<char>
@@ -56,11 +56,11 @@ namespace msgpack {
     private:
         struct stack_item
         {
-            msgpack_container_type type_;
+            container_type type_;
             std::size_t length_;
             std::size_t index_{0};
 
-            stack_item(msgpack_container_type type, std::size_t length = 0) noexcept
+            stack_item(container_type type, std::size_t length = 0) noexcept
                : type_(type), length_(length)
             {
             }
@@ -77,7 +77,7 @@ namespace msgpack {
 
             bool is_object() const
             {
-                return type_ == msgpack_container_type::object;
+                return type_ == container_type::object;
             }
         };
 
@@ -148,7 +148,7 @@ namespace msgpack {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 JSONCONS_VISITOR_RETURN;
             } 
-            stack_.emplace_back(msgpack_container_type::object, length);
+            stack_.emplace_back(container_type::object, length);
 
             if (length <= 15)
             {
@@ -207,7 +207,7 @@ namespace msgpack {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 JSONCONS_VISITOR_RETURN;
             } 
-            stack_.emplace_back(msgpack_container_type::array, length);
+            stack_.emplace_back(container_type::array, length);
             if (length <= 15)
             {
                 // fixarray

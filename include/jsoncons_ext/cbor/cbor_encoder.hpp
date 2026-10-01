@@ -38,7 +38,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_cbor_encoder final : public basic_json_visitor<char>
@@ -66,11 +66,11 @@ private:
 
     struct stack_item
     {
-        cbor_container_type type_;
+        container_type type_;
         std::size_t length_{0};
         std::size_t index_{0};
 
-        stack_item(cbor_container_type type, std::size_t length = 0) noexcept
+        stack_item(container_type type, std::size_t length = 0) noexcept
            : type_(type), length_(length)
         {
         }
@@ -89,12 +89,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == cbor_container_type::object || type_ == cbor_container_type::indefinite_length_object;
+            return type_ == container_type::object || type_ == container_type::indefinite_length_object;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == cbor_container_type::indefinite_length_array || type_ == cbor_container_type::indefinite_length_object;
+            return type_ == container_type::indefinite_length_array || type_ == container_type::indefinite_length_object;
         }
     };
 
@@ -269,7 +269,7 @@ private:
             JSONCONS_VISITOR_RETURN;
         } 
         ++nesting_depth_;
-        stack_.emplace_back(cbor_container_type::indefinite_length_object);
+        stack_.emplace_back(container_type::indefinite_length_object);
         
         sink_.push_back(0xbf);
         JSONCONS_VISITOR_RETURN;
@@ -283,7 +283,7 @@ private:
             JSONCONS_VISITOR_RETURN;
         } 
         ++nesting_depth_;
-        stack_.emplace_back(cbor_container_type::object, length);
+        stack_.emplace_back(container_type::object, length);
 
         write_type_and_length(0xa0, length);
 
@@ -327,7 +327,7 @@ private:
             JSONCONS_VISITOR_RETURN;
         } 
         ++nesting_depth_;
-        stack_.emplace_back(cbor_container_type::indefinite_length_array);
+        stack_.emplace_back(container_type::indefinite_length_array);
         sink_.push_back(0x9f);
         JSONCONS_VISITOR_RETURN;
     }
@@ -340,7 +340,7 @@ private:
             JSONCONS_VISITOR_RETURN;
         } 
         ++nesting_depth_;
-        stack_.emplace_back(cbor_container_type::array, length);
+        stack_.emplace_back(container_type::array, length);
         write_type_and_length(0x80, length);
         JSONCONS_VISITOR_RETURN;
     }

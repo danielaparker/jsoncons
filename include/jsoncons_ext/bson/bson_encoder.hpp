@@ -52,12 +52,12 @@ public:
 private:
     struct stack_item
     {
-        jsoncons::bson::bson_container_type type_;
+        jsoncons::bson::container_type type_;
         std::size_t offset_{0};
         std::size_t name_offset_{0};
         std::size_t index_{0};
 
-        stack_item(jsoncons::bson::bson_container_type type, std::size_t offset) noexcept
+        stack_item(jsoncons::bson::container_type type, std::size_t offset) noexcept
            : type_(type), offset_(offset)
         {
         }
@@ -84,7 +84,7 @@ private:
 
         bool is_object() const
         {
-            return type_ == jsoncons::bson::bson_container_type::document;
+            return type_ == jsoncons::bson::container_type::document;
         }
 
 
@@ -166,7 +166,7 @@ private:
             before_value(jsoncons::bson::bson_type::document_type);
         }
 
-        stack_.emplace_back(jsoncons::bson::bson_container_type::document, buffer_.size());
+        stack_.emplace_back(jsoncons::bson::container_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
 
         JSONCONS_VISITOR_RETURN;
@@ -209,7 +209,7 @@ private:
             }
             before_value(jsoncons::bson::bson_type::array_type);
         }
-        stack_.emplace_back(jsoncons::bson::bson_container_type::array, buffer_.size());
+        stack_.emplace_back(jsoncons::bson::container_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         JSONCONS_VISITOR_RETURN;
     }

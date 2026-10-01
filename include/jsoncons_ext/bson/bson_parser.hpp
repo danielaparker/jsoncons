@@ -195,7 +195,7 @@ public:
                     }
                     if (type != 0x00)
                     {
-                        read_e_name(visitor,jsoncons::bson::bson_container_type::document,ec);
+                        read_e_name(visitor,jsoncons::bson::container_type::document,ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             more_ = false;
@@ -228,7 +228,7 @@ public:
                     }
                     if (type != 0x00)
                     {
-                        read_e_name(visitor,jsoncons::bson::bson_container_type::array,ec);
+                        read_e_name(visitor,jsoncons::bson::container_type::array,ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             more_ = false;
@@ -370,7 +370,7 @@ private:
         state_stack_.back().pos += pos;
     }
 
-    void read_e_name(json_visitor& visitor, jsoncons::bson::bson_container_type type, std::error_code& ec)
+    void read_e_name(json_visitor& visitor, jsoncons::bson::container_type type, std::error_code& ec)
     {
         name_buffer_.clear();
         read_cstring(name_buffer_, ec);
@@ -378,7 +378,7 @@ private:
         {
             return;
         }
-        if (type == jsoncons::bson::bson_container_type::document)
+        if (type == jsoncons::bson::container_type::document)
         {
             auto result = unicode_traits::validate(name_buffer_.data(),name_buffer_.size());
             if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
