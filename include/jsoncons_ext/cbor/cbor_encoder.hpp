@@ -96,7 +96,6 @@ private:
         {
             return type_ == cbor_container_type::indefinite_length_array || type_ == cbor_container_type::indefinite_length_object;
         }
-
     };
 
     using string_size_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>>;
@@ -264,11 +263,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
+        ++nesting_depth_;
         stack_.emplace_back(cbor_container_type::indefinite_length_object);
         
         sink_.push_back(0xbf);
@@ -277,11 +277,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
+        ++nesting_depth_;
         stack_.emplace_back(cbor_container_type::object, length);
 
         write_type_and_length(0xa0, length);
@@ -320,11 +321,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
+        ++nesting_depth_;
         stack_.emplace_back(cbor_container_type::indefinite_length_array);
         sink_.push_back(0x9f);
         JSONCONS_VISITOR_RETURN;
@@ -332,11 +334,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
+        ++nesting_depth_;
         stack_.emplace_back(cbor_container_type::array, length);
         write_type_and_length(0x80, length);
         JSONCONS_VISITOR_RETURN;
