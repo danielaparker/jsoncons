@@ -103,7 +103,7 @@ private:
     using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item>;
 
     Sink sink_;
-    int max_nesting_depth_;
+    std::size_t max_nesting_depth_;
     bool pack_strings_;
     bool use_typed_arrays_;
     allocator_type alloc_;
@@ -128,7 +128,7 @@ public:
                        const cbor_encode_options& options, 
                        const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
-         max_nesting_depth_(options.max_nesting_depth()), 
+         max_nesting_depth_(static_cast<std::size_t>(options.max_nesting_depth())), 
          pack_strings_(options.pack_strings()),
          use_typed_arrays_(options.use_typed_arrays()),
          alloc_(alloc),
