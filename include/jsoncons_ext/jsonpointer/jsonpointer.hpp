@@ -18,15 +18,15 @@
 #include <vector>
 #include <map>
 
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
 namespace jsoncons { 
-namespace jsonpointer {
+namespace jsonpointer { 
 
     namespace detail {
 
@@ -223,15 +223,10 @@ namespace jsonpointer {
             {
                 tokens.push_back(buffer);
             }
-            return basic_json_pointer(tokens);
+            return basic_json_pointer(std::move(tokens));
         }
 
         const std::vector<string_type>& tokens() const
-        {
-            return tokens_;
-        }
-
-        std::vector<string_type>& tokens() 
         {
             return tokens_;
         }
@@ -260,7 +255,7 @@ namespace jsonpointer {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
+        typename std::enable_if<nonstd::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
         append(const StringViewLike& s) 
         {
             tokens_.emplace_back(s.data(), s.size());
@@ -268,7 +263,7 @@ namespace jsonpointer {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer&>::type
         append(IntegerType val)
         {
             string_type s;
@@ -284,14 +279,14 @@ namespace jsonpointer {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
         operator/=(const StringViewLike& s) 
         {
             return append(s);
         }
 
         template <typename IntegerType>
-        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer&>::type
         operator/=(IntegerType val)
         {
             string_type s;
@@ -378,7 +373,7 @@ namespace jsonpointer {
 
         // Non-member functions
         template <typename StringViewLike>
-        friend typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
+        friend typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
         operator/(const basic_json_pointer<CharT>& lhs, const StringViewLike& rhs)
         {
             basic_json_pointer<CharT> p(lhs);
@@ -432,7 +427,7 @@ namespace jsonpointer {
     };
 
     template <typename CharT,typename IntegerType>
-    typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
+    typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
     operator/(const basic_json_pointer<CharT>& lhs, IntegerType rhs)
     {
         basic_json_pointer<CharT> p(lhs);
