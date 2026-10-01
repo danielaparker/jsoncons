@@ -17,62 +17,62 @@
 #include <iostream>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
 
-class my_json_visitor : public default_json_visitor
+class my_json_visitor : public jsoncons::default_json_visitor
 {
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_begin_object\n"; 
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_end_object\n"; 
         JSONCONS_VISITOR_RETURN;
     }
-    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_begin_array\n"; 
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_end_array\n"; 
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& s, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_key " << s << "\n"; 
         JSONCONS_VISITOR_RETURN;
     }
-    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s, jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_string " << s << "\n"; 
         JSONCONS_VISITOR_RETURN;
     }
-    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t val, jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_int64 " << val << "\n"; 
         JSONCONS_VISITOR_RETURN;
     }
-    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_uint64 " << val << "\n"; 
         JSONCONS_VISITOR_RETURN;
     }
-    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool val, jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
     {
         std::cout << "visit_bool " << val << "\n"; 
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const span<const uint16_t>& s, 
-                                semantic_tag tag, 
-                                const ser_context&, 
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(const jsoncons::span<const uint16_t>& s, 
+                                jsoncons::semantic_tag tag, 
+                                const jsoncons::ser_context&, 
                                 std::error_code&) override  
     {
         std::cout << "visit_typed_array uint16_t " << tag << "\n"; 
@@ -84,9 +84,9 @@ class my_json_visitor : public default_json_visitor
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(half_arg_t, const span<const uint16_t>& s,
-        semantic_tag tag,
-        const ser_context&,
+    JSONCONS_VISITOR_RETURN_TYPE visit_typed_array(jsoncons::half_arg_t, const jsoncons::span<const uint16_t>& s,
+        jsoncons::semantic_tag tag,
+        const jsoncons::ser_context&,
         std::error_code&) override
     {
         std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "\n";
@@ -110,16 +110,16 @@ TEST_CASE("generic_visitor cbor 1")
                                       0 // value
     };
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
         {"{\"oc\":[0]}":"a","{}":0}
     )");
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -140,16 +140,16 @@ TEST_CASE("generic_visitor cbor 2")
                                       0 // value
     };
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
         {"{\"aa\":[0],\"bb\":[1]}":"a","{}":0}
     )");
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -171,16 +171,16 @@ TEST_CASE("generic_visitor cbor 3")
                                       0 // value
     };
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
         {"{\"aa\":[0],{}:[1]}":"a","{}":0}
     )");
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -202,16 +202,16 @@ TEST_CASE("generic_visitor cbor 4")
                                       0 // value
     };
 
-    json expected = json::parse(R"(
+    auto expected = jsoncons::json::parse(R"(
         {"{\"aa\":[0],[]:[1]}":"a","{}":0}
     )");
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -233,16 +233,16 @@ TEST_CASE("generic_visitor cbor 5")
                                       0 // value
     };
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
         {"[0,1,2,3]":"a","[]":0}
     )");
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -282,10 +282,10 @@ TEST_CASE("generic_visitor cbor 6")
 
     SECTION("test 1")
     {
-        json_decoder<json> destination;
-        generic_to_json_visitor visitor{destination};
+        jsoncons::json_decoder<jsoncons::json> destination;
+        jsoncons::generic_to_json_visitor visitor{destination};
 
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+        cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ jsoncons::bytes_source(input) };
 
         std::error_code ec;
         parser.parse(visitor, ec);
@@ -294,14 +294,14 @@ TEST_CASE("generic_visitor cbor 6")
 
     SECTION("test 2")
     {
-        auto j1 = cbor::decode_cbor<json>(input);
+        auto j1 = cbor::decode_cbor<jsoncons::json>(input);
 
         auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(input);
 
         // Serialize back to CBOR
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(val, buffer);
-        json j2 = cbor::decode_cbor<json>(buffer);
+        jsoncons::json j2 = cbor::decode_cbor<jsoncons::json>(buffer);
         CHECK(j2 == j1);
     }
 }
@@ -317,13 +317,13 @@ TEST_CASE("cbor_parser reset")
         0xa1,0x61,0x65,0x06, // map(1), text(1), "e", unsigned(6)
     };
 
-    json expected1 = json::parse(R"([1,2])");
-    json expected2 = json::parse(R"({"c":4})");
-    json expected3 = json::parse(R"({"e":6})");
+    jsoncons::json expected1 = jsoncons::json::parse(R"([1,2])");
+    jsoncons::json expected2 = jsoncons::json::parse(R"({"c":4})");
+    jsoncons::json expected3 = jsoncons::json::parse(R"({"e":6})");
 
-    json_decoder<json> destination;
-    generic_to_json_visitor visitor{destination};
-    cbor::basic_cbor_parser<bytes_source> parser{ input1 };
+    jsoncons::json_decoder<jsoncons::json> destination;
+    jsoncons::generic_to_json_visitor visitor{destination};
+    cbor::basic_cbor_parser<jsoncons::bytes_source> parser{ input1 };
     std::error_code ec;
 
     SECTION("keeping same source")

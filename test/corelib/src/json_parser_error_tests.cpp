@@ -15,10 +15,10 @@ using namespace jsoncons;
 
 void test_parse_error(const std::string& text, const std::error_code& ec)
 {
-    REQUIRE_THROWS(json::parse(text));
+    REQUIRE_THROWS(jsoncons::json::parse(text));
     JSONCONS_TRY
     {
-        json::parse(text);        
+        jsoncons::json::parse(text);        
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -36,7 +36,7 @@ void test_parse_ec(const std::string& text, const std::error_code& expected)
     std::error_code ec;
 
     std::istringstream is(text);
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_stream_reader reader(is,decoder);
 
     reader.read(ec);
@@ -87,7 +87,7 @@ TEST_CASE("test_escaped_characters")
     std::string input("[\"\\n\\b\\f\\r\\t\"]");
     std::string expected("\n\b\f\r\t");
 
-    json o = json::parse(input);
+    jsoncons::json o = jsoncons::json::parse(input);
     CHECK(expected == o[0].as<std::string>());
 }
 
@@ -122,24 +122,24 @@ TEST_CASE("test_expected_value")
 
 TEST_CASE("test_parse_primitive_pass")
 {
-    json val;
+    jsoncons::json val;
     CHECK_NOTHROW((val=json::parse("null")));
-    CHECK(val == json::null());
+    CHECK(val == jsoncons::json::null());
     CHECK_NOTHROW((val=json::parse("false")));
-    CHECK(val == json(false));
+    CHECK(val == jsoncons::json(false));
     CHECK_NOTHROW((val=json::parse("true")));
-    CHECK(val == json(true));
+    CHECK(val == jsoncons::json(true));
     CHECK_NOTHROW((val=json::parse("10")));
-    CHECK(val == json(10));
+    CHECK(val == jsoncons::json(10));
     CHECK_NOTHROW((val=json::parse("1.999")));
-    CHECK(val == json(1.999));
+    CHECK(val == jsoncons::json(1.999));
     CHECK_NOTHROW((val=json::parse("\"string\"")));
-    CHECK(val == json("string"));
+    CHECK(val == jsoncons::json("string"));
 }
 
 TEST_CASE("test_parse_empty_structures")
 {
-    json val;
+    jsoncons::json val;
     CHECK_NOTHROW((val=json::parse("{}")));
     CHECK_NOTHROW((val=json::parse("[]")));
     CHECK_NOTHROW((val=json::parse("{\"object\":{},\"array\":[]}")));
@@ -171,19 +171,19 @@ TEST_CASE("test_multiple")
 
     std::istringstream is(in);
 
-    jsoncons::json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     json_stream_reader reader(is,decoder);
 
     REQUIRE_FALSE(reader.eof());
     reader.read_next();
     CHECK_FALSE(reader.eof());
-    json val = decoder.get_result();
+    jsoncons::json val = decoder.get_result();
     CHECK(1 == val["a"].as<int>());
 
     REQUIRE_FALSE(reader.eof());
     reader.read_next();
     CHECK(reader.eof());
-    json val2 = decoder.get_result();
+    jsoncons::json val2 = decoder.get_result();
     CHECK(4 == val2["a"].as<int>());
 }
 
@@ -194,11 +194,11 @@ TEST_CASE("test_uinteger_overflow")
     std::string s2 = s1;
     s2.push_back('0');
     
-    json j1 =  json::parse(s1);
+    jsoncons::json j1 =  jsoncons::json::parse(s1);
     CHECK(j1.is_uint64());
     CHECK(m == j1.as<uint64_t>());
 
-    json j2 =  json::parse(s2);
+    jsoncons::json j2 =  jsoncons::json::parse(s2);
     CHECK_FALSE(j2.is_uint64());
     CHECK(j2.is<jsoncons::bigint>());
     CHECK(s2 == j2.as<std::string>());
@@ -210,10 +210,10 @@ TEST_CASE("test_negative_integer_overflow")
     std::string s2 = s1;
     s2.push_back('0');
     
-    json j1 =  json::parse(s1);
+    jsoncons::json j1 =  jsoncons::json::parse(s1);
     CHECK(m == j1.as<int64_t>());
 
-    json j2 =  json::parse(s2);
+    jsoncons::json j2 =  jsoncons::json::parse(s2);
     CHECK_FALSE(j2.is_int64());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
@@ -226,10 +226,10 @@ TEST_CASE("test_positive_integer_overflow")
     std::string s2 = s1;
     s2.push_back('0');
 
-    json j1 =  json::parse(s1);
+    jsoncons::json j1 =  jsoncons::json::parse(s1);
     CHECK(m == j1.as<int64_t>());
 
-    json j2 =  json::parse(s2);
+    jsoncons::json j2 =  jsoncons::json::parse(s2);
     CHECK_FALSE(j2.is_int64());
     CHECK(j2.is<jsoncons::bigint>());
     CHECK(s2 == j2.as<std::string>());

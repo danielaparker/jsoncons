@@ -16,11 +16,11 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>

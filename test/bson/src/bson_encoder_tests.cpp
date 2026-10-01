@@ -29,9 +29,9 @@ namespace {
     void check_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
     {
         test_equal(v, expected);
-        auto result = bson::try_decode_bson<json>(v);
+        auto result = bson::try_decode_bson<jsoncons::json>(v);
         REQUIRE(result);
-        json& j(*result);
+        jsoncons::json& j(*result);
         std::vector<uint8_t> u;
         bson::encode_bson(j, u);
         test_equal(v,u);
@@ -269,7 +269,7 @@ TEST_CASE("serialize object to bson")
     encoder.end_object();
     encoder.flush();
 
-    auto result = bson::try_decode_bson<json>(v);
+    auto result = bson::try_decode_bson<jsoncons::json>(v);
     REQUIRE(result);
 }
 

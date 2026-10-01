@@ -65,10 +65,10 @@ TEST_CASE("Test polymorhic allocator")
 
     CHECK_FALSE(std::allocator_traits<std::pmr::polymorphic_allocator<char>>::is_always_equal::value);
 
-    pmr_json an_object1(json_object_arg, alloc1);
+    pmr_json an_object1(jsoncons::json_object_arg, alloc1);
     an_object1.try_emplace("true", true);
     an_object1.try_emplace("false", false);
-    an_object1.try_emplace("null", null_type());
+    an_object1.try_emplace("null", jsoncons::null_type());
     an_object1.try_emplace("Key to long for short string", a_long_string);
 
     std::pmr::string key1{"foo", alloc1};
@@ -83,7 +83,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("try_emplace json")
     {
-        pmr_json j(json_object_arg, alloc1);
+        pmr_json j(jsoncons::json_object_arg, alloc1);
 
         pmr_json an_object1_copy(an_object1);
 
@@ -101,7 +101,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("try_emplace ojson")
     {
-        pmr_ojson j(json_object_arg, alloc1);
+        pmr_ojson j(jsoncons::json_object_arg, alloc1);
 
         j.try_emplace(key1, pmr_ojson{});
         j.try_emplace(std::move(key2), a_long_string);
@@ -113,7 +113,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("insert_or_assign json")
     {
-        pmr_json j(json_object_arg, alloc1);
+        pmr_json j(jsoncons::json_object_arg, alloc1);
 
         j.insert_or_assign("foo", pmr_json{});
         j.insert_or_assign("bar", a_long_string);
@@ -125,7 +125,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("insert_or_assign ojson")
     {
-        pmr_ojson j(json_object_arg, alloc1);
+        pmr_ojson j(jsoncons::json_object_arg, alloc1);
 
         j.insert_or_assign("foo", pmr_ojson{});
         j.insert_or_assign("bar", a_long_string);
@@ -137,7 +137,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("emplace_back")
     {
-        pmr_json j(json_array_arg, alloc1);
+        pmr_json j(jsoncons::json_array_arg, alloc1);
         j.emplace_back(1);
         j.emplace_back(a_long_string);
 
@@ -148,7 +148,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("push_back")
     {
-        pmr_json j(json_array_arg, alloc1);
+        pmr_json j(jsoncons::json_array_arg, alloc1);
         j.push_back(1);
         j.push_back(a_long_string);
 
@@ -159,7 +159,7 @@ TEST_CASE("Test polymorhic allocator")
 
     SECTION("insert")
     {
-        pmr_json j(json_array_arg, alloc1);
+        pmr_json j(jsoncons::json_array_arg, alloc1);
 
         j.insert(j.array_range().end(), pmr_json{});
         j.insert(j.array_range().end(), a_long_string);
@@ -174,7 +174,7 @@ TEST_CASE("Test polymorhic allocator")
         std::string s = a_long_string;
         std::string input = "\"" + s + "\"";
 
-        json_decoder<pmr_json> decoder(alloc1);
+        jsoncons::json_decoder<pmr_json> decoder(alloc1);
         JSONCONS_TRY
         {
             json_string_reader reader(input,decoder);

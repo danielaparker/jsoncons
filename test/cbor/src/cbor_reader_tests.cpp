@@ -18,20 +18,40 @@
 #include <iostream>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
-using namespace jsoncons::cbor;
+namespace cbor = jsoncons::cbor;
 
-void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
+namespace {
+
+std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
+{
+    std::error_code ec;
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    cbor::cbor_bytes_reader reader(v, decoder);
+    reader.read(ec);
+
+    // the stream source must agree with the bytes source
+    std::string s(v.begin(), v.end());
+    std::istringstream is(s);
+    std::error_code stream_ec;
+    jsoncons::json_decoder<jsoncons::json> stream_decoder;
+    cbor::cbor_stream_reader stream_reader(is, stream_decoder);
+    stream_reader.read(stream_ec);
+    CHECK(stream_ec == ec);
+
+    return ec;
+}
+
+void check_parse_cbor(const std::vector<uint8_t>& v, const jsoncons::json& expected)
 {
     JSONCONS_TRY
     {
         std::error_code ec;
 
-        jsoncons::json_decoder<json> decoder;
-        cbor_bytes_reader reader(v, decoder);
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(v, decoder);
         reader.read(ec);
 
-        json result = decoder.get_result();
+        jsoncons::json result = decoder.get_result();
 
         if (!(result == expected))
         {
@@ -54,7 +74,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
             s.push_back(c);
         }
         std::istringstream is(s);
-        json j2 = decode_cbor<json>(is);
+        auto j2 = cbor::decode_cbor<jsoncons::json>(is);
         REQUIRE(j2 == expected);
     }
     JSONCONS_CATCH (const std::exception& e)
@@ -63,129 +83,132 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::cout << expected.to_string() << '\n';
     }
 }
+
+} // namespace
+
 TEST_CASE("test_cbor_parsing")
 {
     // unsigned integer
-    check_parse_cbor({0x00},json(0U));
-    check_parse_cbor({0x01},json(1U));
-    check_parse_cbor({0x0a},json(10U));
-    check_parse_cbor({0x17},json(23U));
-    check_parse_cbor({0x18,0x18},json(24U));
-    check_parse_cbor({0x18,0xff},json(255U));
-    check_parse_cbor({0x19,0x01,0x00},json(256U));
-    check_parse_cbor({0x19,0xff,0xff},json(65535U));
-    check_parse_cbor({0x1a,0,1,0x00,0x00},json(65536U));
-    check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
-    check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
-    check_parse_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
+    check_parse_cbor({0x00},jsoncons::json(0U));
+    check_parse_cbor({0x01},jsoncons::json(1U));
+    check_parse_cbor({0x0a},jsoncons::json(10U));
+    check_parse_cbor({0x17},jsoncons::json(23U));
+    check_parse_cbor({0x18,0x18},jsoncons::json(24U));
+    check_parse_cbor({0x18,0xff},jsoncons::json(255U));
+    check_parse_cbor({0x19,0x01,0x00},jsoncons::json(256U));
+    check_parse_cbor({0x19,0xff,0xff},jsoncons::json(65535U));
+    check_parse_cbor({0x1a,0,1,0x00,0x00},jsoncons::json(65536U));
+    check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},jsoncons::json(4294967295U));
+    check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},jsoncons::json(4294967296U));
+    check_parse_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},jsoncons::json((std::numeric_limits<uint64_t>::max)()));
 
     // positive signed integer
-    check_parse_cbor({0x00},json(0));
-    check_parse_cbor({0x01},json(1));
-    check_parse_cbor({0x0a},json(10));
-    check_parse_cbor({0x17},json(23));
-    check_parse_cbor({0x18,0x18},json(24));
-    check_parse_cbor({0x18,0xff},json(255));
-    check_parse_cbor({0x19,0x01,0x00},json(256));
-    check_parse_cbor({0x19,0xff,0xff},json(65535));
-    check_parse_cbor({0x1a,0,1,0x00,0x00},json(65536));
-    check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295));
-    check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296));
-    check_parse_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
+    check_parse_cbor({0x00},jsoncons::json(0));
+    check_parse_cbor({0x01},jsoncons::json(1));
+    check_parse_cbor({0x0a},jsoncons::json(10));
+    check_parse_cbor({0x17},jsoncons::json(23));
+    check_parse_cbor({0x18,0x18},jsoncons::json(24));
+    check_parse_cbor({0x18,0xff},jsoncons::json(255));
+    check_parse_cbor({0x19,0x01,0x00},jsoncons::json(256));
+    check_parse_cbor({0x19,0xff,0xff},jsoncons::json(65535));
+    check_parse_cbor({0x1a,0,1,0x00,0x00},jsoncons::json(65536));
+    check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},jsoncons::json(4294967295));
+    check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},jsoncons::json(4294967296));
+    check_parse_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},jsoncons::json((std::numeric_limits<int64_t>::max)()));
     // negative integers
-    check_parse_cbor({0x20},json(-1));
-    check_parse_cbor({0x21},json(-2));
-    check_parse_cbor({0x37},json(-24));
-    check_parse_cbor({0x38,0x18},json(-25));
-    check_parse_cbor({0x38,0xff},json(-256));
-    check_parse_cbor({0x39,0x01,0x00},json(-257));
-    check_parse_cbor({0x39,0xff,0xff},json(-65536));
-    check_parse_cbor({0x3a,0,1,0x00,0x00},json(-65537));
+    check_parse_cbor({0x20},jsoncons::json(-1));
+    check_parse_cbor({0x21},jsoncons::json(-2));
+    check_parse_cbor({0x37},jsoncons::json(-24));
+    check_parse_cbor({0x38,0x18},jsoncons::json(-25));
+    check_parse_cbor({0x38,0xff},jsoncons::json(-256));
+    check_parse_cbor({0x39,0x01,0x00},jsoncons::json(-257));
+    check_parse_cbor({0x39,0xff,0xff},jsoncons::json(-65536));
+    check_parse_cbor({0x3a,0,1,0x00,0x00},jsoncons::json(-65537));
 
-    check_parse_cbor({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
-    check_parse_cbor({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
+    check_parse_cbor({0x3a,0xff,0xff,0xff,0xff},jsoncons::json(-4294967296));
+    check_parse_cbor({0x3b,0,0,0,1,0,0,0,0},jsoncons::json(-4294967297));
 
     // null, undefined, true, false
-    check_parse_cbor({0xf6},json::null());
-    check_parse_cbor({0xf7},json{null_type(),semantic_tag::undefined});
-    check_parse_cbor({0xf5},json(true));
-    check_parse_cbor({0xf4},json(false));
+    check_parse_cbor({0xf6},jsoncons::json::null());
+    check_parse_cbor({0xf7},jsoncons::json{jsoncons::null_type(), jsoncons::semantic_tag::undefined});
+    check_parse_cbor({0xf5},jsoncons::json(true));
+    check_parse_cbor({0xf4},jsoncons::json(false));
 
     // floating point
-    check_parse_cbor({0xfb,0,0,0,0,0,0,0,0},json(0.0));
-    check_parse_cbor({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
-    check_parse_cbor({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
-    check_parse_cbor({0xfa,0xcb,0x7f,0xff,0xff},json(-16777215.0));
+    check_parse_cbor({0xfb,0,0,0,0,0,0,0,0},jsoncons::json(0.0));
+    check_parse_cbor({0xfb,0xbf,0xf0,0,0,0,0,0,0},jsoncons::json(-1.0));
+    check_parse_cbor({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},jsoncons::json(-16777215.0));
+    check_parse_cbor({0xfa,0xcb,0x7f,0xff,0xff},jsoncons::json(-16777215.0));
 
     // byte string
     std::vector<uint8_t> v;
-    check_parse_cbor({0x40},json(byte_string_view(v)));
+    check_parse_cbor({0x40},jsoncons::json(jsoncons::byte_string_view(v)));
     v = {' '};
-    check_parse_cbor({0x41,' '},json(byte_string_view(v)));
+    check_parse_cbor({0x41,' '},jsoncons::json(jsoncons::byte_string_view(v)));
     v = {0};
-    check_parse_cbor({0x41,0},json(byte_string_view(v)));
+    check_parse_cbor({0x41,0},jsoncons::json(jsoncons::byte_string_view(v)));
     v = {'H','e','l','l','o'};
-    check_parse_cbor({0x45,'H','e','l','l','o'},json(byte_string_view(v)));
+    check_parse_cbor({0x45,'H','e','l','l','o'},jsoncons::json(jsoncons::byte_string_view(v)));
     v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
     check_parse_cbor({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(byte_string_view(v)));
+                 jsoncons::json(jsoncons::byte_string_view(v)));
 
     // string
-    check_parse_cbor({0x60},json(""));
-    check_parse_cbor({0x61,' '},json(" "));
+    check_parse_cbor({0x60},jsoncons::json(""));
+    check_parse_cbor({0x61,' '},jsoncons::json(" "));
     check_parse_cbor({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json("123456789012345678901234"));
+                 jsoncons::json("123456789012345678901234"));
 
     // byte strings with undefined length
-    check_parse_cbor({0x5f,0xff}, json(byte_string()));
-    check_parse_cbor({0x5f,0x40,0xff}, json(byte_string()));
-    check_parse_cbor({0x5f,0x40,0x40,0xff}, json(byte_string()));
+    check_parse_cbor({0x5f,0xff}, jsoncons::json(jsoncons::byte_string()));
+    check_parse_cbor({0x5f,0x40,0xff}, jsoncons::json(jsoncons::byte_string()));
+    check_parse_cbor({0x5f,0x40,0x40,0xff}, jsoncons::json(jsoncons::byte_string()));
 
-    check_parse_cbor({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(byte_string({'H','e','l','l','o'})));
-    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string({'H','e','l','l','o'})));
-    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string({'H','e','l','l','o'})));
+    check_parse_cbor({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, jsoncons::json(jsoncons::byte_string({'H','e','l','l','o'})));
+    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, jsoncons::json(jsoncons::byte_string({'H','e','l','l','o'})));
+    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, jsoncons::json(jsoncons::byte_string({'H','e','l','l','o'})));
 
     // text strings with undefined length
 
-    //check_parse_cbor({0x7f,0x7f,0x65,'H','e','l','l','o',0x7f,0x61,' ',0x60,0xff,0x65,'W','o','r','l','d',0xff,0xff},json("Hello World"));
+    //check_parse_cbor({0x7f,0x7f,0x65,'H','e','l','l','o',0x7f,0x61,' ',0x60,0xff,0x65,'W','o','r','l','d',0xff,0xff},jsoncons::json("Hello World"));
 
-    check_parse_cbor({0x7f,0xff}, json(""));
+    check_parse_cbor({0x7f,0xff}, jsoncons::json(""));
 
-    check_parse_cbor({0x7f,0x60,0xff}, json(""));
-    check_parse_cbor({0x7f,0x60,0x60,0xff}, json(""));
-    check_parse_cbor({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
-    check_parse_cbor({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
-    check_parse_cbor({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
+    check_parse_cbor({0x7f,0x60,0xff}, jsoncons::json(""));
+    check_parse_cbor({0x7f,0x60,0x60,0xff}, jsoncons::json(""));
+    check_parse_cbor({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, jsoncons::json("Hello"));
+    check_parse_cbor({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, jsoncons::json("Hello"));
+    check_parse_cbor({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, jsoncons::json("Hello"));
 
     SECTION ("arrays with definite length")
     {
-        check_parse_cbor({0x80}, json(json_array_arg));
-        check_parse_cbor({0x81,'\0'},json::parse("[0]"));
-        check_parse_cbor({0x82,'\0','\0'}, json(json_array_arg, {0,0}));
-        check_parse_cbor({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
-        check_parse_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+        check_parse_cbor({0x80}, jsoncons::json(jsoncons::json_array_arg));
+        check_parse_cbor({0x81,'\0'},jsoncons::json::parse("[0]"));
+        check_parse_cbor({0x82,'\0','\0'}, jsoncons::json(jsoncons::json_array_arg, {0,0}));
+        check_parse_cbor({0x82,0x81,'\0','\0'}, jsoncons::json::parse("[[0],0]"));
+        check_parse_cbor({0x81,0x65,'H','e','l','l','o'},jsoncons::json::parse("[\"Hello\"]"));
 
-        check_parse_cbor({0x83,0x01,0x82,0x02,0x03,0x82,0x04,0x05},json::parse("[1, [2, 3], [4, 5]]"));
+        check_parse_cbor({0x83,0x01,0x82,0x02,0x03,0x82,0x04,0x05},jsoncons::json::parse("[1, [2, 3], [4, 5]]"));
         check_parse_cbor({0x82,
                        0x7f,0xff,
                        0x7f,0xff},
-                      json::parse("[\"\",\"\"]"));
+                      jsoncons::json::parse("[\"\",\"\"]"));
 
         check_parse_cbor({0x82,
                        0x5f,0xff,
                        0x5f,0xff},
-                       json(json_array_arg, {json(byte_string()),json(byte_string())}));
+                       jsoncons::json(jsoncons::json_array_arg, {jsoncons::json(jsoncons::byte_string()),jsoncons::json(jsoncons::byte_string())}));
     }
 
     SECTION("arrays with indefinite length")
     {
-        //check_parse_cbor({0x9f,0xff}, json(json_array_arg));
-        check_parse_cbor({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+        //check_parse_cbor({0x9f,0xff}, jsoncons::json(jsoncons::json_array_arg));
+        check_parse_cbor({0x9f,0x9f,0xff,0xff},jsoncons::json::parse("[[]]"));
 
-        check_parse_cbor({0x9f,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff,0xff},json::parse("[1, [2, 3], [4, 5]]"));
-        check_parse_cbor({0x9f,0x01,0x82,0x02,0x03,0x82,0x04,0x05,0xff},json::parse("[1, [2, 3], [4, 5]]"));
+        check_parse_cbor({0x9f,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff,0xff},jsoncons::json::parse("[1, [2, 3], [4, 5]]"));
+        check_parse_cbor({0x9f,0x01,0x82,0x02,0x03,0x82,0x04,0x05,0xff},jsoncons::json::parse("[1, [2, 3], [4, 5]]"));
 
-        check_parse_cbor({0x83,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff},json::parse("[1, [2, 3], [4, 5]]"));
+        check_parse_cbor({0x83,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff},jsoncons::json::parse("[1, [2, 3], [4, 5]]"));
         check_parse_cbor({0x83,             // Array of length 3
                            0x01,         // 1
                                0x9f,     // Start indefinite-length array
@@ -195,7 +218,7 @@ TEST_CASE("test_cbor_parsing")
                                 0x82,    // Array of length 2
                                   0x04,  // 4
                                   0x05}, // 5
-                      json::parse("[1, [2, 3], [4, 5]]"));
+                      jsoncons::json::parse("[1, [2, 3], [4, 5]]"));
 
     }
 
@@ -205,18 +228,18 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json("0x6AB3p-2",semantic_tag::bigfloat));
+                  },jsoncons::json("0x6AB3p-2", jsoncons::semantic_tag::bigfloat));
 
     SECTION("maps with definite length")
     {
-        //check_parse_cbor({0xa0}, json(json_object_arg));
-        check_parse_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
-        //check_parse_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+        //check_parse_cbor({0xa0}, jsoncons::json(jsoncons::json_object_arg));
+        check_parse_cbor({0xa1,0x62,'o','c',0x81,'\0'}, jsoncons::json::parse("{\"oc\": [0]}"));
+        //check_parse_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, jsoncons::json::parse("{\"oc\": [0, 1, 2, 3]}"));
     }
     SECTION("maps with indefinite length")
     {
-        check_parse_cbor({0xbf,0xff}, json(json_object_arg));
-        check_parse_cbor({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+        check_parse_cbor({0xbf,0xff}, jsoncons::json(jsoncons::json_object_arg));
+        check_parse_cbor({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},jsoncons::json::parse("{\"Name\":{}}"));
 
         check_parse_cbor({0xbf,                       // Start indefinite-length map
                            0x63,                   // First key, UTF-8 string length 3
@@ -226,14 +249,14 @@ TEST_CASE("test_cbor_parsing")
                                    0x41,0x6d,0x74, // "Amt"
                            0x21,                   // -2
                                0xff},              // "break"
-                      json::parse("{\"Fun\": true, \"Amt\": -2}"));
+                      jsoncons::json::parse("{\"Fun\": true, \"Amt\": -2}"));
         check_parse_cbor({0xbf,                       // Start indefinite-length map
                            0x21,                   // First key, -2
                            0xf5,                   // First value, true
                                0xf5,               // Second key, UTF-8 string length 3
                            0x21,                   // -2
                                0xff},              // "break"
-                      json::parse("{\"-2\": true, \"true\": -2}"));
+                      jsoncons::json::parse("{\"-2\": true, \"true\": -2}"));
     }
 
     SECTION("maps with non-string keys")
@@ -244,21 +267,21 @@ TEST_CASE("test_cbor_parsing")
                                0xf5,               // Second key, UTF-8 string length 3
                            0x21,                   // -2
                                0xff},              // "break"
-                      json::parse("{\"-2\": true, \"true\": -2}"));
+                      jsoncons::json::parse("{\"-2\": true, \"true\": -2}"));
     }
 
     // bignum
     std::vector<uint8_t> data = { 0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 };
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
-                  json(bigint::from_bytes_be(1, data.data(),data.size())));
+                  jsoncons::json(jsoncons::bigint::from_bytes_be(1, data.data(),data.size())));
 
     // datetime
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},
-                  json("2015-05-07 12:41:07-07:00", semantic_tag::datetime));
+                  jsoncons::json("2015-05-07 12:41:07-07:00", jsoncons::semantic_tag::datetime));
 
     // seconds
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
-                  json(1431027667, semantic_tag::epoch_second));
+                  jsoncons::json(1431027667, jsoncons::semantic_tag::epoch_second));
 }
 
 TEST_CASE("cbor decimal fraction")
@@ -268,38 +291,38 @@ TEST_CASE("cbor decimal fraction")
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273.15", semantic_tag::bigdec));
+                  jsoncons::json("273.15", jsoncons::semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x22, // -3
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27.315", semantic_tag::bigdec));
+                  jsoncons::json("27.315", jsoncons::semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x23, // -4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("2.7315", semantic_tag::bigdec));
+                  jsoncons::json("2.7315", jsoncons::semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x24, // -5
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315", semantic_tag::bigdec));
+                  jsoncons::json("0.27315", jsoncons::semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.027315", semantic_tag::bigdec));
+                  jsoncons::json("0.027315", jsoncons::semantic_tag::bigdec));
 
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273150000.0", semantic_tag::bigdec));
+                  jsoncons::json("273150000.0", jsoncons::semantic_tag::bigdec));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -312,7 +335,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("273.15"));
     }
     SECTION("-6 27315")
@@ -323,7 +346,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("0.027315"));
     }
     SECTION("-5 27315")
@@ -334,7 +357,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("0.27315"));
     }
     SECTION("0 27315")
@@ -345,8 +368,8 @@ TEST_CASE("test_decimal_as_string")
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("27315.0"));
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
+        CHECK(std::string("27315") == j.as<std::string>());
     }
     SECTION("2 27315")
     {
@@ -356,8 +379,8 @@ TEST_CASE("test_decimal_as_string")
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("2731500.0"));
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
+        CHECK(std::string("2.7315e6") == j.as<std::string>());
     }
     SECTION("-2 18446744073709551616")
     {
@@ -367,8 +390,8 @@ TEST_CASE("test_decimal_as_string")
                                   0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // 18446744073709551616
                                   };
 
-        json j = decode_cbor<json>(v);
-        CHECK(j.as<std::string>() == std::string("1.8446744073709551616e+17"));
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
+        CHECK(std::string("184467440737095516.16") == j.as<std::string>());
     }
     SECTION("-2 -65537")
     {
@@ -378,7 +401,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("-655.37"));
     }
     SECTION("-5 -65537")
@@ -389,7 +412,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("-0.65537"));
     }
     SECTION("-6 -65537")
@@ -400,7 +423,7 @@ TEST_CASE("test_decimal_as_string")
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        json j = decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         CHECK(j.as<std::string>() == std::string("-0.065537"));
     }
 }
@@ -411,33 +434,33 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     cbor::cbor_bytes_encoder encoder(bytes);
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string{'b','a','r'});
-    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
-    encoder.string_value("-273.15", semantic_tag::bigdec);
-    encoder.string_value("273.15", semantic_tag::bigdec);
-    encoder.string_value("18446744073709551616.15", semantic_tag::bigdec);
-    encoder.string_value("-18446744073709551617.15", semantic_tag::bigdec);
-    encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.int64_value(1431027667, semantic_tag::epoch_second);
-    encoder.int64_value(-1431027667, semantic_tag::epoch_second);
-    encoder.double_value(1431027667.5, semantic_tag::epoch_second);
+    encoder.byte_string_value(jsoncons::byte_string{'b','a','r'});
+    encoder.string_value("-18446744073709551617", jsoncons::semantic_tag::bigint);
+    encoder.string_value("-273.15", jsoncons::semantic_tag::bigdec);
+    encoder.string_value("273.15", jsoncons::semantic_tag::bigdec);
+    encoder.string_value("18446744073709551616.15", jsoncons::semantic_tag::bigdec);
+    encoder.string_value("-18446744073709551617.15", jsoncons::semantic_tag::bigdec);
+    encoder.string_value("2018-10-19 12:41:07-07:00", jsoncons::semantic_tag::datetime) ;
+    encoder.int64_value(1431027667, jsoncons::semantic_tag::epoch_second);
+    encoder.int64_value(-1431027667, jsoncons::semantic_tag::epoch_second);
+    encoder.double_value(1431027667.5, jsoncons::semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 
-    json expected(json_array_arg);
+    jsoncons::json expected(jsoncons::json_array_arg);
     expected.emplace_back("foo");
-    expected.emplace_back(byte_string{ 'b','a','r' });
-    expected.emplace_back("-18446744073709551617", semantic_tag::bigint);
-    expected.emplace_back("-273.15", semantic_tag::bigdec);
-    expected.emplace_back("273.15", semantic_tag::bigdec);
-    expected.emplace_back("1.844674407370955161615e+19", semantic_tag::bigdec);
-    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::bigdec);
-    expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
-    expected.emplace_back(1431027667, semantic_tag::epoch_second);
-    expected.emplace_back(-1431027667, semantic_tag::epoch_second);
-    expected.emplace_back(1431027667.5, semantic_tag::epoch_second);
+    expected.emplace_back(jsoncons::byte_string{ 'b','a','r' });
+    expected.emplace_back("-18446744073709551617", jsoncons::semantic_tag::bigint);
+    expected.emplace_back("-273.15", jsoncons::semantic_tag::bigdec);
+    expected.emplace_back("273.15", jsoncons::semantic_tag::bigdec);
+    expected.emplace_back("1.844674407370955161615e+19", jsoncons::semantic_tag::bigdec);
+    expected.emplace_back("-1.844674407370955161715e+19", jsoncons::semantic_tag::bigdec);
+    expected.emplace_back("2018-10-19 12:41:07-07:00", jsoncons::semantic_tag::datetime);
+    expected.emplace_back(1431027667, jsoncons::semantic_tag::epoch_second);
+    expected.emplace_back(-1431027667, jsoncons::semantic_tag::epoch_second);
+    expected.emplace_back(1431027667.5, jsoncons::semantic_tag::epoch_second);
 
-    json j = cbor::decode_cbor<json>(bytes);
+    auto j = cbor::decode_cbor<jsoncons::json>(bytes);
 
     REQUIRE(expected == j);
     for (std::size_t i = 0; i < j.size(); ++i)
@@ -487,49 +510,49 @@ TEST_CASE("CBOR stringref tag 1")
 
     SECTION("decode")
     {
-        ojson j = decode_cbor<ojson>(v);
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
         //std::cout << pretty_print(j) << "\n";
 
         {
             auto it = j[0].object_range().begin();
             std::string key1;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key1);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
             ++it;
             std::string key2;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key2);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key3;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key3);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
         }
         {
             auto it = j[1].object_range().begin();
             std::string key3;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key3);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
             ++it;
             std::string key2;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key2);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key1;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key1);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
         }
         {
             auto it = j[2].object_range().begin();
             std::string key3;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key3);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
             ++it;
             std::string key2;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key2);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key1;
-            base64url_to_bytes(it->key().begin(),it->key().end(),key1);
+            jsoncons::base64url_to_bytes(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
         }
     }
@@ -605,102 +628,102 @@ TEST_CASE("CBOR stringref tag 2")
             0x18, 0x18    // unsigned(24)
         };
 
-        ojson j = decode_cbor<ojson>(v);
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
         
-        byte_string bytes = j[0].as<byte_string>();
+        jsoncons::byte_string bytes = j[0].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("1"));
         
-        bytes = j[1].as<byte_string>(); // 0
+        bytes = j[1].as<jsoncons::byte_string>(); // 0
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("222"));
         
-        bytes = j[2].as<byte_string>(); // 1
+        bytes = j[2].as<jsoncons::byte_string>(); // 1
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("333"));
         
-        bytes = j[3].as<byte_string>();
+        bytes = j[3].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("4"));
         
-        bytes = j[4].as<byte_string>(); // 2
+        bytes = j[4].as<jsoncons::byte_string>(); // 2
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("555"));
         
-        bytes = j[5].as<byte_string>();
+        bytes = j[5].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("666"));
         
-        bytes = j[6].as<byte_string>();
+        bytes = j[6].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("777"));
         
-        bytes = j[7].as<byte_string>();
+        bytes = j[7].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("888"));
         
-        bytes = j[8].as<byte_string>();
+        bytes = j[8].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("999"));
 
-        bytes = j[9].as<byte_string>();
+        bytes = j[9].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("aaa"));
 
-        bytes = j[10].as<byte_string>();
+        bytes = j[10].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("bbb"));
 
-        bytes = j[11].as<byte_string>();
+        bytes = j[11].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ccc"));
 
-        bytes = j[12].as<byte_string>();
+        bytes = j[12].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ddd"));
 
-        bytes = j[13].as<byte_string>();
+        bytes = j[13].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("eee"));
 
-        bytes = j[14].as<byte_string>();
+        bytes = j[14].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("fff"));
 
-        bytes = j[15].as<byte_string>();
+        bytes = j[15].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ggg"));
 
-        bytes = j[16].as<byte_string>();
+        bytes = j[16].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("hhh"));
 
-        bytes = j[17].as<byte_string>();
+        bytes = j[17].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("iii"));
 
-        bytes = j[18].as<byte_string>();
+        bytes = j[18].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("jjj"));
 
-        bytes = j[19].as<byte_string>();
+        bytes = j[19].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("kkk"));
 
-        bytes = j[20].as<byte_string>();
+        bytes = j[20].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("lll"));
 
-        bytes = j[21].as<byte_string>();
+        bytes = j[21].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("mmm"));
 
-        bytes = j[22].as<byte_string>();
+        bytes = j[22].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("nnn"));
 
-        bytes = j[23].as<byte_string>();
+        bytes = j[23].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ooo"));
 
-        bytes = j[24].as<byte_string>();
+        bytes = j[24].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ppp"));
 
-        bytes = j[25].as<byte_string>();
+        bytes = j[25].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("qqq"));
 
-        bytes = j[26].as<byte_string>();
+        bytes = j[26].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("rrr"));
 
-        bytes = j[27].as<byte_string>();
+        bytes = j[27].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("333"));
 
-        bytes = j[28].as<byte_string>();
+        bytes = j[28].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ssss"));
 
-        bytes = j[29].as<byte_string>();
+        bytes = j[29].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("qqq"));
 
-        bytes = j[30].as<byte_string>();
+        bytes = j[30].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("rrr"));
 
-        bytes = j[31].as<byte_string>();
+        bytes = j[31].as<jsoncons::byte_string>();
         CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ssss"));
 }
 
@@ -730,59 +753,36 @@ TEST_CASE("CBOR stringref tag 3")
             0x00           // unsigned(0)
     };
 
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
         ["aaa","aaa",["bbb","aaa","aaa"],["ccc","ccc"],"aaa"]
     )");
 
     CHECK(expected == j);
 }
 
-namespace {
-
-    std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
-    {
-        std::error_code ec;
-        jsoncons::json_decoder<json> decoder;
-        cbor_bytes_reader reader(v, decoder);
-        reader.read(ec);
-
-        // the stream source must agree with the bytes source
-        std::string s(v.begin(), v.end());
-        std::istringstream is(s);
-        std::error_code stream_ec;
-        jsoncons::json_decoder<json> stream_decoder;
-        cbor_stream_reader stream_reader(is, stream_decoder);
-        stream_reader.read(stream_ec);
-        CHECK(stream_ec == ec);
-
-        return ec;
-    }
-
-} // namespace
-
 TEST_CASE("cbor truncated multibyte heads are rejected")
 {
     SECTION("truncated integer arguments")
     {
-        CHECK(parse_cbor_error({0x19,0x01}) == cbor_errc::unexpected_eof);           // uint16
-        CHECK(parse_cbor_error({0x1a,0xff}) == cbor_errc::unexpected_eof);           // uint32
-        CHECK(parse_cbor_error({0x1a,0xff,0xff,0xff}) == cbor_errc::unexpected_eof);
-        CHECK(parse_cbor_error({0x1b,0x01,0x02}) == cbor_errc::unexpected_eof);      // uint64
+        CHECK(parse_cbor_error({0x19,0x01}) == cbor::cbor_errc::unexpected_eof);           // uint16
+        CHECK(parse_cbor_error({0x1a,0xff}) == cbor::cbor_errc::unexpected_eof);           // uint32
+        CHECK(parse_cbor_error({0x1a,0xff,0xff,0xff}) == cbor::cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0x1b,0x01,0x02}) == cbor::cbor_errc::unexpected_eof);      // uint64
     }
 
     SECTION("truncated half-precision float")
     {
-        CHECK(parse_cbor_error({0xf9,0x3c}) == cbor_errc::unexpected_eof);
+        CHECK(parse_cbor_error({0xf9,0x3c}) == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("complete heads still parse")
     {
-        check_parse_cbor({0x19,0x01,0x00}, json(256));
-        check_parse_cbor({0x1a,0xff,0x00,0x00,0x00}, json(4278190080ULL));
+        check_parse_cbor({0x19,0x01,0x00}, jsoncons::json(256));
+        check_parse_cbor({0x1a,0xff,0x00,0x00,0x00}, jsoncons::json(4278190080ULL));
         // a complete half head still reads through the same two-byte path
-        json half = decode_cbor<json>(std::vector<uint8_t>{0xf9,0x3c,0x00});
+        jsoncons::json half = cbor::decode_cbor<jsoncons::json>(std::vector<uint8_t>{0xf9,0x3c,0x00});
         CHECK(half.as<double>() == 1.0);
     }
 }
@@ -792,16 +792,35 @@ TEST_CASE("cbor indefinite length text chunks are validated individually")
     SECTION("a code point split across chunks is rejected")
     {
         // RFC 8949 3.2.3
-        CHECK(parse_cbor_error({0x7f,0x61,0xc3,0x61,0xa9,0xff}) == cbor_errc::invalid_utf8_text_string);
+        CHECK(parse_cbor_error({0x7f,0x61,0xc3,0x61,0xa9,0xff}) == cbor::cbor_errc::invalid_utf8_text_string);
     }
 
     SECTION("well-formed chunks are accepted")
     {
-        check_parse_cbor({0x7f,0x62,0xc3,0xa9,0x61,0x61,0xff}, json(std::string("\xc3\xa9""a")));
+        check_parse_cbor({0x7f,0x62,0xc3,0xa9,0x61,0x61,0xff}, jsoncons::json(std::string("\xc3\xa9""a")));
     }
 
     SECTION("byte string chunks are not text")
     {
-        check_parse_cbor({0x5f,0x41,0xc3,0xff}, json(byte_string({0xc3})));
+        check_parse_cbor({0x5f,0x41,0xc3,0xff}, jsoncons::json(jsoncons::byte_string({0xc3})));
     }
 }
+
+TEST_CASE("cbor negative integer values")
+{
+    SECTION("-9223372036854775808")
+    {
+        std::vector<uint8_t> data = {0x3b, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+        auto r = cbor::try_decode_cbor<jsoncons::json>(data);
+        REQUIRE(r);
+        CHECK((std::numeric_limits<int64_t>::min)() == (*r).as<int64_t>());
+    }
+    SECTION("-9223372036854775808")
+    { 
+        std::vector<uint8_t> data = {0x3b, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+        auto r = cbor::try_decode_cbor<jsoncons::json>(data);
+        REQUIRE(r);
+        CHECK((std::numeric_limits<int64_t>::min)() == (*r).as<int64_t>());
+    }
+}
+

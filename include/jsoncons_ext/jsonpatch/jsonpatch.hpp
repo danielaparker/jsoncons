@@ -106,7 +106,7 @@ namespace detail {
         {
             tokens.push_back(*it);
         }
-        jsonpointer::basic_json_pointer<char_type> pointer(tokens);
+        jsonpointer::basic_json_pointer<char_type> pointer(std::move(tokens));
 
         std::error_code ec;
 
@@ -117,9 +117,9 @@ namespace detail {
         }
         string_type last_token;
         jsoncons::from_integer(val.size(), last_token);
-        tokens.emplace_back(std::move(last_token));
+        pointer.append(std::move(last_token));
 
-        return jsonpointer::basic_json_pointer<char_type>(std::move(tokens));
+        return pointer;
     }
 
     enum class op_type {add,remove,replace};

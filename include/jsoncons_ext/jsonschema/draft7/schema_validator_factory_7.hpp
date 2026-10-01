@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 

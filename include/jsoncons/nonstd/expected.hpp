@@ -4,17 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons2 for latest version
 
-#ifndef JSONCONS_DETAIL_EXPECTED_HPP    
-#define JSONCONS_DETAIL_EXPECTED_HPP    
+#ifndef JSONCONS_NONSTD_EXPECTED_HPP    
+#define JSONCONS_NONSTD_EXPECTED_HPP    
 
 #include <system_error>
 #include <type_traits>
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/utility.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/utility.hpp>
 #include <cassert>
 
 namespace jsoncons {
-namespace detail {
+namespace nonstd {
     
 struct unexpect_t
 {
@@ -55,7 +55,7 @@ public:
     }
 
     template <typename... Args>    
-    expected(jsoncons::detail::in_place_t, Args&& ... args) noexcept
+    expected(jsoncons::nonstd::in_place_t, Args&& ... args) noexcept
         : has_value_(true)
     {
         ::new (&value_) T(std::forward<Args>(args)...);
@@ -464,7 +464,7 @@ swap(expected<T,E>& lhs, expected<T,E>& rhs) noexcept
     lhs.swap(rhs);
 }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_EXPECTED_HPP
+#endif // JSONCONS_NONSTD_EXPECTED_HPP

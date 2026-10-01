@@ -13,13 +13,13 @@
 
 using namespace jsoncons;
 
-TEST_CASE("json(json_object_arg, first, last)")
+TEST_CASE("json(jsoncons::json_object_arg, first, last)")
 {
     SECTION("copy map into json")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
-        json j(json_object_arg, m.begin(),m.end());
+        jsoncons::json j(jsoncons::json_object_arg, m.begin(),m.end());
 
         REQUIRE(3 == j.size());
         auto it = j.object_range().begin();
@@ -36,7 +36,7 @@ TEST_CASE("json insert(first,last) test")
         std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
         std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
 
-        json j;
+        jsoncons::json j;
         j.insert(m1.begin(),m1.end());
         j.insert(m2.begin(),m2.end());
 
@@ -59,7 +59,7 @@ TEST_CASE("json insert(first,last) test")
         std::map<std::string,double> m1 = {{"a",1},{"b",2},{"c",3}};
         std::map<std::string,double> m2 = {{"d",4},{"e",5},{"f",6}};
 
-        json j;
+        jsoncons::json j;
         j.insert(std::make_move_iterator(m1.begin()),std::make_move_iterator(m1.end()));
         j.insert(std::make_move_iterator(m2.begin()),std::make_move_iterator(m2.end()));
 
@@ -80,7 +80,7 @@ TEST_CASE("json as<T>")
 {
     SECTION("empty object as string")
     {
-        json j;
+        jsoncons::json j;
         std::string s = j.as<std::string>();
         CHECK("{}" == s);
     }
@@ -89,7 +89,7 @@ TEST_CASE("json as<T>")
     {
         JSONCONS_TRY
         {
-            json j;
+            jsoncons::json j;
             std::string s = j["empty"].as<std::string>();
             CHECK(s == "{}");
         }
@@ -112,13 +112,13 @@ TEST_CASE("json as<T>")
 
 TEST_CASE("parse_duplicate_names")
 {
-    json j1 = json::parse(R"({"first":1,"second":2,"third":3})");
+    jsoncons::json j1 = jsoncons::json::parse(R"({"first":1,"second":2,"third":3})");
     CHECK(3 == j1.size());
     CHECK(1 == j1["first"].as<int>());
     CHECK(2 == j1["second"].as<int>());
     CHECK(3 == j1["third"].as<int>());
 
-    json j2 = json::parse(R"({"first":1,"second":2,"first":3})");
+    jsoncons::json j2 = jsoncons::json::parse(R"({"first":1,"second":2,"first":3})");
     CHECK(2 == j2.size());
     CHECK(1 == j2["first"].as<int>());
     CHECK(2 == j2["second"].as<int>());
@@ -126,17 +126,17 @@ TEST_CASE("parse_duplicate_names")
 
 TEST_CASE("test_erase_member")
 {
-    json o;
+    jsoncons::json o;
     o["key"] = "Hello";
 
     CHECK(1 == o.size());
     o.erase("key");
     CHECK(0 == o.size());
 
-    json a;
-    json b(json_object_arg);
+    jsoncons::json a;
+    jsoncons::json b(jsoncons::json_object_arg);
     b["input-file"] = "config_file";
-    json b_copy = b;
+    jsoncons::json b_copy = b;
 
     a["b"] = std::move(b);
 
@@ -146,7 +146,7 @@ TEST_CASE("test_erase_member")
 
 TEST_CASE("test_object_erase_range")
 {
-    json o;
+    jsoncons::json o;
     o["key1"] = "value1";
     o["key2"] = "value2";
     o["key3"] = "value3";
@@ -164,15 +164,15 @@ TEST_CASE("test_object_erase_range")
 
 TEST_CASE("test_empty_object")
 {
-    json a;
+    jsoncons::json a;
     CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
-    json::object_iterator begin = a.object_range().begin();
-    json::object_iterator end = a.object_range().end();
+    jsoncons::json::object_iterator begin = a.object_range().begin();
+    jsoncons::json::object_iterator end = a.object_range().end();
 
-    for (json::object_iterator it = begin; it != end; ++it)
+    for (jsoncons::json::object_iterator it = begin; it != end; ++it)
     {
         CHECK(false);
     }
@@ -190,10 +190,10 @@ TEST_CASE("test_const_empty_object")
     CHECK(b.is_object());
     CHECK(b.is_object());
 
-    json::const_object_iterator begin = b.object_range().begin();
-    json::const_object_iterator end = b.object_range().end();
+    jsoncons::json::const_object_iterator begin = b.object_range().begin();
+    jsoncons::json::const_object_iterator end = b.object_range().end();
 
-    for (json::const_object_iterator it = begin; it != end; ++it)
+    for (jsoncons::json::const_object_iterator it = begin; it != end; ++it)
     {
         CHECK(false);
     }
@@ -201,7 +201,7 @@ TEST_CASE("test_const_empty_object")
 
 TEST_CASE("test_empty_object_reserve")
 {
-    json c;
+    jsoncons::json c;
     CHECK(0 == c.size());
     CHECK(c.is_object());
     CHECK(c.is_object());
@@ -216,12 +216,12 @@ TEST_CASE("test_empty_object_reserve")
 
 TEST_CASE("test_empty_object_copy")
 {
-    json a;
+    jsoncons::json a;
     CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
-    json b = a;
+    jsoncons::json b = a;
     CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
@@ -229,12 +229,12 @@ TEST_CASE("test_empty_object_copy")
 
 TEST_CASE("test_empty_object_move")
 {
-    json a;
+    jsoncons::json a;
     CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
-    json b = std::move(a);
+    jsoncons::json b = std::move(a);
     CHECK(0 == b.size());
     CHECK(b.is_object());
     CHECK(b.is_object());
@@ -242,12 +242,12 @@ TEST_CASE("test_empty_object_move")
 
 TEST_CASE("test_empty_object_copy_assignment")
 {
-    json a;
+    jsoncons::json a;
     CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
-    json b = json::make_array(10);
+    jsoncons::json b = jsoncons::json::make_array(10);
     CHECK(b.size() == 10);
     CHECK(b.is_array());
     CHECK(b.is_array());
@@ -257,7 +257,7 @@ TEST_CASE("test_empty_object_copy_assignment")
     CHECK(b.is_object());
     CHECK(b.is_object());
 
-    json c;
+    jsoncons::json c;
     c["key"] = "value";
     CHECK(1 == c.size());
     CHECK(c.is_object());
@@ -270,12 +270,12 @@ TEST_CASE("test_empty_object_copy_assignment")
 
 TEST_CASE("test_empty_object_move_assignment")
 {
-    json a;
+    jsoncons::json a;
     CHECK(0 == a.size());
     CHECK(a.is_object());
     CHECK(a.is_object());
 
-    json b = json::make_array(10);
+    jsoncons::json b = jsoncons::json::make_array(10);
     CHECK(b.size() == 10);
     CHECK(b.is_array());
     CHECK(b.is_array());
@@ -285,7 +285,7 @@ TEST_CASE("test_empty_object_move_assignment")
     CHECK(b.is_object());
     CHECK(b.is_object());
 
-    json c;
+    jsoncons::json c;
     c["key"] = "value";
     CHECK(1 == c.size());
     CHECK(c.is_object());
@@ -299,7 +299,7 @@ TEST_CASE("test_empty_object_move_assignment")
 
 TEST_CASE("at_or_null test")
 {
-    json a = json::parse(R"(
+    jsoncons::json a = jsoncons::json::parse(R"(
     {
         "key1" : "value1",
         "key2" : {"key3" : "value3"}
@@ -308,38 +308,38 @@ TEST_CASE("at_or_null test")
 
     SECTION("1 arg")
     {
-        const json& j = a.at_or_null("key1");
+        const jsoncons::json& j = a.at_or_null("key1");
         CHECK(j.as<std::string>() == std::string("value1"));
     }
 
     SECTION("1 arg proxy")
     {
-        const json& j = a["key2"].at_or_null("key3");
+        const jsoncons::json& j = a["key2"].at_or_null("key3");
         CHECK(j.as<std::string>() == std::string("value3"));
     }
 
     SECTION("1 arg default")
     {
-        const json& j = a.at_or_null("key4");
+        const jsoncons::json& j = a.at_or_null("key4");
         CHECK(j.is_null());
     }
 
     SECTION("1 arg proxy default")
     {
-        const json& j = a["key2"].at_or_null("key4");
+        const jsoncons::json& j = a["key2"].at_or_null("key4");
         CHECK(j.is_null());
     }
 
     SECTION("1 arg null")
     {
-        const json& j = json::null().at_or_null("key1");
+        const jsoncons::json& j = jsoncons::json::null().at_or_null("key1");
         CHECK(j.is_null());
     }
 }
 
 TEST_CASE("get_value_or test")
 {
-    json a = json::parse(R"(
+    jsoncons::json a = jsoncons::json::parse(R"(
     {
         "key1" : "value1",
         "key2" : {"key3" : "value3"}
@@ -361,22 +361,22 @@ TEST_CASE("get_value_or test")
 
     SECTION("2 arg null")
     {
-        std::string s2 = json::null().get_value_or<std::string>("key4","null");
+        std::string s2 = jsoncons::json::null().get_value_or<std::string>("key4","null");
         CHECK(s2 == std::string("null"));
     }
 }
 
 TEST_CASE("test_proxy_get")
 {
-    json a;
+    jsoncons::json a;
 
-    a["object1"] = json();
+    a["object1"] = jsoncons::json();
     a["object1"]["key1"] = "value1";
 
     std::string s1 = a["object1"].at("key1").as<std::string>();
     std::string s1a = a["object1"].at("key1").as<std::string>();
-    std::string s2 = a["object1"].get_value_or<json>("key2",json::null()).as<std::string>();
-    CHECK(a["object1"].get_value_or<json>("key2", json::null()).is_null());
+    std::string s2 = a["object1"].get_value_or<jsoncons::json>("key2",jsoncons::json::null()).as<std::string>();
+    CHECK(a["object1"].get_value_or<jsoncons::json>("key2", jsoncons::json::null()).is_null());
     //std::cout << s2 << '\n';
     REQUIRE_THROWS_AS(a["object1"].at("key2").as<std::string>(), std::out_of_range);
 
@@ -387,9 +387,9 @@ TEST_CASE("test_proxy_get")
 
 TEST_CASE("test proxy get_value_or")
 {
-    json a;
+    jsoncons::json a;
 
-    a["object1"] = json();
+    a["object1"] = jsoncons::json();
     a["object1"]["field1"] = "3.7";
     a["object1"]["field2"] = 1.5;
 
@@ -414,9 +414,9 @@ TEST_CASE("test proxy get_value_or")
 
 TEST_CASE("test_set_and_proxy_set")
 {
-    json a;
+    jsoncons::json a;
 
-    a.insert_or_assign("object1",json());
+    a.insert_or_assign("object1",jsoncons::json());
     a.insert_or_assign("field1","value1");
     a["object1"].insert_or_assign("field2","value2");
 
@@ -426,9 +426,9 @@ TEST_CASE("test_set_and_proxy_set")
 
 TEST_CASE("test_emplace_and_proxy_set")
 {
-    json a;
+    jsoncons::json a;
 
-    a.try_emplace("object1",json());
+    a.try_emplace("object1",jsoncons::json());
     a.try_emplace("field1","value1");
     a["object1"].try_emplace("field2","value2");
 
@@ -438,7 +438,7 @@ TEST_CASE("test_emplace_and_proxy_set")
 
 TEST_CASE("test_const_member_read")
 {
-    json a;
+    jsoncons::json a;
 
     a["field1"] = 10;
 
@@ -453,9 +453,9 @@ TEST_CASE("test_const_member_read")
 
 TEST_CASE("test_proxy_const_member_read")
 {
-    json a;
+    jsoncons::json a;
 
-    a["object1"] = json();
+    a["object1"] = jsoncons::json();
     a["object1"]["field1"] = "value1";
     a["object1"]["field2"]; // Inserts empty object for "field2"
 
@@ -469,15 +469,15 @@ TEST_CASE("test_proxy_const_member_read")
 
 TEST_CASE("test_object_equals")
 {
-    json a;
+    jsoncons::json a;
     a["field1"] = "value1";
 
-    json b;
+    jsoncons::json b;
     b["field1"] = "value1";
 
     CHECK(a == b);
 
-    json c;
+    jsoncons::json c;
     c["field1"] = 10;
 
     CHECK_FALSE(a == c);
@@ -487,127 +487,127 @@ TEST_CASE("json_object_iterator test 1")
 {
     SECTION("object_iterator")
     {
-        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+        jsoncons::json a = jsoncons::json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-        json::object_iterator it = a.object_range().begin();
+        jsoncons::json::object_iterator it = a.object_range().begin();
         CHECK((*it).key() == "name1");
-        CHECK((*it).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value1"));
         ++it;
         CHECK((*it).key() == "name2");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
         CHECK((*(it++)).key() == "name2");
         CHECK((*it).key() == "name3");
-        CHECK((*it).value() == json("value3"));
+        CHECK((*it).value() == jsoncons::json("value3"));
 
         CHECK((*(it--)).key() == "name3");
-        CHECK((*it).value() == json("value2"));
-        CHECK((*(--it)).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value2"));
+        CHECK((*(--it)).value() == jsoncons::json("value1"));
 
-        json::key_value_type member = *it;
+        jsoncons::json::key_value_type member = *it;
         CHECK(member.key() == "name1");
-        CHECK(member.value() == json("value1"));
+        CHECK(member.value() == jsoncons::json("value1"));
     }
     SECTION("const_object_iterator 1")
     {
-        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+        jsoncons::json a = jsoncons::json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-        json::const_object_iterator it = a.object_range().begin();
+        jsoncons::json::const_object_iterator it = a.object_range().begin();
         CHECK((*it).key() == "name1");
-        CHECK((*it).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value1"));
         ++it;
         CHECK((*it).key() == "name2");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
         CHECK((*(it++)).key() == "name2");
         CHECK((*it).key() == "name3");
-        CHECK((*it).value() == json("value3"));
+        CHECK((*it).value() == jsoncons::json("value3"));
 
         CHECK((*(it--)).key() == "name3");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
-        CHECK((*(--it)).value() == json("value1"));
+        CHECK((*(--it)).value() == jsoncons::json("value1"));
 
-        json::key_value_type member = *it;
+        jsoncons::json::key_value_type member = *it;
         CHECK(member.key() == "name1");
-        CHECK(member.value() == json("value1"));
+        CHECK(member.value() == jsoncons::json("value1"));
     }
     SECTION("const_object_iterator 2")
     {
-        const json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+        const json a = jsoncons::json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-        json::const_object_iterator it = static_cast<const json&>(a).object_range().begin();
+        jsoncons::json::const_object_iterator it = static_cast<const jsoncons::json&>(a).object_range().begin();
         CHECK((it == a.object_range().begin()));
         CHECK_FALSE((it == a.object_range().end()));
         CHECK((*it).key() == "name1");
-        CHECK((*it).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value1"));
         ++it;
         CHECK_FALSE((it == a.object_range().end()));
         CHECK((*it).key() == "name2");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
         CHECK((*(it++)).key() == "name2");
         CHECK_FALSE((it == a.object_range().end()));
         CHECK((*it).key() == "name3");
-        CHECK((*it).value() == json("value3"));
+        CHECK((*it).value() == jsoncons::json("value3"));
 
         CHECK((*(it--)).key() == "name3");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
-        CHECK((*(--it)).value() == json("value1"));
+        CHECK((*(--it)).value() == jsoncons::json("value1"));
         CHECK((it == a.object_range().begin()));
 
-        json::key_value_type member = *it;
+        jsoncons::json::key_value_type member = *it;
         CHECK(member.key() == "name1");
-        CHECK(member.value() == json("value1"));
+        CHECK(member.value() == jsoncons::json("value1"));
 
         //*it = member; // Don't want this to compile
     }
     SECTION("json cbegin")
     {
-        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+        jsoncons::json a = jsoncons::json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-        json::const_object_iterator it = a.object_range().cbegin();
+        jsoncons::json::const_object_iterator it = a.object_range().cbegin();
         CHECK((*it).key() == "name1");
-        CHECK((*it).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value1"));
         ++it;
         CHECK((*it).key() == "name2");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
         CHECK((*(it++)).key() == "name2");
         CHECK((*it).key() == "name3");
-        CHECK((*it).value() == json("value3"));
+        CHECK((*it).value() == jsoncons::json("value3"));
 
         CHECK((*(it--)).key() == "name3");
-        CHECK((*it).value() == json("value2"));
-        CHECK((*(--it)).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value2"));
+        CHECK((*(--it)).value() == jsoncons::json("value1"));
 
-        json::key_value_type member = *it;
+        jsoncons::json::key_value_type member = *it;
         CHECK(member.key() == "name1");
-        CHECK(member.value() == json("value1"));
+        CHECK(member.value() == jsoncons::json("value1"));
     }
     SECTION("const json cbegin")
     {
-        const json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+        const json a = jsoncons::json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-        json::const_object_iterator it = a.object_range().cbegin();
+        jsoncons::json::const_object_iterator it = a.object_range().cbegin();
         CHECK((*it).key() == "name1");
-        CHECK((*it).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value1"));
         ++it;
         CHECK((*it).key() == "name2");
-        CHECK((*it).value() == json("value2"));
+        CHECK((*it).value() == jsoncons::json("value2"));
 
         CHECK((*(it++)).key() == "name2");
         CHECK((*it).key() == "name3");
-        CHECK((*it).value() == json("value3"));
+        CHECK((*it).value() == jsoncons::json("value3"));
 
         CHECK((*(it--)).key() == "name3");
-        CHECK((*it).value() == json("value2"));
-        CHECK((*(--it)).value() == json("value1"));
+        CHECK((*it).value() == jsoncons::json("value2"));
+        CHECK((*(--it)).value() == jsoncons::json("value1"));
 
-        json::key_value_type member = *it;
+        jsoncons::json::key_value_type member = *it;
         CHECK(member.key() == "name1");
-        CHECK(member.value() == json("value1"));
+        CHECK(member.value() == jsoncons::json("value1"));
     }
 }
 
@@ -616,7 +616,7 @@ TEST_CASE("json_object_iterator test 1")
 
 TEST_CASE("test_get_with_string_default")
 {
-    json example;
+    jsoncons::json example;
 
     std::string s("too long string for short string");
     std::string result = example.get_value_or<std::string>("test", s);
@@ -625,7 +625,7 @@ TEST_CASE("test_get_with_string_default")
 
 TEST_CASE("test_compare_with_string")
 {
-    json a;
+    jsoncons::json a;
     a["key"] = "value";
     a["key1"] = "value1";
     a["key2"] = "value2";
@@ -636,7 +636,7 @@ TEST_CASE("test_compare_with_string")
 
 TEST_CASE("test_count")
 {
-    json a;
+    jsoncons::json a;
     a["key1"] = "value1";
     a["key2"] = "value2";
 
@@ -644,7 +644,7 @@ TEST_CASE("test_count")
     CHECK(1 == a.count("key2"));
     CHECK(0 == a.count("key3"));
 
-    json b = json::parse(
+    jsoncons::json b = jsoncons::json::parse(
         "{\"key1\":\"a value\",\"key1\":\"another value\"}"
  );
     CHECK(1 == b.count("key1"));
@@ -652,9 +652,9 @@ TEST_CASE("test_count")
 
 TEST_CASE("test_find")
 {
-    json obj;
+    jsoncons::json obj;
 
-    json::object_iterator it = obj.find("key");
+    jsoncons::json::object_iterator it = obj.find("key");
     CHECK((it == obj.object_range().end()));
 
     obj["key1"] = 10;
@@ -662,17 +662,17 @@ TEST_CASE("test_find")
     obj["key3"] = 'c';
     obj["key4"] = "value4";
 
-    json::object_iterator it2 =  obj.find("key");
+    jsoncons::json::object_iterator it2 =  obj.find("key");
     CHECK((it2 == obj.object_range().end()));
 
-    json::object_iterator it3 =  obj.find("key4");
+    jsoncons::json::object_iterator it3 =  obj.find("key4");
     CHECK_FALSE((it3 == obj.object_range().end()));
     CHECK(std::string("value4") ==it3->value().as<std::string>());
 }
 
 TEST_CASE("test_as")
 {
-    json obj;
+    jsoncons::json obj;
     obj["field1"] = 10;
     obj["field2"] = true;
     obj["char_field"] = 'c';
@@ -692,7 +692,7 @@ TEST_CASE("test_as")
     CHECK(obj["char_field"].is<char>());
     CHECK_FALSE(obj["string_field"].is<char>());
 
-    json parent;
+    jsoncons::json parent;
     parent["child"] = obj;
     s = parent["child"]["field1"].as<std::string>();
     CHECK(s == std::string("10"));
@@ -704,7 +704,7 @@ TEST_CASE("test_as")
     //json::object x = parent["child"].as<json::object>();
     // Compile time error, "as<Json::object> not supported"
 
-    json empty;
+    jsoncons::json empty;
     CHECK(empty.is_object());
     CHECK(empty.empty());
 
@@ -714,7 +714,7 @@ TEST_CASE("test_as")
 
 TEST_CASE("test_as2")
 {
-    json obj;
+    jsoncons::json obj;
     obj["field1"] = "10";
     obj["field2"] = "-10";
     obj["field3"] = "10.1";
@@ -726,7 +726,7 @@ TEST_CASE("test_as2")
 
 TEST_CASE("test_is")
 {
-    json obj;
+    jsoncons::json obj;
     obj["field1"] = 10;
     obj["field2"] = -10;
     obj["field3"] = 10U;
@@ -769,7 +769,7 @@ TEST_CASE("test_is")
 
 TEST_CASE("test_is2")
 {
-    json obj = json::parse("{\"field1\":10}");
+    jsoncons::json obj = jsoncons::json::parse("{\"field1\":10}");
 
     CHECK(obj["field1"].storage_kind() == jsoncons::json_storage_kind::uint64);
 
@@ -785,7 +785,7 @@ TEST_CASE("test_is2")
 
 TEST_CASE("test_is_type")
 {
-    json obj;
+    jsoncons::json obj;
     CHECK(obj.is_object());
     CHECK(obj.is_object());
 
@@ -834,27 +834,27 @@ TEST_CASE("test_is_type")
     CHECK(obj["false"].is_bool());
     CHECK(obj["false"].is<bool>());
 
-    obj["null1"] = json::null();
+    obj["null1"] = jsoncons::json::null();
     CHECK(obj["null1"].is_null());
 
-    obj["object"] = json();
+    obj["object"] = jsoncons::json();
     CHECK(obj["object"].is_object());
     CHECK(obj["object"].is_object());
 
-    obj["array"] = json(json_array_arg);
+    obj["array"] = jsoncons::json(jsoncons::json_array_arg);
     CHECK(obj["array"].is_array());
     CHECK(obj["array"].is_array());
 
     // tests for json is_type methods
 
-    json str = obj["string"];
+    jsoncons::json str = obj["string"];
     CHECK(str.is<std::string>());
     CHECK(str.is<std::string>());
 }
 
 TEST_CASE("test_object_get_defaults")
 {
-    json obj;
+    jsoncons::json obj;
 
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
@@ -875,7 +875,7 @@ TEST_CASE("test_object_get_defaults")
 
 TEST_CASE("test_object_accessing")
 {
-    json obj;
+    jsoncons::json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -889,7 +889,7 @@ TEST_CASE("test_object_accessing")
 
 TEST_CASE("test_value_not_found_and_defaults")
 {
-    json obj;
+    jsoncons::json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
@@ -902,7 +902,7 @@ TEST_CASE("test_value_not_found_and_defaults")
 
 TEST_CASE("test_set_override")
 {
-    json obj;
+    jsoncons::json obj;
     obj["first_name"] = "Jane";
     obj["height"] = 0.9;
 
@@ -915,14 +915,14 @@ TEST_CASE("test_set_override")
 
 TEST_CASE("try_emplace tests")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
     {
         "a" : 1,
         "b" : 2,
@@ -939,7 +939,7 @@ TEST_CASE("try_emplace tests")
 
     SECTION("try_emplace(iterator hint, const string_view_type& name, Args&&... args)")
     {
-        json::object_iterator it = j.object_range().begin();
+        jsoncons::json::object_iterator it = j.object_range().begin();
 
         j.try_emplace(it,"c",3);
 
@@ -951,7 +951,7 @@ TEST_CASE("test json_object erase with iterator")
 {
     SECTION("json erase with iterator")
     {
-        json j(jsoncons::json_object_arg);
+        jsoncons::json j(jsoncons::json_object_arg);
 
         j.try_emplace("a", 1);
         j.try_emplace("b", 2);
@@ -976,7 +976,7 @@ TEST_CASE("test json_object erase with iterator")
     }
     SECTION("json erase with iterator 2")
     {
-        json j(jsoncons::json_object_arg);
+        jsoncons::json j(jsoncons::json_object_arg);
 
         j.try_emplace("a", 1);
         j.try_emplace("b", 2);
@@ -1005,9 +1005,9 @@ TEST_CASE("test empty json_object iterator")
 {
     SECTION("test 1")
     {
-        json j;
+        jsoncons::json j;
 
-        json::const_object_iterator it;
+        jsoncons::json::const_object_iterator it;
         CHECK(!it.has_value());
 
         it = j.find("Min");
@@ -1024,22 +1024,22 @@ TEST_CASE("test empty json_object iterator")
 
 TEST_CASE("test_json_merge")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
-    json j2 = j;
+    jsoncons::json j2 = j;
 
-    const json source = json::parse(R"(
+    const json source = jsoncons::json::parse(R"(
     {
         "a" : 2,
         "c" : 3
     }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
     {
         "a" : 1,
         "b" : 2,
@@ -1058,8 +1058,8 @@ TEST_CASE("test_json_merge")
 
     SECTION("test 2")
     {
-        json empty_object;
-        json original = j;
+        jsoncons::json empty_object;
+        jsoncons::json original = j;
 
         j.merge(empty_object);
 
@@ -1074,22 +1074,22 @@ TEST_CASE("test_json_merge")
 
 TEST_CASE("test_json_merge_move")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
         "a" : "1",
         "b" : [1,2,3]
     }
     )");
-        json j2 = j;
+        jsoncons::json j2 = j;
 
-    json source = json::parse(R"(
+    jsoncons::json source = jsoncons::json::parse(R"(
     {
         "a" : "2",
         "c" : [4,5,6]
     }
     )");
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
     {
         "a" : "1",
         "b" : [1,2,3],
@@ -1099,7 +1099,7 @@ TEST_CASE("test_json_merge_move")
 
     SECTION("test 1")
     {
-        json source2 = source;
+        jsoncons::json source2 = source;
 
         j.merge(std::move(source));
         CHECK(expected == j);
@@ -1113,22 +1113,22 @@ TEST_CASE("test_json_merge_move")
 
 TEST_CASE("test_json_merge_or_update")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
-    json j2 = j;
+    jsoncons::json j2 = j;
 
-    const json source = json::parse(R"(
+    const json source = jsoncons::json::parse(R"(
     {
         "a" : 2,
         "c" : 3
     }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
     {
         "a" : 2,
         "b" : 2,
@@ -1148,22 +1148,22 @@ TEST_CASE("test_json_merge_or_update")
 
 TEST_CASE("test_json_merge_or_update_move")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
         "a" : "1",
         "b" : [1,2,3]
     }
     )");
-        json j2 = j;
+        jsoncons::json j2 = j;
 
-    json source = json::parse(R"(
+    jsoncons::json source = jsoncons::json::parse(R"(
     {
         "a" : "2",
         "c" : [4,5,6]
     }
     )");
 
-    json expected = json::parse(R"(
+    jsoncons::json expected = jsoncons::json::parse(R"(
 {
     "a" : "2",
     "b" : [1,2,3],
@@ -1173,7 +1173,7 @@ TEST_CASE("test_json_merge_or_update_move")
 
     SECTION("test 1")
     {
-        json source2 = source;
+        jsoncons::json source2 = source;
 
         j.merge_or_update(std::move(source));
         CHECK(expected == j);
@@ -1187,7 +1187,7 @@ TEST_CASE("json_object_iterator_adaptor tests")
 {
     SECTION("empty")
     {
-        json j{};
+        jsoncons::json j{};
 
         auto it1 = j.object_range().begin();
         auto it2 = it1;
@@ -1211,7 +1211,7 @@ TEST_CASE("json_object_iterator_adaptor tests")
 
     SECTION("test 1")
     {
-        auto j = json::parse(R"(
+        auto j = jsoncons::json::parse(R"(
 {
     "a" : "1",
     "b" : [1,2,3]

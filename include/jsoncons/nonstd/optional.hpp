@@ -4,20 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_OPTIONAL_HPP
-#define JSONCONS_DETAIL_OPTIONAL_HPP
+#ifndef JSONCONS_NONSTD_OPTIONAL_HPP
+#define JSONCONS_NONSTD_OPTIONAL_HPP
 
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <utility> // std::swap
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/utility.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/utility.hpp>
 
 namespace jsoncons 
 { 
-namespace detail 
+namespace nonstd 
 { 
     template <typename T>
     class optional;
@@ -156,7 +156,7 @@ namespace detail
 
         template<typename... Args, 
             typename = typename std::enable_if<std::is_constructible<T, Args...>::value,int>::type>
-        optional(jsoncons::detail::in_place_t, Args&&... args) 
+        optional(jsoncons::nonstd::in_place_t, Args&&... args) 
           : has_value_(true), value_(std::forward<Args>(args)...)
         {
         }
@@ -490,7 +490,7 @@ namespace detail
         return rhs ? lhs >= *rhs : true;
     }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_OPTIONAL_HPP
+#endif // JSONCONS_NONSTD_OPTIONAL_HPP

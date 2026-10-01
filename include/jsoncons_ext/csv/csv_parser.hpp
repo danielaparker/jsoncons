@@ -17,16 +17,16 @@
 #include <system_error>
 #include <vector>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/staj_event.hpp>
 
 #include <jsoncons_ext/csv/csv_error.hpp>

@@ -20,7 +20,7 @@ TEST_CASE("json_reader exception tests")
         std::string in_file = "./corelib/input/json-exception--1.json";
         std::ifstream is(in_file, std::ios::binary);
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
     
         json_stream_reader reader(is,decoder);
         REQUIRE_THROWS(reader.read_next());
@@ -33,7 +33,7 @@ TEST_CASE("json_reader exception tests")
         std::ifstream is(in_file);
         REQUIRE(is);
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -53,7 +53,7 @@ TEST_CASE("json_reader exception tests")
         std::ifstream is(in_file);
         REQUIRE(is);
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -74,7 +74,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[100");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -94,7 +94,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[\"\\u");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -115,7 +115,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[tru");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -136,7 +136,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[fals");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -157,7 +157,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[nul");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -178,7 +178,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[true");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -198,7 +198,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[false");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -218,7 +218,7 @@ TEST_CASE("json_reader exception tests")
     {
         std::istringstream is("[null");
     
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(is,decoder);
@@ -237,15 +237,15 @@ TEST_CASE("json_reader exception tests")
     SECTION("unexpected_eof quote char")
     {
         std::string input("{\"field1\":\n\"value}");
-        REQUIRE_THROWS_AS(json::parse(input),ser_error);
+        REQUIRE_THROWS_AS(jsoncons::json::parse(input),ser_error);
         JSONCONS_TRY
         {
-            json::parse(input);
+            jsoncons::json::parse(input);
             CHECK(false);
         }
         JSONCONS_CATCH (const ser_error& e)
         {
-            CHECK(json_errc::unexpected_eof == e.code());
+            CHECK(jsoncons::json_errc::unexpected_eof == e.code());
             CHECK(2 == e.line());
             CHECK(8 == e.column());
         }

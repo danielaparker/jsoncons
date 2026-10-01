@@ -60,13 +60,13 @@ using namespace jsoncons;
 
 TEST_CASE("encode and decode json")
 {
-    json j(std::make_pair(false,std::string("foo")));
+    jsoncons::json j(std::make_pair(false,std::string("foo")));
 
     SECTION("string source")
     {
         std::string s;
         encode_json(j, s);
-        json result = decode_json<json>(s);
+        auto result = decode_json<jsoncons::json>(s);
         CHECK(result == j);
     }
 
@@ -74,7 +74,7 @@ TEST_CASE("encode and decode json")
     {
         std::stringstream ss;
         encode_json(j, ss);
-        json result = decode_json<json>(ss);
+        auto result = decode_json<jsoncons::json>(ss);
         CHECK(result == j);
     }
 
@@ -82,20 +82,20 @@ TEST_CASE("encode and decode json")
     {
         std::string s;
         encode_json(j, s);
-        json result = decode_json<json>(s.begin(), s.end());
+        auto result = decode_json<jsoncons::json>(s.begin(), s.end());
         CHECK(result == j);
     }
 }
 
-TEST_CASE("encode and decode wjson")
+TEST_CASE("encode and decode jsoncons::wjson")
 {
-    wjson j(std::make_pair(false,std::wstring(L"foo")));
+    jsoncons::wjson j(std::make_pair(false,std::wstring(L"foo")));
 
     SECTION("string source")
     {
         std::wstring s;
         encode_json(j, s);
-        wjson result = decode_json<wjson>(s);
+        auto result = decode_json<jsoncons::wjson>(s);
         CHECK(result == j);
     }
 
@@ -103,7 +103,7 @@ TEST_CASE("encode and decode wjson")
     {
         std::wstringstream ss;
         encode_json(j, ss);
-        wjson result = decode_json<wjson>(ss);
+        auto result = decode_json<jsoncons::wjson>(ss);
         CHECK(result == j);
     }
 
@@ -111,7 +111,7 @@ TEST_CASE("encode and decode wjson")
     {
         std::wstring s;
         encode_json(j, s);
-        wjson result = decode_json<wjson>(s.begin(), s.end());
+        auto result = decode_json<jsoncons::wjson>(s.begin(), s.end());
         CHECK(result == j);
     }
 }
@@ -204,7 +204,7 @@ TEST_CASE("convert_tuple_test")
     std::string s;
     jsoncons::encode_json(input, s, indenting::indent);
 
-    json j = json::parse(s);
+    jsoncons::json j = jsoncons::json::parse(s);
     REQUIRE(j.is_object());
     REQUIRE(2 == j.size());
     CHECK(j.contains("John Smith"));
@@ -286,7 +286,7 @@ TEST_CASE("decode_json with work allocator")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
-    auto aset = make_alloc_set(temp_alloc_arg, temp_alloc);
+    auto aset = make_alloc_set(jsoncons::temp_alloc_arg, temp_alloc);
 
     SECTION("convert_vector_test")
     {
@@ -348,7 +348,7 @@ TEST_CASE("decode_json with work allocator")
         };
 
         std::string json_text;
-        jsoncons::encode_json(aset, employees, json_text, json_options(), indenting::indent);
+        jsoncons::encode_json(aset, employees, json_text, jsoncons::json_options(), indenting::indent);
         auto employees2 = jsoncons::decode_json<employee_collection>(aset, json_text);
         REQUIRE(employees2.size() == employees.size());
         CHECK(employees2 == employees);

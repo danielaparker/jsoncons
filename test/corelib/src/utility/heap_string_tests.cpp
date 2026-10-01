@@ -15,12 +15,12 @@ using namespace jsoncons;
 
 TEST_CASE("heap_string test")
 {
-    using heap_string_factory_type = jsoncons::heap::heap_string_factory<char, null_type, std::allocator<char>>;
+    using heap_string_factory_type = jsoncons::heap::heap_string_factory<char, jsoncons::null_type, std::allocator<char>>;
     using pointer = typename heap_string_factory_type::pointer;
 
     std::string s("Hello World");
 
-    pointer ptr = heap_string_factory_type::create(s.data(), s.length(), null_type(), std::allocator<char>());
+    pointer ptr = heap_string_factory_type::create(s.data(), s.length(), jsoncons::null_type(), std::allocator<char>());
  
     CHECK(s == ptr->c_str());
     CHECK(s.length() == ptr->length_);
@@ -63,7 +63,7 @@ private:
 
 TEST_CASE("heap_string with polymorphic allocator test")
 {
-    using heap_string_factory_type = jsoncons::heap::heap_string_factory<char, null_type, std::pmr::polymorphic_allocator<char>>;
+    using heap_string_factory_type = jsoncons::heap::heap_string_factory<char, jsoncons::null_type, std::pmr::polymorphic_allocator<char>>;
     using pointer = typename heap_string_factory_type::pointer;
 
     char buffer[1024] = {}; // a small buffer on the stack
@@ -72,12 +72,12 @@ TEST_CASE("heap_string with polymorphic allocator test")
     std::pmr::polymorphic_allocator<char> alloc(&checked);
 
     std::string s1("Hello World 1");
-    pointer ptr1 = heap_string_factory_type::create(s1.data(), s1.length(), null_type(), alloc);
+    pointer ptr1 = heap_string_factory_type::create(s1.data(), s1.length(), jsoncons::null_type(), alloc);
     CHECK(s1 == ptr1->c_str());
     CHECK(s1.length() == ptr1->length_);
 
     std::string s2("Hello 2");
-    pointer ptr2 = heap_string_factory_type::create(s2.data(), s2.length(), null_type(), alloc);
+    pointer ptr2 = heap_string_factory_type::create(s2.data(), s2.length(), jsoncons::null_type(), alloc);
     CHECK(s2 == ptr2->c_str());
     CHECK(s2.length() == ptr2->length_);
 

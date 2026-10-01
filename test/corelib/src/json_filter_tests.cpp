@@ -29,14 +29,14 @@ class name_fixup_filter : public json_filter
 public:
     std::vector<warning> warnings;
 
-    name_fixup_filter(json_visitor& visitor)
+    name_fixup_filter(jsoncons::json_visitor& visitor)
         : json_filter(visitor)
     {
     }
 
 private:
     JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& name,
-        const ser_context& context,
+        const jsoncons::ser_context& context,
         std::error_code& ec) override
     {
         member_name_ = std::string(name);
@@ -52,8 +52,8 @@ private:
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_string(const string_view_type& s,
-        semantic_tag tag,
-        const ser_context& context,
+        jsoncons::semantic_tag tag,
+        const jsoncons::ser_context& context,
         std::error_code&) override
     {
         if (member_name_ == "name")
@@ -126,10 +126,10 @@ TEST_CASE("test_filter2")
 
 TEST_CASE("test_rename_name")
 {
-    json j;
+    jsoncons::json j;
     JSONCONS_TRY
     {
-        j = json::parse(R"(
+        j = jsoncons::json::parse(R"(
 {"store":
 {"book": [
 {"category": "reference",
@@ -153,21 +153,21 @@ TEST_CASE("test_rename_name")
     rename_object_key_filter filter("price","price2",encoder);
     j.dump(filter);
 
-    json j2 = json::parse(ss);
+    jsoncons::json j2 = jsoncons::json::parse(ss);
     CHECK(j2["store"]["book"][0]["price2"].as<double>() == Approx(31.96).epsilon(0.001));
 }
 
 TEST_CASE("test_chained_filters")
 {
-    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
+    jsoncons::ojson j = jsoncons::ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
 
-    json_decoder<ojson> decoder;
+    jsoncons::json_decoder<jsoncons::ojson> decoder;
 
     rename_object_key_filter filter2("fifth", "fourth", decoder);
     rename_object_key_filter filter1("fourth", "third", filter2);
 
     j.dump(filter1);
-    ojson j2 = decoder.get_result();
+    jsoncons::ojson j2 = decoder.get_result();
     CHECK(4 == j2.size());
     CHECK(1 == j2["first"]);
     CHECK(2 == j2["second"]);

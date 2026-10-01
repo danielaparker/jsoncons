@@ -23,7 +23,7 @@ TEST_CASE("jsonpointer unflatten tests 1")
 {
     SECTION("test 1")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
         {
             "discards": {
                 "1000": "Record does not exist",
@@ -38,19 +38,19 @@ TEST_CASE("jsonpointer unflatten tests 1")
         }
         )");
 
-        json flattened = jsonpointer::flatten(input);
+        jsoncons::json flattened = jsonpointer::flatten(input);
 
-        json unflattened1 = jsonpointer::unflatten(flattened);
+        jsoncons::json unflattened1 = jsonpointer::unflatten(flattened);
         //std::cout << "(1)\n" << pretty_print(unflattened1) << "\n";
 
-        json unflattened2 = jsonpointer::unflatten(flattened,
+        jsoncons::json unflattened2 = jsonpointer::unflatten(flattened,
             jsonpointer::unflatten_options::assume_object);
         //std::cout << "(2)\n" << pretty_print(unflattened2) << "\n";
     }
 }
 TEST_CASE("jsonpointer unflatten tests 2")
 {
-    json input = json::parse(R"(
+    jsoncons::json input = jsoncons::json::parse(R"(
         {
             "0": {
                 "1000": "Record does not exist",
@@ -65,11 +65,11 @@ TEST_CASE("jsonpointer unflatten tests 2")
         }
         )");
 
-    json flattened = jsonpointer::flatten(input);
+    jsoncons::json flattened = jsonpointer::flatten(input);
 
     SECTION("default test")
     {
-        json expected = json::parse(R"(
+        jsoncons::json expected = jsoncons::json::parse(R"(
         [
             {
                 "1000": "Record does not exist",
@@ -80,13 +80,13 @@ TEST_CASE("jsonpointer unflatten tests 2")
         ]        
         )");
 
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
         //std::cout << "(1)\n" << pretty_print(unflattened) << "\n";
     }
     SECTION("object test")
     {
-        json expected = json::parse(R"(
+        jsoncons::json expected = jsoncons::json::parse(R"(
         {
             "0": {
                 "1000": "Record does not exist",
@@ -101,7 +101,7 @@ TEST_CASE("jsonpointer unflatten tests 2")
         }        
         )");
 
-        json unflattened = jsonpointer::unflatten(flattened, jsonpointer::unflatten_options::assume_object);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened, jsonpointer::unflatten_options::assume_object);
         CHECK(expected == unflattened);
         //std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
     }
@@ -109,7 +109,7 @@ TEST_CASE("jsonpointer unflatten tests 2")
 
 TEST_CASE("flatten test")
 {
-    json input = json::parse(R"(
+    jsoncons::json input = jsoncons::json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -131,7 +131,7 @@ TEST_CASE("flatten test")
 
     SECTION("flatten")
     {
-        json result = jsonpointer::flatten(input);
+        jsoncons::json result = jsonpointer::flatten(input);
 
         REQUIRE(result.is_object());
         REQUIRE(9 == result.size());
@@ -147,7 +147,7 @@ TEST_CASE("flatten test")
         CHECK(result["/reputons/1/rating"].as<double>() == Approx(0.75).epsilon(0.0000001));
 
         //std::cout << pretty_print(result) << "\n";
-        json unflattened = jsonpointer::unflatten(result);
+        jsoncons::json unflattened = jsonpointer::unflatten(result);
         CHECK(input == unflattened);
         //std::cout << pretty_print(unflattened) << "\n";
 
@@ -158,28 +158,28 @@ TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
 {
     SECTION("object with empty array or object")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
     {
         "foo": [],
         "bar": {}
     }    
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
         CHECK(input == unflattened);
     }
     SECTION("array with empty array or object")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
     [
         [],
         {}
     ]    
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
         CHECK(input == unflattened);
     }
 }
@@ -188,76 +188,76 @@ TEST_CASE("jsonpointer flatten/unflatten test")
 {
     SECTION("array with 2 elements")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 [0,1]
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         CHECK(input == unflattened);
     }
     SECTION("array with more than 9 elements")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 [0,1,2,3,4,5,6,7,8,9,10,11]
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         CHECK(input == unflattened);
     }
     SECTION("array with array with 2 elements")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 [[0,1]]
         )");
 
-        json flattened = jsonpointer::flatten(input);
+        jsoncons::json flattened = jsonpointer::flatten(input);
         //std::cout << "(1) " << input << "\n";
         //std::cout << "(2) " << flattened << "\n";
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         //std::cout << "(3) " << unflattened << "\n";
         CHECK(input == unflattened);
     }
     SECTION("object with consecutive numeric keys")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 {"0":0,"1":1}
         )");
-        json expected = json::parse(R"(
+        jsoncons::json expected = jsoncons::json::parse(R"(
 [0,1]
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         CHECK(expected == unflattened);
     }
     SECTION("object with non-consecutive numeric keys")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 {"0":0,"2":1}
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         //std::cout << unflattened << "\n";
         CHECK(input == unflattened);
     }
     SECTION("test2")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
 {
     "arr": ["0", "1", "2", "3", "4", "5", "6","7","8", "9", "10", "11"]
 }
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
 
         //std::cout << unflattened << "\n";
         CHECK(input == unflattened);
@@ -269,7 +269,7 @@ TEST_CASE("jsonpointer unflatten tests 3")
 
     SECTION("default test")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
         {
             "0": {
                 "2": "A"
@@ -280,8 +280,8 @@ TEST_CASE("jsonpointer unflatten tests 3")
         }
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json expected = json::parse(R"(
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json expected = jsoncons::json::parse(R"(
         [
             {
                 "2": "A"
@@ -293,14 +293,14 @@ TEST_CASE("jsonpointer unflatten tests 3")
         //std::cout << "(1) " << input << "\n"; 
         //std::cout << "(2) " << flattened << "\n"; 
 
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
         //std::cout << "(3) " << unflattened << "\n"; 
         //std::cout << "(4) " << expected << "\n";
     }
     SECTION("default test 2")
     {
-        json input = json::parse(R"(
+        jsoncons::json input = jsoncons::json::parse(R"(
         {
             "0": {
                 "0": "B"
@@ -308,8 +308,8 @@ TEST_CASE("jsonpointer unflatten tests 3")
         }
         )");
 
-        json flattened = jsonpointer::flatten(input);
-        json expected = json::parse(R"(
+        jsoncons::json flattened = jsonpointer::flatten(input);
+        jsoncons::json expected = jsoncons::json::parse(R"(
         [
             ["B"]
         ]        
@@ -318,7 +318,7 @@ TEST_CASE("jsonpointer unflatten tests 3")
         //std::cout << "(1) " << input << "\n";
         //std::cout << "(2) " << flattened << "\n";
 
-        json unflattened = jsonpointer::unflatten(flattened);
+        jsoncons::json unflattened = jsonpointer::unflatten(flattened);
         CHECK(expected == unflattened);
     }
     SECTION("empty object")

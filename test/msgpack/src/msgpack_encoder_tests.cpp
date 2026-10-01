@@ -62,8 +62,8 @@ TEST_CASE("serialize array to msgpack")
     //encoder.end_object();
     encoder.flush();
 
-    json result;
-    REQUIRE_NOTHROW(result = msgpack::decode_msgpack<json>(v));
+    jsoncons::json result;
+    REQUIRE_NOTHROW(result = msgpack::decode_msgpack<jsoncons::json>(v));
 } 
  
 TEST_CASE("serialize object to msgpack")
@@ -79,8 +79,8 @@ TEST_CASE("serialize object to msgpack")
         encoder.string_value("value2");
         REQUIRE_NOTHROW(encoder.end_object());
         encoder.flush();
-        json result; 
-        REQUIRE_NOTHROW(result = msgpack::decode_msgpack<json>(v));
+        jsoncons::json result; 
+        REQUIRE_NOTHROW(result = msgpack::decode_msgpack<jsoncons::json>(v));
     }
 }
 

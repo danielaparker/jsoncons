@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <catch/catch.hpp>
 
 #include <iostream>

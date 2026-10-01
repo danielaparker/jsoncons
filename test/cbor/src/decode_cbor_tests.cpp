@@ -16,7 +16,8 @@
 #include <limits>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 namespace 
 {
@@ -68,7 +69,7 @@ namespace
 
 TEST_CASE("cbor_view_test")
 {
-    ojson j1 = ojson::parse(R"(
+    jsoncons::ojson j1 = jsoncons::ojson::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -85,25 +86,25 @@ TEST_CASE("cbor_view_test")
     std::vector<uint8_t> c;
     cbor::encode_cbor(j1, c);
 
-    json v = cbor::decode_cbor<json>(c); 
+    auto v = cbor::decode_cbor<jsoncons::json>(c); 
     CHECK(v.is_object());
     CHECK_FALSE(v.is_array());
 
-    const json& reputons = v.at("reputons");
+    const jsoncons::json& reputons = v.at("reputons");
     CHECK(reputons.is_array());
 
-    const json& reputons_0 = reputons.at(0);
+    const jsoncons::json& reputons_0 = reputons.at(0);
 
-    const json& reputons_0_rated = reputons_0.at("rated");
+    const jsoncons::json& reputons_0_rated = reputons_0.at("rated");
     (void)reputons_0_rated;
 
-    const json& rating = reputons_0.at("rating");
+    const jsoncons::json& rating = reputons_0.at("rating");
     CHECK(rating.as_double() == 0.90);
 
     for (const auto& member : v.object_range())
     {
         const auto& key = member.key();
-        const json& jval = member.value();
+        const jsoncons::json& jval = member.value();
 
         (void)key;
         (void)jval;
@@ -114,7 +115,7 @@ TEST_CASE("cbor_view_test")
 
     for (const auto& element : reputons.array_range())
     {
-        json j = element;
+        jsoncons::json j = element;
         //std::cout << j << '\n';
     }
     //std::cout << '\n';
@@ -122,7 +123,7 @@ TEST_CASE("cbor_view_test")
 
 TEST_CASE("jsonpointer_test")
 {
-    json j = json::parse(R"(
+    jsoncons::json j = jsoncons::json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -139,22 +140,22 @@ TEST_CASE("jsonpointer_test")
     std::vector<uint8_t> v;
     cbor::encode_cbor(j, v);
 
-    json jdoc = cbor::decode_cbor<json>(v);
+    auto jdoc = cbor::decode_cbor<jsoncons::json>(v);
     std::string s;
     jdoc.dump(s);
-    json j1 = json::parse(s);
+    jsoncons::json j1 = jsoncons::json::parse(s);
     CHECK(j1 == j);
 
     std::error_code ec;
-    const json& application = jsonpointer::get(jdoc, "/application", ec);
+    const jsoncons::json& application = jsonpointer::get(jdoc, "/application", ec);
     CHECK_FALSE(ec);
 
     CHECK(application == j["application"]);
 
-    const json& reputons_0_rated = jsonpointer::get(jdoc, "/reputons", ec);
+    const jsoncons::json& reputons_0_rated = jsonpointer::get(jdoc, "/reputons", ec);
     CHECK_FALSE(ec);
 
-    json j4 = j["reputons"];
+    jsoncons::json j4 = j["reputons"];
     CHECK(reputons_0_rated == j4);
 
     //std::cout << pretty_print(j3) << '\n';
@@ -169,16 +170,16 @@ TEST_CASE("as_string_test")
     encoder.bool_value(false);
     encoder.null_value();
     encoder.string_value("Toronto");
-    encoder.byte_string_value(byte_string{'H','e','l','l','o'});
+    encoder.byte_string_value(jsoncons::byte_string{'H','e','l','l','o'});
     encoder.int64_value(-100);
     encoder.uint64_value(100);
-    encoder.string_value("18446744073709551616", semantic_tag::bigint);
+    encoder.string_value("18446744073709551616", jsoncons::semantic_tag::bigint);
     encoder.double_value(10.5);
-    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+    encoder.string_value("-18446744073709551617", jsoncons::semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::string s0;
     j[0].dump(s0);
@@ -209,7 +210,7 @@ TEST_CASE("as_string_test")
     j[4].dump(s4);
     CHECK(std::string("\"SGVsbG8\"") == s4);
     CHECK(std::string("SGVsbG8") == j[4].as_string());
-    CHECK(byte_string({'H','e','l','l','o'}) == j[4].as<byte_string>());
+    CHECK(jsoncons::byte_string({'H','e','l','l','o'}) == j[4].as<jsoncons::byte_string>());
 
     std::string s5;
     j[5].dump(s5);
@@ -243,14 +244,14 @@ TEST_CASE("dump cbor to string test")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s = n.to_string();
-    encoder.string_value(s, semantic_tag::bigint);
+    encoder.string_value(s, jsoncons::semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::string s0;
     j.dump(s0);
@@ -258,22 +259,22 @@ TEST_CASE("dump cbor to string test")
     //std::cout << s0 << '\n';
 
     std::string s1;
-    auto options1 = json_options{}
-        .bignum_format(bignum_format_kind::raw);
+    auto options1 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::raw);
     j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
     //std::cout << s1 << '\n';
 
     std::string s2;
-    auto options2 = json_options{}
-        .bignum_format(bignum_format_kind::base10);
+    auto options2 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::base10);
     j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
     //std::cout << s2 << '\n';
 
     std::string s3;
-    auto options3 = json_options{}
-        .bignum_format(bignum_format_kind::base64url);
+    auto options3 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::base64url);
     j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
     //std::cout << s3 << '\n';
@@ -285,14 +286,14 @@ TEST_CASE("test_dump_to_stream")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    jsoncons::bigint n = jsoncons::bigint::from_bytes_be(1, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s = n.to_string();
-    encoder.string_value(s, semantic_tag::bigint);
+    encoder.string_value(s, jsoncons::semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     std::ostringstream os0;
     j.dump(os0);
@@ -300,22 +301,22 @@ TEST_CASE("test_dump_to_stream")
     //std::cout << os0.str() << '\n';
 
     std::ostringstream os1;
-    auto options1 = json_options{}
-        .bignum_format(bignum_format_kind::raw);
+    auto options1 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::raw);
     j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
     //std::cout << os1.str() << '\n';
 
     std::ostringstream os2;
-    auto options2 = json_options{}
-        .bignum_format(bignum_format_kind::base10);
+    auto options2 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::base10);
     j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
     //std::cout << os2.str() << '\n';
 
     std::ostringstream os3;
-    auto options3 = json_options{}
-        .bignum_format(bignum_format_kind::base64url);
+    auto options3 = jsoncons::json_options{}
+        .bignum_format(jsoncons::bignum_format_kind::base64url);
     j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
     //std::cout << os3.str() << '\n';
@@ -332,7 +333,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
     encoder.string_value("Ontario");
     encoder.end_object(); 
     encoder.flush();
-    json bv2 = cbor::decode_cbor<json>(v);
+    auto bv2 = cbor::decode_cbor<jsoncons::json>(v);
 
     auto it2 = bv2.object_range().begin();
     CHECK_FALSE((it2 == bv2.object_range().end()));
@@ -349,7 +350,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     encoder.string_value("Ontario");
     encoder.end_array(); 
     encoder.flush();
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     CHECK(2 == j.size());
 
@@ -369,7 +370,7 @@ TEST_CASE("cbor array comparison test")
     encoder1.string_value("Vancouver");
     encoder1.end_array(); 
     encoder1.flush();
-    json j1 = cbor::decode_cbor<json>(v1);
+    jsoncons::json j1 = cbor::decode_cbor<jsoncons::json>(v1);
 
     std::vector<uint8_t> v2;
     cbor::cbor_bytes_encoder serializer2(v2);
@@ -378,7 +379,7 @@ TEST_CASE("cbor array comparison test")
     serializer2.string_value("Vancouver");
     serializer2.end_array(); 
     serializer2.flush();
-    json j2 = cbor::decode_cbor<json>(v2);
+    jsoncons::json j2 = cbor::decode_cbor<jsoncons::json>(v2);
 
     std::vector<uint8_t> v3;
     cbor::cbor_bytes_encoder serializer3(v3);
@@ -387,7 +388,7 @@ TEST_CASE("cbor array comparison test")
     serializer3.string_value("Montreal");
     serializer3.end_array(); 
     serializer3.flush();
-    json j3 = cbor::decode_cbor<json>(v3);
+    jsoncons::json j3 = cbor::decode_cbor<jsoncons::json>(v3);
 
     SECTION("operator== test")
     {
@@ -416,12 +417,12 @@ TEST_CASE("cbor object comparison")
     encoder1.key("City");
     encoder1.string_value("Montreal");
     encoder1.key("Amount");
-    encoder1.string_value("273.15", semantic_tag::bigdec);
+    encoder1.string_value("273.15", jsoncons::semantic_tag::bigdec);
     encoder1.key("Date");
-    encoder1.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
+    encoder1.string_value("2018-05-07 12:41:07-07:00", jsoncons::semantic_tag::datetime) ;
     encoder1.end_object(); 
     encoder1.flush();
-    json j1 = cbor::decode_cbor<json>(v);
+    jsoncons::json j1 = cbor::decode_cbor<jsoncons::json>(v);
 
     //std::cout << pretty_print(j1) << "\n";
  
@@ -433,12 +434,12 @@ TEST_CASE("cbor object comparison")
     serializer2.key("City");
     serializer2.string_value("Toronto");
     serializer2.key("Amount");
-    serializer2.string_value("273.15", semantic_tag::bigdec);
+    serializer2.string_value("273.15", jsoncons::semantic_tag::bigdec);
     serializer2.key("Date");
-    serializer2.string_value("2018-10-18 12:41:07-07:00", semantic_tag::datetime) ;
+    serializer2.string_value("2018-10-18 12:41:07-07:00", jsoncons::semantic_tag::datetime) ;
     serializer2.end_object(); 
     serializer2.flush();
-    json j2 = cbor::decode_cbor<json>(buf2);
+    jsoncons::json j2 = cbor::decode_cbor<jsoncons::json>(buf2);
     REQUIRE(j2.size() == j1.size());
 
     std::vector<uint8_t> buf3;
@@ -456,7 +457,7 @@ TEST_CASE("cbor object comparison")
     serializer3.byte_string_value(jsoncons::byte_string{});
     serializer3.end_object(); 
     serializer3.flush();
-    json j3 = cbor::decode_cbor<json>(buf3);
+    jsoncons::json j3 = cbor::decode_cbor<jsoncons::json>(buf3);
 
     SECTION("contains")
     {
@@ -508,13 +509,13 @@ TEST_CASE("cbor member tests")
     encoder.key("City");
     encoder.string_value("Montreal");
     encoder.key("Amount");
-    encoder.string_value("273.15", semantic_tag::bigdec);
+    encoder.string_value("273.15", jsoncons::semantic_tag::bigdec);
     encoder.key("Date");
-    encoder.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
+    encoder.string_value("2018-05-07 12:41:07-07:00", jsoncons::semantic_tag::datetime) ;
 
     encoder.end_object(); 
     encoder.flush();
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
 
     SECTION("contains")
     {
@@ -547,18 +548,18 @@ TEST_CASE("cbor conversion tests")
     encoder.begin_array(4); // a fixed length array
     encoder.string_value("foo");
     encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
-    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
-    encoder.string_value("273.15", semantic_tag::bigdec);
+    encoder.string_value("-18446744073709551617", jsoncons::semantic_tag::bigint);
+    encoder.string_value("273.15", jsoncons::semantic_tag::bigdec);
     encoder.end_array();
     encoder.end_array();
     encoder.flush();
 
-    json j = cbor::decode_cbor<json>(v);
+    auto j = cbor::decode_cbor<jsoncons::json>(v);
     REQUIRE(1 == j.size());
 
     auto range1 = j.array_range();
     auto it = range1.begin();
-    const json& inner_array = *it++;
+    const jsoncons::json& inner_array = *it++;
     REQUIRE(4 == inner_array.size());
     REQUIRE((it == range1.end()));
 
@@ -568,7 +569,7 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(it2->as<std::vector<uint8_t>>() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
-    CHECK(bool(it2->as<bigint>() == bigint("-18446744073709551617")));
+    CHECK(bool(it2->as<jsoncons::bigint>() == jsoncons::bigint("-18446744073709551617")));
     it2++;
     CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
@@ -581,13 +582,13 @@ TEST_CASE("cbor array as<> test")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string({'b','a','r'}));
-    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
-    encoder.string_value("273.15", semantic_tag::bigdec);
-    encoder.string_value("2015-05-07 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.int64_value(1431027667, semantic_tag::epoch_second);
-    encoder.int64_value(-1431027667, semantic_tag::epoch_second);
-    encoder.double_value(1431027667.5, semantic_tag::epoch_second);
+    encoder.byte_string_value(jsoncons::byte_string({'b','a','r'}));
+    encoder.string_value("-18446744073709551617", jsoncons::semantic_tag::bigint);
+    encoder.string_value("273.15", jsoncons::semantic_tag::bigdec);
+    encoder.string_value("2015-05-07 12:41:07-07:00", jsoncons::semantic_tag::datetime) ;
+    encoder.int64_value(1431027667, jsoncons::semantic_tag::epoch_second);
+    encoder.int64_value(-1431027667, jsoncons::semantic_tag::epoch_second);
+    encoder.double_value(1431027667.5, jsoncons::semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 
@@ -627,18 +628,18 @@ TEST_CASE("cbor array as<> test")
     //}
     //std::cout << "\n\n";
 
-    json j = cbor::decode_cbor<json>(v); // a non-owning view of the CBOR v
+    auto j = cbor::decode_cbor<jsoncons::json>(v); // a non-owning view of the CBOR v
 
     CHECK(8 == j.size());
 
     SECTION("j[0].is<T>()")
     {
         CHECK(j[0].is<std::string>());
-        CHECK(j[1].is<byte_string>());
-        CHECK(j[1].is<byte_string_view>());
-        CHECK(j[2].is<bigint>());
+        CHECK(j[1].is<jsoncons::byte_string>());
+        CHECK(j[1].is<jsoncons::byte_string_view>());
+        CHECK(j[2].is<jsoncons::bigint>());
         CHECK(j[3].is_string());
-        CHECK(j[3].tag() == semantic_tag::bigdec);
+        CHECK(j[3].tag() == jsoncons::semantic_tag::bigdec);
         CHECK(j[4].is<std::string>());
         CHECK(j[5].is<int>());
         CHECK(j[5].is<unsigned int>());
@@ -665,8 +666,8 @@ TEST_CASE("cbor array as<> test")
     {
         auto it = j.array_range().begin();
         CHECK(it++->is<std::string>());
-        CHECK(it++->is<byte_string>());
-        CHECK(it++->is<bigint>());
+        CHECK(it++->is<jsoncons::byte_string>());
+        CHECK(it++->is<jsoncons::bigint>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<int>());
@@ -685,7 +686,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x03 // 3 
                                  };
 
-        json j = cbor::decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
 
         //std::cout << j << "\n";
 
@@ -700,7 +701,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x22 // -3
                                  };
 
-        json j = cbor::decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
         //std::string s = j.as<std::string>();
         //CHECK(s == std::string("-1.5"));
 
@@ -715,7 +716,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -9223372036854775808
                                  };
 
-        json j = cbor::decode_cbor<json>(v);
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
 
         CHECK(j.as<std::string>() == std::string("-0x8000000000000000p-8000000000000000"));
     }
@@ -752,7 +753,7 @@ TEST_CASE("encode decode cbor source")
 
     SECTION("from bytes")
     {
-        ojson j = cbor::decode_cbor<ojson>(input);
+        jsoncons::ojson j = cbor::decode_cbor<jsoncons::ojson>(input);
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);
@@ -764,7 +765,7 @@ TEST_CASE("encode decode cbor source")
         std::string s(reinterpret_cast<const char*>(input.data()), input.size());
         std::stringstream is(std::move(s));
 
-        ojson j = cbor::decode_cbor<ojson>(is);
+        jsoncons::ojson j = cbor::decode_cbor<jsoncons::ojson>(is);
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);
@@ -773,7 +774,7 @@ TEST_CASE("encode decode cbor source")
 
     SECTION("from iterator source")
     {
-        ojson j = cbor::decode_cbor<ojson>(input.begin(), input.end());
+        jsoncons::ojson j = cbor::decode_cbor<jsoncons::ojson>(input.begin(), input.end());
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);
@@ -785,7 +786,7 @@ TEST_CASE("encode decode cbor source")
         MyIterator it(input.data());
         MyIterator end(input.data() + input.size());
 
-        ojson j = cbor::decode_cbor<ojson>(it, end);
+        jsoncons::ojson j = cbor::decode_cbor<jsoncons::ojson>(it, end);
 
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);

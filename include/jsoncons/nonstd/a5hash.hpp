@@ -37,15 +37,15 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef JSONCONS_DETAIL_UTILITY_A5HASH_HPP
-#define JSONCONS_DETAIL_UTILITY_A5HASH_HPP
+#ifndef JSONCONS_NONSTD_UTILITY_A5HASH_HPP
+#define JSONCONS_NONSTD_UTILITY_A5HASH_HPP
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <cstring>
 #include <cstdint> 
 
 namespace jsoncons {
-namespace detail {
+namespace nonstd {
 
 #if defined( __LP64__ ) || defined( _LP64 ) || \
 	!( SIZE_MAX <= 0xFFFFFFFFU ) || ( defined( UINTPTR_MAX ) && \
@@ -451,9 +451,9 @@ JSONCONS_A5HASH_FORCE_INLINE uint32_t a5hash32( const wchar_t* Msg0, size_t MsgL
 	return a5hash32((const unsigned char*)Msg0, MsgLen*sizeof(wchar_t), UseSeed);
 }
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
 #undef JSONCONS_A5HASH_FORCE_INLINE
 
-#endif // JSONCONS_DETAIL_UTILITY_A5HASH_HPP
+#endif // JSONCONS_NONSTD_UTILITY_A5HASH_HPP

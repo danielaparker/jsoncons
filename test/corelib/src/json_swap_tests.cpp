@@ -12,10 +12,10 @@
 
 using namespace jsoncons;
 
-void check_swap(const json& j1, const json& j2)
+void check_swap(const jsoncons::json& j1, const jsoncons::json& j2)
 {
-    json j3 = j1;
-    json j4 = j2;
+    jsoncons::json j3 = j1;
+    jsoncons::json j4 = j2;
 
     j3.swap(j4);
     CHECK(j1 == j4);
@@ -24,16 +24,16 @@ void check_swap(const json& j1, const json& j2)
 
 TEST_CASE("test_swap")
 {
-    json j1 = json::null();
-    json j2 = false;
-    json j3 = -2000;
-    json j4 = 2000U;
-    json j5 = 2000.1234;
-    json j6 = "Small";
-    json j7 = "String too large for small string";
-    json j8 = json::parse("[1,2,3,4]");
-    json j9;
-    json j10 = json(json_object_arg);
+    jsoncons::json j1 = jsoncons::json::null();
+    jsoncons::json j2 = false;
+    jsoncons::json j3 = -2000;
+    jsoncons::json j4 = 2000U;
+    jsoncons::json j5 = 2000.1234;
+    jsoncons::json j6 = "Small";
+    jsoncons::json j7 = "String too large for small string";
+    jsoncons::json j8 = jsoncons::json::parse("[1,2,3,4]");
+    jsoncons::json j9;
+    jsoncons::json j10 = jsoncons::json(jsoncons::json_object_arg);
     j10["Name"] = "John Smith";
 
     check_swap(j1,j1);

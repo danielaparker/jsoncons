@@ -14,7 +14,7 @@
 #include <system_error>
 #include <utility>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
 

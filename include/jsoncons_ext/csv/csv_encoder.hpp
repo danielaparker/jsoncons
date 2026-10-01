@@ -15,7 +15,7 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>

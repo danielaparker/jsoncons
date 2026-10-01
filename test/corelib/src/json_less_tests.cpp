@@ -13,11 +13,11 @@ using namespace jsoncons;
 
 TEST_CASE("json null less")
 {
-    json j1 = null_type();
+    jsoncons::json j1 = jsoncons::null_type();
 
     SECTION("empty object")
     {
-        json j2;
+        jsoncons::json j2;
 
         CHECK(j1 < j2);
         CHECK_FALSE(j2 < j1);
@@ -25,7 +25,7 @@ TEST_CASE("json null less")
 
     SECTION("object")
     {
-        json j2;
+        jsoncons::json j2;
         j2["a"] = 1;
         j2["b"] = 3;
         j2["c"] = 3;
@@ -37,25 +37,25 @@ TEST_CASE("json null less")
 
 TEST_CASE("json empty object less")
 {
-    json j1;
+    jsoncons::json j1;
 
     SECTION("empty object")
     {
-        json j2;
+        jsoncons::json j2;
 
         CHECK_FALSE(j1 < j2);
     }
 
     SECTION("object with no members")
     {
-        json j2(json_object_arg);
+        jsoncons::json j2(jsoncons::json_object_arg);
 
         CHECK_FALSE(j1 < j2);
     }
 
     SECTION("object with members")
     {
-        json j2;
+        jsoncons::json j2;
         j2["a"] = 1;
         j2["b"] = 3;
         j2["c"] = 3;
@@ -66,8 +66,8 @@ TEST_CASE("json empty object less")
 
 TEST_CASE("json bool less")
 {
-    json jtrue = true;
-    json jfalse = false;
+    jsoncons::json jtrue = true;
+    jsoncons::json jfalse = false;
 
     SECTION("bool")
     {
@@ -77,7 +77,7 @@ TEST_CASE("json bool less")
 
     SECTION("null")
     {
-        json j = null_type();
+        jsoncons::json j = jsoncons::null_type();
         CHECK(j < jfalse);
         CHECK(j < jtrue);
     }
@@ -87,8 +87,8 @@ TEST_CASE("json integer less")
 {
     SECTION("-1 < 3")
     {
-        json lhs(-1);
-        json rhs(3);
+        jsoncons::json lhs(-1);
+        jsoncons::json rhs(3);
 
         CHECK(lhs < rhs);
         CHECK(lhs <= rhs);
@@ -97,8 +97,8 @@ TEST_CASE("json integer less")
     }
     SECTION("-1 < uint64_t(3)")
     {
-        json lhs(-1);
-        json rhs(uint64_t(3));
+        jsoncons::json lhs(-1);
+        jsoncons::json rhs(uint64_t(3));
 
         CHECK(lhs < rhs);
         CHECK(lhs <= rhs);
@@ -109,25 +109,25 @@ TEST_CASE("json integer less")
 
 TEST_CASE("json short string less")
 {
-    json j1 = "bcd";
+    jsoncons::json j1 = "bcd";
 
     SECTION("short string")
     {
-        json j2 = "cde";
+        jsoncons::json j2 = "cde";
         CHECK(j1 < j2);
         CHECK_FALSE(j2 < j1);
-        json j3 = "bcda";
+        jsoncons::json j3 = "bcda";
         CHECK(j1 < j3);
         CHECK_FALSE(j3 < j1);
     }
 
     SECTION("long string")
     {
-        json j2 = "string too long for short string";
+        jsoncons::json j2 = "string too long for short string";
         CHECK(j1 < j2);
         CHECK_FALSE(j2 < j1);
 
-        json j3 = "a string too long for short string";
+        jsoncons::json j3 = "a string too long for short string";
         CHECK(j3 < j1);
         CHECK_FALSE(j1 < j3);
     }
@@ -135,21 +135,21 @@ TEST_CASE("json short string less")
 
 TEST_CASE("json long string less")
 {
-    json j1 = "a string too long for short string";
+    jsoncons::json j1 = "a string too long for short string";
 
     SECTION("short string")
     {
-        json j2 = "a s";
+        jsoncons::json j2 = "a s";
         CHECK(j2 < j1);
         CHECK_FALSE(j1 < j2);
-        json j3 = "bcd";
+        jsoncons::json j3 = "bcd";
         CHECK(j1 < j3);
         CHECK_FALSE(j3 < j1);
     }
 
     SECTION("long string")
     {
-        json j2 = "string too long for short string";
+        jsoncons::json j2 = "string too long for short string";
         CHECK(j1 < j2);
         CHECK_FALSE(j2 < j1);
     }
@@ -157,14 +157,14 @@ TEST_CASE("json long string less")
 
 TEST_CASE("json array of string less")
 {
-    json j1(json_array_arg);
+    jsoncons::json j1(jsoncons::json_array_arg);
     j1.push_back("b");
     j1.push_back("c");
     j1.push_back("d");
 
     SECTION("array")
     {
-        json j2(json_array_arg);
+        jsoncons::json j2(jsoncons::json_array_arg);
         j2.push_back("a");
         j2.push_back("b");
         j2.push_back("c");

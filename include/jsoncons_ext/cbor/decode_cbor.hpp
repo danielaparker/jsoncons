@@ -13,12 +13,12 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/reflect/decode_traits.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -28,8 +28,8 @@ namespace jsoncons {
 namespace cbor {
 
 template <typename T,typename BytesViewLike>
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -53,8 +53,8 @@ try_decode_cbor(const BytesViewLike& v,
 }
 
 template <typename T,typename BytesViewLike>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -72,7 +72,7 @@ try_decode_cbor(const BytesViewLike& v,
 }
 
 template <typename T>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(std::istream& is, 
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -96,7 +96,7 @@ try_decode_cbor(std::istream& is,
 }
  
 template <typename T>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(std::istream& is, 
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -114,7 +114,7 @@ try_decode_cbor(std::istream& is,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(InputIt first, InputIt last,
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -138,7 +138,7 @@ try_decode_cbor(InputIt first, InputIt last,
 }
 
 template <typename T,typename InputIt>
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(InputIt first, InputIt last,
     const cbor_decode_options& options = cbor_decode_options())
 {
@@ -158,8 +158,8 @@ try_decode_cbor(InputIt first, InputIt last,
 // With leading allocator_set parameter
 
 template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
@@ -184,8 +184,8 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename BytesViewLike,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value &&
+                        nonstd::is_bytes_view_like<BytesViewLike>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     const BytesViewLike& v, 
     const cbor_decode_options& options = cbor_decode_options())
@@ -204,7 +204,7 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
     std::istream& is, 
     const cbor_decode_options& options = cbor_decode_options())
@@ -232,7 +232,7 @@ try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
 }
 
 template <typename T,typename Alloc,typename TempAlloc >
-typename std::enable_if<!ext_traits::is_basic_json<T>::value,read_result<T>>::type 
+typename std::enable_if<!nonstd::is_basic_json<T>::value,read_result<T>>::type 
 try_decode_cbor(const allocator_set<Alloc,TempAlloc>& aset,
             std::istream& is, 
             const cbor_decode_options& options = cbor_decode_options())

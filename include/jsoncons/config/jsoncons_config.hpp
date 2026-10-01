@@ -15,13 +15,13 @@
 #include <stdexcept>
 #include <string>
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/a5hash.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/nonstd/a5hash.hpp>
 
 namespace jsoncons {
 
-    using jsoncons::detail::a5hash;
-    using jsoncons::detail::a5hash32;
+    using jsoncons::nonstd::a5hash;
+    using jsoncons::nonstd::a5hash32;
 
     class assertion_error : public std::runtime_error
     {
@@ -51,9 +51,9 @@ namespace jsoncons {
             JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
 
-#include <jsoncons/detail/utility.hpp>
+#include <jsoncons/nonstd/utility.hpp>
 namespace jsoncons {
-using jsoncons::detail::in_place_t;
+using jsoncons::nonstd::in_place_t;
 JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
 } // namespace jsoncons
 
@@ -66,25 +66,25 @@ JSONCONS_INLINE_CONSTEXPR in_place_t in_place{};
   JSONCONS_INLINE_CONSTEXPR unexpect_t unexpect{};
   } // namespace jsoncons
 #else
-  #include <jsoncons/detail/expected.hpp>
+  #include <jsoncons/nonstd/expected.hpp>
   namespace jsoncons {
-  using jsoncons::detail::expected;
-  using jsoncons::detail::unexpect_t;
-  using jsoncons::detail::unexpect;
+  using jsoncons::nonstd::expected;
+  using jsoncons::nonstd::unexpect_t;
+  using jsoncons::nonstd::unexpect;
   } // namespace jsoncons
 #endif
         
-#include <jsoncons/detail/make_obj_using_allocator.hpp>
+#include <jsoncons/nonstd/make_obj_using_allocator.hpp>
 namespace jsoncons {
-using jsoncons::detail::make_obj_using_allocator;
+using jsoncons::nonstd::make_obj_using_allocator;
 } // namespace jsoncons
 
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
-#include <jsoncons/detail/string_view.hpp>
+#include <jsoncons/nonstd/string_view.hpp>
 namespace jsoncons {
-using jsoncons::detail::basic_string_view;
-using string_view = jsoncons::detail::string_view;
-using wstring_view = jsoncons::detail::wstring_view;
+using jsoncons::nonstd::basic_string_view;
+using string_view = jsoncons::nonstd::string_view;
+using wstring_view = jsoncons::nonstd::wstring_view;
 } // namespace jsoncons
 #else 
 #include <string_view>
@@ -101,9 +101,9 @@ namespace jsoncons {
 using std::span;
 }
 #else
-#include <jsoncons/detail/span.hpp>
+#include <jsoncons/nonstd/span.hpp>
 namespace jsoncons {
-using jsoncons::detail::span;
+using jsoncons::nonstd::span;
 }
 #endif
 
@@ -118,16 +118,16 @@ using jsoncons::detail::span;
     using boost::optional;
     }
 #else 
-    #include <jsoncons/detail/optional.hpp>
+    #include <jsoncons/nonstd/optional.hpp>
     namespace jsoncons {
-    using jsoncons::detail::optional;
+    using jsoncons::nonstd::optional;
 }
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
 #if !defined(JSONCONS_HAS_STD_ENDIAN)
-#include <jsoncons/detail/endian.hpp>
+#include <jsoncons/nonstd/endian.hpp>
 namespace jsoncons {
-using jsoncons::detail::endian;
+using jsoncons::nonstd::endian;
 }
 #else
 #include <bit>
@@ -251,6 +251,46 @@ namespace jsoncons {
     }
 
 } // namespace jsoncons
+
+#if defined(__cplusplus) && __cplusplus >= 202002L && __has_include(<bit>)
+#include <bit>
+namespace jsoncons {
+template <typename T>
+int bit_width(T x) noexcept
+{
+    return std::bit_width(x);
+}
+template <typename T>
+int countl_zero(T x) noexcept
+{
+    return std::countl_zero(x);
+}
+template <typename T>
+int countr_zero(T x) noexcept
+{
+    return std::countr_zero(x);
+}
+} // namespace jsoncons
+#else
+#include <jsoncons/nonstd/bit.hpp>
+namespace jsoncons {
+template <typename T>
+int bit_width(T x) noexcept
+{
+    return jsoncons::nonstd::bit_width(x);
+}
+template <typename T>
+int countl_zero(T x) noexcept
+{
+    return jsoncons::nonstd::countl_zero(x);
+}
+template <typename T>
+int countr_zero(T x) noexcept
+{
+    return jsoncons::nonstd::countr_zero(x);
+}
+} // namespace jsoncons
+#endif
 
 // Preprocessor macros
 

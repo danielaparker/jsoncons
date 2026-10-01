@@ -9,7 +9,7 @@
 
 #include <string> // std::string
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 

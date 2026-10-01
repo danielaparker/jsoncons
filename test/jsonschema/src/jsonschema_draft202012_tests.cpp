@@ -18,7 +18,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 namespace {
  
-    json resolver(const jsoncons::uri& uri)
+    jsoncons::json resolver(const jsoncons::uri& uri)
     {
         //std::cout << uri.string() << ", " << uri.path() << "\n";
         std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
@@ -27,14 +27,14 @@ namespace {
         std::fstream is(pathname.c_str());
         if (!is)
         {
-            return json::null();
+            return jsoncons::json::null();
         }
 
-        return json::parse(is);       
+        return jsoncons::json::parse(is);       
     }
 
     void jsonschema_tests(const std::string& fpath,
-        jsonschema::evaluation_options options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()))
+        jsonschema::evaluation_options options = jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()))
     {
         std::fstream is(fpath);
         if (!is)
@@ -43,7 +43,7 @@ namespace {
             return;
         }
 
-        json tests = json::parse(is); 
+        jsoncons::json tests = jsoncons::json::parse(is); 
         //std::cout << pretty_print(tests) << "\n";
 
         int count = 0;
@@ -52,7 +52,7 @@ namespace {
             ++count;
             try
             {
-                jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
+                jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
                     options);
 
                 int count_test = 0;
@@ -104,10 +104,10 @@ TEST_CASE("jsonschema draft2020-12 tests")
     SECTION("issues")
     {
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-uri.json",
-        //    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+        //    jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
         //    require_format_validation(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
             require_format_validation(true));
     }
 
@@ -115,7 +115,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
     {
         // unevaluated-tests.json is from https://github.com/networknt/json-schema-validator/tree/master/src/test/resources/schema/unevaluatedTests
         //jsonschema_tests("./jsonschema/more_tests/draft2020-12/unevaluated-tests.json",
-        //    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+        //    jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
         //        compatibility_mode(true));
     }
     SECTION("tests")
@@ -180,50 +180,50 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/uniqueItems.json"); 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/vocabulary.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/dependencies-compatibility.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 compatibility_mode(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/bignum.json");
 
         // format tests
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/date.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/date-time.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/ecmascript-regex.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/email.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/hostname.json",
-        //    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+        //    jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
         //        require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/idn-email.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/idn-hostname.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/ipv4.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/ipv6.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/iri.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/iri-reference.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/json-pointer.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/regex.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/relative-json-pointer.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/time.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
                 require_format_validation(true));
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
             require_format_validation(true));
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri-reference.json",
-            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
+            jsonschema::evaluation_options{}.default_version(jsoncons::jsonschema::schema_version::draft202012()).
             require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri-reference.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri-template.json");

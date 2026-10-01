@@ -13,12 +13,12 @@
 #include <system_error>
 #include <utility> // std::move
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
 

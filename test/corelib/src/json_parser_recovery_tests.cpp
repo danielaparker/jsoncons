@@ -15,23 +15,23 @@ TEST_CASE("test_array_extra_comma")
     {
         allow_trailing_commas err_handler;
 
-        json expected = json::parse("[1,2,3]");
+        jsoncons::json expected = jsoncons::json::parse("[1,2,3]");
 
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
         .err_handler(err_handler);
-        json val = json::parse("[1,2,3,]", options);
+        jsoncons::json val = jsoncons::json::parse("[1,2,3,]", options);
 
         CHECK(expected == val);
     }
 #endif
     SECTION("with option")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .allow_trailing_comma(true);
 
-        json expected = json::parse("[1,2,3]");
+        jsoncons::json expected = jsoncons::json::parse("[1,2,3]");
 
-        json val1 = json::parse("[1,2,3,]", options);
+        jsoncons::json val1 = jsoncons::json::parse("[1,2,3,]", options);
 
         CHECK(expected == val1);
     }
@@ -44,7 +44,7 @@ TEST_CASE("test_object_extra_comma")
     {
         allow_trailing_commas err_handler;
 
-        json expected = json::parse(R"(
+        jsoncons::json expected = jsoncons::json::parse(R"(
     {
         "first" : 1,
         "second" : 2
@@ -52,7 +52,7 @@ TEST_CASE("test_object_extra_comma")
     )",
             err_handler);
 
-        json val = json::parse(R"(
+        jsoncons::json val = jsoncons::json::parse(R"(
     {
         "first" : 1,
         "second" : 2,
@@ -65,17 +65,17 @@ TEST_CASE("test_object_extra_comma")
 #endif
     SECTION("with option")
     {
-        auto options = json_options{}
+        auto options = jsoncons::json_options{}
             .allow_trailing_comma(true);
 
-        json expected = json::parse(R"(
+        jsoncons::json expected = jsoncons::json::parse(R"(
     {
         "first" : 1,
         "second" : 2
     }
     )", options);
 
-        json val = json::parse(R"(
+        jsoncons::json val = jsoncons::json::parse(R"(
     {
         "first" : 1,
         "second" : 2,
@@ -91,7 +91,7 @@ TEST_CASE("test json_parser error recovery")
 #if !defined(JSONCONS_NO_DEPRECATED)
     SECTION("illegal control character")
     {
-        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+        auto err_handler = [](const std::error_code& ec, const jsoncons::ser_context&) noexcept -> bool
             {
                 return ec == json_errc::illegal_control_character;
             };
@@ -109,7 +109,7 @@ TEST_CASE("test json_parser error recovery")
     }
     SECTION("\r")
     {
-        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+        auto err_handler = [](const std::error_code& ec, const jsoncons::ser_context&) noexcept -> bool
             {
                 return ec == json_errc::illegal_character_in_string;
             };
@@ -130,7 +130,7 @@ TEST_CASE("test json_parser error recovery")
     }
     SECTION("\n")
     {
-        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+        auto err_handler = [](const std::error_code& ec, const jsoncons::ser_context&) noexcept -> bool
             {
                 return ec == json_errc::illegal_character_in_string;
             };

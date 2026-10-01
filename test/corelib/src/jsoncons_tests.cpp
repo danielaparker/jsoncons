@@ -16,20 +16,20 @@ using namespace jsoncons;
  
 TEST_CASE("test_assignment")
 {
-    json root;
+    jsoncons::json root;
 
     root["double_1"] = 10.0;
 
-    json double_1 = root["double_1"];
+    jsoncons::json double_1 = root["double_1"];
 
-    root["myobject"] = json();
+    root["myobject"] = jsoncons::json();
     root["myobject"]["double_2"] = 7.0;
     root["myobject"]["bool_2"] = true;
     root["myobject"]["int_2"] = 0LL;
     root["myobject"]["string_2"] = "my string";
-    root["myarray"] = json(json_array_arg);
+    root["myarray"] = jsoncons::json(jsoncons::json_array_arg);
 
-    json double_2 = root["myobject"]["double_2"];
+    jsoncons::json double_2 = root["myobject"]["double_2"];
     CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
 
     CHECK(double_2.as<double>() == Approx(7.0).epsilon(0.000001));
@@ -45,18 +45,18 @@ TEST_CASE("test_assignment")
 
 TEST_CASE("test_1")
 {
-    basic_json<char32_t> j; 
+    jsoncons::basic_json<char32_t> j; 
 
     std::basic_ostringstream<char32_t> os;
 
-    std::cout << sizeof(json) << '\n';
+    std::cout << sizeof(jsoncons::json) << '\n';
 
     //os << j << U"\n";
 }
 
 TEST_CASE("test_shrink_to_fit")
 {
-    json val = json::make_array(3);
+    jsoncons::json val = jsoncons::json::make_array(3);
     val.reserve(100);
     val[0].reserve(100);
     val[0]["key"] = "value";
@@ -68,7 +68,7 @@ TEST_CASE("test_shrink_to_fit")
 TEST_CASE("test_for_each_value")
 {
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
-    json val = json::parse(input);
+    jsoncons::json val = jsoncons::json::parse(input);
 
     auto it = val.object_range().begin();
 
@@ -83,19 +83,19 @@ TEST_CASE("test_for_each_value")
 
 TEST_CASE("test_array")
 {
-    json root;
+    jsoncons::json root;
 
     root["addresses"];
 
-    std::vector<json> addresses;
-    json address1;
+    std::vector<jsoncons::json> addresses;
+    jsoncons::json address1;
     address1["city"] = "San Francisco";
     address1["state"] = "CA";
     address1["zip"] = "94107";
     address1["country"] = "USA";
     addresses.push_back(address1);
 
-    json address2;
+    jsoncons::json address2;
     address2["city"] = "Sunnyvale";
     address2["state"] = "CA";
     address2["zip"] = "94085";
@@ -110,13 +110,13 @@ TEST_CASE("test_array")
 
 TEST_CASE("test_null")
 {
-    json nullval = json::null();
+    jsoncons::json nullval = jsoncons::json::null();
     CHECK(nullval.is_null());
     CHECK(nullval.is<jsoncons::null_type>());
 
-    json obj;
-    obj["field"] = json::null();
-    CHECK(obj["field"] == json::null());
+    jsoncons::json obj;
+    obj["field"] = jsoncons::json::null();
+    CHECK(obj["field"] == jsoncons::json::null());
 }
 
 TEST_CASE("test_to_string")
@@ -137,7 +137,7 @@ TEST_CASE("test_to_string")
        << "}";
 
 
-    json root = json::parse(os.str());
+    jsoncons::json root = jsoncons::json::parse(os.str());
 
     CHECK(root["null"].is_null());
     CHECK(root["null"].is<jsoncons::null_type>());
@@ -162,7 +162,7 @@ TEST_CASE("test_u0000")
 {
     std::string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     //std::cout << "Input:    " << inputStr << '\n';
-    json arr = json::parse(inputStr);
+    jsoncons::json arr = jsoncons::json::parse(inputStr);
 
     std::string s = arr[0].as<std::string>();
     REQUIRE(4 == s.length());
@@ -181,7 +181,7 @@ TEST_CASE("test_u0000")
 TEST_CASE("test_uHHHH")
 {
     std::string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
-    json arr = json::parse(inputStr);
+    jsoncons::json arr = jsoncons::json::parse(inputStr);
 
     std::string s = arr[0].as<std::string>();
     REQUIRE(6 == s.length());
@@ -193,12 +193,12 @@ TEST_CASE("test_uHHHH")
     CHECK(static_cast<uint8_t>(s[5]) == 0x80);
 
     std::ostringstream os;
-    auto options = json_options{}
+    auto options = jsoncons::json_options{}
         .escape_all_non_ascii(true);
     arr.dump(os, options);
     std::string outputStr = os.str();
 
-    json arr2 = json::parse(outputStr);
+    jsoncons::json arr2 = jsoncons::json::parse(outputStr);
     std::string s2 = arr2[0].as<std::string>();
     REQUIRE(6 == s2.length());
     CHECK(static_cast<uint8_t>(s2[0]) == 0x7f);
@@ -219,7 +219,7 @@ TEST_CASE("test_multiline_comments")
         std::cout << "Cannot open " << path << '\n';
         return;
     }
-    json j = json::parse(is);
+    jsoncons::json j = jsoncons::json::parse(is);
 
     CHECK(j.is_array());
     CHECK(0 == j.size());

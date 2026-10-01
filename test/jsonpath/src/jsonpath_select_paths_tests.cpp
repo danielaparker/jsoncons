@@ -25,7 +25,7 @@ using namespace jsoncons;
 TEST_CASE("jsonpath.jsonpath select_paths test")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -49,11 +49,11 @@ TEST_CASE("jsonpath.jsonpath select_paths test")
 }
     )";
 
-    json doc = json::parse(json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("test 1")
     {
-        auto expr = jsonpath::make_expression<json>("$..book[?(@.category == 'fiction')].title");
+        auto expr = jsonpath::make_expression<jsoncons::json>("$..book[?(@.category == 'fiction')].title");
         auto result = expr.select_paths(doc);
 
         for (const auto& loc : result)

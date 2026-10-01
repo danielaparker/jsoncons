@@ -11,9 +11,9 @@
 #include <memory>
 #include <string>
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/read_number.hpp>
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/utility/number_readers.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 

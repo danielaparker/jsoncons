@@ -50,7 +50,7 @@ namespace {
             return aNormalizedPath;
         }
 
-        void custom_visit(const ser_context& context)
+        void custom_visit(const jsoncons::ser_context& context)
         {
             if (check)
             {
@@ -77,7 +77,7 @@ namespace {
             alreadyUpdated = false;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
         {
             //If we are in an array of objects and we are at the same depth (current_.size()) of the object 
             if (arrayObjects_.size() > 0 && arrayObjects_.back() == current_.size())
@@ -97,14 +97,14 @@ namespace {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const jsoncons::ser_context&, std::error_code&) override
         {
             current_.pop_back();
             check = false;
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& key, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_key(const string_view_type& key, const jsoncons::ser_context&, std::error_code&) override
         {
             if (!current_.empty())
             {
@@ -114,7 +114,7 @@ namespace {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
         {
             current_.emplace_back(std::to_string(0));
             arrayIndexes.emplace_back(std::make_pair(current_.size()-1,0));
@@ -122,7 +122,7 @@ namespace {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const jsoncons::ser_context&, std::error_code&) override
         {
             current_.pop_back();
             arrayIndexes.pop_back();
@@ -137,30 +137,30 @@ namespace {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_null(jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code&) override
         {
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, semantic_tag, const ser_context& context, std::error_code&) override
-        {
-            custom_visit(context);
-            JSONCONS_VISITOR_RETURN;
-        }
-
-        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t, semantic_tag, const ser_context& context, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, jsoncons::semantic_tag, const jsoncons::ser_context& context, std::error_code&) override
         {
             custom_visit(context);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_double(double, semantic_tag, const ser_context& context, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_int64(int64_t, jsoncons::semantic_tag, const jsoncons::ser_context& context, std::error_code&) override
         {
             custom_visit(context);
             JSONCONS_VISITOR_RETURN;
         }
 
-        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool, semantic_tag, const ser_context& context, std::error_code&) override
+        JSONCONS_VISITOR_RETURN_TYPE visit_double(double, jsoncons::semantic_tag, const jsoncons::ser_context& context, std::error_code&) override
+        {
+            custom_visit(context);
+            JSONCONS_VISITOR_RETURN;
+        }
+
+        JSONCONS_VISITOR_RETURN_TYPE visit_bool(bool, jsoncons::semantic_tag, const jsoncons::ser_context& context, std::error_code&) override
         {
             custom_visit(context);
             JSONCONS_VISITOR_RETURN;

@@ -25,25 +25,25 @@ namespace jsonpath = jsoncons::jsonpath;
 
 TEST_CASE("jsonpath custom function test")
 {
-    json root;
+    jsoncons::json root;
     JSONCONS_TRY
     {
-        root = json::parse(R"({ "foo": 60,"bar": 10 })");
+        root = jsoncons::json::parse(R"({ "foo": 60,"bar": 10 })");
     }
     JSONCONS_CATCH (const jsoncons::ser_error& e)
     {
         std::cout << e.what() << '\n';
     }
 
-    jsonpath::custom_functions<json> functions;
+    jsonpath::custom_functions<jsoncons::json> functions;
     functions.register_function("divide", // function name
          2,        // number of arguments   
-         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         [](jsoncons::span<const jsonpath::parameter<jsoncons::json>> params, std::error_code& ec) -> jsoncons::json 
          {
             if (!(params[0].value().is_number() && params[1].value().is_number())) 
             {
                 ec = jsonpath::jsonpath_errc::invalid_type; 
-                return json::null();
+                return jsoncons::json::null();
             }
             return json(params[0].value().as<double>() / params[1].value().as<double>());
          }
@@ -51,26 +51,26 @@ TEST_CASE("jsonpath custom function test")
 
     SECTION("test 1")
     {
-        auto expr = jsonpath::make_expression<json>("divide(@.foo, @.bar)", functions);
+        auto expr = jsonpath::make_expression<jsoncons::json>("divide(@.foo, @.bar)", functions);
         auto r = expr.evaluate(root);
         REQUIRE(!r.empty());
-        CHECK(json(6) == r[0]);
+        CHECK(jsoncons::json(6) == r[0]);
     }
 
     SECTION("test 2")
     {
         auto r = jsonpath::json_query(root, "divide($.foo, $.bar)", jsonpath::result_options(), functions);
         REQUIRE(!r.empty());
-        CHECK(json(6) == r[0]);
+        CHECK(jsoncons::json(6) == r[0]);
     }
 
     SECTION("test 3")
     {
-        json r;
+        jsoncons::json r;
         jsonpath::json_query(root, "divide($.foo, $.bar)", 
-            [&](const std::string&, const json& val) {r = val; },
+            [&](const std::string&, const jsoncons::json& val) {r = val; },
                              jsonpath::result_options(), functions);
-        CHECK(json(6) == r);
+        CHECK(jsoncons::json(6) == r);
     }
 }
 

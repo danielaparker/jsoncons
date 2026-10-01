@@ -18,30 +18,30 @@ TEST_CASE("test_round_trip")
     {
         std::ostringstream os;
         double d = 42.229999999999997;
-        json j = d;
+        jsoncons::json j = d;
         os << j;
-        CHECK(json::parse(os.str()).as<double>() == d);
+        CHECK(jsoncons::json::parse(os.str()).as<double>() == d);
     }
     {
         std::ostringstream os;
         double d = 9.0099999999999998;
-        json j = d;
+        jsoncons::json j = d;
         os << j;
-        CHECK(json::parse(os.str()).as<double>() == d);
+        CHECK(jsoncons::json::parse(os.str()).as<double>() == d);
     }
     {
         std::ostringstream os;
         double d = 13.449999999999999;
-        json j = d;
+        jsoncons::json j = d;
         os << j;
-        CHECK(json::parse(os.str()).as<double>() == d);
+        CHECK(jsoncons::json::parse(os.str()).as<double>() == d);
     }
     {
         std::ostringstream os;
         double d = 0.000071;
-        json j = d;
+        jsoncons::json j = d;
         os << j;
-        CHECK(json::parse(os.str()).as<double>() == d);
+        CHECK(jsoncons::json::parse(os.str()).as<double>() == d);
     }
 }
 

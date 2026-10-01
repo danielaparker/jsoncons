@@ -20,7 +20,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema validation report tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://test.com/schema",
@@ -46,7 +46,7 @@ TEST_CASE("jsonschema validation report tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -58,20 +58,20 @@ TEST_CASE("jsonschema validation report tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"({"fails":"value"})");
+        jsoncons::json data = jsoncons::json::parse(R"({"fails":"value"})");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
     SECTION("Test 2")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -99,14 +99,14 @@ TEST_CASE("jsonschema validation report tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
 
-        json data = json::parse(R"({"multi":3.5})");
+        jsoncons::json data = jsoncons::json::parse(R"({"multi":3.5})");
 
         compiled.validate(data, decoder);
 
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -114,7 +114,7 @@ TEST_CASE("jsonschema validation report tests")
 
 TEST_CASE("jsonschema prefixItems report tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "type": "array",
   "prefixItems": [
@@ -129,7 +129,7 @@ TEST_CASE("jsonschema prefixItems report tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -141,16 +141,16 @@ TEST_CASE("jsonschema prefixItems report tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
             [1600, "Pennsylvania", "Avenue", "NW", "Washington"]
         )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -158,7 +158,7 @@ TEST_CASE("jsonschema prefixItems report tests")
 
 TEST_CASE("jsonschema items-additionalItems report tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "type": "array",
@@ -174,7 +174,7 @@ TEST_CASE("jsonschema items-additionalItems report tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -186,16 +186,16 @@ TEST_CASE("jsonschema items-additionalItems report tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
             [1600, "Pennsylvania", "Avenue", "NW", "Washington"]
         )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -203,7 +203,7 @@ TEST_CASE("jsonschema items-additionalItems report tests")
 
 TEST_CASE("jsonschema additionalProperties output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "type": "object",
   "properties": {
@@ -217,7 +217,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -229,16 +229,16 @@ TEST_CASE("jsonschema additionalProperties output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 { "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
 )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -246,7 +246,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
 
 TEST_CASE("jsonschema unevaluatedProperties output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "allOf": [
     {
@@ -270,7 +270,7 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -282,10 +282,10 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 {
   "street_address": "1600 Pennsylvania Avenue NW",
   "city": "Washington",
@@ -297,14 +297,14 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
     }
 }
 
 TEST_CASE("jsonschema unevaluatedItems output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "prefixItems": [
     { "type": "string" }, { "type": "number" }
@@ -315,7 +315,7 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -327,16 +327,16 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 ["foo", 42, null]
         )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -413,7 +413,7 @@ TEST_CASE("jsonschema items output tests")
 )";
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -490,7 +490,7 @@ TEST_CASE("jsonschema items output tests")
 }
 TEST_CASE("jsonschema more output tests 2")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "$id":"http://schemarepo.org/schemas/user.json",
   "$schema":"http://json-schema.org/draft-07/schema#",
@@ -534,7 +534,7 @@ TEST_CASE("jsonschema more output tests 2")
 
     SECTION("With ref")
     {
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 {
   "member":{
       "age":5,  // doesn't meet minimum
@@ -544,7 +544,7 @@ TEST_CASE("jsonschema more output tests 2")
 }
         )");
             
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -597,7 +597,7 @@ TEST_CASE("jsonschema more output tests 2")
 
 TEST_CASE("jsonschema more output tests 3")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "example-schema",
@@ -619,13 +619,13 @@ TEST_CASE("jsonschema more output tests 3")
 
     SECTION("With ref")
     {
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 {
   "baz": 42
 }
         )");
             
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -655,7 +655,7 @@ TEST_CASE("jsonschema more output tests 3")
 
 TEST_CASE("jsonschema more output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "$id": "https://example.com/polygon",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -678,7 +678,7 @@ TEST_CASE("jsonschema more output tests")
     
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -705,7 +705,7 @@ TEST_CASE("jsonschema more output tests")
         )");
 
 
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 [
   {
     "x": 2.5,
@@ -729,7 +729,7 @@ TEST_CASE("jsonschema more output tests")
 
 TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "type": "object",
   "properties": {
@@ -743,7 +743,7 @@ TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -755,16 +755,16 @@ TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 { "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
 )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -772,7 +772,7 @@ TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
 
 TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "type": "object",
   "properties": {
@@ -786,7 +786,7 @@ TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -798,16 +798,16 @@ TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 { "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
 )");
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
@@ -815,7 +815,7 @@ TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
 
 TEST_CASE("jsonschema with 'oneOf' output tests")
 {
-    json schema = json::parse(R"(
+    jsoncons::json schema = jsoncons::json::parse(R"(
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "/test_schema",
@@ -842,7 +842,7 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
 
     SECTION("Test 1")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
 [
     {
         "valid": false,
@@ -854,10 +854,10 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
 ]
         )");
 
-        jsoncons::json_decoder<ojson> decoder;    
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;    
+        jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema);
     
-        json data = json::parse(R"(
+        jsoncons::json data = jsoncons::json::parse(R"(
 {
     "One" : "test",
     "Two" : "test"
@@ -866,7 +866,7 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
     
         compiled.validate(data, decoder);
         
-        ojson output = decoder.get_result();
+        jsoncons::ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }

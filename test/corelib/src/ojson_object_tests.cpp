@@ -20,7 +20,7 @@ TEST_CASE("ojson insert(first,last) test")
         std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
         std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
 
-        ojson doc;
+        jsoncons::ojson doc;
         doc.insert(m1.begin(),m1.end());
         doc.insert(m2.begin(),m2.end());
 
@@ -40,7 +40,7 @@ TEST_CASE("ojson insert(first,last) test")
         std::map<std::string, double> m1 = {{"f", 4}, {"e", 5}, {"d", 6}, {"e", 7}};
         std::map<std::string, double> m2 = {{"c", 1}, {"b", 2}, {"a", 3}, {"b", 3}, {"e", 5}};
 
-        ojson doc;
+        jsoncons::ojson doc;
         doc.insert(m1.begin(), m1.end());
         doc.insert(m2.begin(), m2.end());
 
@@ -61,7 +61,7 @@ TEST_CASE("ojson parse_duplicate_names")
 {
     SECTION("duplicates at front")
     {
-        ojson doc = ojson::parse(R"({"first":1,"first":2,"second":2,"third":3})");
+        jsoncons::ojson doc = jsoncons::ojson::parse(R"({"first":1,"first":2,"second":2,"third":3})");
         REQUIRE(3 == doc.size());
         CHECK(1 == doc["first"].as<int>());
         CHECK(2 == doc["second"].as<int>());
@@ -70,7 +70,7 @@ TEST_CASE("ojson parse_duplicate_names")
 
     SECTION("duplicates at back")
     {
-        ojson doc = ojson::parse(R"({"first":1,"second":2,"third":3,"third":4})");
+        jsoncons::ojson doc = jsoncons::ojson::parse(R"({"first":1,"second":2,"third":3,"third":4})");
         REQUIRE(3 == doc.size());
         CHECK(1 == doc["first"].as<int>());
         CHECK(2 == doc["second"].as<int>());
@@ -79,7 +79,7 @@ TEST_CASE("ojson parse_duplicate_names")
 
     SECTION("duplicates at endpoints")
     {
-        ojson doc = ojson::parse(R"({"first":1,"second":2,"third":3,"first":4})");
+        jsoncons::ojson doc = jsoncons::ojson::parse(R"({"first":1,"second":2,"third":3,"first":4})");
         REQUIRE(3 == doc.size());
         CHECK(1 == doc["first"].as<int>());
         CHECK(2 == doc["second"].as<int>());
@@ -110,7 +110,7 @@ TEST_CASE("ojson parse_duplicate_names")
         }
         str.push_back('}');
 
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
         CHECK(expected == j);
     }
 
@@ -138,7 +138,7 @@ TEST_CASE("ojson parse_duplicate_names")
         }
         str.push_back('}');
 
-        auto j = ojson::parse(str);
+        auto j = jsoncons::ojson::parse(str);
         CHECK(expected == j);
     }
 
@@ -175,7 +175,7 @@ TEST_CASE("ojson object erase with iterator")
 {
     SECTION("ojson erase with iterator")
     {
-        ojson doc(jsoncons::json_object_arg);
+        jsoncons::ojson doc(jsoncons::json_object_arg);
 
         doc.try_emplace("a", 1);
         doc.try_emplace("b", 2);
@@ -203,7 +203,7 @@ TEST_CASE("ojson object erase with iterator")
 
     SECTION("ojson erase with iterator 2")
     {
-        ojson doc(jsoncons::json_object_arg);
+        jsoncons::ojson doc(jsoncons::json_object_arg);
 
         doc.try_emplace("a", 1);
         doc.try_emplace("b", 2);
@@ -229,7 +229,7 @@ TEST_CASE("ojson object erase with iterator")
 
     SECTION("ojson erase with iterator 3")
     {
-        ojson doc(jsoncons::json_object_arg);
+        jsoncons::ojson doc(jsoncons::json_object_arg);
 
         doc.try_emplace("c", 1);
         doc.try_emplace("b", 2);
@@ -257,14 +257,14 @@ TEST_CASE("ojson object erase with iterator")
 
 TEST_CASE("test_ojson_merge")
 {
-    ojson doc = ojson::parse(R"(
+    jsoncons::ojson doc = jsoncons::ojson::parse(R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const ojson source = ojson::parse(R"(
+    const ojson source = jsoncons::ojson::parse(R"(
     {
         "a" : 2,
         "c" : 3,
@@ -276,7 +276,7 @@ TEST_CASE("test_ojson_merge")
 
     SECTION("merge doc with source")
     {
-        const ojson expected = ojson::parse(R"(
+        const ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : 1,
             "b" : 2,
@@ -291,7 +291,7 @@ TEST_CASE("test_ojson_merge")
 
     SECTION("merge doc")
     {
-        const ojson expected = ojson::parse(R"(
+        const ojson expected = jsoncons::ojson::parse(R"(
 {"a":1,"b":2,"c":3,"d":4,"e":6}
         )");
         doc.merge(doc.object_range().begin()+1,source);
@@ -303,14 +303,14 @@ TEST_CASE("test_ojson_merge")
 
 TEST_CASE("test_ojson_merge_move")
 {
-    ojson doc = ojson::parse(R"(
+    jsoncons::ojson doc = jsoncons::ojson::parse(R"(
     {
         "a" : "1",
         "d" : [1,2,3]
     }
     )");
 
-    ojson source = ojson::parse(R"(
+    jsoncons::ojson source = jsoncons::ojson::parse(R"(
     {
         "a" : "2",
         "c" : [4,5,6]
@@ -319,7 +319,7 @@ TEST_CASE("test_ojson_merge_move")
 
     SECTION("merge source into doc")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : "1",
             "d" : [1,2,3],
@@ -332,7 +332,7 @@ TEST_CASE("test_ojson_merge_move")
     }
     SECTION("merge source into doc at begin")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : "1",
             "d" : [1,2,3],
@@ -351,14 +351,14 @@ TEST_CASE("test_ojson_merge_move")
 
 TEST_CASE("ojson merge_or_update test")
 {
-    ojson doc = ojson::parse(R"(
+    jsoncons::ojson doc = jsoncons::ojson::parse(R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const ojson source = ojson::parse(R"(
+    const ojson source = jsoncons::ojson::parse(R"(
     {
         "a" : 2,
         "c" : 3
@@ -367,7 +367,7 @@ TEST_CASE("ojson merge_or_update test")
 
     SECTION("merge_or_update source into doc")
     {
-        const ojson expected = ojson::parse(R"(
+        const ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : 2,
             "b" : 2,
@@ -380,7 +380,7 @@ TEST_CASE("ojson merge_or_update test")
 
     SECTION("merge_or_update source into doc at pos 1")
     {
-        const ojson expected = ojson::parse(R"(
+        const ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : 2,
             "b" : 2,
@@ -396,14 +396,14 @@ TEST_CASE("ojson merge_or_update test")
 
 TEST_CASE("test_ojson_merge_or_update_move")
 {
-    ojson doc = ojson::parse(R"(
+    jsoncons::ojson doc = jsoncons::ojson::parse(R"(
     {
         "a" : "1",
         "d" : [1,2,3]
     }
     )");
 
-    ojson source = ojson::parse(R"(
+    jsoncons::ojson source = jsoncons::ojson::parse(R"(
     {
         "a" : "2",
         "c" : [4,5,6]
@@ -412,7 +412,7 @@ TEST_CASE("test_ojson_merge_or_update_move")
 
     SECTION("merge or update doc from source")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : "2",
             "d" : [1,2,3],
@@ -425,7 +425,7 @@ TEST_CASE("test_ojson_merge_or_update_move")
     }
     SECTION("merge or update doc from source at pos")
     {
-        ojson expected = ojson::parse(R"(
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(
         {
             "a" : "2",
             "d" : [1,2,3],

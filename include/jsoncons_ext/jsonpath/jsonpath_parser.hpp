@@ -16,10 +16,10 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 

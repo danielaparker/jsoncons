@@ -50,9 +50,9 @@ TEST_CASE("jsonschema $recursiveRef tests")
 }
     )";
 
-    json tree_schema = json::parse(tree_schema_str);
+    jsoncons::json tree_schema = jsoncons::json::parse(tree_schema_str);
 
-    json strict_tree_schema = json::parse(strict_tree_schema_str);
+    jsoncons::json strict_tree_schema = jsoncons::json::parse(strict_tree_schema_str);
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
@@ -63,10 +63,10 @@ TEST_CASE("jsonschema $recursiveRef tests")
             }
             else
             {
-                return json::null();
+                return jsoncons::json::null();
             }
         };
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -81,7 +81,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data = json::parse(data_str);
+            jsoncons::json data = jsoncons::json::parse(data_str);
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_state
@@ -138,9 +138,9 @@ TEST_CASE("jsonschema $dynamicRef tests")
 }
     )";
 
-    json tree_schema = json::parse(tree_schema_str);
+    jsoncons::json tree_schema = jsoncons::json::parse(tree_schema_str);
 
-    json strict_tree_schema = json::parse(strict_tree_schema_str);
+    jsoncons::json strict_tree_schema = jsoncons::json::parse(strict_tree_schema_str);
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
@@ -151,10 +151,10 @@ TEST_CASE("jsonschema $dynamicRef tests")
             }
             else
             {
-                return json::null();
+                return jsoncons::json::null();
             }
         };
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -169,7 +169,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data = json::parse(data_str);
+            jsoncons::json data = jsoncons::json::parse(data_str);
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_state
@@ -237,9 +237,9 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
 }
     )";
 
-    json schema = json::parse(schema_str);
+    jsoncons::json schema = jsoncons::json::parse(schema_str);
 
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
+    jsonschema::json_schema<jsoncons::json> compiled = jsonschema::make_json_schema(schema); 
 
     SECTION("/then/$defs/thingy is the final stop for the $dynamicRef")
     {
@@ -248,7 +248,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data(jsoncons::null_type{});
+            jsoncons::json data(jsoncons::null_type{});
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_state

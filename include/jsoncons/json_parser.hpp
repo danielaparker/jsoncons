@@ -18,8 +18,8 @@
 #include <utility>
 #include <vector>
 
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -27,7 +27,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \
@@ -1752,7 +1752,7 @@ minus_sign:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::is_nonzero_digit(*cur))
+        if (jsoncons::is_char_nonzero_digit(*cur))
         {
             ++cur;
             goto integer;
@@ -1780,12 +1780,12 @@ zero:
             ++cur;
             goto fraction1;
         }
-        if (jsoncons::is_exp(*cur))
+        if (jsoncons::is_char_exp(*cur))
         {
             ++cur;
             goto exp1;
         }
-        if (jsoncons::is_digit(*cur))
+        if (jsoncons::is_char_digit(*cur))
         {
             err_handler_(json_errc::leading_zero, *this);
             ec = json_errc::leading_zero;
@@ -1809,7 +1809,7 @@ integer:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_char_digit(*cur)))
             {
                 break;
             }
@@ -1820,7 +1820,7 @@ integer:
             ++cur;
             goto fraction1;
         }
-        if (jsoncons::is_exp(*cur))
+        if (jsoncons::is_char_exp(*cur))
         {
             ++cur;
             goto exp1;
@@ -1837,7 +1837,7 @@ fraction1:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::is_digit(*cur))
+        if (jsoncons::is_char_digit(*cur))
         {
             ++cur;
             goto fraction2;
@@ -1858,13 +1858,13 @@ fraction2:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_char_digit(*cur)))
             {
                 break;
             }
             ++cur;
         }
-        if (jsoncons::is_exp(*cur))
+        if (jsoncons::is_char_exp(*cur))
         {
             ++cur;
             goto exp1;
@@ -1886,7 +1886,7 @@ exp1:
             ++cur;
             goto exp2;
         }
-        if (jsoncons::is_digit(*cur))
+        if (jsoncons::is_char_digit(*cur))
         {
             ++cur;
             goto exp3;
@@ -1909,7 +1909,7 @@ exp2:
             position_ += (cur - hdr);
             return cur;
         }
-        if (jsoncons::is_digit(*cur))
+        if (jsoncons::is_char_digit(*cur))
         {
             ++cur;
             goto exp3;
@@ -1930,7 +1930,7 @@ exp3:
                 position_ += (cur - hdr);
                 return cur;
             }
-            if (JSONCONS_UNLIKELY(!jsoncons::is_digit(*cur)))
+            if (JSONCONS_UNLIKELY(!jsoncons::is_char_digit(*cur)))
             {
                 break;
             }

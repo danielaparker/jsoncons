@@ -27,7 +27,7 @@ using namespace jsoncons;
 
 template <typename T>
 using cust_allocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
-using cust_json = basic_json<char,sorted_policy,cust_allocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,cust_allocator<char>>;
 
 TEST_CASE("json_traits using allocator tests")
 {

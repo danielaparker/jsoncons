@@ -62,8 +62,8 @@ TEST_CASE("jsonschema walk tests")
 }
     )";
 
-    ojson schema = ojson::parse(schema_str);
-    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+    jsoncons::ojson schema = jsoncons::ojson::parse(schema_str);
+    jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     SECTION("walk")
     {
@@ -88,9 +88,9 @@ TEST_CASE("jsonschema walk tests")
         )";
 
         // Data
-        ojson data = ojson::parse(data_str);
+        jsoncons::ojson data = jsoncons::ojson::parse(data_str);
  
-        ojson expected = ojson::parse(R"(      
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {
     "/fruits/0": "string",
     "/fruits/1": "string",
@@ -107,10 +107,10 @@ TEST_CASE("jsonschema walk tests")
 }
         )");
 
-        ojson result(jsoncons::json_object_arg);
+        jsoncons::ojson result(jsoncons::json_object_arg);
         auto reporter = [&](const std::string& keyword,
-            const ojson& schema, const jsoncons::uri& /*schema_location*/,
-            const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+            const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+            const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
         {
             if (keyword == "type" && schema.is_object())
             {
@@ -123,7 +123,7 @@ TEST_CASE("jsonschema walk tests")
             }
             return jsonschema::walk_state::advance;
         };
-        schema = ojson::null(); // walk mustn't try to access memory in original schema
+        schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
         compiled.walk(data, reporter);
         CHECK(expected == result);
         //std::cout << pretty_print(result) << "\n";
@@ -173,8 +173,8 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
 }
     )";
 
-    ojson schema = ojson::parse(schema_str);
-    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+    jsoncons::ojson schema = jsoncons::ojson::parse(schema_str);
+    jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     SECTION("walk")
     {
@@ -183,18 +183,18 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
         try
         {
             // Data
-            ojson data = ojson::parse(data_str);
+            jsoncons::ojson data = jsoncons::ojson::parse(data_str);
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {
     "" : "null"
 }
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 if (keyword == "type" && schema.is_object())
                 {
@@ -207,7 +207,7 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
         }
@@ -224,7 +224,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
     {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "prefixItems": [
@@ -233,23 +233,23 @@ TEST_CASE("jsonschema walk keyword test")
         ]
     }        
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 [ 1, "foo" ]
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {
     "/0": "integer",
     "/1": "string"
 }
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 if (keyword == "type")
                 {
@@ -262,7 +262,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
         }
@@ -275,26 +275,26 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "dependentRequired": {"bar": ["foo"]}
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 {"foo": 1, "bar": 2}
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"":{"bar":["foo"]}}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "dependentRequired")
@@ -308,7 +308,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -322,7 +322,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "dependentSchemas": {
@@ -335,20 +335,20 @@ TEST_CASE("jsonschema walk keyword test")
             }
         }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 {"foo": 1, "bar": 2}
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/bar/foo":"integer","/bar/bar":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -362,7 +362,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -376,29 +376,29 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "propertyNames": {"maxLength": 3}
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 {
     "f": {},
     "foo": {}
 }
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/f":3,"/foo":3}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "maxLength")
@@ -412,7 +412,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -426,26 +426,26 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "contains": {"minimum": 5}
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 [3, 4, 5]
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/0":5,"/1":5,"/2":5}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "minimum")
@@ -459,7 +459,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -473,7 +473,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "patternProperties": {
@@ -481,20 +481,20 @@ TEST_CASE("jsonschema walk keyword test")
     }
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 {"foo": 1, "foooooo" : 2}
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/foo":"integer","/foooooo":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -508,7 +508,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -522,26 +522,26 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "additionalProperties": {"type": "boolean"}
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 {"foo" : true}
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/foo":"boolean"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -555,7 +555,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -569,27 +569,27 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "items": [{}],
     "additionalItems": {"type": "integer"}
 }
             )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 [ null, 2, 3, 4 ]
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"/1":"integer","/2":"integer","/3":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -603,7 +603,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -617,7 +617,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "oneOf": [
@@ -630,20 +630,20 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 1
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -657,7 +657,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -671,7 +671,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "anyOf": [
@@ -684,20 +684,20 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 1
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -711,7 +711,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -725,7 +725,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "anyOf": [
@@ -738,20 +738,20 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 1
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
+            jsoncons::ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
-                const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
+                const jsoncons::ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const jsoncons::ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (keyword == "type")
@@ -765,7 +765,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";
@@ -779,7 +779,7 @@ TEST_CASE("jsonschema walk keyword test")
     {
         try
         {
-            ojson schema = ojson::parse(R"(
+            jsoncons::ojson schema = jsoncons::ojson::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "anyOf": [
@@ -792,21 +792,21 @@ TEST_CASE("jsonschema walk keyword test")
     ]
 }
                     )");
-            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+            jsonschema::json_schema<jsoncons::ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
-            ojson data = ojson::parse(R"(
+            jsoncons::ojson data = jsoncons::ojson::parse(R"(
 1
             )");
 
-            ojson expected = ojson::parse(R"(      
+            jsoncons::ojson expected = jsoncons::ojson::parse(R"(      
 {"":"integer"}
             )");
 
-            ojson result(jsoncons::json_object_arg);
-            auto reporter = [&](const jsonschema::schema_property<ojson>& property,
-                const ojson& /*instance*/, 
+            jsoncons::ojson result(jsoncons::json_object_arg);
+            auto reporter = [&](const jsonschema::schema_property<jsoncons::ojson>& property,
+                const jsoncons::ojson& /*instance*/, 
                 const jsoncons::jsonpointer::json_pointer& instance_location, 
-                jsoncons::optional<ojson>& /*patch*/) -> jsonschema::walk_state
+                jsoncons::optional<jsoncons::ojson>& /*patch*/) -> jsonschema::walk_state
             {
                 //std::cout << "keyword: " << keyword << "\n";
                 if (property.keyword() == "type")
@@ -820,7 +820,7 @@ TEST_CASE("jsonschema walk keyword test")
                 }
                 return jsonschema::walk_state::advance;
             };
-            schema = ojson::null(); // walk mustn't try to access memory in original schema
+            schema = jsoncons::ojson::null(); // walk mustn't try to access memory in original schema
             compiled.walk(data, reporter);
             CHECK(expected == result);
             //std::cout << result << "\n";

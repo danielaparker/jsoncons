@@ -173,7 +173,7 @@ auto basic_types_schema = jsoncons::ojson::parse(R"(
 }
         )");
 
-std::string json_str = R"(
+std::string jstr = R"(
 {
           "$schema": "/schema.json",
           "version": "v0.1",
@@ -207,7 +207,7 @@ std::string json_str = R"(
           };
 
         auto compiled = jsoncons::jsonschema::make_json_schema(main_schema, resolver);
-        CHECK(compiled.is_valid(jsoncons::ojson::parse(json_str)));
+        CHECK(compiled.is_valid(jsoncons::ojson::parse(jstr)));
     }
 
     SECTION("additionalProperties")

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
-#define JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#ifndef JSONCONS_NONSTD_COMPILER_SUPPORT_HPP
+#define JSONCONS_NONSTD_COMPILER_SUPPORT_HPP
 
 #include <cmath>
 #include <cstdint>
@@ -37,6 +37,7 @@
     #define JSONCONS_TRY try
     #define JSONCONS_CATCH(exception) catch(exception)
 #else
+    #include <exception>
     #define JSONCONS_THROW(exception) std::terminate()
     #define JSONCONS_RETHROW std::terminate()
     #define JSONCONS_TRY if (true)
@@ -106,7 +107,7 @@
 #endif
 #endif
 
-// Following boost/atomic/detail/config.hpp
+// Following boost/atomic/nonstd/config.hpp
 #if !defined(JSONCONS_DEPRECATED_MSG) && (\
     (defined(__GNUC__) && ((__GNUC__ + 0) * 100 + (__GNUC_MINOR__ + 0)) >= 405) ||\
     (defined(__SUNPRO_CC) && (__SUNPRO_CC + 0) >= 0x5130))
@@ -393,7 +394,7 @@
 #   endif
 #endif
 
-// Follows boost config/detail/suffix.hpp
+// Follows boost config/nonstd/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
 namespace jsoncons{
 #  ifdef __GNUC__
@@ -601,4 +602,4 @@ namespace binary {
 	#endif // BMI2
 #endif // defined( _MSC_VER )
 
-#endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#endif // JSONCONS_NONSTD_COMPILER_SUPPORT_HPP

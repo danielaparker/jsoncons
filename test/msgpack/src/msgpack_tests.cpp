@@ -21,11 +21,11 @@ using namespace jsoncons::msgpack;
 
 TEST_CASE("msgpack_test")
 {
-    json j1;
+    jsoncons::json j1;
     j1["zero"] = 0;
     j1["one"] = 1;
     j1["two"] = 2;
-    j1["null"] = null_type();
+    j1["null"] = jsoncons::null_type();
     j1["true"] = true;
     j1["false"] = false;
     j1["max int64_t"] = (std::numeric_limits<int64_t>::max)();
@@ -47,11 +47,11 @@ TEST_CASE("msgpack_test")
     j1["min float"] = (std::numeric_limits<float>::lowest)();
     j1["String too long for small string optimization"] = "String too long for small string optimization"; 
 
-    json ja(json_array_arg);
+    jsoncons::json ja(jsoncons::json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);
-    ja.push_back(null_type());
+    ja.push_back(jsoncons::null_type());
     ja.push_back(true);
     ja.push_back(false);
     ja.push_back((std::numeric_limits<int64_t>::max)());
@@ -79,21 +79,21 @@ TEST_CASE("msgpack_test")
     encode_msgpack(j1, v);
 
     // from bytes
-    json j2 = decode_msgpack<json>(v);
+    jsoncons::json j2 = decode_msgpack<jsoncons::json>(v);
     CHECK(j2 == j1);
 
     // from pair of iterators
-    json j3 = decode_msgpack<json>(v.begin(), v.end());
+    jsoncons::json j3 = decode_msgpack<jsoncons::json>(v.begin(), v.end());
     CHECK(j3 == j1);
 } 
 
 TEST_CASE("msgpack_test2")
 {
-    wjson j1;
+    jsoncons::wjson j1;
     j1[L"zero"] = 0;
     j1[L"one"] = 1;
     j1[L"two"] = 2;
-    j1[L"null"] = null_type();
+    j1[L"null"] = jsoncons::null_type();
     j1[L"true"] = true;
     j1[L"false"] = false;
     j1[L"max int64_t"] = (std::numeric_limits<int64_t>::max)();
@@ -116,11 +116,11 @@ TEST_CASE("msgpack_test2")
     j1[L"S"] = L"S";
     j1[L"String too long for small string optimization"] = L"String too long for small string optimization";
 
-    wjson ja(json_array_arg);
+    jsoncons::wjson ja(jsoncons::json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);
-    ja.push_back(null_type());
+    ja.push_back(jsoncons::null_type());
     ja.push_back(true);
     ja.push_back(false);
     ja.push_back((std::numeric_limits<int64_t>::max)());
@@ -148,7 +148,7 @@ TEST_CASE("msgpack_test2")
     std::vector<uint8_t> v;
     encode_msgpack(j1, v);
 
-    //wjson j2 = decode_msgpack<wjson>(v);
+    //wjson j2 = decode_msgpack<jsoncons::wjson>(v);
 
     //CHECK(j2 == j1);
 }
@@ -174,7 +174,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1),output1);
+        encode_msgpack(jsoncons::byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
     SECTION("[1]")
@@ -194,7 +194,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1),output1);
+        encode_msgpack(jsoncons::byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
     SECTION("[0,255]")
@@ -214,7 +214,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1),output1);
+        encode_msgpack(jsoncons::byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
 }
@@ -229,7 +229,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
         CHECK(expected == v);
 
-        auto j = decode_msgpack<json>(input);
+        auto j = decode_msgpack<jsoncons::json>(input);
         std::vector<uint8_t> output;
         encode_msgpack(j, output);
         CHECK(output == input);
@@ -242,7 +242,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
         CHECK(expected == (v));
 
-        auto j = decode_msgpack<json>(input);
+        auto j = decode_msgpack<jsoncons::json>(input);
         std::vector<uint8_t> output;
         encode_msgpack(j, output);
         CHECK(output == input);
@@ -256,7 +256,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
         CHECK(expected == v);
 
-        auto j = decode_msgpack<json>(input);
+        auto j = decode_msgpack<jsoncons::json>(input);
         std::vector<uint8_t> output;
         encode_msgpack(j, output);
         CHECK(output == input);
@@ -270,7 +270,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
         CHECK(expected == v);
 
-        auto j = decode_msgpack<json>(input);
+        auto j = decode_msgpack<jsoncons::json>(input);
         std::vector<uint8_t> output;
         encode_msgpack(j, output);
         CHECK(output == input);
@@ -284,7 +284,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
         CHECK(expected == v);
 
-        auto j = decode_msgpack<json>(input);
+        auto j = decode_msgpack<jsoncons::json>(input);
         std::vector<uint8_t> output;
         encode_msgpack(j, output);
         CHECK(output == input);
@@ -299,7 +299,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input1);
         CHECK(expected == v);
 
-        auto j1 = decode_msgpack<json>(input1);
+        auto j1 = decode_msgpack<jsoncons::json>(input1);
         std::vector<uint8_t> output1;
         encode_msgpack(j1, output1);
         CHECK(output1 == input1);
@@ -309,7 +309,7 @@ TEST_CASE("msgpack ext tests")
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
         CHECK(expected == v2);
 
-        auto j2 = decode_msgpack<json>(input2);
+        auto j2 = decode_msgpack<jsoncons::json>(input2);
         std::vector<uint8_t> output2;
         encode_msgpack(j2, output2);
         CHECK(output2 == input1);
@@ -319,7 +319,7 @@ TEST_CASE("msgpack ext tests")
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
         CHECK(expected == v3);
 
-        auto j3 = decode_msgpack<json>(input3);
+        auto j3 = decode_msgpack<jsoncons::json>(input3);
         std::vector<uint8_t> output3;
         encode_msgpack(j3, output3);
         CHECK(output3 == input1);
@@ -334,7 +334,7 @@ TEST_CASE("msgpack ext tests")
         auto v = decode_msgpack<std::vector<uint8_t>>(input1);
         CHECK(expected == v);
 
-        auto j1 = decode_msgpack<json>(input1);
+        auto j1 = decode_msgpack<jsoncons::json>(input1);
         std::vector<uint8_t> output1;
         encode_msgpack(j1, output1);
         CHECK(output1 == input1);
@@ -344,7 +344,7 @@ TEST_CASE("msgpack ext tests")
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
         CHECK(expected == v2);
 
-        auto j2 = decode_msgpack<json>(input2);
+        auto j2 = decode_msgpack<jsoncons::json>(input2);
         std::vector<uint8_t> output2;
         encode_msgpack(j2, output2);
         CHECK(output2 == input1);
@@ -354,7 +354,7 @@ TEST_CASE("msgpack ext tests")
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
         CHECK(expected == v3);
 
-        auto j3 = decode_msgpack<json>(input3);
+        auto j3 = decode_msgpack<jsoncons::json>(input3);
         std::vector<uint8_t> output3;
         encode_msgpack(j3, output3);
         CHECK(output3 == input1);
@@ -376,13 +376,13 @@ TEST_CASE("encode_msgpack overloads")
 {
     SECTION("json, stream")
     {
-        json person;
+        jsoncons::json person;
         person.try_emplace("name", "John Smith");
 
         std::string s;
         std::stringstream ss(s);
         msgpack::encode_msgpack(person, ss);
-        json other = msgpack::decode_msgpack<json>(ss);
+        jsoncons::json other = msgpack::decode_msgpack<jsoncons::json>(ss);
         CHECK(other == person);
     }
     SECTION("custom, stream")
@@ -404,7 +404,7 @@ TEST_CASE("msgpack json constructor __int64 tests")
 {
     SECTION("test 1")
     {
-        json j1("-18446744073709551617", semantic_tag::bigint);
+        jsoncons::json j1("-18446744073709551617", jsoncons::semantic_tag::bigint);
 
         __int128 val1 = j1.as<__int128>();
 
@@ -422,7 +422,7 @@ TEST_CASE("msgpack json constructor unsigned __int64 tests")
 {
     SECTION("test 1")
     {
-        json j1("18446744073709551616", semantic_tag::bigint);
+        jsoncons::json j1("18446744073709551616", jsoncons::semantic_tag::bigint);
 
         auto val1 = j1.as<unsigned __int128>();
 

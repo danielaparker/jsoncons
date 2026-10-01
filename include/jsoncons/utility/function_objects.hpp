@@ -8,7 +8,7 @@
 #define JSONCONS_UTILITY_FUNCTION_OBJECTS_HPP
 
 #include <functional> 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 
 namespace jsoncons {
 

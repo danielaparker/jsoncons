@@ -13,16 +13,16 @@
 #include <system_error>
 #include <utility>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/function_objects.hpp>
 
 namespace jsoncons {
@@ -234,7 +234,7 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const BytesViewLike& b, 
             semantic_tag tag=semantic_tag::none, 
             const ser_context& context=ser_context(),
-            typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
+            typename std::enable_if<nonstd::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
         {
             std::error_code ec;
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
@@ -249,7 +249,7 @@ namespace jsoncons {
         JSONCONS_VISITOR_RETURN_TYPE byte_string_value(const BytesViewLike& b, 
             uint64_t raw_tag, 
             const ser_context& context=ser_context(),
-            typename std::enable_if<ext_traits::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
+            typename std::enable_if<nonstd::is_bytes_view_like<BytesViewLike>::value,int>::type = 0)
         {
             std::error_code ec;
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
@@ -390,7 +390,7 @@ namespace jsoncons {
             semantic_tag tag, 
             const ser_context& context,
             std::error_code& ec,
-            typename std::enable_if<ext_traits::is_bytes_view_like<Source>::value,int>::type = 0)
+            typename std::enable_if<nonstd::is_bytes_view_like<Source>::value,int>::type = 0)
         {
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
             JSONCONS_VISITOR_RETURN;
@@ -401,7 +401,7 @@ namespace jsoncons {
             uint64_t raw_tag, 
             const ser_context& context,
             std::error_code& ec,
-            typename std::enable_if<ext_traits::is_bytes_view_like<Source>::value,int>::type = 0)
+            typename std::enable_if<nonstd::is_bytes_view_like<Source>::value,int>::type = 0)
         {
             visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), raw_tag, context, ec);
             JSONCONS_VISITOR_RETURN;

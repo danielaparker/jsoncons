@@ -16,7 +16,7 @@ using namespace jsoncons;
 
 TEST_CASE("test_initializer_list_of_integers")
 {
-    json doc(json_array_arg, {0,1,2,3});
+    jsoncons::json doc(jsoncons::json_array_arg, {0,1,2,3});
     CHECK(doc.is_array());
     CHECK(4 == doc.size());
     for (std::size_t i = 0; i < doc.size(); ++i)
@@ -27,9 +27,9 @@ TEST_CASE("test_initializer_list_of_integers")
 
 TEST_CASE("test_assignment_to_initializer_list")
 {
-    json doc;
+    jsoncons::json doc;
 
-    doc = json(json_array_arg, {0,1,2,3});
+    doc = jsoncons::json(jsoncons::json_array_arg, {0,1,2,3});
     CHECK(doc.is_array());
     CHECK(4 == doc.size());
     for (std::size_t i = 0; i < doc.size(); ++i)
@@ -40,39 +40,39 @@ TEST_CASE("test_assignment_to_initializer_list")
 
 TEST_CASE("test_assignment_to_initializer_list2")
 {
-    json val;
-    val["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
-    val["data"]["item"] = json(json_array_arg,{json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,5,2,3}),
-                                      json(json_array_arg, {4}),
-                                      json(json_array_arg, {4,5,2,3}),
-                                      json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,5,3}),
-                                      json(json_array_arg, {2}),
-                                      json(json_array_arg, {4,3})});
+    jsoncons::json val;
+    val["data"]["id"] = jsoncons::json(jsoncons::json_array_arg, {0,1,2,3,4,5,6,7});
+    val["data"]["item"] = jsoncons::json(jsoncons::json_array_arg,{jsoncons::json(jsoncons::json_array_arg, {2}),
+                                      jsoncons::json(jsoncons::json_array_arg, {4,5,2,3}),
+                                      jsoncons::json(jsoncons::json_array_arg, {4}),
+                                      jsoncons::json(jsoncons::json_array_arg, {4,5,2,3}),
+                                      jsoncons::json(jsoncons::json_array_arg, {2}),
+                                      jsoncons::json(jsoncons::json_array_arg, {4,5,3}),
+                                      jsoncons::json(jsoncons::json_array_arg, {2}),
+                                      jsoncons::json(jsoncons::json_array_arg, {4,3})});
 
-    CHECK(json(2) == val["data"]["item"][0][0]);
-    CHECK(json(4) == val["data"]["item"][1][0]);
-    CHECK(json(4) == val["data"]["item"][2][0]);
-    CHECK(json(4) == val["data"]["item"][3][0]);
-    CHECK(json(2) == val["data"]["item"][4][0]);
-    CHECK(json(4) == val["data"]["item"][5][0]);
-    CHECK(json(2) == val["data"]["item"][6][0]);
-    CHECK(json(4) == val["data"]["item"][7][0]);
-    CHECK(json(3) == val["data"]["item"][7][1]);
+    CHECK(jsoncons::json(2) == val["data"]["item"][0][0]);
+    CHECK(jsoncons::json(4) == val["data"]["item"][1][0]);
+    CHECK(jsoncons::json(4) == val["data"]["item"][2][0]);
+    CHECK(jsoncons::json(4) == val["data"]["item"][3][0]);
+    CHECK(jsoncons::json(2) == val["data"]["item"][4][0]);
+    CHECK(jsoncons::json(4) == val["data"]["item"][5][0]);
+    CHECK(jsoncons::json(2) == val["data"]["item"][6][0]);
+    CHECK(jsoncons::json(4) == val["data"]["item"][7][0]);
+    CHECK(jsoncons::json(3) == val["data"]["item"][7][1]);
 }
 
 TEST_CASE("test_assignment_to_initializer_list3")
 {
-    json val;
-    val["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
-    val["data"]["item"] = json(json_array_arg, {json(json_object_arg, {{"first",1},{"second",2}})});
+    jsoncons::json val;
+    val["data"]["id"] = jsoncons::json(jsoncons::json_array_arg, {0,1,2,3,4,5,6,7});
+    val["data"]["item"] = jsoncons::json(jsoncons::json_array_arg, {jsoncons::json(jsoncons::json_object_arg, {{"first",1},{"second",2}})});
 
-    json expected_id = json::parse(R"(
+    jsoncons::json expected_id = jsoncons::json::parse(R"(
 [0,1,2,3,4,5,6,7]
     )");
 
-    json expected_item = json::parse(R"(
+    jsoncons::json expected_item = jsoncons::json::parse(R"(
     [{"first":1,"second":2}]
     )");
 
@@ -82,12 +82,12 @@ TEST_CASE("test_assignment_to_initializer_list3")
 
 TEST_CASE("test_assign_initializer_list_of_object")
 {
-    json doc(json_array_arg);
+    jsoncons::json doc(jsoncons::json_array_arg);
 
-    json transaction;
+    jsoncons::json transaction;
     transaction["Debit"] = 10000;
 
-    doc = json(json_array_arg, {transaction});
+    doc = jsoncons::json(jsoncons::json_array_arg, {transaction});
     CHECK(doc.is_array());
     CHECK(1 == doc.size());
     CHECK(doc[0] == transaction);
@@ -95,15 +95,15 @@ TEST_CASE("test_assign_initializer_list_of_object")
 
 TEST_CASE("test_initializer_list_of_objects")
 {
-    json book1;
+    jsoncons::json book1;
     book1["author"] = "Smith";
     book1["title"] = "Old Bones";
 
-    json book2;
+    jsoncons::json book2;
     book2["author"] = "Jones";
     book2["title"] = "New Things";
 
-    json doc(json_array_arg, {book1, book2});
+    jsoncons::json doc(jsoncons::json_array_arg, {book1, book2});
     CHECK(doc.is_array());
     CHECK(2 == doc.size());
 
@@ -113,7 +113,7 @@ TEST_CASE("test_initializer_list_of_objects")
 
 TEST_CASE("test_array_constructor")
 {
-    json doc(json_array_arg);
+    jsoncons::json doc(jsoncons::json_array_arg);
     doc.resize(10,10.0);
     CHECK(doc.is_array());
     CHECK(doc.size() == 10);
@@ -122,7 +122,7 @@ TEST_CASE("test_array_constructor")
 
 TEST_CASE("test_make_array")
 {
-    json doc(json_array_arg);
+    jsoncons::json doc(jsoncons::json_array_arg);
     CHECK(0 == doc.size());
     doc.resize(10,10.0);
     CHECK(doc.is_array());
@@ -133,7 +133,7 @@ TEST_CASE("test_make_array")
 
 TEST_CASE("test_add_element_to_array")
 {
-    json doc(json_array_arg);
+    jsoncons::json doc(jsoncons::json_array_arg);
     CHECK(doc.is_array());
     CHECK(doc.is_array());
     doc.push_back("Toronto");
@@ -149,7 +149,7 @@ TEST_CASE("test_add_element_to_array")
 
 TEST_CASE("test_emplace_element_to_array")
 {
-    json a(json_array_arg);
+    jsoncons::json a(jsoncons::json_array_arg);
     CHECK(a.is_array());
     CHECK(a.is_array());
     a.emplace_back("Toronto");
@@ -165,7 +165,7 @@ TEST_CASE("test_emplace_element_to_array")
 
 TEST_CASE("test_array_add_pos")
 {
-    json arr(json_array_arg);
+    jsoncons::json arr(jsoncons::json_array_arg);
     CHECK(arr.is_array());
     CHECK(arr.is_array());
     arr.push_back("Toronto");
@@ -181,7 +181,7 @@ TEST_CASE("test_array_add_pos")
 
 TEST_CASE("test_array_erase_range")
 {
-    json arr(json_array_arg);
+    jsoncons::json arr(jsoncons::json_array_arg);
     CHECK(arr.is_array());
     CHECK(arr.is_array());
     arr.push_back("Toronto");
@@ -198,7 +198,7 @@ TEST_CASE("test_array_erase_range")
 
 TEST_CASE("test_reserve_array_capacity")
 {
-    json cities(json_array_arg);
+    jsoncons::json cities(jsoncons::json_array_arg);
     CHECK(cities.is_array());
     CHECK(cities.is_array());
     cities.reserve(10);  // storage is allocated
@@ -218,7 +218,7 @@ TEST_CASE("test_reserve_array_capacity")
 
 TEST_CASE("test make_array()")
 {
-    json doc = json::make_array();
+    jsoncons::json doc = jsoncons::json::make_array();
     CHECK(doc.is_array());
     CHECK(0 == doc.size());
     doc.emplace_back("Toronto");
@@ -231,7 +231,7 @@ TEST_CASE("test make_array()")
 
 TEST_CASE("test_one_dim_array")
 {
-    basic_json<char,sorted_policy,std::allocator<char>> a = basic_json<char,sorted_policy,std::allocator<char>>::make_array<1>(10,0);
+    jsoncons::basic_json<char,jsoncons::sorted_policy,std::allocator<char>> a = jsoncons::basic_json<char,jsoncons::sorted_policy,std::allocator<char>>::make_array<1>(10,0);
     CHECK(a.size() == 10);
     CHECK(0 == a[0].as<int64_t>());
     a[1] = 1;
@@ -247,7 +247,7 @@ TEST_CASE("test_one_dim_array")
 
 TEST_CASE("test_two_dim_array")
 {
-    json a = json::make_array<2>(3,4,0);
+    jsoncons::json a = jsoncons::json::make_array<2>(3,4,0);
     CHECK(3 == a.size());
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
@@ -271,7 +271,7 @@ TEST_CASE("test_two_dim_array")
 
 TEST_CASE("test_three_dim_array")
 {
-    json a = json::make_array<3>(4,3,2,0);
+    jsoncons::json a = jsoncons::json::make_array<3>(4,3,2,0);
     CHECK(4 == a.size());
     a[0][2][0] = 2;
     a[0][2][1] = 3;
@@ -292,7 +292,7 @@ TEST_CASE("test_array_assign_vector")
     vec.push_back("Vancouver");
     vec.push_back("Montreal");
 
-    json val;
+    jsoncons::json val;
     val = vec;
 
     CHECK(3 == val.size());
@@ -309,7 +309,7 @@ TEST_CASE("test_array_assign_vector_of_bool")
     vec.push_back(false);
     vec.push_back(true);
 
-    json val;
+    jsoncons::json val;
     val = vec;
 
     CHECK(3 == val.size());
@@ -321,9 +321,9 @@ TEST_CASE("test_array_assign_vector_of_bool")
 
 TEST_CASE("test_array_add_null")
 {
-    json a(json_array_arg);
+    jsoncons::json a(jsoncons::json_array_arg);
     a.push_back(jsoncons::null_type());
-    a.push_back(json::null());
+    a.push_back(jsoncons::json::null());
     CHECK(a[0].is_null());
     CHECK(a[1].is_null());
 }
@@ -335,7 +335,7 @@ TEST_CASE("test_array_from_container")
     vec.push_back(20);
     vec.push_back(30);
 
-    json val1 = vec;
+    jsoncons::json val1 = vec;
     REQUIRE(3 == vec.size());
     CHECK(vec[0] == 10);
     CHECK(vec[1] == 20);
@@ -346,7 +346,7 @@ TEST_CASE("test_array_from_container")
     list.push_back(20.5);
     list.push_back(30.5);
 
-    json val2 = list;
+    jsoncons::json val2 = list;
     REQUIRE(3 == val2.size());
     CHECK(val2[0].as<double>() == Approx(10.5).epsilon(0.000001));
     CHECK(val2[1].as<double>() == Approx(20.5).epsilon(0.000001));
@@ -356,7 +356,7 @@ TEST_CASE("test_array_from_container")
 TEST_CASE("test_array_as_vector_of_double")
 {
     std::string s("[0,1.1,2,3.1]");
-    json val = json::parse(s);
+    jsoncons::json val = jsoncons::json::parse(s);
 
     std::vector<double> v = val.as<std::vector<double>>(); 
     CHECK(4 == v.size());
@@ -369,7 +369,7 @@ TEST_CASE("test_array_as_vector_of_double")
 TEST_CASE("test_array_as_vector_of_bool")
 {
     std::string s("[true,false,true]");
-    json val = json::parse(s);
+    jsoncons::json val = jsoncons::json::parse(s);
 
     std::vector<bool> v = val.as<std::vector<bool>>(); 
     CHECK(3 == v.size());
@@ -381,7 +381,7 @@ TEST_CASE("test_array_as_vector_of_bool")
 TEST_CASE("test_array_as_vector_of_string")
 {
     std::string s("[\"Hello\",\"World\"]");
-    json val = json::parse(s);
+    jsoncons::json val = jsoncons::json::parse(s);
 
     std::vector<std::string> v = val.as<std::vector<std::string>>(); 
     CHECK(2 == v.size());
@@ -392,7 +392,7 @@ TEST_CASE("test_array_as_vector_of_string")
 TEST_CASE("test_array_as_vector_of_char")
 {
     std::string s("[20,30]");
-    json val = json::parse(s);
+    jsoncons::json val = jsoncons::json::parse(s);
 
     std::vector<char> v = val.as<std::vector<char>>(); 
     CHECK(2 == v.size());
@@ -403,7 +403,7 @@ TEST_CASE("test_array_as_vector_of_char")
 TEST_CASE("test_array_as_vector_of_int")
 {
     std::string s("[0,1,2,3]");
-    json val = json::parse(s);
+    jsoncons::json val = jsoncons::json::parse(s);
 
     std::vector<int> v = val.as<std::vector<int>>(); 
     CHECK(4 == v.size());
@@ -451,8 +451,8 @@ TEST_CASE("test_array_as_vector_of_int")
 TEST_CASE("test_array_as_vector_of_int_on_proxy")
 {
     std::string s("[0,1,2,3]");
-    json val = json::parse(s);
-    json root;
+    jsoncons::json val = jsoncons::json::parse(s);
+    jsoncons::json root;
     root["val"] = val;
     std::vector<int> v = root["val"].as<std::vector<int>>();
     CHECK(4 == v.size());
@@ -466,7 +466,7 @@ TEST_CASE("test json_array erase with iterator")
 {
     SECTION("json erase with iterator")
     {
-        json doc(jsoncons::json_array_arg);
+        jsoncons::json doc(jsoncons::json_array_arg);
 
         doc.push_back("a");
         doc.push_back("b");
@@ -491,7 +491,7 @@ TEST_CASE("test json_array erase with iterator")
 
     SECTION("json erase with iterator 2")
     {
-        json doc(jsoncons::json_array_arg);
+        jsoncons::json doc(jsoncons::json_array_arg);
 
         doc.push_back("a");
         doc.push_back("b");

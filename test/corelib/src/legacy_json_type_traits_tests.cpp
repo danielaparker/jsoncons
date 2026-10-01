@@ -34,9 +34,9 @@ struct json_type_traits<Json, own_vector> {
 
 TEST_CASE("test_trait_type_erasure")
 {
-    json::object o;
+    jsoncons::json::object o;
 
-    json val;
+    jsoncons::json val;
 
     val = o;
 
@@ -45,7 +45,7 @@ TEST_CASE("test_trait_type_erasure")
 
 TEST_CASE("test_assign_non_const_cstring")
 {
-    json root;
+    jsoncons::json root;
 
     const char* p = "A string";
     char* q = const_cast<char*>(p);
@@ -57,7 +57,7 @@ TEST_CASE("test_uint8_t")
 {
     uint8_t x = 10;
 
-    json o;
+    jsoncons::json o;
     o["u"] = x;
 
     CHECK(o["u"].is_number());
@@ -71,7 +71,7 @@ TEST_CASE("test_float_assignment")
 {
     float x = 10.5;
 
-    json o;
+    jsoncons::json o;
     o["float"] = x;
 
     CHECK(o["float"].is_number());
@@ -85,7 +85,7 @@ TEST_CASE("test_float")
 {
     float x = 10.5;
 
-    json o(x);
+    jsoncons::json o(x);
 
     CHECK(o.is<float>());
 
@@ -96,7 +96,7 @@ TEST_CASE("test_float")
 
 TEST_CASE("test_unsupported_type")
 {
-    json o;
+    jsoncons::json o;
 
     //o["u"] = Info; 
     // compile error
@@ -104,25 +104,25 @@ TEST_CASE("test_unsupported_type")
 
 TEST_CASE("test_as_json_value")
 {
-    json a;
+    jsoncons::json a;
 
     a["first"] = "first"; 
     a["second"] = "second"; 
 
-    CHECK(true == a.is<json>());
+    CHECK(true == a.is<jsoncons::json>());
     
-    json b = a.as<json>();
+    jsoncons::json b = a.as<jsoncons::json>();
     CHECK("first" == b["first"].as<std::string>());
     CHECK("second" == b["second"].as<std::string>());
 }
 
 TEST_CASE("test_byte_string_as_vector")
 {
-    json a(byte_string{'H','e','l','l','o'});
+    jsoncons::json a(jsoncons::byte_string{'H','e','l','l','o'});
 
     REQUIRE(a.is_byte_string());
 
-    auto bytes = a.as<byte_string>();
+    auto bytes = a.as<jsoncons::byte_string>();
 
     REQUIRE(5 == bytes.size());
     CHECK('H' == bytes[0]);
@@ -135,7 +135,7 @@ TEST_CASE("test_byte_string_as_vector")
 TEST_CASE("jsoncons::json_type_traits<optional>")
 {
     std::vector<jsoncons::optional<int>> v = { 0,1,jsoncons::optional<int>{} };
-    json j = v;
+    jsoncons::json j = v;
 
     REQUIRE(3 == j.size());
     CHECK(0 == j[0].as<int>());
@@ -154,7 +154,7 @@ TEST_CASE("jsoncons::json_type_traits<shared_ptr>")
     std::vector<std::shared_ptr<std::string>> v = {std::make_shared<std::string>("Hello"), 
                                                    std::make_shared<std::string>("World"),
                                                    std::shared_ptr<std::string>()};
-    json j{v};
+    jsoncons::json j{v};
 
     REQUIRE(3 == j.size());
     CHECK(j[0].as<std::string>() == std::string("Hello"));
@@ -176,7 +176,7 @@ TEST_CASE("jsoncons::json_type_traits<unique_ptr>")
     v.emplace_back(jsoncons::make_unique<std::string>("World"));
     v.emplace_back(std::unique_ptr<std::string>());
 
-    json j{ v };
+    jsoncons::json j{ v };
 
     REQUIRE(3 == j.size());
     CHECK(j[0].as<std::string>() == std::string("Hello"));
@@ -300,8 +300,8 @@ TEST_CASE("json_type_traits for std::variant")
         std::string output;
         encode_json_pretty(basket, output);
 
-        json j1 = json::parse(input);
-        json j2 = json::parse(output);
+        jsoncons::json j1 = jsoncons::json::parse(input);
+        jsoncons::json j2 = jsoncons::json::parse(output);
         CHECK(j1 == j2);
     }
 

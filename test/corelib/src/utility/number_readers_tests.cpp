@@ -1,7 +1,7 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/utility/read_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
 #include <clocale>
 #include <iostream>
 #include <catch/catch.hpp>

@@ -13,9 +13,9 @@
 #include <string>
 #include <system_error>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 
 namespace jsoncons {
 namespace toon {

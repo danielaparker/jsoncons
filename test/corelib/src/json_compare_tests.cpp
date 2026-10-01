@@ -11,13 +11,13 @@
 
 using namespace jsoncons;
 
-TEST_CASE("basic_json object == basic_json object")
+TEST_CASE("basic_json object == jsoncons::basic_json object")
 {
     SECTION("empty, empty")
     {
-        json o1;
-        json o2;
-        json o3(json_object_arg);
+        jsoncons::json o1;
+        jsoncons::json o2;
+        jsoncons::json o3(jsoncons::json_object_arg);
 
         CHECK(o1 == o2);
         CHECK(o2 == o1);
@@ -42,12 +42,12 @@ TEST_CASE("basic_json object == basic_json object")
 
     SECTION("empty and nonempty")
     {
-        json a;
+        jsoncons::json a;
         a["c"] = 3;
         a["a"] = 1;
         a["b"] = 2;
 
-        json b;
+        jsoncons::json b;
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -65,12 +65,12 @@ TEST_CASE("basic_json object == basic_json object")
 
     SECTION("nonempty and shorter")
     {
-        json a;
+        jsoncons::json a;
         a["a"] = "hello";
         a["b"] = 1.0;
         a["c"] = true;
 
-        json b;
+        jsoncons::json b;
         b["a"] = "hello";
         b["b"] = 1.0;
 
@@ -90,12 +90,12 @@ TEST_CASE("basic_json object == basic_json object")
 
     SECTION("nonempty and different")
     {
-        json o1;
+        jsoncons::json o1;
         o1["a"] = 1;
         o1["b"] = 2;
         o1["c"] = 3;
 
-        json o2;
+        jsoncons::json o2;
         o2["c"] = 3;
         o2["a"] = 1;
         o2["b"] = 2;
@@ -105,31 +105,31 @@ TEST_CASE("basic_json object == basic_json object")
         CHECK_FALSE((o1 != o2));
         CHECK_FALSE((o2 != o1));
 
-        CHECK(std::is_convertible<decltype(o1.at("a")),json>::value);
-        CHECK(jsoncons::ext_traits::is_basic_json<decltype(o1.at("a"))>::value);
-        CHECK(jsoncons::ext_traits::is_basic_json<const json&>::value);
+        CHECK(std::is_convertible<decltype(o1.at("a")),jsoncons::json>::value);
+        CHECK(jsoncons::nonstd::is_basic_json<decltype(o1.at("a"))>::value);
+        CHECK(jsoncons::nonstd::is_basic_json<const jsoncons::json&>::value);
 
-        CHECK(1 == (o1.at("a"))); // basic_json == int
-        CHECK((1 == o1.at("a"))); // int == basic_json
+        CHECK(1 == (o1.at("a"))); // jsoncons::basic_json == int
+        CHECK((1 == o1.at("a"))); // int == jsoncons::basic_json
         CHECK(1 == (o1["a"]));    // proxy == int
         CHECK((1 == o1["a"]));    // int == proxy
 
-        CHECK((o1.at("b") != 1)); // basic_json == int
-        CHECK((1 != o1.at("b"))); // int == basic_json
+        CHECK((o1.at("b") != 1)); // jsoncons::basic_json == int
+        CHECK((1 != o1.at("b"))); // int == jsoncons::basic_json
         CHECK((o1["b"] != 1));    // proxy == int
         CHECK((1 != o1["b"]));    // int == proxy
     }
 }
 
-TEST_CASE("basic_json == basic_json")
+TEST_CASE("basic_json == jsoncons::basic_json")
 {
     SECTION("test 1")
     {
-        json o1;
+        jsoncons::json o1;
         o1["a"] = 1;
         o1["b"] = 2;
 
-        json o2(2);
+        jsoncons::json o2(2);
 
         CHECK_FALSE((o1["a"] == o2));
         CHECK_FALSE((o2 == o1["a"]));
@@ -142,12 +142,12 @@ TEST_CASE("basic_json == basic_json")
 
 TEST_CASE("test_object_equals_diff_vals")
 {
-    json o1;
+    jsoncons::json o1;
     o1["a"] = 1;
     o1["b"] = 2;
     o1["c"] = 3;
 
-    json o2;
+    jsoncons::json o2;
     o2["a"] = 1;
     o2["b"] = 4;
     o2["c"] = 3;
@@ -160,12 +160,12 @@ TEST_CASE("test_object_equals_diff_vals")
 
 TEST_CASE("test_object_equals_diff_el_names")
 {
-    json o1;
+    jsoncons::json o1;
     o1["a"] = 1;
     o1["b"] = 2;
     o1["c"] = 3;
 
-    json o2;
+    jsoncons::json o2;
     o2["d"] = 1;
     o2["e"] = 2;
     o2["f"] = 3;
@@ -178,12 +178,12 @@ TEST_CASE("test_object_equals_diff_el_names")
 
 TEST_CASE("test_object_equals_diff_sizes")
 {
-    json o1;
+    jsoncons::json o1;
     o1["a"] = 1;
     o1["b"] = 2;
     o1["c"] = 3;
 
-    json o2;
+    jsoncons::json o2;
     o2["a"] = 1;
     o2["b"] = 2;
 
@@ -195,11 +195,11 @@ TEST_CASE("test_object_equals_diff_sizes")
 
 TEST_CASE("test_object_equals_subtle_offsets")
 {
-    json o1;
+    jsoncons::json o1;
     o1["a"] = 1;
     o1["b"] = 1;
 
-    json o2;
+    jsoncons::json o2;
     o2["b"] = 1;
     o2["c"] = 1;
 
@@ -211,12 +211,12 @@ TEST_CASE("test_object_equals_subtle_offsets")
 
 TEST_CASE("test_object_equals_empty_objects")
 {
-    json def_constructed_1;
-    json def_constructed_2;
-    json parsed_1 = json::parse("{}");
-    json parsed_2 = json::parse("{}");
-    json type_constructed_1 = json(json_object_arg);
-    json type_constructed_2 = json(json_object_arg);
+    jsoncons::json def_constructed_1;
+    jsoncons::json def_constructed_2;
+    jsoncons::json parsed_1 = jsoncons::json::parse("{}");
+    jsoncons::json parsed_2 = jsoncons::json::parse("{}");
+    jsoncons::json type_constructed_1 = jsoncons::json(jsoncons::json_object_arg);
+    jsoncons::json type_constructed_2 = jsoncons::json(jsoncons::json_object_arg);
 
     CHECK(def_constructed_1 == def_constructed_1);
     CHECK(parsed_1 == parsed_2);
@@ -229,10 +229,10 @@ TEST_CASE("test_object_equals_empty_objects")
 
 TEST_CASE("test_object_equals_empty_arrays")
 {
-    json parsed_1 = json::parse("[]");
-    json parsed_2 = json::parse("[]");
-    json type_constructed_1(json_array_arg);
-    json type_constructed_2(json_array_arg);
+    jsoncons::json parsed_1 = jsoncons::json::parse("[]");
+    jsoncons::json parsed_2 = jsoncons::json::parse("[]");
+    jsoncons::json type_constructed_1(jsoncons::json_array_arg);
+    jsoncons::json type_constructed_2(jsoncons::json_array_arg);
 
     CHECK(parsed_1 == parsed_2);
     CHECK(type_constructed_1 == type_constructed_2);
@@ -242,14 +242,14 @@ TEST_CASE("test_object_equals_empty_arrays")
 
 TEST_CASE("test_empty_object_equal")
 {
-    CHECK(json() == json(json_object_arg));
-    CHECK(json(json_object_arg) == json());
+    CHECK(jsoncons::json() == jsoncons::json(jsoncons::json_object_arg));
+    CHECK(jsoncons::json(jsoncons::json_object_arg) == jsoncons::json());
 }
 
 TEST_CASE("test_string_not_equals_empty_object")
 {
-    json o1("42");
-    json o2;
+    jsoncons::json o1("42");
+    jsoncons::json o2;
 
     CHECK(o1 != o2);
     CHECK(o2 != o1);
@@ -257,9 +257,9 @@ TEST_CASE("test_string_not_equals_empty_object")
 
 TEST_CASE("test_byte_strings_equal")
 {
-    json o1(byte_string({'1','2','3','4','5','6','7','8','9'}));
-    json o2(byte_string{'1','2','3','4','5','6','7','8','9'});
-    json o3(byte_string{'1','2','3','4','5','6','7','8'});
+    jsoncons::json o1(jsoncons::byte_string({'1','2','3','4','5','6','7','8','9'}));
+    jsoncons::json o2(jsoncons::byte_string{'1','2','3','4','5','6','7','8','9'});
+    jsoncons::json o3(jsoncons::byte_string{'1','2','3','4','5','6','7','8'});
 
     CHECK(o1 == o2);
     CHECK(o2 == o1);
@@ -269,49 +269,49 @@ TEST_CASE("test_byte_strings_equal")
 
 TEST_CASE("json comparator equals tests")
 {
-    json j1(semantic_tag::none);
-    json j2{ json::object(), semantic_tag::none };
+    jsoncons::json j1(jsoncons::semantic_tag::none);
+    jsoncons::json j2{ jsoncons::json::object(), jsoncons::semantic_tag::none };
     CHECK((j1 == j1 && j2 == j2));
     CHECK((j1 == j2 && j2 == j1));
 
-    json var3{semantic_tag::none };
+    jsoncons::json var3{semantic_tag::none };
     CHECK((var3 == j1 && j1 == var3));
-    json var4{ json::object({{"first",1},{"second",2}}), semantic_tag::none };
-    json var5{ json::object({ { "first",1 },{ "second",2 } }), semantic_tag::none };
+    jsoncons::json var4{ jsoncons::json::object({{"first",1},{"second",2}}), jsoncons::semantic_tag::none };
+    jsoncons::json var5{ jsoncons::json::object({ { "first",1 },{ "second",2 } }), jsoncons::semantic_tag::none };
     CHECK((var3 != var4 && var4 != var3));
     CHECK((j2 != var4 && var4 != j2));
     CHECK(var4 == var4);
     CHECK(var4 == var5);
     CHECK(var5 == var4);
 
-    json var6(int64_t(100), semantic_tag::none);
-    json var7(uint64_t(100), semantic_tag::none);
+    jsoncons::json var6(int64_t(100), jsoncons::semantic_tag::none);
+    jsoncons::json var7(uint64_t(100), jsoncons::semantic_tag::none);
     CHECK((var6 == var7 && var7 == var6));
 
-    json var8(100.0, semantic_tag::none);
+    jsoncons::json var8(100.0, jsoncons::semantic_tag::none);
     CHECK((var8 == var8 && var6 == var8 && var8 == var6 && var7 == var8 && var8 == var7));
 
     std::string val9("small string");
     std::string val11("small string 2");
-    json var9(val9.data(), val9.length(), semantic_tag::none);
-    json var10(val9.data(),val9.length(), semantic_tag::none);
-    json var11(val11.data(),val11.length(), semantic_tag::none);
+    jsoncons::json var9(val9.data(), val9.length(), jsoncons::semantic_tag::none);
+    jsoncons::json var10(val9.data(),val9.length(), jsoncons::semantic_tag::none);
+    jsoncons::json var11(val11.data(),val11.length(), jsoncons::semantic_tag::none);
 
     std::string val12("too long for small string");
     std::string val14("too long for small string 2");
-    json var12(val12.data(),val12.length(), semantic_tag::none);
-    json var13(val12.data(),val12.length(), semantic_tag::none);
-    json var14(val14.data(),val14.length(), semantic_tag::none);
+    jsoncons::json var12(val12.data(),val12.length(), jsoncons::semantic_tag::none);
+    jsoncons::json var13(val12.data(),val12.length(), jsoncons::semantic_tag::none);
+    jsoncons::json var14(val14.data(),val14.length(), jsoncons::semantic_tag::none);
     CHECK((var9 == var10 && var10 == var9));
     CHECK((var9 != var11 && var11 != var9));
     CHECK((var12 == var13 && var13 == var12));
     CHECK((var12 != var14 && var14 != var12));
 
-    json var15(val9.data(),val9.length(), semantic_tag::none, std::allocator<char>());
+    jsoncons::json var15(val9.data(),val9.length(), jsoncons::semantic_tag::none, std::allocator<char>());
     CHECK((var9 == var15 && var15 == var9));
 
-    json var16(static_cast<int64_t>(0), semantic_tag::none);
-    json var17(static_cast<uint64_t>(0), semantic_tag::none);
+    jsoncons::json var16(static_cast<int64_t>(0), jsoncons::semantic_tag::none);
+    jsoncons::json var17(static_cast<uint64_t>(0), jsoncons::semantic_tag::none);
     CHECK(var16 == var17);
     CHECK(var17 == var16);
 }
@@ -320,7 +320,7 @@ TEST_CASE("basic_json number compare")
 {
     SECTION("unsigned unsigned")
     {
-        json o;
+        jsoncons::json o;
         o["a"] = std::numeric_limits<uint64_t>::max();
         o["b"] = std::numeric_limits<uint64_t>::lowest();
 
@@ -384,8 +384,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned signed test")
     {
-        json a = std::numeric_limits<uint64_t>::max();
-        json b = std::numeric_limits<int64_t>::lowest();
+        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json b = std::numeric_limits<int64_t>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -402,8 +402,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("signed unsigned test")
     {
-        json a = std::numeric_limits<int64_t>::max();
-        json b = std::numeric_limits<uint64_t>::lowest();
+        jsoncons::json a = std::numeric_limits<int64_t>::max();
+        jsoncons::json b = std::numeric_limits<uint64_t>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -420,8 +420,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("double double test")
     {
-        json a = std::numeric_limits<double>::max();
-        json b = std::numeric_limits<double>::lowest();
+        jsoncons::json a = std::numeric_limits<double>::max();
+        jsoncons::json b = std::numeric_limits<double>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -438,8 +438,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("signed double test")
     {
-        json a = std::numeric_limits<int64_t>::max();
-        json b = std::numeric_limits<double>::lowest();
+        jsoncons::json a = std::numeric_limits<int64_t>::max();
+        jsoncons::json b = std::numeric_limits<double>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -456,8 +456,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("double signed test")
     {
-        json a = std::numeric_limits<double>::max();
-        json b = std::numeric_limits<int64_t>::lowest();
+        jsoncons::json a = std::numeric_limits<double>::max();
+        jsoncons::json b = std::numeric_limits<int64_t>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -474,8 +474,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned double test")
     {
-        json a = std::numeric_limits<uint64_t>::max();
-        json b = std::numeric_limits<double>::lowest();
+        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json b = std::numeric_limits<double>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -492,8 +492,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("double unsigned test")
     {
-        json a = std::numeric_limits<double>::max();
-        json b = std::numeric_limits<uint64_t>::lowest();
+        jsoncons::json a = std::numeric_limits<double>::max();
+        jsoncons::json b = std::numeric_limits<uint64_t>::lowest();
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -510,8 +510,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("double and bigint string")
     {
-        json a{std::numeric_limits<double>::max()};
-        json b{std::to_string(std::numeric_limits<uint64_t>::lowest()), semantic_tag::bigint};
+        jsoncons::json a{std::numeric_limits<double>::max()};
+        jsoncons::json b{std::to_string(std::numeric_limits<uint64_t>::lowest()), jsoncons::semantic_tag::bigint};
 
         CHECK_FALSE(a == b); 
         CHECK(a != b);
@@ -526,8 +526,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("bigint string and double")
     {
-        json a{ std::to_string(std::numeric_limits<uint64_t>::max()), semantic_tag::bigint };
-        json b{ std::numeric_limits<double>::lowest() };
+        jsoncons::json a{ std::to_string(std::numeric_limits<uint64_t>::max()), jsoncons::semantic_tag::bigint };
+        jsoncons::json b{ std::numeric_limits<double>::lowest() };
 
         CHECK_FALSE(a == b);
         CHECK(a != b);
@@ -542,8 +542,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("double and non-numeric string")
     {
-        json a{ std::numeric_limits<double>::max() };
-        json b{ "Hello world" };
+        jsoncons::json a{ std::numeric_limits<double>::max() };
+        jsoncons::json b{ "Hello world" };
 
         CHECK_FALSE(a == b);
         CHECK(a != b);
@@ -558,8 +558,8 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("non-numeric string and double")
     {
-        json a{"Hello world"};
-        json b{ std::numeric_limits<double>::lowest() };
+        jsoncons::json a{"Hello world"};
+        jsoncons::json b{ std::numeric_limits<double>::lowest() };
 
         CHECK_FALSE(a == b);
         CHECK(a != b);
@@ -578,8 +578,8 @@ TEST_CASE("basic_json bool comparator")
 {
     SECTION("bool")
     {
-        json a(true);
-        json b(false);
+        jsoncons::json a(true);
+        jsoncons::json b(false);
 
         CHECK(a == a); // value and value
         CHECK(a <= a); // value and value
@@ -600,9 +600,9 @@ TEST_CASE("basic_json big number compare")
 {
     SECTION("test1")
     {
-        json j1 = json::parse("[1e999]");
-        json j2 = j1;
-        json j3 = j1;
+        jsoncons::json j1 = jsoncons::json::parse("[1e999]");
+        jsoncons::json j2 = j1;
+        jsoncons::json j3 = j1;
 
         CHECK(j1 == j1);
         CHECK(j2 == j1);
@@ -615,8 +615,8 @@ TEST_CASE("basic_json big number compare")
     }
     SECTION("test2")
     {
-        json j1 = json::parse("[1e999]");
-        json j2 = json::parse("[-1e999]");
+        jsoncons::json j1 = jsoncons::json::parse("[1e999]");
+        jsoncons::json j2 = jsoncons::json::parse("[-1e999]");
 
         CHECK_FALSE(j1 == j2);
         CHECK(j1 > j2);
@@ -626,8 +626,8 @@ TEST_CASE("basic_json big number compare")
     }
     SECTION("test3")
     {
-        json j1 = json::parse("[1e999]");
-        json j2 = json::parse("1000");
+        jsoncons::json j1 = jsoncons::json::parse("[1e999]");
+        jsoncons::json j2 = jsoncons::json::parse("1000");
 
         CHECK_FALSE(j1 == j2);
         CHECK(j1 > j2);

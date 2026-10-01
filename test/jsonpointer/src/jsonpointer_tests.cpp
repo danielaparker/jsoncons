@@ -48,7 +48,7 @@ void check_get(const basic_json<CharT,Policy,Allocator>& example, const std::str
     CHECK(expected == result);
 }
 
-void check_insert_or_assign(json& example, const std::string& path, const json& value, const json& expected)
+void check_insert_or_assign(jsoncons::json& example, const std::string& path, const jsoncons::json& value, const jsoncons::json& expected)
 {
     std::error_code ec;
     jsonpointer::add(example, path, value, ec);
@@ -56,7 +56,7 @@ void check_insert_or_assign(json& example, const std::string& path, const json& 
     CHECK(expected == example);
 }
 
-void check_replace(json& example, const std::string& path, const json& value, const json& expected)
+void check_replace(jsoncons::json& example, const std::string& path, const jsoncons::json& value, const jsoncons::json& expected)
 {
     std::error_code ec;
     jsonpointer::replace(example, path, value, ec);
@@ -64,7 +64,7 @@ void check_replace(json& example, const std::string& path, const json& value, co
     CHECK(expected == example);
 }
 
-void check_remove(json& example, const std::string& path, const json& expected)
+void check_remove(jsoncons::json& example, const std::string& path, const jsoncons::json& expected)
 {
     std::error_code ec;
     jsonpointer::remove(example, path, ec);
@@ -75,7 +75,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
 TEST_CASE("get_with_const_ref_test")
 {
 // Example from RFC 6901
-const json example = json::parse(R"(
+const json jstr = jsoncons::json::parse(R"(
    {
       "foo": ["bar", "baz"],
       "": 0,
@@ -90,160 +90,160 @@ const json example = json::parse(R"(
    }
 )");
 
-    check_contains(example,"",true);
-    check_contains(example,"/foo",true);
-    check_contains(example,"/foo/0",true);
-    check_contains(example,"/",true);
-    check_contains(example,"/a~1b",true);
-    check_contains(example,"/c%d",true);
-    check_contains(example,"/e^f",true);
-    check_contains(example,"/g|h",true);
-    check_contains(example,"/i\\j",true);
-    check_contains(example,"/k\"l",true);
-    check_contains(example,"/ ",true);
-    check_contains(example,"/m~0n",true);
+    check_contains(jstr,"",true);
+    check_contains(jstr,"/foo",true);
+    check_contains(jstr,"/foo/0",true);
+    check_contains(jstr,"/",true);
+    check_contains(jstr,"/a~1b",true);
+    check_contains(jstr,"/c%d",true);
+    check_contains(jstr,"/e^f",true);
+    check_contains(jstr,"/g|h",true);
+    check_contains(jstr,"/i\\j",true);
+    check_contains(jstr,"/k\"l",true);
+    check_contains(jstr,"/ ",true);
+    check_contains(jstr,"/m~0n",true);
 
-    check_get(example,"",example);
-    check_get(example,"/foo",json::parse("[\"bar\", \"baz\"]"));
-    check_get(example,"/foo/0",json("bar"));
-    check_get(example,"/",json(0));
-    check_get(example,"/a~1b",json(1));
-    check_get(example,"/c%d",json(2));
-    check_get(example,"/e^f",json(3));
-    check_get(example,"/g|h",json(4));
-    check_get(example,"/i\\j",json(5));
-    check_get(example,"/k\"l",json(6));
-    check_get(example,"/ ",json(7));
-    check_get(example,"/m~0n",json(8));
+    check_get(jstr,"",jstr);
+    check_get(jstr,"/foo",jsoncons::json::parse("[\"bar\", \"baz\"]"));
+    check_get(jstr,"/foo/0",jsoncons::json("bar"));
+    check_get(jstr,"/",jsoncons::json(0));
+    check_get(jstr,"/a~1b",jsoncons::json(1));
+    check_get(jstr,"/c%d",jsoncons::json(2));
+    check_get(jstr,"/e^f",jsoncons::json(3));
+    check_get(jstr,"/g|h",jsoncons::json(4));
+    check_get(jstr,"/i\\j",jsoncons::json(5));
+    check_get(jstr,"/k\"l",jsoncons::json(6));
+    check_get(jstr,"/ ",jsoncons::json(7));
+    check_get(jstr,"/m~0n",jsoncons::json(8));
 }
 
 TEST_CASE("get_with_ref_test")
 {
 // Example from RFC 6901
-json example = json::parse(R"(
+json jstr = jsoncons::json::parse(R"(
    {
       "foo": ["bar", "baz"]
    }
 )");
 
     std::error_code ec;
-    json& result = jsonpointer::get(example,"/foo/0",ec);
+    jsoncons::json& result = jsonpointer::get(jstr,"/foo/0",ec);
     CHECK_FALSE(ec);
 
     result = "bat";
 
-    //std::cout << example << '\n';
+    //std::cout << jstr << '\n';
 }
 
 TEST_CASE("get_with_nonexistent_target")
 {
-    json example = R"(
+    jsoncons::json jstr = R"(
         { "foo": "bar" }
     )"_json;
 
-    check_contains(example,"/baz",false);
+    check_contains(jstr,"/baz",false);
 }
 
 // insert_or_assign
 
 TEST_CASE("test_add_object_member")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
     { "foo": "bar"}
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
     { "foo": "bar", "baz" : "qux"}
     )");
 
-    check_insert_or_assign(example,"/baz", json("qux"), expected);
+    check_insert_or_assign(jstr,"/baz", jsoncons::json("qux"), expected);
 }
 
 TEST_CASE("test_add_array_element")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
     { "foo": [ "bar", "baz" ] }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
     { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    check_insert_or_assign(example,"/foo/1", json("qux"), expected);
+    check_insert_or_assign(jstr,"/foo/1", jsoncons::json("qux"), expected);
 }
 
 TEST_CASE("test_add_array_value")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
      { "foo": ["bar"] }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
     { "foo": ["bar", ["abc", "def"]] }
     )");
 
-    check_insert_or_assign(example,"/foo/-", json(json_array_arg, {"abc", "def"}), expected);
+    check_insert_or_assign(jstr,"/foo/-", jsoncons::json(jsoncons::json_array_arg, {"abc", "def"}), expected);
 }
 
 // remove
 
 TEST_CASE("test_remove_object_member")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
     { "foo": "bar", "baz" : "qux"}
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
         { "foo": "bar"}
     )");
 
-    check_remove(example,"/baz", expected);
+    check_remove(jstr,"/baz", expected);
 }
 
 TEST_CASE("test_remove_array_element")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
-    check_remove(example,"/foo/1", expected);
+    check_remove(jstr,"/foo/1", expected);
 }
 
 // replace
 
 TEST_CASE("test_replace_object_value")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
         {
           "baz": "qux",
           "foo": "bar"
         }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
         {
           "baz": "boo",
           "foo": "bar"
         }
     )");
 
-    check_replace(example,"/baz", json("boo"), expected);
+    check_replace(jstr,"/baz", jsoncons::json("boo"), expected);
 }
 TEST_CASE("test_replace_array_value")
 {
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
-    const json expected = json::parse(R"(
+    const json expected = jsoncons::json::parse(R"(
         { "foo": [ "bar", "qux" ] }
     )");
 
-    check_replace(example,"/foo/1", json("qux"), expected);
+    check_replace(jstr,"/foo/1", jsoncons::json("qux"), expected);
 }
 
 TEST_CASE("jsonpointer path tests")
@@ -303,7 +303,7 @@ TEST_CASE("wjsonpointer path tests")
 TEST_CASE("jsonpointer concatenation")
 {
     // Example from RFC 6901
-    json example = json::parse(R"(
+    jsoncons::json jstr = jsoncons::json::parse(R"(
        {
           "a/b": ["bar", "baz"],
           "m~n": ["foo", "qux"]
@@ -324,9 +324,9 @@ TEST_CASE("jsonpointer concatenation")
         CHECK(it == end);
 
         std::error_code ec;
-        json j = jsonpointer::get(example, ptr, ec);
+        jsoncons::json j = jsonpointer::get(jstr, ptr, ec);
         //std::cout << j << "\n";
-        CHECK(j == json("bar"));
+        CHECK(j == jsoncons::json("bar"));
     }
 
     SECTION("concatenate two paths")
@@ -344,25 +344,25 @@ TEST_CASE("jsonpointer concatenation")
         CHECK((*it++ == "1"));
         CHECK(it == end);
 
-        json j = jsonpointer::get(example, ptr);
-        CHECK(j == json("qux"));
+        jsoncons::json j = jsonpointer::get(jstr, ptr);
+        CHECK(j == jsoncons::json("qux"));
         //std::cout << j << "\n";
     }
 }
 
 TEST_CASE("[jsonpointer] Inserting object after deleting it")
 {
-    ojson oj;
+    jsoncons::ojson oj;
 
     std::error_code ec;
 
-    jsonpointer::add( oj, "/test", ojson(), ec );
+    jsonpointer::add( oj, "/test", jsoncons::ojson(), ec );
     CHECK(1 == oj.size());
 
     jsonpointer::remove( oj, "/test", ec );
     CHECK(0 == oj.size());
 
-    jsonpointer::add( oj, "/t", ojson(), ec );
+    jsonpointer::add( oj, "/t", jsoncons::ojson(), ec );
     CHECK(1 == oj.size());
 }
 
@@ -378,13 +378,13 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc;
-        json result = jsonpointer::get(doc, ptr, true);
+        jsoncons::json doc;
+        jsoncons::json result = jsonpointer::get(doc, ptr, true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":{}}}})");
 
         CHECK(expected == doc);
-        CHECK(result == json());
+        CHECK(result == jsoncons::json());
     }
     SECTION("get from non-empty")
     {
@@ -396,13 +396,13 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc = json::parse(R"({"foo":{}})");
-        json result = jsonpointer::get(doc, ptr, true);
+        jsoncons::json doc = jsoncons::json::parse(R"({"foo":{}})");
+        jsoncons::json result = jsonpointer::get(doc, ptr, true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":{}}}})");
 
         CHECK(expected == doc);
-        CHECK(result == json());
+        CHECK(result == jsoncons::json());
     }
     SECTION("add into empty")
     {
@@ -414,10 +414,10 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc;
+        jsoncons::json doc;
         jsonpointer::add(doc, ptr, "str", true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
         CHECK(expected == doc);
     }
@@ -431,10 +431,10 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc = json::parse(R"({"foo":{}})");
+        jsoncons::json doc = jsoncons::json::parse(R"({"foo":{}})");
         jsonpointer::add(doc, ptr, "str", true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
         CHECK(expected == doc);
     }
@@ -448,9 +448,9 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc;
+        jsoncons::json doc;
         jsonpointer::add_if_absent(doc, ptr, "str", true);
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(expected == doc);
     }
     SECTION("add_if_absent into non-empty")
@@ -463,9 +463,9 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc = json::parse(R"({"foo":{}})");
+        jsoncons::json doc = jsoncons::json::parse(R"({"foo":{}})");
         jsonpointer::add_if_absent(doc, ptr, "str", true);
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(expected == doc);
     }
     SECTION("replace into empty")
@@ -478,10 +478,10 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc;
+        jsoncons::json doc;
         jsonpointer::replace(doc, ptr, "str", true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
         CHECK(expected == doc);
     }
@@ -495,10 +495,10 @@ TEST_CASE("[jsonpointer] create_if_missing")
             ptr /= key;
         }
 
-        json doc = json::parse(R"({"foo":{}})");
+        jsoncons::json doc = jsoncons::json::parse(R"({"foo":{}})");
         jsonpointer::replace(doc, ptr, "str", true);
 
-        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        jsoncons::json expected = jsoncons::json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
         CHECK(expected == doc);
     }
@@ -512,14 +512,14 @@ TEST_CASE("[jsonpointer] create_if_missing")
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<mock_stateful_allocator<T>>;
 
-using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpointer get with stateful allocator")
 {
     MyScopedAllocator<char> alloc(1);
 
     // Example from RFC 6901
-    const cust_json example = cust_json::parse(make_alloc_set(alloc), R"(
+    const cust_json jstr = cust_json::parse(make_alloc_set(alloc), R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -532,34 +532,34 @@ TEST_CASE("jsonpointer get with stateful allocator")
           " ": 7,
           "m~n": 8
        }
-    )", json_options{});
+    )", jsoncons::json_options{});
 
-    check_contains(example,"",true);
-    check_contains(example,"/foo",true);
-    check_contains(example,"/foo/0",true);
-    check_contains(example,"/",true);
-    check_contains(example,"/a~1b",true);
-    check_contains(example,"/c%d",true);
-    check_contains(example,"/e^f",true);
-    check_contains(example,"/g|h",true);
-    check_contains(example,"/i\\j",true);
-    check_contains(example,"/k\"l",true);
-    check_contains(example,"/ ",true);
-    check_contains(example,"/m~0n",true);
+    check_contains(jstr,"",true);
+    check_contains(jstr,"/foo",true);
+    check_contains(jstr,"/foo/0",true);
+    check_contains(jstr,"/",true);
+    check_contains(jstr,"/a~1b",true);
+    check_contains(jstr,"/c%d",true);
+    check_contains(jstr,"/e^f",true);
+    check_contains(jstr,"/g|h",true);
+    check_contains(jstr,"/i\\j",true);
+    check_contains(jstr,"/k\"l",true);
+    check_contains(jstr,"/ ",true);
+    check_contains(jstr,"/m~0n",true);
 
-    check_get(example,"",example);
-    check_get(example,"/foo", cust_json::parse(make_alloc_set(alloc),
-        jsoncons::string_view("[\"bar\", \"baz\"]"), json_options()));
-    check_get(example,"/foo/0", cust_json("bar", semantic_tag::none, alloc));
-    check_get(example,"/", cust_json(0));
-    check_get(example,"/a~1b", cust_json(1));
-    check_get(example,"/c%d", cust_json(2));
-    check_get(example,"/e^f", cust_json(3));
-    check_get(example,"/g|h", cust_json(4));
-    check_get(example,"/i\\j", cust_json(5));
-    check_get(example,"/k\"l", cust_json(6));
-    check_get(example,"/ ", cust_json(7));
-    check_get(example,"/m~0n", cust_json(8));
+    check_get(jstr,"",jstr);
+    check_get(jstr,"/foo", cust_json::parse(make_alloc_set(alloc),
+        jsoncons::string_view("[\"bar\", \"baz\"]"), jsoncons::json_options()));
+    check_get(jstr,"/foo/0", cust_json("bar", jsoncons::semantic_tag::none, alloc));
+    check_get(jstr,"/", cust_json(0));
+    check_get(jstr,"/a~1b", cust_json(1));
+    check_get(jstr,"/c%d", cust_json(2));
+    check_get(jstr,"/e^f", cust_json(3));
+    check_get(jstr,"/g|h", cust_json(4));
+    check_get(jstr,"/i\\j", cust_json(5));
+    check_get(jstr,"/k\"l", cust_json(6));
+    check_get(jstr,"/ ", cust_json(7));
+    check_get(jstr,"/m~0n", cust_json(8));
 }
 #endif
 

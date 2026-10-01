@@ -41,7 +41,7 @@ TEST_CASE("json_location parse tests")
 TEST_CASE("json_location remove tests")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -65,7 +65,7 @@ TEST_CASE("json_location remove tests")
 }
     )";
 
-    json doc = json::parse(json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
@@ -101,7 +101,7 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store book 3")
     {
-        json orig = doc;
+        jsoncons::json orig = doc;
 
         jsonpath::json_location loc;
         loc.append("store").append("book").append(3);
@@ -138,7 +138,7 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store lost&found")
     {
-        json orig = doc;
+        jsoncons::json orig = doc;
 
         jsonpath::json_location loc;
         loc.append("store").append("lost&found");
@@ -168,7 +168,7 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store 0")
     {
-        json orig = doc;
+        jsoncons::json orig = doc;
 
         jsonpath::json_location loc;
         loc.append("store").append(0);
@@ -186,7 +186,7 @@ TEST_CASE("json_location remove tests")
 TEST_CASE("json_location select tests")
 {
 
-    std::string json_string = R"(
+    std::string jstr = R"(
 { "store": {
     "book": [ 
       { "category": "reference",
@@ -210,7 +210,7 @@ TEST_CASE("json_location select tests")
 }
     )";
 
-    json doc = json::parse(json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
@@ -309,15 +309,15 @@ TEST_CASE("test json_location from path_node")
 
         std::string jsonpath_string = "$['foo']['bar'][7]";
 
-        CHECK((jsonpath::json_location{ a4 } == location));
-        CHECK((jsonpath::to_string(location) == jsonpath_string));
+        CHECK((jsoncons::jsonpath::json_location{ a4 } == location));
+        CHECK((jsoncons::jsonpath::to_string(location) == jsonpath_string));
     }
 }
 #endif
 
 TEST_CASE("json_location replace tests")
 {
-    std::string json_string = R"(
+    std::string jstr = R"(
 {"books": [ 
     { "category": "reference",
       "author": "Nigel Rees",
@@ -338,12 +338,12 @@ TEST_CASE("json_location replace tests")
 }
     )";
 
-    json doc = json::parse(json_string);
+    jsoncons::json doc = jsoncons::json::parse(jstr);
 
     SECTION("store book 1")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[0].price");
-        json new_value{13.0}; 
+        jsoncons::json new_value{13.0}; 
         //std::cout << to_string(loc) << "\n";
         
         auto result1 = jsonpath::replace(doc, loc, new_value, false);
@@ -363,7 +363,7 @@ TEST_CASE("json_location replace tests")
     SECTION("test 2")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].price");
-        json new_value{13.0}; 
+        jsoncons::json new_value{13.0}; 
 
         //std::cout << to_string(loc) << "\n";
 
@@ -383,7 +383,7 @@ TEST_CASE("json_location replace tests")
     SECTION("test 3")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].kindle.price");
-        json new_value{13.0}; 
+        jsoncons::json new_value{13.0}; 
 
         //std::cout << pretty_print(doc) << "\n";
 
@@ -403,7 +403,7 @@ TEST_CASE("json_location replace tests")
     SECTION("test 4")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[2]");
-        json new_value{}; 
+        jsoncons::json new_value{}; 
 
         //std::cout << to_string(loc) << "\n";
 
@@ -426,7 +426,7 @@ TEST_CASE("json_location replace tests")
     SECTION("test 5")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[3]");
-        json new_value{}; 
+        jsoncons::json new_value{}; 
 
         //std::cout << to_string(loc) << "\n";
 

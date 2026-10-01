@@ -2,14 +2,14 @@
 // Distributed under Boost license
 
 #include <unordered_map>
-#include <jsoncons/detail/string_view.hpp>
+#include <jsoncons/nonstd/string_view.hpp>
 #include <catch/catch.hpp>
 
 TEST_CASE("string_view tests")
 {
     SECTION("test 1")
     {
-        std::unordered_map<jsoncons::detail::string_view,int> map;
+        std::unordered_map<jsoncons::nonstd::string_view,int> map;
 
         std::string key1{"Foo"};
         std::string key2{"Bar"};

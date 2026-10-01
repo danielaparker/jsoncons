@@ -4,15 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_ENDIAN_HPP
-#define JSONCONS_DETAIL_ENDIAN_HPP
+#ifndef JSONCONS_NONSTD_ENDIAN_HPP
+#define JSONCONS_NONSTD_ENDIAN_HPP
 
 #if defined(__sun)
 #  include <sys/byteorder.h>
 #endif
 
 namespace jsoncons { 
-namespace detail {
+namespace nonstd {
 
     enum class endian
     {
@@ -38,7 +38,7 @@ namespace detail {
     #endif
     };
 
-} // namespace detail
+} // namespace nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_DETAIL_ENDIAN_HPP
+#endif // JSONCONS_NONSTD_ENDIAN_HPP

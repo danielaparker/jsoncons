@@ -28,8 +28,9 @@ enum class bson_errc
     datetime_too_small,
     datetime_too_large,
     expected_bson_document,
-    invalid_regex_string,
+    bad_regex,
     size_mismatch,
+    expected_boolean,
     unknown_type
 };
 
@@ -69,8 +70,10 @@ public:
                 return "datetime too small";
             case bson_errc::expected_bson_document:
                 return "Expected BSON document";
-            case bson_errc::invalid_regex_string:
+            case bson_errc::bad_regex:
                 return "Invalid regex string";
+            case bson_errc::expected_boolean:
+                return "Expected a boolean value";
             case bson_errc::size_mismatch:
                 return "Document or array size doesn't match bytes read";
             default:

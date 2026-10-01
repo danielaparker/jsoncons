@@ -14,11 +14,11 @@
 #include <ios>
 #include <system_error>
 
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/ser_utils.hpp>
+#include <jsoncons/ser_common.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/conversion.hpp>

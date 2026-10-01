@@ -11,20 +11,20 @@
 #include <string>
 #include <system_error> // std::error_code
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/utility/more_type_traits.hpp>
+#include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
-#include <jsoncons/utility/write_number.hpp> // from_integer
+#include <jsoncons/utility/number_writers.hpp> // from_integer
 
 namespace jsoncons {
 
 template <typename InputIt,typename Container>
 typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value
-    && ext_traits::is_string<Container>::value,size_t>::type
+    && nonstd::is_string<Container>::value,size_t>::type
 bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
 {
     switch (tag)
@@ -39,7 +39,7 @@ bytes_to_string(InputIt first, InputIt last, semantic_tag tag, Container& str)
 }
 
 template <typename InputIt,typename Container>
-typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type
+typename std::enable_if<nonstd::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type
 string_to_bytes(InputIt first, InputIt last, semantic_tag tag, Container& bytes)
 {
     switch (tag)

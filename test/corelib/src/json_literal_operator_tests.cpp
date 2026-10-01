@@ -15,7 +15,7 @@ using namespace jsoncons::literals;
 
 TEST_CASE("json_literal_operator_test1")
 {
-    json j = R"(
+    jsoncons::json j = R"(
 {
     "StartDate" : "2017-03-01",
     "MaturityDate" : "2020-12-30",
@@ -34,7 +34,7 @@ TEST_CASE("json_literal_operator_test1")
 
 TEST_CASE("ojson_literal_operator_test1")
 {
-    ojson j = R"(
+    jsoncons::ojson j = R"(
 {
     "StartDate" : "2017-03-01",
     "MaturityDate" : "2020-12-30",
@@ -53,7 +53,7 @@ TEST_CASE("ojson_literal_operator_test1")
 
 TEST_CASE("json_literal_operator_test2")
 {
-    wjson j = LR"(
+    jsoncons::wjson j = LR"(
 {
     "StartDate" : "2017-03-01",
     "MaturityDate" : "2020-12-30",

@@ -28,7 +28,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_str
     }
 
     std::vector<uint8_t> output;
-    base64_to_bytes(result.begin(), result.end(), output);
+    jsoncons::base64_to_bytes(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -48,7 +48,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_
     }
 
     std::vector<uint8_t> output; 
-    base64url_to_bytes(result.begin(), result.end(), output);
+    jsoncons::base64url_to_bytes(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -68,7 +68,7 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::basic_str
     }
 
     std::vector<uint8_t> output;
-    auto res = base16_to_bytes(result.begin(), result.end(), output);
+    auto res = jsoncons::base16_to_bytes(result.begin(), result.end(), output);
     REQUIRE(res.ec == conv_errc::success);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
@@ -154,7 +154,7 @@ TEST_CASE("byte_string_view constructors")
     SECTION("test 1")
     {
         std::vector<uint8_t> v = {'f','o','o','b','a','r'};
-        byte_string_view bstr(v);
+        jsoncons::byte_string_view bstr(v);
         CHECK(bstr[0] == 'f');
         CHECK(bstr[1] == 'o');
         CHECK(bstr[2] == 'o');
@@ -162,10 +162,10 @@ TEST_CASE("byte_string_view constructors")
         CHECK(bstr[4] == 'a');
         CHECK(bstr[5] == 'r');
 
-        byte_string_view copied(bstr);
+        jsoncons::byte_string_view copied(bstr);
         CHECK(copied == bstr);
 
-        byte_string_view moved(std::move(bstr));
+        jsoncons::byte_string_view moved(std::move(bstr));
         CHECK(bstr.data() == nullptr);
         CHECK(0 == bstr.size());
 
@@ -185,7 +185,7 @@ TEST_CASE("byte_string mutators")
     {
         std::vector<uint8_t> u = {'b','a','z'};
         std::vector<uint8_t> v = {'f','o','o','b','a','r'};
-        byte_string bstr(u.data(),3);
+        jsoncons::byte_string bstr(u.data(),3);
         bstr.append(v.data(), 6);
 
         CHECK(bstr[0] == 'b');
@@ -201,7 +201,7 @@ TEST_CASE("byte_string mutators")
     SECTION("assign")
     {
         std::vector<uint8_t> v = {'f','o','o','b','a','r'};
-        byte_string bstr;
+        jsoncons::byte_string bstr;
         bstr.assign(v.data(), 6);
 
         CHECK(bstr[0] == 'f');
@@ -218,7 +218,7 @@ TEST_CASE("byte_string_view iterators")
     SECTION("begin/end")
     {
         std::vector<uint8_t> v = {'f','o','o'};
-        byte_string_view bstr(v);
+        jsoncons::byte_string_view bstr(v);
 
         auto it = bstr.begin();
         REQUIRE(it != bstr.end());

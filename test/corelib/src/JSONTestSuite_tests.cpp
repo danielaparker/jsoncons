@@ -32,7 +32,7 @@ TEST_CASE("JSON Parsing Test Suite")
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'y')
             {
                 std::ifstream is(p.path().c_str());
-                auto options = json_options{}.allow_comments(false);
+                auto options = jsoncons::json_options{}.allow_comments(false);
                 json_stream_reader reader(is, options);
                 std::error_code ec;
                 reader.read(ec);
@@ -52,7 +52,7 @@ TEST_CASE("JSON Parsing Test Suite")
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'n')
             {
                 std::ifstream is(p.path().c_str());
-                auto options = json_options{}.allow_comments(false);
+                auto options = jsoncons::json_options{}.allow_comments(false);
                 json_stream_reader reader(is, options);
                 std::error_code ec;
                 reader.read(ec);

@@ -17,7 +17,7 @@ TEST_CASE("decode_traits primitive")
 {
     SECTION("is_primitive")
     {
-        CHECK(ext_traits::is_primitive<uint64_t>::value);
+        CHECK(nonstd::is_primitive<uint64_t>::value);
     }
     SECTION("uint64_t")
     {
@@ -51,7 +51,7 @@ TEST_CASE("decode_traits std::string")
 {
     SECTION("is_string")
     {
-        CHECK(ext_traits::is_string<std::string>::value);
+        CHECK(nonstd::is_string<std::string>::value);
     }
     SECTION("string")
     {
@@ -136,6 +136,6 @@ TEST_CASE("decode_traits deserialization errors")
         json_string_cursor cursor(input);
         auto result = reflect::decode_traits<value_type>::decode(make_alloc_set(), cursor);
         REQUIRE_FALSE(result);
-        CHECK(json_errc::expected_comma_or_rbrace == result.error().code());
+        CHECK(jsoncons::json_errc::expected_comma_or_rbrace == result.error().code());
     }
 }

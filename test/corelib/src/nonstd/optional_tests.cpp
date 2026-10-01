@@ -1,11 +1,11 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/detail/optional.hpp>
+#include <jsoncons/nonstd/optional.hpp>
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 
-using jsoncons::detail::optional;
+using jsoncons::nonstd::optional;
 using jsoncons::json;
 
 TEST_CASE("optional constructor tests")
@@ -39,18 +39,18 @@ TEST_CASE("optional constructor tests")
         CHECK_FALSE(x.has_value());
         CHECK_FALSE(x);
     }
-    SECTION("optional<T>(json)")
+    SECTION("optional<T>(jsoncons::json)")
     {
-        json j = json::parse(input);
-        optional<json> x{j};
+        jsoncons::json j = jsoncons::json::parse(input);
+        optional<jsoncons::json> x{j};
         CHECK(x.has_value());
         bool b(x);
         CHECK(b);
 
-        json* p = x.operator->();
+        jsoncons::json* p = x.operator->();
         REQUIRE(p);
         REQUIRE(3 == p->size());
-        json& ref = x.value();
+        jsoncons::json& ref = x.value();
         REQUIRE(3 == ref.size());
 
         const auto& cref = *x;

@@ -38,10 +38,10 @@
 #include <system_error>
 #include <type_traits>
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/read_number.hpp>
-#include <jsoncons/utility/write_number.hpp>
+#include <jsoncons/utility/number_readers.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 
 namespace jsoncons { 
 namespace bson {

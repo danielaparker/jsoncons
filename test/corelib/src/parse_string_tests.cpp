@@ -25,7 +25,7 @@ public:
     {
     }
 
-    bool operator()(const std::error_code& ec, const ser_context&) noexcept
+    bool operator()(const std::error_code& ec, const jsoncons::ser_context&) noexcept
     {
         return ec == value_; // if returns true, use default processing
     }
@@ -35,7 +35,7 @@ TEST_CASE("test_parse_small_string1")
 {
     std::string input = "\"String\"";
 
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     JSONCONS_TRY
     {
         json_string_reader reader(input,decoder);
@@ -51,7 +51,7 @@ TEST_CASE("test_parse_small_string2")
 {
     std::string input = "\"Str\\\"ing\"";
 
-    json_decoder<json> decoder;
+    jsoncons::json_decoder<jsoncons::json> decoder;
     JSONCONS_TRY
     {
         json_string_reader reader(input, decoder);
@@ -70,7 +70,7 @@ TEST_CASE("test_parse_small_string4")
     for (std::size_t i = 4; i < input.length(); ++i)
     {
         std::istringstream is(input);
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(stream_source<char>(is,i), decoder);
@@ -91,7 +91,7 @@ TEST_CASE("test_parse_big_string1")
     for (std::size_t i = 4; i < input.length(); ++i)
     {
         std::istringstream is(input);
-        json_decoder<json> decoder;
+        jsoncons::json_decoder<jsoncons::json> decoder;
         JSONCONS_TRY
         {
             json_stream_reader reader(stream_source<char>(is,i), decoder);
@@ -110,8 +110,8 @@ TEST_CASE("test_parse_big_string2")
     std::string input = "\"Big\t Str\\\"ing\"";
 
     std::istringstream is(input);
-    json_decoder<json> decoder;
-    lenient_error_handler err_handler(json_errc::illegal_character_in_string);
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    lenient_error_handler err_handler(jsoncons::json_errc::illegal_character_in_string);
     JSONCONS_TRY
     {
         json_stream_reader reader(is, decoder, err_handler);

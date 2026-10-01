@@ -45,7 +45,7 @@ TEST_CASE("staj_array_iterator tests")
     {
         json_string_cursor cursor(s);
 
-        auto iter = staj_array_iterator<json>(cursor);
+        auto iter = staj_array_iterator<jsoncons::json>(cursor);
 
         auto it = begin(iter);
         auto last = end(iter);
@@ -74,9 +74,9 @@ TEST_CASE("staj_array_iterator tests")
 
         bool author_next = false;
         auto filtered_c = cursor |
-            [&](const staj_event& event, const ser_context&) -> bool
+            [&](const jsoncons::staj_event& event, const jsoncons::ser_context&) -> bool
         {
-            if (event.event_type() == staj_events::key &&
+            if (event.event_type() == jsoncons::staj_events::key &&
                 event.get<jsoncons::string_view>() == "firstName")
             {
                 author_next = true;
@@ -91,15 +91,15 @@ TEST_CASE("staj_array_iterator tests")
         };
 
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_events::string_value);
+        CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("Tom"));
         filtered_c.next();
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_events::string_value);
+        CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("Catherine"));
         filtered_c.next();
         REQUIRE(!filtered_c.done());
-        CHECK(filtered_c.current().event_type() == staj_events::string_value);
+        CHECK(filtered_c.current().event_type() == jsoncons::staj_events::string_value);
         CHECK(filtered_c.current().get<std::string>() == std::string("William"));
         filtered_c.next();
         REQUIRE(filtered_c.done());
@@ -121,7 +121,7 @@ TEST_CASE("object_iterator test")
     {
         std::istringstream is(s);
         json_stream_cursor cursor(is);
-        auto iter = staj_object_iterator<std::string,json>(cursor);
+        auto iter = staj_object_iterator<std::string,jsoncons::json>(cursor);
 
         auto it = begin(iter);
         auto last = end(iter);
@@ -151,7 +151,7 @@ TEST_CASE("object_iterator test")
         std::string str = R"({ "prop": { "nested": 123} })";
         std::istringstream is(str);
         json_stream_cursor cursor(is);
-        auto iter = staj_object_iterator<std::string,json>(cursor);
+        auto iter = staj_object_iterator<std::string,jsoncons::json>(cursor);
 
         auto it = begin(iter);
         auto last = end(iter);

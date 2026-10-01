@@ -15,7 +15,7 @@ using namespace jsoncons;
 TEST_CASE("test_byte_string_serialization")
 {
     std::vector<uint8_t> bytes = {'H','e','l','l','o'};
-    json j(byte_string_arg, bytes);
+    jsoncons::json j(jsoncons::byte_string_arg, bytes);
 
     std::ostringstream os;
     os << j;
@@ -38,7 +38,7 @@ struct json_string_encoder_reset_test_fixture
 
     json_string_encoder_reset_test_fixture()
         : encoder(output1,
-                  json_options().indent_size(0).new_line_chars("")
+                  jsoncons::json_options().indent_size(0).new_line_chars("")
                                 .spaces_around_comma(spaces_option::no_spaces))
     {}
 
@@ -54,7 +54,7 @@ struct json_stream_encoder_reset_test_fixture
 
     json_stream_encoder_reset_test_fixture()
         : encoder(output1,
-                  json_options().indent_size(0).new_line_chars("")
+                  jsoncons::json_options().indent_size(0).new_line_chars("")
                       .spaces_around_comma(spaces_option::no_spaces))
     {}
 
