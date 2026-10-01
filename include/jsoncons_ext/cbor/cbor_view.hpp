@@ -19,7 +19,6 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/expected.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
@@ -112,10 +111,6 @@ namespace view {
         scan_error error_;
         bool has_value_;
     };
-
-
-    using jsoncons::detail::expected;
-    using jsoncons::detail::unexpect;
 
     namespace detail_view {
 
