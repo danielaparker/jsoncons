@@ -1021,7 +1021,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         reader.read(ec);
         CHECK_FALSE(ec);
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor
     // Issue:  jsoncons:fuzz_cbor: Integer-overflow in jsoncons::cbor::basic_cbor_parser<jsoncons::stream_source<unsigned char, std::__
@@ -1047,7 +1047,25 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         //CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch //-V521
         //       ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
+    }*/
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: failed_throw
+    // Resolution: Check for unmatched end array
+    SECTION("issue 568128284")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-4648046533869568";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        //CHECK(ec == cbor::cbor_errc::unmatched_end_array);
     }
 }
-
 
