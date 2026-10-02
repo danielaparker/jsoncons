@@ -92,6 +92,11 @@ private:
             return type_ == container_type::object || type_ == container_type::indefinite_length_object;
         }
 
+        bool is_array() const
+        {
+            return type_ == container_type::array || type_ == container_type::indefinite_length_array;
+        }
+
         bool is_indefinite_length() const
         {
             return type_ == container_type::indefinite_length_array || type_ == container_type::indefinite_length_object;
@@ -112,7 +117,6 @@ private:
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
-    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -162,7 +166,6 @@ public:
         stringref_map_.clear();
         bytestringref_map_.clear();
         next_stringref_ = 0;
-        nesting_depth_ = 0;
     }
 
     void reset(Sink&& sink)
@@ -268,7 +271,6 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        ++nesting_depth_;
         stack_.emplace_back(container_type::indefinite_length_object);
         
         sink_.push_back(0xbf);
@@ -282,7 +284,6 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        ++nesting_depth_;
         stack_.emplace_back(container_type::object, length);
 
         write_type_and_length(0xa0, length);
@@ -292,8 +293,11 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_object()))
+        {
+            ec = cbor_errc::unmatched_end_object;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {
@@ -326,7 +330,6 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        ++nesting_depth_;
         stack_.emplace_back(container_type::indefinite_length_array);
         sink_.push_back(0x9f);
         JSONCONS_VISITOR_RETURN;
@@ -339,7 +342,6 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        ++nesting_depth_;
         stack_.emplace_back(container_type::array, length);
         write_type_and_length(0x80, length);
         JSONCONS_VISITOR_RETURN;
@@ -347,8 +349,11 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_array()))
+        {
+            ec = cbor_errc::unmatched_end_array;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {

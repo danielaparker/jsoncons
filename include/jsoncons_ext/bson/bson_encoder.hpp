@@ -87,16 +87,18 @@ private:
             return type_ == jsoncons::bson::container_type::document;
         }
 
-
+        bool is_array() const
+        {
+            return type_ == jsoncons::bson::container_type::array;
+        }
     };
 
     sink_type sink_;
-    int max_nesting_depth_;
+    std::size_t max_nesting_depth_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
-    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -115,7 +117,7 @@ public:
                                 const bson_encode_options& options, 
                                 const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
-         max_nesting_depth_(options.max_nesting_depth()),
+         max_nesting_depth_(static_cast<std::size_t>(options.max_nesting_depth())),
          alloc_(alloc)
     {
     }
@@ -132,7 +134,6 @@ public:
     {
         stack_.clear();
         buffer_.clear();
-        nesting_depth_ = 0;
     }
 
     void reset(Sink&& sink)
@@ -151,7 +152,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -172,10 +173,13 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_object()))
+        {
+            ec = bson_errc::unmatched_end_object;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         buffer_.push_back(0x00);
 
@@ -195,7 +199,7 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
@@ -214,10 +218,13 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
-    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code&) final
+    JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_array()))
+        {
+            ec = bson_errc::unmatched_end_array;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         buffer_.push_back(0x00);
 

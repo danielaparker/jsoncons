@@ -58,6 +58,10 @@ public:
                 return "Unexpected character between fields";
             case csv_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case csv_errc::unmatched_end_object:
+                return "Unmatched end object";
+            case csv_errc::unmatched_end_array:
+                return "Unmatched end array";
             case csv_errc::invalid_number:
                 return "Invalid number";
             default:

@@ -1065,7 +1065,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        //CHECK(ec == cbor::cbor_errc::unmatched_end_array);
+        CHECK(ec == cbor::cbor_errc::unmatched_end_array);
     }
 }
 

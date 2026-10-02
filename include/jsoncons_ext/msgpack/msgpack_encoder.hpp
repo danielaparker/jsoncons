@@ -79,14 +79,18 @@ namespace msgpack {
             {
                 return type_ == container_type::object;
             }
+
+            bool is_array() const
+            {
+                return type_ == container_type::array;
+            }
         };
 
         Sink sink_;
-        int max_nesting_depth_;
+        std::size_t max_nesting_depth_;
         allocator_type alloc_;
 
         std::vector<stack_item> stack_;
-        int nesting_depth_{0};
     public:
 
         // Noncopyable and nonmoveable
@@ -102,7 +106,7 @@ namespace msgpack {
             const msgpack_encode_options& options, 
             const Allocator& alloc = Allocator())
            : sink_(std::forward<Sink>(sink)),
-             max_nesting_depth_(options.max_nesting_depth()),
+             max_nesting_depth_(static_cast<std::size_t>(options.max_nesting_depth())),
              alloc_(alloc)
         {
         }
@@ -118,7 +122,6 @@ namespace msgpack {
         void reset()
         {
             stack_.clear();
-            nesting_depth_ = 0;
         }
 
         void reset(Sink&& sink)
@@ -143,7 +146,7 @@ namespace msgpack {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
         {
-            if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+            if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
             {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 JSONCONS_VISITOR_RETURN;
@@ -175,8 +178,11 @@ namespace msgpack {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
         {
-            JSONCONS_ASSERT(!stack_.empty());
-            --nesting_depth_;
+            if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_object()))
+            {
+                ec = msgpack_errc::unmatched_end_object;
+                JSONCONS_VISITOR_RETURN;
+            }
 
             if (stack_.back().count() < stack_.back().length())
             {
@@ -202,7 +208,7 @@ namespace msgpack {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
         {
-            if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+            if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
             {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 JSONCONS_VISITOR_RETURN;
@@ -230,9 +236,11 @@ namespace msgpack {
 
         JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
         {
-            JSONCONS_ASSERT(!stack_.empty());
-
-            --nesting_depth_;
+            if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_array()))
+            {
+                ec = msgpack_errc::unmatched_end_array;
+                JSONCONS_VISITOR_RETURN;
+            }
 
             if (stack_.back().count() < stack_.back().length())
             {
