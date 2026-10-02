@@ -627,7 +627,8 @@ public:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = read_uint64(ec);
+                source_.ignore(1);
+                uint64_t val = read_unsigned_integer(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -698,7 +699,7 @@ public:
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
                 source_.ignore(1);
-                read_negative_integer(info, visitor, ec);
+                read_negative_integer (info, visitor, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -783,7 +784,8 @@ public:
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     {
-                        uint64_t val = read_uint64(ec);
+                        source_.ignore(1);
+                        uint64_t val = read_unsigned_integer(info, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
@@ -1580,7 +1582,8 @@ private:
 
                 case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
                 {
-                    uint64_t u = read_uint64(ec);
+                    source_.ignore(1);
+                    uint64_t u = read_unsigned_integer(info, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return 0;
@@ -1604,7 +1607,7 @@ private:
         return val;
     }
 
-    void read_negative_integer(uint8_t info, generic_visitor& visitor, std::error_code& ec)
+    void read_negative_integer (uint8_t info, generic_visitor& visitor, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1705,6 +1708,62 @@ private:
             default:
                 JSONCONS_UNREACHABLE();
                 break;
+        }
+    }
+
+    uint64_t read_unsigned_integer(uint8_t info, std::error_code& ec)
+    {
+        switch (info)
+        {
+            case JSONCONS_EXT_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+            {
+                return info;
+            }
+            case 0x18: // Unsigned integer (one-byte uint8_t follows)
+            {
+                uint8_t b;
+                if (source_.read(&b, 1) == 0)
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    return uint64_t{};
+                }
+                return b;
+            }
+            case 0x19: // Unsigned integer (two-byte uint16_t follows)
+            {
+                uint8_t buf[sizeof(uint16_t)];
+                if (source_.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    return uint64_t{};
+                }
+                auto u = binary::big_to_native<uint16_t>(buf, sizeof(buf));
+                return u;
+            }
+            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+            {
+                uint8_t buf[sizeof(uint32_t)];
+                if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    return uint64_t{};
+                }
+                auto u = binary::big_to_native<uint32_t>(buf, sizeof(buf));
+                return u;
+            }
+            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+            {
+                uint8_t buf[sizeof(uint64_t)];
+                if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    return uint64_t{};
+                }
+                auto u = binary::big_to_native<uint64_t>(buf, sizeof(buf));
+                return u;
+            }
+            default:
+                JSONCONS_UNREACHABLE();
         }
     }
 
@@ -1831,22 +1890,41 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = read_uint64(ec);
+                uint64_t u = read_uint64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
-                unscaled = bigint(val);
+                unscaled = bigint(u);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = read_int64(ec);
+                uint8_t info = get_additional_information_value(c.value);
+                if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+                {
+                    ec = cbor_errc::reserved_additional_info;
+                    more_ = false;
+                    return;
+                }
+                source_.ignore(1);
+                auto u = read_unsigned_integer(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
                 }
-                unscaled = bigint(val);
+                if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                {
+                    unscaled = -1 - bigint(u);
+                }
+                else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
+                {
+                    unscaled = bigint((std::numeric_limits<int64_t>::min)());
+                }
+                else
+                {
+                    unscaled = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
+                }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
