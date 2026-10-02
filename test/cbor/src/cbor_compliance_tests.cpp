@@ -44,6 +44,9 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
         CHECK(parse_error({0x1c}) == cbor::cbor_errc::reserved_additional_info); // bad
         CHECK(parse_error({0x1d}) == cbor::cbor_errc::reserved_additional_info); // bad
         CHECK(parse_error({0x1e}) == cbor::cbor_errc::reserved_additional_info); // bad
+        CHECK(parse_error({0x1f}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_error({0x3f}) == cbor::cbor_errc::unknown_type);
+        CHECK(parse_error({0xdf}) == cbor::cbor_errc::unknown_type);
         CHECK(parse_error({0xfc}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0xfd}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0xfe}) == cbor::cbor_errc::reserved_additional_info);
@@ -53,6 +56,8 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
         CHECK(parse_error({0x64,0x49,0x45,0x54}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x74,0x32,0x30,0x31,0x33}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x7f,0x01,0xff}) == cbor::cbor_errc::illegal_chunked_string);
+        CHECK(parse_error({0x5f,0x5e}) == cbor::cbor_errc::reserved_additional_info);
+        CHECK(parse_error({0x7f,0x7e}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x62,0xc0,0xae}) == cbor::cbor_errc::invalid_utf8_text_string);
         CHECK(parse_error({0x81}) == cbor::cbor_errc::unexpected_eof);

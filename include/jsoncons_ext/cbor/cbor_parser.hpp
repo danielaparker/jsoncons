@@ -1634,8 +1634,9 @@ private:
                 break;
             }
             default:
-                JSONCONS_UNREACHABLE();
-                break;
+                ec = info == jsoncons::cbor::detail::additional_info::indefinite_length ? cbor_errc::unknown_type : cbor_errc::reserved_additional_info;
+                more_ = false;
+                return;
         }
     }
 
@@ -1691,7 +1692,8 @@ private:
                 return u;
             }
             default:
-                JSONCONS_UNREACHABLE();
+                ec = info == jsoncons::cbor::detail::additional_info::indefinite_length ? cbor_errc::unknown_type : cbor_errc::reserved_additional_info;
+                return uint64_t{};
         }
     }
 

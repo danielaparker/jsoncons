@@ -53,11 +53,11 @@ public:
             case cbor_errc::unexpected_eof:
                 return "Unexpected end of file";
             case cbor_errc::reserved_additional_info:
-                return "Additional-information values 30-32 are reserved";
+                return "Additional-information values 28-30 are reserved";
             case cbor_errc::source_error:
                 return "Source error";
             case cbor_errc::invalid_bigdecimal:
-                return "Invalid DigDecimal value";
+                return "Invalid BigDecimal value";
             case cbor_errc::invalid_bigfloat:
                 return "Invalid BigFloat value";
             case cbor_errc::invalid_utf8_text_string:
