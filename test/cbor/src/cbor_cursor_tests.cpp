@@ -86,6 +86,19 @@ TEST_CASE("cbor cursor read_to stops at the end of a typed array")
     }
 }
 
+TEST_CASE("cbor cursor next after done is a no-op")
+{
+    std::vector<uint8_t> data = {0x01};
+    std::error_code ec;
+    cbor::cbor_bytes_cursor cursor(data, ec);
+    cursor.next(ec);
+    REQUIRE(cursor.done());
+
+    cursor.next(ec);
+    CHECK(cursor.done());
+    CHECK_FALSE(ec);
+}
+
 TEST_CASE("cbor stream source spans straddled strings")
 {
     std::string data;

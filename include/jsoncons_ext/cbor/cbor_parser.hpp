@@ -238,7 +238,7 @@ public:
 
     void restart()
     {
-        more_ = true;
+        more_ = !done_;
     }
 
     void reset()
