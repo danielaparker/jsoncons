@@ -1015,7 +1015,8 @@ private:
             }
             default: // definite length
             {
-                std::size_t len = read_size(ec);
+                source_.ignore(1);
+                std::size_t len = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1074,7 +1075,8 @@ private:
             }
             default: // definite_length
             {
-                std::size_t len = read_size(ec);
+                source_.ignore(1);
+                std::size_t len = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1142,7 +1144,8 @@ private:
             return string_view_type(text_buffer_.data(), text_buffer_.size());
         }
 
-        std::size_t length = read_size(ec);
+        source_.ignore(1);
+        std::size_t length = read_size(info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return string_view_type();
