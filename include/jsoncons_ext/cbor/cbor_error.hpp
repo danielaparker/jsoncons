@@ -32,6 +32,7 @@ enum class cbor_errc
     max_nesting_depth_exceeded,
     unmatched_end_array,
     unmatched_end_object,
+    invalid_major_type,
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,
@@ -78,6 +79,8 @@ public:
                 return "Unmatched end array";
             case cbor_errc::unknown_type:
                 return "Unknown type in input";
+            case cbor_errc::invalid_major_type:
+                return "Invalid major type in input";
             case cbor_errc::illegal_chunked_string:
                 return "An illegal type was found while parsing an indefinite length string";
             case cbor_errc::bad_mdarray:

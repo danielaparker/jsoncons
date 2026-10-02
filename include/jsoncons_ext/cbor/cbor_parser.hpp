@@ -672,8 +672,11 @@ public:
                             break;
                         }
                         default:
-                            JSONCONS_UNREACHABLE();
-                            break;
+                        {
+                            ec = cbor_errc::invalid_major_type;
+                            more_ = false;
+                            return;
+                        }
                     }
                 }
                 else
@@ -718,7 +721,8 @@ public:
             }
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
-                auto sv = read_text_string_view(ec);
+                source_.ignore(1);
+                auto sv = read_text_string_view(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -915,7 +919,9 @@ public:
                 break;
             }
             default:
-                break;
+                ec = cbor_errc::invalid_major_type;
+                more_ = false;
+                return;
         }
         other_tags_[item_tag] = false;
     }
@@ -1116,30 +1122,12 @@ private:
         state_stack_.pop_back();
     }
 
-    string_view_type read_text_string_view(std::error_code& ec)
+    string_view_type read_text_string_view(uint8_t info, std::error_code& ec)
     {
-        auto c = source_.peek();
-        if (JSONCONS_UNLIKELY(c.eof))
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return string_view_type();
-        }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
-        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        uint8_t info = get_additional_information(c.value);
-        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-        {
-            ec = cbor_errc::reserved_additional_info;
-            more_ = false;
-            return string_view_type();
-        }
-
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            source_.ignore(1);
             text_buffer_.clear();
-            iterate_string_chunks(text_buffer_, major_type, ec);
+            iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type::text_string, text_buffer_, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return string_view_type();
@@ -1147,7 +1135,6 @@ private:
             return string_view_type(text_buffer_.data(), text_buffer_.size());
         }
 
-        source_.ignore(1);
         std::size_t length = read_size(info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
@@ -1191,7 +1178,7 @@ private:
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
             source_.ignore(1);
-            iterate_string_chunks(str, major_type, ec);
+            iterate_string_chunks(major_type, str, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1243,7 +1230,7 @@ private:
         {
             source_.ignore(1);
             bytes_buffer_.clear();
-            iterate_string_chunks(bytes_buffer_, major_type, ec);
+            iterate_string_chunks(major_type, bytes_buffer_, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return byte_string_view();
@@ -1313,7 +1300,7 @@ private:
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
             source_.ignore(1);
-            iterate_string_chunks(v, major_type, ec);
+            iterate_string_chunks(major_type, v, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1341,7 +1328,7 @@ private:
     }
 
     template <typename Container>
-    void iterate_string_chunks(Container& v, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
+    void iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type type, Container& v, std::error_code& ec)
     {
         bool done = false;
         while (!done)
