@@ -364,6 +364,10 @@ public:
                     auto iter = typed_array_stack_.back();
                     if (iter->done())
                     {
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
                         if (!is_multi_dim())
                         {
                             typed_array_stack_.pop_back();

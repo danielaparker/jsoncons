@@ -48,6 +48,44 @@ TEST_CASE("cbor cursor exposes definite strings as views")
     }
 }
 
+TEST_CASE("cbor cursor read_to stops at the end of a typed array")
+{
+    SECTION("one-dimensional")
+    {
+        std::vector<uint8_t> data = {0x82, 0xd8,0x40,0x43,0x01,0x02,0x03, 0x05};
+        cbor::cbor_bytes_cursor cursor(data);
+        cursor.next();
+        REQUIRE(cursor.is_typed_array());
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cursor.read_to(decoder);
+        CHECK(decoder.get_result() == jsoncons::json::parse("[1,2,3]"));
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+
+        cursor.next();
+        CHECK(cursor.current().get<int>() == 5);
+        cursor.next();
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+        cursor.next();
+        CHECK(cursor.done());
+    }
+
+    SECTION("multi-dimensional")
+    {
+        std::vector<uint8_t> data = {0x82, 0xd8,0x28,0x82,0x82,0x02,0x02,0xd8,0x40,0x44,0x01,0x02,0x03,0x04, 0x05};
+        cbor::cbor_bytes_cursor cursor(data);
+        cursor.next();
+        REQUIRE(cursor.is_multi_dim());
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cursor.read_to(decoder);
+        CHECK(jsoncons::staj_events::end_array == cursor.current().event_type());
+
+        cursor.next();
+        CHECK(cursor.current().get<int>() == 5);
+    }
+}
+
 TEST_CASE("cbor stream source spans straddled strings")
 {
     std::string data;
@@ -475,7 +513,6 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         CHECK(cursor.done());
     }
 }
-
 
 TEST_CASE("cbor_event_reader reputon test")
 {
