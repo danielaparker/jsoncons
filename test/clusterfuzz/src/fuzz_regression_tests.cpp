@@ -1047,11 +1047,12 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         //CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch //-V521
         //       ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor_encoder
     // Issue: failed_throw
-    // Resolution: Check for unmatched end array
+    // Resolution: Check for unmatched end array 
+    // Status: fixed 
     SECTION("issue 568128284")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-4648046533869568";
@@ -1066,6 +1067,26 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::unmatched_end_array);
+    }*/
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: Bad parameters to --sanitizer-annotate-contiguous-container in jsoncons::cbor::basic_cbor_parser<jsoncons::stream_source<unsigned char, std::__
+    // Resolution: 
+    SECTION("issue 568595812")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-5862127433482240";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        std::cout << ec.message() << "\n";
     }
 }
+
 
