@@ -1334,7 +1334,8 @@ private:
         }
         else 
         {
-            std::size_t length = read_size(ec);
+            source_.ignore(1);
+            std::size_t length = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1387,7 +1388,8 @@ private:
                 return;
             }
 
-            std::size_t length = read_size(ec);
+            source_.ignore(1);
+            std::size_t length = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
