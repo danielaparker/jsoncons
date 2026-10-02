@@ -3050,7 +3050,9 @@ private:
                     }
                     else
                     {
-                        std::size_t extent = read_size(ec);
+                        source_.ignore(1);
+                        std::size_t extent = read_size(get_additional_information(c.value), ec);
+                        //std::size_t extent = read_size(ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             more_ = false;
