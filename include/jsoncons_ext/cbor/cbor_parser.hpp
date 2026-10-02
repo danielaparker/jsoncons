@@ -840,7 +840,7 @@ public:
                     {
                         case 0x04:
                             text_buffer_.clear();
-                            read_bigdecimal(text_buffer_, ec);
+                            read_bigdecimal(info, text_buffer_, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -854,7 +854,7 @@ public:
                             break;
                         case 0x05:
                             text_buffer_.clear();
-                            read_bigfloat(text_buffer_, ec);
+                            read_bigfloat(info, text_buffer_, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -1843,9 +1843,10 @@ private:
         return val;
     }
 
-    void read_bigdecimal(string_type& result, std::error_code& ec)
+    void read_bigdecimal(uint8_t bigdecimal_info, string_type& result, std::error_code& ec)
     {
-        std::size_t size = read_size(ec);
+        source_.ignore(1);
+        std::size_t size = read_unsigned_integer(bigdecimal_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return;
@@ -2028,9 +2029,10 @@ private:
         append_chars(dec, result);
     }
 
-    void read_bigfloat(string_type& str, std::error_code& ec)
+    void read_bigfloat(uint8_t bigfloat_info, string_type& str, std::error_code& ec)
     {
-        std::size_t size = read_size(ec);
+        source_.ignore(1);
+        std::size_t size = read_unsigned_integer(bigfloat_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return;
@@ -3073,7 +3075,21 @@ private:
                 }
                 for (std::size_t i = 0; more_ && i < size; ++i)
                 {
-                    std::size_t extent = read_size(ec);
+                    uint8_t initial_b;
+                    if (source_.read(&initial_b, 1) == 0)
+                    {
+                        ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    info = get_additional_information(initial_b);
+                    if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+                    {
+                        ec = cbor_errc::reserved_additional_info;
+                        more_ = false;
+                        return;
+                    }
+                    std::size_t extent = read_size(info, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
