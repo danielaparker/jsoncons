@@ -1,8 +1,22 @@
-master
+master (targeting 1.10.0)
 
 - Fixed bugs:
 
-  - Git PR ##738: fixed analyzer warning about possible uninitialized variable in encode_toon.hpp. 
+  - Git PR #738: Fixed analyzer warning about possible uninitialized variable in encode_toon.hpp. 
+
+  - Git Issue #740/PR #744: Fixed issue with operator in JMESPath let evaluation expression
+
+  - Git Issue #741: Fixed issue with BSON parser not validating that a boolean value must be one or zero. 
+
+  - Git Issue #742: Fixed issue with CBOR parser not validating that the "additional information value" must not have reserved values 30-32. 
+
+  - Git PR #745: Fixed missing <exception> for !defined(JSONCONS_NO_EXCEPTIONS)
+
+Enhancements:
+
+  - Improved `basic_json_pointer` to reduce allocations and support custom allocators
+
+  - Improved big decimal support in the CBOR parser
 
 Release 1.9.0
 ------
