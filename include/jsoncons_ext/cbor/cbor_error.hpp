@@ -27,6 +27,7 @@ enum class cbor_errc
     invalid_utf8_text_string,
     too_many_items,
     too_few_items,
+    invalid_size,
     number_too_large,
     stringref_too_large,
     max_nesting_depth_exceeded,
@@ -66,6 +67,8 @@ public:
                 return "Too many items were added to a CBOR map or array of known length";
             case cbor_errc::too_few_items:
                 return "Too few items were added to a CBOR map or array of known length";
+            case cbor_errc::invalid_size:
+                return "Size must be an unsigned integer";
             case cbor_errc::number_too_large:
                 return "Number exceeds implementation limits";
             case cbor_errc::stringref_too_large:
