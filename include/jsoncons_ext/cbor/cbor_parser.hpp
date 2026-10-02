@@ -1271,22 +1271,6 @@ private:
         return bytes;
     }
 
-    std::size_t read_size(std::error_code& ec)
-    {
-        uint64_t u = read_uint64(ec);
-        if (JSONCONS_UNLIKELY(ec))
-        {
-            return 0;
-        }
-        std::size_t len = static_cast<std::size_t>(u);
-        if (len != u)
-        {
-            ec = cbor_errc::number_too_large;
-            more_ = false;
-        }
-        return len;
-    }
-
     std::size_t read_size(uint8_t info, std::error_code& ec)
     {
         uint64_t u = read_unsigned_integer(info, ec);
@@ -1418,89 +1402,6 @@ private:
                 }
             }
         }
-    }
-
-    uint64_t read_uint64(std::error_code& ec)
-    {
-        uint64_t val = 0;
-
-        uint8_t initial_b;
-        if (source_.read(&initial_b, 1) == 0)
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return 0;
-        }
-        uint8_t info = get_additional_information(initial_b);
-        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-        {
-            ec = cbor_errc::reserved_additional_info;
-            more_ = false;
-            return val;
-        }
-        switch (info)
-        {
-            case JSONCONS_EXT_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-            {
-                val = info;
-                break;
-            }
-
-            case 0x18: // Unsigned integer (one-byte uint8_t follows)
-            {
-                uint8_t b;
-                if (source_.read(&b, 1) == 0)
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return val;
-                }
-                val = b;
-                break;
-            }
-
-            case 0x19: // Unsigned integer (two-byte uint16_t follows)
-            {
-                uint8_t buf[sizeof(uint16_t)];
-                if (source_.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return val;
-                }
-                val = binary::big_to_native<uint16_t>(buf, sizeof(buf));
-                break;
-            }
-
-            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-            {
-                uint8_t buf[sizeof(uint32_t)];
-                if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return val;
-                }
-                val = binary::big_to_native<uint32_t>(buf, sizeof(buf));
-                break;
-            }
-
-            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-            {
-                uint8_t buf[sizeof(uint64_t)];
-                if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return val;
-                }
-                val = binary::big_to_native<uint64_t>(buf, sizeof(buf));
-                break;
-            }
-            default:
-                break;
-        }
-        return val;
     }
 
     int64_t read_int64(std::error_code& ec)
