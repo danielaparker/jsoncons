@@ -2025,8 +2025,17 @@ private:
             more_ = false;
             return;
         }
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
+        uint8_t info = get_additional_information(c.value);
+        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+        {
+            ec = cbor_errc::reserved_additional_info;
+            more_ = false;
+            return;
+        }
+
         int64_t exponent = 0;
-        switch (get_major_type(c.value))
+        switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -2061,7 +2070,16 @@ private:
             more_ = false;
             return;
         }
-        switch (get_major_type(c.value))
+        major_type = get_major_type(c.value);
+        info = get_additional_information(c.value);
+        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+        {
+            ec = cbor_errc::reserved_additional_info;
+            more_ = false;
+            return;
+        }
+
+        switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
