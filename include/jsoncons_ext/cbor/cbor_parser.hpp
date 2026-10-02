@@ -1797,6 +1797,12 @@ private:
                 {
                     return;
                 }
+                if (JSONCONS_UNLIKELY(u == (std::numeric_limits<int64_t>::min)()))
+                {
+                    ec = cbor_errc::invalid_bigdecimal;
+                    more_ = false;
+                    return;
+                }
                 exponent = u;
                 break;
             }

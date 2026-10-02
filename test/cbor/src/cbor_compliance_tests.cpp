@@ -58,6 +58,7 @@ TEST_CASE("cbor GLD.SerializerBenchmark tests")
         CHECK(parse_error({0x7f,0x01,0xff}) == cbor::cbor_errc::illegal_chunked_string);
         CHECK(parse_error({0x5f,0x5e}) == cbor::cbor_errc::reserved_additional_info);
         CHECK(parse_error({0x7f,0x7e}) == cbor::cbor_errc::reserved_additional_info);
+        CHECK(parse_error({0xc4,0x82,0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x06}) == cbor::cbor_errc::invalid_bigdecimal);
         CHECK(parse_error({0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e}) == cbor::cbor_errc::unexpected_eof);
         CHECK(parse_error({0x62,0xc0,0xae}) == cbor::cbor_errc::invalid_utf8_text_string);
         CHECK(parse_error({0x81}) == cbor::cbor_errc::unexpected_eof);
