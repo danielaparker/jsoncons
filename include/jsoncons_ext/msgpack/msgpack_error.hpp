@@ -25,6 +25,8 @@ enum class msgpack_errc
     too_many_items,
     too_few_items,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     length_is_negative,
     invalid_timestamp,
     unknown_type
@@ -58,6 +60,10 @@ public:
                 return "Too few items were added to a MessagePack object or array";
             case msgpack_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case msgpack_errc::unmatched_end_object:
+                return "Unmatched end object";
+            case msgpack_errc::unmatched_end_array:
+                return "Unmatched end array";
             case msgpack_errc::length_is_negative:
                 return "Request for the length of an array, map or string returned a negative result";
             case msgpack_errc::invalid_timestamp:

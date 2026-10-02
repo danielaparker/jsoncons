@@ -30,6 +30,8 @@ enum class ubjson_errc
     too_few_items,
     number_too_large,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     key_expected,
     max_items_exceeded
 };
@@ -68,6 +70,10 @@ public:
                 return "Number exceeds implementation limits";
             case ubjson_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case ubjson_errc::unmatched_end_object:
+                return "Unmatched end object";
+            case ubjson_errc::unmatched_end_array:
+                return "Unmatched end array";
             case ubjson_errc::key_expected:
                 return "Text string key in a map expected";
             case ubjson_errc::max_items_exceeded:

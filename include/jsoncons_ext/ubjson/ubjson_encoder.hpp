@@ -34,7 +34,7 @@
 namespace jsoncons { 
 namespace ubjson {
 
-enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_ubjson_encoder final : public basic_json_visitor<char>
@@ -49,11 +49,11 @@ public:
 private:
     struct stack_item
     {
-        ubjson_container_type type_;
+        container_type type_;
         std::size_t length_{0};
         std::size_t count_{0};
 
-        stack_item(ubjson_container_type type, std::size_t length = 0) noexcept
+        stack_item(container_type type, std::size_t length = 0) noexcept
            : type_(type), length_(length)
         {
         }
@@ -72,22 +72,26 @@ private:
 
         bool is_object() const
         {
-            return type_ == ubjson_container_type::object || type_ == ubjson_container_type::indefinite_length_object;
+            return type_ == container_type::object || type_ == container_type::indefinite_length_object;
+        }
+
+        bool is_array() const
+        {
+            return type_ == container_type::array || type_ == container_type::indefinite_length_array;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == ubjson_container_type::indefinite_length_array || type_ == ubjson_container_type::indefinite_length_object;
+            return type_ == container_type::indefinite_length_array || type_ == container_type::indefinite_length_object;
         }
 
     };
 
     Sink sink_;
-    int max_nesting_depth_;
+    std::size_t max_nesting_depth_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
-    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -104,7 +108,7 @@ public:
                                   const ubjson_encode_options& options, 
                                   const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
-         max_nesting_depth_(options.max_nesting_depth()),
+         max_nesting_depth_(static_cast<std::size_t>(options.max_nesting_depth())),
          alloc_(alloc)
     {
     }
@@ -126,7 +130,6 @@ public:
     void reset()
     {
         stack_.clear();
-        nesting_depth_ = 0;
     }
 
     void reset(Sink&& sink)
@@ -145,12 +148,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::indefinite_length_object);
+        stack_.emplace_back(container_type::indefinite_length_object);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
 
         JSONCONS_VISITOR_RETURN;
@@ -158,12 +161,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::object, length);
+        stack_.emplace_back(container_type::object, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_object_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
@@ -173,8 +176,11 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_object()))
+        {
+            ec = ubjson_errc::unmatched_end_object;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {
@@ -200,12 +206,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::indefinite_length_array);
+        stack_.emplace_back(container_type::indefinite_length_array);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
 
         JSONCONS_VISITOR_RETURN;
@@ -213,12 +219,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = ubjson_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(ubjson_container_type::array, length);
+        stack_.emplace_back(container_type::array, length);
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
         sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
@@ -228,8 +234,11 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_array()))
+        {
+            ec = ubjson_errc::unmatched_end_array;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {

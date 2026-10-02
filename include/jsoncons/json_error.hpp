@@ -23,6 +23,8 @@ namespace jsoncons {
         syntax_error,
         extra_character,
         max_nesting_depth_exceeded,
+        unmatched_end_array,
+        unmatched_end_object,
         single_quote,
         illegal_character_in_string,
         extra_comma,
@@ -73,6 +75,10 @@ namespace jsoncons {
                     return "Unexpected non-whitespace character after JSON text";
                 case json_errc::max_nesting_depth_exceeded:
                     return "Data item nesting exceeds limit in options";
+                case json_errc::unmatched_end_object:
+                    return "Unmatched end object";
+                case json_errc::unmatched_end_array:
+                    return "Unmatched end array";
                 case json_errc::single_quote:
                     return "JSON strings cannot be quoted with single quotes";
                 case json_errc::illegal_character_in_string:

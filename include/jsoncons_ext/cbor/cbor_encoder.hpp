@@ -38,7 +38,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_cbor_encoder final : public basic_json_visitor<char>
@@ -66,11 +66,11 @@ private:
 
     struct stack_item
     {
-        cbor_container_type type_;
+        container_type type_;
         std::size_t length_{0};
         std::size_t index_{0};
 
-        stack_item(cbor_container_type type, std::size_t length = 0) noexcept
+        stack_item(container_type type, std::size_t length = 0) noexcept
            : type_(type), length_(length)
         {
         }
@@ -89,14 +89,18 @@ private:
 
         bool is_object() const
         {
-            return type_ == cbor_container_type::object || type_ == cbor_container_type::indefinite_length_object;
+            return type_ == container_type::object || type_ == container_type::indefinite_length_object;
+        }
+
+        bool is_array() const
+        {
+            return type_ == container_type::array || type_ == container_type::indefinite_length_array;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == cbor_container_type::indefinite_length_array || type_ == cbor_container_type::indefinite_length_object;
+            return type_ == container_type::indefinite_length_array || type_ == container_type::indefinite_length_object;
         }
-
     };
 
     using string_size_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>>;
@@ -104,7 +108,7 @@ private:
     using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item>;
 
     Sink sink_;
-    int max_nesting_depth_;
+    std::size_t max_nesting_depth_;
     bool pack_strings_;
     bool use_typed_arrays_;
     allocator_type alloc_;
@@ -113,7 +117,6 @@ private:
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
-    int nesting_depth_{0};
 public:
 
     // Noncopyable and nonmoveable
@@ -129,7 +132,7 @@ public:
                        const cbor_encode_options& options, 
                        const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
-         max_nesting_depth_(options.max_nesting_depth()), 
+         max_nesting_depth_(static_cast<std::size_t>(options.max_nesting_depth())), 
          pack_strings_(options.pack_strings()),
          use_typed_arrays_(options.use_typed_arrays()),
          alloc_(alloc),
@@ -163,7 +166,6 @@ public:
         stringref_map_.clear();
         bytestringref_map_.clear();
         next_stringref_ = 0;
-        nesting_depth_ = 0;
     }
 
     void reset(Sink&& sink)
@@ -264,12 +266,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(cbor_container_type::indefinite_length_object);
+        stack_.emplace_back(container_type::indefinite_length_object);
         
         sink_.push_back(0xbf);
         JSONCONS_VISITOR_RETURN;
@@ -277,12 +279,12 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(cbor_container_type::object, length);
+        stack_.emplace_back(container_type::object, length);
 
         write_type_and_length(0xa0, length);
 
@@ -291,8 +293,11 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_object(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_object()))
+        {
+            ec = cbor_errc::unmatched_end_object;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {
@@ -320,32 +325,35 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(cbor_container_type::indefinite_length_array);
+        stack_.emplace_back(container_type::indefinite_length_array);
         sink_.push_back(0x9f);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) final
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
             JSONCONS_VISITOR_RETURN;
         } 
-        stack_.emplace_back(cbor_container_type::array, length);
+        stack_.emplace_back(container_type::array, length);
         write_type_and_length(0x80, length);
         JSONCONS_VISITOR_RETURN;
     }
 
     JSONCONS_VISITOR_RETURN_TYPE visit_end_array(const ser_context&, std::error_code& ec) final
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        --nesting_depth_;
+        if (JSONCONS_UNLIKELY(stack_.empty() || !stack_.back().is_array()))
+        {
+            ec = cbor_errc::unmatched_end_array;
+            JSONCONS_VISITOR_RETURN;
+        }
 
         if (stack_.back().is_indefinite_length())
         {

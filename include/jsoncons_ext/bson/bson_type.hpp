@@ -36,7 +36,7 @@ namespace bson {
         JSONCONS_INLINE_CONSTEXPR uint8_t max_key_type = 0x7f;
     }
 
-    enum class bson_container_type {document, array};
+    enum class container_type {document, array};
 
 } // namespace bson
 } // namespace jsoncons

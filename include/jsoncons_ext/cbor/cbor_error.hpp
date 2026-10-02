@@ -30,6 +30,8 @@ enum class cbor_errc
     number_too_large,
     stringref_too_large,
     max_nesting_depth_exceeded,
+    unmatched_end_array,
+    unmatched_end_object,
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,
@@ -71,6 +73,10 @@ public:
                 return "stringref exceeds stringref map size";
             case cbor_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case cbor_errc::unmatched_end_object:
+                return "Unmatched end object";
+            case cbor_errc::unmatched_end_array:
+                return "Unmatched end array";
             case cbor_errc::unknown_type:
                 return "Unknown type in input";
             case cbor_errc::illegal_chunked_string:
