@@ -747,40 +747,40 @@ public:
                 switch (info)
                 {
                     case 0x14:
+                        source_.ignore(1);
                         visitor.bool_value(false, semantic_tag::none, *this, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
                         more_ = !cursor_mode_;
-                        source_.ignore(1);
                         break;
                     case 0x15:
+                        source_.ignore(1);
                         visitor.bool_value(true, semantic_tag::none, *this, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
                         more_ = !cursor_mode_;
-                        source_.ignore(1);
                         break;
                     case 0x16:
+                        source_.ignore(1);
                         visitor.null_value(semantic_tag::none, *this, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
                         more_ = !cursor_mode_;
-                        source_.ignore(1);
                         break;
                     case 0x17:
+                        source_.ignore(1);
                         visitor.null_value(semantic_tag::undefined, *this, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
                         }
                         more_ = !cursor_mode_;
-                        source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     {
@@ -801,7 +801,8 @@ public:
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
                     {
-                        double val = read_double(ec);
+                        source_.ignore(1);
+                        double val = read_double(info, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
                             return;
@@ -839,6 +840,7 @@ public:
                     switch (raw_tag_)
                     {
                         case 0x04:
+                            source_.ignore(1);
                             text_buffer_.clear();
                             read_bigdecimal(info, text_buffer_, ec);
                             if (JSONCONS_UNLIKELY(ec))
@@ -853,6 +855,7 @@ public:
                             more_ = !cursor_mode_;
                             break;
                         case 0x05:
+                            source_.ignore(1);
                             text_buffer_.clear();
                             read_bigfloat(info, text_buffer_, ec);
                             if (JSONCONS_UNLIKELY(ec))
@@ -938,6 +941,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
+                source_.ignore(1);
                 state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
                 visitor.begin_array(tag, *this, ec);
                 if (JSONCONS_UNLIKELY(ec))
@@ -945,7 +949,6 @@ private:
                     return;
                 }
                 more_ = !cursor_mode_;
-                source_.ignore(1);
                 break;
             }
             default: // definite length
@@ -1008,9 +1011,9 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
+                source_.ignore(1);
                 state_stack_.emplace_back(parse_mode::indefinite_array, 0, pop_stringref_map_stack);
                 more_ = !cursor_mode_;
-                source_.ignore(1);
                 break;
             }
             default: // definite length
@@ -1063,6 +1066,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
+                source_.ignore(1);
                 state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
                 visitor.begin_object(semantic_tag::none, *this, ec);
                 if (JSONCONS_UNLIKELY(ec))
@@ -1070,7 +1074,6 @@ private:
                     return;
                 }
                 more_ = !cursor_mode_;
-                source_.ignore(1);
                 break;
             }
             default: // definite_length
@@ -1134,8 +1137,8 @@ private:
 
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            text_buffer_.clear();
             source_.ignore(1);
+            text_buffer_.clear();
             iterate_string_chunks(text_buffer_, major_type, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1238,8 +1241,8 @@ private:
 
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            bytes_buffer_.clear();
             source_.ignore(1);
+            bytes_buffer_.clear();
             iterate_string_chunks(bytes_buffer_, major_type, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1352,8 +1355,8 @@ private:
             }
             if (c.value == 0xff)
             {
-                done = true;
                 source_.ignore(1);
+                done = true;
                 continue;
             }
 
@@ -1692,27 +1695,13 @@ private:
         }
     }
 
-    double read_double(std::error_code& ec)
+    double read_double(uint8_t info, std::error_code& ec)
     {
         double val = 0;
 
-        uint8_t b;
-        if (source_.read(&b, 1) == 0)
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return 0;
-        }
-        uint8_t info = get_additional_information(b);
-        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-        {
-            ec = cbor_errc::reserved_additional_info;
-            more_ = false;
-            return val; 
-        }
         switch (info)
         {
-        case 0x1a: // Single-Precision Float (four-byte IEEE 754)
+            case 0x1a: // Single-Precision Float (four-byte IEEE 754)
             {
                 uint8_t buf[sizeof(float)];
                 if (source_.read(buf, sizeof(float)) !=sizeof(float)) 
@@ -1725,7 +1714,7 @@ private:
                 break;
             }
 
-        case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
+            case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
             {
                 uint8_t buf[sizeof(double)];
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
@@ -1738,16 +1727,19 @@ private:
                 break;
             }
             default:
-                break;
+            {
+                ec = cbor_errc::unknown_type;
+                more_ = false;
+                return 0;
+            }
         }
         
         return val;
     }
 
-    void read_bigdecimal(uint8_t bigdecimal_info, string_type& result, std::error_code& ec)
+    void read_bigdecimal(uint8_t container_info, string_type& result, std::error_code& ec)
     {
-        source_.ignore(1);
-        std::size_t size = read_unsigned_integer(bigdecimal_info, ec);
+        std::size_t size = read_unsigned_integer(container_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return;
@@ -1930,10 +1922,9 @@ private:
         append_chars(dec, result);
     }
 
-    void read_bigfloat(uint8_t bigfloat_info, string_type& str, std::error_code& ec)
+    void read_bigfloat(uint8_t container_info, string_type& str, std::error_code& ec)
     {
-        source_.ignore(1);
-        std::size_t size = read_unsigned_integer(bigfloat_info, ec);
+        std::size_t size = read_unsigned_integer(container_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return;
@@ -2980,6 +2971,12 @@ private:
                     if (source_.read(&initial_b, 1) == 0)
                     {
                         ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (JSONCONS_UNLIKELY(get_major_type(initial_b) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
+                    {
+                        ec = cbor_errc::unknown_type;
                         more_ = false;
                         return;
                     }
