@@ -950,7 +950,8 @@ private:
             }
             default: // definite length
             {
-                std::size_t len = read_size(ec);
+                source_.ignore(1);
+                std::size_t len = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1268,6 +1269,22 @@ private:
     std::size_t read_size(std::error_code& ec)
     {
         uint64_t u = read_uint64(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return 0;
+        }
+        std::size_t len = static_cast<std::size_t>(u);
+        if (len != u)
+        {
+            ec = cbor_errc::number_too_large;
+            more_ = false;
+        }
+        return len;
+    }
+
+    std::size_t read_size(uint8_t info, std::error_code& ec)
+    {
+        uint64_t u = read_unsigned_integer(info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
             return 0;
