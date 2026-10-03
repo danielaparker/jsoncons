@@ -31,6 +31,12 @@ namespace {
         return result.value();
     }
 
+    cbor::cbor_errc validate_error(const std::vector<uint8_t>& data)
+    {
+        auto result = cbor::view::validate(jsoncons::span<const uint8_t>(data.data(), data.size()));
+        return result ? cbor::cbor_errc::success : result.error().code;
+    }
+
 } // namespace
 
 TEST_CASE("cbor view scan and parse_item")
@@ -154,6 +160,14 @@ TEST_CASE("cbor view scanning validates well-formedness")
         auto map_result = cbor::view::scan(jsoncons::span<const uint8_t>(map));
         REQUIRE_FALSE(map_result.has_value());
         CHECK(map_result.error().code == cbor::cbor_errc::unexpected_eof);
+    }
+
+    SECTION("a count beyond the input fails at its first malformed item, else EOF")
+    {
+        CHECK(validate_error({0x91,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0xb1,0x01,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0x9b,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0x91,0x01}) == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("definite and indefinite nesting can mix")
@@ -729,6 +743,20 @@ TEST_CASE("cbor view walker movement")
             REQUIRE(moved(walker.leave()));
             CHECK(walker.role() == cbor::view::position_role::root);
         }
+    }
+
+    SECTION("a count beyond the input fails where the walk runs out")
+    {
+        std::vector<uint8_t> data = {0x92,0x01};
+        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::walker walker = std::move(result.value());
+
+        REQUIRE(moved(walker.enter()));
+        CHECK(walker.argument() == 1);
+        auto next = walker.next();
+        REQUIRE_FALSE(next.has_value());
+        CHECK(next.error().code == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("empty and non-container enter leave position unchanged")

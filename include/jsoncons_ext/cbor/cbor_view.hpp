@@ -411,12 +411,26 @@ namespace view {
         // Remaining raw items in an open container, or a marker for an
         // indefinite-length one, which ends at a break byte instead: arrays
         // accept a break before any element, maps only between entries, never
-        // between a key and its value. Counts admitted by skip_container are
-        // bounded by the bytes remaining in the input, so a count can never
-        // collide with a marker.
+        // between a key and its value.
         constexpr uint64_t indefinite_array_marker = UINT64_MAX;
         constexpr uint64_t indefinite_map_key_marker = UINT64_MAX - 1;
         constexpr uint64_t indefinite_map_value_marker = UINT64_MAX - 2;
+
+        // A definite count is capped just past what the remaining input can
+        // hold. Every item occupies at least one byte, so a capped container
+        // still runs out of input, failing at its first malformed item, or with
+        // EOF when there is none; and a count can never collide with a marker.
+        inline uint64_t remaining_items(const item_head& head, std::size_t available) noexcept
+        {
+            const bool is_map = head.major_type == cbor::detail::cbor_major_type::map;
+            if (head.indefinite())
+            {
+                return is_map ? indefinite_map_key_marker : indefinite_array_marker;
+            }
+            const uint64_t limit = static_cast<uint64_t>(available);
+            return is_map ? 2 * (std::min)(head.value, limit / 2 + 1)
+                          : (std::min)(head.value, limit + 1);
+        }
 
         class pending_stack
         {
@@ -489,29 +503,11 @@ namespace view {
                     ec = cbor_errc::max_nesting_depth_exceeded;
                     return false;
                 }
-                if (head.indefinite())
+                const uint64_t remaining = remaining_items(head, static_cast<std::size_t>(end - p));
+                if (remaining != 0)
                 {
                     open.push(current);
-                    current = head.major_type == cbor::detail::cbor_major_type::map
-                        ? indefinite_map_key_marker : indefinite_array_marker;
-                }
-                else
-                {
-                    // Every unread item occupies at least one byte, so a
-                    // count the remaining input cannot hold is EOF now.
-                    const bool is_map = head.major_type == cbor::detail::cbor_major_type::map;
-                    const uint64_t avail = static_cast<uint64_t>(end - p);
-                    if (head.value > (is_map ? avail / 2 : avail))
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        return false;
-                    }
-                    const uint64_t count = is_map ? 2 * head.value : head.value;
-                    if (count != 0)
-                    {
-                        open.push(current);
-                        current = count;
-                    }
+                    current = remaining;
                 }
 
                 // Walk items in place until the next container head.
@@ -1195,8 +1191,6 @@ namespace view {
         expected<detail_view::node_state, scan_error> read_node(
             std::size_t begin, position_role role, std::size_t depth,
             std::size_t right_fence = detail_view::unknown_extent) const noexcept;
-        expected<detail_view::container_frame, scan_error> initialize_frame(
-            const detail_view::node_state& container) const noexcept;
         expected<bool, scan_error> take_child(detail_view::container_frame& frame,
             std::size_t& offset, position_role& role, std::size_t& right_fence) const noexcept;
         expected<std::size_t, scan_error> establish_end(
@@ -1702,30 +1696,6 @@ namespace view {
             max_nesting_depth_, right_fence);
     }
 
-    inline expected<detail_view::container_frame, scan_error> walker::initialize_frame(
-        const detail_view::node_state& container) const noexcept
-    {
-        detail_view::container_frame frame;
-        frame.container = container;
-        if (container.head.indefinite())
-        {
-            frame.remaining = container.head.major_type == cbor::detail::cbor_major_type::map
-                ? detail_view::indefinite_map_key_marker
-                : detail_view::indefinite_array_marker;
-            return frame;
-        }
-
-        const bool is_map = container.head.major_type == cbor::detail::cbor_major_type::map;
-        const uint64_t available = static_cast<uint64_t>(input_.size() - container.content_begin);
-        if (container.head.value > (is_map ? available / 2 : available))
-        {
-            return expected<detail_view::container_frame, scan_error>(unexpect,
-                scan_error{cbor_errc::unexpected_eof, container.content_begin});
-        }
-        frame.remaining = is_map ? 2 * container.head.value : container.head.value;
-        return frame;
-    }
-
     inline expected<bool, scan_error> walker::take_child(
         detail_view::container_frame& frame, std::size_t& offset,
         position_role& role, std::size_t& right_fence) const noexcept
@@ -1833,12 +1803,9 @@ namespace view {
             return false;
         }
 
-        auto initialized = initialize_frame(current_);
-        if (!initialized)
-        {
-            return walk_result(initialized.error());
-        }
-        detail_view::container_frame frame = initialized.value();
+        detail_view::container_frame frame;
+        frame.container = current_;
+        frame.remaining = detail_view::remaining_items(current_.head, input_.size() - current_.content_begin);
         std::size_t offset = current_.content_begin;
         position_role child_role = position_role::array_element;
         std::size_t right_fence = detail_view::unknown_extent;
