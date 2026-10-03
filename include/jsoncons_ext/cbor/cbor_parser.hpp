@@ -995,7 +995,6 @@ private:
 
     void begin_classical_array_storage(uint8_t info, std::error_code& ec)
     {
-        source_.ignore(1);
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
@@ -2811,6 +2810,7 @@ private:
 
         if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::row_major) 
         {
+            source_.ignore(1);
             begin_classical_array_storage(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -2825,6 +2825,7 @@ private:
         }
         else if (major_type == jsoncons::cbor::detail::cbor_major_type::array && order_ == mdarray_order::column_major) 
         {
+            source_.ignore(1);
             begin_classical_array_storage(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
