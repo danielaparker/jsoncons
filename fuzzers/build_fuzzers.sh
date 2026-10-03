@@ -1,3 +1,5 @@
+set -eu
+
 oss_fuzz_compile_all()
 {
     # Make sure we are in the root directory of the jsoncons
@@ -46,7 +48,7 @@ oss_fuzz_compile_all()
     zip -j $OUT/fuzz_cbor_noexcept_seed_corpus.zip ./fuzzers/corpus/cbor/*
 }
 
-if [[ -z "${OUT}" ]]; then
+if [[ -z "${OUT:-}" ]]; then
   echo "This script assumes we run inside an oss-fuzz environment with the proper environment variables set"
   echo "Please set these environment variables for it to run properly"
 else
