@@ -196,3 +196,49 @@ TEST_CASE("jmespath issue 620")
     }
 }
 
+
+template <typename Json>
+void test_merge_overwrites_values()
+{
+    const Json values = Json::parse(R"([null,true,42,"short","a string longer than the short string storage",[],[1],{}, {"nested":[2]}])");
+    for (const auto& first : values.array_range())
+    {
+        for (const auto& second : values.array_range())
+        {
+            Json input;
+            input["first"]["key"] = first;
+            input["first"]["retained"] = 1;
+            input["second"]["key"] = second;
+            input["second"]["added"] = 2;
+            const Json original = input;
+            Json expected;
+            expected["key"] = second;
+            expected["retained"] = 1;
+            expected["added"] = 2;
+
+            INFO("first: " << first << ", second: " << second);
+            CHECK(jmespath::search(input, "merge(first, second)") == expected);
+            CHECK(jmespath::search(input, "{a:first,b:second}.merge(a, b)") == expected);
+            CHECK(input == original);
+        }
+    }
+
+    const Json input = Json::parse(R"({"a":{"key":[1]},"b":{"key":{"x":2}},"c":{"key":[3]}})");
+    CHECK(jmespath::search(input, "merge(a, b, c)") == input.at("c"));
+    CHECK(jmespath::search(input, "merge(a)") == input.at("a"));
+    CHECK(jmespath::search(input, "merge(a, `{}`)") == input.at("a"));
+    CHECK(jmespath::search(input, "merge(`{}`, a)") == input.at("a"));
+    CHECK_THROWS(jmespath::search(input, "merge(a, `[]`)"));
+}
+
+TEST_CASE("jmespath merge overwrites values")
+{
+    SECTION("json")
+    {
+        test_merge_overwrites_values<json>();
+    }
+    SECTION("ojson")
+    {
+        test_merge_overwrites_values<ojson>();
+    }
+}
