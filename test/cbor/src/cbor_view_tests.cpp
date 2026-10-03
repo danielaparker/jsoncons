@@ -31,6 +31,12 @@ namespace {
         return result.value();
     }
 
+    cbor::cbor_errc validate_error(const std::vector<uint8_t>& data)
+    {
+        auto result = cbor::view::validate(jsoncons::span<const uint8_t>(data.data(), data.size()));
+        return result ? cbor::cbor_errc::success : result.error().code;
+    }
+
 } // namespace
 
 TEST_CASE("cbor view scan and parse_item")
@@ -156,6 +162,14 @@ TEST_CASE("cbor view scanning validates well-formedness")
         CHECK(map_result.error().code == cbor::cbor_errc::unexpected_eof);
     }
 
+    SECTION("a count beyond the input fails at its first malformed item, else EOF")
+    {
+        CHECK(validate_error({0x91,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0xb1,0x01,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0x9b,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0xff}) == cbor::cbor_errc::unknown_type);
+        CHECK(validate_error({0x91,0x01}) == cbor::cbor_errc::unexpected_eof);
+    }
+
     SECTION("definite and indefinite nesting can mix")
     {
         // [_ {1: [2]}, [], {} ] followed by trailing bytes
@@ -202,6 +216,60 @@ TEST_CASE("cbor view scanning validates well-formedness")
         CHECK(at_32_result.value().kind() == cbor::view::item_kind::simple);
         CHECK(at_32_result.value().argument() == 32);
     }
+}
+
+TEST_CASE("cbor view rejects the RFC 8949 compliance vectors")
+{
+    // The parser's cbor_compliance_tests vectors through validate.
+    using cbor::cbor_errc;
+
+    CHECK(validate_error({0x18}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x19}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x19,0x00}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1a}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1a,0x00}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1a,0x00,0x00}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1a,0x00,0x00,0x00}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1b,0x00,0x00,0x00}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x1c}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0x1d}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0x1e}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xfc}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xfd}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xfe}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0x44,01,02,03}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x5f}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x5f,0x01,0xff}) == cbor_errc::illegal_chunked_string);
+    CHECK(validate_error({0x64,0x49,0x45,0x54}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x74,0x32,0x30,0x31,0x33}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x7f,0x01,0xff}) == cbor_errc::illegal_chunked_string);
+    CHECK(validate_error({0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x62,0xc0,0xae}) == cbor_errc::success);   // validate_text's concern
+    CHECK(validate_error({0x81}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x82,0x01}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x81,0x81,0x81,0x81,0x81}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error(std::vector<uint8_t>(160, 0x81)) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x81,0xfe}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0x9f}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x9f,0x01}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0x9f,0xfe,0xff}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0x91,0xff}) == cbor_errc::unknown_type);
+    CHECK(validate_error({0xa1}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xa1,0xfe,0x01}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xa1,0x61,0x61}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xa1,0x61,0x61,0xfe}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xa2,0x01,0x02}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xbf}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xbf,0x00,0x01,0x03,0xff}) == cbor_errc::unknown_type);
+    CHECK(validate_error({0xbf,0x61,0x61}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xbf,0x61,0x61,0x01}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xbf,0xfe,0x01}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xbf,0x01,0xfe}) == cbor_errc::reserved_additional_info);
+    CHECK(validate_error({0xa1,0xff}) == cbor_errc::unknown_type);
+    CHECK(validate_error({0xa1,0x00,0xff}) == cbor_errc::unknown_type);
+    CHECK(validate_error({0xff}) == cbor_errc::unknown_type);
+    CHECK(validate_error({0x18}) == cbor_errc::unexpected_eof);
+    CHECK(validate_error({0xff}) == cbor_errc::unknown_type);
 }
 
 TEST_CASE("cbor view item exposes wire structure")
@@ -729,6 +797,20 @@ TEST_CASE("cbor view walker movement")
             REQUIRE(moved(walker.leave()));
             CHECK(walker.role() == cbor::view::position_role::root);
         }
+    }
+
+    SECTION("a count beyond the input fails where the walk runs out")
+    {
+        std::vector<uint8_t> data = {0x92,0x01};
+        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        REQUIRE(result.has_value());
+        cbor::view::walker walker = std::move(result.value());
+
+        REQUIRE(moved(walker.enter()));
+        CHECK(walker.argument() == 1);
+        auto next = walker.next();
+        REQUIRE_FALSE(next.has_value());
+        CHECK(next.error().code == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("empty and non-container enter leave position unchanged")
