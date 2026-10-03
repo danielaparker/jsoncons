@@ -995,6 +995,7 @@ private:
 
     void begin_classical_array_storage(uint8_t info, std::error_code& ec)
     {
+        source_.ignore(1);
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
             ec = cbor_errc::max_nesting_depth_exceeded;
@@ -1010,12 +1011,10 @@ private:
         }
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            source_.ignore(1);
             state_stack_.emplace_back(parse_mode::indefinite_array, 0, pop_stringref_map_stack);
         }
         else // definite length
         {
-            source_.ignore(1);
             std::size_t len = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1156,10 +1155,10 @@ private:
             return;
         }
 
+        source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            source_.ignore(1);
-            iterate_string_chunks(major_type, str, ec);
+            iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type::text_string, str, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1167,7 +1166,6 @@ private:
         }
         else
         {
-            source_.ignore(1);
             std::size_t length = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1207,9 +1205,9 @@ private:
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
 
+        source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            source_.ignore(1);
             bytes_buffer_.clear();
             iterate_string_chunks(major_type, bytes_buffer_, ec);
             if (JSONCONS_UNLIKELY(ec))
@@ -1219,7 +1217,6 @@ private:
             return byte_string_view(bytes_buffer_.data(), bytes_buffer_.size());
         }
 
-        source_.ignore(1);
         std::size_t length = read_size(info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
@@ -1278,9 +1275,9 @@ private:
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
 
+        source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            source_.ignore(1);
             iterate_string_chunks(major_type, v, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -1289,7 +1286,6 @@ private:
         }
         else 
         {
-            source_.ignore(1);
             std::size_t length = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
@@ -2890,9 +2886,9 @@ private:
             return;
         }
 
+        source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-             source_.ignore(1);
              bool done = false;
              while (!done)
              {
@@ -2923,7 +2919,6 @@ private:
         }
         else 
         {
-            source_.ignore(1);
             std::size_t size = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
