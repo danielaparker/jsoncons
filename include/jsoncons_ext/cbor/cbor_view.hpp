@@ -267,7 +267,7 @@ namespace view {
                 case 26: length = 4; break;
                 case 27: length = 8; break;
                 default:
-                    ec = cbor_errc::unknown_type;
+                    ec = cbor_errc::reserved_additional_info;
                     return false;
             }
 
