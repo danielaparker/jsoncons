@@ -268,6 +268,18 @@
       "result": {"a": 2, "b": 2, "c": 3, "d": 4}
     },
     {
+      "expression": "merge(`{\"a\": {\"x\": 1}}`, `{\"a\": {\"x\": 2}}`)",
+      "result": {"a": {"x": 2}}
+    },
+    {
+      "expression": "merge(`{\"a\": [1, 2]}`, `{\"a\": [3, 4]}`)",
+      "result": {"a": [3, 4]}
+    },
+    {
+      "expression": "merge(`{\"a\": {\"x\": 1}}`, `{\"a\": {\"x\": 2}}`, `{\"a\": {\"x\": 3}}`)",
+      "result": {"a": {"x": 3}}
+    },
+    {
       "expression": "min(numbers)",
       "result": -1
     },
