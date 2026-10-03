@@ -890,7 +890,8 @@ public:
                             }
                             break;
                         default:
-                            begin_array(visitor, info, ec);
+                            source_.ignore(1);
+                            begin_array(info, visitor, ec);
                             if (JSONCONS_UNLIKELY(ec))
                             {
                                 return;
@@ -901,7 +902,8 @@ public:
                 }
                 else
                 {
-                    begin_array(visitor, info, ec);
+                    source_.ignore(1);
+                    begin_array(info, visitor, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         return;
@@ -927,7 +929,7 @@ public:
     }
 private:
 
-    void begin_array(generic_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_array(uint8_t info, generic_visitor& visitor, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -947,7 +949,6 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                source_.ignore(1);
                 state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
                 visitor.begin_array(tag, *this, ec);
                 if (JSONCONS_UNLIKELY(ec))
@@ -959,7 +960,6 @@ private:
             }
             default: // definite length
             {
-                source_.ignore(1);
                 std::size_t len = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
