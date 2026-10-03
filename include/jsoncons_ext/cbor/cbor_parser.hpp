@@ -238,7 +238,7 @@ public:
 
     void restart()
     {
-        more_ = true;
+        more_ = !done_;
     }
 
     void reset()
@@ -364,6 +364,10 @@ public:
                     auto iter = typed_array_stack_.back();
                     if (iter->done())
                     {
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
                         if (!is_multi_dim())
                         {
                             typed_array_stack_.pop_back();
@@ -1597,8 +1601,9 @@ private:
                 break;
             }
             default:
-                JSONCONS_UNREACHABLE();
-                break;
+                ec = info == jsoncons::cbor::detail::additional_info::indefinite_length ? cbor_errc::unknown_type : cbor_errc::reserved_additional_info;
+                more_ = false;
+                return;
         }
     }
 
@@ -1654,7 +1659,8 @@ private:
                 return u;
             }
             default:
-                JSONCONS_UNREACHABLE();
+                ec = info == jsoncons::cbor::detail::additional_info::indefinite_length ? cbor_errc::unknown_type : cbor_errc::reserved_additional_info;
+                return uint64_t{};
         }
     }
 
@@ -1756,6 +1762,12 @@ private:
                 auto u = read_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
+                    return;
+                }
+                if (JSONCONS_UNLIKELY(u == (std::numeric_limits<int64_t>::min)()))
+                {
+                    ec = cbor_errc::invalid_bigdecimal;
+                    more_ = false;
                     return;
                 }
                 exponent = u;

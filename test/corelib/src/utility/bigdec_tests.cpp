@@ -6,6 +6,7 @@
 #endif
 #include <jsoncons/utility/bigdec.hpp>
 #include <iostream>
+#include <limits>
 #include <catch/catch.hpp>
 
 namespace {
@@ -74,6 +75,22 @@ TEST_CASE("basic_bigdec success tests")
         test_bigdec(L"123456.123456e7", L"1.23456123456e12");
         test_bigdec(L"123456.123456e-7", L"0.0123456123456");
     }
+}
+
+TEST_CASE("basic_bigdec extreme scale tests")
+{
+    std::string buf;
+
+    append_chars(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, (std::numeric_limits<int64_t>::min)()}, buf);
+    CHECK(buf == "1.234567890123456789e9223372036854775826");
+
+    buf.clear();
+    append_chars(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, -(std::numeric_limits<int64_t>::max)()}, buf);
+    CHECK(buf == "1.234567890123456789e9223372036854775825");
+
+    buf.clear();
+    append_chars(jsoncons::bigdec{jsoncons::bigint{5}, (std::numeric_limits<int64_t>::max)()}, buf);
+    CHECK(buf == "5e-9223372036854775807");
 }
 
 TEST_CASE("basic_bigdec terminal tests")
