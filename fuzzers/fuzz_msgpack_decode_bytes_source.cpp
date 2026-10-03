@@ -12,7 +12,7 @@ using namespace jsoncons;
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 {
     try {
-       json j2 = msgpack::decode_msgpack<json>(jsoncons::span<uint8_t>(data, size));
+       json j2 = msgpack::decode_msgpack<json>(jsoncons::span<const uint8_t>(data, size));
     }
     catch(const jsoncons::ser_error&) {}
 
