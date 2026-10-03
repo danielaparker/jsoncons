@@ -946,36 +946,30 @@ private:
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
-        switch (info)
+        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            case jsoncons::cbor::detail::additional_info::indefinite_length:
+            state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
+            visitor.begin_array(tag, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
-                visitor.begin_array(tag, *this, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                more_ = !cursor_mode_;
-                break;
-            }
-            default: // definite length
-            {
-                std::size_t len = read_size(info, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                state_stack_.emplace_back(parse_mode::array,len,pop_stringref_map_stack);
-                visitor.begin_array(len, tag, *this, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                more_ = !cursor_mode_;
-                break;
+                return;
             }
         }
+        else // definite length
+        {
+            std::size_t len = read_size(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            state_stack_.emplace_back(parse_mode::array,len,pop_stringref_map_stack);
+            visitor.begin_array(len, tag, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+        }
+        more_ = !cursor_mode_;
     }
 
     void end_array(generic_visitor& visitor, std::error_code& ec)
@@ -1014,28 +1008,22 @@ private:
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
-        switch (info)
+        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            case jsoncons::cbor::detail::additional_info::indefinite_length:
-            {
-                source_.ignore(1);
-                state_stack_.emplace_back(parse_mode::indefinite_array, 0, pop_stringref_map_stack);
-                more_ = !cursor_mode_;
-                break;
-            }
-            default: // definite length
-            {
-                source_.ignore(1);
-                std::size_t len = read_size(info, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                state_stack_.emplace_back(parse_mode::array, len, pop_stringref_map_stack);
-                more_ = !cursor_mode_;
-                break;
-            }
+            source_.ignore(1);
+            state_stack_.emplace_back(parse_mode::indefinite_array, 0, pop_stringref_map_stack);
         }
+        else // definite length
+        {
+            source_.ignore(1);
+            std::size_t len = read_size(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            state_stack_.emplace_back(parse_mode::array, len, pop_stringref_map_stack);
+        }
+        more_ = !cursor_mode_;
     }
 
     void end_classical_array_storage(std::error_code&)
@@ -1069,36 +1057,30 @@ private:
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
-        switch (info)
+        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            case jsoncons::cbor::detail::additional_info::indefinite_length: 
+            state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
+            visitor.begin_object(semantic_tag::none, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
-                visitor.begin_object(semantic_tag::none, *this, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                more_ = !cursor_mode_;
-                break;
-            }
-            default: // definite_length
-            {
-                std::size_t len = read_size(info, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                state_stack_.emplace_back(parse_mode::map_key,len,pop_stringref_map_stack);
-                visitor.begin_object(len, semantic_tag::none, *this, ec);
-                if (JSONCONS_UNLIKELY(ec))
-                {
-                    return;
-                }
-                more_ = !cursor_mode_;
-                break;
+                return;
             }
         }
+        else // definite_length
+        {
+            std::size_t len = read_size(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            state_stack_.emplace_back(parse_mode::map_key,len,pop_stringref_map_stack);
+            visitor.begin_object(len, semantic_tag::none, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+        }
+        more_ = !cursor_mode_;
     }
 
     void end_object(generic_visitor& visitor, std::error_code& ec)
@@ -2908,80 +2890,75 @@ private:
             return;
         }
 
-        switch (info)
+        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            case jsoncons::cbor::detail::additional_info::indefinite_length:
+             source_.ignore(1);
+             bool done = false;
+             while (!done)
+             {
+                 auto c = source_.peek();
+                 if (JSONCONS_UNLIKELY(c.eof))
+                 {
+                     ec = cbor_errc::unexpected_eof;
+                     more_ = false;
+                     return;
+                 }
+                 if (c.value == 0xff)
+                 {
+                     source_.ignore(1);
+                     done = true;
+                 }
+                 else
+                 {
+                     source_.ignore(1);
+                     std::size_t extent = read_size(get_additional_information(c.value), ec);
+                     if (JSONCONS_UNLIKELY(ec))
+                     {
+                         more_ = false;
+                         return;
+                     }
+                     extents_.push_back(extent);
+                 }
+             }
+        }
+        else 
+        {
+            source_.ignore(1);
+            std::size_t size = read_size(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                source_.ignore(1);
-                bool done = false;
-                while (!done)
-                {
-                    auto c = source_.peek();
-                    if (JSONCONS_UNLIKELY(c.eof))
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-                    if (c.value == 0xff)
-                    {
-                        source_.ignore(1);
-                        done = true;
-                    }
-                    else
-                    {
-                        source_.ignore(1);
-                        std::size_t extent = read_size(get_additional_information(c.value), ec);
-                        if (JSONCONS_UNLIKELY(ec))
-                        {
-                            more_ = false;
-                            return;
-                        }
-                        extents_.push_back(extent);
-                    }
-                }
-                break;
+                more_ = false;
+                return;
             }
-            default:
+            for (std::size_t i = 0; more_ && i < size; ++i)
             {
-                source_.ignore(1);
-                std::size_t size = read_size(info, ec);
+                uint8_t initial_b;
+                if (source_.read(&initial_b, 1) == 0)
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                if (JSONCONS_UNLIKELY(get_major_type(initial_b) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
+                {
+                    ec = cbor_errc::unknown_type;
+                    more_ = false;
+                    return;
+                }
+                info = get_additional_information(initial_b);
+                if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+                {
+                    ec = cbor_errc::reserved_additional_info;
+                    more_ = false;
+                    return;
+                }
+                std::size_t extent = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     more_ = false;
                     return;
                 }
-                for (std::size_t i = 0; more_ && i < size; ++i)
-                {
-                    uint8_t initial_b;
-                    if (source_.read(&initial_b, 1) == 0)
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-                    if (JSONCONS_UNLIKELY(get_major_type(initial_b) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
-                    {
-                        ec = cbor_errc::unknown_type;
-                        more_ = false;
-                        return;
-                    }
-                    info = get_additional_information(initial_b);
-                    if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-                    {
-                        ec = cbor_errc::reserved_additional_info;
-                        more_ = false;
-                        return;
-                    }
-                    std::size_t extent = read_size(info, ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        more_ = false;
-                        return;
-                    }
-                    extents_.push_back(extent);
-                }
-                break;
+                extents_.push_back(extent);
             }
         }
         auto r = calculate_mdarray_size(extents_);
