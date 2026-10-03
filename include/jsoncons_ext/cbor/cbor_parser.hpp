@@ -913,7 +913,8 @@ public:
             }
             case jsoncons::cbor::detail::cbor_major_type::map:
             {
-                begin_object(visitor, info, ec);
+                source_.ignore(1);
+                begin_object(info, visitor, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     return;
@@ -1053,7 +1054,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(generic_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_object(uint8_t info, generic_visitor& visitor, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > max_nesting_depth_))
         {
@@ -1072,7 +1073,6 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                source_.ignore(1);
                 state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
                 visitor.begin_object(semantic_tag::none, *this, ec);
                 if (JSONCONS_UNLIKELY(ec))
@@ -1084,7 +1084,6 @@ private:
             }
             default: // definite_length
             {
-                source_.ignore(1);
                 std::size_t len = read_size(info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
