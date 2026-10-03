@@ -2062,7 +2062,7 @@ namespace detail {
                         }
                         else // shallow copy of non-primitive elements avoids allocations
                         {
-                            result->try_emplace(item.key(), const_json_ptr_arg, &item.value());
+                            result->insert_or_assign(item.key(), Json(const_json_ptr_arg, &item.value()));
                         }
                     }
                 }
