@@ -1110,7 +1110,7 @@ private:
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
             text_buffer_.clear();
-            iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type::text_string, text_buffer_, ec);
+            iterate_text_string_chunks(text_buffer_, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return string_view_type();
@@ -1163,7 +1163,7 @@ private:
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
             bytes_buffer_.clear();
-            iterate_string_chunks(major_type, bytes_buffer_, ec);
+            iterate_byte_string_chunks(bytes_buffer_, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return byte_string_view();
@@ -1232,7 +1232,7 @@ private:
         source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-            iterate_string_chunks(major_type, v, ec);
+            iterate_byte_string_chunks(v, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
@@ -1259,7 +1259,7 @@ private:
     }
 
     template <typename Container>
-    void iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type type, Container& v, std::error_code& ec)
+    void iterate_text_string_chunks(Container& v, std::error_code& ec)
     {
         bool done = false;
         while (!done)
@@ -1279,7 +1279,7 @@ private:
             }
 
             jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
-            if (major_type != type)
+            if (major_type != jsoncons::cbor::detail::cbor_major_type::text_string)
             {
                 ec = cbor_errc::illegal_chunked_string;
                 more_ = false;
@@ -1308,19 +1308,68 @@ private:
             {
                 return;
             }
-            if (type == jsoncons::cbor::detail::cbor_major_type::text_string)
+            // RFC 8949 3.2.3: each chunk of an indefinite-length text
+            // string must itself be well-formed UTF-8, so a code point
+            // may not be split across chunks.
+            auto result = unicode_traits::validate(
+                reinterpret_cast<const char*>(v.data()) + offset, length);
+            if (result.ec != unicode_traits::unicode_errc())
             {
-                // RFC 8949 3.2.3: each chunk of an indefinite-length text
-                // string must itself be well-formed UTF-8, so a code point
-                // may not be split across chunks.
-                auto result = unicode_traits::validate(
-                    reinterpret_cast<const char*>(v.data()) + offset, length);
-                if (result.ec != unicode_traits::unicode_errc())
-                {
-                    ec = cbor_errc::invalid_utf8_text_string;
-                    more_ = false;
-                    return;
-                }
+                ec = cbor_errc::invalid_utf8_text_string;
+                more_ = false;
+                return;
+            }
+        }
+    }
+
+    template <typename Container>
+    void iterate_byte_string_chunks(Container& v, std::error_code& ec)
+    {
+        bool done = false;
+        while (!done)
+        {
+            auto c = source_.peek();
+            if (JSONCONS_UNLIKELY(c.eof))
+            {
+                ec = cbor_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (c.value == 0xff)
+            {
+                source_.ignore(1);
+                done = true;
+                continue;
+            }
+
+            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
+            if (major_type != jsoncons::cbor::detail::cbor_major_type::byte_string)
+            {
+                ec = cbor_errc::illegal_chunked_string;
+                more_ = false;
+                return;
+            }
+            uint8_t info = get_additional_information(c.value);
+            if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
+            {
+                ec = cbor_errc::illegal_chunked_string;
+                more_ = false;
+                return;
+            }
+
+            source_.ignore(1);
+            std::size_t length = read_size(info, ec);
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
+            }
+            if (source_reader<Source>::read(source_, v, length) != length)
+            {
+                ec = cbor_errc::unexpected_eof;
+            }
+            if (JSONCONS_UNLIKELY(ec))
+            {
+                return;
             }
         }
     }
