@@ -19,17 +19,18 @@ master (targeting 1.10.0)
   - Git PR #747/#748: Fix CBOR parser issues found by fuzzing
 
   - Until this version, when parsing CBOR negative integers between -2^64 (inclusive) and -2^63 (exclusive),
-  outside the range of an `int64_t`, jsoncons defaulted to a value of zero. As of this version,
+  outside the range of an `int64_t`, jsoncons defaulted to a value of zero. Now,
   jsoncons outputs a string tagged with `semantic_tag::bigint` for these values.    
+
+  - Until this version, binary parsers (bson, cbor, msgpack, ubjson) terminate
+  when they receive invalid type information in the input. Now, binary parsers 
+  produce an error.
 
 Enhancements:
 
   - Improved `basic_json_pointer` to reduce allocations and support custom allocators
 
   - Improved big decimal support in the CBOR parser
-
-  - Binary parsers (bson, cbor, msgpack, ubjson) now produce an error rather than terminate
-  when they receive invalid type information in the input.
 
 Release 1.9.0
 ------
