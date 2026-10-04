@@ -1,3 +1,5 @@
+set -eu
+
 oss_fuzz_compile_all()
 {
     # Make sure we are in the root directory of the jsoncons
@@ -13,8 +15,8 @@ oss_fuzz_compile_all()
     $CXX ./fuzzers/fuzz_cbor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor
     $CXX ./fuzzers/fuzz_bson.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_bson
     $CXX ./fuzzers/fuzz_msgpack.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack
-    $CXX ./fuzzers/fuzz_msgpack_decode_bytes_source.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack
-    $CXX ./fuzzers/fuzz_msgpack_decode_iterator_source.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack
+    $CXX ./fuzzers/fuzz_msgpack_decode_bytes_source.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack_decode_bytes_source
+    $CXX ./fuzzers/fuzz_msgpack_decode_iterator_source.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack_decode_iterator_source
     $CXX ./fuzzers/fuzz_ubjson.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_ubjson
 
     # Fuzzers with encoders
@@ -34,12 +36,22 @@ oss_fuzz_compile_all()
 
     # Fuzzers that target the cursors
     $CXX ./fuzzers/fuzz_json_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_json_cursor
+    $CXX ./fuzzers/fuzz_cbor_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_cursor
+    $CXX ./fuzzers/fuzz_cbor_typed_array.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_typed_array
+
+    # Fuzzers that target error_code paths
+    $CXX ./fuzzers/fuzz_cbor_noexcept.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_noexcept
+
+    # Seed corpora
+    zip -j $OUT/fuzz_cbor_cursor_seed_corpus.zip ./fuzzers/corpus/cbor/*
+    zip -j $OUT/fuzz_cbor_typed_array_seed_corpus.zip ./fuzzers/corpus/cbor/*
+    zip -j $OUT/fuzz_cbor_noexcept_seed_corpus.zip ./fuzzers/corpus/cbor/*
 
     # Fuzzers that target the views
     $CXX ./fuzzers/fuzz_cbor_view.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_view
 }
 
-if [[ -z "${OUT}" ]]; then
+if [[ -z "${OUT:-}" ]]; then
   echo "This script assumes we run inside an oss-fuzz environment with the proper environment variables set"
   echo "Please set these environment variables for it to run properly"
 else
