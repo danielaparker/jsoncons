@@ -303,8 +303,7 @@ void append_chars(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std:
     std::basic_string<CharT> coeff;
     append_chars(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
-    int64_t adjusted = -value.scale() + (int64_t)(coeffLen-1);
-    if ((value.scale() >= 0) && (adjusted >= -6)) 
+    if ((value.scale() >= 0) && (value.scale() <= static_cast<int64_t>(coeffLen) + 5)) 
     { 
         int64_t pad = value.scale() - coeffLen;         // padding zeros
         if (pad >= 0) {                                 // 0.xxx form
@@ -330,10 +329,18 @@ void append_chars(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std:
             buf.push_back('.');
             buf.append(coeff.data() + 1, coeffLen - 1);
         }
-        if (adjusted != 0) 
+        int64_t digits = static_cast<int64_t>(coeffLen) - 1;
+        if (value.scale() != digits) 
         {             
             buf.push_back('e');
-            from_integer(adjusted, buf);
+            if (value.scale() < digits)
+            {
+                from_integer(static_cast<uint64_t>(digits) - static_cast<uint64_t>(value.scale()), buf);
+            }
+            else
+            {
+                from_integer(digits - value.scale(), buf);
+            }
         }
     }
 }

@@ -20,6 +20,15 @@
 
 using namespace jsoncons;
 
+TEST_CASE("csv reader constructs from source and visitor")
+{
+    std::istringstream is("a,b\n1,2\n");
+    json_decoder<json> decoder;
+    csv::csv_stream_reader reader(is, decoder);
+    reader.read();
+    CHECK(decoder.get_result() == json::parse(R"([["a","b"],[1,2]])"));
+}
+
 TEST_CASE("csv subfield delimiter tests")
 {
     SECTION("n_objects tests")

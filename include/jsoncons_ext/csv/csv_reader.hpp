@@ -69,7 +69,7 @@ namespace csv {
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
             basic_json_visitor<CharT>& visitor,
-            const Allocator& alloc = Allocator())
+            const Allocator& alloc)
             : basic_csv_reader(std::forward<Sourceable>(source), 
                                visitor, 
                                basic_csv_decode_options<CharT>(), 

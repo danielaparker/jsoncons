@@ -32,6 +32,7 @@ enum class cbor_errc
     max_nesting_depth_exceeded,
     unmatched_end_array,
     unmatched_end_object,
+    invalid_major_type,
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,
@@ -54,11 +55,11 @@ public:
             case cbor_errc::unexpected_eof:
                 return "Unexpected end of file";
             case cbor_errc::reserved_additional_info:
-                return "Additional-information values 30-32 are reserved";
+                return "Additional-information values 28-30 are reserved";
             case cbor_errc::source_error:
                 return "Source error";
             case cbor_errc::invalid_bigdecimal:
-                return "Invalid DigDecimal value";
+                return "Invalid BigDecimal value";
             case cbor_errc::invalid_bigfloat:
                 return "Invalid BigFloat value";
             case cbor_errc::invalid_utf8_text_string:
@@ -79,6 +80,8 @@ public:
                 return "Unmatched end array";
             case cbor_errc::unknown_type:
                 return "Unknown type in input";
+            case cbor_errc::invalid_major_type:
+                return "Invalid major type in input";
             case cbor_errc::illegal_chunked_string:
                 return "An illegal type was found while parsing an indefinite length string";
             case cbor_errc::bad_mdarray:
