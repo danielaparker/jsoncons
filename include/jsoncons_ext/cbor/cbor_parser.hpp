@@ -1139,55 +1139,6 @@ private:
         return sv;
     }
 
-    void read_text_string(string_type& str, std::error_code& ec)
-    {
-        auto c = source_.peek();
-        if (JSONCONS_UNLIKELY(c.eof))
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return;
-        }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
-        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        uint8_t info = get_additional_information(c.value);
-        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-        {
-            ec = cbor_errc::reserved_additional_info;
-            more_ = false;
-            return;
-        }
-
-        source_.ignore(1);
-        if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
-        {
-            iterate_string_chunks(jsoncons::cbor::detail::cbor_major_type::text_string, str, ec);
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                return;
-            }
-        }
-        else
-        {
-            std::size_t length = read_size(info, ec);
-            if (JSONCONS_UNLIKELY(ec))
-            {
-                return;
-            }
-            if (source_reader<Source>::read(source_, str, length) != length)
-            {
-                ec = cbor_errc::unexpected_eof;
-            }
-        }
-
-        if (!stringref_map_stack_.empty() && 
-            info != jsoncons::cbor::detail::additional_info::indefinite_length &&
-            str.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
-        {
-            stringref_map_stack_.back().emplace_back(mapped_string(str,alloc_));
-        }
-    }
-
     byte_string_view read_byte_string_view(std::error_code& ec)
     {
         auto c = source_.peek();
