@@ -189,6 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        standard: [11, 14, 17, 20, 23, 26]
         compiler: ['7', '8', '9', '10', '11', '12', '13', '14', '15', 'latest']
     container: gcc:${{ matrix.compiler }}
     steps:
