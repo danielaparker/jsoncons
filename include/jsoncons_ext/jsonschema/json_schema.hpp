@@ -8,6 +8,8 @@
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_HPP
 
 #include <functional>
+#include <memory>
+#include <type_traits>
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -192,6 +194,12 @@ private:
 template <typename Json>
 class json_schema
 {
+    static_assert(std::is_same<typename Json::char_type,char>::value,
+        "json_schema requires Json::char_type to be char");
+    static_assert(nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+        std::allocator_traits<typename Json::allocator_type>::is_always_equal::value,
+        "json_schema requires a polymorphic or always-equal allocator");
+
     using keyword_validator_ptr_type = std::unique_ptr<keyword_validator<Json>>;
     using document_schema_validator_type = std::unique_ptr<document_schema_validator<Json>>;
 
