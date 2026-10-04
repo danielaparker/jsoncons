@@ -2940,20 +2940,20 @@ private:
             }
             for (std::size_t i = 0; more_ && i < size; ++i)
             {
-                uint8_t initial_b;
-                if (source_.read(&initial_b, 1) == 0)
+                uint8_t initial_byte;
+                if (source_.read(&initial_byte, 1) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                if (JSONCONS_UNLIKELY(get_major_type(initial_b) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
+                if (JSONCONS_UNLIKELY(get_major_type(initial_byte) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
                 {
                     ec = cbor_errc::unknown_type;
                     more_ = false;
                     return;
                 }
-                info = get_additional_information(initial_b);
+                info = get_additional_information(initial_byte);
                 if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;
