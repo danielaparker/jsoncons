@@ -170,6 +170,29 @@ public:
                 JSONCONS_UNREACHABLE();
         } 
     }
+
+    int compare_abs(const basic_bigdec& val) 
+    {
+        int64_t sdiff = this->scale - val.scale;
+        if (sdiff != 0) {
+            // Avoid matching scales if the (adjusted) exponents differ
+            int64_t xae = (int64_t)this->precision() - this->scale();   // [-1]
+            int64_t yae = (int64_t)val.precision() - val.scale();     // [-1]
+            if (xae < yae)
+                return -1;
+            if (xae > yae)
+                return 1;
+            if (sdiff < 0) {
+                basic_bigint<Allocator> rb = bigMultiplyPowerTen((int)-sdiff);
+                return rb.compare_abs(val.unscaled());
+            } else { // sdiff > 0
+                // The cases sdiff > Integer.MAX_VALUE intentionally fall through.
+                basic_bigint<Allocator> rb = val.bigMultiplyPowerTen((int)sdiff);
+                return this->intVal.compare_abs(rb);
+            }
+        }
+        return this->unscaled().compare_abs(val.unscaled());
+    }
 public:
     static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& dividend, 
         const basic_bigint<Allocator>& divisor) 
@@ -244,6 +267,18 @@ public:
         os << s;
 
         return os;
+    }
+
+    int compare(const basic_bigdec<Allocator>& other) const
+    {
+        int xsign = this->signum();
+        int ysign = other.signum();
+        if (xsign != ysign)
+            return (xsign > ysign) ? 1 : -1;
+        if (xsign == 0)
+            return 0;
+        int cmp = compare_abs(other);
+        return (xsign > 0) ? cmp : -cmp;
     }
 };
 
