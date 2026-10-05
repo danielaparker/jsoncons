@@ -17,6 +17,8 @@
 
 namespace jsoncons {
 
+enum class rounding_mode {down, up, half_up, half_even};
+
 template <typename Allocator>
 class basic_bigdec;
 
@@ -172,6 +174,24 @@ bignum_result multiply(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& 
     }
     int64_t scale = a.scale() + b.scale();
     c = basic_bigdec<Alloc>(a.unscaled() * b.unscaled(), scale);
+
+    return bignum_result{};
+}
+
+template <typename Alloc>
+bignum_result divide(const basic_bigdec<Alloc>& dividend, 
+    const basic_bigdec<Alloc>& divisor, 
+    basic_bigdec<Alloc>& c,
+    int64_t preferred_scale, rounding_mode rounding)
+{
+    if (divisor.signum() == 0)
+    {
+        return bignum_result{bignum_errc::divide_by_zero};
+    }
+
+    int scale_difference = preferred_scale + divisor.scale() - dividend.scale();
+    basic_bigint<Alloc> scaled_dividend = dividend.unscaled();
+    basic_bigint<Alloc> adjusted_divisor = divisor.unscaled();
 
     return bignum_result{};
 }

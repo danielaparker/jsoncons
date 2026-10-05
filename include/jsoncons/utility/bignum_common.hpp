@@ -45,7 +45,7 @@ enum class bignum_errc
     success = 0,
     invalid_argument,
     result_out_of_range,
-    division_by_zero
+    divide_by_zero
 };
 
 class bignum_error_category_impl
@@ -66,7 +66,7 @@ public:
                 return "Invalid argument";
             case bignum_errc::result_out_of_range:
                 return "Result out of range";
-            case bignum_errc::division_by_zero:
+            case bignum_errc::divide_by_zero:
                 return "Division by zero";
             default:
                 return "Unknown read error";
