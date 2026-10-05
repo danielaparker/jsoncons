@@ -1894,7 +1894,7 @@ private:
         }
 
         bigdec dec(std::move(unscaled), -exponent);
-        append_chars(dec, result);
+        append_to_string(dec, result);
     }
 
     void read_bigfloat(uint8_t container_info, string_type& str, std::error_code& ec)

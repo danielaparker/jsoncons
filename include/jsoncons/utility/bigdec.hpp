@@ -143,6 +143,33 @@ public:
             return q.is_odd();
         }       
     }
+
+    bool need_to_round_up(const basic_bigint<Allocator>& quotient, 
+        const basic_bigint<Allocator>& remainder, 
+        const basic_bigint<Allocator>& divisor, rounding_mode rounding) 
+    {
+        // Conceptual rounding logic helper
+        // Compares (remainder * 2) against the divisor to see if we are past the halfway point (0.5)
+        int compare = (absb(remainder) * basic_bigint<Allocator>(2)).compare(absb(divisor));
+
+        switch (rounding) 
+        {
+            case rounding_mode::down: 
+                return false; // Always truncate toward zero
+            case rounding_mode::up: 
+                return true;  // Always round away from zero
+            case rounding_mode::half_up: 
+                return compare >= 0; // Round up if remainder >= 0.5 of divisor
+            case rounding_mode::half_even:
+                if (compare > 0) return true;
+                if (compare < 0) return false;
+                // If exactly 0.5, round up only if the last digit of the quotient is odd
+                //return quotient.testBit(0);
+                return quotient.is_odd();
+            default:
+                JSONCONS_UNREACHABLE();
+        } 
+    }
 public:
     static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& dividend, 
         const basic_bigint<Allocator>& divisor) 
@@ -163,6 +190,61 @@ public:
 
         return (dividend.signum() != divisor.signum()) ? -q : q;
     }
+
+    bignum_result divide(const basic_bigdec<Allocator>& divisor, 
+        basic_bigdec<Allocator>& value,
+        int64_t preferred_scale = 34, 
+        rounding_mode rounding = rounding_mode::half_even)
+    {
+        if (divisor.signum() == 0)
+        {
+            return bignum_result{bignum_errc::divide_by_zero};
+        }
+
+        int64_t scale_difference = preferred_scale + divisor.scale() - scale();
+        basic_bigint<Allocator> scaled_dividend = unscaled();
+        basic_bigint<Allocator> adjusted_divisor = divisor.unscaled();
+        if (scale_difference > 0) 
+        {
+            // Multiply dividend by 10^scale_difference to make room for decimal precision
+            scaled_dividend = scaled_dividend * powb(basic_bigint<Allocator>(10), scale_difference);
+        } 
+        else if (scale_difference < 0) 
+        {
+            // If scale difference is negative, the divisor needs to be scaled up instead
+            adjusted_divisor = adjusted_divisor * powb(basic_bigint<Allocator>(10), scale_difference);
+        }
+
+        // Perform the integer division (yields quotient and remainder)
+        basic_bigint<Allocator> quotient;
+        basic_bigint<Allocator> remainder;
+
+        scaled_dividend.divide(adjusted_divisor, quotient, remainder, true);
+
+        // Handle Rounding if there is a remainder left over
+        if (remainder.signum() != 0)
+        {
+            if (need_to_round_up(quotient, remainder, adjusted_divisor, rounding)) 
+            {
+                quotient += (basic_bigint<Allocator>(quotient.signum() >= 0 ? 1 : -1));
+            }
+        }
+        
+        // Assigns a standard basic_bigdec<Allocator> with the rounded unscaled value and proper scale
+        value = basic_bigdec<Allocator>(std::move(quotient), preferred_scale);
+        
+        return bignum_result{};
+    }
+
+    template <typename CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigdec& b)
+    {
+        std::basic_string<CharT> s;
+        append_to_string(b, s); 
+        os << s;
+
+        return os;
+    }
 };
 
 template <typename Alloc>
@@ -174,24 +256,6 @@ bignum_result multiply(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& 
     }
     int64_t scale = a.scale() + b.scale();
     c = basic_bigdec<Alloc>(a.unscaled() * b.unscaled(), scale);
-
-    return bignum_result{};
-}
-
-template <typename Alloc>
-bignum_result divide(const basic_bigdec<Alloc>& dividend, 
-    const basic_bigdec<Alloc>& divisor, 
-    basic_bigdec<Alloc>& c,
-    int64_t preferred_scale, rounding_mode rounding)
-{
-    if (divisor.signum() == 0)
-    {
-        return bignum_result{bignum_errc::divide_by_zero};
-    }
-
-    int scale_difference = preferred_scale + divisor.scale() - dividend.scale();
-    basic_bigint<Alloc> scaled_dividend = dividend.unscaled();
-    basic_bigint<Alloc> adjusted_divisor = divisor.unscaled();
 
     return bignum_result{};
 }
@@ -309,11 +373,11 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 }
 
 template <typename Alloc,typename CharT,typename BAlloc>
-void append_chars(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+void append_to_string(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
 {
     if (value.scale() == 0)
     {
-        append_chars(value.unscaled(), buf);
+        append_to_string(value.unscaled(), buf);
         return;
     }
     if (value.unscaled().is_negative())
@@ -321,7 +385,7 @@ void append_chars(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std:
         buf.push_back('-');
     }
     std::basic_string<CharT> coeff;
-    append_chars(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
+    append_to_string(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
     if ((value.scale() >= 0) && (value.scale() <= static_cast<int64_t>(coeffLen) + 5)) 
     { 

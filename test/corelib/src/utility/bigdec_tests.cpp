@@ -19,7 +19,7 @@ void test_bigdec(jsoncons::string_view sv, jsoncons::string_view expected)
     CHECK(sv.data() + sv.length() == result.ptr);
 
     std::string buf;
-    append_chars(value, buf);
+    append_to_string(value, buf);
     CHECK(expected == buf);
 }
 
@@ -31,7 +31,7 @@ void test_bigdec(jsoncons::wstring_view sv, jsoncons::wstring_view expected)
     CHECK(sv.data() + sv.length() == result.ptr);
 
     std::wstring buf;
-    append_chars(value, buf);
+    append_to_string(value, buf);
     CHECK(expected == buf);
 }
 
@@ -81,15 +81,15 @@ TEST_CASE("basic_bigdec extreme scale tests")
 {
     std::string buf;
 
-    append_chars(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, (std::numeric_limits<int64_t>::min)()}, buf);
+    append_to_string(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, (std::numeric_limits<int64_t>::min)()}, buf);
     CHECK(buf == "1.234567890123456789e9223372036854775826");
 
     buf.clear();
-    append_chars(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, -(std::numeric_limits<int64_t>::max)()}, buf);
+    append_to_string(jsoncons::bigdec{jsoncons::bigint{1234567890123456789}, -(std::numeric_limits<int64_t>::max)()}, buf);
     CHECK(buf == "1.234567890123456789e9223372036854775825");
 
     buf.clear();
-    append_chars(jsoncons::bigdec{jsoncons::bigint{5}, (std::numeric_limits<int64_t>::max)()}, buf);
+    append_to_string(jsoncons::bigdec{jsoncons::bigint{5}, (std::numeric_limits<int64_t>::max)()}, buf);
     CHECK(buf == "5e-9223372036854775807");
 }
 
@@ -105,7 +105,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        append_chars(value, buf);
+        append_to_string(value, buf);
         CHECK(expected == buf);
     }
     SECTION("1[.]")
@@ -118,7 +118,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        append_chars(value, buf);
+        append_to_string(value, buf);
         CHECK(expected == buf);
     }
     SECTION("12.12[e]")
@@ -131,7 +131,7 @@ TEST_CASE("basic_bigdec terminal tests")
         CHECK(result);
 
         std::string buf;
-        append_chars(value, buf);
+        append_to_string(value, buf);
         CHECK(expected == buf);
     }
 }
@@ -172,5 +172,16 @@ TEST_CASE("basic_bigdec divide tests")
         auto r = jsoncons::bigdec::divide_and_round(x,y);
         REQUIRE(r);
         CHECK(expected == r);
+    }
+    SECTION("divide")
+    {
+        jsoncons::bigdec a("4.0");
+        jsoncons::bigdec b("2.0");
+        jsoncons::bigdec expected("2");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c);
+        REQUIRE(r);
+        CHECK(expected == c);
     }
 }
