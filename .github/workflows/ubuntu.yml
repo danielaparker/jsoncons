@@ -185,6 +185,28 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
+  ci_test_standards_gcc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        standard: [11, 14, 17, 20, 23, 26]
+        compiler: ['latest']
+    container: gcc:${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
+      - name: cmake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        working-directory: build/
+        run: cmake --build . 
+      - name: test
+        working-directory: build/
+        run: ctest --output-on-failure
+
   ci_test_compilers_gcc:
     runs-on: ubuntu-latest
     strategy:
@@ -206,7 +228,7 @@ jobs:
         working-directory: build/
         run: ctest --output-on-failure
 
-  ci_test_compilers_gcc2:
+  ci_test_sanitizers_gcc:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -218,6 +240,28 @@ jobs:
         uses: lukka/get-cmake@latest
       - name: cmake
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        working-directory: build/
+        run: cmake --build . 
+      - name: test
+        working-directory: build/
+        run: ctest --output-on-failure
+
+  ci_test_standards_clang:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        standard: [11, 14, 17, 20, 23, 26]
+        compiler: ['latest']
+    container: silkeh/clang:${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
+      - name: cmake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       - name: build
         working-directory: build/
         run: cmake --build . 
@@ -246,7 +290,7 @@ jobs:
         working-directory: build/
         run: ctest --output-on-failure
 
-  ci_test_compilers_clang2:
+  ci_test_sanitizers_clang:
     runs-on: ubuntu-latest
     strategy:
       matrix:

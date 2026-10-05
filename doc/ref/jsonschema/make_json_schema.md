@@ -27,6 +27,13 @@ json_schema<Json> make_json_schema(Json root_schema,
 
 Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
 
+All overloads require `Json::char_type` to be `char` and `Json::allocator_type`
+to be either polymorphic or always equal
+(`std::allocator_traits<Json::allocator_type>::is_always_equal::value`). Overloads
+do not participate in overload resolution when these requirements are not met.
+`json`, `ojson`, and their `jsoncons::pmr` variants are supported;
+wide-character types such as `wjson` and `wojson` and other stateful allocators are not.
+
 #### Parameters
 
 <table>

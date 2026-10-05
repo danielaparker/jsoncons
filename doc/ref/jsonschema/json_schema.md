@@ -12,6 +12,13 @@ A `json_schema` is immutable and thread-safe.
 
 The class satisfies the requirements of MoveConstructible and MoveAssignable, but not CopyConstructible or CopyAssignable.
 
+`Json` must be a `basic_json` specialization with `char_type` equal to `char`
+and an allocator that is either polymorphic or always equal
+(`std::allocator_traits<Json::allocator_type>::is_always_equal::value`).
+This includes `json`, `ojson`, and their `jsoncons::pmr` variants. Wide-character
+types such as `wjson` and `wojson`, and other stateful allocators, are not supported.
+Instantiating `json_schema` with these unsupported types produces a compile-time diagnostic.
+
 #### Member functions
 
 <table border="0">
