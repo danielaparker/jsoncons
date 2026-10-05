@@ -1,6 +1,9 @@
-master (targeting 1.10.0)
+Release 1.10.0
+--------------
 
 - Fixed bugs:
+
+  - Git Issue #734/PR #739: Constrain and document supported JSON Schema types
 
   - Git PR #738: Fixed analyzer warning about possible uninitialized variable in encode_toon.hpp. 
 
