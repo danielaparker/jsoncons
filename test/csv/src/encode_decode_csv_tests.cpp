@@ -152,6 +152,19 @@ TEST_CASE("encode decode csv source")
     }
 }
 
+TEST_CASE("encode_csv quotes column names that contain a delimiter or quote")
+{
+    auto j = json::parse(R"([{"a,b":"x","c\"d":"y","e":"z"}])");
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::n_objects);
+
+    std::string output;
+    csv::encode_csv(j, output, options);
+    CHECK("\"a,b\",\"c\"\"d\",e\nx,y,z\n" == output);
+    CHECK(j == csv::decode_csv<json>(output, options));
+}
+
 TEST_CASE("decode_csv non-numeric string into double reports error")
 {
     // Regression test for as_double silently returning 0.0
@@ -179,6 +192,19 @@ TEST_CASE("decode_csv non-numeric string into double reports error")
         REQUIRE(!result); //-V521
         REQUIRE_THROWS(csv::decode_csv<cpp_type>(s, options));
     }
+}
+
+TEST_CASE("encode_csv quotes values that contain a line break")
+{
+    auto j = json::parse(R"([{"a":"line1\nline2","b":"cr\rhere"}])");
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::n_objects);
+
+    std::string output;
+    csv::encode_csv(j, output, options);
+    CHECK("a,b\n\"line1\nline2\",\"cr\rhere\"\n" == output);
+    CHECK(j == csv::decode_csv<json>(output, options));
 }
 
 
