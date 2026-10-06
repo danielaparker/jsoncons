@@ -583,7 +583,7 @@ private:
                         nano *= uint64_t(nanos_in_second);
                         nano += nsec;
                         text_buffer_.clear();
-                        nano.write_string(text_buffer_);
+                        nano.append_to_buffer(text_buffer_);
                         visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
                         more_ = !cursor_mode_;
                         if (!more_) return;
@@ -622,7 +622,7 @@ private:
                         }
 
                         text_buffer_.clear();
-                        nano.write_string(text_buffer_);
+                        nano.append_to_buffer(text_buffer_);
                         visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
                         more_ = !cursor_mode_;
                         if (!more_) return;
