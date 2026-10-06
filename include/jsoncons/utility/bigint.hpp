@@ -1379,12 +1379,12 @@ public:
     std::string to_string() const
     {
         std::string s;
-        append_to_string(s);
+        append_to_buffer(s);
         return s;
     }
 
     template <typename Ch,typename Traits,typename Alloc>
-    void append_to_string(std::basic_string<Ch,Traits,Alloc>& data) const
+    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& data) const
     {
         basic_bigint<Allocator> v(*this);
         auto v_view = v.get_storage_view();
@@ -1660,7 +1660,7 @@ public:
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigint& v)
     {
         std::basic_string<CharT> s;
-        v.append_to_string(s); 
+        v.append_to_buffer(s); 
         os << s;
 
         return os;
@@ -2082,7 +2082,7 @@ private:
     }
 
     template <typename CharT, typename BAlloc>
-    friend void append_to_string(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
+    friend void append_to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
         basic_bigint v(value);
         auto v_view = v.get_storage_view();

@@ -99,29 +99,14 @@ public:
         return powb(basic_bigint<Allocator>(10), n);
     }
 
-    static uint64_t big_digit_length(const basic_bigint<Allocator>& b) {
-        if (b.signum() == 0)
-            return 1;
-        uint64_t r = ((b.bit_width() + 1) * 646456993u) >> 31;
-        return b.compare_abs(big_ten_to_the(r)) < 0 ? r : r+1;
-    }
-
-    uint64_t precision() const
-    {
-        return big_digit_length(unscaled_);
-    }
-
     friend bool operator==(const basic_bigdec& lhs, const basic_bigdec& rhs)
     {
         if (&lhs == &rhs)
         {
             return true;
         }
-        if (lhs.scale_ != rhs.scale_)
-        {
-            return false;
-        }
-        return lhs.unscaled_ == rhs.unscaled_;
+
+        return lhs.compare(rhs) == 0;
     }
 
     static bool need_increment(const basic_bigint<Allocator>& divisor, 
@@ -171,26 +156,23 @@ public:
         } 
     }
 
-    int compare_abs(const basic_bigdec& val) 
+    int compare_abs(const basic_bigdec& val) const
     {
-        int64_t sdiff = this->scale - val.scale;
-        if (sdiff != 0) {
-            // Avoid matching scales if the (adjusted) exponents differ
-            int64_t xae = (int64_t)this->precision() - this->scale();   // [-1]
-            int64_t yae = (int64_t)val.precision() - val.scale();     // [-1]
-            if (xae < yae)
-                return -1;
-            if (xae > yae)
-                return 1;
-            if (sdiff < 0) {
-                basic_bigint<Allocator> rb = bigMultiplyPowerTen((int)-sdiff);
+        int64_t sdiff = this->scale() - val.scale();
+        if (sdiff != 0) 
+        {
+            if (sdiff < 0) 
+            {
+                basic_bigint<Allocator> rb = this->unscaled()*big_ten_to_the(std::size_t(-sdiff));
                 return rb.compare_abs(val.unscaled());
-            } else { // sdiff > 0
-                // The cases sdiff > Integer.MAX_VALUE intentionally fall through.
-                basic_bigint<Allocator> rb = val.bigMultiplyPowerTen((int)sdiff);
-                return this->intVal.compare_abs(rb);
+            } 
+            else // sdiff > 0 
+            { 
+                basic_bigint<Allocator> rb = val.unscaled()*val.big_ten_to_the((std::size_t)sdiff);
+                return this->unscaled().compare_abs(rb);
             }
         }
+
         return this->unscaled().compare_abs(val.unscaled());
     }
 public:
@@ -263,7 +245,7 @@ public:
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigdec& b)
     {
         std::basic_string<CharT> s;
-        append_to_string(b, s); 
+        append_to_buffer(b, s); 
         os << s;
 
         return os;
@@ -278,7 +260,7 @@ public:
         if (xsign == 0)
             return 0;
         int cmp = compare_abs(other);
-        return (xsign > 0) ? cmp : -cmp;
+        return (xsign >= 0) ? cmp : -cmp;
     }
 };
 
@@ -316,12 +298,15 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     if (*cur == '0')
     {
         cur++;
-        if (JSONCONS_UNLIKELY(cur < end && is_char_digit(*cur)))
+        if (!(cur < end && is_char_dot_or_exp(*cur)))
         {
-            return to_number_result<CharT>{s, std::errc::invalid_argument};
+            if (JSONCONS_UNLIKELY(cur < end && is_char_digit(*cur)))
+            {
+                return to_number_result<CharT>{s, std::errc::invalid_argument};
+            }
+            value = basic_bigdec<Allocator>{};
+            return to_number_result<CharT>(cur);
         }
-        value = basic_bigdec<Allocator>{};
-        return to_number_result<CharT>(cur);
     }
     else
     {
@@ -335,6 +320,7 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
             return to_number_result<CharT>(cur);
         }
     }
+
     const CharT* mark1 = cur;
     const CharT* mark = cur;
     if (cur != end && *cur == '.')
@@ -408,11 +394,11 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
 }
 
 template <typename Alloc,typename CharT,typename BAlloc>
-void append_to_string(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+void append_to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
 {
     if (value.scale() == 0)
     {
-        append_to_string(value.unscaled(), buf);
+        append_to_buffer(value.unscaled(), buf);
         return;
     }
     if (value.unscaled().is_negative())
@@ -420,7 +406,7 @@ void append_to_string(const basic_bigdec<Alloc>& value, std::basic_string<CharT,
         buf.push_back('-');
     }
     std::basic_string<CharT> coeff;
-    append_to_string(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
+    append_to_buffer(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
     if ((value.scale() >= 0) && (value.scale() <= static_cast<int64_t>(coeffLen) + 5)) 
     { 

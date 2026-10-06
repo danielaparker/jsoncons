@@ -1585,7 +1585,7 @@ private:
                     bigint b(u);
                     bigint b2 = -1 - b;
                     text_buffer_.clear();
-                    b2.write_string(text_buffer_);
+                    b2.append_to_buffer(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                 }
                 else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
@@ -1894,7 +1894,7 @@ private:
         }
 
         bigdec dec(std::move(unscaled), -exponent);
-        append_to_string(dec, result);
+        append_to_buffer(dec, result);
     }
 
     void read_bigfloat(uint8_t container_info, string_type& str, std::error_code& ec)
@@ -2196,7 +2196,7 @@ private:
                     }
                     bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
                     text_buffer_.clear();
-                    b.write_string(text_buffer_);
+                    b.append_to_buffer(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;
@@ -2212,7 +2212,7 @@ private:
                     bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
                     b = -1 - b;
                     text_buffer_.clear();
-                    b.write_string(text_buffer_);
+                    b.append_to_buffer(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;

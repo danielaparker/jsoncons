@@ -119,13 +119,13 @@ constexpr bool is_char_exp(wchar_t d) {
 }
 
 // Match a floating point indicator: '.', 'e', 'E'. 
-constexpr bool is_fp(wchar_t d) {
+constexpr bool is_char_dot_or_exp(wchar_t d) {
     return d == '.' || d == 'e' || d == 'E';
 }
 
 // Match a digit or floating point indicator: [0-9], '.', 'e', 'E'. 
 constexpr bool is_char_float(wchar_t d) {
-    return is_char_digit(d) || is_fp(d);
+    return is_char_digit(d) || is_char_dot_or_exp(d);
 }
 
 JSONCONS_INLINE_CONSTEXPR std::array<uint64_t,20> uint64_pow10_table = {
