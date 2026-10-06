@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <string>
 #include <system_error>
 #include <utility> // std::move
 #include <vector>
@@ -18,6 +19,7 @@
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/number_readers.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -487,6 +489,18 @@ private:
         {
             sink_.push_back(jsoncons::ubjson::ubjson_type::int64_type);
             binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+        }
+        else
+        {
+            // too large for int64, write as high-precision number
+            std::string s;
+            jsoncons::from_integer(val, s);
+            sink_.push_back(jsoncons::ubjson::ubjson_type::high_precision_number_type);
+            put_length(s.length());
+            for (auto c : s)
+            {
+                sink_.push_back(c);
+            }
         }
         end_value();
         JSONCONS_VISITOR_RETURN;
