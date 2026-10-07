@@ -118,6 +118,25 @@ TEST_CASE("encode_ubjson_test")
                             '1','2'},
                  jsoncons::json("12345678901234567890123456789012"));
 }
+TEST_CASE("encode_ubjson uint64 above int64 max")
+{
+    check_encode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},
+                        jsoncons::json(uint64_t((std::numeric_limits<int64_t>::max)())));
+
+    // UBJSON has no uint64 type, so larger values are written as high-precision numbers
+    std::vector<uint8_t> expected = {'[','#','U',0x02,
+                                     'H','U',19,'9','2','2','3','3','7','2','0','3','6','8','5','4','7','7','5','8','0','8',
+                                     'H','U',20,'1','8','4','4','6','7','4','4','0','7','3','7','0','9','5','5','1','6','1','5'};
+    std::vector<uint8_t> buffer;
+    ubjson::encode_ubjson(jsoncons::json::parse("[9223372036854775808,18446744073709551615]"), buffer);
+    CHECK(buffer == expected);
+
+    auto j = ubjson::decode_ubjson<jsoncons::json>(buffer);
+    REQUIRE(j.size() == 2);
+    CHECK(j[0].as<uint64_t>() == 9223372036854775808u);
+    CHECK(j[1].as<uint64_t>() == (std::numeric_limits<uint64_t>::max)());
+}
+
 TEST_CASE("encode_ubjson_arrays_and_maps")
 {
     check_encode_ubjson({'[','#','U',0x00}, jsoncons::json(jsoncons::json_array_arg));
