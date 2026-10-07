@@ -362,7 +362,7 @@ private:
                                 {
                                     first = false;
                                 }
-                                sink_.append(it->second.data(), it->second.length());
+                                write_column_name(it->second);
                             }
                         }
                         sink_.append(line_delimiter_.data(), line_delimiter_.length());
@@ -397,7 +397,7 @@ private:
                             {
                                 sink_.push_back(field_delimiter_);
                             }
-                            sink_.append(it->second.data(), it->second.length());
+                            write_column_name(it->second);
                             first = false;
                         }
                     }
@@ -642,7 +642,7 @@ private:
                                 {
                                     sink_.push_back(field_delimiter_);
                                 }
-                                sink_.append(it->second.data(), it->second.length());
+                                write_column_name(it->second);
                                 ++col;
                             }
                         }
@@ -704,7 +704,7 @@ private:
                                 {
                                     sink_.push_back(field_delimiter_);
                                 }
-                                sink_.append(it->second.data(), it->second.length());
+                                write_column_name(it->second);
                                 ++col;
                             }
                         }
@@ -1307,6 +1307,24 @@ private:
         JSONCONS_VISITOR_RETURN;
     }
 
+    void write_column_name(const string_type& name)
+    {
+        // Column names come from object keys, so they need the same minimal quoting as values
+        bool quote = quote_style_ != quote_style_kind::none &&
+            (name.find(field_delimiter_) != string_type::npos || name.find(quote_char_) != string_type::npos ||
+             name.find('\n') != string_type::npos || name.find('\r') != string_type::npos);
+        if (!quote)
+        {
+            sink_.append(name.data(), name.length());
+            return;
+        }
+        string_type buf{alloc_};
+        buf.push_back(quote_char_);
+        escape_string(name.data(), name.length(), quote_char_, quote_escape_char_, buf);
+        buf.push_back(quote_char_);
+        sink_.append(buf.data(), buf.length());
+    }
+
     void write_string_value(const string_view_type& value, string_type& str)
     {
         const char* s = value.data();
@@ -1315,7 +1333,8 @@ private:
         bool quote = false;
         if (quote_style_ == quote_style_kind::all || quote_style_ == quote_style_kind::nonnumeric ||
             (quote_style_ == quote_style_kind::minimal &&
-            (std::char_traits<CharT>::find(s, length, field_delimiter_) != nullptr || std::char_traits<CharT>::find(s, length, quote_char_) != nullptr)))
+            (std::char_traits<CharT>::find(s, length, field_delimiter_) != nullptr || std::char_traits<CharT>::find(s, length, quote_char_) != nullptr ||
+             std::char_traits<CharT>::find(s, length, '\n') != nullptr || std::char_traits<CharT>::find(s, length, '\r') != nullptr)))
         {
             quote = true;
             str.push_back(quote_char_);
