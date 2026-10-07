@@ -33,7 +33,7 @@ add_overflow(T a, T b)
 
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,bool>::type
-subtract_overflow(T a, T b) 
+sub_overflow(T a, T b) 
 {
     if (b < 0 && a > (std::numeric_limits<T>::max)() + b) return true;
     if (b > 0 && a < (std::numeric_limits<T>::min)() + b) return true;

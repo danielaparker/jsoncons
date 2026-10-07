@@ -206,7 +206,17 @@ public:
             return bignum_result{bignum_errc::divide_by_zero};
         }
 
-        int64_t scale_difference = preferred_scale + divisor.scale() - scale();
+        if (sub_overflow(divisor.scale(), scale()))
+        {
+            return bignum_result{bignum_errc::result_out_of_range};
+        }
+        int64_t scale_difference = divisor.scale() - scale();
+        if (add_overflow(scale_difference, preferred_scale))
+        {
+            return bignum_result{bignum_errc::result_out_of_range};
+        }
+
+        scale_difference += preferred_scale;
         basic_bigint<Allocator> scaled_dividend = unscaled();
         basic_bigint<Allocator> adjusted_divisor = divisor.unscaled();
         if (scale_difference > 0) 
