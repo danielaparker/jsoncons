@@ -497,10 +497,7 @@ private:
             jsoncons::from_integer(val, s);
             sink_.push_back(jsoncons::ubjson::ubjson_type::high_precision_number_type);
             put_length(s.length());
-            for (auto c : s)
-            {
-                sink_.push_back(c);
-            }
+            sink_.append(reinterpret_cast<const uint8_t*>(s.data()), s.size());
         }
         end_value();
         JSONCONS_VISITOR_RETURN;
