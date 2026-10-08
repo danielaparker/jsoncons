@@ -870,11 +870,6 @@ private:
                 write_decimal_value(sv, context, ec);
                 break;
             }
-            case semantic_tag::bigfloat:
-            {
-                write_hexfloat_value(sv, context, ec);
-                break;
-            }
             case semantic_tag::datetime:
             {
                 write_tag(0);

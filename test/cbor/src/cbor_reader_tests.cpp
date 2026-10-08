@@ -228,7 +228,7 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },jsoncons::json("0x6AB3p-2", jsoncons::semantic_tag::bigfloat));
+                  },jsoncons::json("6828.75", jsoncons::semantic_tag::bigdec));
 
     SECTION("maps with definite length")
     {

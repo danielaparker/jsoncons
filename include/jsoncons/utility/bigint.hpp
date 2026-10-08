@@ -2136,21 +2136,25 @@ basic_bigint<Allocator> absb( const basic_bigint<Allocator>& a )
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> powb(basic_bigint<Allocator> x, std::size_t n)
+basic_bigint<Allocator> powb(basic_bigint<Allocator> base, std::size_t exponent)
 {
-    basic_bigint<Allocator> y = 1;
+    basic_bigint<Allocator> result = 1;
 
-    while ( n )
+    while ( exponent > 0)
     {
-        if ( n & 1 )
+        if (exponent & 1)
         {
-            y *= x;
+            result *= base;
         }
-        x *= x;
-        n >>= 1;
+        base *= base;
+        exponent >>= 1;
+        if (exponent < 100000000000ll)
+        {
+            std::cout << exponent << "\n";
+        }
     }
 
-    return y;
+    return result;
 }
 
 template <typename Allocator>

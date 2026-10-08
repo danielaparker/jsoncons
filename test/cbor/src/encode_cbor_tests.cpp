@@ -127,13 +127,13 @@ TEST_CASE("cbor_arrays_and_maps")
     check_encode_cbor({ 0x81,0x65,'H','e','l','l','o' }, jsoncons::json::parse("[\"Hello\"]"));
 
     // big float
-    jsoncons::json j("0x6AB3p-2", jsoncons::semantic_tag::bigfloat);
-    CHECK(j.tag() == jsoncons::semantic_tag::bigfloat);
+    jsoncons::json j("6828.75", jsoncons::semantic_tag::bigdec);
+    CHECK(j.tag() == jsoncons::semantic_tag::bigdec);
     jsoncons::json j2 = j;
-    CHECK(j2.tag() == jsoncons::semantic_tag::bigfloat);
+    CHECK(j2.tag() == jsoncons::semantic_tag::bigdec);
     jsoncons::json j3;
     j3 = j;
-    CHECK(j3.tag() == jsoncons::semantic_tag::bigfloat);
+    CHECK(j3.tag() == jsoncons::semantic_tag::bigdec);
 
     check_encode_cbor({ 0xc5, // Tag 5 
                          0x82, // Array of length 2

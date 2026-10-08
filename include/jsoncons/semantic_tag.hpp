@@ -26,7 +26,6 @@ enum class semantic_tag : uint8_t
     epoch_nano = 7,         // 00001010 
     base16 = 8,             // 00000100
     base64 = 9,             // 00000101
-    bigfloat = 10,          // 00001010
     float128 = 11,          // 00001011
     base64url = 12,         // 00001100
     undefined = 13,         
@@ -43,9 +42,9 @@ enum class semantic_tag : uint8_t
 inline bool is_number_tag(semantic_tag tag) noexcept
 {
     constexpr uint8_t mask1{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
-        & uint8_t(semantic_tag::bigfloat) & uint8_t(semantic_tag::float128) };
+        & uint8_t(semantic_tag::float128) };
     constexpr uint8_t mask2{ uint8_t(~uint8_t(semantic_tag::bigint) & ~uint8_t(semantic_tag::bigdec) 
-        & ~uint8_t(semantic_tag::bigfloat) & ~uint8_t(semantic_tag::float128)) };
+        & ~uint8_t(semantic_tag::float128)) };
 
     return (uint8_t(tag) & mask1) == mask1 && (uint8_t(~(uint8_t)tag) & mask2) == mask2;
 }
@@ -62,7 +61,6 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     static constexpr const CharT* epoch_nano_name = JSONCONS_CSTRING_CONSTANT(CharT, "epoch-nano");
     static constexpr const CharT* bigint_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigint");
     static constexpr const CharT* bigdec_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigdec");
-    static constexpr const CharT* bigfloat_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigfloat");
     static constexpr const CharT* base16_name = JSONCONS_CSTRING_CONSTANT(CharT, "base16");
     static constexpr const CharT* base64_name = JSONCONS_CSTRING_CONSTANT(CharT, "base64");
     static constexpr const CharT* base64url_name = JSONCONS_CSTRING_CONSTANT(CharT, "base64url");
@@ -121,11 +119,6 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         case semantic_tag::bigdec:
         {
             os << bigdec_name;
-            break;
-        }
-        case semantic_tag::bigfloat:
-        {
-            os << bigfloat_name;
             break;
         }
         case semantic_tag::float128:
