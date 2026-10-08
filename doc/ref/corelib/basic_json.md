@@ -211,6 +211,10 @@ for their storage, otherwise attempts to return a default constructed allocator.
     <td>Return the specified value.</td> 
   </tr>
   <tr>
+    <td><a href="json/as_or.md">at<br>at_or_null</a></td>
+    <td>Attempts to convert a basic_json value to a value of a type if it matches, otherwise a default value.</td> 
+  </tr>
+  <tr>
     <td><a href="json/get_value_or.md">get_value_or</a></td>
     <td>Return the specified value if available, otherwise a default value.</td> 
   </tr>
