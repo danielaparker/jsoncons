@@ -278,16 +278,6 @@ struct u128
     }
 };
 
-// Quick Helper to print hex values
-void print128(const u128& val) {
-    if (val.hi > 0) {
-        std::printf("0x%llX%016llX\n", val.hi, val.lo);
-    }
-    else {
-        std::printf("0x%llX\n", val.lo);
-    }
-}
-
 } // namespace nonstd
 } // namespace jsoncons
 
