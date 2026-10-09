@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+
 TEST_CASE("configuration")
 {
     #if defined(__clang__) 
