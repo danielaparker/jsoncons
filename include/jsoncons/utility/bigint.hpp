@@ -45,7 +45,8 @@ class bigint_storage : private std::allocator_traits<Allocator>:: template rebin
 public:
     using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
-    using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
+    using word_type = uint64_t;
+    using dword_type = jsoncons::u128;
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type mem_unit = sizeof(word_type);
     static constexpr size_type word_bits = sizeof(word_type) * 8;  // Number of bits
@@ -590,6 +591,7 @@ public:
     using size_type = typename detail::bigint_storage<Allocator>::size_type;
     using ssize_type = typename std::make_signed<size_type>::type;
     using word_type = typename detail::bigint_storage<Allocator>::word_type;
+    using dword_type = typename detail::bigint_storage<Allocator>::dword_type;
     using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<word_type>;
     using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const word_type>;
 
@@ -1023,10 +1025,32 @@ public:
 
     template <typename IntegerType>
     typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
-    operator*=(IntegerType y)
+    operator*=(IntegerType m)
     {
         auto words = get_words();
-        size_type len0 = words.size();
+        size_type len = words.size();
+        if (len == 0 || m == 0)
+        {
+            resize(0);
+            return *this;
+        }
+
+        dword_type carry = 0;
+        size_t i = 0;
+        for (; i < len; ++i) {
+            dword_type x = dword_type(words[i]) * m + carry;
+            words[i] = static_cast<word_type>(x);
+            carry = x >> 64;
+        }
+
+        if (carry)
+        {
+            resize(len+1);
+            words = get_words();
+            words[i] = static_cast<word_type>(carry);
+        }
+
+        /*
         word_type dig = words[0];
         word_type carry = 0;
 
@@ -1034,7 +1058,7 @@ public:
         words = get_words();
 
         size_type i = 0;
-        for (; i < len0; i++ )
+        for (; i < len; i++ )
         {
             word_type hi;
             word_type lo;
@@ -1044,7 +1068,8 @@ public:
             carry = hi + (words[i] < lo);
         }
         words[i] = carry;
-        reduce();
+        reduce(); 
+        */ 
         return *this;
     }
  
@@ -2137,21 +2162,19 @@ private:
         basic_bigint<Allocator> r;
         r.words.resize(a.words.size());
 
-        dword_t carry = 0;
+        dword_type carry = 0;
 
         for (size_t i = 0; i < a.words.size(); ++i) {
-            dword_t x =
-                dword_t(a.words[i]) * m + carry;
+            dword_type x = dword_type(a.words[i]) * m + carry;
 
-            r.words[i] =
-                static_cast<word_t>(x);
+            r.words[i] = static_cast<word_type>(x);
 
             carry = x >> 64;
         }
 
         if (carry)
             r.words.push_back(
-                static_cast<word_t>(carry));
+                static_cast<word_type>(carry));
 
         return r;
     }
@@ -2167,20 +2190,20 @@ private:
 
         r.words.resize(n);
 
-        word_t carry = 0;
+        word_type carry = 0;
 
         for (size_t i = 0; i < n; ++i) {
-            word_t x =
+            word_type x =
                 i < a.words.size() ? a.words[i] : 0;
 
-            word_t y =
+            word_type y =
                 i < b.words.size() ? b.words[i] : 0;
 
-            word_t s = x + y;
-            word_t c1 = (s < x);
+            word_type s = x + y;
+            word_type c1 = (s < x);
 
-            word_t t = s + carry;
-            word_t c2 = (t < s);
+            word_type t = s + carry;
+            word_type c2 = (t < s);
 
             r.words[i] = t;
             carry = c1 | c2;
