@@ -77,6 +77,7 @@ add_executable(unit_tests
                cbor/src/cbor_tests.cpp
                cbor/src/cbor_compliance_tests.cpp
                cbor/src/cbor_typed_array_tests.cpp
+               cbor/src/cbor_view_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
                corelib/src/nonstd/optional_tests.cpp
