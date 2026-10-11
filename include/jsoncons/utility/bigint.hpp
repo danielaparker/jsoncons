@@ -1409,17 +1409,27 @@ public:
     }
 
     template <typename Ch,typename Traits,typename Alloc>
-    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& data) const
+    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& buf) const
     {
+        if (is_zero())
+        {
+            buf.push_back('0');
+            return;
+        }
+        if (is_negative())
+        {
+            buf.push_back('-');
+        }
+        std::size_t pos = buf.size();
         basic_bigint<Allocator> v(*this);
         auto v_words = v.get_words();
 
         size_type len = (v_words.size() * word_bits / 3) + 2;
-        data.reserve(len);
+        buf.reserve(len);
 
         if ( v_words.size() == 0 )
         {
-            data.push_back('0');
+            buf.push_back('0');
         }
         else
         {
@@ -1436,7 +1446,7 @@ public:
                 r = (R_words.size() ? R_words[0] : 0);
                 for ( size_type j=0; j < imax_unsigned_power_10; j++ )
                 {
-                    data.push_back(char(r % 10u + '0'));
+                    buf.push_back(char(r % 10u + '0'));
                     r /= 10u;
                     if ( r + v_words.size() == 0 )
                         break;
@@ -1444,11 +1454,7 @@ public:
             } 
             while ( v_words.size() > 0);
 
-            if (is_negative())
-            {
-                data.push_back('-');
-            }
-            std::reverse(data.begin(),data.end());
+            std::reverse(buf.begin()+pos,buf.end());
         }
     }
 
@@ -2150,35 +2156,9 @@ private:
     }
 
     bool is_zero() const {
-        return get_words().empty();
+        return get_words().size() == 0;
     }
 /*
-    basic_bigint<Allocator> basic_bigint<Allocator>::mul_small(const basic_bigint<Allocator>& a,
-                             uint64_t m)
-    {
-        if (a.is_zero() || m == 0)
-            return {};
-
-        basic_bigint<Allocator> r;
-        r.words.resize(a.words.size());
-
-        dword_type carry = 0;
-
-        for (size_t i = 0; i < a.words.size(); ++i) {
-            dword_type x = dword_type(a.words[i]) * m + carry;
-
-            r.words[i] = static_cast<word_type>(x);
-
-            carry = x >> 64;
-        }
-
-        if (carry)
-            r.words.push_back(
-                static_cast<word_type>(carry));
-
-        return r;
-    }
-
     basic_bigint<Allocator> basic_bigint<Allocator>::add(const basic_bigint<Allocator>& a,
                        const basic_bigint<Allocator>& b)
     {
@@ -2359,7 +2339,11 @@ to_bignum_result<CharT> to_bigint(const CharT* data, std::size_t length,
         if (JSONCONS_LIKELY(c >= '0' && c <= '9'))
         {
             v *= 10u;
-            v += (word_type)(c - '0');
+            word_type d = static_cast<word_type>(c - '0');
+            if (d != 0)
+            {
+                v += d;
+            }
         }
         else
         {
