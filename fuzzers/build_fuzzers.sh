@@ -46,6 +46,9 @@ oss_fuzz_compile_all()
     zip -j $OUT/fuzz_cbor_cursor_seed_corpus.zip ./fuzzers/corpus/cbor/*
     zip -j $OUT/fuzz_cbor_typed_array_seed_corpus.zip ./fuzzers/corpus/cbor/*
     zip -j $OUT/fuzz_cbor_noexcept_seed_corpus.zip ./fuzzers/corpus/cbor/*
+
+    # Fuzzers that target the views
+    $CXX ./fuzzers/fuzz_cbor_view.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_cbor_view
 }
 
 if [[ -z "${OUT:-}" ]]; then
