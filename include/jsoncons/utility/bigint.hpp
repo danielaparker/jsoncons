@@ -26,6 +26,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/bignum_common.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 
 namespace jsoncons {
 
@@ -2112,139 +2113,54 @@ private:
         return to_bignum_result<CharT>(cur, bignum_errc{});
     }
 
-    template <typename CharT, typename BAlloc>
+    template <typename CharT, typename BAlloc=std_allocator<CharT>>
     friend void append_to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
+        if (value.is_zero())
+        {
+            buf.push_back('0');
+            return;
+        }
+        if (value.is_negative())
+        {
+            buf.push_back('-');
+        }
+
+        size_type start = buf.size();
         basic_bigint v(value);
         auto v_words = v.get_words();
 
         size_type len = (v_words.size() * word_bits / 3) + 2;
-        buf.reserve(buf.size()+len);
+        buf.reserve(start+len);
 
-        if (v_words.size() == 0)
+        word_type r;
+        basic_bigint R(value.get_allocator());
+        basic_bigint LP10(max_unsigned_power_10, value.get_allocator());
+
+        do
         {
-            buf.push_back('0');
-        }
-        else
-        {
-            word_type r;
-            basic_bigint R(value.get_allocator());
-            basic_bigint LP10(max_unsigned_power_10, value.get_allocator());
+            v.divide(LP10, v, R, true);
+            v_words = v.get_words();
 
-            do
+            auto R_words = R.get_words();
+            r = (R_words.size() ? R_words[0] : 0);
+            for (size_type j = 0; j < imax_unsigned_power_10; j++)
             {
-                v.divide(LP10, v, R, true);
-                v_words = v.get_words();
-
-                auto R_words = R.get_words();
-                r = (R_words.size() ? R_words[0] : 0);
-                for (size_type j = 0; j < imax_unsigned_power_10; j++)
-                {
-                    buf.push_back(char(r % 10u + '0'));
-                    r /= 10u;
-                    if (r + v_words.size() == 0)
-                        break;
-                }
-            } while (v_words.size() > 0);
-
-            if (value.is_negative())
-            {
-                buf.push_back('-');
+                buf.push_back(CharT(r % 10u + '0'));
+                r /= 10u;
+                if (r + v_words.size() == 0)
+                    break;
             }
-            std::reverse(buf.begin(), buf.end());
-        }
+        } while (v_words.size() > 0);
+
+        std::reverse(buf.begin()+start, buf.end());
+        
     }
 
     bool is_zero() const {
         return get_words().size() == 0;
     }
-/*
-    basic_bigint<Allocator> basic_bigint<Allocator>::add(const basic_bigint<Allocator>& a,
-                       const basic_bigint<Allocator>& b)
-    {
-        basic_bigint<Allocator> r;
-
-        const size_t n =
-            std::max(a.words.size(),
-                     b.words.size());
-
-        r.words.resize(n);
-
-        word_type carry = 0;
-
-        for (size_t i = 0; i < n; ++i) {
-            word_type x =
-                i < a.words.size() ? a.words[i] : 0;
-
-            word_type y =
-                i < b.words.size() ? b.words[i] : 0;
-
-            word_type s = x + y;
-            word_type c1 = (s < x);
-
-            word_type t = s + carry;
-            word_type c2 = (t < s);
-
-            r.words[i] = t;
-            carry = c1 | c2;
-        }
-
-        if (carry)
-            r.words.push_back(carry);
-
-        return r;
-    }
-
-    template <typename CharT>
-    static basic_bigint<Allocator> from_string(const std::string& s)
-    {
-        if (s.empty())
-            throw std::invalid_argument("empty basic_bigint<Allocator> string");
-
-        size_t pos = 0;
-
-        // Optional leading '+'
-        if (s[pos] == '+') {
-            ++pos;
-
-            if (pos == s.size())
-                throw std::invalid_argument("invalid basic_bigint<Allocator>");
-        }
-
-        // This version is for unsigned basic_bigint<Allocator>.
-        if (s[pos] == '-') {
-            throw std::invalid_argument(
-                "negative basic_bigint<Allocator> not supported"
-            );
-        }
-
-        basic_bigint<Allocator> result;
-
-        for (; pos < s.size(); ++pos) {
-            char c = s[pos];
-
-            if (c < '0' || c > '9')
-                throw std::invalid_argument(
-                    "invalid digit in basic_bigint<Allocator>"
-                );
-
-            uint64_t digit =
-                static_cast<uint64_t>(c - '0');
-
-            // result = result * 10 + digit
-            result = mul_small(result, 10);
-
-            if (digit != 0) {
-                basic_bigint<Allocator> d(digit);
-                result = add(result, d);
-            }
-        }
-
-        return result;
-    }
-*/
 };
-
 
 template <typename Allocator>
 basic_bigint<Allocator> absb( const basic_bigint<Allocator>& a )
@@ -2257,21 +2173,25 @@ basic_bigint<Allocator> absb( const basic_bigint<Allocator>& a )
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> powb(basic_bigint<Allocator> x, std::size_t n)
+basic_bigint<Allocator> powb(basic_bigint<Allocator> base, std::size_t n)
 {
-    basic_bigint<Allocator> y = 1;
+    basic_bigint<Allocator> result{1};
 
     while ( n )
     {
         if ( n & 1 )
         {
-            y *= x;
+            result *= base;
         }
-        x *= x;
         n >>= 1;
+
+        if (n)
+        {
+            base *= base;
+        }
     }
 
-    return y;
+    return result;
 }
 
 template <typename Allocator>
