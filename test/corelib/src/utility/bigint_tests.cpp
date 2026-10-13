@@ -22,8 +22,8 @@ TEST_CASE("basic_bigint tests")
     {
         jsoncons::bigint a{0};
         jsoncons::bigint b{};
-        CHECK(0 == a.get_storage_view().size());
-        CHECK(a.get_storage_view().size() == b.get_storage_view().size());
+        CHECK(0 == a.get_words().size());
+        CHECK(a.get_words().size() == b.get_words().size());
         CHECK(a == b);
         CHECK(0 == a);
     }

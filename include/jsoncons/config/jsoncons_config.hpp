@@ -18,23 +18,28 @@
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/nonstd/a5hash.hpp>
 
+#include <jsoncons/nonstd/u128.hpp>
+namespace jsoncons {
+    using u128 = jsoncons::nonstd::u128;
+}
+
 namespace jsoncons {
 
-    using jsoncons::nonstd::a5hash;
-    using jsoncons::nonstd::a5hash32;
+using jsoncons::nonstd::a5hash;
+using jsoncons::nonstd::a5hash32;
 
-    class assertion_error : public std::runtime_error
+class assertion_error : public std::runtime_error
+{
+public:
+    assertion_error(const std::string& s) noexcept
+        : std::runtime_error(s)
     {
-    public:
-        assertion_error(const std::string& s) noexcept
-            : std::runtime_error(s)
-        {
-        }
-        const char* what() const noexcept override
-        {
-            return std::runtime_error::what();
-        }
-    };
+    }
+    const char* what() const noexcept override
+    {
+        return std::runtime_error::what();
+    }
+};
 
 } // namespace jsoncons
 

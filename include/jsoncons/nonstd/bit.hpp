@@ -29,6 +29,38 @@ int countl_zero(T x)
         return __builtin_clzll(x) - (sizeof(unsigned long long) - sizeof(T)) * 8;
     }
 #endif
+
+    // windows
+    // _BitScanReverse64
+        if (x == 0)
+        return 64;
+
+/* 
+#include <intrin.h>
+#include <cstdint> 
+ 
+#ifdef _MSC_VER
+    unsigned long index;
+
+#if defined(_M_X64) || defined(_M_ARM64)
+    _BitScanReverse64(&index, x);
+#else
+    // Support 32-bit MSVC.
+    if (x >> 32) {
+        _BitScanReverse(&index, uint32_t(x >> 32));
+        return 31 - index;
+    }
+
+    _BitScanReverse(&index, uint32_t(x));
+    return 63 - index;
+#endif
+
+    return 63 - index;
+#else
+    return __builtin_clzll(x);
+#endif
+*/
+
     int bits = std::numeric_limits<T>::digits;
     T mask = static_cast<T>(1) << (bits - 1);
     int leading_zeros = 0;
