@@ -21,10 +21,10 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_str
 {
     std::basic_string<CharT> result;
     bytes_to_base64(input.begin(),input.end(),result);
-    REQUIRE(result.size() == expected.size());
+    REQUIRE(expected.size() == result.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
-        CHECK(result[i] == expected[i]);
+        CHECK(expected[i] == result[i]);
     }
 
     std::vector<uint8_t> output;
@@ -41,10 +41,10 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_
 {
     std::basic_string<CharT> result;
     bytes_to_base64url(input.begin(),input.end(),result);
-    REQUIRE(result.size() == expected.size());
+    REQUIRE(expected.size() == result.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
-        CHECK(result[i] == expected[i]);
+        CHECK(expected[i] == result[i]);
     }
 
     std::vector<uint8_t> output; 
@@ -61,10 +61,10 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::basic_str
 {
     std::basic_string<CharT> result;
     bytes_to_base16(input.begin(),input.end(), result);
-    REQUIRE(result.size() == expected.size());
+    REQUIRE(expected.size() == result.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
-        CHECK(result[i] == expected[i]);
+        CHECK(expected[i] == result[i]);
     }
 
     std::vector<uint8_t> output;
