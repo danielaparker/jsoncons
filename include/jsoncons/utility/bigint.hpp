@@ -2113,7 +2113,7 @@ private:
         return to_bignum_result<CharT>(cur, bignum_errc{});
     }
 
-    template <typename CharT, typename BAlloc=std_allocator<CharT>>
+    template <typename CharT, typename BAlloc>
     friend void append_to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
         if (value.is_zero())
