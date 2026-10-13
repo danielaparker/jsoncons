@@ -27,7 +27,7 @@
 
 namespace jsoncons { 
 namespace jsonpointer {
-
+                         
     namespace detail {
 
     enum class pointer_state 

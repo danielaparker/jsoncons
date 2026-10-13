@@ -17,7 +17,7 @@
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
 #include <string> // std::string
-#include <system_error>
+#include <system_error> 
 #include <type_traits> // std::enable_if
 #include <vector> // std::vector
 #include <limits> // std::numeric_limits
@@ -26,6 +26,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/bignum_common.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 
 namespace jsoncons {
 
@@ -45,7 +46,8 @@ class bigint_storage : private std::allocator_traits<Allocator>:: template rebin
 public:
     using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
-    using word_type = typename std::allocator_traits<word_allocator_type>::value_type;
+    using word_type = uint64_t;
+    using dword_type = jsoncons::u128;
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type mem_unit = sizeof(word_type);
     static constexpr size_type word_bits = sizeof(word_type) * 8;  // Number of bits
@@ -367,13 +369,13 @@ public:
     {
         if (this != &other)
         {
-            auto other_view = other.get_storage_view();
-            resize(other_view.size());
-            auto view = get_storage_view();
-            if (other_view.size() > 0)
+            auto other_words = other.get_words();
+            resize(other_words.size());
+            auto words = get_words();
+            if (other_words.size() > 0)
             {
                 common_.is_negative_ = other.common_.is_negative_;
-                std::memcpy(view.data(), other_view.data(), size_type(other_view.size()*sizeof(word_type)));
+                std::memcpy(words.data(), other_words.data(), size_type(other_words.size()*sizeof(word_type)));
             }
         }
         return *this;
@@ -381,23 +383,23 @@ public:
 
     bigint_storage& operator&=(const bigint_storage& a)
     {
-        auto view = get_storage_view();
-        auto a_view = a.get_storage_view();
+        auto words = get_words();
+        auto a_words = a.get_words();
 
-        const size_type old_length = view.size();
-        const size_type new_length = (std::min)(old_length, a_view.size());
+        const size_type old_length = words.size();
+        const size_type new_length = (std::min)(old_length, a_words.size());
 
         if (new_length != old_length)
         {
             resize(new_length);
-            view = get_storage_view();
+            words = get_words();
         }
 
         if (new_length > 0)
         {
-            const word_type* first = view.begin();
-            word_type* p = view.end() - 1;
-            const word_type* q = a_view.begin() + view.size() - 1;
+            const word_type* first = words.begin();
+            word_type* p = words.end() - 1;
+            const word_type* q = a_words.begin() + words.size() - 1;
 
             while ( p >= first )
             {
@@ -430,9 +432,9 @@ public:
     {
         if (common_.size_ > 0)
         {
-            auto view = get_storage_view();
-            word_type* p = view.end() - 1;
-            word_type* first = view.begin();
+            auto words = get_words();
+            word_type* p = words.end() - 1;
+            word_type* first = words.begin();
             while ( p >= first )
             {
                 if ( *p )
@@ -517,14 +519,14 @@ public:
         common_.is_negative_ = value;
     }
 
-    storage_view<word_type> get_storage_view()
+    storage_view<word_type> get_words()
     {
         return common_.is_allocated_ ? 
             storage_view<word_type>{allocated_.data_, allocated_.size_} :
             storage_view<word_type>{inlined_.values_, inlined_.size_};
     }
 
-    storage_view<const word_type> get_storage_view() const
+    storage_view<const word_type> get_words() const
     {
         return common_.is_allocated_ ? 
             storage_view<const word_type>{allocated_.data_, allocated_.size_} :
@@ -590,6 +592,7 @@ public:
     using size_type = typename detail::bigint_storage<Allocator>::size_type;
     using ssize_type = typename std::make_signed<size_type>::type;
     using word_type = typename detail::bigint_storage<Allocator>::word_type;
+    using dword_type = typename detail::bigint_storage<Allocator>::dword_type;
     using storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<word_type>;
     using const_storage_view_type = typename detail::bigint_storage<Allocator>::template storage_view<const word_type>;
 
@@ -690,14 +693,14 @@ public:
         return storage_.get_allocator();
     }
 
-    storage_view_type get_storage_view()
+    storage_view_type get_words()
     {
-        return storage_.get_storage_view();
+        return storage_.get_words();
     }
 
-    const_storage_view_type get_storage_view() const
+    const_storage_view_type get_words() const
     {
-        return storage_.get_storage_view();
+        return storage_.get_words();
     }
 
     bool is_negative() const
@@ -707,8 +710,8 @@ public:
 
     bool is_odd() const 
     {
-        auto view = get_storage_view();
-        return view.size() == 0 ? false : ((view[0] & 1) == 1);
+        auto words = get_words();
+        return words.size() == 0 ? false : ((words[0] & 1) == 1);
     }
 
     bool is_even() const 
@@ -728,10 +731,10 @@ public:
 
     int compare_half(const basic_bigint<Allocator>& y) const
     {
-        auto y_view = y.get_storage_view();
-        auto view = get_storage_view();
-        size_type y_len = y_view.size();
-        size_type len = view.size();
+        auto y_words = y.get_words();
+        auto words = get_words();
+        size_type y_len = y_words.size();
+        size_type len = words.size();
         if (len == 0)
             return y_len == 0 ? 0 : -1;
         if (len > y_len)
@@ -742,7 +745,7 @@ public:
         std::size_t y_start = y_len - 1;
         word_type carry = 0;
         if (len != y_len) { // len == y_len - 1
-            if (y_view[y_start] == word_type(1)) {
+            if (y_words[y_start] == word_type(1)) {
                 --y_start;
                 carry = word_twos_complement;
             } else
@@ -753,9 +756,9 @@ public:
         // carrying shifted-out bits across words
         for (std::size_t i = len, j = y_start; i-- > 0; --j) 
         {
-            std::size_t bv = y_view[j];
+            std::size_t bv = y_words[j];
             word_type hb = ((bv >> 1) + carry);
-            word_type v = view[i];
+            word_type v = words[i];
             if (v != hb)
                 return v < hb ? -1 : 1;
             carry = (bv & word_type(1)) << 63; // carry will be either word_twos_complement or 0
@@ -857,7 +860,7 @@ public:
 
     bool operator!() const
     {
-        return get_storage_view().size() == 0 ? true : false;
+        return get_words().size() == 0 ? true : false;
     }
 
     basic_bigint operator-() const
@@ -888,25 +891,25 @@ public:
         word_type d;
         word_type carry = 0;
 
-        auto view = get_storage_view();
-        resize(view.size() + 1);
-        view = get_storage_view();
+        auto words = get_words();
+        resize(words.size() + 1);
+        words = get_words();
 
-        const size_t this_size = view.size();
+        const size_t this_size = words.size();
         const size_t y_size = 1;
         for (size_type i = 0; i < y_size; i++ )
         {
-            d = view[i] + carry;
+            d = words[i] + carry;
             carry = d < carry;
-            view[i] = d + y;
-            if (view[i] < d)
+            words[i] = d + y;
+            if (words[i] < d)
                 carry = 1;
         }
         for (size_type i = y_size; i < this_size && carry != 0; i++ )
         {
-            d = view[i] + carry;
+            d = words[i] + carry;
             carry = d < carry;
-            view[i] = d;
+            words[i] = d;
         }
         reduce();
         return *this;
@@ -922,24 +925,24 @@ public:
         word_type d;
         word_type carry = 0;
 
-        auto view = get_storage_view();
-        resize(view.size() + 1);
+        auto words = get_words();
+        resize(words.size() + 1);
 
-        view = get_storage_view();
-        const size_type this_size = view.size();
+        words = get_words();
+        const size_type this_size = words.size();
         size_type y_size = 1;
 
-        d = view[0] + carry;
+        d = words[0] + carry;
         carry = d < carry;
-        view[0] = d + y;
-        if (view[0] < d)
+        words[0] = d + y;
+        if (words[0] < d)
             carry = 1;
 
         for (size_type i = y_size; i < this_size && carry != 0; ++i)
         {
-            d = view[i] + carry;
+            d = words[i] + carry;
             carry = d < carry;
-            view[i] = d;
+            words[i] = d;
         }
         reduce();
         return *this;
@@ -950,30 +953,30 @@ public:
         if ( is_negative() != y.is_negative())
             return *this -= -y;
 
-        auto y_view = y.get_storage_view();
+        auto y_words = y.get_words();
         
         word_type d;
         word_type carry = 0;
 
-        auto view = get_storage_view();
-        resize( (std::max)(y_view.size(), view.size()) + 1 );
-        view = get_storage_view();
+        auto words = get_words();
+        resize( (std::max)(y_words.size(), words.size()) + 1 );
+        words = get_words();
 
-        const size_t this_size = view.size();
-        const size_t y_size = y_view.size();
+        const size_t this_size = words.size();
+        const size_t y_size = y_words.size();
         for (size_type i = 0; i < y_size; i++ )
         {
-            d = view[i] + carry;
+            d = words[i] + carry;
             carry = d < carry;
-            view[i] = d + y_view[i];
-            if (view[i] < d)
+            words[i] = d + y_words[i];
+            if (words[i] < d)
                 carry = 1;
         }
         for (size_type i = y_size; i < this_size && carry != 0; i++ )
         {
-            d = view[i] + carry;
+            d = words[i] + carry;
             carry = d < carry;
-            view[i] = d;
+            words[i] = d;
         }
         reduce();
         return *this;
@@ -981,7 +984,7 @@ public:
 
     basic_bigint& operator-=(const basic_bigint& y)
     {
-        auto y_view = y.get_storage_view();
+        auto y_words = y.get_words();
 
         if ( is_negative() != y.is_negative())
             return *this += -y;
@@ -989,23 +992,23 @@ public:
             return *this = -(y - *this);
         word_type borrow = 0;
         word_type d;
-        auto view = get_storage_view();
-        const size_type this_size = view.size();
-        const size_type y_size = y_view.size();
+        auto words = get_words();
+        const size_type this_size = words.size();
+        const size_type y_size = y_words.size();
 
         for (size_type i = 0; i < y_size; i++ )
         {
-            d = view[i] - borrow;
-            borrow = d > view[i];
-            view[i] = d - y_view[i];
-            if ( view[i] > d )
+            d = words[i] - borrow;
+            borrow = d > words[i];
+            words[i] = d - y_words[i];
+            if ( words[i] > d )
                 borrow = 1;
         }
         for (size_type i = y_size; i < this_size && borrow != 0; i++ )
         {
-            d = view[i] - borrow;
-            borrow = d > view[i];
-            view[i] = d;
+            d = words[i] - borrow;
+            borrow = d > words[i];
+            words[i] = d;
         }
         reduce();
         return *this;
@@ -1023,92 +1026,115 @@ public:
 
     template <typename IntegerType>
     typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
-    operator*=(IntegerType y)
+    operator*=(IntegerType m)
     {
-        auto view = get_storage_view();
-        size_type len0 = view.size();
-        word_type dig = view[0];
+        auto words = get_words();
+        size_type len = words.size();
+        if (len == 0 || m == 0)
+        {
+            resize(0);
+            return *this;
+        }
+
+        dword_type carry = 0;
+        size_t i = 0;
+        for (; i < len; ++i) {
+            dword_type x = dword_type(words[i]) * m + carry;
+            words[i] = static_cast<word_type>(x);
+            carry = x >> 64;
+        }
+
+        if (carry)
+        {
+            resize(len+1);
+            words = get_words();
+            words[i] = static_cast<word_type>(carry);
+        }
+
+        /*
+        word_type dig = words[0];
         word_type carry = 0;
 
-        resize(view.size() + 1);
-        view = get_storage_view();
+        resize(words.size() + 1);
+        words = get_words();
 
         size_type i = 0;
-        for (; i < len0; i++ )
+        for (; i < len; i++ )
         {
             word_type hi;
             word_type lo;
             DDproduct( dig, y, hi, lo );
-            view[i] = lo + carry;
-            dig = view[i+1];
-            carry = hi + (view[i] < lo);
+            words[i] = lo + carry;
+            dig = words[i+1];
+            carry = hi + (words[i] < lo);
         }
-        view[i] = carry;
-        reduce();
+        words[i] = carry;
+        reduce(); 
+        */ 
         return *this;
     }
  
     basic_bigint& operator*=(basic_bigint y) 
     {
-        auto view = get_storage_view();
-        auto y_view = y.get_storage_view();
+        auto words = get_words();
+        auto y_words = y.get_words();
 
-        if (view.size() == 0 || y_view.size() == 0)
+        if (words.size() == 0 || y_words.size() == 0)
         {
             return *this = 0;
         }
 
         bool difSigns = is_negative() != y.is_negative();
-        const size_type y_size = y_view.size();
-        if ( view.size() + y_size == 2 ) // size() = y.size() = 1
+        const size_type y_size = y_words.size();
+        if ( words.size() + y_size == 2 ) // size() = y.size() = 1
         {
-            word_type a = view[0], b = y_view[0];
-            view[0] = a * b;
-            if ( view[0] / a != b )
+            word_type a = words[0], b = y_words[0];
+            words[0] = a * b;
+            if ( words[0] / a != b )
             {
                 resize(2);
-                view = get_storage_view();
-                DDproduct( a, b, view[1], view[0] );
+                words = get_words();
+                DDproduct( a, b, words[1], words[0] );
             }
             set_negative(difSigns);
             return *this;
         }
 
-        if ( view.size() == 1 )  //  && y.size() > 1
+        if ( words.size() == 1 )  //  && y.size() > 1
         {
-            word_type digit = view[0];
+            word_type digit = words[0];
             *this = y;
             *this *= digit;
         }
         else
         {
-            if (y_view.size() == 1)
+            if (y_words.size() == 1)
             {
-                *this *= y_view[0];
+                *this *= y_words[0];
             }
             else
             {
-                size_type lenProd = view.size() + y_view.size();
+                size_type lenProd = words.size() + y_words.size();
                 word_type sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bigint<Allocator> x = *this;
-                auto x_view = x.get_storage_view();
+                auto x_words = x.get_words();
                 resize( lenProd ); // Give *this length lenProd
-                view = get_storage_view();
+                words = get_words();
 
                 for (size_type i = 0; i < lenProd; i++ )
                 {
                     sumLo = sumHi;
                     sumHi = carry;
                     carry = 0;
-                    for (size_type jA=0; jA < x_view.size(); jA++)
+                    for (size_type jA=0; jA < x_words.size(); jA++)
                     {
                         if (JSONCONS_LIKELY(i >= jA))
                         {
                             size_type jB = i - jA;
-                            if (jB < y_view.size())
+                            if (jB < y_words.size())
                             {
-                                DDproduct( x_view[jA], y_view[jB], hi, lo );
+                                DDproduct( x_words[jA], y_words[jB], hi, lo );
                                 sumLo_old = sumLo;
                                 sumHi_old = sumHi;
                                 sumLo += lo;
@@ -1119,7 +1145,7 @@ public:
                             }
                         }
                     }
-                    view[i] = sumLo;
+                    words[i] = sumLo;
                 }
             }
         }
@@ -1144,27 +1170,27 @@ public:
 
     basic_bigint& operator<<=(size_type k)
     {
-        auto view = get_storage_view();
+        auto words = get_words();
         size_type q = k / word_bits;
         if ( q ) // Increase storage_.size() by q:
         {
-            resize(view.size() + q);
-            view = get_storage_view();
-            for (size_type i = view.size(); i-- > 0; )
-                view[i] = ( i < q ? 0 : view[i - q]);
+            resize(words.size() + q);
+            words = get_words();
+            for (size_type i = words.size(); i-- > 0; )
+                words[i] = ( i < q ? 0 : words[i - q]);
             k %= word_bits;
         }
         if ( k )  // 0 < k < word_bits:
         {
             size_type k1 = word_bits - k;
             word_type mask = (word_type(1) << k) - word_type(1);
-            resize( view.size() + 1 );
-            view = get_storage_view();
-            for (size_type i = view.size(); i-- > 0; )
+            resize( words.size() + 1 );
+            words = get_words();
+            for (size_type i = words.size(); i-- > 0; )
             {
-                view[i] <<= k;
+                words[i] <<= k;
                 if ( i > 0 )
-                    view[i] |= (view[i-1] >> k1) & mask;
+                    words[i] |= (words[i-1] >> k1) & mask;
             }
         }
         reduce();
@@ -1173,17 +1199,17 @@ public:
 
     basic_bigint& operator>>=(size_type k)
     {
-        auto view = get_storage_view();
+        auto words = get_words();
         size_type q = k / word_bits;
-        if ( q >= view.size())
+        if ( q >= words.size())
         {
             resize( 0 );
             return *this;
         }
         if (q > 0)
         {
-            memmove( view.data(), view.data()+q, size_type((view.size() - q)*sizeof(word_type)) );
-            resize( size_type(view.size() - q) );
+            memmove( words.data(), words.data()+q, size_type((words.size() - q)*sizeof(word_type)) );
+            resize( size_type(words.size() - q) );
             k %= word_bits;
             if ( k == 0 )
             {
@@ -1192,15 +1218,15 @@ public:
             }
         }
 
-        view = get_storage_view();
-        size_type n = size_type(view.size() - 1);
+        words = get_words();
+        size_type n = size_type(words.size() - 1);
         ssize_type k1 = word_bits - k;
         word_type mask = (word_type(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
-            view[i] >>= k;
+            words[i] >>= k;
             if ( i < n )
-                view[i] |= ((view[i+1] & mask) << k1);
+                words[i] |= ((words[i+1] & mask) << k1);
         }
         reduce();
         return *this;
@@ -1234,21 +1260,21 @@ public:
 
     basic_bigint& operator|=( const basic_bigint& a )
     {
-        auto a_view = a.get_storage_view();
+        auto a_words = a.get_words();
 
-        if (a_view.size() > 0)
+        if (a_words.size() > 0)
         {
-            auto view = get_storage_view();
+            auto words = get_words();
 
-            if ( view.size() < a_view.size())
+            if ( words.size() < a_words.size())
             {
-                resize( a_view.size());
-                view = get_storage_view();
+                resize( a_words.size());
+                words = get_words();
             }
 
-            const word_type* qfirst = a_view.begin();
-            const word_type* q = a_view.end() - 1;
-            word_type* p = view.begin() + a_view.size() - 1;
+            const word_type* qfirst = a_words.begin();
+            const word_type* q = a_words.end() - 1;
+            word_type* p = words.begin() + a_words.size() - 1;
 
             while (q >= qfirst)
             {
@@ -1262,20 +1288,20 @@ public:
 
     basic_bigint& operator^=( const basic_bigint& a )
     {
-        auto a_view = a.get_storage_view();
+        auto a_words = a.get_words();
 
-        if (a_view.size() > 0)
+        if (a_words.size() > 0)
         {
-            auto view = get_storage_view();
-            if (view.size() < a_view.size())
+            auto words = get_words();
+            if (words.size() < a_words.size())
             {
-                resize(a_view.size());
-                view = get_storage_view();
+                resize(a_words.size());
+                words = get_words();
             }
 
-            const word_type* qfirst = a_view.begin();
-            const word_type* q = a_view.end() - 1;
-            word_type* p = view.begin() + a_view.size() - 1;
+            const word_type* qfirst = a_words.begin();
+            const word_type* q = a_words.end() - 1;
+            word_type* p = words.begin() + a_words.size() - 1;
 
             while (q >= qfirst)
             {
@@ -1296,17 +1322,17 @@ public:
 
     explicit operator bool() const
     {
-       return get_storage_view().size() != 0 ? true : false;
+       return get_words().size() != 0 ? true : false;
     }
 
     template <typename Integer, typename = typename std::enable_if<std::is_integral<Integer>::value && sizeof(Integer) <= sizeof(int64_t)>::type>
     explicit operator Integer() const
     {
-        auto view = get_storage_view();
+        auto words = get_words();
         Integer x = 0;
-        if (view.size() > 0)
+        if (words.size() > 0)
         {
-            x = static_cast<Integer>(view[0]);
+            x = static_cast<Integer>(words[0]);
         }
 
         return is_negative() ? x*(-1) : x;
@@ -1318,10 +1344,10 @@ public:
         double factor = 1.0;
         double values = (double)max_word + 1.0;
 
-        auto view = get_storage_view();
+        auto words = get_words();
 
-        const word_type* p = view.begin();
-        const word_type* pEnd = view.end();
+        const word_type* p = words.begin();
+        const word_type* pEnd = words.end();
         while ( p < pEnd )
         {
             x += *p*factor;
@@ -1338,10 +1364,10 @@ public:
         long double factor = 1.0;
         long double values = (long double)max_word + 1.0;
 
-        auto view = get_storage_view();
+        auto words = get_words();
 
-        const word_type* p = view.begin();
-        const word_type* pEnd = view.end();
+        const word_type* p = words.begin();
+        const word_type* pEnd = words.end();
         while ( p < pEnd )
         {
             x += *p*factor;
@@ -1384,17 +1410,27 @@ public:
     }
 
     template <typename Ch,typename Traits,typename Alloc>
-    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& data) const
+    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& buf) const
     {
-        basic_bigint<Allocator> v(*this);
-        auto v_view = v.get_storage_view();
-
-        size_type len = (v_view.size() * word_bits / 3) + 2;
-        data.reserve(len);
-
-        if ( v_view.size() == 0 )
+        if (is_zero())
         {
-            data.push_back('0');
+            buf.push_back('0');
+            return;
+        }
+        if (is_negative())
+        {
+            buf.push_back('-');
+        }
+        std::size_t pos = buf.size();
+        basic_bigint<Allocator> v(*this);
+        auto v_words = v.get_words();
+
+        size_type len = (v_words.size() * word_bits / 3) + 2;
+        buf.reserve(len);
+
+        if ( v_words.size() == 0 )
+        {
+            buf.push_back('0');
         }
         else
         {
@@ -1405,25 +1441,21 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                v_view = v.get_storage_view();
+                v_words = v.get_words();
 
-                auto R_view = R.get_storage_view();
-                r = (R_view.size() ? R_view[0] : 0);
+                auto R_words = R.get_words();
+                r = (R_words.size() ? R_words[0] : 0);
                 for ( size_type j=0; j < imax_unsigned_power_10; j++ )
                 {
-                    data.push_back(char(r % 10u + '0'));
+                    buf.push_back(char(r % 10u + '0'));
                     r /= 10u;
-                    if ( r + v_view.size() == 0 )
+                    if ( r + v_words.size() == 0 )
                         break;
                 }
             } 
-            while ( v_view.size() > 0);
+            while ( v_words.size() > 0);
 
-            if (is_negative())
-            {
-                data.push_back('-');
-            }
-            std::reverse(data.begin(),data.end());
+            std::reverse(buf.begin()+pos,buf.end());
         }
     }
 
@@ -1440,12 +1472,12 @@ public:
 
 
         basic_bigint<Allocator> v(*this);
-        auto v_view = v.get_storage_view();
+        auto v_words = v.get_words();
 
-        size_type len = (v_view.size() * basic_bigint<Allocator>::word_bits / 3) + 2;
+        size_type len = (v_words.size() * basic_bigint<Allocator>::word_bits / 3) + 2;
         data.reserve(len);
 
-        if ( v_view.size() == 0 )
+        if ( v_words.size() == 0 )
         {
             data.push_back('0');
         }
@@ -1457,19 +1489,19 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                v_view = v.get_storage_view();
-                auto R_view = R.get_storage_view();
-                r = (R_view.size() ? R_view[0] : 0);
+                v_words = v.get_words();
+                auto R_words = R.get_words();
+                r = (R_words.size() ? R_words[0] : 0);
                 for ( size_type j=0; j < imax_unsigned_power_16; j++ )
                 {
                     uint8_t c = r % 16u;
                     data.push_back((c < 10u) ? ('0' + c) : ('A' - 10u + c));
                     r /= 16u;
-                    if ( r + v_view.size() == 0 )
+                    if ( r + v_words.size() == 0 )
                         break;
                 }
             } 
-            while (v_view.size() > 0);
+            while (v_words.size() > 0);
 
             if (is_negative())
             {
@@ -1668,29 +1700,29 @@ public:
 
     int compare( const basic_bigint& y ) const noexcept
     {
-        auto view = get_storage_view();
-        auto y_view = y.get_storage_view();
+        auto words = get_words();
+        auto y_words = y.get_words();
 
-        const size_type y_size = y_view.size();
-        if ( view.size() == 0 && y_size == 0 )
+        const size_type y_size = y_words.size();
+        if ( words.size() == 0 && y_size == 0 )
             return 0;
         if ( is_negative() != y.is_negative())
             return y.is_negative() - is_negative();
         int code = 0;
-        if ( view.size() < y_size)
+        if ( words.size() < y_size)
             code = -1;
-        else if ( view.size() > y_size)
+        else if ( words.size() > y_size)
             code = +1;
         else
         {
-            for (size_type i = view.size(); i-- > 0; )
+            for (size_type i = words.size(); i-- > 0; )
             {
-                if (view[i] > y_view[i])
+                if (words[i] > y_words[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (view[i] < y_view[i])
+                else if (words[i] < y_words[i])
                 {
                     code = -1;
                     break;
@@ -1702,20 +1734,20 @@ public:
 
     size_type bit_width() const
     {
-        auto view = get_storage_view();
-        size_type len = view.size();
+        auto words = get_words();
+        size_type len = words.size();
         if (len == 0)
         {
             return 0;
         }
         size_type n = 0;
-        size_type mag_bit_width = ((len - 1) << 6) + static_cast<size_type>(64 - jsoncons::countl_zero(view[len-1]));
+        size_type mag_bit_width = ((len - 1) << 6) + static_cast<size_type>(64 - jsoncons::countl_zero(words[len-1]));
         if (is_negative())
         {
-            bool pow2 =  jsoncons::bit_width(view[len-1]) == 1;
+            bool pow2 =  jsoncons::bit_width(words[len-1]) == 1;
             for (std::size_t i=len; i-- > 1 && pow2; )
             {
-                pow2 = (view[i] == 0);
+                pow2 = (words[i] == 0);
             }
 
             n = (pow2 ? mag_bit_width - 1 : mag_bit_width);
@@ -1730,27 +1762,27 @@ public:
 
     int compare_abs(const basic_bigint& y) const noexcept
     {
-        auto view = get_storage_view();
-        auto y_view = y.get_storage_view();
+        auto words = get_words();
+        auto y_words = y.get_words();
 
-        const size_type y_size = y_view.size();
-        if ( view.size() == 0 && y_size == 0 )
+        const size_type y_size = y_words.size();
+        if ( words.size() == 0 && y_size == 0 )
             return 0;
         int code = 0;
-        if ( view.size() < y_size)
+        if ( words.size() < y_size)
             code = -1;
-        else if ( view.size() > y_size)
+        else if ( words.size() > y_size)
             code = 1;
         else
         {
-            for (size_type i = view.size(); i-- > 0; )
+            for (size_type i = words.size(); i-- > 0; )
             {
-                if (view[i] > y_view[i])
+                if (words[i] > y_words[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (view[i] < y_view[i])
+                else if (words[i] < y_words[i])
                 {
                     code = -1;
                     break;
@@ -1763,9 +1795,9 @@ public:
     void divide(const basic_bigint& denom_, basic_bigint& quot, basic_bigint& rem, bool remDesired ) const
     {
         basic_bigint<Allocator> denom(denom_, get_allocator());
-        auto denom_view = denom.get_storage_view();
+        auto denom_words = denom.get_words();
 
-        if (denom_view.size() == 0)
+        if (denom_words.size() == 0)
         {
             JSONCONS_THROW(std::runtime_error( "Zero divide." ));
         }
@@ -1783,33 +1815,33 @@ public:
             return;
         }
 
-        auto num_view = num.get_storage_view();
-        auto quot_view = quot.get_storage_view();
-        auto view = get_storage_view();
+        auto num_words = num.get_words();
+        auto quot_words = quot.get_words();
+        auto words = get_words();
 
-        if ( denom_view.size() == 1 && num_view.size() == 1 )
+        if ( denom_words.size() == 1 && num_words.size() == 1 )
         {
-            quot = word_type( num_view[0]/denom_view[0] );
-            rem = word_type( num_view[0]%denom_view[0] );
+            quot = word_type( num_words[0]/denom_words[0] );
+            rem = word_type( num_words[0]%denom_words[0] );
             quot.set_negative(quot_neg);
             rem.set_negative(rem_neg);
             return;
         }
-        if (denom_view.size() == 1 && (denom_view[0] & l_mask) == 0 )
+        if (denom_words.size() == 1 && (denom_words[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
-            word_type divisor = denom_view[0], dHi = 0, q1, r, q2, dividend;
-            quot.resize(view.size());
-            quot_view = quot.get_storage_view();
-            for (size_type i=view.size(); i-- > 0; )
+            word_type divisor = denom_words[0], dHi = 0, q1, r, q2, dividend;
+            quot.resize(words.size());
+            quot_words = quot.get_words();
+            for (size_type i=words.size(); i-- > 0; )
             {
-                dividend = (dHi << word_half_bits) | (view[i] >> word_half_bits);
+                dividend = (dHi << word_half_bits) | (words[i] >> word_half_bits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << word_half_bits) | (view[i] & r_mask);
+                dividend = (r << word_half_bits) | (words[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
-                quot_view[i] = (q1 << word_half_bits) | q2;
+                quot_words[i] = (q1 << word_half_bits) | q2;
             }
             quot.reduce();
             rem = dHi;
@@ -1821,34 +1853,34 @@ public:
         basic_bigint<Allocator> denom0(denom, get_allocator());
         int x = 0;
         bool second_done = normalize(denom, num, x);
-        denom_view = denom.get_storage_view();
-        num_view = num.get_storage_view();
+        denom_words = denom.get_words();
+        num_words = num.get_words();
 
-        size_type l = denom_view.size() - 1;
-        size_type n = num_view.size() - 1;
+        size_type l = denom_words.size() - 1;
+        size_type n = num_words.size() - 1;
         quot.resize(n - l);
-        quot_view = quot.get_storage_view();
-        for (size_type i = quot_view.size(); i-- > 0; )
+        quot_words = quot.get_words();
+        for (size_type i = quot_words.size(); i-- > 0; )
         {
-            quot_view[i] = 0;
+            quot_words[i] = 0;
         }
         rem = num;
-        auto rem_view = rem.get_storage_view();
-        if ( rem_view[n] >= denom_view[l] )
+        auto rem_words = rem.get_words();
+        if ( rem_words[n] >= denom_words[l] )
         {
-            rem.resize(rem_view.size() + 1);
-            rem_view = rem.get_storage_view();
+            rem.resize(rem_words.size() + 1);
+            rem_words = rem.get_words();
             n++;
-            quot.resize(quot_view.size() + 1);
-            quot_view = quot.get_storage_view();
+            quot.resize(quot_words.size() + 1);
+            quot_words = quot.get_words();
         }
-        word_type d = denom_view[l];
+        word_type d = denom_words[l];
 
         for ( size_type k = n; k > l; k-- )
         {
-            word_type q = DDquotient(rem_view[k], rem_view[k-1], d);
-            subtractmul( rem_view.data() + (k - l - 1), denom_view.data(), l + 1, q );
-            quot_view[k - l - 1] = q;
+            word_type q = DDquotient(rem_words[k], rem_words[k-1], d);
+            subtractmul( rem_words.data() + (k - l - 1), denom_words.data(), l + 1, q );
+            quot_words[k - l - 1] = q;
         }
         quot.reduce();
         quot.set_negative(quot_neg);
@@ -1960,13 +1992,13 @@ private:
 
     bool normalize(basic_bigint& denom, basic_bigint& num, int& x) const
     {
-        auto denom_view = denom.get_storage_view();
-        if (denom_view.size() == 0)
+        auto denom_words = denom.get_words();
+        if (denom_words.size() == 0)
         {
             return false;
         }
-        size_type r = denom_view.size() - 1;
-        word_type y = denom_view[r];
+        size_type r = denom_words.size() - 1;
+        word_type y = denom_words[r];
 
         x = 0;
         while ( (y & l_bit) == 0 )
@@ -1977,8 +2009,8 @@ private:
         denom <<= x;
         num <<= x;
 
-        denom_view = denom.get_storage_view();
-        if ( r > 0 && denom_view[r] < denom_view[r-1] )
+        denom_words = denom.get_words();
+        if ( r > 0 && denom_words[r] < denom_words[r-1] )
         {
             denom *= max_word;
             num *= max_word;
@@ -2084,44 +2116,49 @@ private:
     template <typename CharT, typename BAlloc>
     friend void append_to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
-        basic_bigint v(value);
-        auto v_view = v.get_storage_view();
-
-        size_type len = (v_view.size() * word_bits / 3) + 2;
-        buf.reserve(buf.size()+len);
-
-        if (v_view.size() == 0)
+        if (value.is_zero())
         {
             buf.push_back('0');
+            return;
         }
-        else
+        if (value.is_negative())
         {
-            word_type r;
-            basic_bigint R(value.get_allocator());
-            basic_bigint LP10(max_unsigned_power_10, value.get_allocator());
-
-            do
-            {
-                v.divide(LP10, v, R, true);
-                v_view = v.get_storage_view();
-
-                auto R_view = R.get_storage_view();
-                r = (R_view.size() ? R_view[0] : 0);
-                for (size_type j = 0; j < imax_unsigned_power_10; j++)
-                {
-                    buf.push_back(char(r % 10u + '0'));
-                    r /= 10u;
-                    if (r + v_view.size() == 0)
-                        break;
-                }
-            } while (v_view.size() > 0);
-
-            if (value.is_negative())
-            {
-                buf.push_back('-');
-            }
-            std::reverse(buf.begin(), buf.end());
+            buf.push_back('-');
         }
+
+        size_type start = buf.size();
+        basic_bigint v(value);
+        auto v_words = v.get_words();
+
+        size_type len = (v_words.size() * word_bits / 3) + 2;
+        buf.reserve(start+len);
+
+        word_type r;
+        basic_bigint R(value.get_allocator());
+        basic_bigint LP10(max_unsigned_power_10, value.get_allocator());
+
+        do
+        {
+            v.divide(LP10, v, R, true);
+            v_words = v.get_words();
+
+            auto R_words = R.get_words();
+            r = (R_words.size() ? R_words[0] : 0);
+            for (size_type j = 0; j < imax_unsigned_power_10; j++)
+            {
+                buf.push_back(CharT(r % 10u + '0'));
+                r /= 10u;
+                if (r + v_words.size() == 0)
+                    break;
+            }
+        } while (v_words.size() > 0);
+
+        std::reverse(buf.begin()+start, buf.end());
+        
+    }
+
+    bool is_zero() const {
+        return get_words().size() == 0;
     }
 };
 
@@ -2136,21 +2173,21 @@ basic_bigint<Allocator> absb( const basic_bigint<Allocator>& a )
 }
 
 template <typename Allocator>
-basic_bigint<Allocator> powb(basic_bigint<Allocator> base, std::size_t exponent)
+basic_bigint<Allocator> powb(basic_bigint<Allocator> base, std::size_t n)
 {
-    basic_bigint<Allocator> result = 1;
+    basic_bigint<Allocator> result{1};
 
-    while ( exponent > 0)
+    while ( n )
     {
-        if (exponent & 1)
+        if ( n & 1 )
         {
             result *= base;
         }
-        base *= base;
-        exponent >>= 1;
-        if (exponent < 100000000000ll)
+        n >>= 1;
+
+        if (n)
         {
-            std::cout << exponent << "\n";
+            base *= base;
         }
     }
 
@@ -2222,7 +2259,11 @@ to_bignum_result<CharT> to_bigint(const CharT* data, std::size_t length,
         if (JSONCONS_LIKELY(c >= '0' && c <= '9'))
         {
             v *= 10u;
-            v += (word_type)(c - '0');
+            word_type d = static_cast<word_type>(c - '0');
+            if (d != 0)
+            {
+                v += d;
+            }
         }
         else
         {
