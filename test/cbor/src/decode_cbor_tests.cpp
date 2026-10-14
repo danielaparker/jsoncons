@@ -676,7 +676,7 @@ TEST_CASE("cbor array as<> test")
     }
 }
 
-TEST_CASE("cbor bigfloat tests")
+TEST_CASE("cbor decode to bigfloat tests")
 {
     SECTION("1.5")
     {

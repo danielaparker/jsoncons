@@ -695,7 +695,7 @@ int main()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
-        return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
+        return (ev.tag() == semantic_tag::bigdec));  
     };
 
     cbor::cbor_bytes_cursor cursor(data);

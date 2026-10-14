@@ -38,153 +38,118 @@ namespace cbor {
 
 enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
-/*
 template <typename Allocator>
 cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
     int64_t exponent,
     basic_bigdec<Allocator>& value,
-    uint64_t max_scale = 1000000)
+    uint64_t max_decimal_places = 34)
 {
-    // Canonical zero.
-    if (unscaled.is_zero())
+    constexpr uint64_t max_scale =
+        static_cast<uint64_t>(
+            (std::numeric_limits<int64_t>::max)()
+        );
+
+    if (max_decimal_places > max_scale)
     {
-        value = basic_bigdec<Allocator>{std::move(unscaled), 0};
-        return cbor_errc{};
-    }
-
-    if (exponent >= 0) {
-        // m * 2^e is already an integer.
-        unscaled <<= (static_cast<uint64_t>(exponent));
-
-        value = basic_bigdec<Allocator>{std::move(unscaled), 0};
-        return cbor_errc{};
-    }
-
-    // k = abs(exponent), including INT64_MIN.
-    uint64_t k = static_cast<uint64_t>(-(exponent + 1)) + 1;
-
-    // Cancel factors of 2 in the signed unscaled.
-    const uint64_t cancel = (std::min)(k, unscaled.trailing_zero_bits());
-
-    if (cancel != 0)
-        unscaled >>= cancel;
-
-    k -= cancel;
-
-        // IMPORTANT: Check before calculating 5^k.
-    if (k > max_scale)
-    {
-        return cbor_errc::bigfloat_to_bigdec_failed;
-    }
-
-    if (k > uint64_t((std::numeric_limits<int64_t>::max)()))
-    {
-        //BigDec scale overflow"
-        return cbor_errc::bigfloat_to_bigdec_failed;
-    }
-
-    // m / 2^k = (m * 5^k) / 10^k
-    if (k != 0)
-        unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), k);
-
-    value = basic_bigdec<Allocator> {
-        std::move(unscaled),
-        static_cast<int64_t>(k)
-    };
-    return cbor_errc{};
-}*/
-
-template <typename Allocator>
-cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
-    int64_t exponent,
-    basic_bigdec<Allocator>& value,
-    uint64_t decimalPlaces = 34)
-{
-    if (decimalPlaces > uint64_t(INT64_MAX))
         return cbor_errc::bigdec_scale_overflow;
-
-    const int64_t scale = static_cast<int64_t>(decimalPlaces);
+    }
 
     if (unscaled.is_zero())
-        value = { basic_bigint<Allocator>(0), scale };
+    {
+        value = basic_bigdec<Allocator>{ basic_bigint<Allocator>(0), 0 };
+        return cbor_errc{};
+    }
+
+    // Positive exponent: exact integer.
+    if (exponent >= 0) {
+        unscaled <<= (static_cast<uint64_t>(exponent));
+        value = basic_bigdec<Allocator>{ std::move(unscaled), 0 };
+        return cbor_errc{};
+    }
 
     const bool negative = unscaled < basic_bigint<Allocator>(0);
 
     if (negative)
         unscaled = -unscaled;
 
-    // We need round(m * 2^exponent * 10^scale).
+    // Absolute exponent, safe for INT64_MIN.
+    uint64_t k =
+        static_cast<uint64_t>(-(exponent + 1)) + 1;
+
+    // Cancel powers of 2.
+    const u128 trailing = unscaled.trailing_zero_bits();
+
+    const uint64_t cancel =
+        trailing >= static_cast<u128>(k)
+            ? k
+            : static_cast<uint64_t>(trailing);
+
+    if (cancel != 0)
+        unscaled >>= (cancel);
+
+    k -= cancel;
+
+    // Exact conversion when the scale fits.
+    if (k <= max_decimal_places) {
+        if (k != 0)
+            unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), k);
+
+        if (negative)
+            unscaled = -unscaled;
+
+        value = basic_bigdec<Allocator>{
+            std::move(unscaled),
+            static_cast<int64_t>(k)
+        };
+        return cbor_errc{};
+    }
+
+    // Round to max_decimal_places.
     //
-    // = round(m * 5^scale * 2^(exponent + scale)).
+    // m / 2^k * 10^scale
+    // = m * 5^scale / 2^(k-scale)
+
+    const uint64_t scale = max_decimal_places;
+    const uint64_t shift = k - scale;
+
+    // Conservative early-zero bound:
+    // 5^scale < 2^(3*scale).
     //
-    // Check whether the value is too small to round
-    // to anything other than zero BEFORE computing 5^scale.
-    if (exponent < 0) {
-        const uint64_t k =
-            uint64_t(-(exponent + 1)) + 1;
+    // If shift >= bit_length(m) + 3*scale,
+    // the rounded result must be zero.
+    const u128 bits = unscaled.bit_length();
+    const u128 bound =
+        bits + static_cast<u128>(3) * scale;
 
-        const uint64_t bits = unscaled.bit_length();
-
-        // If k >= bits + 4 * decimalPlaces,
-        // the scaled value is strictly less than 1/2.
-        //
-        // Avoid overflow in bits + 4 * decimalPlaces.
-        //const uint64_t max = UINT64_MAX;
-
-        if (decimalPlaces <= ((std::numeric_limits<uint64_t>::max)() - bits) / 4) {
-            const uint64_t bound = bits + 4 * decimalPlaces;
-
-            if (k >= bound) {
-                value = basic_bigdec<Allocator>{ basic_bigint<Allocator>(0), scale };
-                return cbor_errc{};
-            }
-        }
+    if (static_cast<u128>(shift) >= bound) {
+        value = basic_bigdec<Allocator>{
+            basic_bigint<Allocator>(0),
+            static_cast<int64_t>(scale)
+        };
+        return cbor_errc{};
     }
 
-    // For ordinary scales, compute 5^scale.
-    unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), decimalPlaces);
+    // Compute scaled positive magnitude.
+    unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), scale);
 
-    // exponent + scale, calculated without signed overflow.
-    if (exponent >= 0) {
-        const uint64_t shift = uint64_t(exponent) + decimalPlaces;
-        unscaled <<= shift;
-    }
-    else {
-        const uint64_t k = uint64_t(-(exponent + 1)) + 1;
+    // Round unscaled / 2^shift using HALF_EVEN.
+    basic_bigint<Allocator> quotient = unscaled;
+    quotient >>= (shift);
 
-        if (k <= decimalPlaces) {
-            unscaled <<= (decimalPlaces - k);
-        }
-        else {
-            const uint64_t shift = k - decimalPlaces;
+    const bool halfBit = unscaled.test_bit(shift - 1);
+    const bool lowerBits = unscaled.any_low_bits(shift - 1);
+    const bool odd = quotient.test_bit(0);
 
-            // Half-even rounding for division by 2^shift.
-            //
-            // quotient = floor(unscaled / 2^shift)
-            // remainder determines rounding.
+    if (halfBit && (lowerBits || odd))
+        quotient += basic_bigint<Allocator>(1);
 
-            basic_bigint<Allocator> quotient = unscaled;
-            quotient >>= (shift);
+    if (negative && !quotient.is_zero())
+        quotient = -quotient;
 
-            // Round up if discarded bits > half,
-            // or exactly half and quotient is odd.
-            //
-            // Assumes these helpers are implemented.
-            const bool halfBit = unscaled.test_bit(shift - 1);
-            const bool lowerBits = unscaled.any_low_bits(shift - 1);
-            const bool odd = quotient.test_bit(0);
-
-            if (halfBit && (lowerBits || odd))
-                quotient += basic_bigint<Allocator>(1);
-
-            unscaled = std::move(quotient);
-        }
-    }
-
-    if (negative)
-        unscaled = -unscaled;
-
-    value = basic_bigdec<Allocator>{ std::move(unscaled), scale };
+    value = basic_bigdec<Allocator> {
+        std::move(quotient),
+        static_cast<int64_t>(scale)
+    };
     return cbor_errc{};
 }
 

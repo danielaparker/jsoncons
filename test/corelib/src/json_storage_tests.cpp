@@ -79,7 +79,6 @@ TEST_CASE("test jsoncons::semantic_tag")
         CHECK_FALSE(is_number_tag(jsoncons::semantic_tag::multi_dim_column_major));
         CHECK(is_number_tag(jsoncons::semantic_tag::bigint));
         CHECK(is_number_tag(jsoncons::semantic_tag::bigdec));
-        CHECK(is_number_tag(jsoncons::semantic_tag::bigfloat));
         CHECK(is_number_tag(jsoncons::semantic_tag::float128));
         CHECK_FALSE(is_number_tag(jsoncons::semantic_tag::ext));
         CHECK_FALSE(is_number_tag(jsoncons::semantic_tag::id));

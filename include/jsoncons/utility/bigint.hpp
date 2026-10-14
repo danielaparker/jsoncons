@@ -1732,7 +1732,7 @@ public:
         return is_negative() ? -code : code;
     }
 
-    uint64_t trailing_zero_bits() const
+    u128 trailing_zero_bits() const
     {
         // Assumes words contains the absolute magnitude,
         // even when BigInt is negative.
@@ -1742,13 +1742,13 @@ public:
             const uint64_t w = words[i];
 
             if (w != 0) {
-                return static_cast<uint64_t>(i) * 64
+                return static_cast<u128>(i) * 64
                      + jsoncons::countr_zero(w);
             }
         }
 
         // Zero has no finite number of trailing zero bits.
-        return (std::numeric_limits<uint64_t>::max)();
+        return (jsoncons::nonstd::integer_limits<u128>::max)();
     }
 
     size_type bit_width() const

@@ -22,6 +22,15 @@ namespace cbor = jsoncons::cbor;
 
 namespace {
 
+void expect_bigdec(
+    const jsoncons::bigdec& actual,
+    const char* expectedMantissa,
+    int64_t expectedScale)
+{
+    CHECK(actual.unscaled().to_string() == expectedMantissa);
+    CHECK(actual.scale() == expectedScale);
+}
+
 std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
 {
     std::error_code ec;
@@ -822,5 +831,70 @@ TEST_CASE("cbor negative integer values")
         REQUIRE(r);
         CHECK((std::numeric_limits<int64_t>::min)() == (*r).as<int64_t>());
     }
+}
+
+TEST_CASE("cbor bigfloat tests")
+{
+    SECTION("trailing-zero cancellation, negative mantissas, zero, and both exponent directions")
+    {
+        jsoncons::bigdec value;
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -3, value);
+        expect_bigdec(value, "875", 3);
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(12), -3, value);
+        expect_bigdec(
+            value,
+            "15", 1
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-12), -3, value);
+        expect_bigdec(
+            value,
+            "-15", 1
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(1), 0, value);
+        expect_bigdec(
+            value,
+            "1", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(125), 3, value);
+        expect_bigdec(
+            value,
+            "1000", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-7), 2, value);
+        expect_bigdec(
+            value,
+            "-28", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(8), -3, value);
+        expect_bigdec(
+            value,
+            "1", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(16), -2, value);
+        expect_bigdec(
+            value,
+            "4", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MIN, value);
+        expect_bigdec(
+            value,
+            "0", 0
+        );
+
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MAX, value);
+        expect_bigdec(
+            value,
+            "0", 0
+        );
+    }    
 }
 

@@ -189,17 +189,15 @@ void encode_byte_string_with_encoding_hint()
 void query_cbor()
 {
     // Construct a json array of numbers
-    json j(json_array_arg);
+    jsoncons::json j(jsoncons::json_array_arg);
 
     j.emplace_back(5.0);
 
     j.emplace_back(0.000071);
 
-    j.emplace_back("-18446744073709551617",semantic_tag::bigint);
+    j.emplace_back("-18446744073709551617", jsoncons::semantic_tag::bigint);
 
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
-
-    j.emplace_back("0x3p-1", semantic_tag::bigfloat);
+    j.emplace_back("1.23456789012345678901234567890", jsoncons::semantic_tag::bigdec);
 
     // Encode to JSON
     std::cout << "(1)\n";
@@ -217,38 +215,40 @@ void query_cbor()
 
     // Encode to CBOR
     std::vector<uint8_t> v;
-    cbor::encode_cbor(j,v);
+    cbor::encode_cbor(j, v);
 
-    std::cout << "(3)\n" << byte_string_view(v) << "\n\n";
-/*
-    85 -- Array of length 5     
-      fa -- float 
-        40a00000 -- 5.0
-      fb -- double 
-        3f129cbab649d389 -- 0.000071
-      c3 -- Tag 3 (negative bignum)
-        49 -- Byte string value of length 9
-          010000000000000000
-      c4 -- Tag 4 (decimal fraction)
-        82 -- Array of length 2
-          38 -- Negative integer of length 1
-            1c -- -29
-          c2 -- Tag 2 (positive bignum)
-            4d -- Byte string value of length 13
-              018ee90ff6c373e0ee4e3f0ad2
-      c5 -- Tag 5 (bigfloat)
-        82 -- Array of length 2
-          20 -- -1
-          03 -- 3   
-*/
+    std::cout << "(3)\n"; 
+    jsoncons::print_bytes(v, std::cout);
+    std::cout << "\n\n";
+    /*
+        85 -- Array of length 5
+          fa -- float
+            40a00000 -- 5.0
+          fb -- double
+            3f129cbab649d389 -- 0.000071
+          c3 -- Tag 3 (negative bignum)
+            49 -- Byte string value of length 9
+              010000000000000000
+          c4 -- Tag 4 (decimal fraction)
+            82 -- Array of length 2
+              38 -- Negative integer of length 1
+                1c -- -29
+              c2 -- Tag 2 (positive bignum)
+                4d -- Byte string value of length 13
+                  018ee90ff6c373e0ee4e3f0ad2
+          c5 -- Tag 5 (bigfloat)
+            82 -- Array of length 2
+              20 -- -1
+              03 -- 3
+    */
 
     // Decode back to json
-    json other = cbor::decode_cbor<json>(v);
+    auto other = cbor::decode_cbor<jsoncons::json>(v);
     assert(other == j);
 
     // Query with JSONPath
     std::cout << "(4)\n";
-    json result = jsonpath::json_query(other,"$[?(@ < 1.5)]");
+    jsoncons::json result = jsonpath::json_query(other, "$[?(@ < 1.5)]");
     std::cout << pretty_print(result) << "\n\n";
 }
 
@@ -485,7 +485,7 @@ void working_with_cbor4()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
-        return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
+        return (ev.tag() == semantic_tag::bigdec);  
     };
 
     cbor::cbor_bytes_cursor cursor(data);

@@ -49,7 +49,7 @@ struct u128
     u128& operator+=(const u128& rhs) {
         *this = *this + rhs;
         return *this;
-    }
+    } 
 
     bool operator<(const u128& rhs) const
     {
@@ -65,6 +65,14 @@ struct u128
             return hi > rhs.hi;
 
         return lo > rhs.lo;
+    }
+
+    bool operator>=(const u128& rhs) const
+    {
+        if (hi != rhs.hi)
+            return hi > rhs.hi;
+
+        return lo >= rhs.lo;
     }
 
     // Left Shift

@@ -159,6 +159,29 @@ namespace nonstd {
         }
     };
 
+    template <typename T>
+    class integer_limits<T, typename std::enable_if<std::is_same<T,jsoncons::nonstd::u128>::value>::type>
+    {
+    public:
+        static constexpr bool is_specialized = true;
+        static constexpr bool is_signed = false;
+        static constexpr int digits = sizeof(T) * CHAR_BIT;
+        static constexpr int digits10 = 38;
+
+        static constexpr T(max)() noexcept
+        {
+            return T((std::numeric_limits<uint64_t>::max)(), (std::numeric_limits<uint64_t>::max)());
+        }
+        static constexpr T(min)() noexcept
+        {
+            return 0;
+        }
+        static constexpr T lowest() noexcept
+        {
+            return 0;
+        }
+    };
+
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
     template <typename... Ts> struct make_void { typedef void type;};

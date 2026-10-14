@@ -36,7 +36,7 @@ jsoncons strings tagged with `semantic_tag::bigint` are encoded into CBOR positi
 CBOR decimal fractions are decoded into jsoncons strings tagged with `semantic_tag::bigdec`.
 jsoncons strings tagged with `semantic_tag::bigdec` are encoded into CBOR decimal fractions.
 
-5 (bigfloat)  
+5 (bigfloat) (until 1.11.0) 
 CBOR bigfloats are decoded into a jsoncons string that consists of the following parts
 
 - (optional) minus sign
@@ -54,6 +54,10 @@ jsoncons strings that consist of the following parts
 - (optional) p or P followed with optional minus or plus sign and nonempty sequence of decimal digits
 
 and tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
+
+5 (bigfloat) (since 1.11.0) 
+CBOR bigfloats are decoded into jsoncons strings tagged with `semantic_tag::bigdec`.
+jsoncons strings tagged with `semantic_tag::bigdec` are encoded into CBOR decimal fractions.
 
 21, 22, 23 (byte string expected conversion is base64url, base64 or base16)  
 CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
