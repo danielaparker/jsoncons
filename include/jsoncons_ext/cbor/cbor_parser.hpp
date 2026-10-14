@@ -38,6 +38,156 @@ namespace cbor {
 
 enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
+/*
+template <typename Allocator>
+cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
+    int64_t exponent,
+    basic_bigdec<Allocator>& value,
+    uint64_t max_scale = 1000000)
+{
+    // Canonical zero.
+    if (unscaled.is_zero())
+    {
+        value = basic_bigdec<Allocator>{std::move(unscaled), 0};
+        return cbor_errc{};
+    }
+
+    if (exponent >= 0) {
+        // m * 2^e is already an integer.
+        unscaled <<= (static_cast<uint64_t>(exponent));
+
+        value = basic_bigdec<Allocator>{std::move(unscaled), 0};
+        return cbor_errc{};
+    }
+
+    // k = abs(exponent), including INT64_MIN.
+    uint64_t k = static_cast<uint64_t>(-(exponent + 1)) + 1;
+
+    // Cancel factors of 2 in the signed unscaled.
+    const uint64_t cancel = (std::min)(k, unscaled.trailing_zero_bits());
+
+    if (cancel != 0)
+        unscaled >>= cancel;
+
+    k -= cancel;
+
+        // IMPORTANT: Check before calculating 5^k.
+    if (k > max_scale)
+    {
+        return cbor_errc::bigfloat_to_bigdec_failed;
+    }
+
+    if (k > uint64_t((std::numeric_limits<int64_t>::max)()))
+    {
+        //BigDec scale overflow"
+        return cbor_errc::bigfloat_to_bigdec_failed;
+    }
+
+    // m / 2^k = (m * 5^k) / 10^k
+    if (k != 0)
+        unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), k);
+
+    value = basic_bigdec<Allocator> {
+        std::move(unscaled),
+        static_cast<int64_t>(k)
+    };
+    return cbor_errc{};
+}*/
+
+template <typename Allocator>
+cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
+    int64_t exponent,
+    basic_bigdec<Allocator>& value,
+    uint64_t decimalPlaces = 34)
+{
+    if (decimalPlaces > uint64_t(INT64_MAX))
+        return cbor_errc::bigdec_scale_overflow;
+
+    const int64_t scale = static_cast<int64_t>(decimalPlaces);
+
+    if (unscaled.is_zero())
+        value = { basic_bigint<Allocator>(0), scale };
+
+    const bool negative = unscaled < basic_bigint<Allocator>(0);
+
+    if (negative)
+        unscaled = -unscaled;
+
+    // We need round(m * 2^exponent * 10^scale).
+    //
+    // = round(m * 5^scale * 2^(exponent + scale)).
+    //
+    // Check whether the value is too small to round
+    // to anything other than zero BEFORE computing 5^scale.
+    if (exponent < 0) {
+        const uint64_t k =
+            uint64_t(-(exponent + 1)) + 1;
+
+        const uint64_t bits = unscaled.bit_length();
+
+        // If k >= bits + 4 * decimalPlaces,
+        // the scaled value is strictly less than 1/2.
+        //
+        // Avoid overflow in bits + 4 * decimalPlaces.
+        //const uint64_t max = UINT64_MAX;
+
+        if (decimalPlaces <= ((std::numeric_limits<uint64_t>::max)() - bits) / 4) {
+            const uint64_t bound = bits + 4 * decimalPlaces;
+
+            if (k >= bound) {
+                value = basic_bigdec<Allocator>{ basic_bigint<Allocator>(0), scale };
+                return cbor_errc{};
+            }
+        }
+    }
+
+    // For ordinary scales, compute 5^scale.
+    unscaled *= jsoncons::powb(basic_bigint<Allocator>(5), decimalPlaces);
+
+    // exponent + scale, calculated without signed overflow.
+    if (exponent >= 0) {
+        const uint64_t shift = uint64_t(exponent) + decimalPlaces;
+        unscaled <<= shift;
+    }
+    else {
+        const uint64_t k = uint64_t(-(exponent + 1)) + 1;
+
+        if (k <= decimalPlaces) {
+            unscaled <<= (decimalPlaces - k);
+        }
+        else {
+            const uint64_t shift = k - decimalPlaces;
+
+            // Half-even rounding for division by 2^shift.
+            //
+            // quotient = floor(unscaled / 2^shift)
+            // remainder determines rounding.
+
+            basic_bigint<Allocator> quotient = unscaled;
+            quotient >>= (shift);
+
+            // Round up if discarded bits > half,
+            // or exactly half and quotient is odd.
+            //
+            // Assumes these helpers are implemented.
+            const bool halfBit = unscaled.test_bit(shift - 1);
+            const bool lowerBits = unscaled.any_low_bits(shift - 1);
+            const bool odd = quotient.test_bit(0);
+
+            if (halfBit && (lowerBits || odd))
+                quotient += basic_bigint<Allocator>(1);
+
+            unscaled = std::move(quotient);
+        }
+    }
+
+    if (negative)
+        unscaled = -unscaled;
+
+    value = basic_bigdec<Allocator>{ std::move(unscaled), scale };
+    return cbor_errc{};
+}
+
 template <typename Source,typename Allocator>
 class basic_cbor_parser;
 
@@ -1749,7 +1899,7 @@ private:
                 }
                 if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
-                    ec = cbor_errc::invalid_bigdecimal;
+                    ec = cbor_errc::bigdec_scale_overflow;
                     more_ = false;
                     return;
                 }
@@ -1790,7 +1940,7 @@ private:
             return;
         }
 
-        bigint significand;
+        bigint unscaled;
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -1801,7 +1951,7 @@ private:
                 {
                     return;
                 }
-                significand = bigint(u);
+                unscaled = bigint(u);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1814,15 +1964,15 @@ private:
                 }
                 if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
-                    significand = -1 - bigint(u);
+                    unscaled = -1 - bigint(u);
                 }
                 else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
                 {
-                    significand = bigint((std::numeric_limits<int64_t>::min)());
+                    unscaled = bigint((std::numeric_limits<int64_t>::min)());
                 }
                 else
                 {
-                    significand = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
+                    unscaled = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
                 }
                 break;
             }
@@ -1861,12 +2011,12 @@ private:
                     }
                     if (info == 2)
                     {
-                        significand = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     }
                     else if (info == 3)
                     {
-                        significand = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        significand = -1 - significand;
+                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                        unscaled = -1 - unscaled;
                     }
                 }
                 break;
@@ -1879,7 +2029,7 @@ private:
             }
         }
 
-        bigdec dec(std::move(significand), -exponent);
+        bigdec dec(std::move(unscaled), -exponent);
         append_to_buffer(dec, result);
     }
 
@@ -1976,7 +2126,7 @@ private:
             return;
         }
 
-        bigint significand;
+        bigint unscaled;
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -1987,8 +2137,8 @@ private:
                 {
                     return;
                 }
-                significand = bigint(u);
-                //bigdec dec(std::move(significand), -exponent);
+                unscaled = bigint(u);
+                //bigdec dec(std::move(unscaled), -exponent);
                 //append_to_buffer(dec, str);
                 break;
             }
@@ -2002,17 +2152,17 @@ private:
                 }
                 if (u > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
-                    significand = -1 - bigint(u);
+                    unscaled = -1 - bigint(u);
                 }
                 else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
                 {
-                    significand = bigint((std::numeric_limits<int64_t>::min)());
+                    unscaled = bigint((std::numeric_limits<int64_t>::min)());
                 }
                 else
                 {
-                    significand = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
+                    unscaled = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
                 }
-                //bigdec dec(std::move(significand), -exponent);
+                //bigdec dec(std::move(unscaled), -exponent);
                 //append_to_buffer(dec, str);
                 break;
             }
@@ -2050,10 +2200,10 @@ private:
                         more_ = false;
                         return;
                     }
-                    significand = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+                    unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     if (tag == 3)
                     {
-                        significand = -1 - significand;
+                        unscaled = -1 - unscaled;
                     }
                 }
                 break;
@@ -2065,22 +2215,16 @@ private:
                 return;
             }
         }
-        bigdec base{std::move(significand), 0};
-        if (exponent > 0)
+
+        bigdec dec;
+        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec);
+        if (result != cbor_errc{})
         {
-            bigint factor = powb(bigint(2), exponent);
-            bigdec dec; 
-            multiply(base, bigdec(std::move(factor), 0), dec);
-            append_to_buffer(dec, str);
+            ec = result;
+            more_ = false;
+            return;
         }
-        else 
-        {
-            bigint divisor = powb(bigint(2), -exponent);
-            bigdec dec;
-            base.divide(bigdec(std::move(divisor), 0), dec);
-            append_to_buffer(dec, str);
-        }
-        
+        append_to_buffer(dec, str);
     }
 
     static jsoncons::cbor::detail::cbor_major_type get_major_type(uint8_t type)

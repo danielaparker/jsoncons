@@ -23,6 +23,7 @@ enum class cbor_errc
     source_error,
     reserved_additional_info,
     invalid_bigdecimal,
+    bigdec_scale_overflow,
     invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
@@ -36,7 +37,8 @@ enum class cbor_errc
     unknown_type,
     illegal_chunked_string,
     bad_mdarray,
-    bad_extents
+    bad_extents,
+    bigfloat_to_bigdec_failed
 };
 
 class cbor_error_category_impl
@@ -59,8 +61,12 @@ public:
                 return "Source error";
             case cbor_errc::invalid_bigdecimal:
                 return "Invalid BigDecimal value";
+            case cbor_errc::bigdec_scale_overflow:
+                return "bigdec scale overflow";
             case cbor_errc::invalid_bigfloat:
                 return "Invalid BigFloat value";
+            case cbor_errc::bigfloat_to_bigdec_failed:
+                return "CBOR bigfloat requires an impractically large decimal mantissa";
             case cbor_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case cbor_errc::too_many_items:

@@ -69,7 +69,7 @@ public:
     basic_bigdec& operator=(const basic_bigdec&) = default;
     basic_bigdec& operator=(basic_bigdec&&) = default;
 
-    basic_bigint<Allocator> significand() const
+    basic_bigint<Allocator> unscaled() const
     {
         return unscaled_;
     }
@@ -163,17 +163,17 @@ public:
         {
             if (sdiff < 0) 
             {
-                basic_bigint<Allocator> rb = this->significand()*big_ten_to_the(std::size_t(-sdiff));
-                return rb.compare_abs(val.significand());
+                basic_bigint<Allocator> rb = this->unscaled()*big_ten_to_the(std::size_t(-sdiff));
+                return rb.compare_abs(val.unscaled());
             } 
             else // sdiff > 0 
             { 
-                basic_bigint<Allocator> rb = val.significand()*val.big_ten_to_the((std::size_t)sdiff);
-                return this->significand().compare_abs(rb);
+                basic_bigint<Allocator> rb = val.unscaled()*val.big_ten_to_the((std::size_t)sdiff);
+                return this->unscaled().compare_abs(rb);
             }
         }
 
-        return this->significand().compare_abs(val.significand());
+        return this->unscaled().compare_abs(val.unscaled());
     }
 public:
     static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& dividend, 
@@ -217,8 +217,8 @@ public:
         }
 
         scale_difference += preferred_scale;
-        basic_bigint<Allocator> scaled_dividend = significand();
-        basic_bigint<Allocator> adjusted_divisor = divisor.significand();
+        basic_bigint<Allocator> scaled_dividend = unscaled();
+        basic_bigint<Allocator> adjusted_divisor = divisor.unscaled();
         if (scale_difference > 0) 
         {
             // Multiply dividend by 10^scale_difference to make room for decimal precision
@@ -282,7 +282,7 @@ bignum_result multiply(const basic_bigdec<Alloc>& a, const basic_bigdec<Alloc>& 
         return bignum_result{bignum_errc::result_out_of_range};
     }
     int64_t scale = a.scale() + b.scale();
-    c = basic_bigdec<Alloc>(a.significand() * b.significand(), scale);
+    c = basic_bigdec<Alloc>(a.unscaled() * b.unscaled(), scale);
 
     return bignum_result{};
 }
@@ -408,15 +408,15 @@ void append_to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,
 {
     if (value.scale() == 0)
     {
-        append_to_buffer(value.significand(), buf);
+        append_to_buffer(value.unscaled(), buf);
         return;
     }
-    if (value.significand().is_negative())
+    if (value.unscaled().is_negative())
     {
         buf.push_back('-');
     }
     std::basic_string<CharT> coeff;
-    append_to_buffer(value.significand().is_negative() ? -value.significand() : value.significand(), coeff);
+    append_to_buffer(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
     std::size_t coeffLen = coeff.size();
     if ((value.scale() >= 0) && (value.scale() <= static_cast<int64_t>(coeffLen) + 5)) 
     { 

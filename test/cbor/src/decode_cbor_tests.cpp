@@ -716,9 +716,10 @@ TEST_CASE("cbor bigfloat tests")
                                   0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -9223372036854775808
                                  };
 
-        auto j = cbor::decode_cbor<jsoncons::json>(v);
-
-        CHECK(j.as<std::string>() == std::string("-0x8000000000000000p-8000000000000000"));
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+        REQUIRE(result); // bigdec scale overflow
+        CHECK("0e-34" == (*result).to_string());
+        
     }
 }
 

@@ -1732,6 +1732,25 @@ public:
         return is_negative() ? -code : code;
     }
 
+    uint64_t trailing_zero_bits() const
+    {
+        // Assumes words contains the absolute magnitude,
+        // even when BigInt is negative.
+
+        auto words = get_words();
+        for (size_t i = 0; i < words.size(); ++i) {
+            const uint64_t w = words[i];
+
+            if (w != 0) {
+                return static_cast<uint64_t>(i) * 64
+                     + jsoncons::countr_zero(w);
+            }
+        }
+
+        // Zero has no finite number of trailing zero bits.
+        return (std::numeric_limits<uint64_t>::max)();
+    }
+
     size_type bit_width() const
     {
         auto words = get_words();
@@ -2050,7 +2069,7 @@ private:
         n |= n >> 32u;
         return n + 1;
     }
-
+public:
     template <typename CharT>
     friend to_bignum_result<CharT> to_bigint(const CharT* s, basic_bigint& val, int radix)
     {
@@ -2159,6 +2178,71 @@ private:
 
     bool is_zero() const {
         return get_words().size() == 0;
+    }
+
+    bool test_bit(uint64_t bitIndex) const noexcept
+    {
+        auto words = get_words();
+
+        const uint64_t wordIndex = bitIndex / 64;
+        const unsigned bit = static_cast<unsigned>(bitIndex % 64);
+
+        if (wordIndex >= words.size())
+            return false;
+
+        return ((words[static_cast<size_t>(wordIndex)] >> bit) & 1ULL) != 0;
+    }
+
+    bool any_low_bits(uint64_t count) const noexcept
+    {
+        auto words = get_words();
+
+        // Check whether any of bits [0, count) are set.
+        if (words.size() == 0)
+            return false;
+
+        const uint64_t wholeWords = count / 64;
+        const unsigned remainingBits = static_cast<unsigned>(count % 64);
+
+        // Check complete 64-bit limbs.
+        const size_t limit =
+            wholeWords >= words.size()
+                ? words.size()
+                : static_cast<size_t>(wholeWords);
+
+        for (size_t i = 0; i < limit; ++i) {
+            if (words[i] != 0)
+                return true;
+        }
+
+        // Check remaining low bits of the next limb.
+        if (remainingBits != 0 && wholeWords < words.size()) {
+            const uint64_t mask = (1ULL << remainingBits) - 1;
+
+            if ((words[static_cast<size_t>(wholeWords)] & mask) != 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    uint64_t bit_length() const noexcept
+    {
+        // Assumes words stores the absolute magnitude,
+        // even when BigInt is negative.
+
+        auto words = get_words();
+
+        for (size_t i = words.size(); i-- > 0;) {
+            const uint64_t w = words[i];
+
+            if (w != 0) {
+                return static_cast<uint64_t>(i) * 64
+                     + 64 - jsoncons::countl_zero(w);
+            }
+        }
+
+        return 0;
     }
 };
 
