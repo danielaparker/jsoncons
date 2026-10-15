@@ -410,7 +410,7 @@ void bignum_access_examples()
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types
-#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128)
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128)
     __int128 i = j.as<__int128>();
     boost_mp::int128_t boost_i = static_cast<boost_mp::int128_t>(i);
     std::cout << "(4) " << boost_i << "\n\n";

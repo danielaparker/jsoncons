@@ -314,7 +314,7 @@
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cplusplus)
 
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
-#  define JSONCONS_HAS_INT128
+#  define JSONCONS_HAS_NATIVE_INT128
 #endif
 
 #if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
@@ -395,7 +395,7 @@
 #endif
 
 // Follows boost config/nonstd/suffix.hpp
-#if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
+#if defined(JSONCONS_HAS_NATIVE_INT128) && defined(__cplusplus)
 namespace jsoncons{
 #  ifdef __GNUC__
    __extension__ typedef __int128 int128_type;

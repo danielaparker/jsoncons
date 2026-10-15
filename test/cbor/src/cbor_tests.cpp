@@ -191,7 +191,7 @@ TEST_CASE("cbor_reputon_test")
     CHECK(j3 == j1);
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128) 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 TEST_CASE("cbor json constructor __int64 tests")

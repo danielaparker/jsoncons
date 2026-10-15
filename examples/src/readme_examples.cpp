@@ -289,7 +289,7 @@ void playing_around()
     json& ref = jsonpointer::get(j, "/1/2");
     std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
-#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128)
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128)
     // e.g. if code compiled with GCC and std=gnu++11 (rather than std=c++11)
     __int128 i = j[1][2].as<__int128>();
 #endif
