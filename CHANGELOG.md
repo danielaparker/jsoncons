@@ -1,3 +1,19 @@
+master
+------
+
+Changes:
+
+  - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
+  string tagged with **semantic_tag::bigfloat**. Since 1.11.0, the
+  CBOR parser converts bigfloats to a decimal tagged with **semantic_tag::bigfloat**.
+  The conversion from bigfloat to bigdecimal uses exact 
+  conversion when the required decimal scale is at most **max_decimal_places** (defaults to 34), 
+  half-even rounding when the exact scale exceeds that limit, no unnecessary 
+  trailing decimal zeros for exactly representable values, and early rounding to zero 
+  for extremely small values.
+
+  - `semantic_tag::bigfloat` has been removed
+
 Release 1.10.0
 --------------
 

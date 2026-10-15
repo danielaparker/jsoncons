@@ -56,8 +56,12 @@ jsoncons strings that consist of the following parts
 and tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
 
 5 (bigfloat) (since 1.11.0) 
-CBOR bigfloats are decoded into jsoncons strings tagged with `semantic_tag::bigdec`.
-jsoncons strings tagged with `semantic_tag::bigdec` are encoded into CBOR decimal fractions.
+CBOR bigfloats are converted into bigdecimals and decoded into jsoncons strings tagged 
+with `semantic_tag::bigdec`. The conversion from bigfloat to bigdecimal uses exact 
+conversion when the required decimal scale is at most **max_decimal_places** (defaults to 
+34), half-even rounding when the exact scale exceeds that limit, no unnecessary 
+trailing decimal zeros for exactly representable values, and early rounding to zero 
+for extremely small values.
 
 21, 22, 23 (byte string expected conversion is base64url, base64 or base16)  
 CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
