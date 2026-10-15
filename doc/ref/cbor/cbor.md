@@ -57,8 +57,8 @@ and tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
 
 5 (bigfloat) (since 1.11.0) 
 CBOR bigfloats are converted into bigdecimals and decoded into jsoncons strings tagged 
-with `semantic_tag::bigdec`. The conversion from bigfloat to bigdecimal uses exact 
-conversion when the required decimal scale is at most **max_decimal_places** (defaults to 
+with `semantic_tag::bigdec`. Conversion from bigfloat to bigdecimal uses exact 
+conversion when the required decimal scale is at most **bigfloat_precision** (defaults to 
 34), half-even rounding when the exact scale exceeds that limit, no unnecessary 
 trailing decimal zeros for exactly representable values, and early rounding to zero 
 for extremely small values.

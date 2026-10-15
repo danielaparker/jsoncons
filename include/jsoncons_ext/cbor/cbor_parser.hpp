@@ -271,6 +271,7 @@ class basic_cbor_parser : public ser_context
     allocator_type alloc_;
     Source source_;
     int max_nesting_depth_;
+    uint64_t bigfloat_precision_;
     string_type text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -335,6 +336,7 @@ public:
        : alloc_(alloc),
          source_(std::forward<Sourceable>(source)),
          max_nesting_depth_(options.max_nesting_depth()),
+         bigfloat_precision_(options.bigfloat_precision()),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
@@ -2182,7 +2184,7 @@ private:
         }
 
         bigdec dec;
-        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec);
+        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_);
         if (result != cbor_errc{})
         {
             ec = result;

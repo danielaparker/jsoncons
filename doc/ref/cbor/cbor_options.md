@@ -25,6 +25,12 @@ Default is 1024. Parsing can have an arbitrarily large depth
 limited only by available memory. Serializing a [basic_json](../corelib/basic_json.md) to
 CBOR is limited by stack size.
 
+    void bigfloat_precision(uint64_t value)
+Conversion from bigfloat to bigdecimal uses exact 
+conversion with no unnecessary trailing zeros when the required decimal scale is at most **bigfloat_precision** (defaults to 34), 
+and half-even rounding when the exact scale exceeds that limit. Defaults
+to 34.
+
     cbor_options& pack_strings(bool value)
 
 If set to **true**, then encode will store text strings and

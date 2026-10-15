@@ -38,11 +38,17 @@ public:
 class cbor_decode_options : public virtual cbor_options_common
 {
     friend class cbor_options;
+    uint64_t bigfloat_precision_ = 34;
 public:
     cbor_decode_options() = default;
     cbor_decode_options(const cbor_decode_options& other) = default;
 protected:
     cbor_decode_options& operator=(const cbor_decode_options& other) = default;
+public:
+    uint64_t bigfloat_precision() const
+    {
+        return bigfloat_precision_;
+    }
 };
 
 class cbor_encode_options : public virtual cbor_options_common
@@ -71,6 +77,7 @@ public:
 class cbor_options final : public cbor_decode_options, public cbor_encode_options
 {
 public:
+    using cbor_decode_options::bigfloat_precision;
     using cbor_options_common::max_nesting_depth;
     using cbor_encode_options::pack_strings;
     using cbor_encode_options::use_typed_arrays;
@@ -82,6 +89,12 @@ public:
     cbor_options& max_nesting_depth(int value)
     {
         this->max_nesting_depth_ = value;
+        return *this;
+    }
+
+    cbor_options& bigfloat_precision(uint64_t value)
+    {
+        this->bigfloat_precision_ = value;
         return *this;
     }
 
