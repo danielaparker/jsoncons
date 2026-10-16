@@ -92,7 +92,7 @@ You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library man
 
 Or, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
 
-Or, download the latest code on [main](https://github.com/danielaparker/jsoncons/archive/main.zip).
+Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/refs/heads/master.zip).
 
 ## How to use it
 
@@ -222,6 +222,9 @@ and your own types will be supported too if you specialize [reflection traits](d
 in the `jsoncons` namespace. 
 
 ```cpp
+#include <chrono>
+#include <optional>
+
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -258,7 +261,7 @@ namespace ns {
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
-                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
+                   lhs.generated_ == rhs.generated_ && lhs.expires_ == rhs.expires_;
         }
 
         friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
@@ -559,8 +562,8 @@ Output:
 ```
 (1)
 [
-    ["foo", "UHVzcw", "0x3p-1"],
-    ["bar", "UHVzcw==", "1.23456789012345678901234567890"]
+    ["foo", "UHVzcw", 1.5],
+    ["bar", "UHVzcw==", 1.23456789012345678901234567890]
 ]
 
 (2)
@@ -569,12 +572,12 @@ Output:
 
 (3)
 [
-    "0x3p-1",
-    "1.23456789012345678901234567890"
+    1.5,
+    1.23456789012345678901234567890
 ]
 
 (4)
-82,83,63,66,6f,6f,44,50,75,73,73,c5,82,20,03,83,63,62,61,72,d6,44,50,75,73,73,c4,82,38,1c,c2,4d,01,8e,e9,0f,f6,c3,73,e0,ee,4e,3f,0a,d2
+82,83,63,66,6f,6f,44,50,75,73,73,c4,82,20,0f,83,63,62,61,72,d6,44,50,75,73,73,c4,82,38,1c,c2,4d,01,8e,e9,0f,f6,c3,73,e0,ee,4e,3f,0a,d2
 ```
 
 #### As a strongly typed C++ data structure
@@ -601,11 +604,11 @@ int main()
 Output:
 ```
 (1)
-foo, 50,75,73,73, 0x3p-1
+foo, 50,75,73,73, 1.5
 bar, 50,75,73,73, 1.23456789012345678901234567890
 
 (2)
-82,9f,63,66,6f,6f,44,50,75,73,73,66,30,78,33,70,2d,31,ff,9f,63,62,61,72,44,50,75,73,73,78,1f,31,2e,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,ff
+82,83,63,66,6f,6f,44,50,75,73,73,63,31,2e,35,83,63,62,61,72,44,50,75,73,73,78,1f,31,2e,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30
 ```
 
 Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
@@ -647,7 +650,7 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::byte_string_value:
-                std::cout << event.event_type() << ": " << event.get<jsoncons::span<const uint8_t>>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::byte_string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::null_value:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
@@ -678,7 +681,7 @@ begin_array (n/a)
 begin_array (n/a)
 string_value: foo (n/a)
 byte_string_value: 50,75,73,73 (n/a)
-string_value: 0x3p-1 (bigfloat)
+string_value: 1.5 (bigdec)
 end_array (n/a)
 begin_array (n/a)
 string_value: bar (n/a)
@@ -695,7 +698,7 @@ int main()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
-        return (ev.tag() == semantic_tag::bigdec));  
+        return (ev.tag() == semantic_tag::bigdec);
     };
 
     cbor::cbor_bytes_cursor cursor(data);
@@ -719,7 +722,7 @@ int main()
 ```
 Output:
 ```
-string_value: 0x3p-1 (bigfloat)
+string_value: 1.5 (bigdec)
 string_value: 1.23456789012345678901234567890 (bigdec)
 ```
 

@@ -2025,7 +2025,7 @@ namespace ns {
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
-                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
+                   lhs.generated_ == rhs.generated_ && lhs.expires_ == rhs.expires_;
         }
 
         friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
