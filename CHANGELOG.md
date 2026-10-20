@@ -18,6 +18,8 @@ Enhancements:
 
   - New cbor decode option **bigfloat_precision**, defaults to 34.
 
+  - New cbor decode option **max_dimensions**, defaults to 32.
+
 Release 1.10.0
 --------------
 

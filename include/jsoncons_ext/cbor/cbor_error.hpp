@@ -38,7 +38,8 @@ enum class cbor_errc
     illegal_chunked_string,
     bad_mdarray,
     bad_extents,
-    bigfloat_to_bigdec_failed
+    bigfloat_to_bigdec_failed,
+    max_dimensions_exceeded
 };
 
 class cbor_error_category_impl
@@ -67,6 +68,8 @@ public:
                 return "Invalid BigFloat value";
             case cbor_errc::bigfloat_to_bigdec_failed:
                 return "CBOR bigfloat requires an impractically large decimal mantissa";
+            case cbor_errc::max_dimensions_exceeded:
+                return "Maximum number of dimensions exceeded.";
             case cbor_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case cbor_errc::too_many_items:

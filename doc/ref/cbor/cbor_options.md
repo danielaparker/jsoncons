@@ -25,7 +25,10 @@ Default is 1024. Parsing can have an arbitrarily large depth
 limited only by available memory. Serializing a [basic_json](../corelib/basic_json.md) to
 CBOR is limited by stack size.
 
-    void bigfloat_precision(uint64_t value)
+    void max_dimensions(std::size_t depth)                           (since 1.11.0)
+The maximum number of dimensions allowed in a CBOR multi-dimensional array. Defaults to 32.
+
+    void bigfloat_precision(uint64_t value)                           (since 1.11.0)
 Conversion from bigfloat to bigdecimal uses exact 
 conversion with no unnecessary trailing zeros when the required decimal scale is at most **bigfloat_precision** (defaults to 34), 
 and half-even rounding when the exact scale exceeds that limit. Defaults

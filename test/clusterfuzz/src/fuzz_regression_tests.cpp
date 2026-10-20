@@ -1047,7 +1047,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         //CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch //-V521
         //       ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor_encoder
     // Issue: failed_throw
@@ -1066,6 +1066,21 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::unmatched_end_array);
+    }*/
+
+    // Fuzz target: fuzz_cbor_noexcept
+    // Issue:  Out-of-memory (exceeds 2560 MB)
+    // Diagnosis: Huge dimensions for multi-dimensional array
+    // Resolution: Added cbor option max_dimensions defaulting to 32
+    SECTION("issue 573809010")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_noexcept-6463188737261568";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+        auto result = cbor::try_decode_cbor<json>(is);
+        REQUIRE(!result);
+        REQUIRE((cbor::cbor_errc::max_dimensions_exceeded == result.error().code()));
     }
 }
 

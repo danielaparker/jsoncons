@@ -271,6 +271,7 @@ class basic_cbor_parser : public ser_context
     allocator_type alloc_;
     Source source_;
     int max_nesting_depth_;
+    std::size_t max_dimensions_{0};
     uint64_t bigfloat_precision_;
     string_type text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
@@ -336,6 +337,7 @@ public:
        : alloc_(alloc),
          source_(std::forward<Sourceable>(source)),
          max_nesting_depth_(options.max_nesting_depth()),
+         max_dimensions_(options.max_dimensions()),
          bigfloat_precision_(options.bigfloat_precision()),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
@@ -2374,7 +2376,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint8, extents_, order_, alloc_);
+                            typed_array_tags::uint8, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2410,7 +2412,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint8, extents_, order_, alloc_);
+                            typed_array_tags::uint8, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2455,7 +2457,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint16_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint16, extents_, order_, alloc_);
+                            typed_array_tags::uint16, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2500,7 +2502,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint32_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint32, extents_, order_, alloc_);
+                            typed_array_tags::uint32, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2545,7 +2547,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint64_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint64, extents_, order_, alloc_);
+                            typed_array_tags::uint64, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2580,7 +2582,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int8, extents_, order_, alloc_);
+                            typed_array_tags::int8, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2625,7 +2627,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int16_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int16, extents_, order_, alloc_);
+                            typed_array_tags::int16, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2670,7 +2672,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int32_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int32, extents_, order_, alloc_);
+                            typed_array_tags::int32, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2715,7 +2717,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int64_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int64, extents_, order_, alloc_);
+                            typed_array_tags::int64, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2760,7 +2762,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint16_t,decode_half,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::half_float, extents_, order_, alloc_);
+                            typed_array_tags::half_float, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2805,7 +2807,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<float,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::float32, extents_, order_, alloc_);
+                            typed_array_tags::float32, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2850,7 +2852,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<double,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::float64, extents_, order_, alloc_);
+                            typed_array_tags::float64, extents_, order_, max_dimensions_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2948,7 +2950,7 @@ private:
             {
                 return;
             }
-            auto iter = std::make_shared<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, alloc_);
+            auto iter = std::make_shared<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, max_dimensions_, alloc_);
             typed_array_stack_.push_back(iter);
             if (!iter->done())
             {
@@ -2963,7 +2965,7 @@ private:
             {
                 return;
             }
-            auto iter = std::make_shared<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, alloc_);
+            auto iter = std::make_shared<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, max_dimensions_, alloc_);
             typed_array_stack_.push_back(iter);
             if (!iter->done())
             {

@@ -21,6 +21,7 @@ class cbor_options_common
     friend class cbor_options;
 
     int max_nesting_depth_{1024};
+    std::size_t max_dimensions_{32};
 protected:
     cbor_options_common() = default;
     cbor_options_common(const cbor_options_common&) = default;
@@ -32,6 +33,10 @@ public:
     int max_nesting_depth() const 
     {
         return max_nesting_depth_;
+    }
+    std::size_t max_dimensions() const 
+    {
+        return max_dimensions_;
     }
 };
 
@@ -79,6 +84,7 @@ class cbor_options final : public cbor_decode_options, public cbor_encode_option
 public:
     using cbor_decode_options::bigfloat_precision;
     using cbor_options_common::max_nesting_depth;
+    using cbor_options_common::max_dimensions;
     using cbor_encode_options::pack_strings;
     using cbor_encode_options::use_typed_arrays;
 
@@ -89,6 +95,12 @@ public:
     cbor_options& max_nesting_depth(int value)
     {
         this->max_nesting_depth_ = value;
+        return *this;
+    }
+
+    cbor_options& max_dimensions(std::size_t value)
+    {
+        this->max_dimensions_ = value;
         return *this;
     }
 
