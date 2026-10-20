@@ -52,7 +52,7 @@ public:
     static constexpr size_type mem_unit = sizeof(word_type);
     static constexpr size_type word_bits = sizeof(word_type) * 8;  // Number of bits
     static constexpr size_type word_half_bits = word_bits/2;
-    static constexpr size_type word_twos_complement = 0x8000000000000000;
+    static constexpr size_type word_twos_complement = 0x8000000000000000ULL;
     static constexpr size_type inlined_capacity = 2;
 public:
 
