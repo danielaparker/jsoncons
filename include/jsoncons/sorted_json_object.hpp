@@ -664,9 +664,13 @@ namespace jsoncons {
                 {
                     data_.emplace_back(*it);
                 }
-                else 
+                else if ((*it).key() == pos->key())
                 {
-                    pos->value((*it).value());
+                    pos->value(std::move((*it).value()));
+                }
+                else
+                {
+                    data_.emplace(pos,*it);
                 }
             }
         }
@@ -701,10 +705,14 @@ namespace jsoncons {
                     data_.emplace_back(*it);
                     hint = data_.begin() + (data_.size() - 1);
                 }
-                else 
+                else if ((*it).key() == pos->key())
                 {
-                    pos->value((*it).value());
+                    pos->value(std::move((*it).value()));
                     hint = pos;
+                }
+                else
+                {
+                    hint = data_.emplace(pos,*it);
                 }
             }
         }

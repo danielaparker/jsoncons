@@ -1183,6 +1183,25 @@ TEST_CASE("test_json_merge_or_update_move")
     }
 }
 
+TEST_CASE("test_json_merge_or_update_move_key_between_existing_keys")
+{
+    const jsoncons::json expected = jsoncons::json::parse(R"({"a":1,"b":2,"c":3})");
+
+    SECTION("without hint")
+    {
+        jsoncons::json j = jsoncons::json::parse(R"({"a":1,"c":3})");
+        j.merge_or_update(jsoncons::json::parse(R"({"b":2})"));
+        CHECK(expected == j);
+    }
+
+    SECTION("with hint")
+    {
+        jsoncons::json j = jsoncons::json::parse(R"({"a":1,"c":3})");
+        j.merge_or_update(j.object_range().begin(), jsoncons::json::parse(R"({"b":2})"));
+        CHECK(expected == j);
+    }
+}
+
 TEST_CASE("json_object_iterator_adaptor tests")
 {
     SECTION("empty")
