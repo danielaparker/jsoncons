@@ -452,6 +452,18 @@ namespace jsonpointer {
 
     namespace detail {
 
+    // RFC 6901: an array index is "0" or digits without a leading zero
+    template <typename CharT>
+    bool to_array_index(const CharT* data, std::size_t length, std::size_t& index)
+    {
+        if (length > 1 && data[0] == '0')
+        {
+            return false;
+        }
+        auto result = jsoncons::dec_to_integer(data, length, index);
+        return static_cast<bool>(result);
+    }
+
     template <typename Json>
     const Json* resolve(const Json* current, const typename Json::string_view_type& buffer, std::error_code& ec)
     {
@@ -463,8 +475,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-            if (!result)
+            if (!to_array_index(buffer.data(), buffer.length(), index))
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
@@ -504,8 +515,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-            if (!result)
+            if (!to_array_index(buffer.data(), buffer.length(), index))
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
@@ -754,8 +764,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -895,8 +904,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -1040,8 +1048,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -1149,8 +1156,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
