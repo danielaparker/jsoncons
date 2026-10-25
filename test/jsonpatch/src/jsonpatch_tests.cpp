@@ -262,6 +262,14 @@ TEST_CASE("move_root_to_child")
     check_patch(target, patch, jsonpatch::jsonpatch_errc::move_failed, expected);
 }
 
+TEST_CASE("move_array_element_into_its_own_child")
+{
+    jsoncons::json target = jsoncons::json::parse(R"([ [ "a" ], { "b" : 1 } ])");
+    jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "move", "path" : "/0/c", "from": "/0" }])");
+    jsoncons::json expected = target;
+    check_patch(target, patch, jsonpatch::jsonpatch_errc::move_failed, expected);
+}
+
 TEST_CASE("copy_root_to_child")
 {
     jsoncons::json target = jsoncons::json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
