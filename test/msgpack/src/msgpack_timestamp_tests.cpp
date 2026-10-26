@@ -211,3 +211,55 @@ TEST_CASE("msgpack timestamp in array and map")
     CHECK(output == input);
 }
 
+TEST_CASE("msgpack timestamp boundaries")
+{
+    std::vector<uint8_t> output;
+    msgpack_bytes_encoder encoder(output);
+    std::error_code ec;
+
+    SECTION("epoch_milli -1")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x3b,0x8b,0x87,0xc0, // 999000000 nanoseconds in 32-bit unsigned int
+            0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -1 seconds in 64-bit signed int
+        };
+        encoder.int64_value(-1, semantic_tag::epoch_milli, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(output == expected);
+    }
+    SECTION("epoch_second uint64 largest")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x00,0x00,0x00,0x00, // 0 nanoseconds in 32-bit unsigned int
+            0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // 9223372036854775807 seconds in 64-bit signed int
+        };
+        encoder.uint64_value(9223372036854775807u, semantic_tag::epoch_second, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(output == expected);
+    }
+    SECTION("epoch_nano smallest")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x00,0x00,0x00,0x00, // 0 nanoseconds in 32-bit unsigned int
+            0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // -9223372036854775808 seconds in 64-bit signed int
+        };
+        encoder.string_value("-9223372036854775808000000000", semantic_tag::epoch_nano, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(output == expected);
+    }
+    SECTION("timestamp 64 largest nanoseconds")
+    {
+        std::vector<uint8_t> input = {
+            0xd7,0xff, // timestamp 64
+            0xee,0x6b,0x27,0xfc,0x7f,0xff,0xff,0xff // 999999999 nanoseconds, 2147483647 seconds
+        };
+        CHECK(decode_msgpack<jsoncons::json>(input).as_string() == "2147483647999999999");
+    }
+}
+
