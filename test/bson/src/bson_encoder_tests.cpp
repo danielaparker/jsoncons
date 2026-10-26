@@ -273,6 +273,35 @@ TEST_CASE("serialize object to bson")
     REQUIRE(result);
 }
 
+TEST_CASE("bson datetime from uint64")
+{
+    std::vector<uint8_t> v;
+    bson::bson_bytes_encoder encoder(v);
+    std::error_code ec;
+
+    encoder.begin_object();
+    encoder.key("t");
+
+    SECTION("epoch_second")
+    {
+        encoder.uint64_value(9223372036854776u, semantic_tag::epoch_second, ser_context(), ec);
+        CHECK(ec == bson::bson_errc::datetime_too_large);
+    }
+    SECTION("epoch_milli")
+    {
+        encoder.uint64_value(9223372036854775808u, semantic_tag::epoch_milli, ser_context(), ec);
+        CHECK(ec == bson::bson_errc::datetime_too_large);
+    }
+    SECTION("largest epoch_milli")
+    {
+        encoder.uint64_value(9223372036854775807u, semantic_tag::epoch_milli, ser_context(), ec);
+        encoder.end_object();
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(bson::decode_bson<json>(v).at("t").as<int64_t>() == 9223372036854775807);
+    }
+}
+
 struct bson_bytes_encoder_reset_test_fixture
 {
     std::vector<uint8_t> output1;

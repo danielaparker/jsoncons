@@ -500,10 +500,9 @@ private:
 
     JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
         semantic_tag tag, 
-        const ser_context&,
+        const ser_context& context,
         std::error_code& ec) final
     {
-        static constexpr uint64_t max_value_div_1000 = (std::numeric_limits<uint64_t>::max)() / 1000;
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
@@ -513,18 +512,13 @@ private:
         switch (tag)
         {
             case semantic_tag::epoch_second:
-                if (val > max_value_div_1000)
+            case semantic_tag::epoch_milli:
+                if (val > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
                     ec = bson_errc::datetime_too_large;
                     JSONCONS_VISITOR_RETURN;
                 }
-                before_value(jsoncons::bson::bson_type::datetime_type);
-                binary::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
-                break;
-            case semantic_tag::epoch_milli:
-                before_value(jsoncons::bson::bson_type::datetime_type);
-                binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-                break;
+                return visit_int64(static_cast<int64_t>(val), tag, context, ec);
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
