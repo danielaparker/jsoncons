@@ -215,6 +215,7 @@ add_executable(unit_tests
                toon/src/toon_reader_tests.cpp
                toon/src/decode_toon_tests.cpp
                toon/src/encode_toon_tests.cpp
+               toon/src/toon_test_suite.cpp
                corelib/src/testmain.cpp
 )              
 
