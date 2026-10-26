@@ -578,6 +578,12 @@ private:
                         uint64_t data64 = binary::big_to_native<uint64_t>(buf64, sizeof(buf64));
                         uint64_t sec = data64 & 0x00000003ffffffffL;
                         uint64_t nsec = data64 >> 34;
+                        if (nsec >= uint64_t(nanos_in_second))
+                        {
+                            ec = msgpack_errc::invalid_timestamp;
+                            more_ = false;
+                            return;
+                        }
 
                         bigint nano(sec);
                         nano *= uint64_t(nanos_in_second);
@@ -607,6 +613,12 @@ private:
                             return;
                         }
                         int64_t sec = binary::big_to_native<int64_t>(buf2, sizeof(buf2));
+                        if (nsec >= uint64_t(nanos_in_second))
+                        {
+                            ec = msgpack_errc::invalid_timestamp;
+                            more_ = false;
+                            return;
+                        }
 
                         bigint nano(sec);
 
