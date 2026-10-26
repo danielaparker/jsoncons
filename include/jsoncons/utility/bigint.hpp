@@ -631,7 +631,7 @@ public:
         auto r = jsoncons::to_bigint(s, std::char_traits<CharT>::length(s), *this, alloc);
         if (r.ec != bignum_errc{})
         {
-            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+            JSONCONS_THROW(std::system_error(r.error_code()));
         }
     }
 
@@ -642,7 +642,7 @@ public:
         auto r = jsoncons::to_bigint(s, length, *this, alloc);
         if (r.ec != bignum_errc{})
         {
-            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+            JSONCONS_THROW(std::system_error(r.error_code()));
         }
     }
 
@@ -679,7 +679,7 @@ public:
         auto r = jsoncons::to_bigint(s.data(), s.size(), *this);
         if (r.ec != bignum_errc{})
         {
-            JSONCONS_THROW(std::system_error((int)r.ec, std::system_category()));
+            JSONCONS_THROW(std::system_error(r.error_code()));
         }
     }
 

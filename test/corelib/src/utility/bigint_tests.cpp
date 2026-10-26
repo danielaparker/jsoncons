@@ -103,6 +103,48 @@ TEST_CASE("bignums are equal")
     CHECK(test);
 }
 
+TEST_CASE("bigint from invalid string")
+{
+    auto expected = jsoncons::make_error_code(jsoncons::bignum_errc::invalid_argument);
+
+    SECTION("const char*")
+    {
+        JSONCONS_TRY
+        {
+            jsoncons::bigint x("12a");
+            CHECK(false);
+        }
+        JSONCONS_CATCH (const std::system_error& e)
+        {
+            CHECK(e.code() == expected);
+        }
+    }
+    SECTION("const char*, length")
+    {
+        JSONCONS_TRY
+        {
+            jsoncons::bigint x("12a", 3);
+            CHECK(false);
+        }
+        JSONCONS_CATCH (const std::system_error& e)
+        {
+            CHECK(e.code() == expected);
+        }
+    }
+    SECTION("std::string")
+    {
+        JSONCONS_TRY
+        {
+            jsoncons::bigint x(std::string("12a"));
+            CHECK(false);
+        }
+        JSONCONS_CATCH (const std::system_error& e)
+        {
+            CHECK(e.code() == expected);
+        }
+    }
+}
+
 TEST_CASE("test_negative_bignum")
 {
     std::string expected = "-18446744073709551617";
