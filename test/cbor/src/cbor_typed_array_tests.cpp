@@ -91,6 +91,25 @@ TEST_CASE("cbor typed array cursor tests")
         CHECK( -1.79769e+308 == Approx(v1[0]));
         CHECK(1.79769e+308 == Approx(v1[1]));
     }
+    SECTION("Tag 64, uint8, read_typed_array replaces the contents")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8, // Tag
+                0x40, // Tag 64, uint8, typed array
+            0x43, // Byte string value of length 3
+                0x00,0x01,0xff
+        };
+
+        cbor::cbor_bytes_cursor cursor1(data);
+        std::vector<uint8_t> v1 = {7, 8};
+        cursor1.read_typed_array(v1);
+        CHECK(std::vector<uint8_t>{0, 1, 255} == v1);
+
+        cbor::cbor_bytes_cursor cursor2(data);
+        std::vector<int> v2 = {7, 8};
+        cursor2.read_typed_array(v2);
+        CHECK(std::vector<int>{0, 1, 255} == v2);
+    }
 }
 
 TEST_CASE("cbor typed array tests")

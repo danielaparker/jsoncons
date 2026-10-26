@@ -626,6 +626,7 @@ public:
 
         if (is_typed_array())
         {
+            v.clear();
             switch (array_tag())
             {
                 case typed_array_tags::int8:
