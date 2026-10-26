@@ -1011,6 +1011,97 @@ TEST_CASE("cbor multi-dim malformed input tests")
     }
 }
 
+TEST_CASE("cbor multi-dim max_dimensions tests")
+{
+    auto options = cbor::cbor_options{}
+        .max_dimensions(3);
+
+    SECTION("at the limit")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,           // semantic tag 40, row-major storage
+            0x82,                // array(2)
+            0x83,0x01,0x01,0x01, // array(3) -> [1,1,1]
+            0x81,0x00            // array(1) -> [0]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder, options);
+        reader.read(ec);
+
+        CHECK_FALSE(ec);
+    }
+
+    SECTION("above the limit")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,                // semantic tag 40, row-major storage
+            0x82,                     // array(2)
+            0x84,0x01,0x01,0x01,0x01, // array(4) -> [1,1,1,1]
+            0x81,0x00                 // array(1) -> [0]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder, options);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::max_dimensions_exceeded == ec);
+    }
+
+    SECTION("above the limit, indefinite length extents")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,                     // semantic tag 40, row-major storage
+            0x82,                          // array(2)
+            0x9f,0x01,0x01,0x01,0x01,0xff, // array(indefinite length) -> [1,1,1,1]
+            0x81,0x00                      // array(1) -> [0]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder, options);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::max_dimensions_exceeded == ec);
+    }
+
+    SECTION("above the limit, column major storage")
+    {
+        const std::vector<uint8_t> data = {
+            0xd9,0x04,0x10,           // semantic tag 1040, column-major storage
+            0x82,                     // array(2)
+            0x84,0x01,0x01,0x01,0x01, // array(4) -> [1,1,1,1]
+            0x81,0x00                 // array(1) -> [0]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder, options);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::max_dimensions_exceeded == ec);
+    }
+
+    SECTION("above the limit, typed array storage")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,                // semantic tag 40, row-major storage
+            0x82,                     // array(2)
+            0x84,0x01,0x01,0x01,0x01, // array(4) -> [1,1,1,1]
+            0xd8,0x40,0x41,0x00       // typed array tag 64, byte string(1)
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder, options);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::max_dimensions_exceeded == ec);
+    }
+}
+
 TEST_CASE("cbor multi-dim indefinite length extents tests")
 {
     const std::vector<uint8_t> data = {

@@ -28,7 +28,6 @@
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 
 namespace jsoncons { 
@@ -186,7 +185,6 @@ class mdarray_iterator : public typed_array_iterator
     mdarray_order order_;
     Func func_;
     std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
-    std::size_t max_dimensions_{0};
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -196,13 +194,11 @@ public:
     mdarray_iterator(std::vector<uint8_t,byte_allocator_type>&& data, typed_array_tags array_tag, 
         const std::vector<std::size_t, size_type_allocator_type>& extents,
         mdarray_order order, 
-        std::size_t max_dimensions,
         const Allocator& alloc)
         : data_(std::move(data), alloc), 
           span_(typed_array_cast<ValueType>(data_)), 
         array_tag_(array_tag), extents_(extents,alloc), order_(order), func_(Func{}),
-        dimensions_(extents.size(), alloc),
-        max_dimensions_(max_dimensions)
+        dimensions_(extents.size(), alloc)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
         if (order == mdarray_order::column_major)
@@ -287,11 +283,6 @@ public:
         if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
         {
             visitor.begin_array(dimensions_[dim_].extent, semantic_tag::none, context, ec);
-            if (JSONCONS_UNLIKELY(dim_ > max_dimensions_))
-            {
-                ec = cbor_errc::max_dimensions_exceeded;
-                return;
-            }
             ++dim_;
             return;
         }
@@ -331,7 +322,6 @@ class cbor_mdarray_row_major_iterator : public typed_array_iterator
 
     std::vector<std::size_t,size_type_allocator_type> extents_;
     std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
-    std::size_t max_dimensions_;
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -342,9 +332,8 @@ class cbor_mdarray_row_major_iterator : public typed_array_iterator
 public:
     cbor_mdarray_row_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
-        std::size_t max_dimensions,
         const Allocator& alloc)
-        : extents_(extents, alloc), dimensions_(extents.size(), alloc), max_dimensions_(max_dimensions), 
+        : extents_(extents, alloc), dimensions_(extents.size(), alloc),
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -424,11 +413,6 @@ public:
                     return;
                 }
             }
-            if (JSONCONS_UNLIKELY(dim_ > max_dimensions_))
-            {
-                ec = cbor_errc::max_dimensions_exceeded;
-                return;
-            }
             ++dim_;
             return;
         }
@@ -479,7 +463,6 @@ class cbor_mdarray_column_major_iterator : public typed_array_iterator
 
     std::vector<std::size_t,size_type_allocator_type> extents_;
     std::vector<mdarray_dimension,dimension_allocator_type> dimensions_;
-    std::size_t max_dimensions_{0};
     semantic_tag tag_{};
     std::size_t dim_{0};
     bool first_{true};
@@ -490,10 +473,8 @@ class cbor_mdarray_column_major_iterator : public typed_array_iterator
 public:
     cbor_mdarray_column_major_iterator(const std::vector<std::size_t,size_type_allocator_type>& extents,
         basic_cbor_parser<Source,Allocator>* parser, bool cursor_mode, 
-        std::size_t max_dimensions,
         const Allocator& alloc)
         : extents_(extents,alloc), dimensions_(extents.size(), alloc),
-          max_dimensions_(max_dimensions), 
           parser_(parser), cursor_mode_(cursor_mode)
     {
         std::vector<std::size_t> strides(extents.size(), 0);
@@ -583,11 +564,6 @@ public:
         }
         if (dim_+1 < dimensions_.size() && dimensions_[dim_].index < dimensions_[dim_].end)
         {
-            if (JSONCONS_UNLIKELY(dim_ > max_dimensions_))
-            {
-                ec = cbor_errc::max_dimensions_exceeded;
-                return;
-            }
             ++dim_;
             return;
         }

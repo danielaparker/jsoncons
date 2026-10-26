@@ -2376,7 +2376,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint8, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::uint8, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2412,7 +2412,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint8, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::uint8, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2457,7 +2457,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint16_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint16, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::uint16, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2502,7 +2502,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint32_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint32, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::uint32, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2547,7 +2547,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint64_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::uint64, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::uint64, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2582,7 +2582,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int8_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int8, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::int8, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2627,7 +2627,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int16_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int16, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::int16, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2672,7 +2672,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int32_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int32, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::int32, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2717,7 +2717,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<int64_t,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::int64, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::int64, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2762,7 +2762,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<uint16_t,decode_half,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::half_float, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::half_float, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2807,7 +2807,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<float,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::float32, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::float32, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2852,7 +2852,7 @@ private:
                             return;
                         }
                         auto iter = std::make_shared<mdarray_iterator<double,jsoncons::identity,Allocator>>(std::move(array_buffer), 
-                            typed_array_tags::float64, extents_, order_, max_dimensions_, alloc_);
+                            typed_array_tags::float64, extents_, order_, alloc_);
                         typed_array_stack_.push_back(iter);
                         iter->next(visitor, *this, ec);
                     }
@@ -2950,7 +2950,7 @@ private:
             {
                 return;
             }
-            auto iter = std::make_shared<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, max_dimensions_, alloc_);
+            auto iter = std::make_shared<cbor_mdarray_row_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, alloc_);
             typed_array_stack_.push_back(iter);
             if (!iter->done())
             {
@@ -2965,7 +2965,7 @@ private:
             {
                 return;
             }
-            auto iter = std::make_shared<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, max_dimensions_, alloc_);
+            auto iter = std::make_shared<cbor_mdarray_column_major_iterator<Source,Allocator>>(extents_, this, cursor_mode_, alloc_);
             typed_array_stack_.push_back(iter);
             if (!iter->done())
             {
@@ -3054,6 +3054,12 @@ private:
                          more_ = false;
                          return;
                      }
+                     if (JSONCONS_UNLIKELY(extents_.size() == max_dimensions_))
+                     {
+                         ec = cbor_errc::max_dimensions_exceeded;
+                         more_ = false;
+                         return;
+                     }
                      extents_.push_back(extent);
                  }
              }
@@ -3063,6 +3069,12 @@ private:
             std::size_t size = read_size(info, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
+                more_ = false;
+                return;
+            }
+            if (JSONCONS_UNLIKELY(size > max_dimensions_))
+            {
+                ec = cbor_errc::max_dimensions_exceeded;
                 more_ = false;
                 return;
             }
