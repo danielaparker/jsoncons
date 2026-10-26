@@ -1102,6 +1102,39 @@ TEST_CASE("cbor multi-dim max_dimensions tests")
     }
 }
 
+namespace {
+
+class counting_visitor : public jsoncons::default_json_visitor
+{
+public:
+    std::size_t count{0};
+private:
+    JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t, jsoncons::semantic_tag, const jsoncons::ser_context&, std::error_code& ec) override
+    {
+        ++count;
+        ec = jsoncons::cbor::cbor_errc::unexpected_eof;
+        JSONCONS_VISITOR_RETURN;
+    }
+};
+
+} // namespace
+
+TEST_CASE("cbor typed array visitor error tests")
+{
+    std::vector<uint8_t> data = {0xd8,0x40, // Tag 64, uint8 typed array
+                                 0x59,0x03,0xe8 // Byte string of length 1000
+                                };
+    data.resize(data.size() + 1000, 0x01);
+
+    std::error_code ec;
+    counting_visitor visitor;
+    cbor::cbor_bytes_reader reader(data, visitor);
+    reader.read(ec);
+
+    CHECK(jsoncons::cbor::cbor_errc::unexpected_eof == ec);
+    CHECK(1 == visitor.count);
+}
+
 TEST_CASE("cbor multi-dim indefinite length extents tests")
 {
     const std::vector<uint8_t> data = {

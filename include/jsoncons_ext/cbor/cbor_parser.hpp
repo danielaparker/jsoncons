@@ -480,6 +480,10 @@ public:
                 {
                     JSONCONS_ASSERT(!typed_array_stack_.empty());
                     read_typed_array_item(visitor, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     auto iter = typed_array_stack_.back();
                     if (iter->done())
                     {
