@@ -297,6 +297,79 @@ TEST_CASE("json assignment with pmr allocator")
 
 #endif // polymorphic_allocator
 
+TEST_CASE("json assignment between a value and a value it contains")
+{
+    const std::string long_string = "String too long for short string";
+
+    SECTION("long string member to object assignment")
+    {
+        json j(json_object_arg, {{"a", long_string}});
+        j = j.at("a");
+        CHECK(long_string == j.as<std::string>());
+    }
+
+    SECTION("number member to object assignment")
+    {
+        json j(json_object_arg, {{"a", 10}});
+        j = j.at("a");
+        CHECK(10 == j.as<int>());
+    }
+
+    SECTION("array member to object assignment")
+    {
+        json j(json_object_arg, {{"a", json(json_array_arg, {1, 2, json(long_string)})}});
+        j = j.at("a");
+        CHECK(json(json_array_arg, {1, 2, json(long_string)}) == j);
+    }
+
+    SECTION("object member to object assignment")
+    {
+        json j(json_object_arg, {{"a", json(json_object_arg, {{"b", long_string}})}});
+        j = j.at("a");
+        CHECK(json(json_object_arg, {{"b", long_string}}) == j);
+    }
+
+    SECTION("object to its long string member assignment")
+    {
+        json j(json_object_arg, {{"a", long_string}});
+        json expected(j);
+        j.at("a") = j;
+        CHECK(expected == j.at("a"));
+    }
+
+    SECTION("array to its long string element assignment")
+    {
+        json j(json_array_arg, {json(long_string)});
+        json expected(j);
+        j[0] = j;
+        CHECK(expected == j[0]);
+    }
+
+    SECTION("array element to array assignment")
+    {
+        json j(json_array_arg, {json(json_array_arg, {1, 2, json(long_string)}), 4, 5});
+        j = j[0];
+        CHECK(json(json_array_arg, {1, 2, json(long_string)}) == j);
+    }
+
+    SECTION("long string element to array assignment")
+    {
+        json j(json_array_arg);
+        j.push_back(long_string);
+        j = j[0];
+        CHECK(j.as<std::string>() == long_string);
+    }
+
+    SECTION("json reference to element to array assignment")
+    {
+        json j(json_array_arg);
+        j.push_back(long_string);
+        json ref(json_ptr_arg, &j[0]);
+        j = ref;
+        CHECK(j.as<std::string>() == long_string);
+    }
+}
+
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
@@ -478,6 +551,43 @@ TEST_CASE("json assignment with scoped allocator")
         j2 = j1;
         REQUIRE(alloc2 == j2.get_allocator());
         CHECK(j1 == j2);
+    }
+
+    SECTION("json reference to number assignment")
+    {
+        cust_json j1{10};
+
+        cust_json j2{jsoncons::json_array_arg, alloc2};
+        j2.push_back(long_string2);
+        cust_json ref{jsoncons::json_ptr_arg, &j2};
+
+        j1 = ref;
+        REQUIRE(alloc2 == j1.get_allocator());
+        CHECK(j1 == j2);
+    }
+
+    SECTION("json reference to json reference assignment")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        j1.push_back(long_string1);
+        cust_json j2{jsoncons::json_array_arg, alloc2};
+        j2.push_back(long_string2);
+        cust_json ref{jsoncons::const_json_ptr_arg, &j2};
+
+        cust_json j3{jsoncons::const_json_ptr_arg, &j1};
+        j3 = ref;
+        REQUIRE(alloc2 == j3.get_allocator());
+        CHECK(j3 == j2);
+    }
+
+    SECTION("json reference to itself assignment")
+    {
+        cust_json j1{long_string1, alloc1};
+        cust_json ref{jsoncons::json_ptr_arg, &j1};
+
+        j1 = ref;
+        REQUIRE(alloc1 == j1.get_allocator());
+        CHECK(j1.as<std::string>() == long_string1);
     }
 }
 

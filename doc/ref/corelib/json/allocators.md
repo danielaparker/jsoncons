@@ -192,8 +192,6 @@ assert(j2.get_allocator().resource() == &pool1);
 ```
 
 `basic_json` does not check allocator traits `propagate_on_container_copy_assignment`.
-In the case of arrays and objects, `basic_json` leaves it to the implementing types (by
-default `std::vector`) to conform to the traits.
 
 #### Move assignment
 

@@ -728,12 +728,6 @@ namespace jsoncons {
             {
             }
 
-            void assign(const array_storage& other)
-            {
-                tag_ = other.tag_;
-                *ptr_ = *(other.ptr_);
-            }
-
             array_storage& operator=(const array_storage& other) = delete;
 
             semantic_tag tag() const
@@ -776,12 +770,6 @@ namespace jsoncons {
             explicit object_storage(const object_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-            }
-
-            void assign(const object_storage& other)
-            {
-                tag_ = other.tag_;
-                *ptr_ = *(other.ptr_);
             }
 
             object_storage& operator=(const object_storage& other) = delete;
@@ -1352,62 +1340,13 @@ namespace jsoncons {
 
         void copy_assignment(const basic_json& other)
         {
-            if (other.storage_kind() == json_storage_kind::const_json_ref)
+            if (is_trivial_storage(storage_kind()))
             {
-                auto alloc = cast<long_string_storage>().get_allocator();
-                destroy();
-                uninitialized_copy_a(other.cast<const_json_ref_storage>().value(), alloc);
+                *this = basic_json(other);
             }
-            else if (other.storage_kind() == json_storage_kind::json_ref)
+            else
             {
-                auto alloc = cast<long_string_storage>().get_allocator();
-                destroy();
-                uninitialized_copy_a(other.cast<json_ref_storage>().value(), alloc);
-            }
-            else if (is_primitive_storage(other.storage_kind()))
-            {
-                destroy();
-                std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
-            }
-            else if (storage_kind() == other.storage_kind())
-            {
-                switch (other.storage_kind())
-                {
-                    case json_storage_kind::long_str:
-                    {
-                        auto alloc = cast<long_string_storage>().get_allocator();
-                        destroy();
-                        uninitialized_copy_a(other, alloc);
-                        break;
-                    }
-                    case json_storage_kind::byte_str:
-                    {
-                        auto alloc = cast<byte_string_storage>().get_allocator();
-                        destroy();
-                        uninitialized_copy_a(other, alloc);
-                        break;
-                    }
-                    case json_storage_kind::array:
-                        cast<array_storage>().assign(other.cast<array_storage>());
-                        break;
-                    case json_storage_kind::object:
-                        cast<object_storage>().assign(other.cast<object_storage>());
-                        break;
-                    default:
-                        JSONCONS_UNREACHABLE();
-                        break;
-                }
-            }
-            else if (is_trivial_storage(storage_kind())) // rhs is not trivial storage
-            {
-                destroy();
-                uninitialized_copy(other);
-            }
-            else // lhs and rhs are not trivial storage
-            {
-                auto alloc = get_allocator();
-                destroy();
-                uninitialized_copy_a(other, alloc);
+                *this = basic_json(other, get_allocator());
             }
         }
 
