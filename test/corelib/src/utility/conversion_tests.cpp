@@ -3,6 +3,8 @@
 
 #include <jsoncons/nonstd/more_type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
+#include <cmath>
+#include <limits>
 #include <vector>
 #include <catch/catch.hpp>
 
@@ -47,3 +49,33 @@ TEST_CASE("convert into list-like")
     }
 }
 
+TEST_CASE("in_integer_range")
+{
+    SECTION("int64_t")
+    {
+        CHECK(in_integer_range<int64_t>(-9223372036854775808.0));
+        CHECK(in_integer_range<int64_t>(9223372036854775295.0));
+        CHECK_FALSE(in_integer_range<int64_t>(9223372036854775808.0));
+        CHECK_FALSE(in_integer_range<int64_t>(-9223372036854777856.0));
+    }
+    SECTION("uint64_t")
+    {
+        CHECK(in_integer_range<uint64_t>(-0.5));
+        CHECK(in_integer_range<uint64_t>(18446744073709549568.0));
+        CHECK_FALSE(in_integer_range<uint64_t>(-1.5));
+        CHECK_FALSE(in_integer_range<uint64_t>(18446744073709551616.0));
+    }
+    SECTION("int32_t")
+    {
+        CHECK(in_integer_range<int32_t>(2147483647.4));
+        CHECK(in_integer_range<int32_t>(-2147483648.5));
+        CHECK_FALSE(in_integer_range<int32_t>(2147483648.0));
+        CHECK_FALSE(in_integer_range<int32_t>(-2147483649.0));
+    }
+    SECTION("not a number")
+    {
+        CHECK_FALSE(in_integer_range<int64_t>(std::nan("")));
+        CHECK_FALSE(in_integer_range<int64_t>(std::numeric_limits<double>::infinity()));
+        CHECK_FALSE(in_integer_range<int64_t>(-std::numeric_limits<double>::infinity()));
+    }
+}

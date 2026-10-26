@@ -11,10 +11,12 @@
 #include <array>
 #include <bitset> // std::bitset
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -1590,6 +1592,105 @@ namespace variant_detail
             return to_json_(aset, val);
         }
 
+    private:
+        template <typename T, typename RepT=Rep>
+        static
+        typename std::enable_if<nonstd::is_integer<RepT>::value && !nonstd::is_integer<T>::value, result_type>::type
+        from_count(const T& count)
+        {
+            if (!in_integer_range<Rep>(count))
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_epoch);
+            }
+            return result_type(in_place, static_cast<Rep>(count));
+        }
+
+        template <typename RepT=Rep>
+        static
+        typename std::enable_if<nonstd::is_signed_integer<RepT>::value, result_type>::type
+        from_count(int64_t count)
+        {
+            if (count < (nonstd::integer_limits<Rep>::lowest)() || count > (nonstd::integer_limits<Rep>::max)())
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_epoch);
+            }
+            return result_type(in_place, static_cast<Rep>(count));
+        }
+
+        template <typename RepT=Rep>
+        static
+        typename std::enable_if<nonstd::is_unsigned_integer<RepT>::value, result_type>::type
+        from_count(int64_t count)
+        {
+            if (count < 0 || static_cast<uint64_t>(count) > static_cast<uint64_t>((nonstd::integer_limits<Rep>::max)()))
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_epoch);
+            }
+            return result_type(in_place, static_cast<Rep>(count));
+        }
+
+        template <typename T, typename RepT=Rep>
+        static
+        typename std::enable_if<!nonstd::is_integer<RepT>::value, result_type>::type
+        from_count(const T& count)
+        {
+            return result_type(in_place, static_cast<Rep>(count));
+        }
+
+        static result_type from_product(Rep count, int64_t factor)
+        {
+            if (nonstd::is_integer<Rep>::value && (count > (std::numeric_limits<Rep>::max)() / factor || count < (std::numeric_limits<Rep>::lowest)() / factor))
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_epoch);
+            }
+            return result_type(in_place, count*factor);
+        }
+
+        static result_type from_number(const Json& j)
+        {
+            if (j.is_double())
+            {
+                return from_count(j.template as<double>());
+            }
+            if (nonstd::is_integer<Rep>::value && !j.template is<Rep>())
+            {
+                return result_type(jsoncons::unexpect, conv_errc::not_epoch);
+            }
+            return result_type(in_place, j.template as<Rep>());
+        }
+
+        static result_type from_product(const Json& j, int64_t factor)
+        {
+            if (nonstd::is_integer<Rep>::value && j.is_double())
+            {
+                auto count = j.template as<double>();
+                if (count != std::trunc(count))
+                {
+                    return from_count(count * factor);
+                }
+            }
+            auto res = from_number(j);
+            return res ? from_product(res->count(), factor) : res;
+        }
+
+        static result_type from_quotient(const Json& j, int64_t divisor)
+        {
+            if (!nonstd::is_integer<Rep>::value)
+            {
+                return result_type(in_place, j.template as<Rep>() / divisor);
+            }
+            if (j.is_int64() || in_integer_range<int64_t>(j.template as<double>()))
+            {
+                return from_count(j.template as<int64_t>() / divisor);
+            }
+            if (j.is_uint64() || in_integer_range<uint64_t>(j.template as<double>()))
+            {
+                return from_count(static_cast<int64_t>(j.template as<uint64_t>() / divisor));
+            }
+            return from_count(j.template as<double>() / divisor);
+        }
+
+    public:
         template <typename Alloc, typename TempAlloc, typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, result_type>::type
@@ -1597,17 +1698,16 @@ namespace variant_detail
         {
             if (j.is_int64() || j.is_uint64() || j.is_double())
             {
-                auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
                     case semantic_tag::epoch_second:
-                        return result_type(in_place, count);
+                        return from_number(j);
                     case semantic_tag::epoch_milli:
-                        return result_type(in_place, count == 0 ? 0 : count/millis_in_second);
+                        return from_quotient(j, millis_in_second);
                     case semantic_tag::epoch_nano:
-                        return result_type(in_place, count == 0 ? 0 : count/nanos_in_second);
+                        return from_quotient(j, nanos_in_second);
                     default:
-                        return result_type(in_place, count);
+                        return from_number(j);
                 }
             }
             else if (j.is_string())
@@ -1633,7 +1733,7 @@ namespace variant_detail
                         {
                             n = n / millis_in_second;
                         }
-                        return result_type(in_place, static_cast<Rep>(n));
+                        return from_count(n);
                     }
                     case semantic_tag::epoch_nano:
                     {
@@ -1645,7 +1745,7 @@ namespace variant_detail
                         {
                             n = n / nanos_in_second;
                         }
-                        return result_type(in_place, static_cast<Rep>(n));
+                        return from_count(n);
                     }
                     default:
                     {
@@ -1669,42 +1769,18 @@ namespace variant_detail
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value, result_type>::type
         from_json_(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
-            if (j.is_int64() || j.is_uint64())
+            if (j.is_int64() || j.is_uint64() || j.is_double())
             {
-                auto res = j.template try_as<Rep>();
-                if (!res)
-                {
-                    return result_type(jsoncons::unexpect, conv_errc::not_epoch);
-                }
                 switch (j.tag())
                 {
                     case semantic_tag::epoch_second:
-                        return result_type(in_place, *res*millis_in_second);
+                        return from_product(j, millis_in_second);
                     case semantic_tag::epoch_milli:
-                        return result_type(in_place, *res);
+                        return from_number(j);
                     case semantic_tag::epoch_nano:
-                        return result_type(in_place, *res == 0 ? 0 : *res/nanos_in_milli);
+                        return from_quotient(j, nanos_in_milli);
                     default:
-                        return result_type(in_place, *res);
-                }
-            }
-            else if (j.is_double())
-            {
-                auto res = j.template try_as<double>();
-                if (!res)
-                {
-                    return result_type(jsoncons::unexpect, conv_errc::not_epoch);
-                }
-                switch (j.tag())
-                {
-                    case semantic_tag::epoch_second:
-                        return result_type(in_place, static_cast<Rep>(*res * millis_in_second));
-                    case semantic_tag::epoch_milli:
-                        return result_type(in_place, static_cast<Rep>(*res));
-                    case semantic_tag::epoch_nano:
-                        return result_type(in_place, *res == 0 ? 0 : static_cast<Rep>(*res / nanos_in_milli));
-                    default:
-                        return result_type(in_place, static_cast<Rep>(*res));
+                        return from_number(j);
                 }
             }
             else if (j.is_string())
@@ -1718,7 +1794,7 @@ namespace variant_detail
                         {
                             return result_type(jsoncons::unexpect, conv_errc::not_epoch);
                         }
-                        return result_type(in_place, *res*millis_in_second);
+                        return from_product(*res, millis_in_second);
                     }
                     case semantic_tag::epoch_milli:
                     {
@@ -1745,7 +1821,7 @@ namespace variant_detail
                         {
                             n = n / nanos_in_milli;
                         }
-                        return result_type(in_place, static_cast<Rep>(n));
+                        return from_count(n);
                     }
                     default:
                     {
@@ -1771,32 +1847,16 @@ namespace variant_detail
         {
             if (j.is_int64() || j.is_uint64() || j.is_double())
             {
-                auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
                     case semantic_tag::epoch_second:
-                        return result_type(in_place, count*nanos_in_second);
+                        return from_product(j, nanos_in_second);
                     case semantic_tag::epoch_milli:
-                        return result_type(in_place, count*nanos_in_milli);
+                        return from_product(j, nanos_in_milli);
                     case semantic_tag::epoch_nano:
-                        return result_type(in_place, count);
+                        return from_number(j);
                     default:
-                        return result_type(in_place, count);
-                }
-            }
-            else if (j.is_double())
-            {
-                auto count = j.template as<double>();
-                switch (j.tag())
-                {
-                    case semantic_tag::epoch_second:
-                        return result_type(in_place, static_cast<Rep>(count * nanos_in_second));
-                    case semantic_tag::epoch_milli:
-                        return result_type(in_place, static_cast<Rep>(count * nanos_in_milli));
-                    case semantic_tag::epoch_nano:
-                        return result_type(in_place, static_cast<Rep>(count));
-                    default:
-                        return result_type(in_place, static_cast<Rep>(count));
+                        return from_number(j);
                 }
             }
             else if (j.is_string())
@@ -1809,9 +1869,9 @@ namespace variant_detail
                 switch (j.tag())
                 {
                     case semantic_tag::epoch_second:
-                        return result_type(in_place, *res*nanos_in_second);
+                        return from_product(*res, nanos_in_second);
                     case semantic_tag::epoch_milli:
-                        return result_type(in_place, *res*nanos_in_milli);
+                        return from_product(*res, nanos_in_milli);
                     case semantic_tag::epoch_nano:
                         return result_type(in_place, *res);
                     default:

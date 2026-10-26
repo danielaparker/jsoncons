@@ -22,6 +22,15 @@
 
 namespace jsoncons {
 
+template <typename T,typename Number>
+typename std::enable_if<nonstd::is_integer<T>::value,bool>::type
+in_integer_range(const Number& val)
+{
+    // exact at 2^63 and 2^64, where (double)max rounds up; NaN answers false
+    return val - Number((nonstd::integer_limits<T>::lowest)()) > -1 &&
+           val < Number((nonstd::integer_limits<T>::max)()) + 1;
+}
+
 template <typename InputIt,typename Container>
 typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value
     && nonstd::is_string<Container>::value,size_t>::type
