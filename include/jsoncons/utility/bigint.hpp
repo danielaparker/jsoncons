@@ -756,7 +756,7 @@ public:
         // carrying shifted-out bits across words
         for (std::size_t i = len, j = y_start; i-- > 0; --j) 
         {
-            std::size_t bv = y_words[j];
+            word_type bv = y_words[j];
             word_type hb = ((bv >> 1) + carry);
             word_type v = words[i];
             if (v != hb)
