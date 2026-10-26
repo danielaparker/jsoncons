@@ -361,10 +361,10 @@ namespace msgpack {
                 default:
                 {
                     write_string_value(sv);
-                    end_value();
                     break;
                 }
             }
+            end_value();
             JSONCONS_VISITOR_RETURN;
         }
 

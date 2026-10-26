@@ -192,3 +192,22 @@ TEST_CASE("msgpack timestamp seconds outside int64_t")
     }
 }
 
+TEST_CASE("msgpack timestamp in array and map")
+{
+    std::vector<uint8_t> input = {
+        0x92, // array, length 2
+          0xd7,0xff, // timestamp 64
+            0xa1,0xdc,0xd7,0xc8,0x5a,0x4a,0xf6,0xa5, // 678901234 nanoseconds, 1514862245 seconds
+          0x81, // map, length 1
+            0xa1,'t', // string, length 1
+            0xc7,0x0c,0xff, // timestamp 96
+              0x00,0x00,0x00,0x00, // 0 nanoseconds in 32-bit unsigned int
+              0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x80 // -2208988800 seconds in 64-bit signed int
+    };
+
+    auto j = decode_msgpack<jsoncons::json>(input);
+    std::vector<uint8_t> output;
+    REQUIRE_NOTHROW(encode_msgpack(j, output));
+    CHECK(output == input);
+}
+
