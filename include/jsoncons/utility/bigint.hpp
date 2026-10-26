@@ -516,7 +516,7 @@ public:
 
     void set_negative(bool value) 
     {
-        common_.is_negative_ = value;
+        common_.is_negative_ = value && common_.size_ != 0;
     }
 
     storage_view<word_type> get_words()
@@ -538,6 +538,10 @@ public:
         size_type old_length = common_.size_;
         reserve(new_length);
         common_.size_ = new_length;
+        if (new_length == 0)
+        {
+            common_.is_negative_ = false;
+        }
 
         if (old_length < new_length)
         {
@@ -950,6 +954,10 @@ public:
 
     basic_bigint& operator+=( const basic_bigint& y )
     {
+        if (y.is_zero())
+        {
+            return *this;
+        }
         if ( is_negative() != y.is_negative())
             return *this -= -y;
 
@@ -984,6 +992,10 @@ public:
 
     basic_bigint& operator-=(const basic_bigint& y)
     {
+        if (y.is_zero())
+        {
+            return *this;
+        }
         auto y_words = y.get_words();
 
         if ( is_negative() != y.is_negative())

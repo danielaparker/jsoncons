@@ -241,7 +241,7 @@ public:
         {
             if (need_to_round_up(quotient, remainder, adjusted_divisor, rounding)) 
             {
-                quotient += (basic_bigint<Allocator>(quotient.signum() >= 0 ? 1 : -1));
+                quotient += (basic_bigint<Allocator>(signum() == divisor.signum() ? 1 : -1));
             }
         }
         

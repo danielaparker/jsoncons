@@ -211,6 +211,44 @@ TEST_CASE("test_conversion_0")
     CHECK(s == "0");
 }
 
+TEST_CASE("bigint zero is not negative")
+{
+    SECTION("-1 *= 0")
+    {
+        jsoncons::bigint a(-1);
+        a *= 0;
+        CHECK(a.signum() == 0);
+    }
+    SECTION("0 *= -1")
+    {
+        jsoncons::bigint a(0);
+        a *= -1;
+        CHECK(a.signum() == 0);
+    }
+    SECTION("-5 * 0")
+    {
+        jsoncons::bigint a = jsoncons::bigint(-5) * jsoncons::bigint(0);
+        CHECK(a.signum() == 0);
+    }
+    SECTION("-5 += 0")
+    {
+        jsoncons::bigint a(-5);
+        a += jsoncons::bigint(0);
+        CHECK(a == jsoncons::bigint(-5));
+    }
+    SECTION("-5 -= 0")
+    {
+        jsoncons::bigint a(-5);
+        a -= jsoncons::bigint(0);
+        CHECK(a == jsoncons::bigint(-5));
+    }
+    SECTION("-10 % 5")
+    {
+        jsoncons::bigint a = jsoncons::bigint(-10) % jsoncons::bigint(5);
+        CHECK(a.signum() == 0);
+    }
+}
+
 TEST_CASE("test_traits1")
 {
     std::vector<uint8_t> data = {0x01,0x00};

@@ -152,6 +152,28 @@ TEST_CASE("basic_bigdec multiply tests")
 
 TEST_CASE("basic_bigdec divide tests")
 {
+    SECTION("-10 / 5 rounding up")
+    {
+        jsoncons::bigdec a("-10");
+        jsoncons::bigdec b("5");
+        jsoncons::bigdec expected("-2");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c, 0, jsoncons::rounding_mode::up);
+        REQUIRE(r);
+        CHECK((expected == c));
+    }
+    SECTION("-1 / 3 rounding up")
+    {
+        jsoncons::bigdec a("-1");
+        jsoncons::bigdec b("3");
+        jsoncons::bigdec expected("-1");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c, 0, jsoncons::rounding_mode::up);
+        REQUIRE(r);
+        CHECK((expected == c));
+    }
     SECTION("4.0 / 2.0")
     {
         jsoncons::bigdec a("4.0");
