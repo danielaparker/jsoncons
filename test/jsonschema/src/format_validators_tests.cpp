@@ -24,6 +24,11 @@ TEST_CASE("IP4 format checker tests")
         CHECK(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(208.116.0.0)"));
         CHECK(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(208.116.0.0)"));
         CHECK_FALSE(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(208.116.0)"));
+        CHECK(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(0.0.0.0)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(256.1.1.1)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(999.1.1.1)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(1..2.3)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv4_rfc2673(R"(192.168.0.01)"));
     }
     SECTION("b tests")
     {

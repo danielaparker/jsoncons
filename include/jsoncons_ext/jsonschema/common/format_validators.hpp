@@ -460,7 +460,7 @@ namespace jsonschema {
                             state = state_t::decbyte;
                             decbyte_count = 0;
                             digit_count = 1;
-                            value = 0;
+                            value = static_cast<std::size_t>(c - '0');
                             break;
                         case 'b':
                             state = state_t::bindig;
@@ -506,6 +506,15 @@ namespace jsonschema {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
                             ++digit_count;
                             break;
+                        case '.':
+                            if (digit_count != 0)
+                            {
+                                return false;
+                            }
+                            state = state_t::decbyte;
+                            decbyte_count = 1;
+                            value = 0;
+                            break;
                         default:
                             return false;
                     }
@@ -539,7 +548,7 @@ namespace jsonschema {
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         {
-                            if (digit_count >= 3)
+                            if (digit_count >= 3 || (digit_count == 1 && value == 0))
                             {
                                 return false;
                             }
@@ -552,7 +561,7 @@ namespace jsonschema {
                             break;
                         }
                         case '.':
-                            if (decbyte_count > 3)
+                            if (digit_count == 0 || decbyte_count > 3)
                             {
                                 return false;
                             }
