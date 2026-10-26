@@ -366,6 +366,13 @@ TEST_CASE("bigint div")
         CHECK((big_pos / big_pos) == jsoncons::bigint(1));
     }
 #endif
+    SECTION("a / b and a % b with second_done")
+    {
+        jsoncons::bigint a("6277101735386680763835789423207666416102355444464034512895"); // 2^192 - 1
+        jsoncons::bigint b("170141183460469231750134047789593657343"); // 2^127 + 2^64 - 1
+        CHECK(jsoncons::bigint("36893488147419103228") == a / b);
+        CHECK(jsoncons::bigint("110680464442257309691") == a % b);
+    }
 }
 
 // Source: https://github.com/justmoon/node-bignum/blob/master/test/big.js

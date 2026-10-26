@@ -14,6 +14,7 @@
 #include <string>
 #include <stdexcept>
 
+#include <jsoncons/nonstd/a5hash.hpp>
 #include <jsoncons/nonstd/compiler_support.hpp>
 
 namespace jsoncons { 
@@ -109,36 +110,9 @@ struct u128
 
 
     u128 operator*(const u128& rhs) const {
-        // Split components into 32-bit chunks to avoid 64-bit overflow during multiplication
-        uint64_t a3 = hi >> 32;
-        uint64_t a2 = hi & 0xFFFFFFFFFFFFFFULL; // lower 32 bits of hi
-        uint64_t a1 = lo >> 32;
-        uint64_t a0 = lo & 0xFFFFFFFFULL;
-
-        uint64_t b3 = rhs.hi >> 32;
-        uint64_t b2 = rhs.hi & 0xFFFFFFFFFFFFFFULL;
-        uint64_t b1 = rhs.lo >> 32;
-        uint64_t b0 = rhs.lo & 0xFFFFFFFFULL;
-
-        // Long multiplication matrix
-        // We only care about terms that fit in the final 128 bits.
-        // Chunks exceeding indices that add up to 3 (e.g., a2*b2, a3*b1) drop out of range.
-
-        uint64_t c0 = a0 * b0;
-        uint64_t c1 = a0 * b1 + a1 * b0;
-        uint64_t c2 = a0 * b2 + a1 * b1 + a2 * b0;
-        uint64_t c3 = a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0;
-
-        // Carry propagation
-        c1 += (c0 >> 32);
-        c2 += (c1 >> 32);
-        c3 += (c2 >> 32);
-
-        // Reconstruct hi and lo 64-bit values
-        uint64_t new_low = (c0 & 0xFFFFFFFFULL) | (c1 << 32);
-        uint64_t new_high = (c2 & 0xFFFFFFFFULL) | (c3 << 32);
-
-        return {new_high, new_low};
+        uint64_t new_low, new_high;
+        a5hash_umul128(lo, rhs.lo, &new_low, &new_high);
+        return {new_high + hi * rhs.lo + lo * rhs.hi, new_low};
     }
 
     u128& operator*=(const u128& rhs) {

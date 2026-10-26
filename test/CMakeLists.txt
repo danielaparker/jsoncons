@@ -83,6 +83,7 @@ add_executable(unit_tests
                corelib/src/nonstd/span_tests.cpp
                corelib/src/nonstd/string_view_tests.cpp
                corelib/src/nonstd/type_traits_tests.cpp
+               corelib/src/nonstd/u128_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
