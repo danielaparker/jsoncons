@@ -1882,6 +1882,12 @@ private:
                 {
                     return;
                 }
+                if (JSONCONS_UNLIKELY(exponent == (std::numeric_limits<int64_t>::min)()))
+                {
+                    ec = cbor_errc::bigdec_scale_overflow;
+                    more_ = false;
+                    return;
+                }
                 break;
             }
             default:

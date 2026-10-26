@@ -653,6 +653,11 @@ private:
                 ec = r.error_code();
                 return;
             }
+            if (add_overflow(scale, val))
+            {
+                ec = cbor_errc::bigdec_scale_overflow;
+                return;
+            }
             scale += val;
         }
         visit_int64(scale, semantic_tag::none, context, ec);
