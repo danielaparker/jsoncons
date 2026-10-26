@@ -15,7 +15,7 @@ TEST_CASE("nonstd bit tests")
         CHECK(0 == nonstd::countl_zero(uint32_t(4294967295)));
         CHECK(64 == nonstd::countl_zero(uint64_t(0)));
         CHECK(1 == nonstd::countl_zero(uint64_t(9223372036854775807)));
-        CHECK(0 == nonstd::countl_zero(uint64_t(18446744073709551615)));
+        CHECK(0 == nonstd::countl_zero(uint64_t(18446744073709551615u)));
     }
     SECTION("countr_zero")
     {
@@ -24,7 +24,7 @@ TEST_CASE("nonstd bit tests")
         CHECK(0 == nonstd::countr_zero(uint32_t(4294967295)));
         CHECK(64 == nonstd::countr_zero(uint64_t(0)));
         CHECK(0 == nonstd::countr_zero(uint64_t(9223372036854775807)));
-        CHECK(0 == nonstd::countr_zero(uint64_t(18446744073709551615)));
+        CHECK(0 == nonstd::countr_zero(uint64_t(18446744073709551615u)));
     }
     SECTION("bit_width")
     {
@@ -33,7 +33,7 @@ TEST_CASE("nonstd bit tests")
         CHECK(32 == nonstd::bit_width(uint32_t(4294967295)));
         CHECK(0 == nonstd::bit_width(uint64_t(0)));
         CHECK(63 == nonstd::bit_width(uint64_t(9223372036854775807)));
-        CHECK(64 == nonstd::bit_width(uint64_t(18446744073709551615)));
+        CHECK(64 == nonstd::bit_width(uint64_t(18446744073709551615u)));
     }
 }
 

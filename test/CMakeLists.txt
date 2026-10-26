@@ -79,6 +79,7 @@ add_executable(unit_tests
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
+               corelib/src/nonstd/bit_tests.cpp
                corelib/src/nonstd/optional_tests.cpp
                corelib/src/nonstd/span_tests.cpp
                corelib/src/nonstd/string_view_tests.cpp
@@ -87,6 +88,7 @@ add_executable(unit_tests
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
                corelib/src/decode_json_using_allocator_tests.cpp
+               corelib/src/detect_encoding_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
                corelib/src/json_array_tests.cpp
                corelib/src/json_as_tests.cpp
@@ -158,6 +160,7 @@ add_executable(unit_tests
                corelib/src/utility/uri_tests.cpp
                corelib/src/wjson_tests.cpp
                csv/src/csv_cursor_tests.cpp
+               csv/src/csv_encoder_tests.cpp
                csv/src/csv_reader_tests.cpp
                csv/src/csv_subfield_tests.cpp
                csv/src/csv_tests.cpp
@@ -195,7 +198,10 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_draft6_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
                jsonschema/src/jsonschema_keyword_tests.cpp
+               jsonschema/src/jsonschema_patch_tests.cpp
                jsonschema/src/jsonschema_type_constraints_tests.cpp
+               jsonschema/src/jsonschema_validator_tests.cpp
+               jsonschema/src/range_collection_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                jsonschema/src/validation_report_tests.cpp
                jsonschema/src/validation_with_pmr_allocator_tests.cpp
