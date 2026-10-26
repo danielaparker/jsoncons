@@ -34,6 +34,10 @@ conversion with no unnecessary trailing zeros when the required decimal scale is
 and half-even rounding when the exact scale exceeds that limit. Defaults
 to 34.
 
+    void max_bigfloat_exponent(uint64_t value)                       (since 1.11.0)
+The largest exponent a CBOR bigfloat may raise its mantissa by. A larger one is
+rejected rather than shifted. Defaults to 1024.
+
     cbor_options& pack_strings(bool value)
 
 If set to **true**, then encode will store text strings and

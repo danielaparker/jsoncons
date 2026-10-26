@@ -708,6 +708,60 @@ TEST_CASE("cbor decode to bigfloat tests")
         double val = j.as<double>();
         CHECK(val == Approx(-1.5).epsilon(0.0000000001));
     }
+    SECTION("exponent above max_bigfloat_exponent")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x19,0x04,0x01, // 1025
+                                  0x01 // 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::bigfloat_to_bigdec_failed == result.error().code());
+    }
+    SECTION("exponent at max_bigfloat_exponent")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x19,0x04,0x00, // 1024
+                                  0x01 // 1
+                                 };
+
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
+
+        CHECK(309 == j.as<std::string>().size());
+    }
+    SECTION("exponent 2^63 - 1")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff, // 9223372036854775807
+                                  0x01 // 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::bigfloat_to_bigdec_failed == result.error().code());
+    }
+    SECTION("max_bigfloat_exponent")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x18,0x40, // 64
+                                  0x03 // 3
+                                 };
+
+        auto options = cbor::cbor_options{}
+            .max_bigfloat_exponent(16);
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v, options);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::bigfloat_to_bigdec_failed == result.error().code());
+    }
     SECTION("most negative mantissa and exponent")
     {
         std::vector<uint8_t> v = {0xc5, // Tag 5

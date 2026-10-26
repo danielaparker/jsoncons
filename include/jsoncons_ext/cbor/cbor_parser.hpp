@@ -42,7 +42,8 @@ template <typename Allocator>
 cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
     int64_t exponent,
     basic_bigdec<Allocator>& value,
-    uint64_t max_decimal_places = 34)
+    uint64_t max_decimal_places = 34,
+    uint64_t max_exponent = 1024)
 {
     constexpr uint64_t max_scale =
         static_cast<uint64_t>(
@@ -62,6 +63,10 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
 
     // Positive exponent: exact integer.
     if (exponent >= 0) {
+        if (static_cast<uint64_t>(exponent) > max_exponent)
+        {
+            return cbor_errc::bigfloat_to_bigdec_failed;
+        }
         unscaled <<= (static_cast<uint64_t>(exponent));
         value = basic_bigdec<Allocator>{ std::move(unscaled), 0 };
         return cbor_errc{};
@@ -273,6 +278,7 @@ class basic_cbor_parser : public ser_context
     int max_nesting_depth_;
     std::size_t max_dimensions_{0};
     uint64_t bigfloat_precision_;
+    uint64_t max_bigfloat_exponent_;
     string_type text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -339,6 +345,7 @@ public:
          max_nesting_depth_(options.max_nesting_depth()),
          max_dimensions_(options.max_dimensions()),
          bigfloat_precision_(options.bigfloat_precision()),
+         max_bigfloat_exponent_(options.max_bigfloat_exponent()),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          state_stack_(alloc),
@@ -2186,7 +2193,7 @@ private:
         }
 
         bigdec dec;
-        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_);
+        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_, max_bigfloat_exponent_);
         if (result != cbor_errc{})
         {
             ec = result;
