@@ -39,7 +39,7 @@ namespace ns {
 
     struct wstring_example {
         std::wstring name;
-        std::uint8_t value{};
+        std::uint8_t value;
     };
 
     template <typename T1>

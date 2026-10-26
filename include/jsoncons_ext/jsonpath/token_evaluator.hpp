@@ -185,15 +185,15 @@ constexpr result_options
 operator~(result_options flags) noexcept
 { return (result_options)~(unsigned)flags; }
 
-constexpr result_options&
+inline JSONCONS_CONSTEXPR result_options&
 operator|=(result_options& lhs, result_options rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr result_options&
+inline JSONCONS_CONSTEXPR result_options&
 operator&=(result_options& lhs, result_options rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr result_options&
+inline JSONCONS_CONSTEXPR result_options&
 operator^=(result_options& lhs, result_options rhs) noexcept
 { return lhs = lhs ^ rhs; }
 

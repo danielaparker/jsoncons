@@ -913,7 +913,7 @@ struct allocator_delete  : public Alloc
 
     void operator()(pointer ptr) noexcept
     {
-        using T = std::remove_reference_t<decltype(*ptr)>;
+        using T = typename std::remove_reference<decltype(*ptr)>::type;
         using alloc_type = typename T::allocator_type;
 
         std::cout << "type name: " << typeid(ptr).name() << "\n";

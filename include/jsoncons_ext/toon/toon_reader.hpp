@@ -475,6 +475,14 @@ struct header_info
     std::size_t length{0};
     char delimiter{','};
     std::vector<jsoncons::string_view> fields;
+
+    header_info() = default;
+
+    header_info(jsoncons::optional<jsoncons::string_view> key_, std::size_t length_, char delimiter_,
+        std::vector<jsoncons::string_view> fields_)
+        : key(key_), length(length_), delimiter(delimiter_), fields(std::move(fields_))
+    {
+    }
 };
 
 using header_result = jsoncons::expected<jsoncons::optional<header_info>, std::error_code>;
@@ -487,6 +495,13 @@ struct parsed_line
     std::size_t indent{0};
     jsoncons::span<char> content;
     std::size_t line_num{0};
+
+    parsed_line() = default;
+
+    parsed_line(std::size_t depth_, std::size_t indent_, jsoncons::span<char> content_, std::size_t line_num_)
+        : depth(depth_), indent(indent_), content(content_), line_num(line_num_)
+    {
+    }
 
     bool is_blank() const
     {

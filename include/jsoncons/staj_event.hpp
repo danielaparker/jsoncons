@@ -76,15 +76,15 @@ constexpr staj_events
 operator~(staj_events types) noexcept
 { return (staj_events)~(uint64_t)types; }
 
-constexpr staj_events&
+inline JSONCONS_CONSTEXPR staj_events&
 operator|=(staj_events& lhs, staj_events rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr staj_events&
+inline JSONCONS_CONSTEXPR staj_events&
 operator&=(staj_events& lhs, staj_events rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr staj_events&
+inline JSONCONS_CONSTEXPR staj_events&
 operator^=(staj_events& lhs, staj_events rhs) noexcept
 { return lhs = lhs ^ rhs; }
 

@@ -44,15 +44,15 @@ constexpr evaluation_flags
 operator~(evaluation_flags flags) noexcept
 { return (evaluation_flags)~(unsigned)flags; }
 
-constexpr evaluation_flags&
+inline JSONCONS_CONSTEXPR evaluation_flags&
 operator|=(evaluation_flags& lhs, evaluation_flags rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr evaluation_flags&
+inline JSONCONS_CONSTEXPR evaluation_flags&
 operator&=(evaluation_flags& lhs, evaluation_flags rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr evaluation_flags&
+inline JSONCONS_CONSTEXPR evaluation_flags&
 operator^=(evaluation_flags& lhs, evaluation_flags rhs) noexcept
 { return lhs = lhs ^ rhs; }
 

@@ -61,15 +61,15 @@ constexpr typed_array_tags
 operator~(typed_array_tags types) noexcept
 { return (typed_array_tags)~(uint64_t)types; }
 
-constexpr typed_array_tags&
+inline JSONCONS_CONSTEXPR typed_array_tags&
 operator|=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs | rhs; }
 
-constexpr typed_array_tags&
+inline JSONCONS_CONSTEXPR typed_array_tags&
 operator&=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs & rhs; }
 
-constexpr typed_array_tags&
+inline JSONCONS_CONSTEXPR typed_array_tags&
 operator^=(typed_array_tags& lhs, typed_array_tags rhs) noexcept
 { return lhs = lhs ^ rhs; }
 
