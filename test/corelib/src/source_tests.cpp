@@ -179,6 +179,17 @@ TEST_CASE("stream_source tests")
     std::istringstream is(data);
     jsoncons::stream_source<char> source(is);
 
+    SECTION("read more than a chunk after the stream ends")
+    {
+        char b;
+        CHECK(1 == source.read(&b,1));
+
+        std::vector<char> buf(8 + jsoncons::stream_source<char>::default_max_chunk_size);
+        CHECK(8 == source.read(buf.data(), buf.size()));
+        CHECK(std::string("12345678") == std::string(buf.data(), 8));
+        CHECK(9 == source.position());
+    }
+
     SECTION("test get and peek")
     {
         char b;

@@ -426,7 +426,7 @@ public:
             if (stream_ptr_->eof())
             {
                 remaining_ = 0;
-                return 0;
+                return len;
             }
             JSONCONS_TRY
             {
@@ -443,7 +443,7 @@ public:
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return 0;
+                return len;
             }
         }
     }
