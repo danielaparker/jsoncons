@@ -342,6 +342,11 @@ TEST_CASE("bigint div")
         CHECK(jsoncons::bigint("18446744073709551615") == a / b);
         CHECK(jsoncons::bigint("170141183460469231713240559642174554113") == a % b);
     }
+    SECTION("a % a with second_done")
+    {
+        jsoncons::bigint a("170141183460469231750134047789593657343"); // 2^127 + 2^64 - 1
+        CHECK(jsoncons::bigint(0) == a % a);
+    }
 #if (defined(_MSC_VER) && _MSC_VER >= 1910) || !defined(_MSC_VER) 
     SECTION("bigint")
     {

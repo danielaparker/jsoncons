@@ -2040,6 +2040,7 @@ private:
 
     void unnormalize(basic_bigint& rem, int x, bool secondDone) const
     {
+        rem.reduce();
         if (secondDone)
         {
             rem /= max_word;
@@ -2047,10 +2048,6 @@ private:
         if ( x > 0 )
         {
             rem >>= x;
-        }
-        else
-        {
-            rem.reduce();
         }
     }
 
