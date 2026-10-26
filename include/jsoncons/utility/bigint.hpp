@@ -1897,7 +1897,7 @@ public:
 
         for ( size_type k = n; k > l; k-- )
         {
-            word_type q = DDquotient(rem_words[k], rem_words[k-1], d);
+            word_type q = rem_words[k] < d ? DDquotient(rem_words[k], rem_words[k-1], d) : max_word;
             subtractmul( rem_words.data() + (k - l - 1), denom_words.data(), l + 1, q );
             quot_words[k - l - 1] = q;
         }

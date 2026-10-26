@@ -335,6 +335,13 @@ TEST_CASE("times 10")
 
 TEST_CASE("bigint div")
 {
+    SECTION("quotient word of max_word")
+    {
+        jsoncons::bigint a("3138550867693340381917894711603833208051177722232017256448"); // 2^191
+        jsoncons::bigint b("170141183460469231731687303715884105729"); // 2^127 + 1
+        CHECK(jsoncons::bigint("18446744073709551615") == a / b);
+        CHECK(jsoncons::bigint("170141183460469231713240559642174554113") == a % b);
+    }
 #if (defined(_MSC_VER) && _MSC_VER >= 1910) || !defined(_MSC_VER) 
     SECTION("bigint")
     {
