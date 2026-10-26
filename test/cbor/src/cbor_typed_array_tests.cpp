@@ -958,6 +958,40 @@ TEST_CASE("cbor multi-dim malformed input tests")
         CHECK(cbor::cbor_errc::bad_mdarray == ec);
     }
 
+    SECTION("negative integer in an indefinite length extents array")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,           // semantic tag 40, row-major storage
+            0x82,                // array(2)
+            0x9f,0x02,0x22,0xff, // array(indefinite length) -> [2,-3]
+            0x84,0x00,0x01,0x02,0x03 // array(4) -> [0,1,2,3]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::unknown_type == ec);
+    }
+
+    SECTION("byte string in an indefinite length extents array")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x28,                // semantic tag 40, row-major storage
+            0x82,                     // array(2)
+            0x9f,0x02,0x42,0x00,0x01,0xff, // array(indefinite length) -> [2, byte string(2)]
+            0x84,0x00,0x01,0x02,0x03  // array(4) -> [0,1,2,3]
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::unknown_type == ec);
+    }
+
     SECTION("cursor stops with an error on malformed extents")
     {
         const std::vector<uint8_t> data = {

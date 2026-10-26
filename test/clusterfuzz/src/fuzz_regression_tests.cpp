@@ -1080,7 +1080,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         CHECK(is); //-V521
         auto result = cbor::try_decode_cbor<json>(is);
         REQUIRE(!result);
-        REQUIRE((cbor::cbor_errc::max_dimensions_exceeded == result.error().code()));
+        REQUIRE((cbor::cbor_errc::unknown_type == result.error().code()));
     }
 }
 

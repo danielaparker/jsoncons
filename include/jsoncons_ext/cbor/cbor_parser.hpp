@@ -3041,6 +3041,12 @@ private:
                  }
                  else
                  {
+                     if (JSONCONS_UNLIKELY(get_major_type(c.value) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
+                     {
+                         ec = cbor_errc::unknown_type;
+                         more_ = false;
+                         return;
+                     }
                      source_.ignore(1);
                      std::size_t extent = read_size(get_additional_information(c.value), ec);
                      if (JSONCONS_UNLIKELY(ec))
