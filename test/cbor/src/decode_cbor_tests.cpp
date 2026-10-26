@@ -738,6 +738,74 @@ TEST_CASE("cbor decode to bigfloat tests")
         REQUIRE_FALSE(result);
         CHECK(cbor::cbor_errc::unknown_type == result.error().code());
     }
+    SECTION("mantissa as tag 2 in one byte")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x00, // 0
+                                  0xd8,0x02, // Tag 2
+                                  0x41,0x05 // Byte string of length 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE(result);
+        CHECK("5" == result.value().as<std::string>());
+    }
+    SECTION("mantissa as tag 3")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x00, // 0
+                                  0xc3, // Tag 3
+                                  0x41,0x05 // Byte string of length 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE(result);
+        CHECK("-6" == result.value().as<std::string>());
+    }
+    SECTION("mantissa tag that is not a bignum")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x00, // 0
+                                  0xc1, // Tag 1
+                                  0x41,0x05 // Byte string of length 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::invalid_bigfloat == result.error().code());
+    }
+    SECTION("mantissa tag without a byte string")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x01, // 1
+                                  0xc2,0x01 // Tag 2, 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::invalid_bigfloat == result.error().code());
+    }
+    SECTION("bigdecimal mantissa tag without a byte string")
+    {
+        std::vector<uint8_t> v = {0xc4, // Tag 4
+                                  0x82, // Array of length 2
+                                  0x01, // 1
+                                  0xc2,0x01 // Tag 2, 1
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::invalid_bigdecimal == result.error().code());
+    }
     SECTION("most negative mantissa and exponent")
     {
         std::vector<uint8_t> v = {0xc5, // Tag 5

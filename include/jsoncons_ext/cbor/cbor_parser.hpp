@@ -1831,6 +1831,67 @@ private:
         return val;
     }
 
+    // A bigfloat or bigdecimal mantissa written as tag 2 or tag 3 and a byte string
+    bigint read_bignum(cbor_errc invalid, std::error_code& ec)
+    {
+        bigint value;
+
+        auto c = source_.peek();
+        if (JSONCONS_UNLIKELY(c.eof))
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return value;
+        }
+        uint8_t info = get_additional_information(c.value);
+        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+        {
+            ec = cbor_errc::reserved_additional_info;
+            more_ = false;
+            return value;
+        }
+        source_.ignore(1);
+        uint64_t tag = read_unsigned_integer(info, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            more_ = false;
+            return value;
+        }
+        if (JSONCONS_UNLIKELY(tag != 2 && tag != 3))
+        {
+            ec = invalid;
+            more_ = false;
+            return value;
+        }
+
+        c = source_.peek();
+        if (JSONCONS_UNLIKELY(c.eof))
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return value;
+        }
+        if (JSONCONS_UNLIKELY(get_major_type(c.value) != jsoncons::cbor::detail::cbor_major_type::byte_string))
+        {
+            ec = invalid;
+            more_ = false;
+            return value;
+        }
+        bytes_buffer_.clear();
+        read_byte_string(bytes_buffer_, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            more_ = false;
+            return value;
+        }
+        value = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
+        if (tag == 3)
+        {
+            value = -1 - value;
+        }
+        return value;
+    }
+
     void read_bigdecimal(uint8_t container_info, string_type& result, std::error_code& ec)
     {
         std::size_t size = read_unsigned_integer(container_info, ec);
@@ -1953,46 +2014,10 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                uint8_t b;
-                if (source_.read(&b, 1) == 0)
+                unscaled = read_bignum(cbor_errc::invalid_bigdecimal, ec);
+                if (JSONCONS_UNLIKELY(ec))
                 {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
                     return;
-                }
-                info = get_additional_information(b);
-                if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-                {
-                    ec = cbor_errc::reserved_additional_info;
-                    more_ = false;
-                    return;
-                }
-                c = source_.peek();
-                if (JSONCONS_UNLIKELY(c.eof))
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return;
-                }
-
-                if (get_major_type(c.value) == jsoncons::cbor::detail::cbor_major_type::byte_string)
-                {
-                    bytes_buffer_.clear();
-                    read_byte_string(bytes_buffer_, ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        more_ = false;
-                        return;
-                    }
-                    if (info == 2)
-                    {
-                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                    }
-                    else if (info == 3)
-                    {
-                        unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                        unscaled = -1 - unscaled;
-                    }
                 }
                 break;
             }
@@ -2133,43 +2158,10 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                uint8_t x;
-                if (source_.read(&x, 1) == 0)
+                unscaled = read_bignum(cbor_errc::invalid_bigfloat, ec);
+                if (JSONCONS_UNLIKELY(ec))
                 {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
                     return;
-                }
-                uint8_t tag = get_additional_information(x);
-                if (JSONCONS_UNLIKELY(tag >= 0x1C && tag <= 0x1E))
-                {
-                    ec = cbor_errc::reserved_additional_info;
-                    more_ = false;
-                    return;
-                }
-
-                c = source_.peek();
-                if (JSONCONS_UNLIKELY(c.eof))
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return;
-                }
-
-                if (get_major_type(c.value) == jsoncons::cbor::detail::cbor_major_type::byte_string)
-                {
-                    bytes_buffer_.clear();
-                    read_byte_string(bytes_buffer_, ec);
-                    if (JSONCONS_UNLIKELY(ec))
-                    {
-                        more_ = false;
-                        return;
-                    }
-                    unscaled = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
-                    if (tag == 3)
-                    {
-                        unscaled = -1 - unscaled;
-                    }
                 }
                 break;
             }
