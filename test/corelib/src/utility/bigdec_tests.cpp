@@ -187,4 +187,37 @@ TEST_CASE("basic_bigdec divide tests")
         REQUIRE(r);
         CHECK(expected == c);
     }
+    SECTION("123.456 / 2 at scale 1")
+    {
+        jsoncons::bigdec a("123.456");
+        jsoncons::bigdec b("2");
+        jsoncons::bigdec expected("61.7");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c, 1);
+        REQUIRE(r);
+        CHECK(expected == c);
+    }
+    SECTION("1e-9223372036854775807 / 3 at scale 0")
+    {
+        jsoncons::bigdec a("1e-9223372036854775807");
+        jsoncons::bigdec b("3");
+        jsoncons::bigdec expected("0");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c, 0);
+        REQUIRE(r);
+        CHECK(expected == c);
+    }
+    SECTION("1e-1000000 / 3 at scale 0 rounding up")
+    {
+        jsoncons::bigdec a("1e-1000000");
+        jsoncons::bigdec b("3");
+        jsoncons::bigdec expected("1");
+        jsoncons::bigdec c;
+
+        auto r = a.divide(b, c, 0, jsoncons::rounding_mode::up);
+        REQUIRE(r);
+        CHECK(expected == c);
+    }
 }

@@ -219,15 +219,18 @@ public:
         scale_difference += preferred_scale;
         basic_bigint<Allocator> scaled_dividend = unscaled();
         basic_bigint<Allocator> adjusted_divisor = divisor.unscaled();
-        if (scale_difference > 0) 
+        if (scale_difference != 0)
         {
-            // Multiply dividend by 10^scale_difference to make room for decimal precision
-            scaled_dividend = scaled_dividend * powb(basic_bigint<Allocator>(10), scale_difference);
-        } 
-        else if (scale_difference < 0) 
-        {
-            // If scale difference is negative, the divisor needs to be scaled up instead
-            adjusted_divisor = adjusted_divisor * powb(basic_bigint<Allocator>(10), scale_difference);
+            // A negative difference scales the divisor. 10^n > 2^3n, so once 2^3n exceeds twice the
+            // dividend, the quotient is 0 and a larger power changes neither it nor the rounding
+            const uint64_t magnitude = scale_difference > 0 ? static_cast<uint64_t>(scale_difference) :
+                (std::min)(static_cast<uint64_t>(-(scale_difference + 1)) + 1, unscaled_.bit_length() / 3 + 1);
+            if (magnitude > (std::numeric_limits<std::size_t>::max)())
+            {
+                return bignum_result{bignum_errc::result_out_of_range};
+            }
+            basic_bigint<Allocator>& scaled = scale_difference > 0 ? scaled_dividend : adjusted_divisor;
+            scaled *= big_ten_to_the(static_cast<std::size_t>(magnitude));
         }
 
         // Perform the integer division (yields quotient and remainder)
