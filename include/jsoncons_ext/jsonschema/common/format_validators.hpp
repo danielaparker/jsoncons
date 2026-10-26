@@ -826,6 +826,10 @@ namespace jsonschema {
                                 return false;
                         }
                     }
+                    else
+                    {
+                        return false;
+                    }
                     break;
                 }
                 case state_t::secfrac:

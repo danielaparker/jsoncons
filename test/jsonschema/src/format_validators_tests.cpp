@@ -80,6 +80,7 @@ TEST_CASE("time tests")
 
         CHECK(jsoncons::jsonschema::validate_date_time_rfc3339("08:30:06.283185Z", jsonschema::date_time_type::time));
         CHECK_FALSE(jsoncons::jsonschema::validate_date_time_rfc3339("08:30:06.Z", jsonschema::date_time_type::time));
+        CHECK_FALSE(jsoncons::jsonschema::validate_date_time_rfc3339("08:30:0x5Z", jsonschema::date_time_type::time));
     }
 }
 
@@ -109,6 +110,7 @@ TEST_CASE("date-time tests")
         CHECK(jsoncons::jsonschema::validate_date_time_rfc3339("1937-01-01T12:00:27.87+00:20", jsonschema::date_time_type::date_time));
         CHECK(jsoncons::jsonschema::validate_date_time_rfc3339("2020-01-01T00:00:00.12345678901234567890Z", jsonschema::date_time_type::date_time));
         CHECK_FALSE(jsoncons::jsonschema::validate_date_time_rfc3339("2020-01-01T00:00:00.Z", jsonschema::date_time_type::date_time));
+        CHECK_FALSE(jsoncons::jsonschema::validate_date_time_rfc3339("2020-01-01T00:00:0x5Z", jsonschema::date_time_type::date_time));
     }
 }
 
