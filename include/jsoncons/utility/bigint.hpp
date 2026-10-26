@@ -1211,11 +1211,11 @@ public:
             memmove( words.data(), words.data()+q, size_type((words.size() - q)*sizeof(word_type)) );
             resize( size_type(words.size() - q) );
             k %= word_bits;
-            if ( k == 0 )
-            {
-                reduce();
-                return *this;
-            }
+        }
+        if ( k == 0 )
+        {
+            reduce();
+            return *this;
         }
 
         words = get_words();

@@ -295,6 +295,15 @@ TEST_CASE("test shift left")
     }
 }
 
+TEST_CASE("test shift right")
+{
+    jsoncons::bigint n("340282366920938463463374607431768211457");
+    for (unsigned k : {0u, 64u, 128u})
+    {
+        CHECK((n >> k) == n / jsoncons::powb(jsoncons::bigint(2), k));
+    }
+}
+
 TEST_CASE("times 10")
 {
     SECTION("1")
