@@ -53,8 +53,14 @@ namespace jsoncons {
         }
         ~stream_sink() noexcept
         {
-            stream_ptr_->write(begin_buffer_, buffer_length());
-            stream_ptr_->flush();
+            JSONCONS_TRY
+            {
+                stream_ptr_->write(begin_buffer_, buffer_length());
+                stream_ptr_->flush();
+            }
+            JSONCONS_CATCH(...)
+            {
+            }
         }
 
         // Movable
@@ -164,8 +170,14 @@ namespace jsoncons {
         }
         ~binary_stream_sink() noexcept
         {
-            stream_ptr_->write((char*)begin_buffer_, buffer_length());
-            stream_ptr_->flush();
+            JSONCONS_TRY
+            {
+                stream_ptr_->write((char*)begin_buffer_, buffer_length());
+                stream_ptr_->flush();
+            }
+            JSONCONS_CATCH(...)
+            {
+            }
         }
 
         binary_stream_sink& operator=(const binary_stream_sink&) = delete;

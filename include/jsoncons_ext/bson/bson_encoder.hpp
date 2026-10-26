@@ -124,7 +124,13 @@ public:
 
     ~basic_bson_encoder() noexcept
     {
-        sink_.flush();
+        JSONCONS_TRY
+        {
+            sink_.flush();
+        }
+        JSONCONS_CATCH(...)
+        {
+        }
     }
 
     basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;

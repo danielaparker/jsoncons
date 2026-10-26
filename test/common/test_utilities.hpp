@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include <cstddef>
+#include <streambuf>
 
 template <typename Generator>
 std::string random_binary_string(Generator& gen, std::size_t n)
@@ -17,5 +18,11 @@ std::string random_binary_string(Generator& gen, std::size_t n)
   }
   return s;
 }
+
+// A stream buffer that rejects every write
+struct failing_buf : std::streambuf
+{
+    int_type overflow(int_type) override { return traits_type::eof(); }
+};
 
 #endif

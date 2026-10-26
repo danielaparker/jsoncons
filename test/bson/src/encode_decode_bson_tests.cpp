@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp>
 #include <vector>
 #include <catch/catch.hpp>
+#include <common/test_utilities.hpp>
 
 using namespace jsoncons;
 
@@ -231,3 +232,12 @@ TEST_CASE("encode decode bson source with temp_allocator")
 }
 
 #endif
+
+TEST_CASE("encode_bson to a stream that throws")
+{
+    failing_buf buf;
+    std::ostream os(&buf);
+    os.exceptions(std::ios::badbit);
+
+    CHECK_THROWS_AS(bson::encode_bson(json::parse(R"({"a":[1,2,3]})"), os), std::ios_base::failure);
+}

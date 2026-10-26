@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <catch/catch.hpp>
+#include <common/test_utilities.hpp>
 
 namespace cbor = jsoncons::cbor;
 
@@ -180,6 +181,15 @@ TEST_CASE("encode_cbor overloads")
         ns::Person other = cbor::decode_cbor<ns::Person>(ss);
         CHECK(other.name == person.name);
     }
+}
+
+TEST_CASE("encode_cbor to a stream that throws")
+{
+    failing_buf buf;
+    std::ostream os(&buf);
+    os.exceptions(std::ios::badbit);
+
+    CHECK_THROWS_AS(cbor::encode_cbor(jsoncons::json::parse(R"({"a":[1,2,3]})"), os), std::ios_base::failure);
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1

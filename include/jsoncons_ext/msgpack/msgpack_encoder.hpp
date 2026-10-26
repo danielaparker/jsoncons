@@ -113,7 +113,13 @@ namespace msgpack {
 
         ~basic_msgpack_encoder() noexcept
         {
-            sink_.flush();
+            JSONCONS_TRY
+            {
+                sink_.flush();
+            }
+            JSONCONS_CATCH(...)
+            {
+            }
         }
 
         basic_msgpack_encoder& operator=(const basic_msgpack_encoder&) = delete;

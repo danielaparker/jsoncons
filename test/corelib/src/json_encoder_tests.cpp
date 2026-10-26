@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
+#include <common/test_utilities.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -115,4 +116,13 @@ TEMPLATE_TEST_CASE("test_json_encoder_reset", "",
     f.encoder.end_array();
     f.encoder.flush();
     CHECK(f.string2() == R"(["foo",42])");
+}
+
+TEST_CASE("encode_json to a stream that throws")
+{
+    failing_buf buf;
+    std::ostream os(&buf);
+    os.exceptions(std::ios::badbit);
+
+    CHECK_THROWS_AS(encode_json(json::parse(R"({"a":[1,2,3]})"), os), std::ios_base::failure);
 }
