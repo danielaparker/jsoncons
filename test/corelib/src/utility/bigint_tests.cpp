@@ -883,6 +883,63 @@ TEST_CASE("bigint from a 128-bit integer")
 #pragma GCC diagnostic pop
 #endif
 
+template <typename T,typename Enable = void>
+struct can_multiply : std::false_type {};
+
+template <typename T>
+struct can_multiply<T,jsoncons::nonstd::void_t<decltype(std::declval<jsoncons::bigint&>() *= std::declval<T>())>> : std::true_type {};
+
+TEST_CASE("bigint word-width operands")
+{
+    CHECK(can_multiply<uint64_t>::value);
+    CHECK(can_multiply<int64_t>::value);
+    CHECK(can_multiply<jsoncons::bigint>::value);
+    CHECK_FALSE(can_multiply<jsoncons::nonstd::u128>::value);
+
+    jsoncons::bigint a(3);
+    CHECK(jsoncons::bigint("55340232221128654845") == a * (std::numeric_limits<uint64_t>::max)());
+    CHECK(jsoncons::bigint("55340232221128654845") == (std::numeric_limits<uint64_t>::max)() * a);
+    CHECK(jsoncons::bigint("18446744073709551618") == a + (std::numeric_limits<uint64_t>::max)());
+    CHECK(jsoncons::bigint("-18446744073709551612") == a - (std::numeric_limits<uint64_t>::max)());
+    CHECK(jsoncons::bigint(-3) == a * static_cast<int64_t>(-1));
+}
+
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128) && !defined(__STRICT_ANSI__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+TEST_CASE("bigint with a value wider than a word")
+{
+    SECTION("__int128")
+    {
+        jsoncons::bigint a(3);
+        a *= (static_cast<__int128>(1) << 64);
+        CHECK(jsoncons::bigint("55340232221128654848") == a);
+    }
+    SECTION("unsigned __int128")
+    {
+        jsoncons::bigint a(3);
+        a *= (static_cast<unsigned __int128>(1) << 64);
+        CHECK(jsoncons::bigint("55340232221128654848") == a);
+    }
+    SECTION("non-member operators")
+    {
+        jsoncons::bigint a(3);
+        CHECK(jsoncons::bigint("55340232221128654848") == a * (static_cast<__int128>(1) << 64));
+        CHECK(jsoncons::bigint("18446744073709551619") == a + (static_cast<__int128>(1) << 64));
+        CHECK(jsoncons::bigint("-18446744073709551613") == a - (static_cast<__int128>(1) << 64));
+    }
+    SECTION("values that fit in a word")
+    {
+        jsoncons::bigint a(10);
+        CHECK(jsoncons::bigint(9) == a - static_cast<__int128>(1));
+        CHECK(jsoncons::bigint(11) == a + static_cast<__int128>(1));
+        CHECK(jsoncons::bigint(9) == a + static_cast<__int128>(-1));
+        CHECK(jsoncons::bigint(9) == a - static_cast<unsigned __int128>(1));
+    }
+}
+#pragma GCC diagnostic pop
+#endif
+
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <common/mock_stateful_allocator.hpp>

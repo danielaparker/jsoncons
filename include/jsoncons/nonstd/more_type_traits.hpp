@@ -441,6 +441,17 @@ namespace nonstd {
                                typename std::enable_if<integer_limits<T>::is_specialized && 
                                !integer_limits<T>::is_signed>::type> : std::true_type {};
 
+    // is_unsigned_or_wide_integral: an unsigned integral type, or an integral type wider than 64 bits
+
+    template <typename T,typename Enable=void>
+    struct is_unsigned_or_wide_integral : std::false_type {};
+
+    template <typename T>
+    struct is_unsigned_or_wide_integral<T,
+                                        typename std::enable_if<std::is_integral<T>::value &&
+                                                                (sizeof(T) > sizeof(uint64_t) || is_unsigned_integer<T>::value)
+    >::type> : std::true_type {};
+
     // is_primitive
 
     template <typename T,typename Enable=void>

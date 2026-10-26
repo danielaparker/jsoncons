@@ -135,15 +135,23 @@ An empty list means a zero value.
 
     bigint operator+( bigint x, int64_t y )
 
+    bigint operator+( bigint x, Integer y )                          (since 1.11.0)
+
     bigint operator-( bigint x, const bigint& y )
 
     bigint operator-( bigint x, int64_t y )
 
+    bigint operator-( bigint x, Integer y )                          (since 1.11.0)
+
     bigint operator*( int64_t x, const bigint& y )
+
+    bigint operator*( Integer x, const bigint& y )                   (since 1.11.0)
 
     bigint operator*( bigint x, const bigint& y )
 
     bigint operator*( bigint x, int64_t y )
+
+    bigint operator*( bigint x, Integer y )                          (since 1.11.0)
 
     bigint operator/( bigint x, const bigint& y )
 
@@ -182,6 +190,9 @@ An empty list means a zero value.
     bigint power( bigint x, unsigned n )
 
     bigint sqrt( const bigint& a )
+
+In the overloads marked (since 1.11.0), Integer is an unsigned integer type, or an integer
+type wider than 64 bits that the compiler treats as integral, such as `__int128` in GNU mode.
 
 ### Examples
 

@@ -1014,7 +1014,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value && (sizeof(IntegerType) <= sizeof(word_type) || (nonstd::is_int128_type<IntegerType>::value && !std::is_integral<IntegerType>::value)), basic_bigint<Allocator>&>::type
     operator*=(IntegerType y)
     {
         *this *= y < 0 ? (word_type(0) - static_cast<word_type>(y)) : static_cast<word_type>(y);
@@ -1024,7 +1024,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value && (sizeof(IntegerType) <= sizeof(word_type) || (nonstd::is_uint128_type<IntegerType>::value && !std::is_integral<IntegerType>::value)), basic_bigint<Allocator>&>::type
     operator*=(IntegerType m)
     {
         auto words = get_words();
@@ -1582,6 +1582,13 @@ public:
         return x += y;
     }
 
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, basic_bigint<Allocator>>::type
+    operator+( basic_bigint x, IntegerType y )
+    {
+        return x += y;
+    }
+
     friend basic_bigint<Allocator> operator-( basic_bigint x, const basic_bigint& y )
     {
         return x -= y;
@@ -1592,7 +1599,21 @@ public:
         return x -= y;
     }
 
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, basic_bigint<Allocator>>::type
+    operator-( basic_bigint x, IntegerType y )
+    {
+        return x -= y;
+    }
+
     friend basic_bigint<Allocator> operator*( int64_t x, const basic_bigint& y )
+    {
+        return basic_bigint<Allocator>(y) *= x;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, basic_bigint<Allocator>>::type
+    operator*( IntegerType x, const basic_bigint& y )
     {
         return basic_bigint<Allocator>(y) *= x;
     }
@@ -1603,6 +1624,13 @@ public:
     }
 
     friend basic_bigint<Allocator> operator*( basic_bigint<Allocator> x, int64_t y )
+    {
+        return x *= y;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, basic_bigint<Allocator>>::type
+    operator*( basic_bigint<Allocator> x, IntegerType y )
     {
         return x *= y;
     }
