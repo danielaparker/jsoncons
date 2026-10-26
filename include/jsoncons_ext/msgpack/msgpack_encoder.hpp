@@ -343,6 +343,11 @@ namespace msgpack {
                             --q;
                             rem += nanos_in_second;
                         }
+                        if (q < bigint((std::numeric_limits<int64_t>::lowest)()) || q > bigint((std::numeric_limits<int64_t>::max)()))
+                        {
+                            ec = msgpack_errc::invalid_timestamp;
+                            JSONCONS_VISITOR_RETURN;
+                        }
                         auto seconds = static_cast<int64_t>(q);
                         auto nanoseconds = static_cast<int64_t>(rem);
                         write_timestamp(seconds, nanoseconds);
@@ -647,24 +652,24 @@ namespace msgpack {
         JSONCONS_VISITOR_RETURN_TYPE visit_uint64(uint64_t val, 
             semantic_tag tag, 
             const ser_context&,
-            std::error_code&) final
+            std::error_code& ec) final
         {
             switch (tag)
             {
                 case semantic_tag::epoch_second:
+                    if (val > static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                    {
+                        ec = msgpack_errc::invalid_timestamp;
+                        JSONCONS_VISITOR_RETURN;
+                    }
                     write_timestamp(static_cast<int64_t>(val), 0);
                     break;
                 case semantic_tag::epoch_milli:
                 {
                     if (val != 0)
                     {
-                        auto dv = std::div(static_cast<int64_t>(val), static_cast<int64_t>(millis_in_second));
-                        int64_t seconds = dv.quot;
-                        int64_t nanoseconds = dv.rem*nanos_in_milli;
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
+                        int64_t seconds = static_cast<int64_t>(val / millis_in_second);
+                        int64_t nanoseconds = static_cast<int64_t>(val % millis_in_second)*nanos_in_milli;
                         write_timestamp(seconds, nanoseconds);
                     }
                     else
@@ -677,13 +682,8 @@ namespace msgpack {
                 {
                     if (val != 0)
                     {
-                        auto dv = std::div(static_cast<int64_t>(val), static_cast<int64_t>(nanos_in_second));
-                        int64_t seconds = dv.quot;
-                        int64_t nanoseconds = dv.rem;
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
+                        int64_t seconds = static_cast<int64_t>(val / nanos_in_second);
+                        int64_t nanoseconds = static_cast<int64_t>(val % nanos_in_second);
                         write_timestamp(seconds, nanoseconds);
                     }
                     else

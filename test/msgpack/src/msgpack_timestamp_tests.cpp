@@ -134,3 +134,61 @@ TEST_CASE("msgpack timestamp before 1970")
     }
 }
 
+TEST_CASE("msgpack timestamp seconds outside int64_t")
+{
+    std::vector<uint8_t> output;
+    msgpack_bytes_encoder encoder(output);
+    std::error_code ec;
+
+    SECTION("epoch_nano above")
+    {
+        encoder.string_value("9223372036854775808000000000", semantic_tag::epoch_nano, ser_context(), ec);
+        CHECK(ec == msgpack_errc::invalid_timestamp);
+    }
+    SECTION("epoch_nano below")
+    {
+        encoder.string_value("-9223372036854775808000000001", semantic_tag::epoch_nano, ser_context(), ec);
+        CHECK(ec == msgpack_errc::invalid_timestamp);
+    }
+    SECTION("epoch_milli below")
+    {
+        encoder.string_value("-9223372036854775809000", semantic_tag::epoch_milli, ser_context(), ec);
+        CHECK(ec == msgpack_errc::invalid_timestamp);
+    }
+    SECTION("epoch_second uint64")
+    {
+        encoder.uint64_value(9223372036854775808u, semantic_tag::epoch_second, ser_context(), ec);
+        CHECK(ec == msgpack_errc::invalid_timestamp);
+    }
+    SECTION("epoch_nano largest")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x3b,0x9a,0xc9,0xff, // 999999999 nanoseconds in 32-bit unsigned int
+            0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff // 9223372036854775807 seconds in 64-bit signed int
+        };
+        encoder.string_value("9223372036854775807999999999", semantic_tag::epoch_nano, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(output == expected);
+    }
+    SECTION("epoch_nano uint64 above INT64_MAX")
+    {
+        std::vector<uint8_t> expected = {
+            0xd7,0xff, // timestamp 64
+            0xee,0x6b,0x27,0xff,0xff,0xff,0xff,0xff // 999999999 nanoseconds, 17179869183 seconds
+        };
+        encoder.uint64_value(17179869183999999999u, semantic_tag::epoch_nano, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(output == expected);
+    }
+    SECTION("epoch_milli uint64 above INT64_MAX")
+    {
+        encoder.uint64_value(18446744073709551615u, semantic_tag::epoch_milli, ser_context(), ec);
+        encoder.flush();
+        CHECK_FALSE(ec);
+        CHECK(decode_msgpack<jsoncons::json>(output).as_string() == "18446744073709551615000000");
+    }
+}
+
