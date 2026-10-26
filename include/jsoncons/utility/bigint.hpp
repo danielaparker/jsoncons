@@ -1330,7 +1330,7 @@ public:
     {
         auto words = get_words();
         Integer x = 0;
-        if (words.size() > 0)
+        if (words.size() > 0 && words.data() != nullptr)
         {
             x = static_cast<Integer>(words[0]);
         }
