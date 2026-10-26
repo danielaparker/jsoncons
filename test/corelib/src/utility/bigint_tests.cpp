@@ -904,9 +904,33 @@ TEST_CASE("bigint word-width operands")
     CHECK(jsoncons::bigint(-3) == a * static_cast<int64_t>(-1));
 }
 
+TEST_CASE("bigint comparison and division with word-width operands")
+{
+    uint64_t umax = (std::numeric_limits<uint64_t>::max)();
+    int64_t p32 = int64_t(1) << 32;
+
+    CHECK(jsoncons::bigint(umax) == umax);
+    CHECK_FALSE(jsoncons::bigint(-1) == umax);
+    CHECK_FALSE(jsoncons::bigint(10) == p32 + 10);
+    CHECK(jsoncons::bigint(10) != p32 + 10);
+    CHECK(jsoncons::bigint(5) < umax);
+    CHECK_FALSE(jsoncons::bigint(5) > p32);
+    CHECK(jsoncons::bigint(5) <= p32);
+    CHECK_FALSE(jsoncons::bigint(5) >= umax);
+    CHECK(jsoncons::bigint(1) == jsoncons::bigint(umax) / umax);
+    CHECK(jsoncons::bigint(0) == jsoncons::bigint(10) / p32);
+    CHECK(jsoncons::bigint(-3) == jsoncons::bigint(-12) / 4);
+    CHECK(jsoncons::bigint(5) == 5);
+}
+
 #if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128) && !defined(__STRICT_ANSI__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
+#if !defined(__clang__)
+// g++ -O2 and above reports a temporary bigint made from a two-word constant as freeing a
+// non-heap pointer (it does so for bigint(static_cast<__int128>(3) << 64) on master too)
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+#endif
 TEST_CASE("bigint with a value wider than a word")
 {
     SECTION("__int128")
@@ -935,6 +959,15 @@ TEST_CASE("bigint with a value wider than a word")
         CHECK(jsoncons::bigint(11) == a + static_cast<__int128>(1));
         CHECK(jsoncons::bigint(9) == a + static_cast<__int128>(-1));
         CHECK(jsoncons::bigint(9) == a - static_cast<unsigned __int128>(1));
+    }
+    SECTION("comparison and division")
+    {
+        jsoncons::bigint a("55340232221128654848"); // 3 * 2^64
+        CHECK(a == (static_cast<__int128>(3) << 64));
+        CHECK(a != (static_cast<unsigned __int128>(3) << 64) + 1);
+        CHECK(a < (static_cast<__int128>(4) << 64));
+        CHECK(a > (static_cast<__int128>(2) << 64));
+        CHECK(jsoncons::bigint(3) == a / (static_cast<__int128>(1) << 64));
     }
 }
 #pragma GCC diagnostic pop

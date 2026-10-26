@@ -109,27 +109,39 @@ An empty list means a zero value.
 
     bool operator==( const bigint& x, const bigint& y )
 
-    bool operator==( const bigint& x, int y )
+    bool operator==( const bigint& x, int64_t y )                    (int64_t since 1.11.0)
+
+    bool operator==( const bigint& x, Integer y )                    (since 1.11.0)
 
     bool operator!=( const bigint& x, const bigint& y )
 
-    bool operator!=( const bigint& x, int y )
+    bool operator!=( const bigint& x, int64_t y )                    (int64_t since 1.11.0)
+
+    bool operator!=( const bigint& x, Integer y )                    (since 1.11.0)
 
     bool operator<( const bigint& x, const bigint& y )
 
     bool operator<( const bigint& x, int64_t y )
 
+    bool operator<( const bigint& x, Integer y )                     (since 1.11.0)
+
     bool operator>( const bigint& x, const bigint& y )
 
-    bool operator>( const bigint& x, int y )
+    bool operator>( const bigint& x, int64_t y )                     (int64_t since 1.11.0)
+
+    bool operator>( const bigint& x, Integer y )                     (since 1.11.0)
 
     bool operator<=( const bigint& x, const bigint& y )
 
-    bool operator<=( const bigint& x, int y )
+    bool operator<=( const bigint& x, int64_t y )                    (int64_t since 1.11.0)
+
+    bool operator<=( const bigint& x, Integer y )                    (since 1.11.0)
 
     bool operator>=( const bigint& x, const bigint& y )
 
-    bool operator>=( const bigint& x, int y )
+    bool operator>=( const bigint& x, int64_t y )                    (int64_t since 1.11.0)
+
+    bool operator>=( const bigint& x, Integer y )                    (since 1.11.0)
 
     bigint operator+( bigint x, const bigint& y )
 
@@ -155,7 +167,9 @@ An empty list means a zero value.
 
     bigint operator/( bigint x, const bigint& y )
 
-    bigint operator/( bigint x, int y )
+    bigint operator/( bigint x, int64_t y )                          (int64_t since 1.11.0)
+
+    bigint operator/( bigint x, Integer y )                          (since 1.11.0)
 
     bigint operator%( bigint x, const bigint& y )
 
@@ -191,8 +205,8 @@ An empty list means a zero value.
 
     bigint sqrt( const bigint& a )
 
-In the overloads marked (since 1.11.0), Integer is an unsigned integer type, or an integer
-type wider than 64 bits that the compiler treats as integral, such as `__int128` in GNU mode.
+In the overloads that take `Integer`, it is an unsigned integer type, or an integer type
+wider than 64 bits that the compiler treats as integral, such as `__int128` in GNU mode.
 
 ### Examples
 

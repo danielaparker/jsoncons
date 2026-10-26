@@ -1517,7 +1517,14 @@ public:
         return x.compare(y) == 0 ? true : false;
     }
 
-    friend bool operator==( const basic_bigint& x, int y ) noexcept
+    friend bool operator==( const basic_bigint& x, int64_t y ) noexcept
+    {
+        return x.compare(y) == 0 ? true : false;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator==( const basic_bigint& x, IntegerType y ) noexcept
     {
         return x.compare(y) == 0 ? true : false;
     }
@@ -1527,7 +1534,14 @@ public:
         return x.compare(y) != 0 ? true : false;
     }
 
-    friend bool operator!=( const basic_bigint& x, int y ) noexcept
+    friend bool operator!=( const basic_bigint& x, int64_t y ) noexcept
+    {
+        return x.compare(basic_bigint<Allocator>(y)) != 0 ? true : false;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator!=( const basic_bigint& x, IntegerType y ) noexcept
     {
         return x.compare(basic_bigint<Allocator>(y)) != 0 ? true : false;
     }
@@ -1542,12 +1556,26 @@ public:
        return x.compare(y) < 0 ? true : false;
     }
 
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator<( const basic_bigint& x, IntegerType y ) noexcept
+    {
+       return x.compare(y) < 0 ? true : false;
+    }
+
     friend bool operator>( const basic_bigint& x, const basic_bigint& y ) noexcept
     {
         return x.compare(y) > 0 ? true : false;
     }
 
-    friend bool operator>( const basic_bigint& x, int y ) noexcept
+    friend bool operator>( const basic_bigint& x, int64_t y ) noexcept
+    {
+        return x.compare(basic_bigint<Allocator>(y)) > 0 ? true : false;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator>( const basic_bigint& x, IntegerType y ) noexcept
     {
         return x.compare(basic_bigint<Allocator>(y)) > 0 ? true : false;
     }
@@ -1557,7 +1585,14 @@ public:
         return x.compare(y) <= 0 ? true : false;
     }
 
-    friend bool operator<=( const basic_bigint& x, int y ) noexcept
+    friend bool operator<=( const basic_bigint& x, int64_t y ) noexcept
+    {
+        return x.compare(y) <= 0 ? true : false;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator<=( const basic_bigint& x, IntegerType y ) noexcept
     {
         return x.compare(y) <= 0 ? true : false;
     }
@@ -1567,7 +1602,14 @@ public:
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend bool operator>=( const basic_bigint& x, int y ) noexcept
+    friend bool operator>=( const basic_bigint& x, int64_t y ) noexcept
+    {
+        return x.compare(y) >= 0 ? true : false;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, bool>::type
+    operator>=( const basic_bigint& x, IntegerType y ) noexcept
     {
         return x.compare(y) >= 0 ? true : false;
     }
@@ -1640,7 +1682,14 @@ public:
         return x /= y;
     }
 
-    friend basic_bigint<Allocator> operator/( basic_bigint<Allocator> x, int y )
+    friend basic_bigint<Allocator> operator/( basic_bigint<Allocator> x, int64_t y )
+    {
+        return x /= y;
+    }
+
+    template <typename IntegerType>
+    friend typename std::enable_if<nonstd::is_unsigned_or_wide_integral<IntegerType>::value, basic_bigint<Allocator>>::type
+    operator/( basic_bigint<Allocator> x, IntegerType y )
     {
         return x /= y;
     }
