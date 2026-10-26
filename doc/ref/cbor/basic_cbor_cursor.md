@@ -137,6 +137,9 @@ Returns the CBOR tag associated with the current value
     template <typename T>                                      (since 1.8.0)
     void read_typed_array(T& v);
 
+    template <typename T>                                      (since 1.11.0)
+    void read_typed_array(T& v, std::error_code& ec);
+
 ##### Non-member functions
 
     template <typename Source,typename Allocator>

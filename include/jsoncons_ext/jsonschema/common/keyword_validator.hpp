@@ -2452,9 +2452,13 @@ namespace jsonschema {
                         {
                             is_type_found = true;
                         }
-                        else if (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())
+                        else if (instance.is_double())
                         {
-                            is_type_found = true;
+                            auto result = instance.template try_as_integer<int64_t>();
+                            if (result && static_cast<double>(*result) == instance.template as<double>())
+                            {
+                                is_type_found = true;
+                            }
                         }
                         else if (instance.is_string() && instance.tag() == semantic_tag::bigint)
                         {

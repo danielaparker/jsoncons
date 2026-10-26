@@ -465,7 +465,14 @@ public:
             case staj_events::half_value:
                 return static_cast<IntegerType>(value_.half_value_);
             case staj_events::double_value:
+            {
+                if (!in_integer_range<IntegerType>(value_.double_value_))
+                {
+                    ec = conv_errc::not_integer;
+                    return IntegerType();
+                }
                 return static_cast<IntegerType>(value_.double_value_);
+            }
             case staj_events::int64_value:
                 return static_cast<IntegerType>(value_.int64_value_);
             case staj_events::uint64_value:

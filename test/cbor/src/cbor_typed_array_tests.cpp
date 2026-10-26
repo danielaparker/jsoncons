@@ -1411,3 +1411,27 @@ TEST_CASE("multi-dim classical array and typed array")
     }
 }
 
+TEST_CASE("cbor typed array of floats as integers")
+{
+    SECTION("out of range")
+    {
+        std::vector<uint8_t> f64 = {0xd8,0x56,0x48,0x9c,0x75,0x00,0x88,0x3c,0xe4,0x37,0x7e}; // 86([1e300])
+        auto result = cbor::try_decode_cbor<std::vector<int64_t>>(f64);
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::not_integer == result.error().code());
+
+        CHECK_FALSE(cbor::try_decode_cbor<std::vector<uint8_t>>(f64));
+
+        std::vector<uint8_t> f32 = {0xd8,0x55,0x44,0xe6,0xb1,0x61,0x7f}; // 85([3e38f])
+        CHECK_FALSE(cbor::try_decode_cbor<std::vector<int32_t>>(f32));
+
+        cbor::cbor_bytes_cursor cursor(f64);
+        std::vector<int64_t> v;
+        CHECK_THROWS_AS(cursor.read_typed_array(v), jsoncons::ser_error);
+    }
+    SECTION("in range")
+    {
+        std::vector<uint8_t> f64 = {0xd8,0x56,0x48,0x00,0x00,0x00,0x00,0x00,0x00,0x04,0x40}; // 86([2.5])
+        CHECK(std::vector<int64_t>{2} == cbor::decode_cbor<std::vector<int64_t>>(f64));
+    }
+}

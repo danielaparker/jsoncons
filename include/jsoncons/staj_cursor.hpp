@@ -622,6 +622,18 @@ public:
     typename std::enable_if<nonstd::is_back_insertable<T>::value,void>::type
     read_typed_array(T& v)
     {
+        std::error_code ec;
+        read_typed_array(v, ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            JSONCONS_THROW(ser_error(ec, line(), column()));
+        }
+    }
+
+    template <typename T>
+    typename std::enable_if<nonstd::is_back_insertable<T>::value,void>::type
+    read_typed_array(T& v, std::error_code& ec)
+    {
         using value_type = typename T::value_type;
 
         if (is_typed_array())
@@ -811,6 +823,11 @@ public:
                         v.reserve(ta.size());
                         for (auto item : ta)
                         {
+                            if (!in_range<value_type>(item, nonstd::is_integer<value_type>()))
+                            {
+                                ec = conv_errc::not_integer;
+                                break;
+                            }
                             v.push_back(static_cast<value_type>(item));
                         }
                     }
@@ -829,6 +846,11 @@ public:
                         v.reserve(ta.size());
                         for (auto item : ta)
                         {
+                            if (!in_range<value_type>(item, nonstd::is_integer<value_type>()))
+                            {
+                                ec = conv_errc::not_integer;
+                                break;
+                            }
                             v.push_back(static_cast<value_type>(item));
                         }
                     }
@@ -839,6 +861,19 @@ public:
             }
             to_end_array();
         }
+    }
+
+private:
+    template <typename T>
+    static bool in_range(double val, std::true_type)
+    {
+        return in_integer_range<T>(val);
+    }
+
+    template <typename T>
+    static bool in_range(double, std::false_type)
+    {
+        return true;
     }
 };
 

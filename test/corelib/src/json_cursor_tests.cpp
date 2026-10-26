@@ -204,6 +204,25 @@ TEST_CASE("json_cursor double_value test")
     CHECK(cursor.done());
 }
 
+TEST_CASE("json_cursor double_value as integer test")
+{
+    std::string s = "1e300";
+    std::istringstream is(s);
+
+    json_stream_cursor cursor(is);
+
+    REQUIRE_FALSE(cursor.done());
+    CHECK(jsoncons::staj_events::double_value == cursor.current().event_type());
+
+    std::error_code ec;
+    cursor.current().get<int64_t>(ec);
+    CHECK(jsoncons::conv_errc::not_integer == ec);
+
+    auto result = jsoncons::try_decode_json<int64_t>(s);
+    REQUIRE_FALSE(result);
+    CHECK(jsoncons::conv_errc::not_integer == result.error().code());
+}
+
 TEST_CASE("json_cursor array_value test")
 {
     std::string s = R"(

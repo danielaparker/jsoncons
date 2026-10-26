@@ -311,7 +311,11 @@ struct decode_traits<T,
                 T v{jsoncons::make_obj_using_allocator<T>(aset.get_allocator())};
                 if (cursor.is_typed_array())
                 {
-                    cursor.read_typed_array(v);
+                    cursor.read_typed_array(v, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                    }
                 }
                 else
                 {
@@ -379,7 +383,11 @@ struct decode_traits<T,
             T v{jsoncons::make_obj_using_allocator<T>(aset.get_allocator())};
             if (cursor.is_typed_array())
             {
-                cursor.read_typed_array(v);
+                cursor.read_typed_array(v, ec);
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return result_type(jsoncons::unexpect, ec, cursor.line(), cursor.column());
+                }
             }
             else
             {

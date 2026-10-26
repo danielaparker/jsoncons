@@ -50,6 +50,7 @@
 #include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/utility/heap_string.hpp>
 #include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/conversion.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
@@ -3682,7 +3683,14 @@ namespace jsoncons {
                 case json_storage_kind::half_float:
                     return result_type(static_cast<T>(cast<half_storage>().value()));
                 case json_storage_kind::float64:
-                    return result_type(static_cast<T>(cast<double_storage>().value()));
+                {
+                    double val = cast<double_storage>().value();
+                    if (!in_integer_range<T>(val))
+                    {
+                        return result_type(jsoncons::unexpect, conv_errc::not_integer);
+                    }
+                    return result_type(static_cast<T>(val));
+                }
                 case json_storage_kind::int64:
                     return result_type(static_cast<T>(cast<int64_storage>().value()));
                 case json_storage_kind::uint64:

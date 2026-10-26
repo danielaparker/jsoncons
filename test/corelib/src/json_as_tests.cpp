@@ -1,7 +1,9 @@
 // Copyright 2013-2026 Daniel Parker
 // Distributed under Boost license
 
+#include <cmath>
 #include <ctime>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <utility>
@@ -183,3 +185,27 @@ TEST_CASE("as byte string tests")
     }
 }
 
+TEST_CASE("json double as integer tests")
+{
+    SECTION("out of range")
+    {
+        auto result = jsoncons::json(1e300).try_as<int64_t>();
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::not_integer == result.error().code());
+
+        CHECK_FALSE(jsoncons::json(std::nan("")).try_as<int64_t>());
+        CHECK_FALSE(jsoncons::json(1e300).try_as<uint64_t>());
+        CHECK_FALSE(jsoncons::json(-1.5).try_as<uint32_t>());
+        CHECK_FALSE(jsoncons::json(9223372036854775808.0).try_as<int64_t>());
+        CHECK_FALSE(jsoncons::json(1e19).try_as<int64_t>());
+        CHECK_FALSE(jsoncons::json(18446744073709551616.0).try_as<uint64_t>());
+    }
+    SECTION("in range")
+    {
+        CHECK(jsoncons::json(-9223372036854775808.0).as<int64_t>() == (std::numeric_limits<int64_t>::lowest)());
+        CHECK(jsoncons::json(1e19).as<uint64_t>() == 10000000000000000000ull);
+        CHECK(10 == jsoncons::json(10.5).as<int32_t>());
+        CHECK(-10 == jsoncons::json(-10.5).as<int32_t>());
+        CHECK(0 == jsoncons::json(-0.5).as<uint32_t>());
+    }
+}

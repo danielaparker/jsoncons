@@ -15,6 +15,7 @@
 #include <utility>
 
 #include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/conversion_result.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -44,6 +45,15 @@ namespace jsonschema {
 
     private:
         schema_validator_factory_base<Json>* factory_;
+
+        static conversion_result<std::size_t> to_size(const Json& sch)
+        {
+            if (!sch.is_number() || ((sch.is_int64() || sch.is_uint64()) && !sch.template is<std::size_t>()))
+            {
+                return conversion_result<std::size_t>(jsoncons::unexpect, conv_errc::not_integer);
+            }
+            return sch.template try_as<std::size_t>();
+        }
     public:
 
         keyword_validator_factory(schema_validator_factory_base<Json>* factory)
@@ -106,27 +116,27 @@ namespace jsonschema {
             const Json& sch, const Json& parent)
         {
             uri schema_location = context.make_schema_location("maxLength");
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("maxLength must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
             return jsoncons::make_unique<max_length_validator<Json>>(parent, schema_location, context.get_custom_message("maxLength"), 
-                value);
+                *value);
         }
 
         std::unique_ptr<min_length_validator<Json>> make_min_length_validator(const compilation_context<Json>& context, 
             const Json& sch, const Json& parent)
         {
             uri schema_location = context.make_schema_location("minLength");
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("minLength must be an integer value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_length_validator<Json>>(parent, schema_location, context.get_custom_message("minLength"), value);
+            return jsoncons::make_unique<min_length_validator<Json>>(parent, schema_location, context.get_custom_message("minLength"), *value);
         }
 
         std::unique_ptr<not_validator<Json>> make_not_validator(const compilation_context<Json>& context, 
@@ -467,13 +477,13 @@ namespace jsonschema {
             std::string keyword = "maxItems";
             uri schema_location = context.make_schema_location(keyword);
 
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("maxItems must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
+            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), *value);
         }
 
         std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context<Json>& context, 
@@ -482,13 +492,13 @@ namespace jsonschema {
             std::string keyword = "minItems";
             uri schema_location = context.make_schema_location(keyword);
 
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("minItems must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
+            return jsoncons::make_unique<min_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), *value);
         }
 
         std::unique_ptr<max_properties_validator<Json>> make_max_properties_validator(const compilation_context<Json>& context, 
@@ -496,13 +506,13 @@ namespace jsonschema {
         {
             std::string keyword = "maxProperties";
             uri schema_location = context.make_schema_location(keyword);
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("maxProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
+            return jsoncons::make_unique<max_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), *value);
         }
 
         std::unique_ptr<min_properties_validator<Json>> make_min_properties_validator(const compilation_context<Json>& context, 
@@ -510,13 +520,13 @@ namespace jsonschema {
         {
             std::string keyword = "minProperties";
             uri schema_location = context.make_schema_location(keyword);
-            if (!sch.is_number())
+            auto value = to_size(sch);
+            if (!value)
             {
                 const std::string message("minProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
+            return jsoncons::make_unique<min_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), *value);
         }
 
         std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context<Json>& context,
@@ -531,8 +541,13 @@ namespace jsonschema {
             if (it != parent.object_range().end()) 
             {
                 uri path = context.make_schema_location("maxContains");
-                auto value = (*it).value().template as<std::size_t>();
-                max_contains = jsoncons::make_unique<max_contains_keyword<Json>>(parent, path, context.get_custom_message("maxContains"), value);
+                auto value = to_size((*it).value());
+                if (!value)
+                {
+                    const std::string message("maxContains must be a number value");
+                    JSONCONS_THROW(schema_error(path.string() + ": " + message));
+                }
+                max_contains = jsoncons::make_unique<max_contains_keyword<Json>>(parent, path, context.get_custom_message("maxContains"), *value);
             }
             else
             {
@@ -545,8 +560,13 @@ namespace jsonschema {
             if (it != parent.object_range().end()) 
             {
                 uri path = context.make_schema_location("minContains");
-                auto value = (*it).value().template as<std::size_t>();
-                min_contains = jsoncons::make_unique<min_contains_keyword<Json>>(parent, path, context.get_custom_message("minContains"), value);
+                auto value = to_size((*it).value());
+                if (!value)
+                {
+                    const std::string message("minContains must be a number value");
+                    JSONCONS_THROW(schema_error(path.string() + ": " + message));
+                }
+                min_contains = jsoncons::make_unique<min_contains_keyword<Json>>(parent, path, context.get_custom_message("minContains"), *value);
             }
             else
             {

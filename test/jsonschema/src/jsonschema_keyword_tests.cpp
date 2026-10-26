@@ -256,3 +256,37 @@ std::string jstr = R"(
         CHECK(std::string("/x5") == result[1].instance_location().string());
     }
 }
+
+TEST_CASE("jsonschema size keyword tests")
+{
+    SECTION("every keyword, invalid value")
+    {
+        const jsoncons::json values[] = {jsoncons::json(1e300), jsoncons::json(-1), jsoncons::json("5"), jsoncons::json(true)};
+        for (const char* keyword : {"maxLength", "minLength", "maxItems", "minItems", "maxProperties", "minProperties", "maxContains", "minContains"})
+        {
+            for (const auto& value : values)
+            {
+                jsoncons::json schema = jsoncons::json::parse(R"({"contains":{}})");
+                schema.insert_or_assign(keyword, value);
+                CHECK_THROWS_AS(jsonschema::make_json_schema(schema), jsonschema::schema_error);
+            }
+        }
+    }
+    SECTION("maxLength out of range")
+    {
+        jsoncons::json schema = jsoncons::json::parse(R"({"maxLength":1e300})");
+        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema), "https://jsoncons.com#/maxLength: maxLength must be a number value");
+    }
+    SECTION("minContains out of range")
+    {
+        jsoncons::json schema = jsoncons::json::parse(R"({"contains":{},"minContains":-1.5})");
+        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema), "https://jsoncons.com#/minContains: minContains must be a number value");
+    }
+    SECTION("maxItems in range")
+    {
+        jsoncons::json schema = jsoncons::json::parse(R"({"maxItems":2.0})");
+        auto compiled = jsonschema::make_json_schema(schema);
+        CHECK(compiled.is_valid(jsoncons::json::parse("[1,2]")));
+        CHECK_FALSE(compiled.is_valid(jsoncons::json::parse("[1,2,3]")));
+    }
+}

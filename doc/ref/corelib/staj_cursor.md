@@ -63,6 +63,13 @@ Returns a [tag](typed_array_tags.md) that indicates the element type of the type
 
     template <typename T>                                        (since 1.8.0)
     void read_typed_array(T& v);
+Reads a typed array into `v`. If an element is a floating-point value
+outside the range of an integer `T::value_type`, throws a [ser_error](ser_error.md).
+
+    template <typename T>                                        (since 1.11.0)
+    void read_typed_array(T& v, std::error_code& ec);
+Reads a typed array into `v`. If an element is a floating-point value
+outside the range of an integer `T::value_type`, sets `ec`.
 
 ##### Multi-dimensional array input
 
