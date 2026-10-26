@@ -70,6 +70,13 @@ TEST_CASE("IP6 format checker tests")
     {
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::13.1.68.3)"));
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::FFFF:129.144.52.38)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::999.2.3.4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::a.2.3.4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1.2.3.18446744073709551617)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1.18446744073709551617.3.4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1..3.4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1.2..4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::ffff:192.168.0.01)"));
     }
 }
 

@@ -236,21 +236,21 @@ namespace jsonschema {
         return state == state_t::domain_name || state == state_t::done;
     }
 
-    // RFC 2673, Section 3.2
+    inline bool validate_ipv4_rfc2673(jsoncons::string_view sv);
+
+    // RFC 2373, Section 2.2
 
     inline
     bool validate_ipv6_rfc2373(jsoncons::string_view sv)
     {
         enum class state_t{start,expect_hexdig_or_unspecified,
-                              hexdig, decdig,expect_unspecified, unspecified};
+                              hexdig, expect_unspecified, unspecified};
 
         state_t state = state_t::start;
 
         std::size_t digit_count = 0;
         std::size_t piece_count = 0;
-        std::size_t piece_count2 = 0;
         bool has_unspecified = false;
-        std::size_t dec_value = 0;
 
         for (std::size_t i = 0; i < sv.length(); ++i)
         {
@@ -288,10 +288,6 @@ namespace jsonschema {
                     switch (c)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            dec_value = dec_value*10 + static_cast<std::size_t>(c - '0'); // just in case this piece is followed by a dot
-                            state = state_t::hexdig;
-                            ++digit_count;
-                            break;
                         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
                             state = state_t::hexdig;
@@ -340,7 +336,6 @@ namespace jsonschema {
                             {
                                 ++piece_count;
                                 digit_count = 0;
-                                dec_value = 0;
                                 state = state_t::expect_hexdig_or_unspecified;
                             }
                             else
@@ -349,39 +344,7 @@ namespace jsonschema {
                             }
                             break;
                         case '.':
-                            if (piece_count == 6 || has_unspecified)
-                            {
-                                ++piece_count2;
-                                state = state_t::decdig;
-                                dec_value = 0;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        default:
-                            return false;
-                    }
-                    break;
-                }
-                case state_t::decdig:
-                {
-                    switch (c)
-                    {
-                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            dec_value = dec_value*10 + static_cast<std::size_t>(c - '0');
-                            ++digit_count;
-                            break;
-                        case '.':
-                            if (dec_value > 0xff)
-                            {
-                                return false;
-                            }
-                            digit_count = 0;
-                            dec_value = 0;
-                            ++piece_count2;
-                            break;
+                            return (piece_count == 6 || has_unspecified) && validate_ipv4_rfc2673(sv.substr(i - digit_count));
                         default:
                             return false;
                     }
@@ -421,13 +384,6 @@ namespace jsonschema {
                 {
                     return false;
                 }
-            case state_t::decdig:
-                ++piece_count2;
-                if (dec_value > 0xff)
-                {
-                    return false;
-                }
-                return digit_count > 0 && piece_count2 == 4;
             default:
                 return false;
         }
