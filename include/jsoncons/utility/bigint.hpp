@@ -881,12 +881,9 @@ public:
         operator+=(IntegerType y)
     {
         if ( is_negative() != (y < 0))
-            return *this -= -y;
+            return *this -= -basic_bigint<Allocator>(y);
 
-        if (y < 0)
-        {
-            y = -y;
-        }
+        word_type u = y < 0 ? (word_type(0) - static_cast<word_type>(y)) : static_cast<word_type>(y);
 
         word_type d;
         word_type carry = 0;
@@ -901,7 +898,7 @@ public:
         {
             d = words[i] + carry;
             carry = d < carry;
-            words[i] = d + y;
+            words[i] = d + u;
             if (words[i] < d)
                 carry = 1;
         }
@@ -1018,7 +1015,7 @@ public:
     typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
     operator*=(IntegerType y)
     {
-        *this *= word_type(y < 0 ? -y : y);
+        *this *= y < 0 ? (word_type(0) - static_cast<word_type>(y)) : static_cast<word_type>(y);
         if ( y < 0 )
             set_negative(!is_negative());
         return *this;
@@ -1329,13 +1326,13 @@ public:
     explicit operator Integer() const
     {
         auto words = get_words();
-        Integer x = 0;
+        word_type x = 0;
         if (words.size() > 0)
         {
-            x = static_cast<Integer>(words[0]);
+            x = words[0];
         }
 
-        return is_negative() ? x*(-1) : x;
+        return static_cast<Integer>(is_negative() ? word_type(0) - x : x);
     }
 
     explicit operator double() const

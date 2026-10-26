@@ -462,6 +462,12 @@ TEST_CASE("bigint cast")
         auto val = (long long)b;
         CHECK((std::numeric_limits<long long>::max)() == val);
     }
+    SECTION("to long long lowest")
+    {
+        jsoncons::bigint b{(std::numeric_limits<long long>::lowest)()};
+        auto val = (long long)b;
+        CHECK((std::numeric_limits<long long>::lowest)() == val);
+    }
     SECTION("to unsigned long")
     {
         jsoncons::bigint b{(std::numeric_limits<unsigned long>::max)()};
@@ -687,6 +693,44 @@ TEST_CASE("bigint operator+= tests")
         CHECK(expected == a);
     }
 
+    SECTION("a += INT_MIN")
+    {
+        a += (std::numeric_limits<int>::lowest)();
+        auto expected = jsoncons::bigint("56654250564056135415631554529407030165");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += INT64_MIN")
+    {
+        a += (std::numeric_limits<int64_t>::lowest)();
+        auto expected = jsoncons::bigint("56654250564056135406408182494699738005");
+        CHECK(expected == a);
+    }
+
+    SECTION("-a += SHRT_MIN")
+    {
+        a = -a;
+        a += (std::numeric_limits<short>::lowest)();
+        auto expected = jsoncons::bigint("-56654250564056135415631554531554546581");
+        CHECK(expected == a);
+    }
+
+    SECTION("-a += INT_MIN")
+    {
+        a = -a;
+        a += (std::numeric_limits<int>::lowest)();
+        auto expected = jsoncons::bigint("-56654250564056135415631554533701997461");
+        CHECK(expected == a);
+    }
+
+    SECTION("-a += INT64_MIN")
+    {
+        a = -a;
+        a += (std::numeric_limits<int64_t>::lowest)();
+        auto expected = jsoncons::bigint("-56654250564056135424854926568409289621");
+        CHECK(expected == a);
+    }
+
     SECTION("pos number += 5")
     {
         jsoncons::bigint expected = jsoncons::bigint("4253529586511730793019062996110615940069384017080242667525");
@@ -748,6 +792,25 @@ TEST_CASE("bigint operator+= tests")
         //std::cout << expected << "\n";
         //std::cout << c << "\n";
     }    
+}
+
+TEST_CASE("bigint operator*= tests")
+{
+    jsoncons::bigint a("56654250564056135415631554531554513813");
+
+    SECTION("a *= INT_MIN")
+    {
+        a *= (std::numeric_limits<int>::lowest)();
+        auto expected = jsoncons::bigint("-121664076676005327359142446949333618434007629824");
+        CHECK(expected == a);
+    }
+
+    SECTION("a *= INT64_MIN")
+    {
+        a *= (std::numeric_limits<int64_t>::lowest)();
+        auto expected = jsoncons::bigint("-522543230421479268929290856252802860167405504308554235904");
+        CHECK(expected == a);
+    }
 }
 
 TEST_CASE("basic_bigint compare_half")
