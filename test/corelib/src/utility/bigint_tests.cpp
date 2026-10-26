@@ -423,6 +423,15 @@ TEST_CASE("bigint operations")
         CHECK(a == b);
     }
 
+    SECTION("&= with fewer words")
+    {
+        jsoncons::bigint a = (jsoncons::bigint{1} << 128) + 1;
+        jsoncons::bigint b{1};
+        a &= b;
+
+        CHECK(b == a);
+    }
+
     SECTION("|=")
     {
         jsoncons::bigint a{0};

@@ -410,7 +410,7 @@ public:
             {
                 if (is_allocated())
                 {
-                    std::memset(allocated_.data_ + new_length, 0, size_type(old_length - new_length*sizeof(word_type)));
+                    std::memset(allocated_.data_ + new_length, 0, size_type((old_length - new_length)*sizeof(word_type)));
                 }
                 else
                 {
