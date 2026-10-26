@@ -599,8 +599,7 @@ namespace jsonschema {
                         label_length = 0;
                         state = state_t::start_label;
                     }
-                    else if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-                               (c >= '0' && c < '9') || c == '-'))
+                    else if (!(is_digit(c) || is_alpha(c) || c == '-'))
                     {
                         return false;
                     }
@@ -614,7 +613,7 @@ namespace jsonschema {
         }
 
         char last = hostname.back();
-        if (!((last >= 'a' && last <= 'z') || (last >= 'A' && last <= 'Z') || (last >= '0' && last < '9')))
+        if (!(is_digit(last) || is_alpha(last)))
         {
             return false;
         }

@@ -133,6 +133,8 @@ TEST_CASE("hostname tests")
         CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("www.example.com"));
         CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(""));
         CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(jsoncons::string_view()));
+        CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("www.example9.com"));
+        CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("a9"));
     }
 }
 
