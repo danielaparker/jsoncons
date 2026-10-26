@@ -158,22 +158,31 @@ public:
 
     int compare_abs(const basic_bigdec& val) const
     {
-        int64_t sdiff = this->scale() - val.scale();
-        if (sdiff != 0) 
+        const bool zero = unscaled_.is_zero();
+        const bool val_zero = val.unscaled_.is_zero();
+        if (zero || val_zero)
         {
-            if (sdiff < 0) 
+            return zero ? (val_zero ? 0 : -1) : 1;
+        }
+        const bool scale_greater = scale_ > val.scale_;
+        const uint64_t magnitude = scale_greater
+            ? static_cast<uint64_t>(scale_) - static_cast<uint64_t>(val.scale_)
+            : static_cast<uint64_t>(val.scale_) - static_cast<uint64_t>(scale_);
+        if (magnitude != 0)
+        {
+            const basic_bigint<Allocator>& finer = scale_greater ? unscaled_ : val.unscaled_;
+            const basic_bigint<Allocator>& coarser = scale_greater ? val.unscaled_ : unscaled_;
+            // 10^n needs more than 3n bits, so once three times the distance between the scales
+            // reaches the bit length of the finer value, that value is the smaller one
+            if (magnitude >= (finer.bit_length() + 2) / 3)
             {
-                basic_bigint<Allocator> rb = this->unscaled()*big_ten_to_the(std::size_t(-sdiff));
-                return rb.compare_abs(val.unscaled());
-            } 
-            else // sdiff > 0 
-            { 
-                basic_bigint<Allocator> rb = val.unscaled()*val.big_ten_to_the((std::size_t)sdiff);
-                return this->unscaled().compare_abs(rb);
+                return scale_greater ? -1 : 1;
             }
+            const int cmp = finer.compare_abs(coarser * big_ten_to_the(std::size_t(magnitude)));
+            return scale_greater ? cmp : -cmp;
         }
 
-        return this->unscaled().compare_abs(val.unscaled());
+        return unscaled_.compare_abs(val.unscaled_);
     }
 public:
     static basic_bigint<Allocator> divide_and_round(const basic_bigint<Allocator>& dividend, 

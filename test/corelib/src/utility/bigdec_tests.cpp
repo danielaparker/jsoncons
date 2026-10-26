@@ -188,3 +188,37 @@ TEST_CASE("basic_bigdec divide tests")
         CHECK(expected == c);
     }
 }
+
+TEST_CASE("basic_bigdec compare tests")
+{
+    SECTION("scales more than int64_t apart")
+    {
+        jsoncons::bigdec small("1e-9223372036854775807");
+        jsoncons::bigdec large("1e9223372036854775807");
+
+        CHECK(small.compare(large) < 0);
+        CHECK(large.compare(small) > 0);
+        CHECK(small.compare(jsoncons::bigdec("1")) < 0);
+        CHECK(large.compare(jsoncons::bigdec("1")) > 0);
+    }
+    SECTION("scales near the cut-off")
+    {
+        CHECK(0 == jsoncons::bigdec("1").compare(jsoncons::bigdec("1.000")));
+        CHECK(jsoncons::bigdec("1").compare(jsoncons::bigdec("1.001")) < 0);
+        CHECK(jsoncons::bigdec("1.001").compare(jsoncons::bigdec("1")) > 0);
+    }
+    SECTION("a 400-bit value near the cut-off")
+    {
+        // 2^399 is about 1.29e120, and the cut-off for 400 bits is a distance of 134
+        CHECK(jsoncons::bigdec(jsoncons::bigint(1) << 399, 120).compare(jsoncons::bigdec("1")) > 0);
+        CHECK(jsoncons::bigdec(jsoncons::bigint(1) << 399, 121).compare(jsoncons::bigdec("1")) < 0);
+        CHECK(jsoncons::bigdec(jsoncons::bigint(1) << 399, 133).compare(jsoncons::bigdec("1")) < 0);
+        CHECK(jsoncons::bigdec(jsoncons::bigint(1) << 399, 134).compare(jsoncons::bigdec("1")) < 0);
+    }
+    SECTION("zero")
+    {
+        CHECK(jsoncons::bigdec("0").compare_abs(jsoncons::bigdec("1e-5")) < 0);
+        CHECK(jsoncons::bigdec("1e-5").compare_abs(jsoncons::bigdec("0")) > 0);
+        CHECK(0 == jsoncons::bigdec("0").compare_abs(jsoncons::bigdec("0.00")));
+    }
+}
