@@ -320,33 +320,6 @@ namespace msgpack {
                     break;
                 }
                 case semantic_tag::epoch_milli:
-                {
-                    bigint n;
-                    auto result = to_bigint(sv.data(), sv.length(), n);
-                    if (!result)
-                    {
-                        ec = msgpack_errc::invalid_timestamp;
-                        JSONCONS_VISITOR_RETURN;
-                    }
-                    if (n != 0)
-                    {
-                        bigint q;
-                        bigint rem;
-                        n.divide(millis_in_second, q, rem, true);
-                        auto seconds = static_cast<int64_t>(q);
-                        auto nanoseconds = static_cast<int64_t>(rem) * nanos_in_milli;
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
-                        write_timestamp(seconds, nanoseconds);
-                    }
-                    else
-                    {
-                        write_timestamp(0, 0);
-                    }
-                    break;
-                }
                 case semantic_tag::epoch_nano:
                 {
                     bigint n;
@@ -358,15 +331,20 @@ namespace msgpack {
                     }
                     if (n != 0)
                     {
+                        if (tag == semantic_tag::epoch_milli)
+                        {
+                            n *= nanos_in_milli;
+                        }
                         bigint q;
                         bigint rem;
                         n.divide(nanos_in_second, q, rem, true);
+                        if (rem < 0)
+                        {
+                            --q;
+                            rem += nanos_in_second;
+                        }
                         auto seconds = static_cast<int64_t>(q);
                         auto nanoseconds = static_cast<int64_t>(rem);
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
                         write_timestamp(seconds, nanoseconds);
                     }
                     else
@@ -558,12 +536,13 @@ namespace msgpack {
                     if (val != 0)
                     {
                         auto dv = std::div(val,millis_in_second);
+                        if (dv.rem < 0)
+                        {
+                            --dv.quot;
+                            dv.rem += millis_in_second;
+                        }
                         int64_t seconds = dv.quot;
                         int64_t nanoseconds = dv.rem*nanos_in_milli;
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
                         write_timestamp(seconds, nanoseconds);
                     }
                     else
@@ -577,12 +556,13 @@ namespace msgpack {
                     if (val != 0)
                     {
                         auto dv = std::div(val,static_cast<int64_t>(nanos_in_second));
+                        if (dv.rem < 0)
+                        {
+                            --dv.quot;
+                            dv.rem += nanos_in_second;
+                        }
                         int64_t seconds = dv.quot;
                         int64_t nanoseconds = dv.rem;
-                        if (nanoseconds < 0)
-                        {
-                            nanoseconds = -nanoseconds; 
-                        }
                         write_timestamp(seconds, nanoseconds);
                     }
                     else

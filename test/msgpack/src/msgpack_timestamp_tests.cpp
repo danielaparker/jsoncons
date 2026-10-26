@@ -55,12 +55,12 @@ TEST_CASE("msgpack timestamp tests")
         auto r = decode_msgpack<jsoncons::json>(input);
         std::cout << pretty_print(r) << "\n\n";
 
-        //CHECK(expected == r);
+        CHECK(r.as_string() == "-2208988800000000001");
 
-        //std::vector<uint8_t> output;
-        //json j = decode_msgpack<jsoncons::json>(input);
-        //encode_msgpack(j,output);
-        //CHECK(output == input);
+        std::vector<uint8_t> output;
+        json j = decode_msgpack<jsoncons::json>(input);
+        encode_msgpack(j,output);
+        CHECK(output == input);
     }
     SECTION("test 4")
     {
@@ -98,6 +98,39 @@ TEST_CASE("msgpack timestamp tests")
         std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
         auto j2 = decode_msgpack<jsoncons::json>(data);
         std::cout << "j2: " << j2 << "\n\n";
+    }
+}
+
+TEST_CASE("msgpack timestamp before 1970")
+{
+    SECTION("epoch_nano -1")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x3b,0x9a,0xc9,0xff, // 999999999 nanoseconds in 32-bit unsigned int
+            0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -1 seconds in 64-bit signed int
+        };
+
+        std::vector<uint8_t> output;
+        encode_msgpack(jsoncons::json(-1, semantic_tag::epoch_nano), output);
+        CHECK(output == expected);
+        CHECK(decode_msgpack<jsoncons::json>(output).as_string() == "-1");
+    }
+    SECTION("epoch_milli -500")
+    {
+        std::vector<uint8_t> expected = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x1d,0xcd,0x65,0x00, // 500000000 nanoseconds in 32-bit unsigned int
+            0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff // -1 seconds in 64-bit signed int
+        };
+
+        std::vector<uint8_t> output;
+        encode_msgpack(jsoncons::json(-500, semantic_tag::epoch_milli), output);
+        CHECK(output == expected);
+        output.clear();
+        encode_msgpack(jsoncons::json("-500", semantic_tag::epoch_milli), output);
+        CHECK(output == expected);
+        CHECK(decode_msgpack<jsoncons::json>(output).as_string() == "-500000000");
     }
 }
 

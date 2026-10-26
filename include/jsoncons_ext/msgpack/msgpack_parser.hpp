@@ -612,14 +612,7 @@ private:
 
                         nano *= uint64_t(nanos_in_second);
 
-                        if (nano < 0)
-                        {
-                            nano -= nsec;
-                        }
-                        else
-                        {
-                            nano += nsec;
-                        }
+                        nano += nsec;
 
                         text_buffer_.clear();
                         nano.append_to_buffer(text_buffer_);

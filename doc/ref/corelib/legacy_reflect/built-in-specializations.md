@@ -320,8 +320,8 @@ int main()
 ```
 Output:
 ```
-milliseconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801999
-seconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801
+milliseconds elapsed since 1970-01-01 00:00:00 UTC: -2208988800000
+seconds elapsed since 1970-01-01 00:00:00 UTC: -2208988800
 ```
 
 #### BSON example
