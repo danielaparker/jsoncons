@@ -251,6 +251,7 @@ namespace jsonschema {
         std::size_t digit_count = 0;
         std::size_t piece_count = 0;
         bool has_unspecified = false;
+        auto fits = [&has_unspecified](std::size_t pieces) { return has_unspecified ? pieces <= 7 : pieces == 8; };
 
         for (std::size_t i = 0; i < sv.length(); ++i)
         {
@@ -344,7 +345,7 @@ namespace jsonschema {
                             }
                             break;
                         case '.':
-                            return (piece_count == 6 || has_unspecified) && validate_ipv4_rfc2673(sv.substr(i - digit_count));
+                            return fits(piece_count + 2) && validate_ipv4_rfc2673(sv.substr(i - digit_count));
                         default:
                             return false;
                     }
@@ -373,12 +374,12 @@ namespace jsonschema {
         switch (state)
         {
             case state_t::unspecified:
-                return piece_count <= 8;
+                return fits(piece_count);
             case state_t::hexdig:
                 if (digit_count <= 4)
                 {
                     ++piece_count;
-                    return digit_count > 0 && (piece_count == 8 || (has_unspecified && piece_count <= 8));
+                    return digit_count > 0 && fits(piece_count);
                 }
                 else
                 {

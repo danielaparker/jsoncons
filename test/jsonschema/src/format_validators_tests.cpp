@@ -60,6 +60,9 @@ TEST_CASE("IP6 format checker tests")
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(FF01::101)"));
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1)"));
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::)"));
+        CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(1:2:3:4:5:6:7::)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(1:2:3:4:5:6:7:8::)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(1::2:3:4:5:6:7:8)"));
     }
     SECTION("x:x:x:x:x:x.d.d.d.d")
     {
@@ -70,6 +73,8 @@ TEST_CASE("IP6 format checker tests")
     {
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::13.1.68.3)"));
         CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::FFFF:129.144.52.38)"));
+        CHECK(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(1:2:3:4:5::1.2.3.4)"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(1:2:3:4:5:6::1.2.3.4)"));
         CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::999.2.3.4)"));
         CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::a.2.3.4)"));
         CHECK_FALSE(jsoncons::jsonschema::validate_ipv6_rfc2373(R"(::1.2.3.18446744073709551617)"));
