@@ -961,6 +961,7 @@ public:
         auto words = get_words();
         resize( (std::max)(y_words.size(), words.size()) + 1 );
         words = get_words();
+        y_words = y.get_words();
 
         const size_t this_size = words.size();
         const size_t y_size = y_words.size();

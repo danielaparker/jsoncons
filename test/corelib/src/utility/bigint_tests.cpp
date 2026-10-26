@@ -659,6 +659,21 @@ TEST_CASE("bigint operator+= tests")
         CHECK(expected == a);
     }
 
+    SECTION("a += a")
+    {
+        a += a;
+        jsoncons::bigint expected("113308501128112270831263109063109027626");
+        CHECK(expected == a);
+    }
+
+    SECTION("a += a, reallocating")
+    {
+        jsoncons::bigint c = jsoncons::bigint(1) << 447;
+        c += c;
+        c += c;
+        CHECK((jsoncons::bigint(1) << 449) == c);
+    }
+
     SECTION("a += 56242")
     {
         a += 56242;
