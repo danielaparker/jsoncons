@@ -8,6 +8,8 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <stdexcept>
+#include <streambuf>
 #include "common/mock_stateful_allocator.hpp"
 #include <catch/catch.hpp>
 
@@ -832,3 +834,32 @@ TEST_CASE("iterator_source::read_span tests")
     }
 }
 
+TEST_CASE("stream_source read when the stream throws")
+{
+    struct throwing_buf : std::streambuf
+    {
+        std::string s{"0123456789abcdefXYZ"};
+        bool given = false;
+        int_type underflow() override
+        {
+            if (given)
+            {
+                throw std::runtime_error("stream failure");
+            }
+            given = true;
+            setg(&s[0], &s[0], &s[0] + 16);
+            return traits_type::to_int_type(s[0]);
+        }
+    };
+
+    throwing_buf buf;
+    std::istream is(&buf);
+    jsoncons::stream_source<char> source(is, 16);
+
+    char b;
+    CHECK(1 == source.read(&b,1));
+    std::vector<char> v(15 + 16);
+    CHECK(15 == source.read(v.data(), v.size()));
+    CHECK(std::string("123456789abcdef") == std::string(v.data(), 15));
+    CHECK(source.is_error());
+}
