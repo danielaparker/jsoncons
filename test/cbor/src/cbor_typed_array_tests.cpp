@@ -906,6 +906,25 @@ TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
     }
 }
 
+TEST_CASE("cbor typed array malformed input tests")
+{
+    SECTION("uint16 byte string length not a multiple of 2")
+    {
+        const std::vector<uint8_t> data = {
+            0xd8,0x41, // semantic tag 65, uint16, big endian, typed array
+            0x43,      // byte string of length 3
+                0x00,0x01,0x02
+        };
+
+        std::error_code ec;
+        jsoncons::json_decoder<jsoncons::json> decoder;
+        cbor::cbor_bytes_reader reader(data, decoder);
+        reader.read(ec);
+
+        CHECK(cbor::cbor_errc::bad_typed_array == ec);
+    }
+}
+
 TEST_CASE("cbor multi-dim malformed input tests")
 {
     SECTION("break byte in place of the extents array")

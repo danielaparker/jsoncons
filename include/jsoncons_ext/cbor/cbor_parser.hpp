@@ -2301,6 +2301,16 @@ private:
         return std::size_t(1) << (f + ll); 
     }
 
+    template <typename Read,typename Buffer>
+    void read_typed_array_bytes(Read& read, Buffer& buffer, std::error_code& ec)
+    {
+        read(buffer, ec);
+        if (!ec && buffer.size() % get_typed_array_bytes_per_element(static_cast<uint8_t>(raw_tag_)) != 0)
+        {
+            ec = cbor_errc::bad_typed_array;
+        }
+    }
+
     template <typename Read>
     void read_byte_string(Read read, generic_visitor& visitor, std::error_code& ec)
     {
@@ -2360,7 +2370,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint8;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2396,7 +2406,7 @@ private:
                     array_tag_ = typed_array_tags::uint8;
                     typed_array_tag_ = semantic_tag::clamped;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2432,7 +2442,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint16;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2477,7 +2487,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint32;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2522,7 +2532,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::uint64;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2566,7 +2576,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::int8;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2602,7 +2612,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::int16;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2647,7 +2657,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::int32;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2692,7 +2702,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::int64;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2737,7 +2747,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::half_float;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2782,7 +2792,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::float32;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -2827,7 +2837,7 @@ private:
                 {
                     array_tag_ = typed_array_tags::float64;
                     std::vector<uint8_t,byte_allocator_type> array_buffer(alloc_);
-                    read(array_buffer, ec);
+                    read_typed_array_bytes(read, array_buffer, ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;

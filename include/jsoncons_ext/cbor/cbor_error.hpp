@@ -39,7 +39,8 @@ enum class cbor_errc
     bad_mdarray,
     bad_extents,
     bigfloat_to_bigdec_failed,
-    max_dimensions_exceeded
+    max_dimensions_exceeded,
+    bad_typed_array
 };
 
 class cbor_error_category_impl
@@ -96,6 +97,8 @@ public:
                 return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
                 return "Product of extents does not match number of elements.";
+            case cbor_errc::bad_typed_array:
+                return "Typed array length is not a multiple of the element size.";
             default:
                 return "Unknown CBOR parser error";
         }
