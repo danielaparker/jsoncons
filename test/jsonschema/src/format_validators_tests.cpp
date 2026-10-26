@@ -126,6 +126,16 @@ TEST_CASE("date-time tests")
     }
 }
 
+TEST_CASE("hostname tests")
+{
+    SECTION("hostname")
+    {
+        CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("www.example.com"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(""));
+        CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(jsoncons::string_view()));
+    }
+}
+
 TEST_CASE("email tests")
 {
     SECTION("email")

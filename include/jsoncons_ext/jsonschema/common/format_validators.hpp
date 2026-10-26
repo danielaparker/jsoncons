@@ -565,6 +565,11 @@ namespace jsonschema {
     {
         enum class state_t {start_label,expect_letter_or_digit_or_hyphen_or_dot};
 
+        if (hostname.empty())
+        {
+            return false;
+        }
+
         state_t state = state_t::start_label;
         std::size_t length = hostname.length() - 1;
         std::size_t label_length = 0;
