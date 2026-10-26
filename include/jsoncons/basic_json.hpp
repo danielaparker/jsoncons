@@ -578,7 +578,10 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::short_str)), short_str_length_(length), tag_(tag)
             {
                 JSONCONS_ASSERT(length <= max_length);
-                std::memcpy(data_,p,length*sizeof(char_type));
+                if (length > 0)
+                {
+                    std::memcpy(data_,p,length*sizeof(char_type));
+                }
                 data_[length] = 0;
             }
 

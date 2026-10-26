@@ -641,158 +641,33 @@ public:
             switch (array_tag())
             {
                 case typed_array_tags::int8:
-                {
-                    auto ta = typed_array_cast<const int8_t>(array_buffer());
-                    if (std::is_same<value_type, int8_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const int8_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::int16:
-                {
-                    auto ta = typed_array_cast<const int16_t>(array_buffer());
-                    if (std::is_same<value_type, int16_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const int16_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::int32:
-                {
-                    auto ta = typed_array_cast<const int32_t>(array_buffer());
-                    if (std::is_same<value_type, int32_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const int32_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::int64:
-                {
-                    auto ta = typed_array_cast<const int64_t>(array_buffer());
-                    if (std::is_same<value_type, int64_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const int64_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::uint8:
-                {
-                    auto ta = typed_array_cast<const uint8_t>(array_buffer());
-                    if (std::is_same<value_type, uint8_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const uint8_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::uint16:
-                {
-                    auto ta = typed_array_cast<const uint16_t>(array_buffer());
-                    if (std::is_same<value_type, uint16_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const uint16_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::uint32:
-                {
-                    auto ta = typed_array_cast<const uint32_t>(array_buffer());
-                    if (std::is_same<value_type, uint32_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const uint32_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::uint64:
-                {
-                    auto ta = typed_array_cast<const uint64_t>(array_buffer());
-                    if (std::is_same<value_type, uint64_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const uint64_t>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::half_float:
                 {
                     auto ta = typed_array_cast<const int16_t>(array_buffer());
-                    if (std::is_same<value_type, int16_t>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else if (std::is_floating_point<value_type>::value)
+                    if (std::is_floating_point<value_type>::value)
                     {
                         v.reserve(ta.size());
                         for (auto item : ta)
@@ -802,60 +677,16 @@ public:
                     }
                     else
                     {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            v.push_back(static_cast<value_type>(item));
-                        }
+                        copy_typed_array(v, ta, ec);
                     }
                     break;
                 }
                 case typed_array_tags::float32:
-                {
-                    auto ta = typed_array_cast<const float>(array_buffer());
-                    if (std::is_same<value_type, float>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            if (!in_range<value_type>(item, nonstd::is_integer<value_type>()))
-                            {
-                                ec = conv_errc::not_integer;
-                                break;
-                            }
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const float>(array_buffer()), ec);
                     break;
-                }
                 case typed_array_tags::float64 :
-                {
-                    auto ta = typed_array_cast<const double>(array_buffer());
-                    if (std::is_same<value_type, double>::value)
-                    {
-                        v.resize(ta.size());
-                        std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
-                    }
-                    else
-                    {
-                        v.reserve(ta.size());
-                        for (auto item : ta)
-                        {
-                            if (!in_range<value_type>(item, nonstd::is_integer<value_type>()))
-                            {
-                                ec = conv_errc::not_integer;
-                                break;
-                            }
-                            v.push_back(static_cast<value_type>(item));
-                        }
-                    }
+                    copy_typed_array(v, typed_array_cast<const double>(array_buffer()), ec);
                     break;
-                }
                 default:
                     break;
             }
@@ -864,14 +695,43 @@ public:
     }
 
 private:
+    template <typename T,typename U>
+    static void copy_typed_array(T& v, jsoncons::span<const U> ta, std::error_code& ec)
+    {
+        using value_type = typename T::value_type;
+        using check_range = std::integral_constant<bool, std::is_floating_point<U>::value && nonstd::is_integer<value_type>::value>;
+
+        if (std::is_same<value_type, U>::value)
+        {
+            v.resize(ta.size());
+            if (!ta.empty())
+            {
+                std::memcpy(v.data(), ta.data(), ta.size()*sizeof(value_type));
+            }
+        }
+        else
+        {
+            v.reserve(ta.size());
+            for (auto item : ta)
+            {
+                if (!in_range<value_type>(item, check_range()))
+                {
+                    ec = conv_errc::not_integer;
+                    break;
+                }
+                v.push_back(static_cast<value_type>(item));
+            }
+        }
+    }
+
     template <typename T>
     static bool in_range(double val, std::true_type)
     {
         return in_integer_range<T>(val);
     }
 
-    template <typename T>
-    static bool in_range(double, std::false_type)
+    template <typename T,typename U>
+    static bool in_range(U, std::false_type)
     {
         return true;
     }

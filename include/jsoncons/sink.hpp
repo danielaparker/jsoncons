@@ -73,7 +73,10 @@ namespace jsoncons {
             std::size_t diff = end_buffer_ - p_;
             if (diff >= length)
             {
-                std::memcpy(p_, s, length*sizeof(CharT));
+                if (length > 0)
+                {
+                    std::memcpy(p_, s, length*sizeof(CharT));
+                }
                 p_ += length;
             }
             else
@@ -182,7 +185,10 @@ namespace jsoncons {
             std::size_t diff = end_buffer_ - p_;
             if (diff >= length)
             {
-                std::memcpy(p_, s, length*sizeof(uint8_t));
+                if (length > 0)
+                {
+                    std::memcpy(p_, s, length*sizeof(uint8_t));
+                }
                 p_ += length;
             }
             else

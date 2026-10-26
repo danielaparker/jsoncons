@@ -327,6 +327,10 @@ namespace detail {
 
         static int compare(const char_type* s1, const char_type* s2, std::size_t count) noexcept
         {
+            if (count == 0)
+            {
+                return 0;
+            }
             return std::memcmp(s1,s2,count);
         }
     };

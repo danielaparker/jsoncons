@@ -375,6 +375,10 @@ public:
 
     std::size_t read(value_type* p, std::size_t length)
     {
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            return 0;
+        }
         std::size_t len = 0;
         if (remaining_ > 0)
         {
@@ -595,7 +599,10 @@ public:
         {
             len = length;
         }
-        std::memcpy(p, current_, len*sizeof(value_type));
+        if (len > 0)
+        {
+            std::memcpy(p, current_, len*sizeof(value_type));
+        }
         current_  += len;
         return len;
     }

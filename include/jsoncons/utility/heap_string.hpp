@@ -156,7 +156,10 @@ public:
         auto psa = launder_cast<storage_t*>(storage);
 
         CharT* p = new(&psa->c)char_type[length + 1];
-        std::memcpy(p, s, length*sizeof(char_type));
+        if (length > 0)
+        {
+            std::memcpy(p, s, length*sizeof(char_type));
+        }
         p[length] = 0;
         ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
         ps->length_ = length;

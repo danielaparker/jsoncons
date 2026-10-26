@@ -240,6 +240,13 @@ TEST_CASE("stream_source tests")
         CHECK(0 == source.read(&b,1));
         CHECK(source.eof());
     }
+
+    SECTION("read nothing into a null buffer")
+    {
+        CHECK(source.peek().value == '0');
+        CHECK(0 == source.read(nullptr, 0));
+        CHECK(0 == source.position());
+    }
 }
 
 TEST_CASE("stream_source with non-propagating allocator tests")

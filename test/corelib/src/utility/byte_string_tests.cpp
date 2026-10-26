@@ -177,6 +177,14 @@ TEST_CASE("byte_string_view constructors")
         CHECK(moved[4] == 'a');
         CHECK(moved[5] == 'r');
     }
+    SECTION("empty views")
+    {
+        std::vector<uint8_t> v;
+        jsoncons::byte_string_view bstr(v.data(), v.size());
+        jsoncons::byte_string_view other;
+        CHECK(bstr == other);
+        CHECK_FALSE(bstr < other);
+    }
 }
 
 TEST_CASE("byte_string mutators")

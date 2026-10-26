@@ -801,6 +801,23 @@ TEST_CASE("cbor typed array tests")
         //REQUIRE(j.is_array());
         //REQUIRE(2 == j.size());
     }
+
+    SECTION("Empty typed arrays")
+    {
+        const std::vector<uint8_t> data1 = {
+            0xd8, // Tag
+                0x40, // Tag 64, uint8, typed array
+            0x40 // Byte string value of length 0
+        };
+        CHECK(cbor::decode_cbor<std::vector<uint8_t>>(data1).empty());
+
+        const std::vector<uint8_t> data2 = {
+            0xd8, // Tag
+                0x56, // Tag 86, float64, little endian, typed array
+            0x40 // Byte string value of length 0
+        };
+        CHECK(cbor::decode_cbor<std::vector<double>>(data2).empty());
+    }
 } 
 
 TEST_CASE("cbor multi-dim, row-major, uint64, classical array tests")
