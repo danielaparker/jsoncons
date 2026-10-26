@@ -283,6 +283,48 @@ TEST_CASE("stream_source with non-propagating allocator tests")
 
         CHECK(1 == source2.position());
     }
+
+    SECTION("move assignment reads the rest of the chunk")
+    {
+        char b[8]{};
+
+        source_type source(is, 8, alloc);
+        CHECK(3 == source.read(b, 3));
+        CHECK(5 == source.remaining());
+
+        source_type source2(is, 8, alloc);
+        source2 = std::move(source);
+        CHECK(5 == source2.read(b, 5));
+        CHECK(std::string("34567") == std::string(b, 5));
+    }
+
+    SECTION("self move assignment reads the rest of the chunk")
+    {
+        char b[8]{};
+
+        source_type source(is, 8, alloc);
+        CHECK(3 == source.read(b, 3));
+
+        source_type& same = source;
+        source = std::move(same);
+        CHECK(5 == source.read(b, 5));
+        CHECK(std::string("34567") == std::string(b, 5));
+    }
+
+    SECTION("move assignment from a source moved with an equal allocator")
+    {
+        char b[8]{};
+
+        source_type source(is, 8, alloc);
+        CHECK(3 == source.read(b, 3));
+        source_type source2(std::move(source), alloc);
+        CHECK(0 == source.chunk_size());
+        CHECK(5 == source2.read(b, 5));
+
+        source_type source3(alloc);
+        source3 = std::move(source);
+        CHECK(0 == source3.read(b, 5));
+    }
 }
 
 TEST_CASE("stream_source with propagating allocator tests")
@@ -325,6 +367,21 @@ TEST_CASE("stream_source with propagating allocator tests")
         CHECK(0 == source.chunk_size());
 
         CHECK(1 == source2.position());
+    }
+
+    SECTION("move assignment from a source moved with an equal allocator")
+    {
+        char b[8]{};
+
+        source_type source(is, 8, alloc);
+        CHECK(3 == source.read(b, 3));
+        source_type source2(std::move(source), alloc);
+        CHECK(0 == source.chunk_size());
+        CHECK(5 == source2.read(b, 5));
+
+        source_type source3(alloc);
+        source3 = std::move(source);
+        CHECK(0 == source3.read(b, 5));
     }
 }
 

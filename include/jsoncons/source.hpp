@@ -149,6 +149,7 @@ public:
             remaining_ = other.remaining_;
             other.chunk_ = nullptr;
             other.data_end_ = nullptr;
+            other.chunk_size_ = 0;
             other.remaining_ = 0;
         }
         else if (other.chunk_ != nullptr)
@@ -162,6 +163,9 @@ public:
             stream_ptr_ = other.stream_ptr_;
             sbuf_ = other.sbuf_;
             position_ = other.position_;
+            other.stream_ptr_ = &other.null_is_;
+            other.sbuf_ = other.null_is_.rdbuf();
+            other.position_ = 0;
         }
         else
         {
@@ -226,11 +230,25 @@ public:
     void move_assignment(std::false_type, // not propagate_on_container_move_assignment
         stream_source&& other) noexcept
     {
+        value_type* chunk = nullptr;
+        value_type* data_end = nullptr;
+        if (other.chunk_ != nullptr)
+        {
+            chunk = std::allocator_traits<char_allocator_type>::allocate(alloc_, other.chunk_size_);
+            data_end = chunk + (other.data_end_ - other.chunk_);
+            if (other.remaining_ > 0)
+            {
+                std::memcpy(data_end, other.data_end_, sizeof(value_type)*other.remaining_);
+            }
+        }
+        if (chunk_ != nullptr)
+        {
+            std::allocator_traits<char_allocator_type>::deallocate(alloc_, chunk_, chunk_size_);
+        }
+        chunk_ = chunk;
         chunk_size_ = other.chunk_size_;
-        chunk_ = std::allocator_traits<char_allocator_type>::allocate(alloc_, chunk_size_);
-        data_end_ = chunk_ + (other.data_end_ - other.chunk_);
+        data_end_ = data_end;
         remaining_ = other.remaining_;
-        std::memcpy(chunk_, other.chunk_, sizeof(value_type)*other.remaining_);
         if (other.stream_ptr_ != &other.null_is_)
         {
             stream_ptr_ = other.stream_ptr_;
