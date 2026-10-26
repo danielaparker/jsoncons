@@ -217,6 +217,17 @@ public:
         }
 
         scale_difference += preferred_scale;
+        if (unscaled_.is_zero())
+        {
+            value = basic_bigdec<Allocator>(basic_bigint<Allocator>(0), preferred_scale);
+            return bignum_result{};
+        }
+        // A positive difference n scales the dividend by 10^n, at a cost that grows with n squared
+        constexpr int64_t max_scale_difference = 100000;
+        if (scale_difference > max_scale_difference)
+        {
+            return bignum_result{bignum_errc::result_out_of_range};
+        }
         basic_bigint<Allocator> scaled_dividend = unscaled();
         basic_bigint<Allocator> adjusted_divisor = divisor.unscaled();
         if (scale_difference != 0)

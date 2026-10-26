@@ -220,4 +220,38 @@ TEST_CASE("basic_bigdec divide tests")
         REQUIRE(r);
         CHECK(expected == c);
     }
+    SECTION("a scale difference of 100000")
+    {
+        jsoncons::bigdec c;
+
+        auto r = jsoncons::bigdec("1").divide(jsoncons::bigdec("1e-100000"), c, 0);
+        REQUIRE(r);
+        CHECK(jsoncons::bigdec::big_ten_to_the(100000) == c.unscaled());
+
+        r = jsoncons::bigdec("1").divide(jsoncons::bigdec("3"), c, 100000);
+        REQUIRE(r);
+        CHECK(100000 == c.scale());
+        CHECK(jsoncons::bigdec::big_ten_to_the(100000) / 3 == c.unscaled());
+    }
+    SECTION("a scale difference above 100000")
+    {
+        jsoncons::bigdec c;
+
+        auto r = jsoncons::bigdec("1").divide(jsoncons::bigdec("1e-100001"), c, 0);
+        CHECK(jsoncons::bignum_errc::result_out_of_range == r.ec);
+
+        r = jsoncons::bigdec("1").divide(jsoncons::bigdec("3"), c, 100001);
+        CHECK(jsoncons::bignum_errc::result_out_of_range == r.ec);
+
+        r = jsoncons::bigdec("1").divide(jsoncons::bigdec("1e-9223372036854775807"), c, 0);
+        CHECK(jsoncons::bignum_errc::result_out_of_range == r.ec);
+
+        r = jsoncons::bigdec("0").divide(jsoncons::bigdec("1e-100001"), c, 0);
+        REQUIRE(r);
+        CHECK(jsoncons::bigdec("0") == c);
+
+        r = jsoncons::bigdec("0").divide(jsoncons::bigdec("1e-9223372036854775807"), c, 0);
+        REQUIRE(r);
+        CHECK(jsoncons::bigdec("0") == c);
+    }
 }
