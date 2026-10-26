@@ -559,7 +559,7 @@ namespace jsonschema {
         }
     }
 
-    // RFC 1034, Section 3.1
+    // RFC 1034, Section 3.1, with the label rules of RFC 1123, Section 2.1
     inline
     bool validate_hostname_rfc1034(jsoncons::string_view hostname)
     {
@@ -573,6 +573,7 @@ namespace jsonschema {
         state_t state = state_t::start_label;
         std::size_t length = hostname.length() - 1;
         std::size_t label_length = 0;
+        bool numeric_label = true;
 
         for (std::size_t i = 0; i < length; ++i)
         {
@@ -581,8 +582,9 @@ namespace jsonschema {
             {
                 case state_t::start_label:
                 {
-                    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                    if (is_digit(c) || is_alpha(c))
                     {
+                        numeric_label = is_digit(c);
                         ++label_length;
                         state = state_t::expect_letter_or_digit_or_hyphen_or_dot;
                     }
@@ -596,12 +598,17 @@ namespace jsonschema {
                 {
                     if (c == '.')
                     {
+                        numeric_label = true;
                         label_length = 0;
                         state = state_t::start_label;
                     }
                     else if (!(is_digit(c) || is_alpha(c) || c == '-'))
                     {
                         return false;
+                    }
+                    else if (!is_digit(c))
+                    {
+                        numeric_label = false;
                     }
                     if (++label_length > 63)
                     {
@@ -613,7 +620,7 @@ namespace jsonschema {
         }
 
         char last = hostname.back();
-        if (!(is_digit(last) || is_alpha(last)))
+        if (!(is_digit(last) || is_alpha(last)) || (numeric_label && is_digit(last)))
         {
             return false;
         }
