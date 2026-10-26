@@ -565,17 +565,16 @@ namespace jsonschema {
     {
         enum class state_t {start_label,expect_letter_or_digit_or_hyphen_or_dot};
 
-        if (hostname.empty())
+        if (hostname.empty() || hostname.length() > 253)
         {
             return false;
         }
 
         state_t state = state_t::start_label;
-        std::size_t length = hostname.length() - 1;
         std::size_t label_length = 0;
         bool numeric_label = true;
 
-        for (std::size_t i = 0; i < length; ++i)
+        for (std::size_t i = 0; i < hostname.length(); ++i)
         {
             const char c = hostname[i];
             switch (state)
@@ -598,11 +597,14 @@ namespace jsonschema {
                 {
                     if (c == '.')
                     {
-                        numeric_label = true;
+                        if (hostname[i - 1] == '-')
+                        {
+                            return false;
+                        }
                         label_length = 0;
                         state = state_t::start_label;
                     }
-                    else if (!(is_digit(c) || is_alpha(c) || c == '-'))
+                    else if (!(is_digit(c) || is_alpha(c) || c == '-') || ++label_length > 63)
                     {
                         return false;
                     }
@@ -610,17 +612,13 @@ namespace jsonschema {
                     {
                         numeric_label = false;
                     }
-                    if (++label_length > 63)
-                    {
-                        return false;
-                    }
                     break;
                 }
             }
         }
 
         char last = hostname.back();
-        if (!(is_digit(last) || is_alpha(last)) || (numeric_label && is_digit(last)))
+        if (numeric_label || !(is_digit(last) || is_alpha(last)))
         {
             return false;
         }

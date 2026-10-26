@@ -139,6 +139,11 @@ TEST_CASE("hostname tests")
         CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("a9"));
         CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("9abc.com"));
         CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034("-abc.com"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034("abc-.com"));
+        CHECK(jsoncons::jsonschema::validate_hostname_rfc1034("com." + std::string(63, 'a') + ".com"));
+        CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(std::string(64, 'a')));
+        CHECK(jsoncons::jsonschema::validate_hostname_rfc1034(std::string(63, 'a') + "." + std::string(63, 'b') + "." + std::string(63, 'c') + "." + std::string(61, 'd')));
+        CHECK_FALSE(jsoncons::jsonschema::validate_hostname_rfc1034(std::string(63, 'a') + "." + std::string(63, 'b') + "." + std::string(63, 'c') + "." + std::string(62, 'd')));
     }
 }
 
