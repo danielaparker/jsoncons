@@ -693,7 +693,6 @@ namespace jsonschema {
         int hour = 0;
         int minute = 0;
         int second = 0;
-        int secfrac = 0;
         int offset_signum = 0;
         int offset_hour = 0;
         int offset_minute = 0;      
@@ -806,6 +805,7 @@ namespace jsonschema {
                         switch (c)
                         {
                             case '.':
+                                piece_length = 0;
                                 state = state_t::secfrac;
                                 break;
                             case '+':
@@ -832,9 +832,9 @@ namespace jsonschema {
                 {
                     if (c >= '0' && c <= '9')
                     {
-                        secfrac = secfrac*10 + static_cast<int>(c - '0');
+                        piece_length++;
                     }
-                    else
+                    else if (piece_length > 0)
                     {
                         switch (c)
                         {
@@ -855,6 +855,10 @@ namespace jsonschema {
                             default:
                                 return false;
                         }
+                    }
+                    else
+                    {
+                        return false;
                     }
                     break;
                 }
