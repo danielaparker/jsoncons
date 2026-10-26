@@ -275,3 +275,15 @@ TEMPLATE_TEST_CASE("test_ubjson_encoder_reset", "",
     f.encoder.flush();
     CHECK(f.bytes2() == expected_full);
 }
+
+TEST_CASE("encode_ubjson nesting deeper than max_nesting_depth")
+{
+    auto options = ubjson::ubjson_options{}.max_nesting_depth(2);
+    for (auto text : {R"([[[[]]]])", R"({"a":{"a":{"a":{}}}})", R"({"a":[[[]]]})"})
+    {
+        std::vector<uint8_t> v;
+        auto result = ubjson::try_encode_ubjson(jsoncons::json::parse(text), v, options);
+        REQUIRE_FALSE(result);
+        CHECK(result.error() == ubjson::ubjson_errc::max_nesting_depth_exceeded);
+    }
+}

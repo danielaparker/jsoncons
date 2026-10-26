@@ -231,3 +231,15 @@ TEMPLATE_TEST_CASE("test_msgpack_encoder_reset", "",
     f.encoder.flush();
     CHECK(f.bytes2() == expected_full);
 }
+
+TEST_CASE("encode_msgpack nesting deeper than max_nesting_depth")
+{
+    auto options = msgpack::msgpack_options{}.max_nesting_depth(2);
+    for (auto text : {R"([[[[]]]])", R"({"a":{"a":{"a":{}}}})", R"({"a":[[[]]]})"})
+    {
+        std::vector<uint8_t> v;
+        auto result = msgpack::try_encode_msgpack(jsoncons::json::parse(text), v, options);
+        REQUIRE_FALSE(result);
+        CHECK(result.error() == msgpack::msgpack_errc::max_nesting_depth_exceeded);
+    }
+}

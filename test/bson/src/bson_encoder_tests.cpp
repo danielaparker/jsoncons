@@ -343,3 +343,15 @@ TEMPLATE_TEST_CASE("test_bson_encoder_reset", "",
     f.encoder.flush();
     CHECK(f.bytes2() == expected_full);
 }
+
+TEST_CASE("encode_bson nesting deeper than max_nesting_depth")
+{
+    auto options = bson::bson_options{}.max_nesting_depth(2);
+    for (auto text : {R"({"a":{"a":{"a":{}}}})", R"({"a":[[[]]]})"})
+    {
+        std::vector<uint8_t> v;
+        auto result = bson::try_encode_bson(jsoncons::json::parse(text), v, options);
+        REQUIRE_FALSE(result);
+        CHECK(result.error() == bson::bson_errc::max_nesting_depth_exceeded);
+    }
+}

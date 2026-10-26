@@ -615,3 +615,15 @@ TEST_CASE("test cbor encode with raw tags")
         CHECK(jsoncons::staj_events::begin_object == cursor.current().event_type());
     }
 }
+
+TEST_CASE("encode_cbor nesting deeper than max_nesting_depth")
+{
+    auto options = cbor::cbor_options{}.max_nesting_depth(2);
+    for (auto text : {R"([[[[]]]])", R"({"a":{"a":{"a":{}}}})", R"({"a":[[[]]]})"})
+    {
+        std::vector<uint8_t> v;
+        auto result = cbor::try_encode_cbor(jsoncons::json::parse(text), v, options);
+        REQUIRE_FALSE(result);
+        CHECK(result.error() == cbor::cbor_errc::max_nesting_depth_exceeded);
+    }
+}

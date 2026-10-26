@@ -4827,16 +4827,32 @@ namespace jsoncons {
                     break;
                 case json_storage_kind::empty_object:
                     visitor.begin_object(0, tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     visitor.end_object(context, ec);
                     break;
                 case json_storage_kind::object:
                 {
                     visitor.begin_object(size(), tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     const object& o = cast<object_storage>().value();
                     for (auto it = o.begin(); it != o.end(); ++it)
                     {
                         visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                         (*it).value().dump_noflush(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     visitor.end_object(context, ec);
                     break;
@@ -4844,10 +4860,18 @@ namespace jsoncons {
                 case json_storage_kind::array:
                 {
                     visitor.begin_array(size(), tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return;
+                    }
                     const array& o = cast<array_storage>().value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         (*it).dump_noflush(visitor, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return;
+                        }
                     }
                     visitor.end_array(context, ec);
                     break;
@@ -4902,15 +4926,27 @@ namespace jsoncons {
                     return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::empty_object:
                     visitor.begin_object(0, tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return write_result{unexpect, ec};
+                    }
                     visitor.end_object(context, ec);
                     return ec ? write_result{unexpect, ec} : write_result{};
                 case json_storage_kind::object:
                 {
                     visitor.begin_object(size(), tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return write_result{unexpect, ec};
+                    }
                     const object& o = cast<object_storage>().value();
                     for (auto it = o.begin(); it != o.end(); ++it)
                     {
                         visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
+                        if (JSONCONS_UNLIKELY(ec))
+                        {
+                            return write_result{unexpect, ec};
+                        }
                         (*it).value().dump_noflush(visitor, ec);
                         if (JSONCONS_UNLIKELY(ec))
                         {
@@ -4927,6 +4963,10 @@ namespace jsoncons {
                 case json_storage_kind::array:
                 {
                     visitor.begin_array(size(), tag(), context, ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        return write_result{unexpect, ec};
+                    }
                     const array& o = cast<array_storage>().value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
