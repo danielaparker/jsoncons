@@ -653,7 +653,7 @@ private:
                 ec = r.error_code();
                 return;
             }
-            if (add_overflow(scale, val))
+            if (add_overflow(scale, val) || scale + val == (std::numeric_limits<int64_t>::min)())
             {
                 ec = cbor_errc::bigdec_scale_overflow;
                 return;

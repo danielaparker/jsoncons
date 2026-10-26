@@ -348,6 +348,12 @@ TEST_CASE("serialize bigdec to cbor")
         cbor::cbor_bytes_encoder encoder(v);
         REQUIRE_THROWS_WITH(encoder.string_value("1.5e-9223372036854775808", jsoncons::semantic_tag::bigdec), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::bigdec_scale_overflow).c_str());
     }
+    SECTION("1e-9223372036854775808")
+    {
+        std::vector<uint8_t> v;
+        cbor::cbor_bytes_encoder encoder(v);
+        REQUIRE_THROWS_WITH(encoder.string_value("1e-9223372036854775808", jsoncons::semantic_tag::bigdec), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::bigdec_scale_overflow).c_str());
+    }
 } 
 
 TEST_CASE("Too many and too few items in CBOR map or array")
