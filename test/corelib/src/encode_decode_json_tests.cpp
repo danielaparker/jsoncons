@@ -190,7 +190,7 @@ TEST_CASE("convert vector of vector test")
     }
 }
 
-#if !(defined(__GNUC__) && __GNUC__ <= 5)
+#if !(defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 5)
 TEST_CASE("convert_tuple_test")
 {
     using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
@@ -335,7 +335,7 @@ TEST_CASE("decode_json with work allocator")
         }
     }
 
-    #if !(defined(__GNUC__) && __GNUC__ <= 5)
+    #if !(defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 5)
 
     SECTION("convert_tuple_test")
     {
