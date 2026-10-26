@@ -136,6 +136,13 @@ TEST_CASE("basic_bigdec terminal tests")
     }
 }
 
+TEST_CASE("basic_bigdec big_ten_to_the tests")
+{
+    CHECK(jsoncons::bigint(1) == jsoncons::bigdec::big_ten_to_the(0));
+    CHECK(jsoncons::bigint(10) == jsoncons::bigdec::big_ten_to_the(1));
+    CHECK(jsoncons::bigint("100000000000000000000") == jsoncons::bigdec::big_ten_to_the(20));
+}
+
 TEST_CASE("basic_bigdec multiply tests")
 {
     SECTION("123456.123456 * 123456789.123456789")

@@ -86,11 +86,6 @@ public:
 
     static basic_bigint<Allocator> big_ten_to_the(std::size_t n) 
     {
-        if (n == 0)
-        {
-            return basic_bigint<Allocator>{0};
-        }
-
         if (n < uint64_pow10_table.size())
         {
             return basic_bigint<Allocator>(uint64_pow10_table[n]);
