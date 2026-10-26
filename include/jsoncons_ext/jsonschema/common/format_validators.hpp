@@ -746,7 +746,7 @@ namespace jsonschema {
                         piece_length++;
                         mday = mday *10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if ((c == 'T' || c == 't') && piece_length == 2 && (mday <= days_in_month(year, month)))
+                    else if ((c == 'T' || c == 't') && piece_length == 2 && (mday >= 1 && mday <= days_in_month(year, month)))
                     {
                         piece_length = 0;
                         state = state_t::hour;
@@ -891,10 +891,6 @@ namespace jsonschema {
                         piece_length++;
                         offset_minute = offset_minute*10 + static_cast<int>(c - '0');
                     }
-                    else if (c == ':' && piece_length == 2 && (/*offset_minute >=0 && */offset_minute <= 59))
-                    {
-                        piece_length = 0;
-                    }
                     else
                     {
                         return false;
@@ -959,7 +955,7 @@ namespace jsonschema {
         {
             return state == state_t::mday && piece_length == 2 && (mday >= 1 && mday <= days_in_month(year, month));
         }
-        return state == state_t::offset_minute || state == state_t::z || state == state_t::secfrac;
+        return (state == state_t::offset_minute && piece_length == 2) || state == state_t::z;
     }
 
     // format checkers
