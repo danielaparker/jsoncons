@@ -1591,6 +1591,10 @@ private:
                             }
                             break;
                         }
+                    default:
+                        ec = cbor_errc::unknown_type;
+                        more_ = false;
+                        return val;
                 }
                 break;
 
@@ -1615,7 +1619,9 @@ private:
                 }
                 break;
             default:
-                break;
+                ec = cbor_errc::unknown_type;
+                more_ = false;
+                return val;
         }
 
         return val;
@@ -2050,11 +2056,6 @@ private:
                     return;
                 }
                 exponent = static_cast<int64_t>(u);
-                if (exponent == 0)
-                {
-                    str.append("0.0");
-                    return;
-                }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -2062,11 +2063,6 @@ private:
                 exponent = read_int64(ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
-                    return;
-                }
-                if (exponent == 0)
-                {
-                    str.append("0.0");
                     return;
                 }
                 break;

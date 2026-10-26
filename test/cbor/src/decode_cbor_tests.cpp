@@ -708,6 +708,36 @@ TEST_CASE("cbor decode to bigfloat tests")
         double val = j.as<double>();
         CHECK(val == Approx(-1.5).epsilon(0.0000000001));
     }
+    SECTION("exponent 0")
+    {
+        std::vector<uint8_t> v = {0x82, // Array of length 2
+                                  0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x00, // 0
+                                  0x18,0xe0, // 224
+                                  0x01 // 1
+                                 };
+
+        auto j = cbor::decode_cbor<jsoncons::json>(v);
+
+        REQUIRE(2 == j.size());
+        CHECK("224" == j[0].as<std::string>());
+        CHECK(224.0 == j[0].as<double>());
+        CHECK(1 == j[1].as<int>());
+    }
+    SECTION("reserved exponent")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5
+                                  0x82, // Array of length 2
+                                  0x3f, // Negative integer, additional information 31
+                                  0x03 // 3
+                                 };
+
+        auto result = cbor::try_decode_cbor<jsoncons::json>(v);
+
+        REQUIRE_FALSE(result);
+        CHECK(cbor::cbor_errc::unknown_type == result.error().code());
+    }
     SECTION("most negative mantissa and exponent")
     {
         std::vector<uint8_t> v = {0xc5, // Tag 5
