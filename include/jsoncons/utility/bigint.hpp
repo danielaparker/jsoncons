@@ -153,7 +153,7 @@ public:
             std::is_signed<T>::value > ::type* = 0)
             : is_allocated_(false),
             is_negative_(n < 0),
-            size_(n == 0 ? 0 : inlined_capacity)
+            size_(0)
         {
             using unsigned_type = typename std::make_unsigned<T>::type;
 
@@ -161,6 +161,7 @@ public:
             values_[0] = word_type(u & max_word);;
             u >>= word_bits;
             values_[1] = word_type(u & max_word);;
+            size_ = values_[1] != 0 ? inlined_capacity : (values_[0] != 0 ? 1 : 0);
         }
 
         template <typename T>
@@ -170,11 +171,12 @@ public:
             !std::is_signed<T>::value > ::type* = 0)
             : is_allocated_(false),
             is_negative_(false),
-            size_(n == 0 ? 0 : inlined_capacity)
+            size_(0)
         {
             values_[0] = word_type(n & max_word);;
             n >>= word_bits;
             values_[1] = word_type(n & max_word);;
+            size_ = values_[1] != 0 ? inlined_capacity : (values_[0] != 0 ? 1 : 0);
         }
 
         inlined_storage(const inlined_storage& stor)

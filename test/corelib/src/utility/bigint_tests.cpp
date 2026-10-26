@@ -870,6 +870,19 @@ TEST_CASE("basic_bigint bit tests")
     }
 }
 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_NATIVE_INT128) && !defined(__STRICT_ANSI__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+TEST_CASE("bigint from a 128-bit integer")
+{
+    CHECK(jsoncons::bigint(1) == jsoncons::bigint(static_cast<__int128>(1)));
+    CHECK(jsoncons::bigint(-1) == jsoncons::bigint(static_cast<__int128>(-1)));
+    CHECK(jsoncons::bigint(9) == jsoncons::bigint(10) - jsoncons::bigint(static_cast<unsigned __int128>(1)));
+    CHECK(jsoncons::bigint("18446744073709551616") == jsoncons::bigint(static_cast<__int128>(1) << 64));
+}
+#pragma GCC diagnostic pop
+#endif
+
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <common/mock_stateful_allocator.hpp>
