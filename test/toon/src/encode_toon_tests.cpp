@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/toon/encode_toon.hpp>
 #include <catch/catch.hpp>
+#include <common/test_utilities.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -233,6 +234,24 @@ quux[3]: 1,2,3)";
         toon::encode_toon(j, buffer);
         CHECK(expected == buffer);
 
+    }
+    SECTION("ostream")
+    {
+        auto j = jsoncons::ojson::parse(R"({"foo":1})");
+
+        std::string expected = R"(foo: 1)";
+        std::ostringstream os;
+        toon::encode_toon(j, os);
+        CHECK(expected == os.str());
+    }
+    SECTION("ostream that throws")
+    {
+        auto j = jsoncons::ojson::parse(R"({"foo":1})");
+
+        failing_buf buf;
+        std::ostream os(&buf);
+        os.exceptions(std::ios::badbit);
+        CHECK_THROWS_AS(toon::encode_toon(j, os), std::ios_base::failure);
     }
 }
 

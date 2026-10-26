@@ -1409,7 +1409,9 @@ write_result try_encode_toon(const T& val, std::basic_ostream<char>& os,
     const toon_encode_options& options = toon_encode_options())
 {
     stream_sink<char> sink{os};
-    return encode_value(val, options, sink);
+    auto result = encode_value(val, options, sink, 0);
+    sink.flush();
+    return result;
 }
 
 template <typename... Args>
