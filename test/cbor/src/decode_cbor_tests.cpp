@@ -863,6 +863,8 @@ TEST_CASE("cbor nested semantic tags with differing argument widths")
         std::vector<uint8_t> v = {0xC1,0xC2,0x00}; // tag 1 (tag 2 (0))
         auto j = cbor::decode_cbor<jsoncons::ojson>(v);
         CHECK(j.as<uint64_t>() == 0);
+        // The inner tag 2 must not be misread as tag 1 (epoch_second).
+        CHECK(j.tag() == jsoncons::semantic_tag::none);
     }
     SECTION("nested tag with reserved additional information is rejected")
     {
