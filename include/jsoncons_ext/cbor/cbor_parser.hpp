@@ -2220,16 +2220,16 @@ private:
             return;
         }
         jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
-        uint8_t info = get_additional_information(c.value);
-        if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
-        {
-            ec = cbor_errc::reserved_additional_info;
-            more_ = false;
-            return;
-        }
 
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
+            uint8_t info = get_additional_information(c.value);
+            if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+            {
+                ec = cbor_errc::reserved_additional_info;
+                more_ = false;
+                return;
+            }
             source_.ignore(1);
             uint64_t val = read_unsigned_integer(info, ec);
             if (JSONCONS_UNLIKELY(ec))
