@@ -191,7 +191,7 @@ try_encode_optional_member(const basic_string_view<CharT>& key, const T& val, ba
     if (val.has_value())
     {
         encoder.key(key);
-        return encode_traits<T>::encode(make_alloc_set(), *val, encoder); 
+        return encode_traits<T>::encode(make_alloc_set(), val, encoder);
     }
     return write_result{}; 
 } 
