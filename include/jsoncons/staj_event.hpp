@@ -29,7 +29,7 @@
 #include <jsoncons/ser_common.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 
 #include <jsoncons/utility/conversion.hpp>
 

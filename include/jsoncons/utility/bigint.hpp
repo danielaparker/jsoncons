@@ -24,7 +24,7 @@
 
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/bignum_common.hpp>
 #include <jsoncons/utility/number_writers.hpp>
 
@@ -47,7 +47,7 @@ public:
     using word_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
     using size_type = typename std::allocator_traits<word_allocator_type>::size_type;
     using word_type = uint64_t;
-    using dword_type = jsoncons::u128;
+    using dword_type = jsoncons::uint128;
     static constexpr word_type max_word = (std::numeric_limits<word_type>::max)();
     static constexpr size_type mem_unit = sizeof(word_type);
     static constexpr size_type word_bits = sizeof(word_type) * 8;  // Number of bits
@@ -76,6 +76,16 @@ public:
         ValueType operator[](size_type i) const
         {
             return data_[i];
+        }
+
+        bool empty() const
+        {
+            return size_ == 0;
+        }
+
+        const ValueType& back() const
+        {
+            return data_[size_ - 1];
         }
 
         ValueType* data()
@@ -1405,12 +1415,12 @@ public:
     std::string to_string() const
     {
         std::string s;
-        append_to_buffer(s);
+        append_to_string(s);
         return s;
     }
 
     template <typename Ch,typename Traits,typename Alloc>
-    void append_to_buffer(std::basic_string<Ch,Traits,Alloc>& buf) const
+    void append_to_string(std::basic_string<Ch,Traits,Alloc>& buf) const
     {
         if (is_zero())
         {
@@ -1692,7 +1702,7 @@ public:
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigint& v)
     {
         std::basic_string<CharT> s;
-        v.append_to_buffer(s); 
+        v.append_to_string(s); 
         os << s;
 
         return os;
@@ -1732,7 +1742,7 @@ public:
         return is_negative() ? -code : code;
     }
 
-    u128 trailing_zero_bits() const
+    uint128 trailing_zero_bits() const
     {
         // Assumes words contains the absolute magnitude,
         // even when BigInt is negative.
@@ -1742,16 +1752,16 @@ public:
             const uint64_t w = words[i];
 
             if (w != 0) {
-                return static_cast<u128>(i) * 64
+                return static_cast<uint128>(i) * 64
                      + jsoncons::countr_zero(w);
             }
         }
 
         // Zero has no finite number of trailing zero bits.
-        return (jsoncons::nonstd::integer_limits<u128>::max)();
+        return (jsoncons::nonstd::integer_limits<uint128>::max)();
     }
 
-    size_type bit_width() const
+    uint128 bit_width() const
     {
         auto words = get_words();
         size_type len = words.size();
@@ -1759,7 +1769,7 @@ public:
         {
             return 0;
         }
-        size_type n = 0;
+        uint128 n = 0;
         size_type mag_bit_width = ((len - 1) << 6) + static_cast<size_type>(64 - jsoncons::countl_zero(words[len-1]));
         if (is_negative())
         {
@@ -2133,7 +2143,7 @@ public:
     }
 
     template <typename CharT, typename BAlloc>
-    friend void append_to_buffer(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
+    friend void append_to_string(const basic_bigint& value, std::basic_string<CharT, std::char_traits<CharT>, BAlloc>& buf)
     {
         if (value.is_zero())
         {
@@ -2243,6 +2253,64 @@ public:
         }
 
         return 0;
+    }
+
+    uint64_t divmod_small(uint64_t divisor)
+    {
+        auto words = get_words();
+
+        if (divisor == 0)
+        {
+            JSONCONS_THROW(std::runtime_error( "Divide by zero." ));
+        }
+
+        uint64_t remainder = 0;
+
+        for (size_t i = words.size(); i-- > 0;) {
+            const uint128 current =
+                (static_cast<uint128>(remainder) << 64) | words[i];
+
+            const uint64_t q =
+                static_cast<uint64_t>(current / divisor);
+
+            words[i] = q;
+
+            remainder = static_cast<uint64_t>(
+                current - static_cast<uint128>(q) * divisor
+            );
+        }
+
+        normalize();
+        return remainder;
+    }
+
+    uint64_t mod_small(uint64_t divisor) const
+    {
+        if (divisor == 0)
+            JSONCONS_THROW(std::runtime_error( "Divide by zero." ));
+
+        auto words = get_words();
+
+        uint64_t remainder = 0;
+
+        for (size_t i = words.size(); i-- > 0;) {
+            const uint128 current =
+                (static_cast<uint128>(remainder) << 64) | words[i];
+
+            remainder = static_cast<uint64_t>(current % divisor);
+        }
+
+        return remainder;
+    }
+
+    void normalize()
+    {
+        auto words = get_words();
+        while (!words.empty() && words.back() == 0)
+            resize(words.size() - 1);
+
+        if (words.empty())
+            set_negative(false);
     }
 };
 

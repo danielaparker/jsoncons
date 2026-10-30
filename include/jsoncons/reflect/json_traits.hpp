@@ -32,7 +32,7 @@
 #include <jsoncons/semantic_tag.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/byte_string.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/conversion.hpp>
 #include <jsoncons/conversion_result.hpp>
 #include <jsoncons/json_type_traits.hpp>
@@ -1397,7 +1397,7 @@ has_can_convert = nonstd::is_detected<traits_can_convert_t, Json, T>;
         {
             using temp_alloc_type = typename std::allocator_traits<TempAlloc>:: template rebind_alloc<char_type>;
             std::basic_string<char_type,std::char_traits<char_type>,temp_alloc_type> s{aset.get_temp_allocator()};
-            val.append_to_buffer(s);
+            val.append_to_string(s);
             return jsoncons::make_obj_using_allocator<Json>(aset.get_allocator(), s, semantic_tag::bigint);
         }
     };

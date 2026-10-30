@@ -321,7 +321,7 @@ TEST_CASE("basic_json number compare")
     SECTION("unsigned unsigned")
     {
         jsoncons::json o;
-        o["a"] = std::numeric_limits<uint64_t>::max();
+        o["a"] = (std::numeric_limits<uint64_t>::max)();
         o["b"] = std::numeric_limits<uint64_t>::lowest();
 
         CHECK(o.at("a") == o.at("a")); // value and value
@@ -384,7 +384,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned signed test")
     {
-        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json a = (std::numeric_limits<uint64_t>::max)();
         jsoncons::json b = std::numeric_limits<int64_t>::lowest();
 
         CHECK(a == a); // value and value
@@ -474,7 +474,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned double test")
     {
-        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json a = (std::numeric_limits<uint64_t>::max)();
         jsoncons::json b = std::numeric_limits<double>::lowest();
 
         CHECK(a == a); // value and value
@@ -526,7 +526,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("bigint string and double")
     {
-        jsoncons::json a{ std::to_string(std::numeric_limits<uint64_t>::max()), jsoncons::semantic_tag::bigint };
+        jsoncons::json a{ std::to_string((std::numeric_limits<uint64_t>::max)()), jsoncons::semantic_tag::bigint };
         jsoncons::json b{ std::numeric_limits<double>::lowest() };
 
         CHECK_FALSE(a == b);

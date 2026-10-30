@@ -36,6 +36,24 @@ void expect_bigdec(
     }
 }
 
+void expect_bigdec(
+    const jsoncons::bigdec& b,
+    const char* expectedMantissa,
+    int64_t expectedScale,
+    const char* expectedStr)
+{
+    CHECK(b.unscaled().to_string() == expectedMantissa);
+    CHECK(b.scale() == expectedScale);
+    std::string str;
+    append_to_string(b, str); 
+    CHECK(str == expectedStr);
+
+    if (b.scale() != expectedScale || str != expectedStr)
+    {
+        std::cout << "bigdec: " << b << ", expectedMantissa: " << expectedMantissa << ", actualScale: " << b.scale() << ", expectedScale: " << expectedScale << ", str: " << str << "\n";
+    }
+}
+
 std::error_code parse_cbor_error(const std::vector<uint8_t>& v)
 {
     std::error_code ec;
@@ -868,13 +886,13 @@ TEST_CASE("cbor bigfloat tests")
         cbor::from_cbor_bigfloat(jsoncons::bigint(125), 3, value);
         expect_bigdec(
             value,
-            "1000", 0
+            "1", -3, "1e3"
         );
 
         cbor::from_cbor_bigfloat(jsoncons::bigint(-7), 2, value);
         expect_bigdec(
             value,
-            "-28", 0
+            "-28", 0, "-28"
         );
 
         cbor::from_cbor_bigfloat(jsoncons::bigint(8), -3, value);

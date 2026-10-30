@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>

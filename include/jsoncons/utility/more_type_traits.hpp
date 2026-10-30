@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
-#define JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
+#ifndef JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
@@ -18,9 +18,9 @@
 #include <string>
 #include <type_traits> // std::enable_if, std::true_type
 #include <utility> // std::declval
-#include <jsoncons/nonstd/u128.hpp>
+#include <jsoncons/nonstd/uint128.hpp>
 
-#include <jsoncons/nonstd/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> 
@@ -67,20 +67,16 @@ namespace nonstd {
     template <typename T,typename Enable=void>
     struct is_int128_type : std::false_type {};
 
-#if defined(JSONCONS_HAS_NATIVE_INT128)
     template <typename T>
-    struct is_int128_type<T,typename std::enable_if<std::is_same<T,int128_type>::value>::type> : std::true_type {};
-#endif
+    struct is_int128_type<T,typename std::enable_if<std::is_same<T,int128>::value>::type> : std::true_type {};
 
     // is_unsigned_integer
 
     template <typename T,typename Enable=void>
     struct is_uint128_type : std::false_type {};
 
-#if defined (JSONCONS_HAS_NATIVE_INT128)
     template <typename T>
-    struct is_uint128_type<T,typename std::enable_if<std::is_same<T,uint128_type>::value>::type> : std::true_type {};
-#endif
+    struct is_uint128_type<T,typename std::enable_if<std::is_same<T,uint128>::value>::type> : std::true_type {};
 
     template <typename T,typename Enable = void>
     class integer_limits
@@ -114,13 +110,13 @@ namespace nonstd {
     };
 
     template <typename T>
-    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && is_int128_type<T>::value>::type>
+    class integer_limits<T,typename std::enable_if<std::is_same<T,jsoncons::int128>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = true;
         static constexpr int digits =  sizeof(T)*CHAR_BIT - 1;
-        static constexpr std::size_t buffer_size = (sizeof(T)*CHAR_BIT*0.302) + 3;
+        static constexpr std::size_t buffer_size = size_t((sizeof(T)*CHAR_BIT*0.302) + 3);
         static constexpr int digits10 = 38;
 
         static constexpr T(max)() noexcept
@@ -138,30 +134,7 @@ namespace nonstd {
     };
 
     template <typename T>
-    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && is_uint128_type<T>::value>::type>
-    {
-    public:
-        static constexpr bool is_specialized = true;
-        static constexpr bool is_signed = false;
-        static constexpr int digits =  sizeof(T)*CHAR_BIT;
-        static constexpr int digits10 = 38;
-
-        static constexpr T(max)() noexcept
-        {
-            return T(T(~0));
-        }
-        static constexpr T(min)() noexcept
-        {
-            return 0;
-        }
-        static constexpr T lowest() noexcept
-        {
-            return std::numeric_limits<T>::lowest();
-        }
-    };
-
-    template <typename T>
-    class integer_limits<T, typename std::enable_if<std::is_same<T,jsoncons::nonstd::u128>::value>::type>
+    class integer_limits<T, typename std::enable_if<std::is_same<T,jsoncons::uint128>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
@@ -402,12 +375,10 @@ namespace nonstd {
     template <typename T>
     struct make_unsigned_impl {using type = typename std::make_unsigned<T>::type;};
 
-    #if defined(JSONCONS_HAS_NATIVE_INT128)
     template <> 
-    struct make_unsigned_impl<int128_type> {using type = uint128_type;};
+    struct make_unsigned_impl<int128> {using type = uint128;};
     template <> 
-    struct make_unsigned_impl<uint128_type> {using type = uint128_type;};
-    #endif
+    struct make_unsigned_impl<uint128> {using type = uint128;};
 
     template <typename T>
     struct make_unsigned
@@ -818,19 +789,6 @@ namespace impl {
     template <typename T>
     using is_typed_array = impl::is_typed_array<typename std::decay<T>::type>;
 
-    // is_compatible_element
-
-    template <typename Container,typename Element,typename Enable=void>
-    struct is_compatible_element : std::false_type {};
-
-    template <typename Container,typename Element>
-    struct is_compatible_element
-    <
-        Container, Element, 
-        typename std::enable_if<has_data<Container>::value>::type>
-            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data())>::type(*)[], Element(*)[]>
-    {};
-
     template <typename T>
     using
     construct_from_string_t = decltype(T(std::string{}));
@@ -1007,4 +965,4 @@ namespace impl {
 } // nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_NONSTD_MORE_TYPE_TRAITS_HPP
+#endif // JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP

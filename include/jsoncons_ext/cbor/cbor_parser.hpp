@@ -27,16 +27,567 @@
 #include <jsoncons/utility/binary.hpp>
 #include <jsoncons/utility/bigdec.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
-
+ 
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 #include <jsoncons_ext/cbor/cbor_typed_array_iterator.hpp>
 
-namespace jsoncons { 
+namespace jsoncons {
 namespace cbor {
 
-enum class parse_mode {root,accept,array,typed_array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
+namespace {
+
+template <typename Allocator>
+struct binary_interval {
+    basic_bigint<Allocator> lo;
+    basic_bigint<Allocator> hi;
+    int128 exponent = 0;
+};
+
+// Compare a * 2^ae against b * 2^be.
+// a and b must be nonnegative.
+//
+// The large exponent is never expanded into a basic_bigint<Allocator>.
+
+template <typename Allocator>
+int compare_scaled(
+    const basic_bigint<Allocator>& a, int128 ae,
+    const basic_bigint<Allocator>& b, int128 be)
+{
+    const int128 alen =
+        static_cast<int128>(a.bit_length());
+    const int128 blen =
+        static_cast<int128>(b.bit_length());
+
+    if (alen == 0 || blen == 0) {
+        if (alen == blen) return 0;
+        return alen == 0 ? -1 : 1;
+    }
+
+    const int128 atop = alen + ae;
+    const int128 btop = blen + be;
+
+    if (atop != btop)
+        return atop < btop ? -1 : 1;
+
+    // Equal effective bit lengths imply that the
+    // required alignment shift is bounded by the
+    // sizes of a and b, not by the huge exponent.
+    if (ae > be) {
+        const int128 delta = ae - be;
+
+        if (delta > static_cast<int128>(UINT64_MAX))
+            throw std::length_error("shift too large");
+
+        basic_bigint<Allocator> aligned = a;
+        aligned <<= (static_cast<uint64_t>(delta));
+
+        if (aligned < b) return -1;
+        if (aligned > b) return 1;
+        return 0;
+    }
+
+    if (be > ae) {
+        const int128 delta = be - ae;
+
+        if (delta > static_cast<int128>(UINT64_MAX))
+            throw std::length_error("shift too large");
+
+        basic_bigint<Allocator> aligned = b;
+        aligned <<= (static_cast<uint64_t>(delta));
+
+        if (a < aligned) return -1;
+        if (a > aligned) return 1;
+        return 0;
+    }
+
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+}
+
+template <typename Allocator>
+void normalize_interval(
+    binary_interval<Allocator>& x,
+    uint64_t workingBits)
+{
+    const uint128 n = x.hi.bit_length();
+
+    if (n <= workingBits)
+        return;
+
+    const uint64_t shift =
+        static_cast<uint64_t>(n - workingBits);
+
+    const bool upperDiscarded =
+        x.hi.any_low_bits(shift);
+
+    x.lo >>= (shift);
+    x.hi >>= (shift);
+
+    if (upperDiscarded)
+        x.hi += basic_bigint<Allocator>(1);
+
+    x.exponent += static_cast<int128>(shift);
+}
+
+template <typename Allocator>
+binary_interval<Allocator> exact_interval(
+    const basic_bigint<Allocator>& value,
+    int128 exponent,
+    uint64_t workingBits)
+{
+    binary_interval<Allocator> result{
+        value, value, exponent
+    };
+
+    normalize_interval(result, workingBits);
+    return result;
+}
+
+template <typename Allocator>
+binary_interval<Allocator> multiply_intervals(
+    const binary_interval<Allocator>& a,
+    const binary_interval<Allocator>& b,
+    uint64_t workingBits)
+{
+    binary_interval<Allocator> result{
+        a.lo * b.lo,
+        a.hi * b.hi,
+        a.exponent + b.exponent
+    };
+
+    normalize_interval(result, workingBits);
+    return result;
+}
+
+// Bounded-size representation of 5^exponent.
+template <typename Allocator>
+binary_interval<Allocator> pow5_interval(
+    uint64_t exponent,
+    uint64_t workingBits)
+{
+    binary_interval<Allocator> result =
+        exact_interval(basic_bigint<Allocator>(1), 0, workingBits);
+
+    binary_interval<Allocator> base =
+        exact_interval(basic_bigint<Allocator>(5), 0, workingBits);
+
+    while (exponent != 0) {
+        if (exponent & 1) {
+            result = multiply_intervals(
+                result, base, workingBits
+            );
+        }
+
+        exponent >>= 1;
+
+        if (exponent != 0) {
+            base = multiply_intervals(
+                base, base, workingBits
+            );
+        }
+    }
+
+    return result;
+}
+
+// Test exact equality:
+//
+//     unscaled * 2^exponent == 10^k
+//
+// This is used only when interval comparison
+// cannot distinguish the operands.
+template <typename Allocator>
+bool exactly_power_of_ten(
+    const basic_bigint<Allocator>& unscaled,
+    uint64_t exponent,
+    uint64_t k)
+{
+    // 10^k = 5^k * 2^k.
+    // An integer unscaled cannot compensate for
+    // more powers of 2 on the left.
+    if (exponent > k)
+        return false;
+
+    // 5^k has more than k bits for k > 0.
+    // Avoid allocating an enormous power.
+    if (static_cast<uint128>(k) >
+        unscaled.bit_length())
+        return false;
+
+    const basic_bigint<Allocator> power5 =
+        powb(basic_bigint<Allocator>(5), k);
+
+    return compare_scaled(
+        unscaled, static_cast<int128>(exponent),
+        power5, static_cast<int128>(k)
+    ) == 0;
+}
+
+// Returns -1, 0, +1 for comparison with 10^k.
+template <typename Allocator>
+int compare_power10(
+    const basic_bigint<Allocator>& unscaled,
+    uint64_t exponent,
+    uint64_t k)
+{
+    uint64_t workingBits = 128;
+
+    for (;;) {
+        const binary_interval<Allocator> value = exact_interval(
+            unscaled,
+            static_cast<int128>(exponent),
+            workingBits
+        );
+
+        binary_interval<Allocator> power =
+            pow5_interval<Allocator>(k, workingBits);
+
+        power.exponent += static_cast<int128>(k);
+
+        // The entire value interval is below 10^k.
+        if (compare_scaled(
+                value.hi, value.exponent,
+                power.lo, power.exponent) < 0)
+            return -1;
+
+        // The entire value interval is above 10^k.
+        if (compare_scaled(
+                value.lo, value.exponent,
+                power.hi, power.exponent) > 0)
+            return 1;
+
+        // Handle exact equality without endless refinement.
+        if (exactly_power_of_ten(unscaled, exponent, k))
+            return 0;
+
+        if (workingBits > UINT64_MAX / 2)
+            throw std::length_error("precision overflow");
+
+        workingBits *= 2;
+    }
+}
+
+// Find floor(log10(unscaled * 2^exponent)).
+//
+// This uses O(log(exponent + bit_length)) comparisons,
+// without constructing the expanded value.
+template <typename Allocator>
+uint64_t decimal_order(
+    const basic_bigint<Allocator>& unscaled,
+    uint64_t exponent)
+{
+    const uint128 upper =
+        unscaled.bit_width() +
+        static_cast<uint128>(exponent);
+
+    if (upper > static_cast<uint128>(UINT64_MAX))
+        throw std::overflow_error("decimal order overflow");
+
+    uint64_t low = 0;
+    uint64_t high = static_cast<uint64_t>(upper);
+
+    // The input is a positive integer, so it is >= 10^0.
+    while (low < high) {
+        const uint64_t mid =
+            low + (high - low + 1) / 2;
+
+        if (compare_power10(
+                unscaled, exponent, mid) >= 0)
+            low = mid;
+        else
+            high = mid - 1;
+    }
+
+    return low;
+}
+
+// Round a nonnegative rational number to the nearest
+// integer, ties to even.
+template <typename Allocator>
+basic_bigint<Allocator> divide_round_even(
+    const basic_bigint<Allocator>& numerator,
+    const basic_bigint<Allocator>& denominator)
+{
+    basic_bigint<Allocator> remainder;
+
+    basic_bigint<Allocator> quotient;
+    numerator.divide(denominator, quotient, remainder, true);
+
+    remainder <<= (1);
+
+    if (remainder > denominator ||
+        (remainder == denominator &&
+         quotient.test_bit(0))) {
+        quotient += basic_bigint<Allocator>(1);
+    }
+
+    return quotient;
+}
+
+// Round:
+//
+//     (numerator / denominator) * 2^binaryShift
+//
+// All shifts are bounded by the working precision
+// when the decimal order has been chosen correctly.
+template <typename Allocator>
+basic_bigint<Allocator> round_scaled_ratio(
+    basic_bigint<Allocator> numerator,
+    basic_bigint<Allocator> denominator,
+    int128 binaryShift)
+{
+    if (binaryShift >= 0) {
+        if (binaryShift > static_cast<int128>(UINT64_MAX))
+            throw std::length_error("shift too large");
+
+        numerator <<= (
+            static_cast<uint64_t>(binaryShift));
+    } else {
+        const int128 amount = -binaryShift;
+
+        if (amount > static_cast<int128>(UINT64_MAX))
+            throw std::length_error("shift too large");
+
+        denominator <<= (
+            static_cast<uint64_t>(amount));
+    }
+
+    return divide_round_even(numerator, denominator);
+}
+
+// Exact midpoint test:
+//
+// m * 2^e == (q + 1/2) * 10^d
+//
+// Equivalently:
+//
+// m * 2^(e+1) == (2*q+1) * 5^d * 2^d
+template <typename Allocator>
+bool exactly_halfway(
+    const basic_bigint<Allocator>& unscaled,
+    uint64_t exponent,
+    uint64_t d,
+    const basic_bigint<Allocator>& lowerRounded)
+{
+    // The right side has exactly d factors of 2.
+    // If the left side has more, equality is impossible.
+    if (static_cast<uint128>(exponent) + 1 >
+        static_cast<uint128>(d))
+        return false;
+
+    // With exponent + 1 <= d, an exact tie requires
+    // 5^d to divide the input unscaled.
+    // Therefore d cannot exceed its bit length.
+    if (static_cast<uint128>(d) >
+        unscaled.bit_length())
+        return false;
+
+    basic_bigint<Allocator> odd = lowerRounded;
+    odd <<= (1);
+    odd += basic_bigint<Allocator>(1);
+
+    const basic_bigint<Allocator> power5 =
+        powb(basic_bigint<Allocator>(5), d);
+
+    odd *= power5;
+
+    return compare_scaled(
+        unscaled,
+        static_cast<int128>(exponent) + 1,
+        odd,
+        static_cast<int128>(d)
+    ) == 0;
+}
+
+// Round m * 2^e / 10^d to nearest integer.
+//
+// Increase working precision only when the bounds
+// do not determine a unique answer.
+template <typename Allocator>
+basic_bigint<Allocator> rounded_decimal_mantissa(
+    const basic_bigint<Allocator>& unscaled,
+    uint64_t exponent,
+    uint64_t d,
+    uint64_t precision)
+{
+    if (precision > (UINT64_MAX - 128) / 4)
+        throw std::length_error("precision too large");
+
+    uint64_t workingBits =
+        std::max<uint64_t>(128, precision * 4 + 128);
+
+    for (;;) {
+        const binary_interval<Allocator> value = exact_interval(
+            unscaled,
+            static_cast<int128>(exponent),
+            workingBits
+        );
+
+        const binary_interval<Allocator> power =
+            pow5_interval<Allocator>(d, workingBits);
+
+        const int128 shift =
+            value.exponent -
+            power.exponent -
+            static_cast<int128>(d);
+
+        const basic_bigint<Allocator> lower = round_scaled_ratio(
+            value.lo, power.hi, shift
+        );
+
+        const basic_bigint<Allocator> upper = round_scaled_ratio(
+            value.hi, power.lo, shift
+        );
+
+        if (lower == upper)
+            return lower;
+
+        // Exact ties can otherwise remain ambiguous forever.
+        basic_bigint<Allocator> next = lower;
+        next += basic_bigint<Allocator>(1);
+
+        if (upper == next &&
+            exactly_halfway(
+                unscaled, exponent, d, lower)) {
+            return lower.test_bit(0) ? upper : lower;
+        }
+
+        if (workingBits > UINT64_MAX / 2)
+            throw std::length_error("precision overflow");
+
+        workingBits *= 2;
+    }
+}
+
+// Compact an exact positive integer m * 2^e
+// by moving as many powers of 10 as possible
+// into a negative decimal scale.
+template <typename Allocator>
+basic_bigdec<Allocator> compact_exact_positive(
+    basic_bigint<Allocator> unscaled,
+    uint64_t exponent)
+{
+    uint64_t canceled = 0;
+
+    while (canceled < exponent &&
+           unscaled.mod_small(5) == 0) {
+        unscaled.divmod_small(5);
+        ++canceled;
+    }
+
+    unscaled <<= (exponent - canceled);
+
+    return {
+        std::move(unscaled),
+        -static_cast<int64_t>(canceled)
+    };
+}
+
+} // namespace
+
+template <typename Allocator>
+cbor_errc from_cbor_bigfloat_positive_rounded(
+    basic_bigint<Allocator> unscaled,
+    uint64_t exponent,
+    uint64_t precision,
+    basic_bigdec<Allocator>& value)
+{
+    if (precision == 0)
+        throw std::invalid_argument(
+            "precision must be positive");
+
+    if (unscaled.is_zero())
+    {
+        value = {basic_bigint<Allocator>(0), 0};
+        return cbor_errc{};
+    }
+
+    const bool negative = unscaled < basic_bigint<Allocator>(0);
+
+    if (negative)
+        unscaled = -unscaled;
+
+    // decimalOrder = floor(log10(abs(m) * 2^e)).
+    const uint64_t decimalOrder =
+        decimal_order(unscaled, exponent);
+
+    // The exact integer already fits the requested
+    // significant-digit precision.
+    if (static_cast<uint128>(decimalOrder) + 1 <=
+        static_cast<uint128>(precision)) {
+
+        basic_bigdec<Allocator> result = compact_exact_positive(
+            std::move(unscaled), exponent
+        );
+
+        if (negative)
+            result.set_negative(result.unscaled().is_negative() ? false : true);
+
+        value = result;
+        return cbor_errc{};
+    }
+
+    // Number of decimal places to discard.
+    uint64_t decimalShift =
+        decimalOrder - (precision - 1);
+
+    basic_bigint<Allocator> rounded = rounded_decimal_mantissa(
+        unscaled,
+        exponent,
+        decimalShift,
+        precision
+    );
+
+    // Rounding can increase the digit count:
+    // 999 -> 1000, with precision 3.
+    //
+    // This power is only precision digits long,
+    // never exponent digits long.
+    const basic_bigint<Allocator> precisionLimit =
+        powb(basic_bigint<Allocator>(10), precision);
+
+    if (rounded >= precisionLimit) {
+        if (rounded.divmod_small(10) != 0)
+            throw std::logic_error(
+                "unexpected rounding carry");
+
+        ++decimalShift;
+    }
+
+    // Remove trailing decimal zeros to minimize
+    // the resulting unscaled.
+    while (rounded.mod_small(10) == 0) {
+        rounded.divmod_small(10);
+        ++decimalShift;
+    }
+
+    // scale = -decimalShift.
+    // Allow decimalShift == 2^63, which maps
+    // exactly to INT64_MIN.
+    constexpr uint64_t maxNegativeScaleMagnitude =
+        uint64_t(1) << 63;
+
+    if (decimalShift > maxNegativeScaleMagnitude)
+        throw std::overflow_error(
+            "decimal scale overflow");
+
+    if (negative)
+        rounded = -rounded;
+
+    const int64_t scale =
+        decimalShift == maxNegativeScaleMagnitude
+            ? INT64_MIN
+            : -static_cast<int64_t>(decimalShift);
+
+    value = basic_bigdec<Allocator> {
+        std::move(rounded),
+        scale
+    };
+    return cbor_errc{};
+}
 
 template <typename Allocator>
 cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
@@ -60,27 +611,40 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
         return cbor_errc{};
     }
 
-    // Positive exponent: exact integer.
-    if (exponent >= 0) {
-        unscaled <<= (static_cast<uint64_t>(exponent));
-        value = basic_bigdec<Allocator>{ std::move(unscaled), 0 };
-        return cbor_errc{};
-    }
-
     const bool negative = unscaled < basic_bigint<Allocator>(0);
 
     if (negative)
-        unscaled = -unscaled;
+    {
+        unscaled.set_negative(false);
+    }
+
+    // Positive exponent: exact integer.
+    //if (exponent >= 0) {
+    //    unscaled <<= (static_cast<uint64_t>(exponent));
+    //    value = basic_bigdec<Allocator>{ std::move(unscaled), 0 };
+    //    return cbor_errc{};
+    //}
+
+    if (exponent >= 0) {
+        auto r = from_cbor_bigfloat_positive_rounded(unscaled, exponent, max_decimal_places, value);
+        if (negative)
+        {
+            //std::cout << value << ", ";
+            value.set_negative(true);
+            //std::cout << value << "\n";
+        }
+        return r;
+    }
 
     // Absolute exponent, safe for INT64_MIN.
     uint64_t k =
         static_cast<uint64_t>(-(exponent + 1)) + 1;
 
     // Cancel powers of 2.
-    const u128 trailing = unscaled.trailing_zero_bits();
+    const uint128 trailing = unscaled.trailing_zero_bits();
 
     const uint64_t cancel =
-        trailing >= static_cast<u128>(k)
+        trailing >= static_cast<uint128>(k)
             ? k
             : static_cast<uint64_t>(trailing);
 
@@ -117,11 +681,11 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
     //
     // If shift >= bit_length(m) + 3*scale,
     // the rounded result must be zero.
-    const u128 bits = unscaled.bit_length();
-    const u128 bound =
-        bits + static_cast<u128>(3) * scale;
+    const uint128 bits = unscaled.bit_length();
+    const uint128 bound =
+        bits + static_cast<uint128>(3) * scale;
 
-    if (static_cast<u128>(shift) >= bound) {
+    if (static_cast<uint128>(shift) >= bound) {
         value = basic_bigdec<Allocator>{
             basic_bigint<Allocator>(0),
             static_cast<int64_t>(scale)
@@ -155,6 +719,8 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
 
 template <typename Source,typename Allocator>
 class basic_cbor_parser;
+
+enum class parse_mode { root, accept, array, typed_array, indefinite_array, map_key, map_value, indefinite_map_key, indefinite_map_value, multi_dim };
 
 struct parse_state 
 {
@@ -1704,7 +2270,7 @@ private:
                     bigint b(u);
                     bigint b2 = -1 - b;
                     text_buffer_.clear();
-                    b2.append_to_buffer(text_buffer_);
+                    b2.append_to_string(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                 }
                 else if (JSONCONS_UNLIKELY(u == static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())))
@@ -1999,7 +2565,7 @@ private:
         }
 
         bigdec dec(std::move(unscaled), -exponent);
-        append_to_buffer(dec, result);
+        append_to_string(dec, result);
     }
 
     void read_bigfloat(uint8_t container_info, string_type& str, std::error_code& ec)
@@ -2108,7 +2674,7 @@ private:
                 }
                 unscaled = bigint(u);
                 //bigdec dec(std::move(unscaled), -exponent);
-                //append_to_buffer(dec, str);
+                //append_to_string(dec, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -2132,7 +2698,7 @@ private:
                     unscaled = bigint(static_cast<int64_t>(-1) - static_cast<int64_t>(u));
                 }
                 //bigdec dec(std::move(unscaled), -exponent);
-                //append_to_buffer(dec, str);
+                //append_to_string(dec, str);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -2186,6 +2752,7 @@ private:
         }
 
         bigdec dec;
+
         auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_);
         if (result != cbor_errc{})
         {
@@ -2193,7 +2760,7 @@ private:
             more_ = false;
             return;
         }
-        append_to_buffer(dec, str);
+        append_to_string(dec, str);
     }
 
     static jsoncons::cbor::detail::cbor_major_type get_major_type(uint8_t type)
@@ -2318,7 +2885,7 @@ private:
                     }
                     bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
                     text_buffer_.clear();
-                    b.append_to_buffer(text_buffer_);
+                    b.append_to_string(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;
@@ -2334,7 +2901,7 @@ private:
                     bigint b = bigint::from_bytes_be(1, bytes.data(), bytes.size());
                     b = -1 - b;
                     text_buffer_.clear();
-                    b.append_to_buffer(text_buffer_);
+                    b.append_to_string(text_buffer_);
                     visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     more_ = !cursor_mode_;
                     break;

@@ -12,6 +12,7 @@
 #include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/utility/bignum_common.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/number_writers.hpp>
 
 #include <array>
 
@@ -69,9 +70,14 @@ public:
     basic_bigdec& operator=(const basic_bigdec&) = default;
     basic_bigdec& operator=(basic_bigdec&&) = default;
 
-    basic_bigint<Allocator> unscaled() const
+    const basic_bigint<Allocator>& unscaled() const
     {
         return unscaled_;
+    }
+
+    void set_negative(bool value)
+    {
+        unscaled_.set_negative(value);
     }
 
     int64_t scale() const
@@ -255,7 +261,7 @@ public:
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigdec& b)
     {
         std::basic_string<CharT> s;
-        append_to_buffer(b, s); 
+        append_to_string(b, s); 
         os << s;
 
         return os;
@@ -403,61 +409,53 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     return to_number_result<CharT>(cur);
 }
 
-template <typename Alloc,typename CharT,typename BAlloc>
-void append_to_buffer(const basic_bigdec<Alloc>& value, std::basic_string<CharT,std::char_traits<CharT>,BAlloc>& buf)
+template <typename Alloc,typename CharT,typename SAlloc>
+void append_to_string(const basic_bigdec<Alloc>& value, 
+    std::basic_string<CharT,std::char_traits<CharT>,SAlloc>& buf) 
 {
-    if (value.scale() == 0)
-    {
-        append_to_buffer(value.unscaled(), buf);
+    append_to_string(value.unscaled(), buf);
+
+    const size_t sign = buf[0] == '-' ? 1 : 0;
+    const size_t precision = buf.size() - sign;
+    const int64_t scale = value.scale();
+
+    const int128 adjustedExponent =
+        static_cast<int128>(precision) - 1 -
+        static_cast<int128>(scale);
+
+    // Plain notation when scale >= 0 and
+    // adjustedExponent >= -6.
+    if (scale >= 0 && adjustedExponent >= -6) {
+        if (scale == 0)
+            return;
+
+        if (static_cast<uint64_t>(scale) >= precision) {
+            // 123 with scale 5 -> 0.00123
+            const size_t zeros =
+                static_cast<size_t>(scale) - precision;
+
+            buf.insert(sign, "0.");
+            buf.insert(sign + 2, zeros, '0');
+        }
+        else {
+            // 12345 with scale 2 -> 123.45
+            const size_t position =
+                buf.size() - static_cast<size_t>(scale);
+
+            buf.insert(position, 1, '.');
+        }
+
         return;
     }
-    if (value.unscaled().is_negative())
-    {
-        buf.push_back('-');
-    }
-    std::basic_string<CharT> coeff;
-    append_to_buffer(value.unscaled().is_negative() ? -value.unscaled() : value.unscaled(), coeff);
-    std::size_t coeffLen = coeff.size();
-    if ((value.scale() >= 0) && (value.scale() <= static_cast<int64_t>(coeffLen) + 5)) 
-    { 
-        int64_t pad = value.scale() - coeffLen;         // padding zeros
-        if (pad >= 0) {                                 // 0.xxx form
-            buf.push_back('0');
-            buf.push_back('.');
-            for (; pad>0; pad--) {
-                buf.push_back('0');
-            }
-            buf.append(coeff.data(), coeffLen);
-        } 
-        else 
-        {
-            buf.append(coeff.data(), -pad);
-            buf.push_back('.');
-            buf.append(coeff.data() -pad, value.scale());
-        }
-    }
-    else
-    {
-        buf.push_back(coeff[0]);   // first character
-        if (coeffLen > 1) 
-        {
-            buf.push_back('.');
-            buf.append(coeff.data() + 1, coeffLen - 1);
-        }
-        int64_t digits = static_cast<int64_t>(coeffLen) - 1;
-        if (value.scale() != digits) 
-        {             
-            buf.push_back('e');
-            if (value.scale() < digits)
-            {
-                from_integer(static_cast<uint64_t>(digits) - static_cast<uint64_t>(value.scale()), buf);
-            }
-            else
-            {
-                from_integer(digits - value.scale(), buf);
-            }
-        }
-    }
+
+    // Scientific notation.
+    // 12345 with scale -2 -> 1.2345E+6
+    if (precision > 1)
+        buf.insert(sign + 1, 1, '.');
+
+    buf.push_back('e');
+
+    from_integer(adjustedExponent, buf);
 }
 
 using bigdec = basic_bigdec<std::allocator<uint64_t>>;

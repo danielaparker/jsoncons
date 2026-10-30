@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_NONSTD_U128_HPP
-#define JSONCONS_NONSTD_U128_HPP
+#ifndef JSONCONS_NONSTD_UINT128_HPP
+#define JSONCONS_NONSTD_UINT128_HPP
 
 #include <limits>
 #include <type_traits>
@@ -19,15 +19,15 @@
 namespace jsoncons { 
 namespace nonstd {
 
-struct u128 
+struct uint128 
 {
     uint64_t hi;
     uint64_t lo;
 
     // Constructors
-    constexpr u128() : hi(0), lo(0) {}
-    constexpr u128(uint64_t lo) : hi(0), lo(lo) {}
-    constexpr u128(uint64_t hi, uint64_t lo) : hi(hi), lo(lo) {}
+    constexpr uint128() : hi(0), lo(0) {}
+    constexpr uint128(uint64_t lo) : hi(0), lo(lo) {}
+    constexpr uint128(uint64_t hi, uint64_t lo) : hi(hi), lo(lo) {}
 
     explicit operator bool() const {
         return hi != 0 || lo != 0;
@@ -37,8 +37,17 @@ struct u128
         return hi == 0 && lo == 0;
     }
 
+    template<typename T>
+    explicit operator T() const
+    {
+        static_assert(std::is_integral<T>::value, "T must be an integral type");
+        static_assert(sizeof(T) <= sizeof(uint64_t), "T must be 64 bits or less");
+
+        return static_cast<T>(lo);
+    }    
+
     // Addition
-    u128 operator+(const u128& rhs) const {
+    uint128 operator+(const uint128& rhs) const {
         uint64_t new_low = lo + rhs.lo;
         // Carry occurs if the result wrapped around and is less than one of the inputs
         uint64_t carry = (new_low < lo) ? 1 : 0;
@@ -46,12 +55,12 @@ struct u128
         return {new_high, new_low};
     }
 
-    u128& operator+=(const u128& rhs) {
+    uint128& operator+=(const uint128& rhs) {
         *this = *this + rhs;
         return *this;
     } 
 
-    bool operator<(const u128& rhs) const
+    bool operator<(const uint128& rhs) const
     {
         if (hi != rhs.hi)
             return hi < rhs.hi;
@@ -59,7 +68,7 @@ struct u128
         return lo < rhs.lo;
     }
 
-    bool operator>(const u128& rhs) const
+    bool operator>(const uint128& rhs) const
     {
         if (hi != rhs.hi)
             return hi > rhs.hi;
@@ -67,7 +76,7 @@ struct u128
         return lo > rhs.lo;
     }
 
-    bool operator>=(const u128& rhs) const
+    bool operator>=(const uint128& rhs) const
     {
         if (hi != rhs.hi)
             return hi > rhs.hi;
@@ -76,7 +85,7 @@ struct u128
     }
 
     // Left Shift
-    u128 operator<<(unsigned int shift) const {
+    uint128 operator<<(unsigned int shift) const {
         if (shift == 0) return *this;
         if (shift >= 128) return {0, 0};
 
@@ -92,7 +101,7 @@ struct u128
     }
 
     // Right Shift
-    u128 operator>>(unsigned int shift) const {
+    uint128 operator>>(unsigned int shift) const {
         if (shift == 0) return *this;
         if (shift >= 128) return {0, 0};
 
@@ -108,7 +117,7 @@ struct u128
     }
 
 
-    u128 operator*(const u128& rhs) const {
+    uint128 operator*(const uint128& rhs) const {
         // Split components into 32-bit chunks to avoid 64-bit overflow during multiplication
         uint64_t a3 = hi >> 32;
         uint64_t a2 = hi & 0xFFFFFFFFFFFFFFULL; // lower 32 bits of hi
@@ -141,13 +150,13 @@ struct u128
         return {new_high, new_low};
     }
 
-    u128& operator*=(const u128& rhs) {
+    uint128& operator*=(const uint128& rhs) {
         *this = *this * rhs;
         return *this;
     }
     // Equality Comparisons
-    bool operator==(const u128& rhs) const { return hi == rhs.hi && lo == rhs.lo; }
-    bool operator!=(const u128& rhs) const { return !(*this == rhs); }
+    bool operator==(const uint128& rhs) const { return hi == rhs.hi && lo == rhs.lo; }
+    bool operator!=(const uint128& rhs) const { return !(*this == rhs); }
 
     // Explicit conversion operator to uint64_t
         // Returns the lower 64 bits and discards the hi 64 bits
@@ -155,29 +164,29 @@ struct u128
         return lo;
     }
     // Bitwise OR
-    constexpr u128 operator|(const u128& rhs) const {
+    constexpr uint128 operator|(const uint128& rhs) const {
         return {hi | rhs.hi, lo | rhs.lo};
     }
 
-    u128& operator|=(const u128& rhs) {
+    uint128& operator|=(const uint128& rhs) {
         hi |= rhs.hi;
         lo |= rhs.lo;
         return *this;
     }
 /*
-    bool operator<(const u128& rhs) const {
+    bool operator<(const uint128& rhs) const {
         if (hi != rhs.hi) {
             return hi < rhs.hi;
         }
         return lo < rhs.lo;
     }
 */
-    bool operator<=(const u128& rhs) const {
+    bool operator<=(const uint128& rhs) const {
         return *this < rhs || *this == rhs;
     }
 
     // 128-bit Division Operator
-    u128 operator/(const u128& rhs) const {
+    uint128 operator/(const uint128& rhs) const {
         // 1. Handle division by zero
         if (rhs.hi == 0 && rhs.lo == 0) {
             JSONCONS_THROW(std::runtime_error("Division by zero"));
@@ -194,8 +203,8 @@ struct u128
         }
 
         // 4. Core Shift-and-Subtract Loop
-        u128 quotient = {0, 0};
-        u128 remainder = {0, 0};
+        uint128 quotient = {0, 0};
+        uint128 remainder = {0, 0};
 
         // Standard binary long division tracking bit-by-bit from MSB to LSB
         for (int i = 127; i >= 0; --i) {
@@ -203,26 +212,26 @@ struct u128
             remainder = remainder << 1;
 
             // Extract the i-th bit of the dividend
-            u128 current_bit = (*this >> i) & u128(1);
+            uint128 current_bit = (*this >> i) & uint128(1);
             remainder = remainder | current_bit;
 
             // If the remainder is larger than or equal to the divisor, subtract
             if (rhs <= remainder) {
                 remainder = remainder - rhs; // Note: Requires operator- (shown below)
-                quotient = quotient | (u128(1) << i);
+                quotient = quotient | (uint128(1) << i);
             }
         }
 
         return quotient;
     }
 
-    u128& operator/=(const u128& rhs) {
+    uint128& operator/=(const uint128& rhs) {
         *this = *this / rhs;
         return *this;
     }
 
     // Helper operator- required for the division algorithm subtraction step
-    u128 operator-(const u128& rhs) const {
+    uint128 operator-(const uint128& rhs) const {
         uint64_t new_low = lo - rhs.lo;
         // Borrow occurs if lo wrapped around
         uint64_t borrow = (lo < rhs.lo) ? 1 : 0;
@@ -230,22 +239,22 @@ struct u128
         return {new_high, new_low};
     }
 
-    u128& operator>>=(unsigned int shift) {
+    uint128& operator>>=(unsigned int shift) {
         *this = *this >> shift;
         return *this;
     }
     // Bitwise AND
-    constexpr u128 operator&(const u128& rhs) const {
+    constexpr uint128 operator&(const uint128& rhs) const {
         return {hi & rhs.hi, lo & rhs.lo};
     }
 
-    u128& operator&=(const u128& rhs) {
+    uint128& operator&=(const uint128& rhs) {
         hi &= rhs.hi;
         lo &= rhs.lo;
         return *this;
     }
     // 128-bit Modulo Operator
-    u128 operator%(const u128& rhs) const {
+    uint128 operator%(const uint128& rhs) const {
         // 1. Handle division by zero
         if (rhs.hi == 0 && rhs.lo == 0) {
             JSONCONS_THROW(std::runtime_error("Division by zero in modulo operation"));
@@ -262,13 +271,13 @@ struct u128
         }
 
         // 4. Shift-and-Subtract Loop
-        u128 remainder = {0, 0};
+        uint128 remainder = {0, 0};
 
         for (int i = 127; i >= 0; --i) {
             // Shift remainder left by 1 and pull down the next bit from the dividend
             remainder = remainder << 1;
 
-            u128 current_bit = (*this >> i) & u128(1);
+            uint128 current_bit = (*this >> i) & uint128(1);
             remainder = remainder | current_bit;
 
             // If the remainder is larger than or equal to the divisor, subtract
@@ -280,7 +289,7 @@ struct u128
         return remainder;
     }
 
-    u128& operator%=(const u128& rhs) {
+    uint128& operator%=(const uint128& rhs) {
         *this = *this % rhs;
         return *this;
     }
@@ -289,4 +298,4 @@ struct u128
 } // namespace nonstd
 } // namespace jsoncons
 
-#endif // JSONCONS_NONSTD_U128_HPP
+#endif // JSONCONS_NONSTD_UINT128_HPP
