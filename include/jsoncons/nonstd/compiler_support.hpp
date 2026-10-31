@@ -398,11 +398,11 @@
 #if defined(JSONCONS_HAS_NATIVE_INT128) && defined(__cplusplus)
 namespace jsoncons{
 #  ifdef __GNUC__
-   __extension__ typedef __int128 int128_type;
-   __extension__ typedef unsigned __int128 uint128_type;
+   __extension__ typedef __int128 native_int128;
+   __extension__ typedef unsigned __int128 native_uint128;
 #  else
-   typedef __int128 int128_type;
-   typedef unsigned __int128 uint128_type;
+   typedef __int128 native_int128;
+   typedef unsigned __int128 native_uint128;
 #  endif
 }
 #endif

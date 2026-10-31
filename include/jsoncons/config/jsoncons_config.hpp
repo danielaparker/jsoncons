@@ -20,8 +20,8 @@
 
 #if defined(JSONCONS_HAS_NATIVE_INT128)
 namespace jsoncons {
-using int128 = jsoncons::int128_type;
-using uint128 = jsoncons::uint128_type;
+using int128 = jsoncons::native_int128;
+using uint128 = jsoncons::native_uint128;
 } // namespace jsoncons
 #else 
 #include <jsoncons/nonstd/uint128.hpp>

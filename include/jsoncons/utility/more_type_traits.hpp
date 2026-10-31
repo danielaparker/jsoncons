@@ -18,7 +18,6 @@
 #include <string>
 #include <type_traits> // std::enable_if, std::true_type
 #include <utility> // std::declval
-#include <jsoncons/nonstd/uint128.hpp>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
