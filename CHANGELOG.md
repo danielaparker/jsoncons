@@ -1,7 +1,35 @@
 master
 ------
 
-Changes:
+- Fixed bugs
+
+  - Git Issue PR #750: Fix JMESPath merge overrides for non-primitive values
+
+  - Git Issue PR #751: Fix jmespath merge() dropping overrides for object/array values 
+
+  - Git Issue PR #752: Quote CSV values with line breaks and column names that need it
+
+  - Git Issue PR #753: Encode uint64 values above INT64_MAX in UBJSON
+
+  - Git Issue PR #756: Fix incorrect keys overriden by merge_or_update
+
+  - Git Issue PR #757: jsonpath: accept a + exponent sign in number literals
+
+  - Git Issue PR #758: docs: fix runnable JSON and CBOR examples
+
+  - Git Issue PR #759: docs: fix quick-guide JSONPath and reflection examples
+
+  - Git Issue PR #760: Little fix for truncation warning
+
+  - Git Issue PR #761: jsonpointer: reject array indices with leading zeros
+
+  - Git Issue PR #762: jsonpatch: reject moving a location into one of its children
+
+  - Git PR #763: jsonpatch: roll back add, move and copy that target the root
+
+  - Git Issue #764/PR #798: Fix CBOR read_tags reuse of the first tag's additional information
+
+- Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
   string tagged with **semantic_tag::bigfloat**. Since 1.11.0, the
@@ -14,11 +42,14 @@ Changes:
 
   - `semantic_tag::bigfloat` has been removed
 
-Enhancements:
+- Enhancements:
 
   - New cbor decode option **bigfloat_precision**, defaults to 34.
 
   - New cbor decode option **max_dimensions**, defaults to 32.
+
+  - New integer types jsoncons::int128 and jsoncons::uint128 that 
+  are typedef-ed to native types when detected and otherwise to custom types. 
 
 Release 1.10.0
 --------------
