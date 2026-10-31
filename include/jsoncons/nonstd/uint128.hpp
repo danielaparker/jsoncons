@@ -21,20 +21,20 @@ namespace nonstd {
 
 struct uint128 
 {
-    uint64_t hi;
-    uint64_t lo;
+    uint64_t hi_;
+    uint64_t lo_;
 
     // Constructors
-    constexpr uint128() : hi(0), lo(0) {}
-    constexpr uint128(uint64_t lo) : hi(0), lo(lo) {}
-    constexpr uint128(uint64_t hi, uint64_t lo) : hi(hi), lo(lo) {}
+    constexpr uint128() : hi_(0), lo_(0) {}
+    constexpr uint128(uint64_t lo) : hi_(0), lo_(lo) {}
+    constexpr uint128(uint64_t hi, uint64_t lo) : hi_(hi), lo_(lo) {}
 
     explicit operator bool() const {
-        return hi != 0 || lo != 0;
+        return hi_ != 0 || lo_ != 0;
     }
 
     bool operator!() const {
-        return hi == 0 && lo == 0;
+        return hi_ == 0 && lo_ == 0;
     }
 
     template<typename T>
@@ -43,45 +43,45 @@ struct uint128
         static_assert(std::is_integral<T>::value, "T must be an integral type");
         static_assert(sizeof(T) <= sizeof(uint64_t), "T must be 64 bits or less");
 
-        return static_cast<T>(lo);
+        return static_cast<T>(lo_);
     }    
 
     // Addition
-    uint128 operator+(const uint128& rhs) const {
-        uint64_t new_low = lo + rhs.lo;
+    uint128 operator+(uint128 rhs) const {
+        uint64_t new_low = lo_ + rhs.lo_;
         // Carry occurs if the result wrapped around and is less than one of the inputs
-        uint64_t carry = (new_low < lo) ? 1 : 0;
-        uint64_t new_high = hi + rhs.hi + carry;
+        uint64_t carry = (new_low < lo_) ? 1 : 0;
+        uint64_t new_high = hi_ + rhs.hi_ + carry;
         return {new_high, new_low};
     }
 
-    uint128& operator+=(const uint128& rhs) {
+    uint128& operator+=(uint128 rhs) {
         *this = *this + rhs;
         return *this;
     } 
 
-    bool operator<(const uint128& rhs) const
+    bool operator<(uint128 rhs) const
     {
-        if (hi != rhs.hi)
-            return hi < rhs.hi;
+        if (hi_ != rhs.hi_)
+            return hi_ < rhs.hi_;
 
-        return lo < rhs.lo;
+        return lo_ < rhs.lo_;
     }
 
-    bool operator>(const uint128& rhs) const
+    bool operator>(uint128 rhs) const
     {
-        if (hi != rhs.hi)
-            return hi > rhs.hi;
+        if (hi_ != rhs.hi_)
+            return hi_ > rhs.hi_;
 
-        return lo > rhs.lo;
+        return lo_ > rhs.lo_;
     }
 
-    bool operator>=(const uint128& rhs) const
+    bool operator>=(uint128 rhs) const
     {
-        if (hi != rhs.hi)
-            return hi > rhs.hi;
+        if (hi_ != rhs.hi_)
+            return hi_ > rhs.hi_;
 
-        return lo >= rhs.lo;
+        return lo_ >= rhs.lo_;
     }
 
     // Left Shift
@@ -90,12 +90,12 @@ struct uint128
         if (shift >= 128) return {0, 0};
 
         if (shift >= 64) {
-            return {lo << (shift - 64), 0};
+            return {lo_ << (shift - 64), 0};
         }
         else {
             return {
-                (hi << shift) | (lo >> (64 - shift)),
-                lo << shift
+                (hi_ << shift) | (lo_ >> (64 - shift)),
+                lo_ << shift
             };
         }
     }
@@ -106,28 +106,27 @@ struct uint128
         if (shift >= 128) return {0, 0};
 
         if (shift >= 64) {
-            return {0, hi >> (shift - 64)};
+            return {0, hi_ >> (shift - 64)};
         }
         else {
             return {
-                hi >> shift,
-                (lo >> shift) | (hi << (64 - shift))
+                hi_ >> shift,
+                (lo_ >> shift) | (hi_ << (64 - shift))
             };
         }
     }
 
-
-    uint128 operator*(const uint128& rhs) const {
+    uint128 operator*(uint128 rhs) const {
         // Split components into 32-bit chunks to avoid 64-bit overflow during multiplication
-        uint64_t a3 = hi >> 32;
-        uint64_t a2 = hi & 0xFFFFFFFFFFFFFFULL; // lower 32 bits of hi
-        uint64_t a1 = lo >> 32;
-        uint64_t a0 = lo & 0xFFFFFFFFULL;
+        uint64_t a3 = hi_ >> 32;
+        uint64_t a2 = hi_ & 0xFFFFFFFFFFFFFFULL; // lower 32 bits of hi_
+        uint64_t a1 = lo_ >> 32;
+        uint64_t a0 = lo_ & 0xFFFFFFFFULL;
 
-        uint64_t b3 = rhs.hi >> 32;
-        uint64_t b2 = rhs.hi & 0xFFFFFFFFFFFFFFULL;
-        uint64_t b1 = rhs.lo >> 32;
-        uint64_t b0 = rhs.lo & 0xFFFFFFFFULL;
+        uint64_t b3 = rhs.hi_ >> 32;
+        uint64_t b2 = rhs.hi_ & 0xFFFFFFFFFFFFFFULL;
+        uint64_t b1 = rhs.lo_ >> 32;
+        uint64_t b0 = rhs.lo_ & 0xFFFFFFFFULL;
 
         // Long multiplication matrix
         // We only care about terms that fit in the final 128 bits.
@@ -143,52 +142,52 @@ struct uint128
         c2 += (c1 >> 32);
         c3 += (c2 >> 32);
 
-        // Reconstruct hi and lo 64-bit values
+        // Reconstruct hi_ and lo_ 64-bit values
         uint64_t new_low = (c0 & 0xFFFFFFFFULL) | (c1 << 32);
         uint64_t new_high = (c2 & 0xFFFFFFFFULL) | (c3 << 32);
 
         return {new_high, new_low};
     }
 
-    uint128& operator*=(const uint128& rhs) {
+    uint128& operator*=(uint128 rhs) {
         *this = *this * rhs;
         return *this;
     }
     // Equality Comparisons
-    bool operator==(const uint128& rhs) const { return hi == rhs.hi && lo == rhs.lo; }
-    bool operator!=(const uint128& rhs) const { return !(*this == rhs); }
+    bool operator==(uint128 rhs) const { return hi_ == rhs.hi_ && lo_ == rhs.lo_; }
+    bool operator!=(uint128 rhs) const { return !(*this == rhs); }
 
     // Explicit conversion operator to uint64_t
-        // Returns the lower 64 bits and discards the hi 64 bits
+        // Returns the lower 64 bits and discards the hi_ 64 bits
     explicit operator uint64_t() const {
-        return lo;
+        return lo_;
     }
     // Bitwise OR
-    constexpr uint128 operator|(const uint128& rhs) const {
-        return {hi | rhs.hi, lo | rhs.lo};
+    constexpr uint128 operator|(uint128 rhs) const {
+        return {hi_ | rhs.hi_, lo_ | rhs.lo_};
     }
 
-    uint128& operator|=(const uint128& rhs) {
-        hi |= rhs.hi;
-        lo |= rhs.lo;
+    uint128& operator|=(uint128 rhs) {
+        hi_ |= rhs.hi_;
+        lo_ |= rhs.lo_;
         return *this;
     }
 /*
-    bool operator<(const uint128& rhs) const {
-        if (hi != rhs.hi) {
-            return hi < rhs.hi;
+    bool operator<(uint128 rhs) const {
+        if (hi_ != rhs.hi_) {
+            return hi_ < rhs.hi_;
         }
-        return lo < rhs.lo;
+        return lo_ < rhs.lo_;
     }
 */
-    bool operator<=(const uint128& rhs) const {
+    bool operator<=(uint128 rhs) const {
         return *this < rhs || *this == rhs;
     }
 
     // 128-bit Division Operator
-    uint128 operator/(const uint128& rhs) const {
+    uint128 operator/(uint128 rhs) const {
         // 1. Handle division by zero
-        if (rhs.hi == 0 && rhs.lo == 0) {
+        if (rhs.hi_ == 0 && rhs.lo_ == 0) {
             JSONCONS_THROW(std::runtime_error("Division by zero"));
         }
 
@@ -225,17 +224,17 @@ struct uint128
         return quotient;
     }
 
-    uint128& operator/=(const uint128& rhs) {
+    uint128& operator/=(uint128 rhs) {
         *this = *this / rhs;
         return *this;
     }
 
     // Helper operator- required for the division algorithm subtraction step
-    uint128 operator-(const uint128& rhs) const {
-        uint64_t new_low = lo - rhs.lo;
-        // Borrow occurs if lo wrapped around
-        uint64_t borrow = (lo < rhs.lo) ? 1 : 0;
-        uint64_t new_high = hi - rhs.hi - borrow;
+    uint128 operator-(uint128 rhs) const {
+        uint64_t new_low = lo_ - rhs.lo_;
+        // Borrow occurs if lo_ wrapped around
+        uint64_t borrow = (lo_ < rhs.lo_) ? 1 : 0;
+        uint64_t new_high = hi_ - rhs.hi_ - borrow;
         return {new_high, new_low};
     }
 
@@ -244,19 +243,19 @@ struct uint128
         return *this;
     }
     // Bitwise AND
-    constexpr uint128 operator&(const uint128& rhs) const {
-        return {hi & rhs.hi, lo & rhs.lo};
+    constexpr uint128 operator&(uint128 rhs) const {
+        return {hi_ & rhs.hi_, lo_ & rhs.lo_};
     }
 
-    uint128& operator&=(const uint128& rhs) {
-        hi &= rhs.hi;
-        lo &= rhs.lo;
+    uint128& operator&=(uint128 rhs) {
+        hi_ &= rhs.hi_;
+        lo_ &= rhs.lo_;
         return *this;
     }
     // 128-bit Modulo Operator
-    uint128 operator%(const uint128& rhs) const {
+    uint128 operator%(uint128 rhs) const {
         // 1. Handle division by zero
-        if (rhs.hi == 0 && rhs.lo == 0) {
+        if (rhs.hi_ == 0 && rhs.lo_ == 0) {
             JSONCONS_THROW(std::runtime_error("Division by zero in modulo operation"));
         }
 
@@ -289,9 +288,23 @@ struct uint128
         return remainder;
     }
 
-    uint128& operator%=(const uint128& rhs) {
+    uint128& operator%=(uint128 rhs) {
         *this = *this % rhs;
         return *this;
+    }
+
+    template<typename T>
+    friend typename std::enable_if<std::is_integral<T>::value && (sizeof(T) <= sizeof(uint64_t)),bool>::type
+    operator==(uint128 lhs, T rhs)
+    {
+        return lhs.hi_ == 0 && lhs.lo_ == rhs;
+    }
+
+    template<typename T>
+    friend typename std::enable_if<std::is_integral<T>::value &&(sizeof(T) <= sizeof(uint64_t)),bool>::type
+    operator==(T lhs, uint128 rhs)
+    {
+        return rhs == lhs;
     }
 };
 

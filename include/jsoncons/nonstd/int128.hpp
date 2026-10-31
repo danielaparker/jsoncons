@@ -300,6 +300,24 @@ public:
     int128& operator>>=(unsigned s) {
         return *this = *this >> s;
     }
+
+    template<typename T>
+    friend typename std::enable_if<std::is_integral<T>::value && (sizeof(T) <= sizeof(int64_t)),bool>::type
+    operator==(int128 lhs, T rhs)
+    {
+        return lhs.hi_ == 0 && lhs.lo_ == rhs;
+    }
+
+    template<typename T>
+    friend typename std::enable_if<
+        std::is_integral<T>::value &&
+        (sizeof(T) <= sizeof(int64_t)),
+        bool
+    >::type
+    operator==(T lhs, int128 rhs)
+    {
+        return rhs == lhs;
+    }
 };
 
 } // namespace nonstd
