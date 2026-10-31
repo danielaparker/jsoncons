@@ -110,7 +110,7 @@ namespace nonstd {
     };
 
     template <typename T>
-    class integer_limits<T,typename std::enable_if<std::is_same<T,jsoncons::int128>::value>::type>
+    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && std::is_same<T,jsoncons::int128>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
@@ -134,7 +134,7 @@ namespace nonstd {
     };
 
     template <typename T>
-    class integer_limits<T, typename std::enable_if<std::is_same<T,jsoncons::uint128>::value>::type>
+    class integer_limits<T, typename std::enable_if<!std::is_integral<T>::value && std::is_same<T,jsoncons::uint128>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
