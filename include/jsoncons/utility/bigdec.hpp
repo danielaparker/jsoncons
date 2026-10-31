@@ -434,8 +434,8 @@ void append_to_string(const basic_bigdec<Alloc>& value,
             const size_t zeros =
                 static_cast<size_t>(scale) - precision;
 
-            buf.insert(sign, '0');
-            buf.insert(sign+1, '.');
+            buf.insert(sign, 1, '0');
+            buf.insert(sign+1, 1, '.');
             buf.insert(sign + 2, zeros, '0');
         }
         else {
