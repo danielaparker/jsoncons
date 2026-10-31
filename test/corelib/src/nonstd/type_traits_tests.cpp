@@ -21,9 +21,9 @@ TEST_CASE("nonstd tests")
 {
     SECTION("is_propagating_allocator")
     {
-        CHECK_FALSE(jsoncons::nonstd::is_propagating_allocator<std::allocator<char>>::value);
+        CHECK_FALSE(jsoncons::ext_traits::is_propagating_allocator<std::allocator<char>>::value);
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
-        CHECK(jsoncons::nonstd::is_propagating_allocator<std::pmr::polymorphic_allocator<char>>::value);
+        CHECK(jsoncons::ext_traits::is_propagating_allocator<std::pmr::polymorphic_allocator<char>>::value);
 #endif
     }
 }
@@ -39,8 +39,8 @@ TEST_CASE("nonstd tests is_propagating_allocator")
 {
     SECTION("is_propagating_allocator")
     {
-        CHECK_FALSE(jsoncons::nonstd::is_propagating_allocator<mock_stateful_allocator<char>>::value);
-        CHECK(jsoncons::nonstd::is_propagating_allocator<MyScopedAllocator<char>>::value);
+        CHECK_FALSE(jsoncons::ext_traits::is_propagating_allocator<mock_stateful_allocator<char>>::value);
+        CHECK(jsoncons::ext_traits::is_propagating_allocator<MyScopedAllocator<char>>::value);
     }
 }
 #endif
@@ -49,19 +49,19 @@ TEST_CASE("nonstd function object tests")
 {
     SECTION("is_function_object (1 arg)")
     {
-        CHECK_FALSE(nonstd::is_function_object<std::string,int>::value);
+        CHECK_FALSE(ext_traits::is_function_object<std::string,int>::value);
     }
     SECTION("is_function_object_exact (1 arg)")
     {
-        CHECK_FALSE(nonstd::is_function_object_exact<std::string, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object_exact<std::string, int, int>::value);
     }
     SECTION("is_function_object (2 args)")
     {
-        CHECK_FALSE(nonstd::is_function_object<std::string, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object<std::string, int, int>::value);
     }
     SECTION("is_function_object_exact (2 args)")
     {
-        CHECK_FALSE(nonstd::is_function_object_exact<std::string, int, int, int>::value);
+        CHECK_FALSE(ext_traits::is_function_object_exact<std::string, int, int, int>::value);
     }
 }
 

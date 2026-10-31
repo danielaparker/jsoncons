@@ -37,7 +37,7 @@ char to_hex_character(uint8_t c)
 // append_to_string
 
 template <typename Integer,typename Result>
-typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
+typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
 append_to_string(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;
@@ -84,7 +84,7 @@ append_to_string(Integer value, Result& result)
 // append_to_string_hex
 
 template <typename Integer,typename Result>
-typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
+typename std::enable_if<ext_traits::is_integer<Integer>::value,std::size_t>::type
 append_to_string_hex(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;

@@ -686,7 +686,7 @@ namespace jsonpath {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_location&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             append(IntegerType val)
         {
             elements_.emplace_back(static_cast<std::size_t>(val));
@@ -701,7 +701,7 @@ namespace jsonpath {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_location&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             operator/=(IntegerType val)
         {
             elements_.emplace_back(static_cast<std::size_t>(val));

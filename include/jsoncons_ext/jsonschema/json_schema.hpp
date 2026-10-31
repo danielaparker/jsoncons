@@ -97,7 +97,7 @@ struct error_reporter_adaptor : public error_reporter<Json>
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -120,7 +120,7 @@ private:
 
 template <typename Json,typename Reporter>
 struct error_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value>::type>
     : public error_reporter<Json>
 {
     Reporter reporter_;
@@ -147,7 +147,7 @@ struct walk_reporter_adaptor : public walk_reporter<Json>
 
 template <typename Json,typename Reporter>
 struct walk_reporter_adaptor<Json,Reporter,
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value>::type>
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value>::type>
     : public walk_reporter<Json>
 {
     Reporter reporter_;
@@ -170,7 +170,7 @@ private:
 
 template <typename Json,typename Reporter>
 struct walk_reporter_adaptor<Json,Reporter,
-        typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value>::type>
+        typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value>::type>
     : public walk_reporter<Json>
 {
     Reporter reporter_;
@@ -196,7 +196,7 @@ class json_schema
 {
     static_assert(std::is_same<typename Json::char_type,char>::value,
         "json_schema requires Json::char_type to be char");
-    static_assert(nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+    static_assert(ext_traits::is_polymorphic_allocator<typename Json::allocator_type>::value ||
         std::allocator_traits<typename Json::allocator_type>::is_always_equal::value,
         "json_schema requires a polymorphic or always-equal allocator");
 
@@ -245,7 +245,7 @@ public:
 
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
     validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
@@ -259,7 +259,7 @@ public:
 
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message>::value,void>::type
     validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
@@ -281,7 +281,7 @@ public:
 
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message,jsoncons::optional<Json>&>::value,void>::type
     validate(const Json& instance, Reporter&& reporter) const
     {
         jsonpointer::json_pointer instance_location{};
@@ -295,7 +295,7 @@ public:
 
     // Validate input JSON against a JSON Schema with a provided error reporter
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,validation_message, jsoncons::optional<Json>&>::value,void>::type
     validate(const Json& instance, Reporter&& reporter, Json& patch) const
     {
         jsonpointer::json_pointer instance_location{};
@@ -352,7 +352,7 @@ public:
     }
 
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const std::string&,const Json&,const uri&, const Json&,const jsonpointer::json_pointer&>::value,void>::type
     walk(const Json& instance, Reporter&& reporter) const
     {
         jsoncons::optional<Json> patch;
@@ -363,7 +363,7 @@ public:
     }
 
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
     walk(const Json& instance, Reporter&& reporter) const
     {
         jsoncons::optional<Json> patch;
@@ -374,7 +374,7 @@ public:
     }
 
     template <typename Reporter>
-    typename std::enable_if<nonstd::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
+    typename std::enable_if<ext_traits::is_function_object_exact<Reporter,walk_state,const schema_property<Json>&, const Json&,const jsonpointer::json_pointer&,jsoncons::optional<Json>&>::value,void>::type
     walk(const Json& instance, Reporter&& reporter, jsoncons::optional<Json>& patch) const
     {
         jsonpointer::json_pointer instance_location{};

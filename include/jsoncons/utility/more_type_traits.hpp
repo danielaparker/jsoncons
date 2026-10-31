@@ -26,7 +26,7 @@
 #endif
 
 namespace jsoncons {
-namespace nonstd {
+namespace ext_traits {
   
     template <typename T>
     struct is_std_pair : public std::false_type {};
@@ -961,7 +961,7 @@ namespace impl {
     > : std::true_type{};
 
     
-} // nonstd
+} // ext_traits
 } // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_MORE_TYPE_TRAITS_HPP

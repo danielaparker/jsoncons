@@ -229,7 +229,7 @@ public:
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
             JSONCONS_TRY
             {
-                std::allocator_traits<real_allocator_type>::construct(alloc, nonstd::to_plain_pointer(data_));
+                std::allocator_traits<real_allocator_type>::construct(alloc, ext_traits::to_plain_pointer(data_));
             }
             JSONCONS_CATCH(...)
             {
@@ -683,7 +683,7 @@ public:
     {
     }
 
-    template <typename StringViewLike,typename=typename std::enable_if<nonstd::is_string_or_string_view<StringViewLike>::value>::type>
+    template <typename StringViewLike,typename=typename std::enable_if<ext_traits::is_string_or_string_view<StringViewLike>::value>::type>
     basic_bigint(const StringViewLike& s)
     {
         auto r = jsoncons::to_bigint(s.data(), s.size(), *this);
@@ -887,7 +887,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
         operator+=(IntegerType y)
     {
         if ( is_negative() != (y < 0))
@@ -926,7 +926,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
+    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(word_type), basic_bigint<Allocator>&>::type
         operator+=(IntegerType y)
     {
         if ( is_negative())
@@ -1025,7 +1025,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<ext_traits::is_signed_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
     operator*=(IntegerType y)
     {
         *this *= word_type(y < 0 ? -y : y);
@@ -1035,7 +1035,7 @@ public:
     }
 
     template <typename IntegerType>
-    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
+    typename std::enable_if<ext_traits::is_unsigned_integer<IntegerType>::value, basic_bigint<Allocator>&>::type
     operator*=(IntegerType m)
     {
         auto words = get_words();
@@ -1758,7 +1758,7 @@ public:
         }
 
         // Zero has no finite number of trailing zero bits.
-        return (jsoncons::nonstd::integer_limits<uint128>::max)();
+        return (jsoncons::ext_traits::integer_limits<uint128>::max)();
     }
 
     uint128 bit_width() const

@@ -47,7 +47,7 @@ struct transparent_string_less {
 };
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
 starts_with(const StringViewLike& sv, const StringViewLike& prefix)
 {
     using char_type = typename StringViewLike::value_type;
@@ -71,21 +71,21 @@ starts_with(const StringViewLike& sv, const StringViewLike& prefix)
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
 starts_with(const StringViewLike& s, const typename StringViewLike::value_type* prefix)
 {
     return starts_with(s, StringViewLike(prefix));
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,bool>::type
 starts_with(const StringViewLike& s, typename StringViewLike::value_type prefix)
 {
     return starts_with(s, StringViewLike(&prefix, 1));
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value, bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
 ends_with(const StringViewLike& sv, const StringViewLike& suffix)
 {
     using char_type = typename StringViewLike::value_type;
@@ -109,21 +109,21 @@ ends_with(const StringViewLike& sv, const StringViewLike& suffix)
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value, bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
 ends_with(const StringViewLike& s, const typename StringViewLike::value_type* suffix)
 {
     return ends_with(s, StringViewLike(suffix));
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value, bool>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, bool>::type
 ends_with(const StringViewLike& s, typename StringViewLike::value_type suffix)
 {
     return ends_with(s, StringViewLike(&suffix, 1));
 }
 
 template <typename StringViewLike>
-typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value, StringViewLike>::type
+typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value, StringViewLike>::type
 strip(const StringViewLike& sv)
 {
     using char_type = typename StringViewLike::value_type;
