@@ -826,3 +826,52 @@ TEST_CASE("decode_cbor map with non-string keys")
     }
 }
 
+TEST_CASE("cbor nested semantic tags with differing argument widths")
+{
+    SECTION("tag 100 wrapping tag 1 wrapping 0")
+    {
+        std::vector<uint8_t> v = {0xD8,0x64,0xC1,0x00}; // tag 100 (tag 1 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+    }
+    SECTION("tag 1 wrapping tag 100 wrapping 0")
+    {
+        std::vector<uint8_t> v = {0xC1,0xD8,0x64,0x00}; // tag 1 (tag 100 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+    }
+    SECTION("tag 24 wrapping tag 1 wrapping 0")
+    {
+        std::vector<uint8_t> v = {0xD8,0x18,0xC1,0x00}; // tag 24 (tag 1 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+    }
+    SECTION("tag 500 wrapping tag 1 wrapping 0")
+    {
+        std::vector<uint8_t> v = {0xD9,0x01,0xF4,0xC1,0x00}; // tag 500 (tag 1 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+    }
+    SECTION("tag 70000 wrapping tag 1 wrapping 0")
+    {
+        std::vector<uint8_t> v = {0xDA,0x00,0x01,0x11,0x70,0xC1,0x00}; // tag 70000 (tag 1 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+    }
+    SECTION("same-width nested tags")
+    {
+        std::vector<uint8_t> v = {0xC1,0xC2,0x00}; // tag 1 (tag 2 (0))
+        auto j = cbor::decode_cbor<jsoncons::ojson>(v);
+        CHECK(j.as<uint64_t>() == 0);
+        // The inner tag 2 must not be misread as tag 1 (epoch_second).
+        CHECK(j.tag() == jsoncons::semantic_tag::none);
+    }
+    SECTION("nested tag with reserved additional information is rejected")
+    {
+        std::vector<uint8_t> v = {0xC1,0xDC,0x00}; // tag 1 (tag with reserved additional information 0x1C)
+        auto result = cbor::try_decode_cbor<jsoncons::ojson>(v);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code() == cbor::cbor_errc::reserved_additional_info);
+    }
+}
+
