@@ -470,6 +470,21 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
                 return;
             }
 
+            // A location cannot be moved into one of its children
+            auto from_it = from_pointer.begin();
+            auto path_it = location.begin();
+            while (from_it != from_pointer.end() && path_it != location.end() && *from_it == *path_it)
+            {
+                ++from_it;
+                ++path_it;
+            }
+            if (from_it == from_pointer.end() && path_it != location.end())
+            {
+                ec = jsonpatch_errc::move_failed;
+                unwinder.state = jsoncons::jsonpatch::detail::state_type::abort;
+                return;
+            }
+
             Json val = jsonpointer::get(target, from_pointer, local_ec);
             if (local_ec)
             {
