@@ -383,8 +383,11 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
             auto npath = jsonpatch::detail::definite_path(target,location);
 
             std::error_code insert_ec;
-            jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
-            if (insert_ec) // try a replace
+            if (!npath.empty()) // the root can't be removed on rollback, so it is replaced below
+            {
+                jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
+            }
+            if (npath.empty() || insert_ec) // try a replace
             {
                 std::error_code select_ec;
                 Json orig_val = jsonpointer::get(target,npath,select_ec);
@@ -470,6 +473,21 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
                 return;
             }
 
+            // A location cannot be moved into one of its children
+            auto from_it = from_pointer.begin();
+            auto path_it = location.begin();
+            while (from_it != from_pointer.end() && path_it != location.end() && *from_it == *path_it)
+            {
+                ++from_it;
+                ++path_it;
+            }
+            if (from_it == from_pointer.end() && path_it != location.end())
+            {
+                ec = jsonpatch_errc::move_failed;
+                unwinder.state = jsoncons::jsonpatch::detail::state_type::abort;
+                return;
+            }
+
             Json val = jsonpointer::get(target, from_pointer, local_ec);
             if (local_ec)
             {
@@ -488,8 +506,11 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
             // add
             std::error_code insert_ec;
             auto npath = jsonpatch::detail::definite_path(target,location);
-            jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
-            if (insert_ec) // try a replace
+            if (!npath.empty()) // the root can't be removed on rollback, so it is replaced below
+            {
+                jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
+            }
+            if (npath.empty() || insert_ec) // try a replace
             {
                 std::error_code select_ec;
                 Json orig_val = jsonpointer::get(target,npath,select_ec);
@@ -534,8 +555,11 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
             // add
             auto npath = jsonpatch::detail::definite_path(target,location);
             std::error_code insert_ec;
-            jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
-            if (insert_ec) // Failed, try a replace
+            if (!npath.empty()) // the root can't be removed on rollback, so it is replaced below
+            {
+                jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
+            }
+            if (npath.empty() || insert_ec) // Failed, try a replace
             {
                 std::error_code select_ec;
                 Json orig_val = jsonpointer::get(target,npath, select_ec);
