@@ -879,7 +879,7 @@ namespace jsonpath {
             else
             {
                 buffer.push_back('[');
-                jsoncons::from_integer(element.index(), buffer);
+                jsoncons::append_to_string(element.index(), buffer);
                 buffer.push_back(']');
             }
         }

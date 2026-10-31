@@ -34,11 +34,11 @@ char to_hex_character(uint8_t c)
     return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
 }
 
-// from_integer
+// append_to_string
 
 template <typename Integer,typename Result>
 typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
-from_integer(Integer value, Result& result)
+append_to_string(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;
 
@@ -81,11 +81,11 @@ from_integer(Integer value, Result& result)
     return count;
 }
 
-// integer_to_hex
+// append_to_string_hex
 
 template <typename Integer,typename Result>
 typename std::enable_if<nonstd::is_integer<Integer>::value,std::size_t>::type
-integer_to_hex(Integer value, Result& result)
+append_to_string_hex(Integer value, Result& result)
 {
     using char_type = typename Result::value_type;
 
@@ -162,7 +162,7 @@ void fill_exponent(int K, Result& result)
     }
     else
     {
-        jsoncons::from_integer(K, result);
+        jsoncons::append_to_string(K, result);
     }
 }
 

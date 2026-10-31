@@ -341,13 +341,13 @@ public:
             case staj_events::uint64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::from_integer(value_.uint64_value_, s);
+                jsoncons::append_to_string(value_.uint64_value_, s);
                 return s;
             }
             case staj_events::int64_value:
             {
                 auto s = jsoncons::make_obj_using_allocator<T>(alloc);
-                jsoncons::from_integer(value_.int64_value_, s);
+                jsoncons::append_to_string(value_.int64_value_, s);
                 return s;
             }
             case staj_events::half_value:

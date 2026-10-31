@@ -267,7 +267,7 @@ namespace jsonpointer {
         append(IntegerType val)
         {
             string_type s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -290,7 +290,7 @@ namespace jsonpointer {
         operator/=(IntegerType val)
         {
             string_type s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -1304,7 +1304,7 @@ namespace jsonpointer {
                     {
                         string_type key(parent_key);
                         key.push_back('/');
-                        jsoncons::from_integer(i,key);
+                        jsoncons::append_to_string(i,key);
                         flatten_(key, parent_value.at(i), result);
                     }
                 }

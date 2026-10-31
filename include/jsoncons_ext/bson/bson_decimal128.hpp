@@ -494,7 +494,7 @@ namespace bson {
            if (scientific_exponent >= 0) {
                s.push_back('+');
            }
-           jsoncons::from_integer(scientific_exponent, s);
+           jsoncons::append_to_string(scientific_exponent, s);
            if (str_out + s.size() < last) 
            {
                std::memcpy(str_out, s.data(), s.size());

@@ -1234,7 +1234,7 @@ template <typename CharT,typename Allocator>
             if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
-                jsoncons::from_integer(value,key_);
+                jsoncons::append_to_string(value,key_);
             }
 
             if (level_stack_.back().is_key())
@@ -1280,7 +1280,7 @@ template <typename CharT,typename Allocator>
             if (level_stack_.back().is_key() || level_stack_.back().target_kind() == json_target_kind::buffer)
             {
                 key_.clear();
-                jsoncons::from_integer(value,key_);
+                jsoncons::append_to_string(value,key_);
             }
 
             if (level_stack_.back().is_key())

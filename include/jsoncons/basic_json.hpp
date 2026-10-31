@@ -2627,7 +2627,7 @@ namespace jsoncons {
                    typename std::enable_if<nonstd::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -2658,7 +2658,7 @@ namespace jsoncons {
                    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
@@ -2675,7 +2675,7 @@ namespace jsoncons {
                    typename std::enable_if<nonstd::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
                 construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);

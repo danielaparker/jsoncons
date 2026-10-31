@@ -455,7 +455,7 @@ void append_to_string(const basic_bigdec<Alloc>& value,
 
     buf.push_back('e');
 
-    from_integer(adjustedExponent, buf);
+    append_to_string(adjustedExponent, buf);
 }
 
 using bigdec = basic_bigdec<std::allocator<uint64_t>>;
