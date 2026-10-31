@@ -39,7 +39,8 @@ enum class cbor_errc
     bad_mdarray,
     bad_extents,
     bigfloat_to_bigdec_failed,
-    max_dimensions_exceeded
+    max_dimensions_exceeded,
+    bigfloat_shift_too_large
 };
 
 class cbor_error_category_impl
@@ -96,6 +97,8 @@ public:
                 return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
                 return "Product of extents does not match number of elements.";
+            case cbor_errc::bigfloat_shift_too_large:
+                return "bigfloat shift count exceeds the supported range.";
             default:
                 return "Unknown CBOR parser error";
         }

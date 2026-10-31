@@ -53,7 +53,8 @@ struct binary_interval {
 template <typename Allocator>
 int compare_scaled(
     const basic_bigint<Allocator>& a, int128 ae,
-    const basic_bigint<Allocator>& b, int128 be)
+    const basic_bigint<Allocator>& b, int128 be,
+    std::error_code& ec)
 {
     const int128 alen =
         static_cast<int128>(a.bit_length());
@@ -78,7 +79,10 @@ int compare_scaled(
         const int128 delta = ae - be;
 
         if (delta > static_cast<int128>(UINT64_MAX))
-            throw std::length_error("shift too large");
+        {
+            ec = cbor_errc::bigfloat_shift_too_large;
+            return 0;
+        }
 
         basic_bigint<Allocator> aligned = a;
         aligned <<= (static_cast<uint64_t>(delta));
@@ -92,7 +96,10 @@ int compare_scaled(
         const int128 delta = be - ae;
 
         if (delta > static_cast<int128>(UINT64_MAX))
-            throw std::length_error("shift too large");
+        {
+            ec = cbor_errc::bigfloat_shift_too_large;
+            return 0;
+        }
 
         basic_bigint<Allocator> aligned = b;
         aligned <<= (static_cast<uint64_t>(delta));
@@ -203,7 +210,8 @@ template <typename Allocator>
 bool exactly_power_of_ten(
     const basic_bigint<Allocator>& unscaled,
     uint64_t exponent,
-    uint64_t k)
+    uint64_t k,
+    std::error_code& ec)
 {
     // 10^k = 5^k * 2^k.
     // An integer unscaled cannot compensate for
@@ -222,8 +230,7 @@ bool exactly_power_of_ten(
 
     return compare_scaled(
         unscaled, static_cast<int128>(exponent),
-        power5, static_cast<int128>(k)
-    ) == 0;
+        power5, static_cast<int128>(k), ec) == 0;
 }
 
 // Returns -1, 0, +1 for comparison with 10^k.
@@ -231,7 +238,8 @@ template <typename Allocator>
 int compare_power10(
     const basic_bigint<Allocator>& unscaled,
     uint64_t exponent,
-    uint64_t k)
+    uint64_t k,
+    std::error_code& ec)
 {
     uint64_t workingBits = 128;
 
@@ -250,18 +258,23 @@ int compare_power10(
         // The entire value interval is below 10^k.
         if (compare_scaled(
                 value.hi, value.exponent,
-                power.lo, power.exponent) < 0)
+                power.lo, power.exponent,ec ) < 0)
             return -1;
 
         // The entire value interval is above 10^k.
         if (compare_scaled(
                 value.lo, value.exponent,
-                power.hi, power.exponent) > 0)
+                power.hi, power.exponent, ec) > 0)
             return 1;
 
         // Handle exact equality without endless refinement.
-        if (exactly_power_of_ten(unscaled, exponent, k))
+        if (exactly_power_of_ten(unscaled, exponent, k, ec))
             return 0;
+
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return 0;
+        }
 
         if (workingBits > UINT64_MAX / 2)
             throw std::length_error("precision overflow");
@@ -277,7 +290,8 @@ int compare_power10(
 template <typename Allocator>
 uint64_t decimal_order(
     const basic_bigint<Allocator>& unscaled,
-    uint64_t exponent)
+    uint64_t exponent,
+    std::error_code& ec)
 {
     const uint128 upper =
         unscaled.bit_width() +
@@ -290,15 +304,19 @@ uint64_t decimal_order(
     uint64_t high = static_cast<uint64_t>(upper);
 
     // The input is a positive integer, so it is >= 10^0.
-    while (low < high) {
+    while (low < high) 
+    {
         const uint64_t mid =
             low + (high - low + 1) / 2;
 
         if (compare_power10(
-                unscaled, exponent, mid) >= 0)
+                unscaled, exponent, mid, ec) >= 0)
             low = mid;
         else
             high = mid - 1;
+        if (JSONCONS_UNLIKELY(ec)) {
+            return low;
+        }
     }
 
     return low;
@@ -337,11 +355,15 @@ template <typename Allocator>
 basic_bigint<Allocator> round_scaled_ratio(
     basic_bigint<Allocator> numerator,
     basic_bigint<Allocator> denominator,
-    int128 binaryShift)
+    int128 binaryShift,
+    std::error_code& ec)
 {
     if (binaryShift >= 0) {
         if (binaryShift > static_cast<int128>(UINT64_MAX))
-            throw std::length_error("shift too large");
+        {
+            ec = cbor_errc::bigfloat_shift_too_large;
+            return basic_bigint<Allocator>{};
+        }
 
         numerator <<= (
             static_cast<uint64_t>(binaryShift));
@@ -349,7 +371,10 @@ basic_bigint<Allocator> round_scaled_ratio(
         const int128 amount = -binaryShift;
 
         if (amount > static_cast<int128>(UINT64_MAX))
-            throw std::length_error("shift too large");
+        {
+            ec = cbor_errc::bigfloat_shift_too_large;
+            return basic_bigint<Allocator>{};
+        }
 
         denominator <<= (
             static_cast<uint64_t>(amount));
@@ -370,7 +395,8 @@ bool exactly_halfway(
     const basic_bigint<Allocator>& unscaled,
     uint64_t exponent,
     uint64_t d,
-    const basic_bigint<Allocator>& lowerRounded)
+    const basic_bigint<Allocator>& lowerRounded,
+    std::error_code& ec)
 {
     // The right side has exactly d factors of 2.
     // If the left side has more, equality is impossible.
@@ -398,7 +424,8 @@ bool exactly_halfway(
         unscaled,
         static_cast<int128>(exponent) + 1,
         odd,
-        static_cast<int128>(d)
+        static_cast<int128>(d),
+        ec
     ) == 0;
 }
 
@@ -411,7 +438,8 @@ basic_bigint<Allocator> rounded_decimal_mantissa(
     const basic_bigint<Allocator>& unscaled,
     uint64_t exponent,
     uint64_t d,
-    uint64_t precision)
+    uint64_t precision,
+    std::error_code& ec)
 {
     if (precision > (UINT64_MAX - 128) / 4)
         throw std::length_error("precision too large");
@@ -435,12 +463,16 @@ basic_bigint<Allocator> rounded_decimal_mantissa(
             static_cast<int128>(d);
 
         const basic_bigint<Allocator> lower = round_scaled_ratio(
-            value.lo, power.hi, shift
+            value.lo, power.hi, shift, ec
         );
 
         const basic_bigint<Allocator> upper = round_scaled_ratio(
-            value.hi, power.lo, shift
+            value.hi, power.lo, shift, ec
         );
+        if (JSONCONS_UNLIKELY(ec)) 
+        {
+            return lower;
+        }
 
         if (lower == upper)
             return lower;
@@ -450,9 +482,12 @@ basic_bigint<Allocator> rounded_decimal_mantissa(
         next += basic_bigint<Allocator>(1);
 
         if (upper == next &&
-            exactly_halfway(
-                unscaled, exponent, d, lower)) {
+            exactly_halfway(unscaled, exponent, d, lower, ec)) {
             return lower.test_bit(0) ? upper : lower;
+        }
+        if (JSONCONS_UNLIKELY(ec)) 
+        {
+            return lower;
         }
 
         if (workingBits > UINT64_MAX / 2)
@@ -489,11 +524,12 @@ basic_bigdec<Allocator> compact_exact_positive(
 } // namespace
 
 template <typename Allocator>
-cbor_errc from_cbor_bigfloat_positive_rounded(
+void from_cbor_bigfloat_positive_rounded(
     basic_bigint<Allocator> unscaled,
     uint64_t exponent,
     uint64_t precision,
-    basic_bigdec<Allocator>& value)
+    basic_bigdec<Allocator>& value,
+    std::error_code& ec)
 {
     if (precision == 0)
         throw std::invalid_argument(
@@ -502,7 +538,7 @@ cbor_errc from_cbor_bigfloat_positive_rounded(
     if (unscaled.is_zero())
     {
         value = {basic_bigint<Allocator>(0), 0};
-        return cbor_errc{};
+        return;
     }
 
     const bool negative = unscaled < basic_bigint<Allocator>(0);
@@ -511,8 +547,10 @@ cbor_errc from_cbor_bigfloat_positive_rounded(
         unscaled = -unscaled;
 
     // decimalOrder = floor(log10(abs(m) * 2^e)).
-    const uint64_t decimalOrder =
-        decimal_order(unscaled, exponent);
+    const uint64_t decimalOrder = decimal_order(unscaled, exponent, ec);
+    if (ec) 
+    {
+    }
 
     // The exact integer already fits the requested
     // significant-digit precision.
@@ -527,7 +565,7 @@ cbor_errc from_cbor_bigfloat_positive_rounded(
             result.set_negative(result.unscaled().is_negative() ? false : true);
 
         value = result;
-        return cbor_errc{};
+        return;
     }
 
     // Number of decimal places to discard.
@@ -538,8 +576,14 @@ cbor_errc from_cbor_bigfloat_positive_rounded(
         unscaled,
         exponent,
         decimalShift,
-        precision
+        precision,
+        ec
     );
+
+    if (JSONCONS_UNLIKELY(ec)) 
+    {
+        return;
+    }
 
     // Rounding can increase the digit count:
     // 999 -> 1000, with precision 3.
@@ -586,14 +630,15 @@ cbor_errc from_cbor_bigfloat_positive_rounded(
         std::move(rounded),
         scale
     };
-    return cbor_errc{};
+    return;
 }
 
 template <typename Allocator>
-cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
+void from_cbor_bigfloat(basic_bigint<Allocator> unscaled, 
     int64_t exponent,
     basic_bigdec<Allocator>& value,
-    uint64_t max_decimal_places = 34)
+    uint64_t max_decimal_places,
+    std::error_code& ec)
 {
     constexpr uint64_t max_scale =
         static_cast<uint64_t>(
@@ -602,13 +647,14 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
 
     if (max_decimal_places > max_scale)
     {
-        return cbor_errc::bigdec_scale_overflow;
+        ec = cbor_errc::bigdec_scale_overflow;
+        return;
     }
 
     if (unscaled.is_zero())
     {
         value = basic_bigdec<Allocator>{ basic_bigint<Allocator>(0), 0 };
-        return cbor_errc{};
+        return;
     }
 
     const bool negative = unscaled < basic_bigint<Allocator>(0);
@@ -618,22 +664,13 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
         unscaled.set_negative(false);
     }
 
-    // Positive exponent: exact integer.
-    //if (exponent >= 0) {
-    //    unscaled <<= (static_cast<uint64_t>(exponent));
-    //    value = basic_bigdec<Allocator>{ std::move(unscaled), 0 };
-    //    return cbor_errc{};
-    //}
-
     if (exponent >= 0) {
-        auto r = from_cbor_bigfloat_positive_rounded(unscaled, exponent, max_decimal_places, value);
+        from_cbor_bigfloat_positive_rounded(unscaled, exponent, max_decimal_places, value, ec);
         if (negative)
         {
-            //std::cout << value << ", ";
             value.set_negative(true);
-            //std::cout << value << "\n";
         }
-        return r;
+        return;
     }
 
     // Absolute exponent, safe for INT64_MIN.
@@ -665,7 +702,7 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
             std::move(unscaled),
             static_cast<int64_t>(k)
         };
-        return cbor_errc{};
+        return;
     }
 
     // Round to max_decimal_places.
@@ -690,7 +727,7 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
             basic_bigint<Allocator>(0),
             static_cast<int64_t>(scale)
         };
-        return cbor_errc{};
+        return;
     }
 
     // Compute scaled positive magnitude.
@@ -714,7 +751,7 @@ cbor_errc from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
         std::move(quotient),
         static_cast<int64_t>(scale)
     };
-    return cbor_errc{};
+    return;
 }
 
 template <typename Source,typename Allocator>
@@ -2753,10 +2790,9 @@ private:
 
         bigdec dec;
 
-        auto result = from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_);
-        if (result != cbor_errc{})
+        from_cbor_bigfloat(std::move(unscaled), exponent, dec, bigfloat_precision_, ec);
+        if (ec)
         {
-            ec = result;
             more_ = false;
             return;
         }

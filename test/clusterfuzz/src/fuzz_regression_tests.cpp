@@ -1087,7 +1087,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
     // Issue: Out-of-memory
     // Diagnosis: 
     // Resolution: 
-    /*SECTION("issue 575098084 ")
+    SECTION("issue 575098084 ")
     {
         std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor-5291805093199872";
 
@@ -1103,8 +1103,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch //-V521
-               ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
-    }*/
+        CHECK((ec.value() == (int)cbor::cbor_errc::bigfloat_shift_too_large)); 
+    }
 }
 
