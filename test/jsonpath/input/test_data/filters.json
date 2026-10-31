@@ -1601,5 +1601,36 @@
             }
         ]
    }
+   ,
+   {
+       "given": [{"a": 100}, {"a": 3}, {"a": 0.05}],
+       "cases": [
+            {
+               "comment" : "Number literal with a positive exponent sign",
+               "expression": "$[?@.a == 1e+2]",
+               "result": [{"a": 100}]
+            },
+            {
+               "comment" : "Number literal with an uppercase exponent and positive sign",
+               "expression": "$[?@.a == 1E+2]",
+               "result": [{"a": 100}]
+            },
+            {
+               "comment" : "Decimal fraction with a positive exponent sign",
+               "expression": "$[?@.a == 1.0e+2]",
+               "result": [{"a": 100}]
+            },
+            {
+               "comment" : "Number literal with a negative exponent sign",
+               "expression": "$[?@.a == 5e-2]",
+               "result": [{"a": 0.05}]
+            },
+            {
+               "comment" : "A plus after a number is still addition",
+               "expression": "$[?@.a == 2+1]",
+               "result": [{"a": 3}]
+            }
+       ]
+   }
 ]
 

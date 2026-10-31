@@ -50,6 +50,7 @@ For the examples below you need to include some header files and initialize a st
 
 ```cpp
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <iostream>
 #include <cassert>
 
@@ -64,7 +65,7 @@ std::string data = R"(
            "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90,
-           "confidence": 0.99
+           "generated": 1514862245
          }
        ]
     }
@@ -130,7 +131,7 @@ Marilyn C, 0.9
     "reputons": [
         {
             "assertion": "advanced",
-            "confidence": 0.99,
+            "generated": 1514862245,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -151,6 +152,9 @@ and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 ```cpp
+#include <chrono>
+#include <optional>
+
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -185,7 +189,7 @@ namespace ns {
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
-                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
+                   lhs.generated_ == rhs.generated_ && lhs.expires_ == rhs.expires_;
         }
 
         friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
@@ -331,7 +335,6 @@ int main()
 ```
 Output:
 ```
-Marilyn C
 begin_object
 key: application
 string_value: hiking
@@ -346,8 +349,8 @@ key: rated
 string_value: Marilyn C
 key: rating
 double_value: 0.9
-key: confidence
-double_value: 0.99
+key: generated
+uint64_value: 1514862245
 end_object
 end_array
 end_object

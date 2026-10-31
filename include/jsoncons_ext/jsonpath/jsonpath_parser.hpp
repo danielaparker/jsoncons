@@ -483,6 +483,20 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '+':
+                                // An exponent sign, as in 1e+2. Anywhere else the
+                                // number ends here.
+                                if (!buffer.empty() && (buffer.back() == 'e' || buffer.back() == 'E'))
+                                {
+                                    buffer.push_back(*p_);
+                                    ++p_;
+                                    ++column_;
+                                }
+                                else
+                                {
+                                    state_stack_.pop_back(); // number
+                                }
+                                break;
                             default:
                                 state_stack_.pop_back(); // number
                                 break;
