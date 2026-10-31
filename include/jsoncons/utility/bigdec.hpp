@@ -434,13 +434,13 @@ void append_to_string(const basic_bigdec<Alloc>& value,
             const size_t zeros =
                 static_cast<size_t>(scale) - precision;
 
-            buf.insert(sign, "0.");
+            buf.insert(sign, '0');
+            buf.insert(sign+1, '.');
             buf.insert(sign + 2, zeros, '0');
         }
         else {
             // 12345 with scale 2 -> 123.45
-            const size_t position =
-                buf.size() - static_cast<size_t>(scale);
+            const size_t position = buf.size() - static_cast<size_t>(scale);
 
             buf.insert(position, 1, '.');
         }
