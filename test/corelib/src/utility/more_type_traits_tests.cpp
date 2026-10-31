@@ -15,7 +15,7 @@
 #include <memory_resource> 
 #endif
 
-namespace nonstd = jsoncons::nonstd;
+namespace ext_traits = jsoncons::ext_traits;
 
 TEST_CASE("nonstd tests")
 {

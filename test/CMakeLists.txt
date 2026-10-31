@@ -61,43 +61,40 @@ endif()
 target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
+               bson/src/bson_compliance_tests.cpp
                bson/src/bson_cursor_tests.cpp
                bson/src/bson_decimal128_tests.cpp
                bson/src/bson_encoder_tests.cpp
                bson/src/bson_oid_tests.cpp
-               bson/src/bson_compliance_tests.cpp
                bson/src/bson_reader_tests.cpp
                bson/src/bson_test_suite.cpp
                bson/src/encode_decode_bson_tests.cpp
                cbor/src/cbor_bitset_traits_tests.cpp
+               cbor/src/cbor_compliance_tests.cpp
                cbor/src/cbor_cursor_tests.cpp
                cbor/src/cbor_encoder_tests.cpp
                cbor/src/cbor_event_visitor_tests.cpp
                cbor/src/cbor_reader_tests.cpp
                cbor/src/cbor_tests.cpp
-               cbor/src/cbor_compliance_tests.cpp
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
-               corelib/src/nonstd/optional_tests.cpp
-               corelib/src/nonstd/span_tests.cpp
-               corelib/src/nonstd/string_view_tests.cpp
-               corelib/src/nonstd/type_traits_tests.cpp
+               clusterfuzz/src/fuzz_regression_tests.cpp
+               corelib/src/const_json_ptr_arg_tests.cpp
+               corelib/src/decode_json_using_allocator_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
-               corelib/src/decode_json_using_allocator_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
+               corelib/src/generic_to_json_visitor_tests.cpp
                corelib/src/json_array_tests.cpp
                corelib/src/json_as_tests.cpp
                corelib/src/json_assignment_tests.cpp
                corelib/src/json_bitset_traits_tests.cpp
                corelib/src/json_checker_tests.cpp
                corelib/src/json_compare_tests.cpp
-               corelib/src/const_json_ptr_arg_tests.cpp
                corelib/src/json_constructor_tests.cpp
                corelib/src/json_cursor_tests.cpp
-               corelib/src/generic_to_json_visitor_tests.cpp
                corelib/src/json_encoder_tests.cpp
                corelib/src/json_exception_tests.cpp
                corelib/src/json_filter_tests.cpp
@@ -122,6 +119,9 @@ add_executable(unit_tests
                corelib/src/jsoncons_tests.cpp
                corelib/src/JSONTestSuite_tests.cpp
                corelib/src/legacy_json_type_traits_tests.cpp
+               corelib/src/nonstd/optional_tests.cpp
+               corelib/src/nonstd/span_tests.cpp
+               corelib/src/nonstd/string_view_tests.cpp
                corelib/src/ojson_object_tests.cpp
                corelib/src/ojson_tests.cpp
                corelib/src/parse_string_tests.cpp
@@ -147,11 +147,12 @@ add_executable(unit_tests
                corelib/src/string_to_double_tests.cpp
                corelib/src/try_decode_json_tests.cpp
                corelib/src/try_to_json_tests.cpp
-               corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/bigdec_tests.cpp
+               corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/byte_string_tests.cpp
                corelib/src/utility/conversion_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
+               corelib/src/utility/more_type_traits_tests.cpp
                corelib/src/utility/number_readers_tests.cpp
                corelib/src/utility/string_utils_tests.cpp
                corelib/src/utility/unicode_traits_tests.cpp
@@ -162,7 +163,6 @@ add_executable(unit_tests
                csv/src/csv_subfield_tests.cpp
                csv/src/csv_tests.cpp
                csv/src/encode_decode_csv_tests.cpp
-               clusterfuzz/src/fuzz_regression_tests.cpp
                jmespath/src/jmespath_custom_function_tests.cpp
                jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_let_tests.cpp
@@ -203,18 +203,18 @@ add_executable(unit_tests
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp
                msgpack/src/msgpack_bitset_traits_tests.cpp
+               msgpack/src/msgpack_compliance_tests.cpp
                msgpack/src/msgpack_cursor_tests.cpp
                msgpack/src/msgpack_encoder_tests.cpp
                msgpack/src/msgpack_tests.cpp
-               msgpack/src/msgpack_compliance_tests.cpp
                msgpack/src/msgpack_timestamp_tests.cpp
+               toon/src/decode_toon_tests.cpp
+               toon/src/encode_toon_tests.cpp
+               toon/src/toon_reader_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
-               toon/src/toon_reader_tests.cpp
-               toon/src/decode_toon_tests.cpp
-               toon/src/encode_toon_tests.cpp
                corelib/src/testmain.cpp
 )              
 
