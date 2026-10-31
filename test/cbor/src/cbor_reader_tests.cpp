@@ -861,59 +861,70 @@ TEST_CASE("cbor bigfloat tests")
     SECTION("trailing-zero cancellation, negative mantissas, zero, and both exponent directions")
     {
         jsoncons::bigdec value;
+        std::error_code ec;
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -3, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -3, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(value, "875", 3);
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(12), -3, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(12), -3, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "15", 1
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-12), -3, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-12), -3, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-15", 1
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(1), 0, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(1), 0, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "1", 0
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(125), 3, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(125), 3, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "1", -3, "1e3"
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-7), 2, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-7), 2, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-28", 0, "-28"
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(8), -3, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(8), -3, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "1", 0
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(16), -2, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(16), -2, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "4", 0
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MIN, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MAX, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), INT64_MAX, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
@@ -922,71 +933,82 @@ TEST_CASE("cbor bigfloat tests")
     SECTION("Rounding tests (HALF_EVEN)")
     {
         jsoncons::bigdec value;
+        std::error_code ec;
 
         // 1.25 -> 1.2 (tie, even)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(5), -2, value, 1);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(5), -2, value, 1, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "12", 1
         );
 
         // 1.75 -> 1.8 (tie, odd rounds up)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -2, value, 1);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -2, value, 1, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "18", 1
         );
 
         // -1.25 -> -1.2
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-5), -2, value, 1);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-5), -2, value, 1, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-12", 1
         );
 
         // -1.75 -> -1.8
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-7), -2, value, 1);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-7), -2, value, 1, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-18", 1
         );
 
         // 0.5 -> 0 (tie, even)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(1), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(1), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
         );
 
         // 1.5 -> 2 (tie, odd rounds up)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(3), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(3), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "2", 0
         );
 
         // 2.5 -> 2 (tie, even)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(5), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(5), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(value,
             "2", 0
         );
 
         // 3.5 -> 4 (tie, odd rounds up)
-        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(7), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "4", 0
         );
 
         // -0.5 -> 0
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-1), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-1), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
         );
 
         // -1.5 -> -2
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-3), -1, value, 0);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-3), -1, value, 0, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-2", 0
@@ -995,42 +1017,49 @@ TEST_CASE("cbor bigfloat tests")
     SECTION("Very small values and exponent boundaries")
     {
         jsoncons::bigdec value;
+        std::error_code ec;
 
         constexpr int64_t MIN = INT64_MIN;
         constexpr int64_t MAX = INT64_MAX;
 
         // Must round to zero quickly, without computing 5^(2^63).
-        cbor::from_cbor_bigfloat(jsoncons::bigint(MIN), MIN, value, 34);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(MIN), MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 34
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(1), MIN, value, 34);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(1), MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 34
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(-1), MIN, value, 34);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(-1), MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 34
         );
 
         // Zero must short-circuit even for extreme exponents.
-        cbor::from_cbor_bigfloat(jsoncons::bigint(0), MIN, value, 34);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
         );
 
-        cbor::from_cbor_bigfloat(jsoncons::bigint(0), MAX, value, 34);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(0), MAX, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 0
         );
-        cbor::from_cbor_bigfloat(jsoncons::bigint(1), MIN, value);
+        cbor::from_cbor_bigfloat(jsoncons::bigint(1), MIN, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "0", 34
@@ -1039,23 +1068,27 @@ TEST_CASE("cbor bigfloat tests")
     SECTION("Limb-boundary tests")
     {
         jsoncons::bigdec value;
+        std::error_code ec;
 
         // 2^64 * 2^-64 = 1
-        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 64), -64, value);
+        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 64), -64, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "1", 0
         );
 
         // 2^128 * 2^-128 = 1
-        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 128), -128, value);
+        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 128), -128, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "1", 0
         );
 
         // -(2^128) * 2^-127 = -2
-        cbor::from_cbor_bigfloat(-jsoncons::powb(jsoncons::bigint(2), 128), -127, value);
+        cbor::from_cbor_bigfloat(-jsoncons::powb(jsoncons::bigint(2), 128), -127, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "-2", 0
@@ -1063,7 +1096,8 @@ TEST_CASE("cbor bigfloat tests")
 
         // (2^64 + 1) * 2^-1
         // = 9223372036854775808.5
-        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 64) + jsoncons::bigint(1), -1, value);
+        cbor::from_cbor_bigfloat(jsoncons::powb(jsoncons::bigint(2), 64) + jsoncons::bigint(1), -1, value, 34, ec);
+        REQUIRE(!ec);
         expect_bigdec(
             value,
             "92233720368547758085", 1
