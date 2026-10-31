@@ -50,7 +50,7 @@ class int128 {
     static void divmodu(int128 n, int128 d,
                         int128& q, int128& r) {
         if (!d)
-            throw std::domain_error("int128 division by zero");
+            JSONCONS_THROW(std::domain_error("int128 division by zero"));
 
         q = 0;
         r = 0;
@@ -81,10 +81,10 @@ class int128 {
     static void divmods(int128 a, int128 b,
                         int128& q, int128& r) {
         if (!b)
-            throw std::domain_error("int128 division by zero");
+            JSONCONS_THROW(std::domain_error("int128 division by zero"));
 
         if (a == min_() && b == int128(-1))
-            throw std::overflow_error("int128 division overflow");
+            JSONCONS_THROW(std::overflow_error("int128 division overflow"));
 
         bool an = a.negative();
         bool bn = b.negative();

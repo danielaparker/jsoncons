@@ -277,7 +277,10 @@ int compare_power10(
         }
 
         if (workingBits > UINT64_MAX / 2)
-            throw std::length_error("precision overflow");
+        {
+            ec = cbor_errc::bigfloat_precision_overflow;
+            return 0;
+        }
 
         workingBits *= 2;
     }
@@ -298,7 +301,10 @@ uint64_t decimal_order(
         static_cast<uint128>(exponent);
 
     if (upper > static_cast<uint128>(UINT64_MAX))
-        throw std::overflow_error("decimal order overflow");
+    {
+        ec = cbor_errc::bigfloat_decimal_exponent_overflow;
+        return 0;
+    }
 
     uint64_t low = 0;
     uint64_t high = static_cast<uint64_t>(upper);
@@ -442,7 +448,10 @@ basic_bigint<Allocator> rounded_decimal_mantissa(
     std::error_code& ec)
 {
     if (precision > (UINT64_MAX - 128) / 4)
-        throw std::length_error("precision too large");
+    {
+        ec = cbor_errc::bigfloat_precision_overflow;
+        return basic_bigint<Allocator>{};
+    }
 
     uint64_t workingBits =
         std::max<uint64_t>(128, precision * 4 + 128);
@@ -491,7 +500,10 @@ basic_bigint<Allocator> rounded_decimal_mantissa(
         }
 
         if (workingBits > UINT64_MAX / 2)
-            throw std::length_error("precision overflow");
+        {
+            ec = cbor_errc::bigfloat_precision_overflow;
+            return lower;
+        }
 
         workingBits *= 2;
     }
@@ -532,8 +544,10 @@ void from_cbor_bigfloat_positive_rounded(
     std::error_code& ec)
 {
     if (precision == 0)
-        throw std::invalid_argument(
-            "precision must be positive");
+    {
+        ec = cbor_errc::precison_must_be_positive;
+        return;
+    }
 
     if (unscaled.is_zero())
     {
@@ -595,8 +609,10 @@ void from_cbor_bigfloat_positive_rounded(
 
     if (rounded >= precisionLimit) {
         if (rounded.divmod_small(10) != 0)
-            throw std::logic_error(
-                "unexpected rounding carry");
+        {
+            ec = cbor_errc::bigfloat_invalid_rounding_carry;
+            return;
+        }
 
         ++decimalShift;
     }
@@ -615,8 +631,10 @@ void from_cbor_bigfloat_positive_rounded(
         uint64_t(1) << 63;
 
     if (decimalShift > maxNegativeScaleMagnitude)
-        throw std::overflow_error(
-            "decimal scale overflow");
+    {
+        ec = cbor_errc::bigfloat_decimal_scale_overflow;
+        return;
+    }
 
     if (negative)
         rounded = -rounded;
@@ -647,7 +665,7 @@ void from_cbor_bigfloat(basic_bigint<Allocator> unscaled,
 
     if (max_decimal_places > max_scale)
     {
-        ec = cbor_errc::bigdec_scale_overflow;
+        ec = cbor_errc::bigfloat_scale_overflow;
         return;
     }
 
