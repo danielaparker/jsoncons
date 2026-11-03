@@ -347,17 +347,6 @@
 
 #endif // __CUDA_ARCH__
 
-#ifndef JSONCONS_FORCE_INLINE
-# ifdef _MSC_VER
-#  define JSONCONS_FORCE_INLINE __forceinline
-# elif defined(__GNUC__) || defined(__clang__)
-#  define JSONCONS_FORCE_INLINE inline __attribute__((always_inline))
-# else
-#  define JSONCONS_FORCE_INLINE inline
-# endif
-#endif // JSONCONS_FORCE_INLINE
- 
-
 /** compiler builtin check (since gcc 10.0, clang 2.6, icc 2021) */
 #ifndef JSONCONS_HAS_BUILTIN
 #   ifdef __has_builtin
@@ -382,6 +371,28 @@
 #       define JSONCONS_HAS_FEATURE(x) __has_feature(x)
 #   else
 #       define JSONCONS_HAS_FEATURE(x) 0
+#   endif
+#endif
+
+#ifndef JSONCONS_FORCE_INLINE
+# ifdef _MSC_VER
+#  define JSONCONS_FORCE_INLINE __forceinline
+# elif defined(__GNUC__) || defined(__clang__)
+#  define JSONCONS_FORCE_INLINE inline __attribute__((always_inline))
+# else
+#  define JSONCONS_FORCE_INLINE inline
+# endif
+#endif // JSONCONS_FORCE_INLINE
+ 
+
+/** noinline for compiler */
+#ifndef JSONCONS_NOLINE
+#   if defined(_MSC_VER) && MSC_VER >= 1400
+#       define JSONCONS_NOLINE __declspec(noinline)
+#   elif JSONCONS_HAS_ATTRIBUTE(noinline) || JSONCONS_GCC_AVAILABLE(4,0,0)
+#       define JSONCONS_NOLINE __attribute__((noinline))
+#   else
+#       define JSONCONS_NOLINE
 #   endif
 #endif
 
