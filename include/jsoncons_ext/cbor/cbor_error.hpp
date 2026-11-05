@@ -41,7 +41,7 @@ enum class cbor_errc
     bad_extents,
     bigfloat_to_bigdec_failed,
     max_dimensions_exceeded,
-    trailing_data
+    trailing_data,
     bigfloat_shift_too_large,
     bigfloat_precision_overflow,
     bigfloat_decimal_exponent_overflow,
