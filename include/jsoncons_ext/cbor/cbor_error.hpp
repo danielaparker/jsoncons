@@ -24,6 +24,7 @@ enum class cbor_errc
     reserved_additional_info,
     invalid_bigdecimal,
     bigdec_scale_overflow,
+    bigfloat_scale_overflow,
     invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
@@ -41,6 +42,12 @@ enum class cbor_errc
     bigfloat_to_bigdec_failed,
     max_dimensions_exceeded,
     trailing_data
+    bigfloat_shift_too_large,
+    bigfloat_precision_overflow,
+    bigfloat_decimal_exponent_overflow,
+    precison_must_be_positive,
+    bigfloat_invalid_rounding_carry,
+    bigfloat_decimal_scale_overflow,
 };
 
 class cbor_error_category_impl
@@ -65,8 +72,10 @@ public:
                 return "Invalid BigDecimal value";
             case cbor_errc::bigdec_scale_overflow:
                 return "bigdec scale overflow";
+            case cbor_errc::bigfloat_scale_overflow:
+                return "bigfloat scale overflow";
             case cbor_errc::invalid_bigfloat:
-                return "Invalid BigFloat value";
+                return "Invalid bigfloat value";
             case cbor_errc::bigfloat_to_bigdec_failed:
                 return "CBOR bigfloat requires an impractically large decimal mantissa";
             case cbor_errc::max_dimensions_exceeded:
@@ -99,6 +108,18 @@ public:
                 return "Product of extents does not match number of elements.";
             case cbor_errc::trailing_data:
                 return "Trailing bytes after the end of a CBOR item";
+            case cbor_errc::bigfloat_shift_too_large:
+                return "bigfloat shift count exceeds the supported range.";
+            case cbor_errc::bigfloat_precision_overflow:
+                return "bigfloat precision_overflow";
+            case cbor_errc::bigfloat_decimal_exponent_overflow:
+                return "bigfloat decimal exponent exceeds supported range";
+            case cbor_errc::precison_must_be_positive:
+                return "Precision must be positive.";
+            case cbor_errc::bigfloat_invalid_rounding_carry:
+                return "bigfloat decimal rounding produced an invalid carry.";
+            case cbor_errc::bigfloat_decimal_scale_overflow:
+                return "bigfloat decimal scale overflow.";
             default:
                 return "Unknown CBOR parser error";
         }

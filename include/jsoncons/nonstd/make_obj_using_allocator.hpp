@@ -3,14 +3,24 @@
 
 #include <new>			// for placement operator new
 #include <tuple>		// for tuple, make_tuple, make_from_tuple
-#include <utility>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <utility>      // for std::pair
+#include <type_traits>
 
 namespace jsoncons {
 namespace nonstd {
 
+namespace detail {
+  
+template <typename T>
+struct is_std_pair : public std::false_type {};
+
+template <typename S, typename T>
+struct is_std_pair<std::pair<S, T> > : public std::true_type {};
+
+} // namespace detail
+
 template <typename T, typename Alloc, typename... Args>
-typename std::enable_if<!nonstd::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
+typename std::enable_if<!nonstd::detail::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
     && std::is_constructible<T, Args...,Alloc>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, Args&&... args)
 {
@@ -18,7 +28,7 @@ make_obj_using_allocator(const Alloc& alloc, Args&&... args)
 }
 
 template <typename T, typename Alloc, typename... Args>
-typename std::enable_if<!nonstd::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
+typename std::enable_if<!nonstd::detail::is_std_pair<T>::value && std::uses_allocator<T, Alloc>::value
     && std::is_constructible<T,std::allocator_arg_t,Alloc,Args...>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, Args&&... args)
 {
@@ -35,7 +45,7 @@ make_obj_using_allocator(const Alloc&, Args&&... args)
 // std::pair
 
 template <typename T, typename Alloc>
-typename std::enable_if<nonstd::is_std_pair<T>::value, T>::type
+typename std::enable_if<nonstd::detail::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc)
 {
     return T(
@@ -44,7 +54,7 @@ make_obj_using_allocator(const Alloc& alloc)
 }
 
 template <typename T, typename Alloc, typename U, typename V>
-typename std::enable_if<nonstd::is_std_pair<T>::value, T>::type
+typename std::enable_if<nonstd::detail::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, U&& u, V&& v)
 {
     return T(
@@ -53,7 +63,7 @@ make_obj_using_allocator(const Alloc& alloc, U&& u, V&& v)
 }
 
 template <typename T, typename Alloc, typename U, typename V>
-typename std::enable_if<nonstd::is_std_pair<T>::value, T>::type
+typename std::enable_if<nonstd::detail::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, const std::pair<U,V>& pr)
 {
     return T(
@@ -62,7 +72,7 @@ make_obj_using_allocator(const Alloc& alloc, const std::pair<U,V>& pr)
 }
 
 template <typename T, typename Alloc, typename U, typename V>
-typename std::enable_if<nonstd::is_std_pair<T>::value, T>::type
+typename std::enable_if<nonstd::detail::is_std_pair<T>::value, T>::type
 make_obj_using_allocator(const Alloc& alloc, std::pair<U,V>&& pr)
 {
     return T(

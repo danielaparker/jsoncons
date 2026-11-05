@@ -144,6 +144,38 @@ TEST_CASE("get_with_nonexistent_target")
     check_contains(jstr,"/baz",false);
 }
 
+TEST_CASE("jsonpointer array index with leading zeros")
+{
+    // RFC 6901: an array index has no leading zeros
+    json doc = json::parse(R"(["foo", "bar", "baz"])");
+
+    for (const std::string path : {"/01", "/00"})
+    {
+        std::error_code ec;
+        jsonpointer::get(doc, path, ec);
+        CHECK(ec == jsonpointer::jsonpointer_errc::invalid_index);
+        CHECK_FALSE(jsonpointer::contains(doc, path));
+
+        json target = doc;
+        ec.clear();
+        jsonpointer::add(target, path, json("X"), ec);
+        CHECK(ec == jsonpointer::jsonpointer_errc::invalid_index);
+        ec.clear();
+        jsonpointer::add_if_absent(target, path, json("X"), ec);
+        CHECK(ec == jsonpointer::jsonpointer_errc::invalid_index);
+        ec.clear();
+        jsonpointer::replace(target, path, json("X"), ec);
+        CHECK(ec == jsonpointer::jsonpointer_errc::invalid_index);
+        ec.clear();
+        jsonpointer::remove(target, path, ec);
+        CHECK(ec == jsonpointer::jsonpointer_errc::invalid_index);
+        CHECK(target == doc);
+    }
+
+    CHECK(jsonpointer::get(doc, "/0") == json("foo"));
+    CHECK(jsonpointer::get(doc, "/1") == json("bar"));
+}
+
 // insert_or_assign
 
 TEST_CASE("test_add_object_member")

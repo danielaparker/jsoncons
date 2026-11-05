@@ -117,10 +117,10 @@ TEST_CASE("json::as<__int128>()")
     __int128 val = doc.as<__int128>();
 
     std::string s2;
-    jsoncons::from_integer(val, s2);
+    jsoncons::append_to_string(val, s2);
 
     std::string s3;
-    jsoncons::from_integer(n, s3);
+    jsoncons::append_to_string(n, s3);
 
     CHECK((n == val));
 }
@@ -139,9 +139,9 @@ TEST_CASE("json::as<unsigned __int128>()")
     unsigned __int128 val = doc.as<unsigned __int128>();
 
     std::string s2;
-    jsoncons::from_integer(val, s2);
+    jsoncons::append_to_string(val, s2);
     std::string s3;
-    jsoncons::from_integer(n, s3);
+    jsoncons::append_to_string(n, s3);
 
     CHECK((n == val));
 }

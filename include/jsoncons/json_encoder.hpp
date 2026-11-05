@@ -751,7 +751,7 @@ namespace jsoncons {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::from_integer(value, sink_);
+            std::size_t length = jsoncons::append_to_string(value, sink_);
             column_ += length;
             end_value();
             JSONCONS_VISITOR_RETURN;
@@ -773,7 +773,7 @@ namespace jsoncons {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::from_integer(value, sink_);
+            std::size_t length = jsoncons::append_to_string(value, sink_);
             column_ += length;
             end_value();
             JSONCONS_VISITOR_RETURN;
@@ -1431,7 +1431,7 @@ namespace jsoncons {
             {
                 sink_.push_back(',');
             }
-            jsoncons::from_integer(value, sink_);
+            jsoncons::append_to_string(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();
@@ -1448,7 +1448,7 @@ namespace jsoncons {
             {
                 sink_.push_back(',');
             }
-            jsoncons::from_integer(value, sink_);
+            jsoncons::append_to_string(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();

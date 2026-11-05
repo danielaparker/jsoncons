@@ -347,17 +347,6 @@
 
 #endif // __CUDA_ARCH__
 
-#ifndef JSONCONS_FORCE_INLINE
-# ifdef _MSC_VER
-#  define JSONCONS_FORCE_INLINE __forceinline
-# elif defined(__GNUC__) || defined(__clang__)
-#  define JSONCONS_FORCE_INLINE inline __attribute__((always_inline))
-# else
-#  define JSONCONS_FORCE_INLINE inline
-# endif
-#endif // JSONCONS_FORCE_INLINE
- 
-
 /** compiler builtin check (since gcc 10.0, clang 2.6, icc 2021) */
 #ifndef JSONCONS_HAS_BUILTIN
 #   ifdef __has_builtin
@@ -385,6 +374,28 @@
 #   endif
 #endif
 
+#ifndef JSONCONS_FORCE_INLINE
+# ifdef _MSC_VER
+#  define JSONCONS_FORCE_INLINE __forceinline
+# elif defined(__GNUC__) || defined(__clang__)
+#  define JSONCONS_FORCE_INLINE inline __attribute__((always_inline))
+# else
+#  define JSONCONS_FORCE_INLINE inline
+# endif
+#endif // JSONCONS_FORCE_INLINE
+ 
+
+/** noinline for compiler */
+#ifndef JSONCONS_NOLINE
+#   if defined(_MSC_VER) && MSC_VER >= 1400
+#       define JSONCONS_NOLINE __declspec(noinline)
+#   elif JSONCONS_HAS_ATTRIBUTE(noinline) || JSONCONS_GCC_AVAILABLE(4,0,0)
+#       define JSONCONS_NOLINE __attribute__((noinline))
+#   else
+#       define JSONCONS_NOLINE
+#   endif
+#endif
+
 /** include check (since gcc 5.0, clang 2.7, icc 16, msvc 2017 15.3) */
 #ifndef JSONCONS_HAS_INCLUDE
 #   ifdef __has_include
@@ -398,11 +409,11 @@
 #if defined(JSONCONS_HAS_NATIVE_INT128) && defined(__cplusplus)
 namespace jsoncons{
 #  ifdef __GNUC__
-   __extension__ typedef __int128 int128_type;
-   __extension__ typedef unsigned __int128 uint128_type;
+   __extension__ typedef __int128 native_int128;
+   __extension__ typedef unsigned __int128 native_uint128;
 #  else
-   typedef __int128 int128_type;
-   typedef unsigned __int128 uint128_type;
+   typedef __int128 native_int128;
+   typedef unsigned __int128 native_uint128;
 #  endif
 }
 #endif

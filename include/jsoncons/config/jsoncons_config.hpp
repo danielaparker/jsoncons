@@ -18,10 +18,19 @@
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/nonstd/a5hash.hpp>
 
-#include <jsoncons/nonstd/u128.hpp>
+#if defined(JSONCONS_HAS_NATIVE_INT128)
 namespace jsoncons {
-    using u128 = jsoncons::nonstd::u128;
-}
+using int128 = jsoncons::native_int128;
+using uint128 = jsoncons::native_uint128;
+} // namespace jsoncons
+#else 
+#include <jsoncons/nonstd/uint128.hpp>
+#include <jsoncons/nonstd/int128.hpp>
+namespace jsoncons {
+using uint128 = jsoncons::nonstd::uint128;
+using int128 = jsoncons::nonstd::int128;
+} // namespace jsoncons
+#endif
 
 namespace jsoncons {
 

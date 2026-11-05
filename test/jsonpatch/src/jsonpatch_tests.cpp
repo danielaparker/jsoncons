@@ -230,6 +230,28 @@ TEST_CASE("replace_root_with_object_via_replace")
     check_patch(target, patch, std::error_code(), expected);
 }
 
+TEST_CASE("rollback_after_replacing_root")
+{
+    jsoncons::json target = jsoncons::json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
+    jsoncons::json expected = target;
+
+    SECTION("add")
+    {
+        jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "add", "path" : "", "value": {} }, { "op" : "test", "path" : "", "value": [] }])");
+        check_patch(target, patch, jsonpatch::jsonpatch_errc::test_failed, expected);
+    }
+    SECTION("move")
+    {
+        jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "move", "path" : "", "from": "/child" }, { "op" : "test", "path" : "", "value": {} }])");
+        check_patch(target, patch, jsonpatch::jsonpatch_errc::test_failed, expected);
+    }
+    SECTION("copy")
+    {
+        jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "copy", "path" : "", "from": "/child" }, { "op" : "test", "path" : "", "value": {} }])");
+        check_patch(target, patch, jsonpatch::jsonpatch_errc::test_failed, expected);
+    }
+}
+
 TEST_CASE("remove_root")
 {
     jsoncons::json target = jsoncons::json::parse(R"({})");
@@ -258,6 +280,14 @@ TEST_CASE("move_root_to_child")
 {
     jsoncons::json target = jsoncons::json::parse(R"({ "child" : [ "a", "b", "c", "d" ] })");
     jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "move", "path" : "/child", "from": "" }])");
+    jsoncons::json expected = target;
+    check_patch(target, patch, jsonpatch::jsonpatch_errc::move_failed, expected);
+}
+
+TEST_CASE("move_array_element_into_its_own_child")
+{
+    jsoncons::json target = jsoncons::json::parse(R"([ [ "a" ], { "b" : 1 } ])");
+    jsoncons::json patch = jsoncons::json::parse(R"([{ "op" : "move", "path" : "/0/c", "from": "/0" }])");
     jsoncons::json expected = target;
     check_patch(target, patch, jsonpatch::jsonpatch_errc::move_failed, expected);
 }

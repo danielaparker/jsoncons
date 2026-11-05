@@ -106,8 +106,8 @@ TEST_CASE("basic_json object == jsoncons::basic_json object")
         CHECK_FALSE((o2 != o1));
 
         CHECK(std::is_convertible<decltype(o1.at("a")),jsoncons::json>::value);
-        CHECK(jsoncons::nonstd::is_basic_json<decltype(o1.at("a"))>::value);
-        CHECK(jsoncons::nonstd::is_basic_json<const jsoncons::json&>::value);
+        CHECK(jsoncons::ext_traits::is_basic_json<decltype(o1.at("a"))>::value);
+        CHECK(jsoncons::ext_traits::is_basic_json<const jsoncons::json&>::value);
 
         CHECK(1 == (o1.at("a"))); // jsoncons::basic_json == int
         CHECK((1 == o1.at("a"))); // int == jsoncons::basic_json
@@ -321,7 +321,7 @@ TEST_CASE("basic_json number compare")
     SECTION("unsigned unsigned")
     {
         jsoncons::json o;
-        o["a"] = std::numeric_limits<uint64_t>::max();
+        o["a"] = (std::numeric_limits<uint64_t>::max)();
         o["b"] = std::numeric_limits<uint64_t>::lowest();
 
         CHECK(o.at("a") == o.at("a")); // value and value
@@ -384,7 +384,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned signed test")
     {
-        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json a = (std::numeric_limits<uint64_t>::max)();
         jsoncons::json b = std::numeric_limits<int64_t>::lowest();
 
         CHECK(a == a); // value and value
@@ -474,7 +474,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("unsigned double test")
     {
-        jsoncons::json a = std::numeric_limits<uint64_t>::max();
+        jsoncons::json a = (std::numeric_limits<uint64_t>::max)();
         jsoncons::json b = std::numeric_limits<double>::lowest();
 
         CHECK(a == a); // value and value
@@ -526,7 +526,7 @@ TEST_CASE("basic_json number compare")
     }
     SECTION("bigint string and double")
     {
-        jsoncons::json a{ std::to_string(std::numeric_limits<uint64_t>::max()), jsoncons::semantic_tag::bigint };
+        jsoncons::json a{ std::to_string((std::numeric_limits<uint64_t>::max)()), jsoncons::semantic_tag::bigint };
         jsoncons::json b{ std::numeric_limits<double>::lowest() };
 
         CHECK_FALSE(a == b);

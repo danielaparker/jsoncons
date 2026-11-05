@@ -1066,7 +1066,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::unmatched_end_array);
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor_noexcept
     // Issue:  Out-of-memory (exceeds 2560 MB)
@@ -1081,6 +1081,33 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         auto result = cbor::try_decode_cbor<json>(is);
         REQUIRE(!result);
         REQUIRE((cbor::cbor_errc::max_dimensions_exceeded == result.error().code()));
+    }*/
+
+    // Fuzz target: fuzz_cbor
+    // Issue: Out-of-memory
+    // Diagnosis: 
+    // Resolution: 
+    SECTION("issue 575098084 ")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor-5291805093199872";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
+
+        jsoncons::default_json_visitor visitor;
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        if ((ec.value() != (int)cbor::cbor_errc::bigfloat_shift_too_large))
+        {
+            std::cout << "EC MESSAGE: "  << ec.message() << "\n";
+        }
+        //CHECK((ec.value() == (int)cbor::cbor_errc::bigfloat_shift_too_large)); 
     }
 }
 

@@ -33,14 +33,14 @@ namespace
     {
         using resolver_type = Json (*)(const jsoncons::uri&);
         using options_type = jsonschema::evaluation_options;
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, options_type>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, std::string>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, std::string, options_type>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, resolver_type>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, resolver_type, options_type>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, std::string, resolver_type>::value == supported));
-        CHECK((jsoncons::nonstd::is_detected<make_schema_result, Json, std::string, resolver_type, options_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, options_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, std::string>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, std::string, options_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, resolver_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, resolver_type, options_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, std::string, resolver_type>::value == supported));
+        CHECK((jsoncons::ext_traits::is_detected<make_schema_result, Json, std::string, resolver_type, options_type>::value == supported));
     }
 
     template <typename Json>

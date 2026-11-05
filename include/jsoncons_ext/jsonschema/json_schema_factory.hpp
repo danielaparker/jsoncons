@@ -227,9 +227,9 @@ namespace jsonschema {
 
     template <typename Json,typename SchemaResolver>
     typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
-        (nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+        (ext_traits::is_polymorphic_allocator<typename Json::allocator_type>::value ||
          std::allocator_traits<typename Json::allocator_type>::is_always_equal::value) &&
-        nonstd::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+        ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const std::string& retrieval_uri, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
@@ -247,7 +247,7 @@ namespace jsonschema {
 
     template <typename Json>
     typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
-        (nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+        (ext_traits::is_polymorphic_allocator<typename Json::allocator_type>::value ||
          std::allocator_traits<typename Json::allocator_type>::is_always_equal::value),json_schema<Json>>::type
     make_json_schema(Json root_schema, const std::string& retrieval_uri,
         const evaluation_options& options = evaluation_options{})
@@ -266,9 +266,9 @@ namespace jsonschema {
 
     template <typename Json,typename SchemaResolver>
     typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
-        (nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+        (ext_traits::is_polymorphic_allocator<typename Json::allocator_type>::value ||
          std::allocator_traits<typename Json::allocator_type>::is_always_equal::value) &&
-        nonstd::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+        ext_traits::is_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json root_schema, const SchemaResolver& resolver, 
         const evaluation_options& options = evaluation_options{})
     {
@@ -286,7 +286,7 @@ namespace jsonschema {
  
     template <typename Json>
     typename std::enable_if<std::is_same<typename Json::char_type,char>::value &&
-        (nonstd::is_polymorphic_allocator<typename Json::allocator_type>::value ||
+        (ext_traits::is_polymorphic_allocator<typename Json::allocator_type>::value ||
          std::allocator_traits<typename Json::allocator_type>::is_always_equal::value),json_schema<Json>>::type
     make_json_schema(Json root_schema,
         const evaluation_options& options = evaluation_options{})

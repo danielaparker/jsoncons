@@ -494,7 +494,7 @@ private:
         {
             // too large for int64, write as high-precision number
             std::string s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             sink_.push_back(jsoncons::ubjson::ubjson_type::high_precision_number_type);
             put_length(s.length());
             sink_.append(reinterpret_cast<const uint8_t*>(s.data()), s.size());

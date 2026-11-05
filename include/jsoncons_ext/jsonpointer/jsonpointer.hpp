@@ -20,7 +20,7 @@
 
 #include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/nonstd/more_type_traits.hpp>
+#include <jsoncons/utility/more_type_traits.hpp>
 #include <jsoncons/utility/string_utils.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
@@ -255,7 +255,7 @@ namespace jsonpointer {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<nonstd::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_string_view_of<StringViewLike,char_type>::value,basic_json_pointer&>::type
         append(const StringViewLike& s) 
         {
             tokens_.emplace_back(s.data(), s.size());
@@ -263,11 +263,11 @@ namespace jsonpointer {
         }
 
         template <typename IntegerType>
-        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         append(IntegerType val)
         {
             string_type s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -279,18 +279,18 @@ namespace jsonpointer {
         }
 
         template <typename StringViewLike>
-        typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer&>::type
         operator/=(const StringViewLike& s) 
         {
             return append(s);
         }
 
         template <typename IntegerType>
-        typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         operator/=(IntegerType val)
         {
             string_type s;
-            jsoncons::from_integer(val, s);
+            jsoncons::append_to_string(val, s);
             tokens_.push_back(s);
 
             return *this;
@@ -373,7 +373,7 @@ namespace jsonpointer {
 
         // Non-member functions
         template <typename StringViewLike>
-        friend typename std::enable_if<nonstd::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
+        friend typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value,basic_json_pointer>::type
         operator/(const basic_json_pointer<CharT>& lhs, const StringViewLike& rhs)
         {
             basic_json_pointer<CharT> p(lhs);
@@ -427,7 +427,7 @@ namespace jsonpointer {
     };
 
     template <typename CharT,typename IntegerType>
-    typename std::enable_if<nonstd::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
+    typename std::enable_if<ext_traits::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
     operator/(const basic_json_pointer<CharT>& lhs, IntegerType rhs)
     {
         basic_json_pointer<CharT> p(lhs);
@@ -452,6 +452,18 @@ namespace jsonpointer {
 
     namespace detail {
 
+    // RFC 6901: an array index is "0" or digits without a leading zero
+    template <typename CharT>
+    bool to_array_index(const CharT* data, std::size_t length, std::size_t& index)
+    {
+        if (length > 1 && data[0] == '0')
+        {
+            return false;
+        }
+        auto result = jsoncons::dec_to_integer(data, length, index);
+        return static_cast<bool>(result);
+    }
+
     template <typename Json>
     const Json* resolve(const Json* current, const typename Json::string_view_type& buffer, std::error_code& ec)
     {
@@ -463,8 +475,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-            if (!result)
+            if (!to_array_index(buffer.data(), buffer.length(), index))
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
@@ -504,8 +515,7 @@ namespace jsonpointer {
                 return current;
             }
             std::size_t index{0};
-            auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-            if (!result)
+            if (!to_array_index(buffer.data(), buffer.length(), index))
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
@@ -754,8 +764,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -895,8 +904,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -1040,8 +1048,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{0};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -1149,8 +1156,7 @@ namespace jsonpointer {
             else
             {
                 std::size_t index{};
-                auto result = jsoncons::dec_to_integer(buffer.data(), buffer.length(), index);
-                if (!result)
+                if (!detail::to_array_index(buffer.data(), buffer.length(), index))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -1304,7 +1310,7 @@ namespace jsonpointer {
                     {
                         string_type key(parent_key);
                         key.push_back('/');
-                        jsoncons::from_integer(i,key);
+                        jsoncons::append_to_string(i,key);
                         flatten_(key, parent_value.at(i), result);
                     }
                 }
