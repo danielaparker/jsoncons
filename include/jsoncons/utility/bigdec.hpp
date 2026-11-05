@@ -413,10 +413,12 @@ template <typename Alloc,typename CharT,typename SAlloc>
 void append_to_string(const basic_bigdec<Alloc>& value, 
     std::basic_string<CharT,std::char_traits<CharT>,SAlloc>& buf) 
 {
+    const std::size_t rel = buf.size();  
     append_to_string(value.unscaled(), buf);
 
-    const size_t sign = buf[0] == '-' ? 1 : 0;
-    const size_t precision = buf.size() - sign;
+    const size_t sign = buf[rel] == '-' ? 1 : 0;
+    const size_t sign_pos = rel+sign;
+    const size_t precision = (buf.size()-rel) - sign;
     const int64_t scale = value.scale();
 
     const int128 adjustedExponent =
@@ -434,15 +436,15 @@ void append_to_string(const basic_bigdec<Alloc>& value,
             const size_t zeros =
                 static_cast<size_t>(scale) - precision;
 
-            buf.insert(sign, 1, '0');
-            buf.insert(sign+1, 1, '.');
-            buf.insert(sign + 2, zeros, '0');
+            buf.insert(sign_pos, 1, '0');
+            buf.insert(sign_pos+1, 1, '.');
+            buf.insert(sign_pos+2, zeros, '0');
         }
         else {
             // 12345 with scale 2 -> 123.45
-            const size_t position = buf.size() - static_cast<size_t>(scale);
+            const size_t dot_pos = buf.size() - static_cast<size_t>(scale);
 
-            buf.insert(position, 1, '.');
+            buf.insert(dot_pos, 1, '.');
         }
 
         return;
@@ -451,7 +453,7 @@ void append_to_string(const basic_bigdec<Alloc>& value,
     // Scientific notation.
     // 12345 with scale -2 -> 1.2345E+6
     if (precision > 1)
-        buf.insert(sign + 1, 1, '.');
+        buf.insert(sign_pos + 1, 1, '.');
 
     buf.push_back('e');
 

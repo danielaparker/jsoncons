@@ -188,3 +188,35 @@ TEST_CASE("basic_bigdec divide tests")
         CHECK(expected == c);
     }
 }
+
+
+TEST_CASE("bigdec append_to_string tests")
+{
+    SECTION("test 1")
+    {
+        std::string str = "12345678901234567890.0987654321";
+        jsoncons::bigdec a(str.c_str());
+
+        std::string buf = "foo";
+        append_to_string(a, buf);
+        CHECK(("foo"+str) == buf);
+    }
+    SECTION("test 2")
+    {
+        std::string str = "-12345678901234567890e20";
+        jsoncons::bigdec a(str.c_str());
+
+        std::string buf = "foo";
+        append_to_string(a, buf);
+        CHECK("foo-1.2345678901234567890e39" == buf);
+    }
+    SECTION("test 3")
+    {
+        std::string str = "-12345678901234567890e-20";
+        jsoncons::bigdec a(str.c_str());
+
+        std::string buf = "foo";
+        append_to_string(a, buf);
+        CHECK("foo-0.12345678901234567890" == buf);
+    }
+}
