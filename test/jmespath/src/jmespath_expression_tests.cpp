@@ -242,3 +242,15 @@ TEST_CASE("jmespath merge overwrites values")
         test_merge_overwrites_values<ojson>();
     }
 }
+
+TEST_CASE("jmespath literal after pipe")
+{
+    auto doc = json::parse(R"({"a":{"b":1},"c":[{"d":1}]})");
+
+    CHECK(jmespath::search(doc, "a | `1`") == json(1));
+    CHECK(jmespath::search(doc, "a | 'x'") == json("x"));
+    CHECK(jmespath::search(doc, "a | b | `3`") == json(3));
+    CHECK(jmespath::search(doc, "a | `[1,2]`[1]") == json(2));
+    CHECK(jmespath::search(doc, "[a | `1`]") == json::parse("[1]"));
+    CHECK(jmespath::search(doc, "c[*].[d | `1`]") == json::parse("[[1]]"));
+}
