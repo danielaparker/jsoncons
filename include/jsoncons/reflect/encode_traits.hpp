@@ -46,6 +46,15 @@ public:
 };
 
 // specializations
+template <typename T> struct encode_traits<T, typename std::enable_if<nonstd::is_optional<T>::value && !is_json_type_traits_declared<T>::value>::type> {
+    template <typename CharT, typename Alloc, typename TempAlloc>
+    static write_result encode(const allocator_set<Alloc,TempAlloc>& aset, const T& val, basic_json_visitor<CharT>& encoder) {
+        if (val.has_value()) return encode_traits<typename T::value_type>::encode(aset, *val, encoder);
+        std::error_code ec;
+        encoder.null_value(semantic_tag::none, ser_context(), ec);
+        return ec ? write_result{unexpect, ec} : write_result{};
+    }
+};
 
 // bool
 template <typename T>
