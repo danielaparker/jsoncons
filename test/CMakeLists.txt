@@ -77,6 +77,7 @@ add_executable(unit_tests
                cbor/src/cbor_reader_tests.cpp
                cbor/src/cbor_tests.cpp
                cbor/src/cbor_typed_array_tests.cpp
+               cbor/src/cbor_ondemand_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
                clusterfuzz/src/fuzz_regression_tests.cpp

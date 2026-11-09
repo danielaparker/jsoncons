@@ -41,6 +41,7 @@ enum class cbor_errc
     bad_extents,
     bigfloat_to_bigdec_failed,
     max_dimensions_exceeded,
+    trailing_data,
     bigfloat_shift_too_large,
     bigfloat_precision_overflow,
     bigfloat_decimal_exponent_overflow,
@@ -105,6 +106,8 @@ public:
                 return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
                 return "Product of extents does not match number of elements.";
+            case cbor_errc::trailing_data:
+                return "Trailing bytes after the end of a CBOR item";
             case cbor_errc::bigfloat_shift_too_large:
                 return "bigfloat shift count exceeds the supported range.";
             case cbor_errc::bigfloat_precision_overflow:
