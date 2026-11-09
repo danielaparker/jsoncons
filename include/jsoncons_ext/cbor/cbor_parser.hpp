@@ -2448,6 +2448,8 @@ private:
 
     void read_bigdecimal(uint8_t container_info, string_type& result, std::error_code& ec)
     {
+        std::cout << "read bigdecimal\n";
+
         std::size_t size = read_unsigned_integer(container_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {

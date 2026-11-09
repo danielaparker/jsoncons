@@ -1081,7 +1081,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         auto result = cbor::try_decode_cbor<json>(is);
         REQUIRE(!result);
         REQUIRE((cbor::cbor_errc::max_dimensions_exceeded == result.error().code()));
-    }*/
+    }
 
     // Fuzz target: fuzz_cbor
     // Issue: Out-of-memory
@@ -1108,6 +1108,29 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
             std::cout << "EC MESSAGE: "  << ec.message() << "\n";
         }
         //CHECK((ec.value() == (int)cbor::cbor_errc::bigfloat_shift_too_large)); 
+    }
+    */
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: 
+    // Resolution: 
+    SECTION("issue 581723971")
+    {
+        std::string pathname = "clusterfuzz/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-5093639983005696";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> buf;
+        //cbor::cbor_bytes_encoder encoder(buf);
+        jsoncons::default_json_visitor encoder;
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(
+            reader.read(ec))
+        ;
+        //CHECK(ec == cbor::cbor_errc::invalid_bigdecimal); //-V521
     }
 }
 
