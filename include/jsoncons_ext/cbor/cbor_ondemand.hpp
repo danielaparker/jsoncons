@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CBOR_CBOR_VIEW_HPP
-#define JSONCONS_EXT_CBOR_CBOR_VIEW_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_ONDEMAND_HPP
+#define JSONCONS_EXT_CBOR_CBOR_ONDEMAND_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -32,7 +32,7 @@
 
 namespace jsoncons {
 namespace cbor {
-namespace view {
+namespace ondemand {
 
     constexpr int default_max_nesting_depth = 1024;
 
@@ -598,7 +598,7 @@ namespace view {
 
     class scan_context;
 
-    // A checked, zero-copy view of one complete, structurally well-formed CBOR
+    // A checked, zero-copy ondemand of one complete, structurally well-formed CBOR
     // item: its leading semantic tags, head, and content. Obtained from
     // validation, scanning, wire_cursor, or walker::finish_item; never
     // constructed from unvalidated bytes. Borrows the scanned input, so it
@@ -722,7 +722,7 @@ namespace view {
 
     struct item_head
     {
-        view::major_type major_type{};
+        ondemand::major_type major_type{};
         uint8_t additional_info{0};
         uint64_t value{0};
 
@@ -778,7 +778,7 @@ namespace view {
             }
 
             item_head head;
-            head.major_type = static_cast<view::major_type>(static_cast<uint8_t>(h.major_type));
+            head.major_type = static_cast<ondemand::major_type>(static_cast<uint8_t>(h.major_type));
             head.additional_info = h.additional_info;
             head.value = h.value;
             return head;
@@ -2126,7 +2126,7 @@ namespace view {
         return true;
     }
 
-} // namespace view
+} // namespace ondemand
 } // namespace cbor
 } // namespace jsoncons
 

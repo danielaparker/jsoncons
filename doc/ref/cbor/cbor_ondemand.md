@@ -1,12 +1,12 @@
-### jsoncons::cbor::view
+### jsoncons::cbor::ondemand
 
 ```cpp
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/cbor::ondemand.hpp>
 ```
 
 <br>
 
-The `cbor::view` namespace reads the encoded structure of
+The `cbor::ondemand` namespace reads the encoded structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
 without copying it or building a data structure. It provides two orthogonal
 forms of access:
@@ -274,7 +274,7 @@ const std::vector<uint8_t> data = {
     0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
 };
 
-auto made = jsoncons::cbor::view::get_walker(
+auto made = jsoncons::cbor::ondemand::get_walker(
     jsoncons::span<const uint8_t>(data));
 if (!made)
 {

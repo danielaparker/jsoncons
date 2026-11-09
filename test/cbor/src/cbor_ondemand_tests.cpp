@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -18,14 +18,14 @@ using namespace jsoncons;
 
 namespace {
 
-    cbor::view::item parse(const std::vector<uint8_t>& data)
+    cbor::ondemand::item parse(const std::vector<uint8_t>& data)
     {
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data.data(), data.size()));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data.data(), data.size()));
         REQUIRE(result.has_value());
         return result.value();
     }
 
-    bool moved(cbor::view::walk_result result)
+    bool moved(cbor::ondemand::walk_result result)
     {
         REQUIRE(result.has_value());
         return result.value();
@@ -33,7 +33,7 @@ namespace {
 
     cbor::cbor_errc validate_error(const std::vector<uint8_t>& data)
     {
-        auto result = cbor::view::validate(jsoncons::span<const uint8_t>(data.data(), data.size()));
+        auto result = cbor::ondemand::validate(jsoncons::span<const uint8_t>(data.data(), data.size()));
         return result ? cbor::cbor_errc::success : result.error().code;
     }
 
@@ -44,7 +44,7 @@ TEST_CASE("cbor view scan and parse_item")
     SECTION("scan returns the first item and the remainder")
     {
         std::vector<uint8_t> data = {0x01,0x02};
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         CHECK(result.value().first.encoded_bytes().data() == data.data());
         CHECK(result.value().first.encoded_bytes().size() == 1);
@@ -59,7 +59,7 @@ TEST_CASE("cbor view scan and parse_item")
         std::size_t count = 0;
         while (!rest.empty())
         {
-            auto result = cbor::view::scan(rest);
+            auto result = cbor::ondemand::scan(rest);
             REQUIRE(result.has_value());
             rest = result.value().remainder;
             ++count;
@@ -70,18 +70,18 @@ TEST_CASE("cbor view scan and parse_item")
     SECTION("parse_item rejects trailing bytes with their offset")
     {
         std::vector<uint8_t> data = {0x01,0x02};
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::trailing_data);
         CHECK(result.error().offset == 1);
 
         std::vector<uint8_t> exact = {0x01};
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(exact)).has_value());
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(exact)).has_value());
     }
 
     SECTION("empty input fails at offset zero")
     {
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>());
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>());
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unexpected_eof);
         CHECK(result.error().offset == 0);
@@ -91,7 +91,7 @@ TEST_CASE("cbor view scan and parse_item")
     {
         // [1, <invalid head 0x1f>]
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 3);
@@ -99,14 +99,14 @@ TEST_CASE("cbor view scan and parse_item")
 
     SECTION("a scan_context is reusable across scans")
     {
-        cbor::view::scan_context context(4000);
+        cbor::ondemand::scan_context context(4000);
         std::vector<uint8_t> deep(2000, 0x81);
         deep.push_back(0x01);
         std::vector<uint8_t> shallow = {0x01};
 
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(deep), context).has_value());
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(shallow), context).has_value());
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(deep), context).has_value());
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(deep), context).has_value());
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(shallow), context).has_value());
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(deep), context).has_value());
     }
 }
 
@@ -114,30 +114,30 @@ TEST_CASE("cbor view scanning validates well-formedness")
 {
     SECTION("nesting at the default depth bound succeeds")
     {
-        std::vector<uint8_t> data(cbor::view::default_max_nesting_depth, 0x81);
+        std::vector<uint8_t> data(cbor::ondemand::default_max_nesting_depth, 0x81);
         data.push_back(0x01);
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         CHECK(result.value().encoded_bytes().size() == data.size());
     }
 
     SECTION("nesting past the depth bound is rejected")
     {
-        std::vector<uint8_t> data(cbor::view::default_max_nesting_depth + 1, 0x81);
+        std::vector<uint8_t> data(cbor::ondemand::default_max_nesting_depth + 1, 0x81);
         data.push_back(0x01);
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
 
-        cbor::view::scan_context deeper(4000);
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(data), deeper).has_value());
+        cbor::ondemand::scan_context deeper(4000);
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), deeper).has_value());
     }
 
     SECTION("tag chains do not consume nesting depth or stack")
     {
         std::vector<uint8_t> data(1000000, 0xc0);
         data.push_back(0x01);
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
 
         std::size_t count = 0;
@@ -152,12 +152,12 @@ TEST_CASE("cbor view scanning validates well-formedness")
     SECTION("containers claiming huge counts are rejected")
     {
         std::vector<uint8_t> array = {0x9a,0xff,0xff,0xff,0xff};
-        auto array_result = cbor::view::scan(jsoncons::span<const uint8_t>(array));
+        auto array_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(array));
         REQUIRE_FALSE(array_result.has_value());
         CHECK(array_result.error().code == cbor::cbor_errc::unexpected_eof);
 
         std::vector<uint8_t> map = {0xba,0xff,0xff,0xff,0xff};
-        auto map_result = cbor::view::scan(jsoncons::span<const uint8_t>(map));
+        auto map_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(map));
         REQUIRE_FALSE(map_result.has_value());
         CHECK(map_result.error().code == cbor::cbor_errc::unexpected_eof);
     }
@@ -174,7 +174,7 @@ TEST_CASE("cbor view scanning validates well-formedness")
     {
         // [_ {1: [2]}, [], {} ] followed by trailing bytes
         std::vector<uint8_t> data = {0x9f,0xa1,0x01,0x81,0x02,0x80,0xa0,0xff,0x63,'a','b','c'};
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         CHECK(result.value().first.encoded_bytes().size() == 8);
         CHECK(result.value().remainder.size() == 4);
@@ -183,18 +183,18 @@ TEST_CASE("cbor view scanning validates well-formedness")
     SECTION("an indefinite map break may not split a key from its value")
     {
         std::vector<uint8_t> dangling_key = {0xbf,0x01,0xff};
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>(dangling_key));
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(dangling_key));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
 
         std::vector<uint8_t> complete_entry = {0xbf,0x01,0x02,0xff};
-        CHECK(cbor::view::parse_item(jsoncons::span<const uint8_t>(complete_entry)).has_value());
+        CHECK(cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(complete_entry)).has_value());
     }
 
     SECTION("an invalid indefinite integer is rejected")
     {
         std::vector<uint8_t> data = {0x1f};
-        auto result = cbor::view::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
     }
@@ -203,17 +203,17 @@ TEST_CASE("cbor view scanning validates well-formedness")
     {
         // RFC 8949 3.3
         std::vector<uint8_t> below = {0xf8,0x13};
-        auto below_result = cbor::view::scan(jsoncons::span<const uint8_t>(below));
+        auto below_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(below));
         REQUIRE_FALSE(below_result.has_value());
         CHECK(below_result.error().code == cbor::cbor_errc::unknown_type);
 
         std::vector<uint8_t> nested = {0x81,0xf8,0x00};
-        CHECK_FALSE(cbor::view::scan(jsoncons::span<const uint8_t>(nested)).has_value());
+        CHECK_FALSE(cbor::ondemand::scan(jsoncons::span<const uint8_t>(nested)).has_value());
 
         std::vector<uint8_t> at_32 = {0xf8,0x20};
-        auto at_32_result = cbor::view::parse_item(jsoncons::span<const uint8_t>(at_32));
+        auto at_32_result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(at_32));
         REQUIRE(at_32_result.has_value());
-        CHECK(at_32_result.value().kind() == cbor::view::item_kind::simple);
+        CHECK(at_32_result.value().kind() == cbor::ondemand::item_kind::simple);
         CHECK(at_32_result.value().argument() == 32);
     }
 }
@@ -276,13 +276,13 @@ TEST_CASE("cbor view item exposes wire structure")
 {
     SECTION("kinds follow the untagged major type")
     {
-        CHECK(parse({0x00}).kind() == cbor::view::item_kind::unsigned_integer);
-        CHECK(parse({0x20}).kind() == cbor::view::item_kind::negative_integer);
-        CHECK(parse({0x41,0x01}).kind() == cbor::view::item_kind::byte_string);
-        CHECK(parse({0x61,'a'}).kind() == cbor::view::item_kind::text_string);
-        CHECK(parse({0x80}).kind() == cbor::view::item_kind::array);
-        CHECK(parse({0xa0}).kind() == cbor::view::item_kind::map);
-        CHECK(parse({0xf4}).kind() == cbor::view::item_kind::simple);
+        CHECK(parse({0x00}).kind() == cbor::ondemand::item_kind::unsigned_integer);
+        CHECK(parse({0x20}).kind() == cbor::ondemand::item_kind::negative_integer);
+        CHECK(parse({0x41,0x01}).kind() == cbor::ondemand::item_kind::byte_string);
+        CHECK(parse({0x61,'a'}).kind() == cbor::ondemand::item_kind::text_string);
+        CHECK(parse({0x80}).kind() == cbor::ondemand::item_kind::array);
+        CHECK(parse({0xa0}).kind() == cbor::ondemand::item_kind::map);
+        CHECK(parse({0xf4}).kind() == cbor::ondemand::item_kind::simple);
     }
 
     SECTION("argument exposes the head argument")
@@ -298,7 +298,7 @@ TEST_CASE("cbor view item exposes wire structure")
     SECTION("indefinite length is visible")
     {
         std::vector<uint8_t> data = {0x9f,0x01,0xff};
-        cbor::view::item scanned = parse(data);
+        cbor::ondemand::item scanned = parse(data);
         CHECK(scanned.indefinite());
         CHECK(scanned.argument() == 0);
         CHECK_FALSE(parse({0x81,0x01}).indefinite());
@@ -307,8 +307,8 @@ TEST_CASE("cbor view item exposes wire structure")
     SECTION("tags are exposed, not interpreted")
     {
         std::vector<uint8_t> data = {0xd8,0x40,0xc2,0x42,0x01,0x02};   // tag 64, tag 2, bytes
-        cbor::view::item tagged = parse(data);
-        CHECK(tagged.kind() == cbor::view::item_kind::byte_string);
+        cbor::ondemand::item tagged = parse(data);
+        CHECK(tagged.kind() == cbor::ondemand::item_kind::byte_string);
 
         std::vector<uint64_t> tags;
         for (uint64_t tag : tagged.tags())
@@ -324,7 +324,7 @@ TEST_CASE("cbor view item exposes wire structure")
     SECTION("encoded_bytes covers the whole item, tags included")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};
-        cbor::view::item tagged = parse(data);
+        cbor::ondemand::item tagged = parse(data);
         CHECK(tagged.encoded_bytes().data() == data.data());
         CHECK(tagged.encoded_bytes().size() == data.size());
     }
@@ -388,7 +388,7 @@ TEST_CASE("cbor view typed accessors")
     SECTION("a tagged scalar still reads, with its tag visible")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1 (epoch time) 10
-        cbor::view::item tagged = parse(data);
+        cbor::ondemand::item tagged = parse(data);
         CHECK_FALSE(tagged.tags().empty());
         uint64_t v = 0;
         CHECK(tagged.uint64_value(v));
@@ -398,7 +398,7 @@ TEST_CASE("cbor view typed accessors")
     SECTION("text views definite strings in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
-        cbor::view::item text_item = parse(data);
+        cbor::ondemand::item text_item = parse(data);
         jsoncons::string_view sv;
         REQUIRE(text_item.text(sv));
         CHECK(std::string(sv.data(), sv.size()) == "abc");
@@ -458,7 +458,7 @@ TEST_CASE("cbor view copying accessors are transactional")
     SECTION("the destination may alias the scanned bytes")
     {
         std::vector<uint8_t> data = {0x42,0x01,0x02};
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         REQUIRE(result.value().bytes(data));   // the item borrows `data` itself
         CHECK((data == std::vector<uint8_t>{0x01,0x02}));
@@ -531,7 +531,7 @@ TEST_CASE("cbor view deterministic encoding orders")
         {
             for (std::size_t j = 0; j < bytewise_sorted.size(); ++j)
             {
-                const int r = cbor::view::bytewise_compare()(parse(bytewise_sorted[i]), parse(bytewise_sorted[j]));
+                const int r = cbor::ondemand::bytewise_compare()(parse(bytewise_sorted[i]), parse(bytewise_sorted[j]));
                 CHECK((i < j ? r < 0 : (i > j ? r > 0 : r == 0)));
             }
         }
@@ -543,7 +543,7 @@ TEST_CASE("cbor view deterministic encoding orders")
         {
             for (std::size_t j = 0; j < length_first_sorted.size(); ++j)
             {
-                const int r = cbor::view::length_first_compare()(parse(length_first_sorted[i]), parse(length_first_sorted[j]));
+                const int r = cbor::ondemand::length_first_compare()(parse(length_first_sorted[i]), parse(length_first_sorted[j]));
                 CHECK((i < j ? r < 0 : (i > j ? r > 0 : r == 0)));
             }
         }
@@ -555,7 +555,7 @@ TEST_CASE("cbor view deterministic encoding orders")
         {
             bool operator()(const std::vector<uint8_t>& a, const std::vector<uint8_t>& b) const
             {
-                return cbor::view::bytewise_less()(jsoncons::span<const uint8_t>(a), jsoncons::span<const uint8_t>(b));
+                return cbor::ondemand::bytewise_less()(jsoncons::span<const uint8_t>(a), jsoncons::span<const uint8_t>(b));
             }
         };
 
@@ -569,15 +569,15 @@ TEST_CASE("cbor view deterministic encoding orders")
     {
         struct reverse_bytewise_compare
         {
-            int operator()(const cbor::view::item& a, const cbor::view::item& b) const noexcept
+            int operator()(const cbor::ondemand::item& a, const cbor::ondemand::item& b) const noexcept
             {
-                return -cbor::view::bytewise_compare()(a, b);
+                return -cbor::ondemand::bytewise_compare()(a, b);
             }
         };
 
         std::vector<uint8_t> ten = {0x0a};
         std::vector<uint8_t> hundred = {0x18,0x64};
-        CHECK(cbor::view::bytewise_compare()(parse(ten), parse(hundred)) < 0);
+        CHECK(cbor::ondemand::bytewise_compare()(parse(ten), parse(hundred)) < 0);
         CHECK(reverse_bytewise_compare()(parse(ten), parse(hundred)) > 0);
     }
 }
@@ -587,45 +587,45 @@ TEST_CASE("cbor view validate_text")
 {
     SECTION("well-formed UTF-8 passes")
     {
-        CHECK(cbor::view::validate_text(parse({0x63,'a','b','c'})));
-        CHECK(cbor::view::validate_text(parse({0x62,0xc3,0xa9})));
-        CHECK(cbor::view::validate_text(parse({0x7f,0x62,0xc3,0xa9,0x61,'a',0xff})));
+        CHECK(cbor::ondemand::validate_text(parse({0x63,'a','b','c'})));
+        CHECK(cbor::ondemand::validate_text(parse({0x62,0xc3,0xa9})));
+        CHECK(cbor::ondemand::validate_text(parse({0x7f,0x62,0xc3,0xa9,0x61,'a',0xff})));
     }
 
     SECTION("ill-formed UTF-8 is rejected")
     {
-        CHECK_FALSE(cbor::view::validate_text(parse({0x62,0xc3,0x28})));
-        CHECK_FALSE(cbor::view::validate_text(parse({0x61,0x80})));
+        CHECK_FALSE(cbor::ondemand::validate_text(parse({0x62,0xc3,0x28})));
+        CHECK_FALSE(cbor::ondemand::validate_text(parse({0x61,0x80})));
     }
 
     SECTION("a multibyte sequence may not straddle chunks")
     {
         // RFC 8949 3.2.3
-        CHECK_FALSE(cbor::view::validate_text(parse({0x7f,0x61,0xc3,0x61,0xa9,0xff})));
+        CHECK_FALSE(cbor::ondemand::validate_text(parse({0x7f,0x61,0xc3,0x61,0xa9,0xff})));
     }
 
     SECTION("non-text items are not valid text")
     {
-        CHECK_FALSE(cbor::view::validate_text(parse({0x01})));
-        CHECK_FALSE(cbor::view::validate_text(parse({0x41,0x61})));
+        CHECK_FALSE(cbor::ondemand::validate_text(parse({0x01})));
+        CHECK_FALSE(cbor::ondemand::validate_text(parse({0x41,0x61})));
     }
 }
 
-static_assert(std::is_move_constructible<cbor::view::walker>::value,
+static_assert(std::is_move_constructible<cbor::ondemand::walker>::value,
               "walker must be movable");
-static_assert(!std::is_copy_constructible<cbor::view::walker>::value,
+static_assert(!std::is_copy_constructible<cbor::ondemand::walker>::value,
               "walker must not be copyable");
-static_assert(!std::is_convertible<cbor::view::walk_result, bool>::value,
+static_assert(!std::is_convertible<cbor::ondemand::walk_result, bool>::value,
               "walk_result must not be implicitly convertible to bool");
-static_assert(!std::is_constructible<bool, cbor::view::walk_result>::value,
+static_assert(!std::is_constructible<bool, cbor::ondemand::walk_result>::value,
               "walk_result must not be contextually convertible to bool");
-static_assert(noexcept(std::declval<cbor::view::walker&>().enter()),
+static_assert(noexcept(std::declval<cbor::ondemand::walker&>().enter()),
               "walker enter must not throw");
-static_assert(noexcept(std::declval<cbor::view::walker&>().next()),
+static_assert(noexcept(std::declval<cbor::ondemand::walker&>().next()),
               "walker next must not throw");
-static_assert(noexcept(std::declval<cbor::view::walker&>().leave()),
+static_assert(noexcept(std::declval<cbor::ondemand::walker&>().leave()),
               "walker leave must not throw");
-static_assert(noexcept(std::declval<cbor::view::walker&>().finish_item()),
+static_assert(noexcept(std::declval<cbor::ondemand::walker&>().finish_item()),
               "walker finish_item must not throw");
 
 TEST_CASE("cbor view walker construction and root access")
@@ -633,11 +633,11 @@ TEST_CASE("cbor view walker construction and root access")
     SECTION("get_walker reads only the root head")
     {
         std::vector<uint8_t> data = {0xc1,0x18,0x2a,0x01};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        CHECK(result.value().kind() == cbor::view::item_kind::unsigned_integer);
+        CHECK(result.value().kind() == cbor::ondemand::item_kind::unsigned_integer);
         CHECK(result.value().argument() == 42);
-        CHECK(result.value().role() == cbor::view::position_role::root);
+        CHECK(result.value().role() == cbor::ondemand::position_role::root);
         CHECK(result.value().depth() == 0);
         CHECK(result.value().extent_known());
 
@@ -660,14 +660,14 @@ TEST_CASE("cbor view walker construction and root access")
     SECTION("get_walker exposes scalar and string content")
     {
         std::vector<uint8_t> text_data = {0x63,'a','d','a'};
-        auto text_result = cbor::view::get_walker(jsoncons::span<const uint8_t>(text_data));
+        auto text_result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(text_data));
         REQUIRE(text_result.has_value());
         jsoncons::string_view text;
         CHECK(text_result.value().text(text));
         CHECK(text == "ada");
 
         std::vector<uint8_t> bytes_data = {0x42,0x01,0x02};
-        auto bytes_result = cbor::view::get_walker(jsoncons::span<const uint8_t>(bytes_data));
+        auto bytes_result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(bytes_data));
         REQUIRE(bytes_result.has_value());
         jsoncons::span<const uint8_t> bytes;
         CHECK(bytes_result.value().bytes(bytes));
@@ -676,7 +676,7 @@ TEST_CASE("cbor view walker construction and root access")
         CHECK(bytes[1] == 2);
 
         std::vector<uint8_t> boolean_data = {0xf5};
-        auto boolean_result = cbor::view::get_walker(jsoncons::span<const uint8_t>(boolean_data));
+        auto boolean_result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(boolean_data));
         REQUIRE(boolean_result.has_value());
         bool boolean = false;
         CHECK(boolean_result.value().bool_value(boolean));
@@ -686,17 +686,17 @@ TEST_CASE("cbor view walker construction and root access")
     SECTION("validate is the exact eager boundary")
     {
         std::vector<uint8_t> data = {0x01,0x02};
-        REQUIRE(cbor::view::get_walker(jsoncons::span<const uint8_t>(data)).has_value());
-        auto result = cbor::view::validate(jsoncons::span<const uint8_t>(data));
+        REQUIRE(cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data)).has_value());
+        auto result = cbor::ondemand::validate(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::trailing_data);
         CHECK(result.error().offset == 1);
 
         std::vector<uint8_t> exact = {0x81,0x01};
-        auto checked = cbor::view::validate(jsoncons::span<const uint8_t>(exact));
+        auto checked = cbor::ondemand::validate(jsoncons::span<const uint8_t>(exact));
         REQUIRE(checked.has_value());
         CHECK(checked.value().encoded_bytes().size() == exact.size());
-        CHECK(checked.value().kind() == cbor::view::item_kind::array);
+        CHECK(checked.value().kind() == cbor::ondemand::item_kind::array);
     }
 }
 
@@ -705,17 +705,17 @@ TEST_CASE("cbor view walker movement")
     SECTION("walks nested definite arrays incrementally")
     {
         std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
 
         REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 1);
-        CHECK(walker.role() == cbor::view::position_role::array_element);
+        CHECK(walker.role() == cbor::ondemand::position_role::array_element);
         CHECK(walker.argument() == 1);
 
         REQUIRE(moved(walker.next()));
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK_FALSE(walker.extent_known());
         REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 2);
@@ -726,7 +726,7 @@ TEST_CASE("cbor view walker movement")
         CHECK_FALSE(moved(walker.next()));
         REQUIRE(moved(walker.leave()));
         CHECK(walker.depth() == 1);
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK(walker.extent_known());
 
         REQUIRE(moved(walker.next()));
@@ -735,18 +735,18 @@ TEST_CASE("cbor view walker movement")
         CHECK_FALSE(moved(walker.next()));
         REQUIRE(moved(walker.leave()));
         CHECK(walker.depth() == 0);
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK_FALSE(moved(walker.leave()));
     }
 
     SECTION("next skips an unopened container")
     {
         std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         REQUIRE(moved(walker.enter()));
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK_FALSE(walker.extent_known());
         REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 3);
@@ -756,14 +756,14 @@ TEST_CASE("cbor view walker movement")
     SECTION("early leave skips only the unread remainder")
     {
         std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         REQUIRE(moved(walker.enter()));
         REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 1);
         REQUIRE(moved(walker.leave()));
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK(walker.extent_known());
         REQUIRE(moved(walker.next()));
         CHECK(walker.argument() == 3);
@@ -777,34 +777,34 @@ TEST_CASE("cbor view walker movement")
         };
         for (const auto& data : maps)
         {
-            auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+            auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
             REQUIRE(result.has_value());
-            cbor::view::walker walker = std::move(result.value());
+            cbor::ondemand::walker walker = std::move(result.value());
             REQUIRE(moved(walker.enter()));
-            CHECK(walker.role() == cbor::view::position_role::map_key);
+            CHECK(walker.role() == cbor::ondemand::position_role::map_key);
             CHECK(walker.argument() == 1);
             REQUIRE(moved(walker.next()));
-            CHECK(walker.role() == cbor::view::position_role::map_value);
+            CHECK(walker.role() == cbor::ondemand::position_role::map_value);
             CHECK(walker.argument() == 2);
             REQUIRE(moved(walker.next()));
-            CHECK(walker.role() == cbor::view::position_role::map_key);
+            CHECK(walker.role() == cbor::ondemand::position_role::map_key);
             CHECK(walker.argument() == 3);
             REQUIRE(moved(walker.next()));
-            CHECK(walker.role() == cbor::view::position_role::map_value);
+            CHECK(walker.role() == cbor::ondemand::position_role::map_value);
             CHECK(walker.argument() == 4);
             CHECK_FALSE(moved(walker.next()));
             CHECK_FALSE(moved(walker.next()));
             REQUIRE(moved(walker.leave()));
-            CHECK(walker.role() == cbor::view::position_role::root);
+            CHECK(walker.role() == cbor::ondemand::position_role::root);
         }
     }
 
     SECTION("a count beyond the input fails where the walk runs out")
     {
         std::vector<uint8_t> data = {0x92,0x01};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
 
         REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 1);
@@ -820,10 +820,10 @@ TEST_CASE("cbor view walker movement")
         };
         for (const auto& data : values)
         {
-            auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+            auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
             REQUIRE(result.has_value());
-            cbor::view::walker walker = std::move(result.value());
-            const cbor::view::item_kind kind = walker.kind();
+            cbor::ondemand::walker walker = std::move(result.value());
+            const cbor::ondemand::item_kind kind = walker.kind();
             CHECK_FALSE(moved(walker.enter()));
             CHECK(walker.kind() == kind);
             CHECK(walker.depth() == 0);
@@ -833,9 +833,9 @@ TEST_CASE("cbor view walker movement")
     SECTION("finish_item caches an unknown extent and descent remains legal")
     {
         std::vector<uint8_t> data = {0x82,0x82,0x01,0x02,0x03};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         REQUIRE(moved(walker.enter()));
         CHECK_FALSE(walker.extent_known());
         auto nested = walker.finish_item();
@@ -853,15 +853,15 @@ TEST_CASE("cbor view walker movement")
             0x87,0x01,0x02,0x03,0x04,0x05,0x06,
             0x82,0x81,0x07,0x81,0x08
         };
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         REQUIRE(moved(walker.enter()));
         for (int i = 0; i < 6; ++i)
         {
             REQUIRE(moved(walker.next()));
         }
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK_FALSE(walker.extent_known());
         auto payload = walker.finish_item();
         REQUIRE(payload.has_value());
@@ -869,7 +869,7 @@ TEST_CASE("cbor view walker movement")
         CHECK(payload.value().encoded_bytes().size() == 5);
 
         REQUIRE(moved(walker.enter()));
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         CHECK_FALSE(walker.extent_known());
         REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 7);
@@ -879,16 +879,16 @@ TEST_CASE("cbor view walker movement")
     SECTION("rewind restores the root")
     {
         std::vector<uint8_t> data = {0x81,0x81,0x01};
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         REQUIRE(moved(walker.enter()));
         REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 2);
         walker.rewind();
         CHECK(walker.depth() == 0);
-        CHECK(walker.role() == cbor::view::position_role::root);
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.role() == cbor::ondemand::position_role::root);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         REQUIRE(moved(walker.enter()));
         CHECK(walker.depth() == 1);
     }
@@ -898,9 +898,9 @@ TEST_CASE("cbor view walker movement")
         const std::size_t depth = 100;
         std::vector<uint8_t> data(depth, 0x81);
         data.push_back(0x01);
-        auto result = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::view::walker walker = std::move(result.value());
+        cbor::ondemand::walker walker = std::move(result.value());
         for (std::size_t i = 0; i < depth; ++i)
         {
             REQUIRE(moved(walker.enter()));
@@ -920,23 +920,23 @@ TEST_CASE("cbor view lazy walker errors")
     SECTION("enter reports a malformed first child transactionally")
     {
         std::vector<uint8_t> data = {0x81,0x1f};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         auto result = walker.enter();
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 2);
-        CHECK(walker.role() == cbor::view::position_role::root);
+        CHECK(walker.role() == cbor::ondemand::position_role::root);
         CHECK(walker.depth() == 0);
     }
 
     SECTION("next reports a malformed sibling transactionally")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto result = walker.next();
         REQUIRE_FALSE(result.has_value());
@@ -949,23 +949,23 @@ TEST_CASE("cbor view lazy walker errors")
     SECTION("next reports a malformed unopened subtree")
     {
         std::vector<uint8_t> data = {0x82,0x81,0x1f,0x01};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto result = walker.next();
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 3);
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
     }
 
     SECTION("leave reports a malformed unread remainder")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto result = walker.leave();
         REQUIRE_FALSE(result.has_value());
@@ -977,23 +977,23 @@ TEST_CASE("cbor view lazy walker errors")
     SECTION("an indefinite map cannot end between key and value")
     {
         std::vector<uint8_t> data = {0xbf,0x01,0xff};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto result = walker.next();
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 3);
-        CHECK(walker.role() == cbor::view::position_role::map_key);
+        CHECK(walker.role() == cbor::ondemand::position_role::map_key);
     }
 
     SECTION("depth errors occur when the nested container is reached")
     {
         std::vector<uint8_t> data = {0x81,0x81,0x81,0x01};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data), 2);
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data), 2);
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto result = walker.enter();
         REQUIRE_FALSE(result.has_value());
@@ -1005,23 +1005,23 @@ TEST_CASE("cbor view lazy walker errors")
     SECTION("finish_item reports malformed descendants transactionally")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         auto result = walker.finish_item();
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 3);
-        CHECK(walker.role() == cbor::view::position_role::root);
+        CHECK(walker.role() == cbor::ondemand::position_role::root);
         CHECK_FALSE(walker.extent_known());
     }
 
     SECTION("trailing bytes are not used as a lazy root fence")
     {
         std::vector<uint8_t> data = {0x81,0x80,0x01};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(moved(walker.enter()));
         auto child = walker.finish_item();
         REQUIRE(child.has_value());
@@ -1039,9 +1039,9 @@ TEST_CASE("cbor view completed walker")
     SECTION("completion and rewind reuse the same walker")
     {
         std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x04};
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data));
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data));
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         auto checked = walker.finish_item();
         REQUIRE(checked.has_value());
         CHECK(checked.value().encoded_bytes().size() == data.size());
@@ -1051,7 +1051,7 @@ TEST_CASE("cbor view completed walker")
         REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 1);
         REQUIRE(moved(walker.next()));
-        CHECK(walker.kind() == cbor::view::item_kind::array);
+        CHECK(walker.kind() == cbor::ondemand::item_kind::array);
         REQUIRE(moved(walker.enter()));
         CHECK(walker.argument() == 2);
         REQUIRE(moved(walker.next()));
@@ -1070,9 +1070,9 @@ TEST_CASE("cbor view completed walker")
         const std::size_t depth = 100;
         std::vector<uint8_t> data(depth, 0x81);
         data.push_back(0x01);
-        auto made = cbor::view::get_walker(jsoncons::span<const uint8_t>(data), 200);
+        auto made = cbor::ondemand::get_walker(jsoncons::span<const uint8_t>(data), 200);
         REQUIRE(made.has_value());
-        cbor::view::walker walker = std::move(made.value());
+        cbor::ondemand::walker walker = std::move(made.value());
         REQUIRE(walker.finish_item().has_value());
         walker.rewind();
         for (std::size_t i = 0; i < depth; ++i)
@@ -1090,32 +1090,32 @@ TEST_CASE("cbor view completed walker")
 
 TEST_CASE("cbor view item children")
 {
-    cbor::view::scan_context context;
+    cbor::ondemand::scan_context context;
 
     SECTION("array children are checked items in order")
     {
         std::vector<uint8_t> data = {0x83,0x01,0x82,0x02,0x03,0x63,'a','b','c'};   // [1,[2,3],"abc"]
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data), context);
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), context);
         REQUIRE(result.has_value());
 
-        std::vector<cbor::view::item> children;
-        for (cbor::view::item child : result.value().children(context))
+        std::vector<cbor::ondemand::item> children;
+        for (cbor::ondemand::item child : result.value().children(context))
         {
             children.push_back(child);
         }
         REQUIRE(children.size() == 3);
-        CHECK(children[0].kind() == cbor::view::item_kind::unsigned_integer);
+        CHECK(children[0].kind() == cbor::ondemand::item_kind::unsigned_integer);
         CHECK(children[0].argument() == 1);
-        CHECK(children[1].kind() == cbor::view::item_kind::array);
+        CHECK(children[1].kind() == cbor::ondemand::item_kind::array);
         CHECK(children[1].encoded_bytes().data() == data.data() + 2);
         CHECK(children[1].encoded_bytes().size() == 3);
-        CHECK(children[2].kind() == cbor::view::item_kind::text_string);
+        CHECK(children[2].kind() == cbor::ondemand::item_kind::text_string);
         jsoncons::string_view text;
         CHECK(children[2].text(text));
         CHECK(text == "abc");
 
         std::vector<uint64_t> nested;
-        for (cbor::view::item grandchild : children[1].children(context))
+        for (cbor::ondemand::item grandchild : children[1].children(context))
         {
             uint64_t value = 0;
             REQUIRE(grandchild.uint64_value(value));
@@ -1134,10 +1134,10 @@ TEST_CASE("cbor view item children")
         };
         for (const auto& data : maps)
         {
-            auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data), context);
+            auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), context);
             REQUIRE(result.has_value());
             std::vector<uint64_t> values;
-            for (cbor::view::item child : result.value().children(context))
+            for (cbor::ondemand::item child : result.value().children(context))
             {
                 uint64_t value = 0;
                 REQUIRE(child.uint64_value(value));
@@ -1158,20 +1158,20 @@ TEST_CASE("cbor view item children")
         };
         for (const auto& data : values)
         {
-            auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data), context);
+            auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), context);
             REQUIRE(result.has_value());
             CHECK(result.value().children(context).empty());
-            CHECK(result.value().children(context).begin() == cbor::view::item::child_iterator());
+            CHECK(result.value().children(context).begin() == cbor::ondemand::item::child_iterator());
         }
     }
 
     SECTION("indefinite container children stop at the break")
     {
         std::vector<uint8_t> data = {0x9f,0x01,0x81,0x02,0xff};   // [_ 1,[2]]
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data), context);
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), context);
         REQUIRE(result.has_value());
         std::size_t count = 0;
-        for (cbor::view::item child : result.value().children(context))
+        for (cbor::ondemand::item child : result.value().children(context))
         {
             (void)child;
             ++count;
@@ -1184,14 +1184,14 @@ TEST_CASE("cbor view item children")
         const std::size_t depth = 100;
         std::vector<uint8_t> data(depth + 1, 0x81);
         data.push_back(0x01);
-        cbor::view::scan_context deep_context(200);
-        auto result = cbor::view::parse_item(jsoncons::span<const uint8_t>(data), deep_context);
+        cbor::ondemand::scan_context deep_context(200);
+        auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data), deep_context);
         REQUIRE(result.has_value());
         auto it = result.value().children(deep_context).begin();
-        REQUIRE(it != cbor::view::item::child_iterator());
+        REQUIRE(it != cbor::ondemand::item::child_iterator());
         CHECK((*it).encoded_bytes().size() == data.size() - 1);
         ++it;
-        CHECK(it == cbor::view::item::child_iterator());
+        CHECK(it == cbor::ondemand::item::child_iterator());
     }
 }
 
@@ -1200,13 +1200,13 @@ TEST_CASE("cbor view wire cursor")
     SECTION("read_head decodes one head and advances past it only")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x02};   // [1, 2]
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
         CHECK(cursor.position() == 0);
         CHECK(cursor.remaining().size() == data.size());
 
         auto result = cursor.read_head();
         REQUIRE(result.has_value());
-        CHECK(result.value().major_type == cbor::view::major_type::array);
+        CHECK(result.value().major_type == cbor::ondemand::major_type::array);
         CHECK(result.value().value == 2);
         CHECK(cursor.position() == 1);   // past the head, not the elements
         CHECK(cursor.remaining().data() == data.data() + 1);
@@ -1215,23 +1215,23 @@ TEST_CASE("cbor view wire cursor")
     SECTION("read_head surfaces tags as their own heads")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1, 10
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
 
         auto tag = cursor.read_head();
         REQUIRE(tag.has_value());
-        CHECK(tag.value().major_type == cbor::view::major_type::semantic_tag);
+        CHECK(tag.value().major_type == cbor::ondemand::major_type::semantic_tag);
         CHECK(tag.value().value == 1);
 
         auto value = cursor.read_head();
         REQUIRE(value.has_value());
-        CHECK(value.value().major_type == cbor::view::major_type::unsigned_integer);
+        CHECK(value.value().major_type == cbor::ondemand::major_type::unsigned_integer);
         CHECK(value.value().value == 10);
         CHECK(cursor.remaining().empty());
     }
 
     SECTION("read_head reports malformed and truncated heads")
     {
-        cbor::view::wire_cursor empty{jsoncons::span<const uint8_t>()};
+        cbor::ondemand::wire_cursor empty{jsoncons::span<const uint8_t>()};
         auto no_head = empty.read_head();
         REQUIRE_FALSE(no_head.has_value());
         CHECK(no_head.error().code == cbor::cbor_errc::unexpected_eof);
@@ -1241,7 +1241,7 @@ TEST_CASE("cbor view wire cursor")
         CHECK(empty.skip(0));
         CHECK_FALSE(empty.skip(1));
 
-        cbor::view::scan_context context;
+        cbor::ondemand::scan_context context;
         static_assert(noexcept(empty.read_item(context)), "");
         static_assert(noexcept(empty.skip_item(context)), "");
 
@@ -1256,7 +1256,7 @@ TEST_CASE("cbor view wire cursor")
         CHECK(no_skip.error().offset == 0);
 
         std::vector<uint8_t> truncated = {0x19,0x01};
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(truncated)};
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(truncated)};
         auto result = cursor.read_head();
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unexpected_eof);
@@ -1267,18 +1267,18 @@ TEST_CASE("cbor view wire cursor")
     SECTION("read_item returns and advances past one complete item")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x02,0x63,'a','b','c'};   // [1,2] then "abc"
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
-        cbor::view::scan_context context;
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::scan_context context;
 
         auto array = cursor.read_item(context);
         REQUIRE(array.has_value());
-        CHECK(array.value().kind() == cbor::view::item_kind::array);
+        CHECK(array.value().kind() == cbor::ondemand::item_kind::array);
         CHECK(array.value().encoded_bytes().size() == 3);
         CHECK(cursor.position() == 3);
 
         auto text = cursor.read_item(context);
         REQUIRE(text.has_value());
-        CHECK(text.value().kind() == cbor::view::item_kind::text_string);
+        CHECK(text.value().kind() == cbor::ondemand::item_kind::text_string);
         CHECK(cursor.position() == data.size());
         CHECK(cursor.remaining().empty());
     }
@@ -1286,11 +1286,11 @@ TEST_CASE("cbor view wire cursor")
     SECTION("read_item honours the depth bound and reports an absolute offset")
     {
         std::vector<uint8_t> data = {0x01,0x81,0x81,0x01};   // 1 then [[1]]
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
-        cbor::view::scan_context default_context;
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::scan_context default_context;
         REQUIRE(cursor.read_item(default_context).has_value());
 
-        cbor::view::scan_context context(1);
+        cbor::ondemand::scan_context context(1);
         auto result = cursor.read_item(context);
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
@@ -1301,8 +1301,8 @@ TEST_CASE("cbor view wire cursor")
     SECTION("skip_item passes over one item, returning its bytes unparsed")
     {
         std::vector<uint8_t> data = {0x82,0x01,0x02,0x63,'a','b','c'};   // [1,2] then "abc"
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
-        cbor::view::scan_context context;
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::scan_context context;
 
         auto skipped = cursor.skip_item(context);
         REQUIRE(skipped.has_value());
@@ -1312,18 +1312,18 @@ TEST_CASE("cbor view wire cursor")
 
         auto text = cursor.read_item(context);
         REQUIRE(text.has_value());
-        CHECK(text.value().kind() == cbor::view::item_kind::text_string);
+        CHECK(text.value().kind() == cbor::ondemand::item_kind::text_string);
         CHECK(cursor.remaining().empty());
     }
 
     SECTION("skip_item honours the depth bound like read_item")
     {
         std::vector<uint8_t> data = {0x01,0x81,0x81,0x01};   // 1 then [[1]]
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
-        cbor::view::scan_context default_context;
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::scan_context default_context;
         REQUIRE(cursor.skip_item(default_context).has_value());
 
-        cbor::view::scan_context context(1);
+        cbor::ondemand::scan_context context(1);
         auto result = cursor.skip_item(context);
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
@@ -1334,7 +1334,7 @@ TEST_CASE("cbor view wire cursor")
     SECTION("skip advances past measured content only when it is available")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
-        cbor::view::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
+        cbor::ondemand::wire_cursor cursor{jsoncons::span<const uint8_t>(data)};
         auto head = cursor.read_head();
         REQUIRE(head.has_value());
         REQUIRE(cursor.skip(static_cast<std::size_t>(head.value().value)));
@@ -1353,7 +1353,7 @@ TEST_CASE("cbor view span-based order entry points")
     {
         int operator()(jsoncons::span<const uint8_t> a, jsoncons::span<const uint8_t> b) const noexcept
         {
-            return -cbor::view::bytewise_compare()(a, b);
+            return -cbor::ondemand::bytewise_compare()(a, b);
         }
     };
 
@@ -1362,13 +1362,13 @@ TEST_CASE("cbor view span-based order entry points")
         std::vector<uint8_t> ten = {0x0a};
         std::vector<uint8_t> hundred = {0x18,0x64};
         std::vector<uint8_t> ten_plus = {0x0a,0x63,'x','y','z'};   // 10 then trailing
-        auto lt = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred));
+        auto lt = cbor::ondemand::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred));
         REQUIRE(lt.has_value());
         CHECK(lt.value() < 0);
-        auto eq = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(ten_plus));
+        auto eq = cbor::ondemand::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(ten_plus));
         REQUIRE(eq.has_value());
         CHECK(eq.value() == 0);
-        auto rev = cbor::view::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred), reverse_bytewise());
+        auto rev = cbor::ondemand::compare(jsoncons::span<const uint8_t>(ten), jsoncons::span<const uint8_t>(hundred), reverse_bytewise());
         REQUIRE(rev.has_value());
         CHECK(rev.value() > 0);
     }
@@ -1377,7 +1377,7 @@ TEST_CASE("cbor view span-based order entry points")
     {
         std::vector<uint8_t> good = {0x01};
         std::vector<uint8_t> bad = {0x82,0x01,0x1f};   // [1, <invalid>]
-        auto result = cbor::view::compare(jsoncons::span<const uint8_t>(good), jsoncons::span<const uint8_t>(bad));
+        auto result = cbor::ondemand::compare(jsoncons::span<const uint8_t>(good), jsoncons::span<const uint8_t>(bad));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().offset == 3);
@@ -1388,32 +1388,32 @@ TEST_CASE("cbor view span-based order entry points")
         std::vector<uint8_t> sorted_map = {0xa2,0x01,0x61,0x61,0x61,0x6b,0x02};
         std::vector<uint8_t> unsorted_map = {0xa2,0x61,0x6b,0x02,0x01,0x61,0x61};
         std::vector<uint8_t> duplicate_map = {0xa2,0x01,0x00,0x01,0x01};
-        auto sorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(sorted_map));
+        auto sorted = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(sorted_map));
         REQUIRE(sorted.has_value());
         CHECK(sorted.value());
-        auto unsorted = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(unsorted_map));
+        auto unsorted = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(unsorted_map));
         REQUIRE(unsorted.has_value());
         CHECK_FALSE(unsorted.value());
-        auto duplicate = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(duplicate_map));
+        auto duplicate = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(duplicate_map));
         REQUIRE(duplicate.has_value());
         CHECK_FALSE(duplicate.value());
 
         std::vector<uint8_t> length_order = {0xa2,0x18,0x64,0x00,0x20,0x00};
-        auto bytewise = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(length_order));
-        auto length_first = cbor::view::map_keys_sorted(
-            jsoncons::span<const uint8_t>(length_order), cbor::view::length_first_compare());
+        auto bytewise = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(length_order));
+        auto length_first = cbor::ondemand::map_keys_sorted(
+            jsoncons::span<const uint8_t>(length_order), cbor::ondemand::length_first_compare());
         REQUIRE(bytewise.has_value());
         REQUIRE(length_first.has_value());
         CHECK(bytewise.value());
         CHECK_FALSE(length_first.value());
 
         std::vector<uint8_t> array = {0x81,0x01};
-        auto not_map = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(array));
+        auto not_map = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(array));
         REQUIRE(not_map.has_value());
         CHECK_FALSE(not_map.value());
 
         std::vector<uint8_t> malformed = {0xa1,0x01};   // key, no value
-        auto bad = cbor::view::map_keys_sorted(jsoncons::span<const uint8_t>(malformed));
+        auto bad = cbor::ondemand::map_keys_sorted(jsoncons::span<const uint8_t>(malformed));
         REQUIRE_FALSE(bad.has_value());
         CHECK(bad.error().code == cbor::cbor_errc::unexpected_eof);
     }
