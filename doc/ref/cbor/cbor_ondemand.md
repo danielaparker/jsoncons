@@ -1,12 +1,12 @@
-### jsoncons::cbor::view
+### jsoncons::cbor::ondemand
 
 ```cpp
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
 ```
 
 <br>
 
-The `cbor::view` namespace reads the encoded structure of
+The `cbor::ondemand` namespace reads the encoded structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
 without copying it or building a data structure. Scanning validates an item's
 structure once and yields a checked `item`; everything after that is
@@ -117,11 +117,11 @@ indefinite-length text string is checked independently, as RFC 8949 section
 ### Example
 
 ```cpp
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
 #include <iostream>
 #include <vector>
 
-namespace view = jsoncons::cbor::view;
+namespace view = jsoncons::cbor::ondemand;
 
 int main()
 {

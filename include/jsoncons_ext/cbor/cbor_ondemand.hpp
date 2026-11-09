@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CBOR_CBOR_VIEW_HPP
-#define JSONCONS_EXT_CBOR_CBOR_VIEW_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_ONDEMAND_HPP
+#define JSONCONS_EXT_CBOR_CBOR_ONDEMAND_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -29,7 +29,7 @@
 
 namespace jsoncons {
 namespace cbor {
-namespace view {
+namespace ondemand {
 
     constexpr int default_max_nesting_depth = 1024;
 
@@ -52,7 +52,7 @@ namespace view {
         std::size_t offset;
     };
 
-    namespace detail_view {
+    namespace ondemand_detail {
 
         struct item_head
         {
@@ -531,7 +531,7 @@ namespace view {
 
         struct item_access;
 
-    } // namespace detail_view
+    } // namespace ondemand_detail
 
     // A zero-copy view of one complete, structurally well-formed CBOR item:
     // its leading tags, head and content. Obtained only from scan, parse_item
@@ -547,7 +547,7 @@ namespace view {
 
         item_kind kind() const noexcept
         {
-            return detail_view::kind(head_);
+            return ondemand_detail::kind(head_);
         }
 
         // The head's argument (RFC 8949 3): an integer's value, a string's
@@ -580,34 +580,34 @@ namespace view {
         // item is not of that kind or range.
         bool uint64_value(uint64_t& value) const noexcept
         {
-            return detail_view::uint64_value(head_, value);
+            return ondemand_detail::uint64_value(head_, value);
         }
 
         bool int64_value(int64_t& value) const noexcept
         {
-            return detail_view::int64_value(head_, value);
+            return ondemand_detail::int64_value(head_, value);
         }
 
         bool bool_value(bool& value) const noexcept
         {
-            return detail_view::bool_value(head_, value);
+            return ondemand_detail::bool_value(head_, value);
         }
 
         bool double_value(double& value) const noexcept
         {
-            return detail_view::double_value(head_, value);
+            return ondemand_detail::double_value(head_, value);
         }
 
         // Zero-copy string content. False for indefinite-length strings,
         // whose chunks are their children.
         bool text(string_view& value) const noexcept
         {
-            return detail_view::text(head_, content_, value);
+            return ondemand_detail::text(head_, content_, value);
         }
 
         bool bytes(span<const uint8_t>& value) const noexcept
         {
-            return detail_view::bytes(head_, content_, value);
+            return ondemand_detail::bytes(head_, content_, value);
         }
 
         // Copies string content, assembling chunked strings. `value` is replaced
@@ -616,9 +616,9 @@ namespace view {
         bool bytes(std::vector<uint8_t>& value) const;
 
     private:
-        friend struct detail_view::item_access;
+        friend struct ondemand_detail::item_access;
 
-        item(span<const uint8_t> bytes, const detail_view::item_head& head, const uint8_t* content) noexcept
+        item(span<const uint8_t> bytes, const ondemand_detail::item_head& head, const uint8_t* content) noexcept
             : bytes_(bytes), head_(head), content_(content)
         {
         }
@@ -628,11 +628,11 @@ namespace view {
         void copy_content(uint8_t* out) const noexcept;
 
         span<const uint8_t> bytes_;
-        detail_view::item_head head_;
+        ondemand_detail::item_head head_;
         const uint8_t* content_;   // first byte after the untagged head
     };
 
-    namespace detail_view {
+    namespace ondemand_detail {
 
         struct item_access
         {
@@ -642,7 +642,7 @@ namespace view {
             }
         };
 
-    } // namespace detail_view
+    } // namespace ondemand_detail
 
     // Iterates an item's leading tag numbers.
     class item::tag_iterator
@@ -701,10 +701,10 @@ namespace view {
                 pos_ = nullptr;
                 return;
             }
-            detail_view::item_head head;
+            ondemand_detail::item_head head;
             cbor_errc ec{};
             const uint8_t* p = pos_;
-            const bool ok = detail_view::read_head(p, stop_, head, ec);
+            const bool ok = ondemand_detail::read_head(p, stop_, head, ec);
             assert(ok && head.major_type == cbor::detail::cbor_major_type::semantic_tag);
             (void)ok;
             value_ = head.value;
@@ -737,7 +737,7 @@ namespace view {
     inline item::tag_range item::tags() const noexcept
     {
         // Leading tags occupy [start of encoding, start of untagged head).
-        return tag_range(bytes_.data(), content_ - detail_view::head_size(head_));
+        return tag_range(bytes_.data(), content_ - ondemand_detail::head_size(head_));
     }
 
     // Iterates an item's children, measuring each once. The last child of a
@@ -759,7 +759,7 @@ namespace view {
         item operator*() const noexcept
         {
             assert(pos_ != nullptr);
-            return detail_view::item_access::make(
+            return ondemand_detail::item_access::make(
                 span<const uint8_t>(pos_, static_cast<std::size_t>(next_ - pos_)),
                 head_, content_);
         }
@@ -799,7 +799,7 @@ namespace view {
         void advance()
         {
             pos_ = next_;
-            if (remaining_ == detail_view::indefinite_array_marker)
+            if (remaining_ == ondemand_detail::indefinite_array_marker)
             {
                 if (*pos_ == 0xff)
                 {
@@ -819,18 +819,18 @@ namespace view {
 
             const uint8_t* p = pos_;
             cbor_errc ec{};
-            const bool ok = detail_view::read_value_head(p, end_, head_, ec);
+            const bool ok = ondemand_detail::read_value_head(p, end_, head_, ec);
             assert(ok);
             (void)ok;
             content_ = p;
-            next_ = remaining_ == 0 ? end_ : detail_view::skip_checked(p, end_, head_);
+            next_ = remaining_ == 0 ? end_ : ondemand_detail::skip_checked(p, end_, head_);
         }
 
         const uint8_t* pos_;    // current child's begin, nullptr when exhausted
         const uint8_t* next_;   // current child's end, the next child's begin
         const uint8_t* end_;    // the parent's end
         uint64_t remaining_;    // raw children left; indefinite ends at a break
-        detail_view::item_head head_;
+        ondemand_detail::item_head head_;
         const uint8_t* content_;
     };
 
@@ -853,7 +853,7 @@ namespace view {
         bool empty() const noexcept
         {
             return first_ == nullptr ||
-                (remaining_ == detail_view::indefinite_array_marker
+                (remaining_ == ondemand_detail::indefinite_array_marker
                     ? *first_ == 0xff : remaining_ == 0);
         }
 
@@ -881,12 +881,12 @@ namespace view {
                     const bool is_map = head_.major_type == cbor::detail::cbor_major_type::map;
                     return child_range(content_, end, is_map ? 2 * head_.value : head_.value);
                 }
-                return child_range(content_, end, detail_view::indefinite_array_marker);
+                return child_range(content_, end, ondemand_detail::indefinite_array_marker);
             case cbor::detail::cbor_major_type::byte_string:
             case cbor::detail::cbor_major_type::text_string:
                 if (head_.indefinite())
                 {
-                    return child_range(content_, end, detail_view::indefinite_array_marker);
+                    return child_range(content_, end, ondemand_detail::indefinite_array_marker);
                 }
                 break;
             default:
@@ -977,19 +977,19 @@ namespace view {
         const uint8_t* end = p + input.size();
         cbor_errc ec{};
 
-        detail_view::item_head head;
-        bool ok = detail_view::read_value_head(p, end, head, ec);
+        ondemand_detail::item_head head;
+        bool ok = ondemand_detail::read_value_head(p, end, head, ec);
         const uint8_t* content = p;
         if (ok)
         {
             if (head.major_type == cbor::detail::cbor_major_type::array ||
                 head.major_type == cbor::detail::cbor_major_type::map)
             {
-                ok = detail_view::skip_container(p, end, head, max_nesting_depth, ec);
+                ok = ondemand_detail::skip_container(p, end, head, max_nesting_depth, ec);
             }
             else
             {
-                ok = detail_view::skip_scalar_or_string(head, p, end, ec);
+                ok = ondemand_detail::skip_scalar_or_string(head, p, end, ec);
             }
         }
         if (!ok)
@@ -998,7 +998,7 @@ namespace view {
                 scan_error{ec, static_cast<std::size_t>(p - input.data())});
         }
         return scan_result{
-            detail_view::item_access::make(
+            ondemand_detail::item_access::make(
                 span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data())), head, content),
             span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
     }
@@ -1034,7 +1034,7 @@ namespace view {
         string_view text;
         if (text_item.text(text))
         {
-            return detail_view::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
+            return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
         }
         if (text_item.kind() != item_kind::text_string)
         {
@@ -1043,7 +1043,7 @@ namespace view {
         for (const item chunk : text_item.children())
         {
             if (!chunk.text(text) ||
-                !detail_view::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
+                !ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
             {
                 return false;
             }
@@ -1051,7 +1051,7 @@ namespace view {
         return true;
     }
 
-} // namespace view
+} // namespace ondemand
 } // namespace cbor
 } // namespace jsoncons
 
