@@ -384,9 +384,23 @@ jsoncons::expected<void,std::error_code> parse_primitive(jsoncons::span<char> to
 
     if (!exponent_str.empty())
     {
-        std::size_t exponent;
+        std::size_t exponent{0};
         auto r = dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
-        JSONCONS_ASSERT(r);
+        // Shifting the decimal point by a larger exponent cannot produce a value
+        // that fits a 64-bit integer, and would overflow the size arithmetic below
+        if (!r || exponent > token.size() + 20)
+        {
+            double d;
+            if (jsoncons::decstr_to_double(token.data(), token.size(), d))
+            {
+                visitor.double_value(d);
+            }
+            else
+            {
+                visitor.string_value(jsoncons::string_view(token.data(), token.size()));
+            }
+            return result_type{};
+        }
 
         std::size_t n = num_str.size();
 
