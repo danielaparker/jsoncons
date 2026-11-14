@@ -31,5 +31,15 @@
 ]
             }
         ]
+    },
+    {
+        "given" : [2, "a", 4, 5, 100, "nice"],
+        "cases" : [
+            {
+                "comment" : "Slice with a step that overflows int64 when added to the index",
+                "expression" : "[1::9223372036854775807]",
+                "result" : ["a"]
+            }
+        ]
     }
 ]

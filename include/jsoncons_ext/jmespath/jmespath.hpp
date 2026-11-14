@@ -3071,7 +3071,7 @@ namespace detail {
                     {
                         end = val.size();
                     }
-                    for (int64_t i = start; i < end; i += step)
+                    for (int64_t i = start; i < end; i = (end - i > step) ? i + step : end)
                     {
                         reference j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), context, ec);
                         if (!j.is_null())

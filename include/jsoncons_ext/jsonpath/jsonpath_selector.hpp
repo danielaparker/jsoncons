@@ -1149,7 +1149,7 @@ namespace detail {
                     {
                         end = current.size();
                     }
-                    for (int64_t i = start; i < end; i += step)
+                    for (int64_t i = start; i < end; i = (end - i > step) ? i + step : end)
                     {
                         auto j = static_cast<std::size_t>(i);
                         this->tail_select(context, root, 
