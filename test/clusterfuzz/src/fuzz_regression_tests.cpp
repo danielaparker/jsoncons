@@ -1128,8 +1128,8 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
             //std::cout << std::hex << "0x" << (uint8_t)is.get() << ",";
         }
 
-        jsoncons::print_bytes(data, std::cout);
-        std::cout << "\n";
+        //jsoncons::print_bytes(data, std::cout);
+        //std::cout << "\n";
 
         //std::vector<uint8_t> buf;
         //cbor::cbor_bytes_encoder encoder(buf);
@@ -1140,7 +1140,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         REQUIRE_NOTHROW(
             reader.read(ec))
         ;
-        CHECK(ec == cbor::cbor_errc::expected_unsigned_integer); //-V521
+        CHECK(ec == cbor::cbor_errc::invalid_mdarray_header); //-V521
     }
 }
 

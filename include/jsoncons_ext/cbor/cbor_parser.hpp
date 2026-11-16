@@ -3516,16 +3516,24 @@ private:
 
     void read_mdarray_header(generic_visitor& visitor, std::error_code& ec)
     {
-        uint8_t b;
-        if (source_.read(&b, 1) == 0)
+        uint8_t initial_byte;
+        if (source_.read(&initial_byte, 1) == 0)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(b);
+
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(initial_byte);
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
-        uint8_t info = get_additional_information(b);
+        uint8_t info = get_additional_information(initial_byte);
+        if (info != 2)
+        {
+            ec = cbor_errc::invalid_mdarray_header;
+            more_ = false;
+            return;
+        }
+
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
