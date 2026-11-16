@@ -47,6 +47,7 @@ enum class cbor_errc
     precison_must_be_positive,
     bigfloat_invalid_rounding_carry,
     bigfloat_decimal_scale_overflow,
+    expected_unsigned_integer,
 };
 
 class cbor_error_category_impl
@@ -117,6 +118,8 @@ public:
                 return "bigfloat decimal rounding produced an invalid carry.";
             case cbor_errc::bigfloat_decimal_scale_overflow:
                 return "bigfloat decimal scale overflow.";
+            case cbor_errc::expected_unsigned_integer:
+                return "Expected an unsigned integer.";
             default:
                 return "Unknown CBOR parser error";
         }

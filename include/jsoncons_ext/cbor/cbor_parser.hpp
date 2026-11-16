@@ -1134,7 +1134,6 @@ public:
                         {
                             if (iter->count() != state_stack_.back().length)
                             {
-                                //std::cout << state_stack_.back().index << "!=" << state_stack_.back().length << "\n";
                                 ec = cbor_errc::bad_mdarray;
                                 return;
                             }
@@ -2448,8 +2447,6 @@ private:
 
     void read_bigdecimal(uint8_t container_info, string_type& result, std::error_code& ec)
     {
-        std::cout << "read bigdecimal\n";
-
         std::size_t size = read_unsigned_integer(container_info, ec);
         if (JSONCONS_UNLIKELY(ec))
         {
@@ -3647,33 +3644,39 @@ private:
         source_.ignore(1);
         if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
         {
-             bool done = false;
-             while (!done)
-             {
-                 auto c = source_.peek();
-                 if (JSONCONS_UNLIKELY(c.eof))
-                 {
-                     ec = cbor_errc::unexpected_eof;
-                     more_ = false;
-                     return;
-                 }
-                 if (c.value == 0xff)
-                 {
-                     source_.ignore(1);
-                     done = true;
-                 }
-                 else
-                 {
-                     source_.ignore(1);
-                     std::size_t extent = read_size(get_additional_information(c.value), ec);
-                     if (JSONCONS_UNLIKELY(ec))
-                     {
-                         more_ = false;
-                         return;
-                     }
-                     extents_.push_back(extent);
-                 }
-             }
+            bool done = false;
+            while (!done)
+            {
+                auto initial_byte = source_.peek();
+                if (JSONCONS_UNLIKELY(initial_byte.eof))
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+                if (initial_byte.value == 0xff)
+                {
+                    source_.ignore(1);
+                    done = true;
+                }
+                else
+                {
+                    if (JSONCONS_UNLIKELY(get_major_type(initial_byte.value) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
+                    {
+                        ec = cbor_errc::expected_unsigned_integer;
+                        more_ = false;
+                        return;
+                    }
+                    source_.ignore(1);
+                    std::size_t extent = read_size(get_additional_information(initial_byte.value), ec);
+                    if (JSONCONS_UNLIKELY(ec))
+                    {
+                        more_ = false;
+                        return;
+                    }
+                    extents_.push_back(extent);
+                }
+            }
         }
         else 
         {
@@ -3683,6 +3686,7 @@ private:
                 more_ = false;
                 return;
             }
+
             for (std::size_t i = 0; more_ && i < size; ++i)
             {
                 uint8_t initial_byte;
@@ -3694,12 +3698,12 @@ private:
                 }
                 if (JSONCONS_UNLIKELY(get_major_type(initial_byte) != jsoncons::cbor::detail::cbor_major_type::unsigned_integer))
                 {
-                    ec = cbor_errc::unknown_type;
+                    ec = cbor_errc::expected_unsigned_integer;
                     more_ = false;
                     return;
                 }
-                info = get_additional_information(initial_byte);
-                if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
+                uint8_t item_info = get_additional_information(initial_byte);
+                if (JSONCONS_UNLIKELY(item_info >= 0x1C && item_info <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;
                     more_ = false;

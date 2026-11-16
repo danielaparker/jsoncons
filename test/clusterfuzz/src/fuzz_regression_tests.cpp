@@ -1121,16 +1121,26 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        std::vector<uint8_t> buf;
+        std::vector<uint8_t> data;
+        while (!is.eof())
+        {
+            data.push_back((uint8_t)is.get());
+            //std::cout << std::hex << "0x" << (uint8_t)is.get() << ",";
+        }
+
+        jsoncons::print_bytes(data, std::cout);
+        std::cout << "\n";
+
+        //std::vector<uint8_t> buf;
         //cbor::cbor_bytes_encoder encoder(buf);
         jsoncons::default_json_visitor encoder;
-        cbor::cbor_stream_reader reader(is, encoder);
+        cbor::cbor_bytes_reader reader(data, encoder);
 
         std::error_code ec;
         REQUIRE_NOTHROW(
             reader.read(ec))
         ;
-        //CHECK(ec == cbor::cbor_errc::invalid_bigdecimal); //-V521
+        CHECK(ec == cbor::cbor_errc::expected_unsigned_integer); //-V521
     }
 }
 
