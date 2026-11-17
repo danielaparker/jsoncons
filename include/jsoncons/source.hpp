@@ -595,7 +595,10 @@ public:
         {
             len = length;
         }
-        std::memcpy(p, current_, len*sizeof(value_type));
+        if (len > 0)
+        {
+            std::memcpy(p, current_, len*sizeof(value_type));
+        }
         current_  += len;
         return len;
     }

@@ -764,3 +764,12 @@ TEST_CASE("iterator_source::read_span tests")
     }
 }
 
+TEST_CASE("bytes_source read from empty input")
+{
+    std::vector<uint8_t> data;
+    jsoncons::bytes_source source(data);
+
+    uint8_t b = 0;
+    CHECK(0 == source.read(&b, 1));
+    CHECK(source.eof());
+}
