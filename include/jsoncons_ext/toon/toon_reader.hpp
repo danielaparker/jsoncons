@@ -1415,7 +1415,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     {
                         return line_result{jsoncons::unexpect, field_header_result.error(), line.line_num, 0};
                     }
-                    if (*field_header_result)
+                    if (*field_header_result && (*field_header_result)->key)
                     {
                         const header_info& field_header (*(*field_header_result));
                         auto field_key = field_header.key;
@@ -1523,7 +1523,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 {
                     return line_result{jsoncons::unexpect, field_header_result.error(), field_line.line_num, 0};
                 }
-                if (*field_header_result)
+                if (*field_header_result && (*field_header_result)->key)
                 {
                     const header_info& field_header (*(*field_header_result));
                     auto field_key = field_header.key;

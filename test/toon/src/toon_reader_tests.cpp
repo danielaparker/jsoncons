@@ -591,6 +591,26 @@ season: spring_2025)";
             std::cout << "Error: "  << e.what() << "\n";
         }
     }
+    SECTION("list item field line with an array header but no key")
+    {
+        auto expected1 = jsoncons::ojson::parse(R"({"items":[{"a":1,"[2]":"x,y"}]})");
+        auto expected2 = jsoncons::ojson::parse(R"({"items":[{"k":["v"],"[2]":"x,y"}]})");
+
+        std::string data1 = "items[1]:\n  - a: 1\n    [2]: x,y";
+        std::string data2 = "items[1]:\n  - k[1]: v\n    [2]: x,y";
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder1;
+        toon::toon_string_reader reader1(data1, decoder1);
+        REQUIRE(reader1.try_read());
+        REQUIRE(decoder1.is_valid());
+        CHECK(expected1 == decoder1.get_result());
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder2;
+        toon::toon_string_reader reader2(data2, decoder2);
+        REQUIRE(reader2.try_read());
+        REQUIRE(decoder2.is_valid());
+        CHECK(expected2 == decoder2.get_result());
+    }
 }
 
 
