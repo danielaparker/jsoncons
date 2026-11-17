@@ -3706,7 +3706,7 @@ namespace detail {
             slice slic{};
 
             bool done = false;
-            while (p_ < input_end_ && !done)
+            while (p_ < input_end_ && !done && !state_stack.empty())
             {
                 switch (state_stack.back())
                 {

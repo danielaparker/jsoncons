@@ -41,5 +41,23 @@
                 "result" : ["a"]
             }
         ]
+    },
+    {
+        "given" : {"a" : [1, 2]},
+        "cases" : [
+            {
+                "comment" : "Unbalanced ')' after a complete expression",
+                "expression" : "a)",
+                "error" : "syntax"
+            },
+            {
+                "expression" : "length(a))",
+                "error" : "syntax"
+            },
+            {
+                "expression" : "(a)) | a",
+                "error" : "syntax"
+            }
+        ]
     }
 ]
