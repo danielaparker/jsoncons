@@ -1134,7 +1134,7 @@ public:
                         {
                             if (iter->count() != state_stack_.back().length)
                             {
-                                ec = cbor_errc::bad_mdarray;
+                                ec = cbor_errc::invalid_mdarray;
                                 return;
                             }
                             end_classical_array_storage(ec);
@@ -1195,7 +1195,7 @@ public:
                             }
                             else
                             {
-                                ec = cbor_errc::bad_mdarray;
+                                ec = cbor_errc::invalid_mdarray;
                                 return;
                             }
                             end_classical_array_storage(ec);
@@ -3620,13 +3620,13 @@ private:
             if (typed_array_stack_.size() == typed_array_count)
             {
                 // Byte string storage must be a typed array
-                ec = cbor_errc::bad_mdarray;
+                ec = cbor_errc::invalid_mdarray;
                 return;
             }
         }
         else
         {
-            ec = cbor_errc::bad_mdarray;
+            ec = cbor_errc::invalid_mdarray;
             return;
         }
         // cursor case
@@ -3725,7 +3725,7 @@ private:
                     more_ = false;
                     return;
                 }
-                std::size_t extent = read_size(info, ec);
+                std::size_t extent = read_size(item_info, ec);
                 if (JSONCONS_UNLIKELY(ec))
                 {
                     more_ = false;

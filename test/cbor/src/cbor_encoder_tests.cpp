@@ -78,8 +78,7 @@ TEST_CASE("cbor encode multi dim array test")
     encoder.end_array();
     encoder.end_multi_dim();
 
-    jsoncons::byte_string_view bstr(v);
-    //std::cout << "bstr: " << bstr << "\n\n";
+    //jsoncons::print_bytes(v, std::cout);
 
     //for (auto ch : bstr)
     //{

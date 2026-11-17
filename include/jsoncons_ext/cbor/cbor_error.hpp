@@ -37,7 +37,7 @@ enum class cbor_errc
     invalid_major_type,
     unknown_type,
     illegal_chunked_string,
-    bad_mdarray,
+    invalid_mdarray,
     bad_extents,
     bigfloat_to_bigdec_failed,
     max_dimensions_exceeded,
@@ -104,7 +104,7 @@ public:
                 return "Invalid major type in input";
             case cbor_errc::illegal_chunked_string:
                 return "An illegal type was found while parsing an indefinite length string";
-            case cbor_errc::bad_mdarray:
+            case cbor_errc::invalid_mdarray:
                 return "Invalid multi-dimensional array.";
             case cbor_errc::bad_extents:
                 return "Product of extents does not match number of elements.";

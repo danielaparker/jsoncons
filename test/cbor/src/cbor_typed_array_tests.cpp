@@ -937,7 +937,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
-        CHECK(cbor::cbor_errc::bad_mdarray == ec);
+        CHECK(cbor::cbor_errc::invalid_mdarray == ec);
     }
 
     SECTION("byte string storage with a non typed array tag")
@@ -955,7 +955,7 @@ TEST_CASE("cbor multi-dim malformed input tests")
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
 
-        CHECK(cbor::cbor_errc::bad_mdarray == ec);
+        CHECK(cbor::cbor_errc::invalid_mdarray == ec);
     }
 
     SECTION("cursor stops with an error on malformed extents")
