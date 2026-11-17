@@ -14,7 +14,7 @@ jobs:
           - g++-12
         build_type: [Debug, Release]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     env:
       CXX: ${{ matrix.compiler }}
@@ -25,10 +25,10 @@ jobs:
       run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On
 
     - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
+      run: cmake --build . --config ubuntu-26.04
 
     - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      run: ctest -C ubuntu-26.04 --output-on-failure
 
   #github_20_no_exceptions: 
   #  strategy:
@@ -38,7 +38,7 @@ jobs:
   #        - g++-12
   #      build_type: [Debug, Release]
   #
-  #  runs-on: ubuntu-latest
+  #  runs-on: ubuntu-26.04
   #
   #  env:
   #    CXX: ${{ matrix.compiler }}
@@ -49,13 +49,13 @@ jobs:
   #    run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_FLAGS="-fno-exceptions"
   #
   #  - working-directory: build/
-  #    run: cmake --build . --config ubuntu-latest
+  #    run: cmake --build . --config ubuntu-26.04
   #
   #  - working-directory: build/
-  #    run: ctest -C ubuntu-latest --output-on-failure
+  #    run: ctest -C ubuntu-26.04 --output-on-failure
 
   gcc_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
     - uses: actions/checkout@v7.0.1
@@ -71,13 +71,13 @@ jobs:
         CXX:  g++-10
 
     - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
+      run: cmake --build . --config ubuntu-26.04
 
     - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      run: ctest -C ubuntu-26.04 --output-on-failure
 
   gcc_build12:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
     - uses: actions/checkout@v7.0.1
@@ -93,13 +93,13 @@ jobs:
         CXX:  g++-11
 
     - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
+      run: cmake --build . --config ubuntu-26.04
 
     - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      run: ctest -C ubuntu-26.04 --output-on-failure
 
   gcc_build_no_deprecated:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
     - uses: actions/checkout@v7.0.1
@@ -115,13 +115,13 @@ jobs:
         CXX:  g++-10
 
     - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
+      run: cmake --build . --config ubuntu-26.04
 
     - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      run: ctest -C ubuntu-26.04 --output-on-failure
 
   gcc_build11b:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
     - uses: actions/checkout@v7.0.1
@@ -136,13 +136,13 @@ jobs:
         CXX:  g++-11
 
     - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
+      run: cmake --build . --config ubuntu-26.04
 
     - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      run: ctest -C ubuntu-26.04 --output-on-failure
 
   #clang_13_build:
-  #  runs-on: ubuntu-latest
+  #  runs-on: ubuntu-26.04
   #
   #  steps:
   #  - uses: actions/checkout@v7.0.1
@@ -158,10 +158,10 @@ jobs:
   #      CXX:  clang++-13
   #
   #  - working-directory: build/
-  #    run: cmake --build . --config ubuntu-latest
+  #    run: cmake --build . --config ubuntu-26.04
   #
   #  - working-directory: build/
-  #    run: ctest -C ubuntu-latest --output-on-failure
+  #    run: ctest -C ubuntu-26.04 --output-on-failure
 
   clang_test:
     runs-on: ubuntu-26.04
@@ -174,14 +174,31 @@ jobs:
         with:
           persist-credentials: false
       - name: cmake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
+      - working-directory: build/
+        run: cmake --build . --config ubuntu-26.04
+      - working-directory: build/
+        run: ctest -C ubuntu-26.04 --output-on-failure
+
+  clang_sanitize_test:
+    runs-on: ubuntu-26.04
+    strategy:
+      matrix:
+        compiler: ['19', 'latest']
+    container: silkeh/clang:${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: cmake
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       - working-directory: build/
-        run: cmake --build . --config ubuntu-latest
+        run: cmake --build . --config ubuntu-26.04
       - working-directory: build/
-        run: ctest -C ubuntu-latest --output-on-failure
+        run: ctest -C ubuntu-26.04 --output-on-failure
 
   ci_test_standards_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         standard: [11, 14, 17, 20, 23, 26]
@@ -203,7 +220,7 @@ jobs:
         run: ctest --output-on-failure
 
   ci_test_compilers_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         compiler: ['7', '8', '9', '10', '11', '12', '13', '14', '15', 'latest']
@@ -224,7 +241,7 @@ jobs:
         run: ctest --output-on-failure
 
   ci_test_sanitizers_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         compiler: ['12','latest']
@@ -243,7 +260,7 @@ jobs:
         run: ctest --output-on-failure
 
   ci_test_standards_clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         standard: [11, 14, 17, 20, 23, 26]
@@ -265,7 +282,7 @@ jobs:
         run: ctest --output-on-failure
 
   ci_test_compilers_clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         compiler: ['7', '8', '9', '10', '11', '12', '13', '14', '15', 'latest']
@@ -286,7 +303,7 @@ jobs:
         run: ctest --output-on-failure
 
   ci_test_sanitizers_clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         compiler: ['13', '15', 'latest']
