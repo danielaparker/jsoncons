@@ -29,6 +29,16 @@ master
 
   - Git Issue #764/PR #798: Fix CBOR read_tags reuse of the first tag's additional information
 
+  - Git Issue PR #799: jmespath: fix a literal right after a pipe
+
+  - Git Issue PR #802: jsonpath, jmespath: avoid int64 overflow when stepping through a slice
+
+  - Git Issue PR #803: toon: bound exponent before shifting decimal point
+
+  - Git Issue PR #804: toon: check for a key before using a field line's array header
+
+  - Git Issue PR #805: toon: fix out-of-bounds line span for tab indentation in non-strict mode
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
@@ -50,6 +60,8 @@ master
 
   - New integer types jsoncons::int128 and jsoncons::uint128 that 
   are typedef-ed to native types when detected and otherwise to custom types. 
+
+  - Added checks to detect invalid CBOR multi-dimensional arrays
 
 Release 1.10.0
 --------------
