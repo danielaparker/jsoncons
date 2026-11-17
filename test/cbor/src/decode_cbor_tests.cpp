@@ -875,3 +875,18 @@ TEST_CASE("cbor nested semantic tags with differing argument widths")
     }
 }
 
+
+TEST_CASE("decode_cbor empty strings")
+{
+    SECTION("empty byte string")
+    {
+        auto j = cbor::decode_cbor<jsoncons::json>(std::vector<uint8_t>{0x40});
+        REQUIRE(j.is_byte_string());
+        CHECK(j.as<std::vector<uint8_t>>().empty());
+    }
+    SECTION("empty text string")
+    {
+        auto j = cbor::decode_cbor<jsoncons::json>(std::vector<uint8_t>{0x60});
+        CHECK(j.as<std::string>().empty());
+    }
+}
