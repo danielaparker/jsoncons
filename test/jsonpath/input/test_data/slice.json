@@ -24,6 +24,11 @@
                 "comment" : "Array slice with negative start and positive end and range of -1",
                 "expression" : "$[-4:1]",
                 "result" : [] 
+            },
+            {
+                "comment" : "Array slice with a step that overflows int64 when added to the index",
+                "expression" : "$[1::9223372036854775807]",
+                "result" : ["a"] 
             }
         ]
     },
