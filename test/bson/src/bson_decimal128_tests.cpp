@@ -1086,3 +1086,34 @@ TEST_CASE("test_decimal128_from_string_w_len__special")
    CHECK (negative_number == bson::decimal128_t(0xb040000000000000, 0x002bdc545d6b4b87));
 }
 
+
+TEST_CASE("test_decimal128_from_string_w_len__no_read_past_last")
+{
+   /* Characters after last must not be parsed as part of the number. */
+   {
+       char buf[] = "12e5";
+       bson::decimal128_t number;
+       auto rc = bson::decimal128_from_chars(buf, buf+2, number);
+       CHECK(rc.ec == std::errc{});
+       CHECK(rc.ptr == buf+2);
+       CHECK(number == bson::decimal128_t(0x3040000000000000, 12));
+   }
+   {
+       char buf[] = "1e+5";
+       bson::decimal128_t number;
+       auto rc = bson::decimal128_from_chars(buf, buf+2, number);
+       CHECK(rc.ec == std::errc::invalid_argument);
+   }
+   {
+       char buf[] = "-5";
+       bson::decimal128_t number;
+       auto rc = bson::decimal128_from_chars(buf, buf+1, number);
+       CHECK(rc.ec == std::errc::invalid_argument);
+   }
+   {
+       char buf[] = "5";
+       bson::decimal128_t number;
+       auto rc = bson::decimal128_from_chars(buf, buf, number);
+       CHECK(rc.ec == std::errc::invalid_argument);
+   }
+}
