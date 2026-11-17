@@ -3535,7 +3535,7 @@ private:
         jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(initial_byte);
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
         uint8_t info = get_additional_information(initial_byte);
-        if (info != 2)
+        if (info != jsoncons::cbor::detail::additional_info::indefinite_length && info != 2)
         {
             ec = cbor_errc::invalid_mdarray_header;
             more_ = false;

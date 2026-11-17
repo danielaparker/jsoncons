@@ -1225,6 +1225,10 @@ TEST_CASE("cbor multi-dim, row-major, classical indefinite array tests")
         std::error_code ec;
         cbor::cbor_bytes_reader reader(data, decoder);
         reader.read(ec);
+        if (ec)
+        {
+            std::cout << ec.message() << "\n";
+        }
         REQUIRE(!ec);
         REQUIRE(decoder.is_valid());
         CHECK(parse_expected  == decoder.get_result());
