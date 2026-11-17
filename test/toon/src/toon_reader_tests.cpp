@@ -102,6 +102,21 @@ TEST_CASE("toon_reader parse_primitive")
         REQUIRE(decoder.is_valid());
         CHECK("0" == decoder.get_result().as_string());
     }
+    SECTION("1e-18446744073709551615")
+    {
+        std::string str = "1e-18446744073709551615";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
+        REQUIRE(decoder.is_valid());
+    }
+    SECTION("1e99999999999999999999999")
+    {
+        std::string str = "1e99999999999999999999999";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::parse_primitive(jsoncons::span<char>(&str[0], str.size()), decoder);
+        REQUIRE(decoder.is_valid());
+        CHECK(jsoncons::ojson{"1e99999999999999999999999"} == decoder.get_result());
+    }
 }
 
 TEST_CASE("toon_reader util tests")

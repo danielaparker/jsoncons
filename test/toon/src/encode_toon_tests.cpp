@@ -91,6 +91,12 @@ TEST_CASE("toon::detail::exponential_to_decimal_notation")
         std::string expected = "-123456.78";
         CHECK(expected == str);
     }
+    SECTION("1e-18446744073709551615")
+    {
+        std::string str;
+        auto result = toon::detail::exponential_to_decimal_notation("1e-18446744073709551615", str);
+        CHECK_FALSE(result);
+    }
 }
 
 TEST_CASE("toon is_number")

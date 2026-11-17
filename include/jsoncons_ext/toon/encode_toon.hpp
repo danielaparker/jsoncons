@@ -9,6 +9,7 @@
 
 #include <ostream>
 #include <cctype>
+#include <limits>
 
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons_ext/toon/toon_options.hpp>
@@ -118,7 +119,7 @@ write_result exponential_to_decimal_notation(jsoncons::string_view str, std::str
 
     std::size_t exponent{0};
     auto r = dec_to_integer(exponent_str.data(), exponent_str.size(), exponent);
-    if (!r)
+    if (!r || exponent > (std::numeric_limits<std::size_t>::max)() - decimal_places - 1)
     {
         return write_result{jsoncons::unexpect, toon_errc::invalid_value};
     }
