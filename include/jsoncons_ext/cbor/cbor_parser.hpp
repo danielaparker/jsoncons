@@ -1337,6 +1337,7 @@ public:
             iter->next(visitor, *this, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
+                more_ = false;
                 return;
             }
             more_ = !cursor_mode_;
@@ -3486,6 +3487,13 @@ private:
                     state_stack_.emplace_back(parse_mode::typed_array, ta.size(), false);
                     more_ = !cursor_mode_;
                     break;
+                }
+                case 0x53:
+                case 0x57:
+                {
+                    ec = cbor_errc::float128_not_supported;
+                    more_ = !cursor_mode_;
+                    return;
                 }
                 default:
                 {
