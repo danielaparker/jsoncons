@@ -67,7 +67,7 @@ namespace
 
 } // namespace
 
-TEST_CASE("cbor_view_test")
+TEST_CASE("cbor_ondemand_test")
 {
     jsoncons::ojson j1 = jsoncons::ojson::parse(R"(
     {

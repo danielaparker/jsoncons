@@ -2591,7 +2591,17 @@ namespace detail {
                 {
                     case token_kind::literal:
                     {
-                        stack.emplace_back(t.value_);
+                        // A literal right after a pipe ignores the left side's
+                        // result, so it replaces that result on the stack.
+                        if (i > 0 && output_stack[i-1].type() == token_kind::pipe)
+                        {
+                            JSONCONS_ASSERT(!stack.empty());
+                            stack.back() = parameter_type(t.value_);
+                        }
+                        else
+                        {
+                            stack.emplace_back(t.value_);
+                        }
                         break;
                     }
                     case token_kind::begin_expression_type:
