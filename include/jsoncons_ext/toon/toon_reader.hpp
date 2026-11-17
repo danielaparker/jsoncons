@@ -1030,6 +1030,7 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw,
 
     std::size_t line_num = 1;
     std::size_t indent = 0;
+    std::size_t indent_chars = 0;
     std::size_t start = 0;
     bool is_blank_line = true;
     std::size_t trailing_blanks = 0;
@@ -1049,6 +1050,7 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw,
                 else
                 {
                     indent += indent_size;
+                    ++indent_chars;
                     continue;
                 }
             }
@@ -1058,6 +1060,7 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw,
             if (is_blank_line)
             {
                 ++indent;
+                ++indent_chars;
             }
             else
             {
@@ -1079,9 +1082,10 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw,
                 return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, line_num, 0};
             }
             std::size_t depth = compute_depth_from_indent(indent, indent_size);
-            lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+            lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent_chars), i-(start+indent_chars+trailing_blanks)}, line_num});
             ++line_num;
             indent = 0;
+            indent_chars = 0;
             is_blank_line = true;
             start = i+1;
             trailing_blanks = 0;
@@ -1094,7 +1098,7 @@ read_result<std::vector<parsed_line>> read_lines(jsoncons::span<char> raw,
             return result_type{jsoncons::unexpect, toon_errc::indent_not_multiple_of_indent_size, line_num, 0};
         }
         std::size_t depth = compute_depth_from_indent(indent, indent_size);
-        lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent), i-(start+indent+trailing_blanks)}, line_num});
+        lines.push_back(parsed_line{depth, indent, jsoncons::span<char>{raw.data()+(start+indent_chars), i-(start+indent_chars+trailing_blanks)}, line_num});
     }
 
     return result_type{std::move(lines)};

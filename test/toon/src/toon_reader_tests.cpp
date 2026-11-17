@@ -658,3 +658,35 @@ TEST_CASE("toon_reader errors")
         CHECK(expected == result.error().message());
     }
 }
+
+TEST_CASE("toon_reader tab indentation in non-strict mode")
+{
+    SECTION("tab indented key")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"a":{"b":1}})");
+
+        std::string data = "a:\n\tb: 1";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.strict(false);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE(result);
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+    }
+    SECTION("tab indented blank line")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"a":1,"b":2})");
+
+        std::string data = "a: 1\n\t\t\nb: 2\n" + std::string(1000, '\t');
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.strict(false);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE(result);
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+    }
+}
