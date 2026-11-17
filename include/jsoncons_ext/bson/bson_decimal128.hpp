@@ -607,13 +607,13 @@ namespace bson {
         dec.high = 0;
         dec.low = 0;
  
-        if (*str_read == '+' || *str_read == '-') {
+        if (str_read < last && (*str_read == '+' || *str_read == '-')) {
            is_negative = *(str_read++) == '-';
            includes_sign = true;
         }
 
         /* Check for Infinity or NaN */
-        if (!isdigit(*str_read) && *str_read != '.') {
+        if (str_read == last || (!isdigit(*str_read) && *str_read != '.')) {
            if (detail::dec128_istreq (str_read, last, inf_str.data(), inf_str.data()+inf_str.length()) ||
                detail::dec128_istreq (str_read, last, infinity_str.data(), infinity_str.data()+infinity_str.length())) 
            {
@@ -629,8 +629,8 @@ namespace bson {
         }
  
         /* Read digits */
-        while (((isdigit (*str_read) || *str_read == '.')) &&
-               (len == -1 || str_read < first + len)) {
+        while ((len == -1 || str_read < first + len) &&
+               (isdigit (*str_read) || *str_read == '.')) {
            if (*str_read == '.') {
               if (saw_radix) {
                  dec = decimal128_limits::nan();
@@ -672,9 +672,9 @@ namespace bson {
         }
  
         /* Read exponent if exists */
-        if (*str_read == 'e' || *str_read == 'E') {
+        if (str_read < last && (*str_read == 'e' || *str_read == 'E')) {
            ++str_read;
-           if (*str_read == '+') {
+           if (str_read < last && *str_read == '+') {
                ++str_read;
            }
            auto result = jsoncons::to_integer(str_read, last - str_read, exponent);
