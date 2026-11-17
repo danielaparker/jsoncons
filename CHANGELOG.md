@@ -39,6 +39,10 @@ master
 
   - Git Issue PR #805: toon: fix out-of-bounds line span for tab indentation in non-strict mode
 
+  - Git Issue PR #806: bson: don't read past last in decimal128_from_chars
+
+  - Git Issue PR #807: Skip memcpy when there is nothing to copy
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 

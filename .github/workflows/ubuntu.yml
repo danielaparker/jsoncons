@@ -163,27 +163,22 @@ jobs:
   #  - working-directory: build/
   #    run: ctest -C ubuntu-latest --output-on-failure
 
-  clang_14_build:
-    runs-on: ubuntu-latest
-
+  clang_test:
+    runs-on: ubuntu-26.04
+    strategy:
+      matrix:
+        compiler: ['3.4', '3.5', '3.6', '3.7', '3.8', '3.9', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15-bullseye', '16', '17', '18', '19', '20', '21', '22', 'latest']
+    container: silkeh/clang:${{ matrix.compiler }}
     steps:
-    - uses: actions/checkout@v7.0.1
-    - name: install_gcc
-      run: |
-           sudo apt update
-           sudo apt install clang-14
-      shell: bash
-    - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
-      env:
-        CC:   clang-14
-        CXX:  clang++-14
-
-    - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
-
-    - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: cmake
+        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
+      - working-directory: build/
+        run: cmake --build . --config ubuntu-latest
+      - working-directory: build/
+        run: ctest -C ubuntu-latest --output-on-failure
 
   ci_test_standards_gcc:
     runs-on: ubuntu-latest
