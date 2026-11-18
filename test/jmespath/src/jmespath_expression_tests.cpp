@@ -254,3 +254,19 @@ TEST_CASE("jmespath literal after pipe")
     CHECK(jmespath::search(doc, "[a | `1`]") == json::parse("[1]"));
     CHECK(jmespath::search(doc, "c[*].[d | `1`]") == json::parse("[[1]]"));
 }
+
+TEST_CASE("jmespath unexpected character in function arguments or multi-select hash")
+{
+    std::vector<std::string> exprs = {"length(@@)", "length(a b)", "abs(a]", "{1:2}", "{*}", "{]", "{-1}"};
+
+    for (const auto& expr : exprs)
+    {
+        std::error_code ec;
+        jmespath::make_expression<json>(expr, ec);
+        CHECK(ec); //-V521
+    }
+
+    auto doc = json::parse(R"({"a":[1,2],"b":3})");
+    CHECK(jmespath::search(doc, "length(a)") == json(2));
+    CHECK(jmespath::search(doc, "{ x: b, y: length(a) }") == json::parse(R"({"x":3,"y":2})"));
+}

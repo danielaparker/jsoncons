@@ -4188,7 +4188,8 @@ namespace detail {
                                 break;
                             }
                             default:
-                                break;
+                                ec = jmespath_errc::syntax_error;
+                                return jmespath_expression{};
                         }
                         break;
 
@@ -4655,19 +4656,8 @@ namespace detail {
                         break;
 
                     case expr_state::multi_select_hash:
-                        switch(*p_)
-                        {
-                            case '*':
-                            case ']':
-                            case '?':
-                            case ':':
-                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                break;
-                            default:
-                                state_stack.back() = expr_state::expect_rbrace;
-                                state_stack.push_back(expr_state::key_val_expr);
-                                break;
-                        }
+                        state_stack.back() = expr_state::expect_rbrace;
+                        state_stack.push_back(expr_state::key_val_expr);
                         break;
 
                     case expr_state::index_or_slice_expression:
