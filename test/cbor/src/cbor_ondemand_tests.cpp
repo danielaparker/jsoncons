@@ -351,16 +351,16 @@ TEST_CASE("cbor ondemand typed accessors")
         CHECK_FALSE(parse({0xf6}).get_bool());
     }
 
-    /*SECTION("double_value")
+    SECTION("double_value")
     {
         cbor::ondemand::access_result<double> r;
-        CHECK(parse({0xf9,0x3c,0x00}).get_double());
+        CHECK((r = parse({0xf9,0x3c,0x00}).get_double()));
         CHECK(*r == 1.0);
-        CHECK(parse({0xf9,0x7c,0x00}).get_double());
+        CHECK((r = parse({0xf9,0x7c,0x00}).get_double()));
         CHECK(*r == std::numeric_limits<double>::infinity());
-        CHECK(parse({0xfa,0x3f,0xc0,0x00,0x00}).get_double());
+        CHECK((r = parse({0xfa,0x3f,0xc0,0x00,0x00}).get_double()));
         CHECK(*r == 1.5);
-        CHECK(parse({0xfb,0x3f,0xf1,0x99,0x99,0x99,0x99,0x99,0x9a}).get_double());
+        CHECK((r = parse({0xfb,0x3f,0xf1,0x99,0x99,0x99,0x99,0x99,0x9a}).get_double()));
         CHECK(*r == 1.1);
 
         CHECK_FALSE(parse({0x01}).get_double());
@@ -371,12 +371,12 @@ TEST_CASE("cbor ondemand typed accessors")
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1 (epoch time) 10
         cbor::ondemand::item tagged = parse(data);
         CHECK_FALSE(tagged.tags().empty());
-        uint64_t r = 0;
-        CHECK(tagged.get_uint64());
+        cbor::ondemand::access_result<uint64_t> r;
+        CHECK((r = tagged.get_uint64()));
         CHECK(*r == 10);
     }
 
-    SECTION("text views definite strings in place")
+    /*SECTION("text views definite strings in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
         cbor::ondemand::item text_item = parse(data);
