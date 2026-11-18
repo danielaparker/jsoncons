@@ -198,7 +198,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         CHECK(at_32_result.value().argument() == 32);
     }
 }
-#if 0
+
 TEST_CASE("cbor ondemand rejects the RFC 8949 compliance vectors")
 {
     // The vectors of cbor_compliance_tests.cpp, through parse_item.
@@ -252,7 +252,7 @@ TEST_CASE("cbor ondemand rejects the RFC 8949 compliance vectors")
     CHECK(parse_errc({0x18}) == cbor_errc::unexpected_eof);
     CHECK(parse_errc({0xff}) == cbor_errc::unknown_type);
 }
-
+#if 0
 TEST_CASE("cbor ondemand item exposes wire structure")
 {
     SECTION("kinds follow the untagged major type")
