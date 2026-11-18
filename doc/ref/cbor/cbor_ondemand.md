@@ -1,4 +1,4 @@
-### jsoncons::cbor::view
+### jsoncons::cbor::ondemand
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
@@ -6,7 +6,7 @@
 
 <br>
 
-The `cbor::view` namespace reads the encoded structure of
+The `cbor::ondemand` namespace reads the encoded structure of
 [Concise Binary Object Representation](http://cbor.io/) data in place,
 without copying it or building a data structure. Scanning validates an item's
 structure once and yields a checked `item`; everything after that is
@@ -60,7 +60,7 @@ stopped. Scanning allocates only when nesting exceeds 32 open containers.
 #### Checked items
 
 ```cpp
-enum class item_kind
+enum class cbor_type
 {
     unsigned_integer, negative_integer, byte_string, text_string,
     array, map, simple
@@ -70,21 +70,21 @@ class item
 {
 public:
     span<const uint8_t> encoded_bytes() const noexcept;
-    item_kind kind() const noexcept;
+    cbor_type kind() const noexcept;
     uint64_t argument() const noexcept;
     bool indefinite() const noexcept;
 
     tag_range tags() const noexcept;
     child_range children() const noexcept;
 
-    bool uint64_value(uint64_t&) const noexcept;
-    bool int64_value(int64_t&) const noexcept;
-    bool bool_value(bool&) const noexcept;
-    bool double_value(double&) const noexcept;
-    bool text(string_view&) const noexcept;
-    bool bytes(span<const uint8_t>&) const noexcept;
-    bool text(std::string&) const;
-    bool bytes(std::vector<uint8_t>&) const;
+    access_result<uint64_t> get_uint64() const noexcept;
+    access_result<int64_t> get_int64() const noexcept;
+    access_result<bool> get_bool() const noexcept;
+    access_result<double> get_double() const noexcept;
+    access_result<jsoncons::string_view> get_string() const noexcept;
+    access_result<span<const uint8_t>> get_byte_string() const noexcep;t
+    access_result<jsoncons::string_view> get_string(std::string& buffer) const;
+    access_result<span<const uint8_t>> get_byte_string(std::vector<uint8_t>& buffer) const;
 };
 ```
 
@@ -121,48 +121,46 @@ indefinite-length text string is checked independently, as RFC 8949 section
 #include <iostream>
 #include <vector>
 
-namespace view = jsoncons::cbor::view;
+namespace ondemand = jsoncons::cbor::ondemand;
 
 int main()
 {
     // {"id": 42, "scores": [1, 2]}
     const std::vector<uint8_t> data = {
         0xa2,
-        0x62,'i','d', 0x18,0x2a,
-        0x66,'s','c','o','r','e','s', 0x82,0x01,0x02
+        0x62, 'i', 'd', 0x18, 0x2a,
+        0x66, 's', 'c', 'o', 'r', 'e', 's', 0x82, 0x01, 0x02
     };
 
-    auto parsed = view::parse_item(jsoncons::span<const uint8_t>(data));
+    auto parsed = ondemand::parse_item(jsoncons::span<const uint8_t>(data));
     if (!parsed)
     {
         std::cout << "error " << static_cast<int>(parsed.error().code)
-                  << " at offset " << parsed.error().offset << "\n";
+            << " at offset " << parsed.error().offset << "\n";
         return 1;
     }
 
     bool is_key = true;
-    jsoncons::string_view key;
-    for (const view::item child : parsed.value().children())
+    std::string_view key;
+    for (const ondemand::item child : parsed.value().children())
     {
         if (is_key)
         {
-            child.text(key);
+            key = child.get_string().value();
         }
-        else if (child.kind() == view::item_kind::array)
+        else if (child.type() == ondemand::cbor_type::array)
         {
             std::cout << key << ":";
-            for (const view::item element : child.children())
+            for (const ondemand::item element : child.children())
             {
-                uint64_t value = 0;
-                element.uint64_value(value);
+                uint64_t value = element.get_uint64().value();
                 std::cout << " " << value;
             }
             std::cout << "\n";
         }
         else
         {
-            uint64_t value = 0;
-            child.uint64_value(value);
+            uint64_t value = child.get_uint64().value();
             std::cout << key << ": " << value << "\n";
         }
         is_key = !is_key;

@@ -36,6 +36,7 @@ enum class access_errc
     success = 0,
     invalid_type = 1,
     indefinite_length,
+    result_out_of_range, 
 };
 
 class access_error_category
@@ -56,6 +57,8 @@ public:
                 return "Invalid type";
             case access_errc::indefinite_length:
                 return "Indefinite length";
+            case access_errc::result_out_of_range:
+                return "Result out of range";
             default:
                 return "Unknown access error";
         }
@@ -65,7 +68,7 @@ public:
 inline 
 std::error_code make_error_code(access_errc e) noexcept
 {
-    return std::error_code(static_cast<int>(e), access_error_category());
+    return std::error_code(static_cast<int>(e), access_error_category{});
 }
 
 class access_error
@@ -111,7 +114,7 @@ public:
 };
 
 template <typename T>
-using read_result = expected<T,access_error>;
+using access_result = expected<T,access_error>;
 
 constexpr int default_max_nesting_depth = 1024;
 
@@ -162,77 +165,96 @@ namespace ondemand_detail {
         }
     }
 
-    inline bool uint64_value(const item_head& head, uint64_t& value) noexcept
+    inline 
+    access_result<uint64_t> get_uint64(const item_head& head) noexcept
     {
+        using result_type = access_result<uint64_t>;
         if (head.major_type != cbor::detail::cbor_major_type::unsigned_integer)
         {
-            return false;
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
-        value = head.value;
-        return true;
+        return result_type{head.value};
     }
 
-    inline bool int64_value(const item_head& head, int64_t& value) noexcept
+    inline 
+    access_result<int64_t> get_int64(const item_head& head) noexcept
     {
+        using result_type = access_result<int64_t>;
         const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
-        if (head.major_type == cbor::detail::cbor_major_type::unsigned_integer && head.value <= int64_max)
+        if (head.major_type == cbor::detail::cbor_major_type::unsigned_integer)
         {
-            value = static_cast<int64_t>(head.value);
-            return true;
+            if (head.value <= int64_max)
+            {
+                return result_type{static_cast<int64_t>(head.value)};
+            }
+            else
+            {
+                return result_type(jsoncons::unexpect, access_errc::result_out_of_range);
+            }
         }
-        if (head.major_type == cbor::detail::cbor_major_type::negative_integer && head.value <= int64_max)
+        if (head.major_type == cbor::detail::cbor_major_type::negative_integer)
         {
-            value = -1 - static_cast<int64_t>(head.value);
-            return true;
+            if (head.value <= int64_max)
+            {
+                return result_type{-1 - static_cast<int64_t>(head.value)};
+            }
+            else
+            {
+                return result_type(jsoncons::unexpect, access_errc::result_out_of_range);
+            }
         }
-        return false;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
 
-    inline bool bool_value(const item_head& head, bool& value) noexcept
+    inline 
+    access_result<bool> get_bool(const item_head& head) noexcept
     {
+        using result_type = access_result<bool>;
+
         if (head.major_type != cbor::detail::cbor_major_type::simple ||
             (head.additional_info != 20 && head.additional_info != 21))
         {
-            return false;
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
-        value = head.additional_info == 21;
-        return true;
+        return head.additional_info == 21;
     }
 
-    inline bool double_value(const item_head& head, double& value) noexcept
+    inline 
+    access_result<double> get_double(const item_head& head) noexcept
     {
+        using result_type = access_result<double>;
+
         if (head.major_type != cbor::detail::cbor_major_type::simple)
         {
-            return false;
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
         switch (head.additional_info)
         {
             case 25:
-                value = binary::decode_half(static_cast<uint16_t>(head.value));
-                return true;
+                return binary::decode_half(static_cast<uint16_t>(head.value));
             case 26:
             {
                 const uint32_t bits = static_cast<uint32_t>(head.value);
                 float single;
                 std::memcpy(&single, &bits, sizeof single);
-                value = single;
-                return true;
+                return result_type{single};
             }
             case 27:
             {
                 const uint64_t bits = head.value;
+                double value;
                 std::memcpy(&value, &bits, sizeof value);
-                return true;
+                return result_type{value};
             }
             default:
-                return false;
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
     }
 
     inline 
-    read_result<jsoncons::string_view> get_string(const item_head& head, const uint8_t* content) noexcept
+    access_result<jsoncons::string_view> get_string(const item_head& head, const uint8_t* content) noexcept
     {
-        using result_type = read_result<jsoncons::string_view>;
+        using result_type = access_result<jsoncons::string_view>;
         if (head.major_type != cbor::detail::cbor_major_type::text_string)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -241,13 +263,13 @@ namespace ondemand_detail {
         {
             return result_type(jsoncons::unexpect, access_errc::indefinite_length);
         }
-        return read_result{string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value))};
+        return result_type{string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value))};
     }
 
     inline 
-    read_result<jsoncons::span<const uint8_t>> get_byte_string(const item_head& head, const uint8_t* content) noexcept
+    access_result<jsoncons::span<const uint8_t>> get_byte_string(const item_head& head, const uint8_t* content) noexcept
     {
-        using result_type = read_result<span<const uint8_t>>;
+        using result_type = access_result<span<const uint8_t>>;
         if (head.major_type != cbor::detail::cbor_major_type::byte_string)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -256,7 +278,7 @@ namespace ondemand_detail {
         {
             return result_type(jsoncons::unexpect, access_errc::indefinite_length);
         }
-        return read_result{span<const uint8_t>(content, static_cast<std::size_t>(head.value))};
+        return result_type{span<const uint8_t>(content, static_cast<std::size_t>(head.value))};
     }
 
     JSONCONS_FORCE_INLINE bool read_uint(const uint8_t*& p, const uint8_t* end, uint8_t info, uint64_t& value, cbor_errc& ec)
@@ -670,42 +692,43 @@ public:
 
     // The typed accessors return false, leaving `value` unchanged, if the
     // item is not of that kind or range.
-    bool uint64_value(uint64_t& value) const noexcept
+    access_result<uint64_t> get_uint64() const noexcept
     {
-        return ondemand_detail::uint64_value(head_, value);
+        return ondemand_detail::get_uint64(head_);
     }
 
-    bool int64_value(int64_t& value) const noexcept
+    access_result<int64_t> get_int64() const noexcept
     {
-        return ondemand_detail::int64_value(head_, value);
+        return ondemand_detail::get_int64(head_);
     }
 
-    bool bool_value(bool& value) const noexcept
+    access_result<bool> get_bool() const noexcept
     {
-        return ondemand_detail::bool_value(head_, value);
+        return ondemand_detail::get_bool(head_);
     }
 
-    bool double_value(double& value) const noexcept
+    access_result<double> get_double() const noexcept
     {
-        return ondemand_detail::double_value(head_, value);
+        return ondemand_detail::get_double(head_);
     }
 
     // Zero-copy string content. False for indefinite-length strings,
     // whose chunks are their children.
-    read_result<jsoncons::string_view> get_string() const noexcept
+    access_result<jsoncons::string_view> get_string() const noexcept
     {
         return ondemand_detail::get_string(head_, content_);
     }
 
-    read_result<span<const uint8_t>> get_byte_string() const noexcept
+    access_result<span<const uint8_t>> get_byte_string() const noexcept
     {
         return ondemand_detail::get_byte_string(head_, content_);
     }
 
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
-    bool text(std::string& value) const;
-    bool bytes(std::vector<uint8_t>& value) const;
+    access_result<jsoncons::string_view> get_string(std::string& buffer) const;
+
+    access_result<span<const uint8_t>> get_byte_string(std::vector<uint8_t>& buffer) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1018,11 +1041,13 @@ inline void item::copy_content(uint8_t* out) const noexcept
     }
 }
 
-inline bool item::text(std::string& value) const
+inline 
+access_result<jsoncons::string_view> item::get_string(std::string& value) const 
 {
+    using result_type = access_result<jsoncons::string_view>;
     if (head_.major_type != cbor::detail::cbor_major_type::text_string)
     {
-        return false;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
     std::string content(content_size(), '\0');
     if (!content.empty())
@@ -1030,14 +1055,16 @@ inline bool item::text(std::string& value) const
         copy_content(reinterpret_cast<uint8_t*>(&content[0]));
     }
     value = std::move(content);
-    return true;
+    return result_type{string_view(value.data(), value.size())};
 }
 
-inline bool item::bytes(std::vector<uint8_t>& value) const
+inline 
+access_result<jsoncons::span<const uint8_t>> item::get_byte_string(std::vector<uint8_t>& value) const
 {
+    using result_type = access_result<span<const uint8_t>>;
     if (head_.major_type != cbor::detail::cbor_major_type::byte_string)
     {
-        return false;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
     std::vector<uint8_t> content(content_size());
     if (!content.empty())
@@ -1045,7 +1072,7 @@ inline bool item::bytes(std::vector<uint8_t>& value) const
         copy_content(content.data());
     }
     value = std::move(content);
-    return true;
+    return result_type{span<const uint8_t>(value.data(), value.size())};
 }
 
 struct scan_result
@@ -1127,16 +1154,18 @@ inline bool validate_text(const item& text_item) noexcept
     {
         return false;
     }
-    if (auto str = text_item.get_string(); str.has_value())
+    auto str = text_item.get_string();
+    if (str.has_value())
     {
         string_view text = *str;
         return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
     }
     for (const item chunk : text_item.children())
     {
-        if (auto str = text_item.get_string(); str.has_value())
+        auto s = text_item.get_string();
+        if (s.has_value())
         {
-            string_view text = *str;
+            string_view text = *s;
             if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
             {
                 return false;
