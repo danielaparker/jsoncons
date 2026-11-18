@@ -252,7 +252,7 @@ TEST_CASE("cbor ondemand rejects the RFC 8949 compliance vectors")
     CHECK(parse_errc({0x18}) == cbor_errc::unexpected_eof);
     CHECK(parse_errc({0xff}) == cbor_errc::unknown_type);
 }
-#if 0
+
 TEST_CASE("cbor ondemand item exposes wire structure")
 {
     SECTION("kinds follow the untagged major type")
@@ -315,55 +315,55 @@ TEST_CASE("cbor ondemand typed accessors")
 {
     SECTION("uint64_value")
     {
-        uint64_t v = 0;
-        CHECK(parse({0x00}).uint64_value(v));
-        CHECK(v == 0);
-        CHECK(parse({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).uint64_value(v));
-        CHECK(v == (std::numeric_limits<uint64_t>::max)());
+        cbor::ondemand::access_result<uint64_t> r;
+        CHECK((r = parse({0x00}).get_uint64()));
+        CHECK(*r == 0);
+        CHECK((r = parse({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).get_uint64()));
+        CHECK(*r == (std::numeric_limits<uint64_t>::max)());
 
-        CHECK_FALSE(parse({0x20}).uint64_value(v));
-        CHECK_FALSE(parse({0x61,'a'}).uint64_value(v));
+        CHECK_FALSE(parse({0x20}).get_uint64());
+        CHECK_FALSE(parse({0x61,'a'}).get_uint64());
     }
 
     SECTION("int64_value")
     {
-        int64_t v = 0;
-        CHECK(parse({0x0a}).int64_value(v));
-        CHECK(v == 10);
-        CHECK(parse({0x20}).int64_value(v));
-        CHECK(v == -1);
-        CHECK(parse({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).int64_value(v));
-        CHECK(v == (std::numeric_limits<int64_t>::max)());
-        CHECK(parse({0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).int64_value(v));
-        CHECK(v == (std::numeric_limits<int64_t>::min)());
+        cbor::ondemand::access_result<int64_t> r;
+        CHECK((r = parse({0x0a}).get_int64()));
+        CHECK(*r == 10);
+        CHECK((r = parse({0x20}).get_int64()));
+        CHECK(*r == -1);
+        CHECK((r = parse({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).get_int64()));
+        CHECK(*r == (std::numeric_limits<int64_t>::max)());
+        CHECK((r = parse({0x3b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff}).get_int64()));
+        CHECK(*r == (std::numeric_limits<int64_t>::min)());
 
-        CHECK_FALSE(parse({0x1b,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00}).int64_value(v));
-        CHECK_FALSE(parse({0x3b,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00}).int64_value(v));
+        CHECK_FALSE(parse({0x1b,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00}).get_int64());
+        CHECK_FALSE(parse({0x3b,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00}).get_int64());
     }
 
     SECTION("bool_value")
     {
-        bool v = false;
-        CHECK(parse({0xf5}).bool_value(v));
-        CHECK(v);
-        CHECK(parse({0xf4}).bool_value(v));
-        CHECK_FALSE(v);
-        CHECK_FALSE(parse({0xf6}).bool_value(v));
+        cbor::ondemand::access_result<bool> r;
+        CHECK((r = parse({0xf5}).get_bool()));
+        CHECK(*r);
+        CHECK((r = parse({0xf4}).get_bool()));
+        CHECK_FALSE(*r);
+        CHECK_FALSE(parse({0xf6}).get_bool());
     }
 
-    SECTION("double_value")
+    /*SECTION("double_value")
     {
-        double v = 0;
-        CHECK(parse({0xf9,0x3c,0x00}).double_value(v));
-        CHECK(v == 1.0);
-        CHECK(parse({0xf9,0x7c,0x00}).double_value(v));
-        CHECK(v == std::numeric_limits<double>::infinity());
-        CHECK(parse({0xfa,0x3f,0xc0,0x00,0x00}).double_value(v));
-        CHECK(v == 1.5);
-        CHECK(parse({0xfb,0x3f,0xf1,0x99,0x99,0x99,0x99,0x99,0x9a}).double_value(v));
-        CHECK(v == 1.1);
+        cbor::ondemand::access_result<double> r;
+        CHECK(parse({0xf9,0x3c,0x00}).get_double());
+        CHECK(*r == 1.0);
+        CHECK(parse({0xf9,0x7c,0x00}).get_double());
+        CHECK(*r == std::numeric_limits<double>::infinity());
+        CHECK(parse({0xfa,0x3f,0xc0,0x00,0x00}).get_double());
+        CHECK(*r == 1.5);
+        CHECK(parse({0xfb,0x3f,0xf1,0x99,0x99,0x99,0x99,0x99,0x9a}).get_double());
+        CHECK(*r == 1.1);
 
-        CHECK_FALSE(parse({0x01}).double_value(v));
+        CHECK_FALSE(parse({0x01}).get_double());
     }
 
     SECTION("a tagged scalar still reads, with its tag visible")
@@ -371,9 +371,9 @@ TEST_CASE("cbor ondemand typed accessors")
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1 (epoch time) 10
         cbor::ondemand::item tagged = parse(data);
         CHECK_FALSE(tagged.tags().empty());
-        uint64_t v = 0;
-        CHECK(tagged.uint64_value(v));
-        CHECK(v == 10);
+        uint64_t r = 0;
+        CHECK(tagged.get_uint64());
+        CHECK(*r == 10);
     }
 
     SECTION("text views definite strings in place")
@@ -402,9 +402,9 @@ TEST_CASE("cbor ondemand typed accessors")
         REQUIRE(parse(data).bytes(bs));
         CHECK(bs.data() == data.data() + 1);
         CHECK(bs.size() == 3);
-    }
+    }*/
 }
-
+#if 0
 TEST_CASE("cbor ondemand copying accessors are transactional")
 {
     SECTION("text assembles chunked strings")
