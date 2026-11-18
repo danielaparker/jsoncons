@@ -51,6 +51,7 @@ enum class cbor_errc
     expected_unsigned_integer,
     invalid_mdarray_header,
     float128_not_supported,
+    not_a_string,
 };
 
 class cbor_error_category_impl
@@ -129,6 +130,8 @@ public:
                 return "Invalid multi-dimensional array header.";
             case cbor_errc::float128_not_supported:
                 return "float128 typed array is not supported.";              
+            case cbor_errc::not_a_string:
+                return "Not a string.";              
             default:
                 return "Unknown CBOR parser error";
         }

@@ -8,7 +8,7 @@ types that have [reflection traits](../corelib/reflection-traits.md) defined.
 
 [basic_cbor_cursor](basic_cbor_cursor.md)
 
-[cbor::ondemand](cbor_ondemand.md)
+[cbor::view](cbor_view.md)
 
 [encode_cbor](encode_cbor.md)
 
