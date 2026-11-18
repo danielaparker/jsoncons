@@ -576,7 +576,8 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t base_depth,
     const header_info& header_info,
     const toon_decode_options& options,
-    json_visitor& visitor);
+    json_visitor& visitor,
+    int nesting_depth);
 
 inline
 jsoncons::expected<jsoncons::string_view, toon_errc> parse_key(jsoncons::span<char> key_str)
@@ -1188,9 +1189,15 @@ line_result decode_object(const std::vector<parsed_line>& lines,
     std::size_t start_idx,
     std::size_t base_depth,
     const toon_decode_options& options,
-    json_visitor& visitor)
+    json_visitor& visitor,
+    int nesting_depth)
 {
     bool strict = options.strict();
+
+    if (JSONCONS_UNLIKELY(nesting_depth > options.max_nesting_depth()))
+    {
+        return line_result{jsoncons::unexpect, toon_errc::max_nesting_depth_exceeded, start_idx, 0};
+    }
 
     visitor.begin_object();
 
@@ -1235,7 +1242,7 @@ line_result decode_object(const std::vector<parsed_line>& lines,
             {
                 // Array field
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, false, i, line.depth, header, options, visitor);
+                auto next_i_result = decode_array_from_header(lines, false, i, line.depth, header, options, visitor, nesting_depth+1);
                 if (!next_i_result)
                 {
                     return line_result(jsoncons::unexpect, next_i_result.error());
@@ -1271,7 +1278,7 @@ line_result decode_object(const std::vector<parsed_line>& lines,
         {
             // Nested object
             visitor.key(key);
-            auto r = decode_object(lines, i+1, line.depth, options, visitor);
+            auto r = decode_object(lines, i+1, line.depth, options, visitor, nesting_depth+1);
             if (!r)
             {
                 return r;
@@ -1301,9 +1308,15 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
     std::size_t base_depth,
     std::size_t expected_length,
     const toon_decode_options& options,
-    json_visitor& visitor)
+    json_visitor& visitor,
+    int nesting_depth)
 {
     bool strict = options.strict();
+
+    if (JSONCONS_UNLIKELY(nesting_depth > options.max_nesting_depth()))
+    {
+        return line_result{jsoncons::unexpect, toon_errc::max_nesting_depth_exceeded, start_idx, 0};
+    }
 
     visitor.begin_array();
 
@@ -1382,7 +1395,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     else 
                     {
                         auto next_i_result = decode_list_array(
-                            lines, i + 1, base_depth, length, options, visitor);
+                            lines, i + 1, base_depth, length, options, visitor, nesting_depth+1);
                         if (!next_i_result)
                         {
                             return next_i_result;
@@ -1397,7 +1410,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 visitor.begin_object();
                 visitor.key(*key);
-                auto next_i_result = decode_array_from_header(lines, true, i, line.depth, item_header, options, visitor);
+                auto next_i_result = decode_array_from_header(lines, true, i, line.depth, item_header, options, visitor, nesting_depth+2);
                 if (!next_i_result)
                 {
                     return next_i_result;
@@ -1425,7 +1438,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                         auto field_key = field_header.key;
 
                         visitor.key(*field_key);
-                        auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor);
+                        auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor, nesting_depth+2);
                         if (!r1)
                         {
                             return r1;
@@ -1450,7 +1463,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     if (field_value_str.empty())
                     {
                         visitor.key(field_key);
-                        auto r = decode_object(lines, i + 1, field_line.depth, options, visitor);
+                        auto r = decode_object(lines, i + 1, field_line.depth, options, visitor, nesting_depth+2);
                         if (!r)
                         {
                             return line_result{jsoncons::unexpect, r.error()};
@@ -1492,7 +1505,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
             {
                 // First field is nested object: fields at depth +2
                 visitor.key(key);
-                auto r = decode_object(lines, i + 1, line.depth + 1, options, visitor);
+                auto r = decode_object(lines, i + 1, line.depth + 1, options, visitor, nesting_depth+2);
                 if (!r)
                 {
                     return line_result{jsoncons::unexpect, r.error()};
@@ -1532,7 +1545,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                     const header_info& field_header (*(*field_header_result));
                     auto field_key = field_header.key;
                     visitor.key(*field_key);
-                    auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor);
+                    auto r1 = decode_array_from_header(lines, false, i, field_line.depth, field_header, options, visitor, nesting_depth+2);
                     if (!r1)
                     {
                         return r1;
@@ -1558,7 +1571,7 @@ line_result decode_list_array(const std::vector<parsed_line>& lines,
                 {
                     // Nested object
                     visitor.key(field_key);
-                    auto r = decode_object(lines, i + 1, field_line.depth, options, visitor);
+                    auto r = decode_object(lines, i + 1, field_line.depth, options, visitor, nesting_depth+2);
                     if (!r)
                     {
                         return line_result{jsoncons::unexpect, r.error()};
@@ -1689,8 +1702,14 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     std::size_t base_depth,
     const header_info& header_info,
     const toon_decode_options& options,
-    json_visitor& visitor)
+    json_visitor& visitor,
+    int nesting_depth)
 {
+    if (JSONCONS_UNLIKELY(nesting_depth > options.max_nesting_depth()))
+    {
+        return line_result{jsoncons::unexpect, toon_errc::max_nesting_depth_exceeded, header_idx+1, 0};
+    }
+
     auto key = header_info.key;
     std::size_t length{header_info.length};
     char delimiter{header_info.delimiter};
@@ -1734,7 +1753,7 @@ line_result decode_array_from_header(const std::vector<parsed_line>& lines,
     }
     else
     {
-        return decode_list_array(lines, header_idx + 1, base_depth, length, options, visitor);
+        return decode_list_array(lines, header_idx + 1, base_depth, length, options, visitor, nesting_depth);
     }
 }
 
@@ -1853,7 +1872,7 @@ public:
         {
             // Root array
             const header_info& header(*(*header_result));
-            auto r1 = decode_array_from_header(lines, false, 0, 0, header, options_, visitor_);
+            auto r1 = decode_array_from_header(lines, false, 0, 0, header, options_, visitor_, 1);
             if (!r1)
             {
                 return result_type{jsoncons::unexpect, r1.error()};
@@ -1885,7 +1904,7 @@ public:
         }
 
         // Otherwise, root object
-        auto r = decode_object(lines, 0, 0, options_, visitor_);
+        auto r = decode_object(lines, 0, 0, options_, visitor_, 1);
         if (!r)
         {
             return result_type{jsoncons::unexpect, r.error()};
