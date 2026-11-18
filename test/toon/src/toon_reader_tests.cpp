@@ -690,3 +690,51 @@ TEST_CASE("toon_reader tab indentation in non-strict mode")
         CHECK(expected == decoder.get_result());
     }
 }
+
+TEST_CASE("toon_reader max_nesting_depth")
+{
+    SECTION("nested list arrays")
+    {
+        std::string expected = "Data item nesting exceeds limit in options at line 17";
+
+        std::string data = "[1]:\n";
+        for (std::size_t i = 0; i < 100000; ++i)
+        {
+            data += "  - [1]:\n";
+        }
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.max_nesting_depth(16);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE_FALSE(result);
+        CHECK(expected == result.error().message());
+    }
+    SECTION("nested objects")
+    {
+        std::string expected = "Data item nesting exceeds limit in options at line 2";
+
+        std::string data = "a:\n  b:\n    c: 1";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.max_nesting_depth(2);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE_FALSE(result);
+        CHECK(expected == result.error().message());
+    }
+    SECTION("nested objects within limit")
+    {
+        auto expected = jsoncons::ojson::parse(R"({"a":{"b":{"c":1}}})");
+
+        std::string data = "a:\n  b:\n    c: 1";
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        auto options = toon::toon_options{}.max_nesting_depth(3);
+        toon::toon_string_reader reader(data, decoder, options);
+
+        auto result = reader.try_read();
+        REQUIRE(result);
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+    }
+}
