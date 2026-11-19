@@ -45,6 +45,10 @@ master
 
   - Git Issue PR #808: toon: enforce max_nesting_depth in toon_reader
 
+  - Git Issue PR #809: jmespath: reject unexpected characters instead of looping forever
+
+  - Git Issue PR #810: jmespath: stop parsing when an unbalanced ')' empties the state stack
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
