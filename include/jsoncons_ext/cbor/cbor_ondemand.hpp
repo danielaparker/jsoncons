@@ -1077,6 +1077,7 @@ access_result<jsoncons::string_view> item::get_string(std::string& value) const
         auto sv = *r;
         value.append(sv.data(), sv.size());
     }
+    return result_type{jsoncons::string_view(value.data(), value.size())};
 }
 
 inline 
@@ -1087,12 +1088,28 @@ access_result<jsoncons::span<const uint8_t>> item::get_byte_string(std::vector<u
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    std::vector<uint8_t> content(content_size());
-    if (!content.empty())
+
+    value.clear();
+    if (head_.indefinite())
     {
-        copy_content(content.data());
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_byte_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            auto sv = *r;
+            value.insert(value.end(), sv.begin(), sv.end());
+        }
     }
-    value = std::move(content);
+    else
+    {
+        auto r = get_byte_string();
+        auto sv = *r;
+        value.insert(value.begin(), sv.begin(), sv.end());
+    }
+
     return result_type{span<const uint8_t>(value.data(), value.size())};
 }
 
