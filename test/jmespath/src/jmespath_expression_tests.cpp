@@ -270,3 +270,14 @@ TEST_CASE("jmespath unexpected character in function arguments or multi-select h
     CHECK(jmespath::search(doc, "length(a)") == json(2));
     CHECK(jmespath::search(doc, "{ x: b, y: length(a) }") == json::parse(R"({"x":3,"y":2})"));
 }
+
+TEST_CASE("jmespath pipe binds more loosely than or, and, not and comparisons")
+{
+    auto doc = json::parse(R"({"a":{"c":5},"b":{"c":7},"x":1})");
+
+    CHECK(jmespath::search(doc, "a || b | c") == json(5));
+    CHECK(jmespath::search(doc, "x && b | c") == json(7));
+    CHECK(jmespath::search(doc, "!x | c") == json::null());
+    CHECK(jmespath::search(doc, "x == `1` | c") == json::null());
+    CHECK(jmespath::search(doc, "(a || b) | c") == json(5));
+}
