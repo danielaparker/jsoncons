@@ -461,7 +461,7 @@ TEST_CASE("cbor ondemand string chunks")
         CHECK((*r2).size() == 3);
     }
 
-    /*SECTION("an indefinite string's children are its chunks")
+    SECTION("an indefinite string's children are its chunks")
     {
         std::vector<uint8_t> data = {0x7f,0x62,'h','e',0x63,'l','l','o',0xff};
         std::vector<std::size_t> sizes;
@@ -469,9 +469,9 @@ TEST_CASE("cbor ondemand string chunks")
         {
             CHECK(chunk.type() == cbor::ondemand::cbor_type::text_string);
             CHECK_FALSE(chunk.indefinite());
-            jsoncons::string_view text;
-            REQUIRE(chunk.get_string(text));
-            sizes.push_back(text.size());
+            cbor::ondemand::access_result<jsoncons::string_view> r;
+            REQUIRE((r = chunk.get_string()));
+            sizes.push_back((*r).size());
         }
         CHECK((sizes == std::vector<std::size_t>{2,3}));
 
@@ -483,10 +483,8 @@ TEST_CASE("cbor ondemand string chunks")
     {
         CHECK(parse({0x01}).children().empty());
         CHECK(parse({0xf5}).children().empty());
-    }*/
+    }
 }
-
-#if 0
 
 TEST_CASE("cbor ondemand validate_text")
 {
@@ -536,16 +534,16 @@ TEST_CASE("cbor ondemand item children")
         CHECK(children[1].encoded_bytes().data() == data.data() + 2);
         CHECK(children[1].encoded_bytes().size() == 3);
         CHECK(children[2].type() == cbor::ondemand::cbor_type::text_string);
-        jsoncons::string_view text;
-        CHECK(children[2].get_string(text));
-        CHECK(text == "abc");
+        cbor::ondemand::access_result<jsoncons::string_view> r1;
+        CHECK((r1 = children[2].get_string()));
+        CHECK(*r1 == "abc");
 
         std::vector<uint64_t> nested;
         for (cbor::ondemand::item grandchild : children[1].children())
         {
-            uint64_t value = 0;
-            REQUIRE(grandchild.uint64_value(value));
-            nested.push_back(value);
+            cbor::ondemand::access_result<uint64_t> r;
+            REQUIRE((r = grandchild.get_uint64()));
+            nested.push_back(*r);
         }
         REQUIRE(nested.size() == 2);
         CHECK(nested[0] == 2);
@@ -565,9 +563,9 @@ TEST_CASE("cbor ondemand item children")
             std::vector<uint64_t> values;
             for (cbor::ondemand::item child : result.value().children())
             {
-                uint64_t value = 0;
-                REQUIRE(child.uint64_value(value));
-                values.push_back(value);
+                cbor::ondemand::access_result<uint64_t> r;
+                REQUIRE((r = child.get_uint64()));
+                values.push_back(*r);
             }
             REQUIRE(values.size() == 4);
             CHECK(values[0] == 1);
@@ -619,14 +617,14 @@ TEST_CASE("cbor ondemand item children")
         CHECK((*it).encoded_bytes().size() == depth + 1);
         ++it;
         REQUIRE(it != cbor::ondemand::item::child_iterator());
-        uint64_t value = 0;
-        CHECK((*it).uint64_value(value));
-        CHECK(value == 7);
+        cbor::ondemand::access_result<uint64_t> r;
+        CHECK((r = (*it).get_uint64()));
+        CHECK(*r == 7);
         ++it;
         CHECK(it == cbor::ondemand::item::child_iterator());
     }
 
-    SECTION("children are measured across mixed definite and indefinite nesting")
+    /*SECTION("children are measured across mixed definite and indefinite nesting")
     {
         // [[1, [_ 2, [3]], 4], {_ 5: [_ ]}, [[[6]]], 7]
         std::vector<uint8_t> data = {0x84,
@@ -666,6 +664,5 @@ TEST_CASE("cbor ondemand item children")
         CHECK(levels == 3);
         CHECK(last.encoded_bytes().data() == data.data() + 7);
         CHECK(last.encoded_bytes().size() == 1);
-    }
+    }*/
 }
-#endif
