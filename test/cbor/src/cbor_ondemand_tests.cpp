@@ -395,14 +395,14 @@ TEST_CASE("cbor ondemand typed accessors")
         CHECK_FALSE(parse(bytes).get_string());
     }
 
-    /*SECTION("bytes views definite strings in place")
+    SECTION("bytes views definite strings in place")
     {
         std::vector<uint8_t> data = {0x43,0x01,0x02,0x03};
-        jsoncons::span<const uint8_t> bs;
-        REQUIRE(parse(data).bytes(bs));
-        CHECK(bs.data() == data.data() + 1);
-        CHECK(bs.size() == 3);
-    }*/
+        cbor::ondemand::access_result<jsoncons::span<const uint8_t>> r;
+        REQUIRE((r = parse(data).get_byte_string()));
+        CHECK((*r).data() == data.data() + 1);
+        CHECK((*r).size() == 3);
+    }
 }
 #if 0
 TEST_CASE("cbor ondemand copying accessors are transactional")
