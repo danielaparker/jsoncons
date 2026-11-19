@@ -17,6 +17,7 @@
 #include <utility> // std::move
 #include <vector>
 #include <map>
+#include <set>
 
 #include <jsoncons/utility/number_writers.hpp>
 #include <jsoncons/json_type.hpp>
@@ -1436,6 +1437,30 @@ namespace jsonpointer {
     template <typename Json, typename Iterator>
     jsoncons::optional<Json> try_unflatten_array(Iterator first, Iterator last, std::size_t offset)
     {
+        // Decide whether this level is an array before unflattening any of it,
+        // otherwise a level that turns out to be an object is unflattened twice,
+        // and nested levels of numeric keys take exponential time.
+        std::set<std::size_t> indices;
+        for (auto it = first; it != last; ++it)
+        {
+            if (offset >= it->first.tokens().size())
+            {
+                return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
+            }
+            const auto& s = *(it->first.tokens().begin() + offset);
+            std::size_t n;
+            auto r = jsoncons::dec_to_integer(s.data(), s.size(), n);
+            if (r.ec != std::errc{})
+            {
+                return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
+            }
+            indices.insert(n);
+        }
+        if (!indices.empty() && *indices.rbegin() != indices.size() - 1)
+        {
+            return unflatten_object<Json,Iterator>(first, last, offset, unflatten_options{});
+        }
+
         std::map<std::size_t,Json> m;
 
         auto it = first;

@@ -390,3 +390,41 @@ TEST_CASE("jsonpointer unflatten tests 3")
     }
 }
 
+TEST_CASE("jsonpointer unflatten deeply nested numeric keys")
+{
+    SECTION("object levels with non-consecutive numeric keys")
+    {
+        // Each level is an object keyed "1", which is not an array index
+        // sequence. This used to take time exponential in the depth.
+        std::string key;
+        jsoncons::json expected(0);
+        for (int i = 0; i < 64; ++i)
+        {
+            key += "/1";
+            jsoncons::json level(jsoncons::json_object_arg);
+            level.try_emplace("1", std::move(expected));
+            expected = std::move(level);
+        }
+        jsoncons::json flattened(jsoncons::json_object_arg);
+        flattened.try_emplace(key, 0);
+
+        CHECK(expected == jsonpointer::unflatten(flattened));
+    }
+    SECTION("array levels")
+    {
+        std::string key;
+        jsoncons::json expected(0);
+        for (int i = 0; i < 64; ++i)
+        {
+            key += "/0";
+            jsoncons::json level(jsoncons::json_array_arg);
+            level.push_back(std::move(expected));
+            expected = std::move(level);
+        }
+        jsoncons::json flattened(jsoncons::json_object_arg);
+        flattened.try_emplace(key, 0);
+
+        CHECK(expected == jsonpointer::unflatten(flattened));
+    }
+}
+
