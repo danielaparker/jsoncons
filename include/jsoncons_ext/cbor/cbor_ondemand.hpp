@@ -39,7 +39,7 @@ enum class access_errc
     result_out_of_range, 
 };
 
-class access_error_category
+class access_error_category_impl
     : public std::error_category
 {
 public:
@@ -66,9 +66,16 @@ public:
 };
 
 inline 
+const std::error_category& access_error_category() noexcept
+{
+  static const access_error_category_impl instance;
+  return instance;
+}
+
+inline 
 std::error_code make_error_code(access_errc e) noexcept
 {
-    return std::error_code(static_cast<int>(e), access_error_category{});
+    return std::error_code(static_cast<int>(e), access_error_category());
 }
 
 class access_error
