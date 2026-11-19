@@ -1162,10 +1162,10 @@ inline bool validate_text(const item& text_item) noexcept
     }
     for (const item chunk : text_item.children())
     {
-        auto s = text_item.get_string();
-        if (s.has_value())
+        auto r = chunk.get_string();
+        if (r)
         {
-            string_view text = *s;
+            string_view text = *r;
             if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
             {
                 return false;
