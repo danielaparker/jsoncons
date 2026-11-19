@@ -43,6 +43,8 @@ master
 
   - Git Issue PR #807: Skip memcpy when there is nothing to copy
 
+  - Git Issue PR #808: toon: enforce max_nesting_depth in toon_reader
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
