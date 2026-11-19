@@ -35,11 +35,11 @@ enum class access_errc
 {
     success = 0,
     invalid_type = 1,
-    indefinite_length,
+    indefinite,
     result_out_of_range, 
 };
 
-class access_error_category
+class access_error_category_impl
     : public std::error_category
 {
 public:
@@ -55,7 +55,7 @@ public:
                 return "Success";
             case access_errc::invalid_type:
                 return "Invalid type";
-            case access_errc::indefinite_length:
+            case access_errc::indefinite:
                 return "Indefinite length";
             case access_errc::result_out_of_range:
                 return "Result out of range";
@@ -66,9 +66,16 @@ public:
 };
 
 inline 
+const std::error_category& access_error_category() noexcept
+{
+  static const access_error_category_impl instance;
+  return instance;
+}
+
+inline 
 std::error_code make_error_code(access_errc e) noexcept
 {
-    return std::error_code(static_cast<int>(e), access_error_category{});
+    return std::error_code(static_cast<int>(e), access_error_category());
 }
 
 class access_error
@@ -261,7 +268,7 @@ namespace ondemand_detail {
         }
         if (head.indefinite())
         {
-            return result_type(jsoncons::unexpect, access_errc::indefinite_length);
+            return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value))};
     }
@@ -276,7 +283,7 @@ namespace ondemand_detail {
         }
         if (head.indefinite())
         {
-            return result_type(jsoncons::unexpect, access_errc::indefinite_length);
+            return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{span<const uint8_t>(content, static_cast<std::size_t>(head.value))};
     }
@@ -726,9 +733,9 @@ public:
 
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
-    access_result<jsoncons::string_view> get_string(std::string& buffer) const;
+    jsoncons::expected<void,access_error> get_string(std::string& buffer) const;
 
-    access_result<span<const uint8_t>> get_byte_string(std::vector<uint8_t>& buffer) const;
+    jsoncons::expected<void,access_error> get_byte_string(std::vector<uint8_t>& buffer) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1042,37 +1049,68 @@ inline void item::copy_content(uint8_t* out) const noexcept
 }
 
 inline 
-access_result<jsoncons::string_view> item::get_string(std::string& value) const 
+jsoncons::expected<void,access_error> item::get_string(std::string& value) const 
 {
-    using result_type = access_result<jsoncons::string_view>;
+    using result_type = jsoncons::expected<void,access_error>;
     if (head_.major_type != cbor::detail::cbor_major_type::text_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    std::string content(content_size(), '\0');
-    if (!content.empty())
+
+    value.clear();
+    if (head_.indefinite())
     {
-        copy_content(reinterpret_cast<uint8_t*>(&content[0]));
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            auto sv = *r;
+            value.append(sv.data(), sv.size());
+        }
     }
-    value = std::move(content);
-    return result_type{string_view(value.data(), value.size())};
+    else
+    {
+        auto r = get_string();
+        auto sv = *r;
+        value.append(sv.data(), sv.size());
+    }
+    return result_type{};
 }
 
 inline 
-access_result<jsoncons::span<const uint8_t>> item::get_byte_string(std::vector<uint8_t>& value) const
+jsoncons::expected<void,access_error> item::get_byte_string(std::vector<uint8_t>& value) const
 {
-    using result_type = access_result<span<const uint8_t>>;
+    using result_type = jsoncons::expected<void,access_error>;
     if (head_.major_type != cbor::detail::cbor_major_type::byte_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    std::vector<uint8_t> content(content_size());
-    if (!content.empty())
+
+    value.clear();
+    if (head_.indefinite())
     {
-        copy_content(content.data());
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_byte_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            auto sv = *r;
+            value.insert(value.end(), sv.begin(), sv.end());
+        }
     }
-    value = std::move(content);
-    return result_type{span<const uint8_t>(value.data(), value.size())};
+    else
+    {
+        auto r = get_byte_string();
+        auto sv = *r;
+        value.insert(value.begin(), sv.begin(), sv.end());
+    }
+
+    return result_type{};
 }
 
 struct scan_result
