@@ -645,7 +645,7 @@ TEST_CASE("cbor ondemand item children")
         CHECK((sizes == std::vector<std::size_t>{8,5,4,1}));
     }
 
-    /*SECTION("the last child of a definite container ends where its parent does")
+    SECTION("the last child of a definite container ends where its parent does")
     {
         // [1, {"a": [2, 3]}] then trailing bytes
         std::vector<uint8_t> data = {0x82,0x01,0xa1,0x61,'a',0x82,0x02,0x03,0x01,0x02};
@@ -664,5 +664,5 @@ TEST_CASE("cbor ondemand item children")
         CHECK(levels == 3);
         CHECK(last.encoded_bytes().data() == data.data() + 7);
         CHECK(last.encoded_bytes().size() == 1);
-    }*/
+    }
 }
