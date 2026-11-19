@@ -35,7 +35,7 @@ enum class access_errc
 {
     success = 0,
     invalid_type = 1,
-    indefinite_length,
+    indefinite,
     result_out_of_range, 
 };
 
@@ -55,7 +55,7 @@ public:
                 return "Success";
             case access_errc::invalid_type:
                 return "Invalid type";
-            case access_errc::indefinite_length:
+            case access_errc::indefinite:
                 return "Indefinite length";
             case access_errc::result_out_of_range:
                 return "Result out of range";
@@ -268,7 +268,7 @@ namespace ondemand_detail {
         }
         if (head.indefinite())
         {
-            return result_type(jsoncons::unexpect, access_errc::indefinite_length);
+            return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value))};
     }
@@ -283,7 +283,7 @@ namespace ondemand_detail {
         }
         if (head.indefinite())
         {
-            return result_type(jsoncons::unexpect, access_errc::indefinite_length);
+            return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{span<const uint8_t>(content, static_cast<std::size_t>(head.value))};
     }
@@ -1056,13 +1056,27 @@ access_result<jsoncons::string_view> item::get_string(std::string& value) const
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    std::string content(content_size(), '\0');
-    if (!content.empty())
+
+    value.clear();
+    if (head_.indefinite())
     {
-        copy_content(reinterpret_cast<uint8_t*>(&content[0]));
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            auto sv = *r;
+            value.append(sv.data(), sv.size());
+        }
     }
-    value = std::move(content);
-    return result_type{string_view(value.data(), value.size())};
+    else
+    {
+        auto r = get_string();
+        auto sv = *r;
+        value.append(sv.data(), sv.size());
+    }
 }
 
 inline 
