@@ -82,9 +82,9 @@ public:
     access_result<bool> get_bool() const noexcept;
     access_result<double> get_double() const noexcept;
     access_result<jsoncons::string_view> get_string() const noexcept;
-    access_result<span<const uint8_t>> get_byte_string() const noexcep;t
-    access_result<jsoncons::string_view> get_string(std::string& buffer) const;
-    access_result<span<const uint8_t>> get_byte_string(std::vector<uint8_t>& buffer) const;
+    access_result<span<const uint8_t>> get_byte_string() const noexcept;
+    expected<void,access_error><jsoncons::string_view> get_string(std::string& buffer) const;
+    expected<void,access_error> get_byte_string(std::vector<uint8_t>& buffer) const;
 };
 ```
 

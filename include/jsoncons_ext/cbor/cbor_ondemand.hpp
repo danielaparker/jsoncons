@@ -733,9 +733,9 @@ public:
 
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
-    access_result<jsoncons::string_view> get_string(std::string& buffer) const;
+    jsoncons::expected<void,access_error> get_string(std::string& buffer) const;
 
-    access_result<span<const uint8_t>> get_byte_string(std::vector<uint8_t>& buffer) const;
+    jsoncons::expected<void,access_error> get_byte_string(std::vector<uint8_t>& buffer) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1049,9 +1049,9 @@ inline void item::copy_content(uint8_t* out) const noexcept
 }
 
 inline 
-access_result<jsoncons::string_view> item::get_string(std::string& value) const 
+jsoncons::expected<void,access_error> item::get_string(std::string& value) const 
 {
-    using result_type = access_result<jsoncons::string_view>;
+    using result_type = jsoncons::expected<void,access_error>;
     if (head_.major_type != cbor::detail::cbor_major_type::text_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1077,13 +1077,13 @@ access_result<jsoncons::string_view> item::get_string(std::string& value) const
         auto sv = *r;
         value.append(sv.data(), sv.size());
     }
-    return result_type{jsoncons::string_view(value.data(), value.size())};
+    return result_type{};
 }
 
 inline 
-access_result<jsoncons::span<const uint8_t>> item::get_byte_string(std::vector<uint8_t>& value) const
+jsoncons::expected<void,access_error> item::get_byte_string(std::vector<uint8_t>& value) const
 {
-    using result_type = access_result<span<const uint8_t>>;
+    using result_type = jsoncons::expected<void,access_error>;
     if (head_.major_type != cbor::detail::cbor_major_type::byte_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1110,7 +1110,7 @@ access_result<jsoncons::span<const uint8_t>> item::get_byte_string(std::vector<u
         value.insert(value.begin(), sv.begin(), sv.end());
     }
 
-    return result_type{span<const uint8_t>(value.data(), value.size())};
+    return result_type{};
 }
 
 struct scan_result
