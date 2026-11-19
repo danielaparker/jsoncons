@@ -624,7 +624,7 @@ TEST_CASE("cbor ondemand item children")
         CHECK(it == cbor::ondemand::item::child_iterator());
     }
 
-    /*SECTION("children are measured across mixed definite and indefinite nesting")
+    SECTION("children are measured across mixed definite and indefinite nesting")
     {
         // [[1, [_ 2, [3]], 4], {_ 5: [_ ]}, [[[6]]], 7]
         std::vector<uint8_t> data = {0x84,
@@ -645,7 +645,7 @@ TEST_CASE("cbor ondemand item children")
         CHECK((sizes == std::vector<std::size_t>{8,5,4,1}));
     }
 
-    SECTION("the last child of a definite container ends where its parent does")
+    /*SECTION("the last child of a definite container ends where its parent does")
     {
         // [1, {"a": [2, 3]}] then trailing bytes
         std::vector<uint8_t> data = {0x82,0x01,0xa1,0x61,'a',0x82,0x02,0x03,0x01,0x02};
