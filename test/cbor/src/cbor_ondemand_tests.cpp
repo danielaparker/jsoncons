@@ -425,7 +425,7 @@ TEST_CASE("cbor ondemand copying accessors are transactional")
         CHECK((buffer == std::vector<uint8_t>{0x01,0x02,0x03}));
     }
 
-    /*SECTION("the destination is untouched on kind mismatch")
+    SECTION("the destination is untouched on kind mismatch")
     {
         std::string s = "sentinel";
         CHECK_FALSE(parse({0x41,0x01}).get_string(s));
@@ -441,11 +441,11 @@ TEST_CASE("cbor ondemand copying accessors are transactional")
         std::vector<uint8_t> data = {0x42,0x01,0x02};
         auto result = cbor::ondemand::parse_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        REQUIRE(result.value().bytes(data));   // the item borrows `data` itself
+        REQUIRE(result.value().get_byte_string(data));   // the item borrows `data` itself
         CHECK((data == std::vector<uint8_t>{0x01,0x02}));
-    }*/
+    }
 }
-#if 0
+
 
 TEST_CASE("cbor ondemand string chunks")
 {
@@ -453,15 +453,15 @@ TEST_CASE("cbor ondemand string chunks")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
         CHECK(parse(data).children().empty());
-        jsoncons::span<const uint8_t> content;
-        CHECK_FALSE(parse(data).bytes(content));
-        jsoncons::string_view text;
-        REQUIRE(parse(data).text(text));
-        CHECK(reinterpret_cast<const uint8_t*>(text.data()) == data.data() + 1);
-        CHECK(text.size() == 3);
+        cbor::ondemand::access_result<jsoncons::span<const uint8_t>> r;
+        CHECK_FALSE((r = parse(data).get_byte_string()));
+        cbor::ondemand::access_result<jsoncons::string_view> r2;
+        REQUIRE((r2 = parse(data).get_string()));
+        CHECK(reinterpret_cast<const uint8_t*>((*r2).data()) == data.data() + 1);
+        CHECK((*r2).size() == 3);
     }
 
-    SECTION("an indefinite string's children are its chunks")
+    /*SECTION("an indefinite string's children are its chunks")
     {
         std::vector<uint8_t> data = {0x7f,0x62,'h','e',0x63,'l','l','o',0xff};
         std::vector<std::size_t> sizes;
@@ -470,7 +470,7 @@ TEST_CASE("cbor ondemand string chunks")
             CHECK(chunk.type() == cbor::ondemand::cbor_type::text_string);
             CHECK_FALSE(chunk.indefinite());
             jsoncons::string_view text;
-            REQUIRE(chunk.text(text));
+            REQUIRE(chunk.get_string(text));
             sizes.push_back(text.size());
         }
         CHECK((sizes == std::vector<std::size_t>{2,3}));
@@ -483,8 +483,10 @@ TEST_CASE("cbor ondemand string chunks")
     {
         CHECK(parse({0x01}).children().empty());
         CHECK(parse({0xf5}).children().empty());
-    }
+    }*/
 }
+
+#if 0
 
 TEST_CASE("cbor ondemand validate_text")
 {
@@ -535,7 +537,7 @@ TEST_CASE("cbor ondemand item children")
         CHECK(children[1].encoded_bytes().size() == 3);
         CHECK(children[2].type() == cbor::ondemand::cbor_type::text_string);
         jsoncons::string_view text;
-        CHECK(children[2].text(text));
+        CHECK(children[2].get_string(text));
         CHECK(text == "abc");
 
         std::vector<uint64_t> nested;
