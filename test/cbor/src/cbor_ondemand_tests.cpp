@@ -376,26 +376,26 @@ TEST_CASE("cbor ondemand typed accessors")
         CHECK(*r == 10);
     }
 
-    /*SECTION("text views definite strings in place")
+    SECTION("text views definite strings in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
         cbor::ondemand::item text_item = parse(data);
-        jsoncons::string_view sv;
-        REQUIRE(text_item.text(sv));
-        CHECK(std::string(sv.data(), sv.size()) == "abc");
-        CHECK(reinterpret_cast<const uint8_t*>(sv.data()) == data.data() + 1);
+        cbor::ondemand::access_result<jsoncons::string_view> r;
+        REQUIRE((r = text_item.get_string()));
+        CHECK(std::string((*r).data(), (*r).size()) == "abc");
+        CHECK(reinterpret_cast<const uint8_t*>((*r).data()) == data.data() + 1);
 
         std::vector<uint8_t> empty = {0x60};
-        REQUIRE(parse(empty).text(sv));
-        CHECK(sv.empty());
+        REQUIRE((r = parse(empty).get_string()));
+        CHECK((*r).empty());
 
         std::vector<uint8_t> chunked = {0x7f,0x61,'a',0xff};
-        CHECK_FALSE(parse(chunked).text(sv));
+        CHECK_FALSE(parse(chunked).get_string());
         std::vector<uint8_t> bytes = {0x41,0x01};
-        CHECK_FALSE(parse(bytes).text(sv));
+        CHECK_FALSE(parse(bytes).get_string());
     }
 
-    SECTION("bytes views definite strings in place")
+    /*SECTION("bytes views definite strings in place")
     {
         std::vector<uint8_t> data = {0x43,0x01,0x02,0x03};
         jsoncons::span<const uint8_t> bs;
