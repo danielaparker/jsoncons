@@ -5630,10 +5630,29 @@ namespace detail {
                     output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
+                case token_kind::pipe:
+                {
+                    // A pipe binds more loosely than every operator, so the operators
+                    // waiting for their right side end here.
+                    auto it = operator_stack_.rbegin();
+                    while (it != operator_stack_.rend() && (*it).is_operator())
+                    {
+                        auto rhs = unwind_roperator(output_stack, *it);
+                        if (rhs.empty())
+                        {
+                            break;
+                        }
+                        it->expression_->add_expression(resources.create_expression(function_expression(std::move(rhs))));
+                        output_stack.push_back(std::move(*it));
+                        ++it;
+                    }
+                    operator_stack_.erase(it.base(), operator_stack_.end());
+                    output_stack.push_back(std::move(tok));
+                    break;
+                }
                 case token_kind::current_node:
                 case token_kind::variable_ref:
                 case token_kind::key:
-                case token_kind::pipe:
                     output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::argument:
