@@ -49,6 +49,8 @@ master
 
   - Git Issue PR #810: jmespath: stop parsing when an unbalanced ')' empties the state stack
 
+  - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 

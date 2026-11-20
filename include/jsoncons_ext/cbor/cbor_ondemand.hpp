@@ -127,7 +127,7 @@ constexpr int default_max_nesting_depth = 1024;
 
 // The major type of an item's head, after any leading tags. `simple` is
 // major type 7: simple values and floats, told apart by the argument.
-enum class cbor_type : uint8_t
+enum class item_type : uint8_t
 {
     unsigned_integer = 0,
     negative_integer = 0x20,
@@ -135,13 +135,13 @@ enum class cbor_type : uint8_t
     text_string      = 0x60,
     array            = 0x80,
     map              = 0xa0,
-    simple           = 0xe0,
     boolean          = 0xf5,
     null             = 0xf6,
     undefined        = 0xf7,
     float16          = 0xf9,
     float32          = 0xfa,
     float64          = 0xfb,
+    simple           = 0xe0,
 };                   
 
 struct scan_error
@@ -174,11 +174,11 @@ namespace ondemand_detail {
         return head.additional_info;
     }
 
-    inline cbor_type type(const item_head& head) noexcept
+    inline item_type type(const item_head& head) noexcept
     {
         if (head.major_type != cbor_major_type::simple)
         {
-            return static_cast<cbor_type>(static_cast<uint8_t>(head.major_type) << 5); 
+            return static_cast<item_type>(static_cast<uint8_t>(head.major_type) << 5); 
         }
         else
         {
@@ -186,19 +186,19 @@ namespace ondemand_detail {
             {
                 case 20:
                 case 21:
-                    return cbor_type::boolean;
+                    return item_type::boolean;
                 case 22:
-                    return cbor_type::null;
+                    return item_type::null;
                 case 23:
-                    return cbor_type::undefined;
+                    return item_type::undefined;
                 case 25:
-                    return cbor_type::float16;
+                    return item_type::float16;
                 case 26:
-                    return cbor_type::float32;
+                    return item_type::float32;
                 case 27:
-                    return cbor_type::float64;
+                    return item_type::float64;
                 default:
-                    return cbor_type::simple;
+                    return item_type::simple;
             }
         }
     }
@@ -249,7 +249,7 @@ namespace ondemand_detail {
     {
         using result_type = access_result<bool>;
 
-        if (type(head) != cbor_type::boolean)
+        if (type(head) != item_type::boolean)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }        
@@ -706,7 +706,7 @@ public:
         return ondemand_detail::additional_info(head_);
     }
 
-    cbor_type type() const noexcept
+    item_type type() const noexcept
     {
         return ondemand_detail::type(head_);
     }
@@ -773,9 +773,9 @@ public:
 
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
-    jsoncons::expected<void,access_error> get_string(std::string& buffer) const;
+    access_result<void> get_string(std::string& buffer) const;
 
-    jsoncons::expected<void,access_error> get_byte_string(std::vector<uint8_t>& buffer) const;
+    access_result<void> get_byte_string(std::vector<uint8_t>& buffer) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1089,9 +1089,9 @@ inline void item::copy_content(uint8_t* out) const noexcept
 }
 
 inline 
-jsoncons::expected<void,access_error> item::get_string(std::string& value) const 
+access_result<void> item::get_string(std::string& value) const 
 {
-    using result_type = jsoncons::expected<void,access_error>;
+    using result_type = access_result<void>;
     if (head_.major_type != cbor::cbor_major_type::text_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1121,9 +1121,9 @@ jsoncons::expected<void,access_error> item::get_string(std::string& value) const
 }
 
 inline 
-jsoncons::expected<void,access_error> item::get_byte_string(std::vector<uint8_t>& value) const
+access_result<void> item::get_byte_string(std::vector<uint8_t>& value) const
 {
-    using result_type = jsoncons::expected<void,access_error>;
+    using result_type = access_result<void>;
     if (head_.major_type != cbor::cbor_major_type::byte_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1228,7 +1228,7 @@ expected<item, scan_error> parse_item(const Container&&, int = default_max_nesti
 // chunk of an indefinite-length string separately (RFC 8949 3.2.3).
 inline bool validate_text(const item& text_item) noexcept
 {
-    if (text_item.type() != cbor_type::text_string)
+    if (text_item.type() != item_type::text_string)
     {
         return false;
     }
