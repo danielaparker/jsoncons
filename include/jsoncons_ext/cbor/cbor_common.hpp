@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
-#define JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_COMMON_HPP
+#define JSONCONS_EXT_CBOR_CBOR_COMMON_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -22,6 +22,19 @@
 
 namespace jsoncons { 
 namespace cbor { 
+
+enum class cbor_major_type : uint8_t
+{
+    unsigned_integer = 0x00,
+    negative_integer = 0x01,
+    byte_string = 0x02,
+    text_string = 0x03,
+    array = 0x04,
+    map = 0x05,   
+    semantic_tag = 0x06,
+    simple = 0x7
+};
+
 namespace detail {
 
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_010_mask = 0xE0;
@@ -35,18 +48,6 @@ JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_f_shift = 4;
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_s_shift = 3;
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_e_shift = 2;
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_ll_shift = 0;
-
-enum class cbor_major_type : uint8_t
-{
-    unsigned_integer = 0x00,
-    negative_integer = 0x01,
-    byte_string = 0x02,
-    text_string = 0x03,
-    array = 0x04,
-    map = 0x05,   
-    semantic_tag = 0x06,
-    simple = 0x7
-};
 
 namespace additional_info
 {

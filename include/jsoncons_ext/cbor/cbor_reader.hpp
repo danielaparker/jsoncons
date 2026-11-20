@@ -16,7 +16,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/source.hpp>
 
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_common.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>

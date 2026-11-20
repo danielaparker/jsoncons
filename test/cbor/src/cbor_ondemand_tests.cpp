@@ -263,7 +263,7 @@ TEST_CASE("cbor ondemand item exposes wire structure")
         CHECK(parse({0x61,'a'}).type() == cbor::ondemand::cbor_type::text_string);
         CHECK(parse({0x80}).type() == cbor::ondemand::cbor_type::array);
         CHECK(parse({0xa0}).type() == cbor::ondemand::cbor_type::map);
-        CHECK(parse({0xf4}).type() == cbor::ondemand::cbor_type::simple);
+        CHECK(parse({0xf4}).type() == cbor::ondemand::cbor_type::boolean);
     }
 
     SECTION("argument exposes the head argument")

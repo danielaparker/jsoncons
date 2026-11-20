@@ -9,7 +9,7 @@
 
 #include <cwchar>
 
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_common.hpp>
 
 namespace jsoncons { 
 namespace cbor {

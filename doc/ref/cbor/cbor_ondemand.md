@@ -63,14 +63,15 @@ stopped. Scanning allocates only when nesting exceeds 32 open containers.
 enum class cbor_type
 {
     unsigned_integer, negative_integer, byte_string, text_string,
-    array, map, simple
+    array, map, simple, boolean, null, undefined, float16, float32, float64
 };
 
 class item
 {
 public:
     span<const uint8_t> encoded_bytes() const noexcept;
-    cbor_type kind() const noexcept;
+    cbor_major_type major_type() const noexcept;
+    cbor_type type() const noexcept;
     uint64_t argument() const noexcept;
     bool indefinite() const noexcept;
 

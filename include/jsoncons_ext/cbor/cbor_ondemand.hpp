@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_common.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 
 // Zero-copy access to CBOR data in its encoded form. Scanning checks
@@ -135,7 +135,13 @@ enum class cbor_type : uint8_t
     text_string,
     array,
     map,
-    simple
+    simple,
+    boolean,
+    null,
+    undefined,
+    float16,
+    float32,
+    float64
 };
 
 struct scan_error
@@ -148,7 +154,7 @@ namespace ondemand_detail {
 
     struct item_head
     {
-        cbor::detail::cbor_major_type major_type{};
+        cbor::cbor_major_type major_type{};
         uint8_t additional_info{0};
         uint64_t value{0};
 
@@ -158,17 +164,49 @@ namespace ondemand_detail {
         }
     };
 
-    inline cbor_type kind(const item_head& head) noexcept
+    inline cbor_major_type major_type(const item_head& head) noexcept
+    {
+        return head.major_type;
+    }
+
+    inline cbor_type type(const item_head& head) noexcept
     {
         switch (head.major_type)
         {
-            case cbor::detail::cbor_major_type::unsigned_integer: return cbor_type::unsigned_integer;
-            case cbor::detail::cbor_major_type::negative_integer: return cbor_type::negative_integer;
-            case cbor::detail::cbor_major_type::byte_string:      return cbor_type::byte_string;
-            case cbor::detail::cbor_major_type::text_string:      return cbor_type::text_string;
-            case cbor::detail::cbor_major_type::array:            return cbor_type::array;
-            case cbor::detail::cbor_major_type::map:              return cbor_type::map;
-            default:                                              return cbor_type::simple;
+            case cbor::cbor_major_type::unsigned_integer: return cbor_type::unsigned_integer;
+            case cbor::cbor_major_type::negative_integer: return cbor_type::negative_integer;
+            case cbor::cbor_major_type::byte_string:      return cbor_type::byte_string;
+            case cbor::cbor_major_type::text_string:      return cbor_type::text_string;
+            case cbor::cbor_major_type::array:            return cbor_type::array;
+            case cbor::cbor_major_type::map:              return cbor_type::map;
+            default: 
+            {
+                if (head.additional_info == 20 || head.additional_info == 21)
+                {
+                    return cbor_type::boolean;
+                }
+                if (head.additional_info == 22)
+                {
+                    return cbor_type::null;
+                }
+                if (head.additional_info == 23)
+                {
+                    return cbor_type::undefined;
+                }
+                if (head.additional_info == 25)
+                {
+                    return cbor_type::float16;
+                }
+                if (head.additional_info == 26)
+                {
+                    return cbor_type::float32;
+                }
+                if (head.additional_info == 27)
+                {
+                    return cbor_type::float64;
+                }
+                return cbor_type::simple;
+            }
         }
     }
 
@@ -176,7 +214,7 @@ namespace ondemand_detail {
     access_result<uint64_t> get_uint64(const item_head& head) noexcept
     {
         using result_type = access_result<uint64_t>;
-        if (head.major_type != cbor::detail::cbor_major_type::unsigned_integer)
+        if (head.major_type != cbor::cbor_major_type::unsigned_integer)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
@@ -188,7 +226,7 @@ namespace ondemand_detail {
     {
         using result_type = access_result<int64_t>;
         const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
-        if (head.major_type == cbor::detail::cbor_major_type::unsigned_integer)
+        if (head.major_type == cbor::cbor_major_type::unsigned_integer)
         {
             if (head.value <= int64_max)
             {
@@ -199,7 +237,7 @@ namespace ondemand_detail {
                 return result_type(jsoncons::unexpect, access_errc::result_out_of_range);
             }
         }
-        if (head.major_type == cbor::detail::cbor_major_type::negative_integer)
+        if (head.major_type == cbor::cbor_major_type::negative_integer)
         {
             if (head.value <= int64_max)
             {
@@ -218,11 +256,11 @@ namespace ondemand_detail {
     {
         using result_type = access_result<bool>;
 
-        if (head.major_type != cbor::detail::cbor_major_type::simple ||
+        if (head.major_type != cbor::cbor_major_type::simple ||
             (head.additional_info != 20 && head.additional_info != 21))
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
-        }
+        }        
         return head.additional_info == 21;
     }
 
@@ -231,7 +269,7 @@ namespace ondemand_detail {
     {
         using result_type = access_result<double>;
 
-        if (head.major_type != cbor::detail::cbor_major_type::simple)
+        if (head.major_type != cbor::cbor_major_type::simple)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
@@ -262,7 +300,7 @@ namespace ondemand_detail {
     access_result<jsoncons::string_view> get_string(const item_head& head, const uint8_t* content) noexcept
     {
         using result_type = access_result<jsoncons::string_view>;
-        if (head.major_type != cbor::detail::cbor_major_type::text_string)
+        if (head.major_type != cbor::cbor_major_type::text_string)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
@@ -277,7 +315,7 @@ namespace ondemand_detail {
     access_result<jsoncons::span<const uint8_t>> get_byte_string(const item_head& head, const uint8_t* content) noexcept
     {
         using result_type = access_result<span<const uint8_t>>;
-        if (head.major_type != cbor::detail::cbor_major_type::byte_string)
+        if (head.major_type != cbor::cbor_major_type::byte_string)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
@@ -332,7 +370,7 @@ namespace ondemand_detail {
         }
 
         const uint8_t initial = *p++;
-        head.major_type = static_cast<cbor::detail::cbor_major_type>(initial >> 5);
+        head.major_type = static_cast<cbor::cbor_major_type>(initial >> 5);
         head.additional_info = initial & 0x1f;
         head.value = 0;
 
@@ -340,10 +378,10 @@ namespace ondemand_detail {
         {
             switch (head.major_type)
             {
-                case cbor::detail::cbor_major_type::byte_string:
-                case cbor::detail::cbor_major_type::text_string:
-                case cbor::detail::cbor_major_type::array:
-                case cbor::detail::cbor_major_type::map:
+                case cbor::cbor_major_type::byte_string:
+                case cbor::cbor_major_type::text_string:
+                case cbor::cbor_major_type::array:
+                case cbor::cbor_major_type::map:
                     break;
                 default:
                     ec = cbor_errc::unknown_type;
@@ -357,7 +395,7 @@ namespace ondemand_detail {
         }
         // RFC 8949 3.3: a two-byte encoding of a simple value below 32
         // is not well-formed.
-        if (head.major_type == cbor::detail::cbor_major_type::simple &&
+        if (head.major_type == cbor::cbor_major_type::simple &&
             head.additional_info == 24 && head.value < 32)
         {
             ec = cbor_errc::unknown_type;
@@ -376,12 +414,12 @@ namespace ondemand_detail {
                 return false;
             }
         }
-        while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+        while (head.major_type == cbor::cbor_major_type::semantic_tag);
         return true;
     }
 
     inline bool skip_string_chunks(const uint8_t*& p, const uint8_t* end,
-                                  cbor::detail::cbor_major_type expected_major, cbor_errc& ec)
+                                  cbor::cbor_major_type expected_major, cbor_errc& ec)
     {
         for (;;)
         {
@@ -420,13 +458,13 @@ namespace ondemand_detail {
     {
         switch (head.major_type)
         {
-            case cbor::detail::cbor_major_type::unsigned_integer:
-            case cbor::detail::cbor_major_type::negative_integer:
-            case cbor::detail::cbor_major_type::simple:
+            case cbor::cbor_major_type::unsigned_integer:
+            case cbor::cbor_major_type::negative_integer:
+            case cbor::cbor_major_type::simple:
                 return true;
 
-            case cbor::detail::cbor_major_type::byte_string:
-            case cbor::detail::cbor_major_type::text_string:
+            case cbor::cbor_major_type::byte_string:
+            case cbor::cbor_major_type::text_string:
                 if (head.indefinite())
                 {
                     return skip_string_chunks(p, end, head.major_type, ec);
@@ -458,7 +496,7 @@ namespace ondemand_detail {
     // no count collides with a marker.
     inline uint64_t remaining_items(const item_head& head, std::size_t available) noexcept
     {
-        const bool is_map = head.major_type == cbor::detail::cbor_major_type::map;
+        const bool is_map = head.major_type == cbor::cbor_major_type::map;
         if (head.indefinite())
         {
             return is_map ? indefinite_map_key_marker : indefinite_array_marker;
@@ -583,8 +621,8 @@ namespace ondemand_detail {
                 {
                     return false;
                 }
-                if (head.major_type == cbor::detail::cbor_major_type::array ||
-                    head.major_type == cbor::detail::cbor_major_type::map)
+                if (head.major_type == cbor::cbor_major_type::array ||
+                    head.major_type == cbor::cbor_major_type::map)
                 {
                     break;
                 }
@@ -607,8 +645,8 @@ namespace ondemand_detail {
         uint64_t left = 0;
         for (;;)
         {
-            if (head.major_type == cbor::detail::cbor_major_type::array ||
-                head.major_type == cbor::detail::cbor_major_type::map)
+            if (head.major_type == cbor::cbor_major_type::array ||
+                head.major_type == cbor::cbor_major_type::map)
             {
                 if (head.indefinite())
                 {
@@ -618,7 +656,7 @@ namespace ondemand_detail {
                     (void)ok;
                     return p;
                 }
-                left += head.major_type == cbor::detail::cbor_major_type::map ? 2 * head.value : head.value;
+                left += head.major_type == cbor::cbor_major_type::map ? 2 * head.value : head.value;
             }
             else
             {
@@ -666,9 +704,14 @@ public:
         return bytes_;
     }
 
+    cbor_major_type major_type() const noexcept
+    {
+        return ondemand_detail::major_type(head_);
+    }
+
     cbor_type type() const noexcept
     {
-        return ondemand_detail::kind(head_);
+        return ondemand_detail::type(head_);
     }
 
     // The head's argument (RFC 8949 3): an integer's value, a string's
@@ -827,7 +870,7 @@ private:
         cbor_errc ec{};
         const uint8_t* p = pos_;
         const bool ok = ondemand_detail::read_head(p, stop_, head, ec);
-        assert(ok && head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+        assert(ok && head.major_type == cbor::cbor_major_type::semantic_tag);
         (void)ok;
         value_ = head.value;
         pos_ = p;
@@ -996,16 +1039,16 @@ inline item::child_range item::children() const noexcept
     const uint8_t* const end = bytes_.data() + bytes_.size();
     switch (head_.major_type)
     {
-        case cbor::detail::cbor_major_type::array:
-        case cbor::detail::cbor_major_type::map:
+        case cbor::cbor_major_type::array:
+        case cbor::cbor_major_type::map:
             if (!head_.indefinite())
             {
-                const bool is_map = head_.major_type == cbor::detail::cbor_major_type::map;
+                const bool is_map = head_.major_type == cbor::cbor_major_type::map;
                 return child_range(content_, end, is_map ? 2 * head_.value : head_.value);
             }
             return child_range(content_, end, ondemand_detail::indefinite_array_marker);
-        case cbor::detail::cbor_major_type::byte_string:
-        case cbor::detail::cbor_major_type::text_string:
+        case cbor::cbor_major_type::byte_string:
+        case cbor::cbor_major_type::text_string:
             if (head_.indefinite())
             {
                 return child_range(content_, end, ondemand_detail::indefinite_array_marker);
@@ -1052,7 +1095,7 @@ inline
 jsoncons::expected<void,access_error> item::get_string(std::string& value) const 
 {
     using result_type = jsoncons::expected<void,access_error>;
-    if (head_.major_type != cbor::detail::cbor_major_type::text_string)
+    if (head_.major_type != cbor::cbor_major_type::text_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
@@ -1084,7 +1127,7 @@ inline
 jsoncons::expected<void,access_error> item::get_byte_string(std::vector<uint8_t>& value) const
 {
     using result_type = jsoncons::expected<void,access_error>;
-    if (head_.major_type != cbor::detail::cbor_major_type::byte_string)
+    if (head_.major_type != cbor::cbor_major_type::byte_string)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
@@ -1139,8 +1182,8 @@ inline expected<scan_result, scan_error> scan(span<const uint8_t> input,
     const uint8_t* content = p;
     if (ok)
     {
-        if (head.major_type == cbor::detail::cbor_major_type::array ||
-            head.major_type == cbor::detail::cbor_major_type::map)
+        if (head.major_type == cbor::cbor_major_type::array ||
+            head.major_type == cbor::cbor_major_type::map)
         {
             ok = ondemand_detail::skip_container(p, end, head, max_nesting_depth, ec);
         }

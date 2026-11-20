@@ -19,7 +19,7 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_common.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 
 // Zero-copy access to CBOR data in its encoded form. Scanning checks
@@ -56,7 +56,7 @@ namespace view {
 
         struct item_head
         {
-            cbor::detail::cbor_major_type major_type{};
+            cbor::cbor_major_type major_type{};
             uint8_t additional_info{0};
             uint64_t value{0};
 
@@ -70,19 +70,19 @@ namespace view {
         {
             switch (head.major_type)
             {
-                case cbor::detail::cbor_major_type::unsigned_integer: return item_kind::unsigned_integer;
-                case cbor::detail::cbor_major_type::negative_integer: return item_kind::negative_integer;
-                case cbor::detail::cbor_major_type::byte_string:      return item_kind::byte_string;
-                case cbor::detail::cbor_major_type::text_string:      return item_kind::text_string;
-                case cbor::detail::cbor_major_type::array:            return item_kind::array;
-                case cbor::detail::cbor_major_type::map:              return item_kind::map;
+                case cbor::cbor_major_type::unsigned_integer: return item_kind::unsigned_integer;
+                case cbor::cbor_major_type::negative_integer: return item_kind::negative_integer;
+                case cbor::cbor_major_type::byte_string:      return item_kind::byte_string;
+                case cbor::cbor_major_type::text_string:      return item_kind::text_string;
+                case cbor::cbor_major_type::array:            return item_kind::array;
+                case cbor::cbor_major_type::map:              return item_kind::map;
                 default:                                              return item_kind::simple;
             }
         }
 
         inline bool uint64_value(const item_head& head, uint64_t& value) noexcept
         {
-            if (head.major_type != cbor::detail::cbor_major_type::unsigned_integer)
+            if (head.major_type != cbor::cbor_major_type::unsigned_integer)
             {
                 return false;
             }
@@ -93,12 +93,12 @@ namespace view {
         inline bool int64_value(const item_head& head, int64_t& value) noexcept
         {
             const uint64_t int64_max = static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
-            if (head.major_type == cbor::detail::cbor_major_type::unsigned_integer && head.value <= int64_max)
+            if (head.major_type == cbor::cbor_major_type::unsigned_integer && head.value <= int64_max)
             {
                 value = static_cast<int64_t>(head.value);
                 return true;
             }
-            if (head.major_type == cbor::detail::cbor_major_type::negative_integer && head.value <= int64_max)
+            if (head.major_type == cbor::cbor_major_type::negative_integer && head.value <= int64_max)
             {
                 value = -1 - static_cast<int64_t>(head.value);
                 return true;
@@ -108,7 +108,7 @@ namespace view {
 
         inline bool bool_value(const item_head& head, bool& value) noexcept
         {
-            if (head.major_type != cbor::detail::cbor_major_type::simple ||
+            if (head.major_type != cbor::cbor_major_type::simple ||
                 (head.additional_info != 20 && head.additional_info != 21))
             {
                 return false;
@@ -119,7 +119,7 @@ namespace view {
 
         inline bool double_value(const item_head& head, double& value) noexcept
         {
-            if (head.major_type != cbor::detail::cbor_major_type::simple)
+            if (head.major_type != cbor::cbor_major_type::simple)
             {
                 return false;
             }
@@ -149,7 +149,7 @@ namespace view {
 
         inline bool text(const item_head& head, const uint8_t* content, string_view& value) noexcept
         {
-            if (head.major_type != cbor::detail::cbor_major_type::text_string || head.indefinite())
+            if (head.major_type != cbor::cbor_major_type::text_string || head.indefinite())
             {
                 return false;
             }
@@ -159,7 +159,7 @@ namespace view {
 
         inline bool bytes(const item_head& head, const uint8_t* content, span<const uint8_t>& value) noexcept
         {
-            if (head.major_type != cbor::detail::cbor_major_type::byte_string || head.indefinite())
+            if (head.major_type != cbor::cbor_major_type::byte_string || head.indefinite())
             {
                 return false;
             }
@@ -211,7 +211,7 @@ namespace view {
             }
 
             const uint8_t initial = *p++;
-            head.major_type = static_cast<cbor::detail::cbor_major_type>(initial >> 5);
+            head.major_type = static_cast<cbor::cbor_major_type>(initial >> 5);
             head.additional_info = initial & 0x1f;
             head.value = 0;
 
@@ -219,10 +219,10 @@ namespace view {
             {
                 switch (head.major_type)
                 {
-                    case cbor::detail::cbor_major_type::byte_string:
-                    case cbor::detail::cbor_major_type::text_string:
-                    case cbor::detail::cbor_major_type::array:
-                    case cbor::detail::cbor_major_type::map:
+                    case cbor::cbor_major_type::byte_string:
+                    case cbor::cbor_major_type::text_string:
+                    case cbor::cbor_major_type::array:
+                    case cbor::cbor_major_type::map:
                         break;
                     default:
                         ec = cbor_errc::unknown_type;
@@ -236,7 +236,7 @@ namespace view {
             }
             // RFC 8949 3.3: a two-byte encoding of a simple value below 32
             // is not well-formed.
-            if (head.major_type == cbor::detail::cbor_major_type::simple &&
+            if (head.major_type == cbor::cbor_major_type::simple &&
                 head.additional_info == 24 && head.value < 32)
             {
                 ec = cbor_errc::unknown_type;
@@ -255,12 +255,12 @@ namespace view {
                     return false;
                 }
             }
-            while (head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+            while (head.major_type == cbor::cbor_major_type::semantic_tag);
             return true;
         }
 
         inline bool skip_string_chunks(const uint8_t*& p, const uint8_t* end,
-                                      cbor::detail::cbor_major_type expected_major, cbor_errc& ec)
+                                      cbor::cbor_major_type expected_major, cbor_errc& ec)
         {
             for (;;)
             {
@@ -299,13 +299,13 @@ namespace view {
         {
             switch (head.major_type)
             {
-                case cbor::detail::cbor_major_type::unsigned_integer:
-                case cbor::detail::cbor_major_type::negative_integer:
-                case cbor::detail::cbor_major_type::simple:
+                case cbor::cbor_major_type::unsigned_integer:
+                case cbor::cbor_major_type::negative_integer:
+                case cbor::cbor_major_type::simple:
                     return true;
 
-                case cbor::detail::cbor_major_type::byte_string:
-                case cbor::detail::cbor_major_type::text_string:
+                case cbor::cbor_major_type::byte_string:
+                case cbor::cbor_major_type::text_string:
                     if (head.indefinite())
                     {
                         return skip_string_chunks(p, end, head.major_type, ec);
@@ -337,7 +337,7 @@ namespace view {
         // no count collides with a marker.
         inline uint64_t remaining_items(const item_head& head, std::size_t available) noexcept
         {
-            const bool is_map = head.major_type == cbor::detail::cbor_major_type::map;
+            const bool is_map = head.major_type == cbor::cbor_major_type::map;
             if (head.indefinite())
             {
                 return is_map ? indefinite_map_key_marker : indefinite_array_marker;
@@ -462,8 +462,8 @@ namespace view {
                     {
                         return false;
                     }
-                    if (head.major_type == cbor::detail::cbor_major_type::array ||
-                        head.major_type == cbor::detail::cbor_major_type::map)
+                    if (head.major_type == cbor::cbor_major_type::array ||
+                        head.major_type == cbor::cbor_major_type::map)
                     {
                         break;
                     }
@@ -486,8 +486,8 @@ namespace view {
             uint64_t left = 0;
             for (;;)
             {
-                if (head.major_type == cbor::detail::cbor_major_type::array ||
-                    head.major_type == cbor::detail::cbor_major_type::map)
+                if (head.major_type == cbor::cbor_major_type::array ||
+                    head.major_type == cbor::cbor_major_type::map)
                 {
                     if (head.indefinite())
                     {
@@ -497,7 +497,7 @@ namespace view {
                         (void)ok;
                         return p;
                     }
-                    left += head.major_type == cbor::detail::cbor_major_type::map ? 2 * head.value : head.value;
+                    left += head.major_type == cbor::cbor_major_type::map ? 2 * head.value : head.value;
                 }
                 else
                 {
@@ -705,7 +705,7 @@ namespace view {
             cbor_errc ec{};
             const uint8_t* p = pos_;
             const bool ok = ondemand_detail::read_head(p, stop_, head, ec);
-            assert(ok && head.major_type == cbor::detail::cbor_major_type::semantic_tag);
+            assert(ok && head.major_type == cbor::cbor_major_type::semantic_tag);
             (void)ok;
             value_ = head.value;
             pos_ = p;
@@ -874,16 +874,16 @@ namespace view {
         const uint8_t* const end = bytes_.data() + bytes_.size();
         switch (head_.major_type)
         {
-            case cbor::detail::cbor_major_type::array:
-            case cbor::detail::cbor_major_type::map:
+            case cbor::cbor_major_type::array:
+            case cbor::cbor_major_type::map:
                 if (!head_.indefinite())
                 {
-                    const bool is_map = head_.major_type == cbor::detail::cbor_major_type::map;
+                    const bool is_map = head_.major_type == cbor::cbor_major_type::map;
                     return child_range(content_, end, is_map ? 2 * head_.value : head_.value);
                 }
                 return child_range(content_, end, ondemand_detail::indefinite_array_marker);
-            case cbor::detail::cbor_major_type::byte_string:
-            case cbor::detail::cbor_major_type::text_string:
+            case cbor::cbor_major_type::byte_string:
+            case cbor::cbor_major_type::text_string:
                 if (head_.indefinite())
                 {
                     return child_range(content_, end, ondemand_detail::indefinite_array_marker);
@@ -928,7 +928,7 @@ namespace view {
 
     inline bool item::text(std::string& value) const
     {
-        if (head_.major_type != cbor::detail::cbor_major_type::text_string)
+        if (head_.major_type != cbor::cbor_major_type::text_string)
         {
             return false;
         }
@@ -943,7 +943,7 @@ namespace view {
 
     inline bool item::bytes(std::vector<uint8_t>& value) const
     {
-        if (head_.major_type != cbor::detail::cbor_major_type::byte_string)
+        if (head_.major_type != cbor::cbor_major_type::byte_string)
         {
             return false;
         }
@@ -982,8 +982,8 @@ namespace view {
         const uint8_t* content = p;
         if (ok)
         {
-            if (head.major_type == cbor::detail::cbor_major_type::array ||
-                head.major_type == cbor::detail::cbor_major_type::map)
+            if (head.major_type == cbor::cbor_major_type::array ||
+                head.major_type == cbor::cbor_major_type::map)
             {
                 ok = ondemand_detail::skip_container(p, end, head, max_nesting_depth, ec);
             }
