@@ -256,3 +256,68 @@ std::string jstr = R"(
         CHECK(std::string("/x5") == result[1].instance_location().string());
     }
 }
+
+TEST_CASE("jsonschema strings with embedded nul")
+{
+    SECTION("pattern")
+    {
+        auto schema = jsonschema::make_json_schema(json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "string",
+    "pattern": "^[a-z]+$"
+}
+        )"));
+
+        CHECK(schema.is_valid(json::parse(R"("abc")")));
+        CHECK_FALSE(schema.is_valid(json::parse(R"("abc\u0000; rm -rf /")")));
+    }
+
+    SECTION("additionalProperties")
+    {
+        auto schema = jsonschema::make_json_schema(json::parse(R"(
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "properties": {
+        "name": {}
+    },
+    "additionalProperties": false
+}
+        )"));
+
+        CHECK(schema.is_valid(json::parse(R"({"name": 1})")));
+        CHECK_FALSE(schema.is_valid(json::parse(R"({"name\u0000x": 1})")));
+        CHECK_FALSE(schema.is_valid(json::parse(R"({"name": 1, "name\u0000x": 1})")));
+    }
+
+    SECTION("additionalProperties with a schema")
+    {
+        auto schema = jsonschema::make_json_schema(json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "name": {}
+    },
+    "additionalProperties": {"type": "string"}
+}
+        )"));
+
+        CHECK_FALSE(schema.is_valid(json::parse(R"({"name": 1, "name\u0000x": 1})")));
+    }
+
+    SECTION("unevaluatedProperties")
+    {
+        auto schema = jsonschema::make_json_schema(json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "name": {}
+    },
+    "unevaluatedProperties": false
+}
+        )"));
+
+        CHECK(schema.is_valid(json::parse(R"({"name": 1})")));
+        CHECK_FALSE(schema.is_valid(json::parse(R"({"name": 1, "name\u0000x": 1})")));
+    }
+}
