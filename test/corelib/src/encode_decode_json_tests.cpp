@@ -171,6 +171,32 @@ TEST_CASE("convert_array_test")
     }
 }
 
+TEST_CASE("decode std::array with wrong number of elements")
+{
+    SECTION("too few elements")
+    {
+        auto result = jsoncons::try_decode_json<std::array<int64_t,4>>(std::string("[7]"));
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::not_array == result.error().code());
+    }
+    SECTION("too many elements")
+    {
+        auto result = jsoncons::try_decode_json<std::array<int64_t,2>>(std::string("[1,2,3]"));
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::not_array == result.error().code());
+    }
+    SECTION("too many elements inside a container")
+    {
+        auto result = jsoncons::try_decode_json<std::vector<std::array<int64_t,2>>>(std::string("[[1,2,[9,9]],[3,4]]"));
+        REQUIRE_FALSE(result);
+    }
+    SECTION("empty array")
+    {
+        auto result = jsoncons::try_decode_json<std::array<int64_t,0>>(std::string("[]"));
+        CHECK(result);
+    }
+}
+
 TEST_CASE("convert vector of vector test")
 {
     std::vector<double> u{1,2,3,4};
