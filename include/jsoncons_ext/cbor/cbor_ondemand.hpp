@@ -129,20 +129,20 @@ constexpr int default_max_nesting_depth = 1024;
 // major type 7: simple values and floats, told apart by the argument.
 enum class cbor_type : uint8_t
 {
-    unsigned_integer,
-    negative_integer,
-    byte_string,
-    text_string,
-    array,
-    map,
-    simple,
-    boolean,
-    null,
-    undefined,
-    float16,
-    float32,
-    float64
-};
+    unsigned_integer = 0,
+    negative_integer = 0x20,
+    byte_string      = 0x40,
+    text_string      = 0x60,
+    array            = 0x80,
+    map              = 0xa0,
+    simple           = 0xe0,
+    boolean          = 0xf5,
+    null             = 0xf6,
+    undefined        = 0xf7,
+    float16          = 0xf9,
+    float32          = 0xfa,
+    float64          = 0xfb,
+};                   
 
 struct scan_error
 {
@@ -169,44 +169,44 @@ namespace ondemand_detail {
         return head.major_type;
     }
 
+    inline uint8_t additional_info(const item_head& head) noexcept
+    {
+        return head.additional_info;
+    }
+
     inline cbor_type type(const item_head& head) noexcept
     {
-        switch (head.major_type)
+        if (head.major_type != cbor_major_type::simple)
         {
-            case cbor::cbor_major_type::unsigned_integer: return cbor_type::unsigned_integer;
-            case cbor::cbor_major_type::negative_integer: return cbor_type::negative_integer;
-            case cbor::cbor_major_type::byte_string:      return cbor_type::byte_string;
-            case cbor::cbor_major_type::text_string:      return cbor_type::text_string;
-            case cbor::cbor_major_type::array:            return cbor_type::array;
-            case cbor::cbor_major_type::map:              return cbor_type::map;
-            default: 
+            return static_cast<cbor_type>(static_cast<uint8_t>(head.major_type) << 5); 
+        }
+        else
+        {
+            if (head.additional_info == 20 || head.additional_info == 21)
             {
-                if (head.additional_info == 20 || head.additional_info == 21)
-                {
-                    return cbor_type::boolean;
-                }
-                if (head.additional_info == 22)
-                {
-                    return cbor_type::null;
-                }
-                if (head.additional_info == 23)
-                {
-                    return cbor_type::undefined;
-                }
-                if (head.additional_info == 25)
-                {
-                    return cbor_type::float16;
-                }
-                if (head.additional_info == 26)
-                {
-                    return cbor_type::float32;
-                }
-                if (head.additional_info == 27)
-                {
-                    return cbor_type::float64;
-                }
-                return cbor_type::simple;
+                return cbor_type::boolean;
             }
+            if (head.additional_info == 22)
+            {
+                return cbor_type::null;
+            }
+            if (head.additional_info == 23)
+            {
+                return cbor_type::undefined;
+            }
+            if (head.additional_info == 25)
+            {
+                return cbor_type::float16;
+            }
+            if (head.additional_info == 26)
+            {
+                return cbor_type::float32;
+            }
+            if (head.additional_info == 27)
+            {
+                return cbor_type::float64;
+            }
+            return cbor_type::simple;
         }
     }
 
@@ -707,6 +707,11 @@ public:
     cbor_major_type major_type() const noexcept
     {
         return ondemand_detail::major_type(head_);
+    }
+
+    uint8_t additional_info() const noexcept
+    {
+        return ondemand_detail::additional_info(head_);
     }
 
     cbor_type type() const noexcept

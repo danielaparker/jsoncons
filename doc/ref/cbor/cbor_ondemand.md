@@ -71,6 +71,7 @@ class item
 public:
     span<const uint8_t> encoded_bytes() const noexcept;
     cbor_major_type major_type() const noexcept;
+    uint8_t additional_info() const noexcept;
     cbor_type type() const noexcept;
     uint64_t argument() const noexcept;
     bool indefinite() const noexcept;
