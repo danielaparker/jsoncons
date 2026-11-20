@@ -573,7 +573,8 @@ struct decode_traits<std::array<T,N>>
             return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
         }
         cursor.next(ec);
-        for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
+        std::size_t i = 0;
+        for (; i != N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
         {
             auto r = decode_traits<element_type>::decode(aset, cursor);
             if (!r)
@@ -584,8 +585,12 @@ struct decode_traits<std::array<T,N>>
             cursor.next(ec);
             if (JSONCONS_UNLIKELY(ec)) 
             {
-                return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()}; 
+                return result_type{jsoncons::unexpect, conv_errc::not_vector, cursor.line(), cursor.column()};
             }
+        }
+        if (i != N || cursor.current().event_type() != staj_events::end_array)
+        {
+            return result_type{jsoncons::unexpect, conv_errc::not_array, cursor.line(), cursor.column()};
         }
         return v;
     }
