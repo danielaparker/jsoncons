@@ -182,31 +182,24 @@ namespace ondemand_detail {
         }
         else
         {
-            if (head.additional_info == 20 || head.additional_info == 21)
+            switch (head.additional_info)
             {
-                return cbor_type::boolean;
+                case 20:
+                case 21:
+                    return cbor_type::boolean;
+                case 22:
+                    return cbor_type::null;
+                case 23:
+                    return cbor_type::undefined;
+                case 25:
+                    return cbor_type::float16;
+                case 26:
+                    return cbor_type::float32;
+                case 27:
+                    return cbor_type::float64;
+                default:
+                    return cbor_type::simple;
             }
-            if (head.additional_info == 22)
-            {
-                return cbor_type::null;
-            }
-            if (head.additional_info == 23)
-            {
-                return cbor_type::undefined;
-            }
-            if (head.additional_info == 25)
-            {
-                return cbor_type::float16;
-            }
-            if (head.additional_info == 26)
-            {
-                return cbor_type::float32;
-            }
-            if (head.additional_info == 27)
-            {
-                return cbor_type::float64;
-            }
-            return cbor_type::simple;
         }
     }
 
@@ -256,8 +249,7 @@ namespace ondemand_detail {
     {
         using result_type = access_result<bool>;
 
-        if (head.major_type != cbor::cbor_major_type::simple ||
-            (head.additional_info != 20 && head.additional_info != 21))
+        if (type(head) != cbor_type::boolean)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }        
