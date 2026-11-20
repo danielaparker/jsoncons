@@ -574,7 +574,7 @@ struct decode_traits<std::array<T,N>>
         }
         cursor.next(ec);
         std::size_t i = 0;
-        for (; i < N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
+        for (; i != N && cursor.current().event_type() != staj_events::end_array && !ec; ++i)
         {
             auto r = decode_traits<element_type>::decode(aset, cursor);
             if (!r)
