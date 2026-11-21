@@ -3762,7 +3762,15 @@ namespace detail {
                                 break;
                             case ')':
                             {
-                                state_stack.pop_back();
+                                if (state_stack.size() > 1)
+                                {
+                                    state_stack.pop_back();
+                                }
+                                else
+                                {
+                                    ec = jmespath_errc::unbalanced_parentheses;
+                                    return jmespath_expression{};
+                                }
                                 break;
                             }
                             default:
