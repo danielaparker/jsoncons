@@ -1096,12 +1096,16 @@ has_can_convert = ext_traits::is_detected<traits_can_convert_t, Json, T>;
 
         static bool is(const Json& j) noexcept
         {
-            return helper::is(j);
+            return j.is_array() && j.size() == sizeof...(E) && helper::is(j);
         }
         
         template <typename Alloc, typename TempAlloc>
         static result_type try_as(const allocator_set<Alloc,TempAlloc>& aset, const Json& j)
         {
+            if (!j.is_array() || j.size() != sizeof...(E))
+            {
+                return result_type(jsoncons::unexpect, conv_errc::conversion_failed);
+            }
             std::error_code ec;
             std::tuple<E...> val;
             helper::try_as(val, aset, j, ec);
