@@ -107,7 +107,7 @@ int main()
         0x66, 's', 'c', 'o', 'r', 'e', 's', 0x82, 0x01, 0x02
     };
 
-    auto parsed = ondemand::parse_item(jsoncons::span<const uint8_t&gt;(data));
+    auto parsed = ondemand::read_item(jsoncons::span<const uint8_t&gt;(data));
     if (!parsed)
     {
         std::cout << "error " << static_cast<int>(parsed.error().code)

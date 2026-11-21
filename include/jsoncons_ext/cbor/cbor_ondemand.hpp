@@ -147,7 +147,7 @@ enum class item_type : uint8_t
 struct scan_error
 {
     cbor_errc code;
-    std::size_t offset;
+    std::size_t position;
 };
 
 namespace ondemand_detail {
@@ -685,7 +685,7 @@ namespace ondemand_detail {
 } // namespace ondemand_detail
 
 // A zero-copy view of one complete, structurally well-formed CBOR item:
-// its leading tags, head and content. Obtained only from scan, parse_item
+// its leading tags, head and content. Obtained only from scan, read_item
 // or children(). Borrows the scanned bytes and must not outlive them.
 class item
 {
@@ -1202,7 +1202,7 @@ inline expected<scan_result, scan_error> scan(span<const uint8_t> input,
 
 // Like scan, but `input` must hold exactly one item: trailing bytes are
 // cbor_errc::trailing_data.
-inline expected<item, scan_error> parse_item(span<const uint8_t> input,
+inline expected<item, scan_error> read_item(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
     auto scanned = scan(input, max_nesting_depth);
@@ -1222,7 +1222,7 @@ inline expected<item, scan_error> parse_item(span<const uint8_t> input,
 template <typename Container>
 expected<scan_result, scan_error> scan(const Container&&, int = default_max_nesting_depth) = delete;
 template <typename Container>
-expected<item, scan_error> parse_item(const Container&&, int = default_max_nesting_depth) = delete;
+expected<item, scan_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
 
 // True if `text_item` is a text string of well-formed UTF-8, checking each
 // chunk of an indefinite-length string separately (RFC 8949 3.2.3).
