@@ -1147,7 +1147,7 @@ access_result<void> item::get_byte_string(std::vector<uint8_t>& value) const
     {
         auto r = get_byte_string();
         auto sv = *r;
-        value.insert(value.begin(), sv.begin(), sv.end());
+        value.insert(value.end(), sv.begin(), sv.end());
     }
 
     return result_type{};
