@@ -18,8 +18,8 @@ An `item` is one complete, structurally valid encoding.
     <td>Returns CBOR additional information.</td> 
   </tr>
   <tr>
-    <td>cbor_type type() const noexcept</td>
-    <td>Returns a <a href="cbor_type.md">cbor_type</a>.</td> 
+    <td>item_type type() const noexcept</td>
+    <td>Returns a <a href="item_type.md">item_type</a>.</td> 
   </tr>
   <tr>
     <td>uint64_t argument() const noexcept</td>
@@ -123,7 +123,7 @@ int main()
         {
             key = child.get_string().value();
         }
-        else if (child.type() == ondemand::cbor_type::array)
+        else if (child.type() == ondemand::item_type::array)
         {
             std::cout << key << ":";
             for (const ondemand::item element : child.children())
