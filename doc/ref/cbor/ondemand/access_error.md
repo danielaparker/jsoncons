@@ -2,18 +2,23 @@
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
-```
 
-enum class access_errc : uint8_t 
-{
-    success = 0,
-    invalid_type = 1,
-    indefinite,
-    result_out_of_range, 
-};
+enum class access_errc;
 
 class access_error;
 ```
+
+### enum class access_errc
+
+#### Member constants
+
+Name                  | Definition 
+----------------------|---------------
+invalid_type          | Attempting to acces an item of the wrong type
+indefinite            | Cannot access a view of an item with indefinite length
+result_out_of_range   | A numeric item is out of range 
+
+### class access_error
 
 #### Accessors
 

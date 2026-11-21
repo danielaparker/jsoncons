@@ -44,36 +44,36 @@ the last child of a definite-length container is not measured at all, since
 it ends where its parent does.</td> 
   </tr>
   <tr>
-    <td>access_result<uint64_t> get_uint64() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;uint64_t&rt;> get_uint64() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;uint64_t&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<int64_t> get_int64() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;int64_t&rt;> get_int64() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;int64_t&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<bool> get_bool() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;bool> get_bool() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;bool&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<double> get_double() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;double> get_double() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;double&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<jsoncons::string_view> get_string() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;jsoncons::string_view> get_string() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;jsoncons::string_view&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<jsoncons::span<const uint8_t>> get_byte_string() const noexcept</td>
-    <td>.</td> 
+    <td>access_result&lt;jsoncons::span&lt;const uint8_t&rt;>> get_byte_string() const noexcept</td>
+    <td>Returns an <a href="access_result.md">access_result&lt;jsoncons::span&lt;const uint8_t&rt;&rt;></a>.</td> 
   </tr>
   <tr>
-    <td>access_result<void> get_string(std::string& buffer) const</td>
+    <td>access_result&lt;void> get_string(std::string& buffer) const</td>
     <td>Copying get_string overload, assembles
 indefinite-length strings into the provided buffer.</td> 
   </tr>
   <tr>
-    <td>access_result<void> get_byte_string(std::vector<uint8_t>& buffer) const</td>
+    <td>access_result&lt;void> get_byte_string(std::vector<uint8_t&rt;>& buffer) const</td>
     <td>Copying get_byte_string overload, assembles
 indefinite-length strings into the provided buffer.</td> 
   </tr>
@@ -101,13 +101,13 @@ namespace ondemand = jsoncons::cbor::ondemand;
 int main()
 {
     // {"id": 42, "scores": [1, 2]}
-    const std::vector<uint8_t> data = {
+    const std::vector<uint8_t&rt;> data = {
         0xa2,
         0x62, 'i', 'd', 0x18, 0x2a,
         0x66, 's', 'c', 'o', 'r', 'e', 's', 0x82, 0x01, 0x02
     };
 
-    auto parsed = ondemand::parse_item(jsoncons::span<const uint8_t>(data));
+    auto parsed = ondemand::parse_item(jsoncons::span<const uint8_t&rt;>(data));
     if (!parsed)
     {
         std::cout << "error " << static_cast<int>(parsed.error().code)
