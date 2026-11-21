@@ -13,7 +13,7 @@ zero-copy and cannot fail.
 ### Classes
 <table border="0">
   <tr>
-    <td><a href="ondemand/item.md">item</a></td>
+    <td><a href="item.md">item</a></td>
     <td>Represents one complete, structurally valid encoding.</td> 
   </tr>
 </table>
