@@ -738,3 +738,27 @@ TEST_CASE("toon_reader max_nesting_depth")
         CHECK(expected == decoder.get_result());
     }
 }
+
+TEST_CASE("toon_reader quoted key is unescaped once")
+{
+    std::vector<std::pair<std::string,std::string>> cases = {
+        {R"("x\\n"[2]: 1,2)", R"({"x\\n":[1,2]})"},
+        {R"("a\\q"[1]: 7)", R"({"a\\q":[7]})"},
+        {R"("k\\\""[1]: 7)", R"({"k\\\"":[7]})"},
+        {"a: 1\n" R"("x\\n": [)", R"({"a":1,"x\\n":"["})"}
+    };
+
+    for (const auto& item : cases)
+    {
+        INFO(item.first);
+        auto expected = jsoncons::ojson::parse(item.second);
+
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        toon::toon_string_reader reader(item.first, decoder);
+
+        auto result = reader.try_read();
+        REQUIRE(result);
+        REQUIRE(decoder.is_valid());
+        CHECK(expected == decoder.get_result());
+    }
+}
