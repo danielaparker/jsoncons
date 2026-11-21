@@ -1,9 +1,9 @@
-### jsoncons::cbor::ondemand::cbor_type
+### jsoncons::cbor::ondemand::item_type
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
 
-enum class cbor_type : uint8_t
+enum class item_type : uint8_t
 {
     unsigned_integer = 0,
     negative_integer = 0x20,
@@ -21,6 +21,6 @@ enum class cbor_type : uint8_t
 };                   
 ```
 
-The `cbor_type` enum generally matches the CBOR major type values, 
+The `item_type` enum mostly matches the CBOR major type values, 
 except that major type 7 is subdivided into several logical types.
 
