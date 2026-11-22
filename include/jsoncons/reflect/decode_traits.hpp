@@ -263,7 +263,7 @@ template <typename T>
 struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
-             ext_traits::is_back_insertable_byte_container<T>::value &&
+             ext_traits::is_byte_buffer<T>::value &&
              ext_traits::is_typed_array<T>::value
 >::type>
 {
@@ -361,7 +361,7 @@ struct decode_traits<T,
     typename std::enable_if<!reflect::is_json_traits_declared<T>::value && 
              ext_traits::is_array_like<T>::value &&
              ext_traits::is_back_insertable<T>::value &&
-             !ext_traits::is_back_insertable_byte_container<T>::value &&
+             !ext_traits::is_byte_buffer<T>::value &&
              ext_traits::is_typed_array<T>::value
 >::type>
 {

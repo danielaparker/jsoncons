@@ -18,6 +18,10 @@
 #include <jsoncons/nonstd/compiler_support.hpp>
 #include <jsoncons/nonstd/a5hash.hpp>
 
+#if defined(__cpp_char8_t)
+    #define JSONCONS_HAS_CHAR8 1
+#endif 
+
 #if defined(JSONCONS_HAS_NATIVE_INT128)
 namespace jsoncons {
 using int128 = jsoncons::native_int128;
@@ -99,12 +103,16 @@ namespace jsoncons {
 using jsoncons::nonstd::basic_string_view;
 using string_view = jsoncons::nonstd::string_view;
 using wstring_view = jsoncons::nonstd::wstring_view;
+#if defined(__cpp_char8_t)
+    using u8string_view = jsoncons::nonstd::u8string_view;   
+#endif
 } // namespace jsoncons
 #else 
 #include <string_view>
 namespace jsoncons {
 using std::basic_string_view;
 using std::string_view;
+using std::u8string_view;
 using std::wstring_view;
 }
 #endif

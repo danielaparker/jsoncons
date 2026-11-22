@@ -36,6 +36,7 @@ enum class access_errc
     success = 0,
     invalid_type = 1,
     indefinite,
+    invalid_utf8,
     result_out_of_range, 
 };
 
@@ -59,6 +60,8 @@ public:
                 return "Indefinite length";
             case access_errc::result_out_of_range:
                 return "Result out of range";
+            case access_errc::invalid_utf8:
+                return "Invalid utf8";
             default:
                 return "Unknown access error";
         }
@@ -144,7 +147,7 @@ enum class item_type : uint8_t
     simple           = 0xe0,
 };                   
 
-struct scan_error
+struct read_error
 {
     cbor_errc code;
     std::size_t position;
@@ -300,7 +303,13 @@ namespace ondemand_detail {
         {
             return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
-        return result_type{string_view(reinterpret_cast<const char*>(content), static_cast<std::size_t>(head.value))};
+        const char* s = reinterpret_cast<const char*>(content);
+        std::size_t length = static_cast<std::size_t>(head.value);
+        if (unicode_traits::validate(s, length).ec != unicode_traits::unicode_errc())
+        {
+            return result_type(jsoncons::unexpect, access_errc::invalid_utf8);
+        }
+        return result_type{string_view(s, length)};
     }
 
     inline 
@@ -685,7 +694,7 @@ namespace ondemand_detail {
 } // namespace ondemand_detail
 
 // A zero-copy view of one complete, structurally well-formed CBOR item:
-// its leading tags, head and content. Obtained only from scan, read_item
+// its leading tags, head and content. Obtained only from read, read_item
 // or children(). Borrows the scanned bytes and must not outlive them.
 class item
 {
@@ -766,6 +775,18 @@ public:
         return ondemand_detail::get_string(head_, content_);
     }
 
+#if defined(JSONCONS_HAS_CHAR8)
+    access_result<jsoncons::u8string_view> get_u8string() const noexcept
+    {
+        auto str = ondemand_detail::get_string(head_, content_);
+        if (!str)
+        {
+            return access_result<jsoncons::u8string_view>(jsoncons::unexpect, str.error());
+        }
+        return access_result<jsoncons::u8string_view>(jsoncons::u8string_view(reinterpret_cast<const char8_t*>((*str).data()), (*str).size()));
+    }
+#endif
+
     access_result<span<const uint8_t>> get_byte_string() const noexcept
     {
         return ondemand_detail::get_byte_string(head_, content_);
@@ -773,9 +794,93 @@ public:
 
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
-    access_result<void> get_string(std::string& buffer) const;
 
-    access_result<void> get_byte_string(std::vector<uint8_t>& buffer) const;
+    template <typename CharBuffer>
+    typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, access_result<void>>::type
+    get_string(CharBuffer& value) const 
+    {
+        using char_type = typename CharBuffer::value_type;
+        using result_type = access_result<void>;
+        if (head_.major_type != cbor::cbor_major_type::text_string)
+        {
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
+        }
+
+        if (head_.indefinite())
+        {
+            std::size_t length = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                }
+                length += (*r).size();
+            }
+            value.resize(length);
+            std::size_t pos = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_string();
+                auto sv = *r;
+                std::memcpy(value.data() + pos, reinterpret_cast<const char_type*>(sv.data()), sv.size());
+                pos += sv.size();
+            }
+        }
+        else
+        {
+            auto r = get_string();
+            auto sv = r.value();
+            value.resize(sv.size());
+            std::memcpy(value.data(), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+        }
+        return result_type{};
+    }
+
+    template <typename ByteBuffer>
+    typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, access_result<void>>::type
+    get_byte_string(ByteBuffer& value) const
+    {
+        using byte_type = typename ByteBuffer::value_type;
+        using result_type = access_result<void>;
+        if (head_.major_type != cbor::cbor_major_type::byte_string)
+        {
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
+        }
+
+        if (head_.indefinite())
+        {
+            std::size_t length = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_byte_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                }
+                length += (*r).size();
+            }
+            value.resize(length);
+            std::size_t pos = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_byte_string();
+                auto bsv = *r;
+                std::memcpy(value.data() + pos, reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+                pos += bsv.size();
+            }
+        }
+        else
+        {
+            auto r = get_byte_string();
+            auto bsv = r.value();
+            value.resize(bsv.size());
+            std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+        }
+
+        return result_type{};
+    }
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1088,72 +1193,7 @@ inline void item::copy_content(uint8_t* out) const noexcept
     }
 }
 
-inline 
-access_result<void> item::get_string(std::string& value) const 
-{
-    using result_type = access_result<void>;
-    if (head_.major_type != cbor::cbor_major_type::text_string)
-    {
-        return result_type(jsoncons::unexpect, access_errc::invalid_type);
-    }
-
-    value.clear();
-    if (head_.indefinite())
-    {
-        for (const item chunk : children())
-        {
-            auto r = chunk.get_string();
-            if (!r)
-            {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
-            }
-            auto sv = *r;
-            value.append(sv.data(), sv.size());
-        }
-    }
-    else
-    {
-        auto r = get_string();
-        auto sv = *r;
-        value.append(sv.data(), sv.size());
-    }
-    return result_type{};
-}
-
-inline 
-access_result<void> item::get_byte_string(std::vector<uint8_t>& value) const
-{
-    using result_type = access_result<void>;
-    if (head_.major_type != cbor::cbor_major_type::byte_string)
-    {
-        return result_type(jsoncons::unexpect, access_errc::invalid_type);
-    }
-
-    value.clear();
-    if (head_.indefinite())
-    {
-        for (const item chunk : children())
-        {
-            auto r = chunk.get_byte_string();
-            if (!r)
-            {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
-            }
-            auto sv = *r;
-            value.insert(value.end(), sv.begin(), sv.end());
-        }
-    }
-    else
-    {
-        auto r = get_byte_string();
-        auto sv = *r;
-        value.insert(value.end(), sv.begin(), sv.end());
-    }
-
-    return result_type{};
-}
-
-struct scan_result
+struct read_result
 {
     item first;
     span<const uint8_t> remainder;
@@ -1162,13 +1202,13 @@ struct scan_result
 // Scans the first item in `input`, checking its structure, and returns it
 // with the bytes that follow. Errors report where scanning stopped.
 // Allocates only when nesting exceeds 32 open containers.
-inline expected<scan_result, scan_error> scan(span<const uint8_t> input,
+inline expected<read_result, read_error> read(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
     if (input.empty())
     {
-        return expected<scan_result, scan_error>(unexpect,
-            scan_error{cbor_errc::unexpected_eof, 0});
+        return expected<read_result, read_error>(unexpect,
+            read_error{cbor_errc::unexpected_eof, 0});
     }
     const uint8_t* p = input.data();
     const uint8_t* end = p + input.size();
@@ -1191,38 +1231,38 @@ inline expected<scan_result, scan_error> scan(span<const uint8_t> input,
     }
     if (!ok)
     {
-        return expected<scan_result, scan_error>(unexpect,
-            scan_error{ec, static_cast<std::size_t>(p - input.data())});
+        return expected<read_result, read_error>(unexpect,
+            read_error{ec, static_cast<std::size_t>(p - input.data())});
     }
-    return scan_result{
+    return read_result{
         ondemand_detail::item_access::make(
             span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data())), head, content),
         span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
 }
 
-// Like scan, but `input` must hold exactly one item: trailing bytes are
+// Like read, but `input` must hold exactly one item: trailing bytes are
 // cbor_errc::trailing_data.
-inline expected<item, scan_error> read_item(span<const uint8_t> input,
+inline expected<item, read_error> read_item(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
-    auto scanned = scan(input, max_nesting_depth);
+    auto scanned = read(input, max_nesting_depth);
     if (!scanned)
     {
-        return expected<item, scan_error>(unexpect, scanned.error());
+        return expected<item, read_error>(unexpect, scanned.error());
     }
     if (!scanned.value().remainder.empty())
     {
-        return expected<item, scan_error>(unexpect,
-            scan_error{cbor_errc::trailing_data, scanned.value().first.encoded_bytes().size()});
+        return expected<item, read_error>(unexpect,
+            read_error{cbor_errc::trailing_data, scanned.value().first.encoded_bytes().size()});
     }
     return scanned.value().first;
 }
 
 // Reject temporary owning containers, whose items would dangle.
 template <typename Container>
-expected<scan_result, scan_error> scan(const Container&&, int = default_max_nesting_depth) = delete;
+expected<read_result, read_error> read(const Container&&, int = default_max_nesting_depth) = delete;
 template <typename Container>
-expected<item, scan_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
+expected<item, read_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
 
 // True if `text_item` is a text string of well-formed UTF-8, checking each
 // chunk of an indefinite-length string separately (RFC 8949 3.2.3).
@@ -1237,6 +1277,10 @@ inline bool validate_text(const item& text_item) noexcept
     {
         string_view text = *str;
         return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
+    }
+    else if (str.error().code() == access_errc::invalid_utf8)
+    {
+        return false;
     }
     for (const item chunk : text_item.children())
     {

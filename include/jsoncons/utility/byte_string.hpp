@@ -99,7 +99,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename F,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_byte_buffer<Container>::value,to_bytes_result<InputIt>>::type 
     base64_to_bytes_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
                           F f,
@@ -214,7 +214,7 @@ namespace detail {
     // decode
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_byte_buffer<Container>::value,to_bytes_result<InputIt>>::type 
     base64url_to_bytes(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -242,7 +242,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_byte_buffer<Container>::value,to_bytes_result<InputIt>>::type 
     base64_to_bytes(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -270,7 +270,7 @@ namespace detail {
     }
 
     template <typename InputIt,typename Container>
-    typename std::enable_if<ext_traits::is_back_insertable_byte_container<Container>::value,to_bytes_result<InputIt>>::type 
+    typename std::enable_if<ext_traits::is_byte_buffer<Container>::value,to_bytes_result<InputIt>>::type 
     base16_to_bytes(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);

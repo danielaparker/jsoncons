@@ -275,23 +275,23 @@ namespace ext_traits {
                                    std::is_same<T,wchar_t>::value
     >::type> : std::true_type {};
 
-    // is_narrow_character
+    // is_narrow_char
 
     template <typename T,typename Enable=void>
-    struct is_narrow_character : std::false_type {};
+    struct is_narrow_char : std::false_type {};
 
     template <typename T>
-    struct is_narrow_character<T, 
+    struct is_narrow_char<T, 
            typename std::enable_if<is_character<T>::value && (sizeof(T) == sizeof(char))
     >::type> : std::true_type {};
 
-    // is_wide_character
+    // is_wide_char
 
     template <typename T,typename Enable=void>
-    struct is_wide_character : std::false_type {};
+    struct is_wide_char : std::false_type {};
 
     template <typename T>
-    struct is_wide_character<T, 
+    struct is_wide_char<T, 
            typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
     >::type> : std::true_type {};
 
@@ -717,15 +717,26 @@ namespace ext_traits {
                                    std::is_same<typename Container::value_type,ValueT>::value
     >::type> : std::true_type {};
 
-    // is_back_insertable_byte_container
+    // is_byte_buffer
 
     template <typename Container,typename Enable=void>
-    struct is_back_insertable_byte_container : std::false_type {};
+    struct is_byte_buffer : std::false_type {};
 
     template <typename Container>
-    struct is_back_insertable_byte_container<Container, 
+    struct is_byte_buffer<Container, 
            typename std::enable_if<is_back_insertable<Container>::value &&
                                    is_byte<typename Container::value_type>::value
+    >::type> : std::true_type {};
+
+    // is_narrow_char_buffer
+
+    template <typename CharBuffer,typename Enable=void>
+    struct is_narrow_char_buffer : std::false_type {};
+
+    template <typename CharBuffer>
+    struct is_narrow_char_buffer<CharBuffer, 
+           typename std::enable_if<is_back_insertable<CharBuffer>::value &&
+                                   is_narrow_char<typename CharBuffer::value_type>::value
     >::type> : std::true_type {};
 
     // is_back_insertable_char_container

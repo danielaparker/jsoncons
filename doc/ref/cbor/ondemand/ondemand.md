@@ -21,28 +21,28 @@ zero-copy and cannot fail.
 ### Functions
 
 ```cpp
-struct scan_error
+struct read_error
 {
     cbor_errc code;
     std::size_t position;
 };
 
-struct scan_result
+struct read_result
 {
     item first;
     span<const uint8_t> remainder;
 };
 
-expected<scan_result, scan_error> scan(
+expected<read_result, read_error> read(
     span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth);
 
-expected<item, scan_error> read_item(
+expected<item, read_error> read_item(
     span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth);
 ```
 
-`scan` checks the first item in `input` and returns it with the bytes that
+`read` checks the first item in `input` and returns it with the bytes that
 follow, so a CBOR sequence can be read by scanning the remainder repeatedly.
 `read_item` requires `input` to hold exactly one item; trailing bytes produce
 `cbor_errc::trailing_data`. Errors report the position at which scanning
@@ -57,7 +57,7 @@ schemas. Tags are exposed, never interpreted.
 
 An `item` borrows the scanned bytes. Destroying, mutating or reallocating
 those bytes invalidates the item, its children, and any spans or string views
-obtained from it. `scan` and `read_item` reject temporary owning containers
+obtained from it. `read` and `read_item` reject temporary owning containers
 at compile time, but an explicitly constructed span remains the caller's
 lifetime responsibility.
 

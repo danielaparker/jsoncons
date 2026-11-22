@@ -3594,7 +3594,7 @@ namespace jsoncons {
 
         template <typename T>
         typename std::enable_if<(!ext_traits::is_string<T>::value && 
-                                 ext_traits::is_back_insertable_byte_container<T>::value) ||
+                                 ext_traits::is_byte_buffer<T>::value) ||
                                  ext_traits::is_basic_byte_string<T>::value,T>::type
         as(byte_string_arg_t, semantic_tag hint) const
         {

@@ -23,7 +23,7 @@ namespace ubjson {
 
 template <typename T,typename BytesLike>
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+                        ext_traits::is_byte_buffer<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const T& j, 
     BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -36,7 +36,7 @@ try_encode_ubjson(const T& j,
 
 template <typename T,typename BytesLike>
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+                        ext_traits::is_byte_buffer<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const T& val, 
     BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -71,7 +71,7 @@ try_encode_ubjson(const T& val,
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+                        ext_traits::is_byte_buffer<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j, 
     BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())
@@ -84,7 +84,7 @@ try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& j,
 
 template <typename T,typename BytesLike,typename Alloc,typename TempAlloc >
 typename std::enable_if<!ext_traits::is_basic_json<T>::value &&
-                        ext_traits::is_back_insertable_byte_container<BytesLike>::value,write_result>::type 
+                        ext_traits::is_byte_buffer<BytesLike>::value,write_result>::type 
 try_encode_ubjson(const allocator_set<Alloc,TempAlloc>& aset,const T& val, 
     BytesLike& cont, 
     const ubjson_encode_options& options = ubjson_encode_options())

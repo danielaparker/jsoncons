@@ -6,6 +6,7 @@
 #endif
 
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <common/mock_stateful_allocator.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -33,12 +34,12 @@ namespace {
 
 } // namespace
 
-TEST_CASE("cbor ondemand scan and read_item")
+TEST_CASE("cbor ondemand read and read_item")
 {
-    SECTION("scan returns the first item and the remainder")
+    SECTION("read returns the first item and the remainder")
     {
         std::vector<uint8_t> data = {0x01,0x02};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         CHECK(result.value().first.encoded_bytes().data() == data.data());
         CHECK(result.value().first.encoded_bytes().size() == 1);
@@ -46,14 +47,14 @@ TEST_CASE("cbor ondemand scan and read_item")
         CHECK(result.value().remainder.size() == 1);
     }
 
-    SECTION("scan walks a sequence of items")
+    SECTION("read walks a sequence of items")
     {
         std::vector<uint8_t> data = {0x01,0x61,'a',0x80};
         jsoncons::span<const uint8_t> rest(data.data(), data.size());
         std::size_t count = 0;
         while (!rest.empty())
         {
-            auto result = cbor::ondemand::scan(rest);
+            auto result = cbor::ondemand::read(rest);
             REQUIRE(result.has_value());
             rest = result.value().remainder;
             ++count;
@@ -75,7 +76,7 @@ TEST_CASE("cbor ondemand scan and read_item")
 
     SECTION("empty input fails at position zero")
     {
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>());
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>());
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unexpected_eof);
         CHECK(result.error().position == 0);
@@ -85,7 +86,7 @@ TEST_CASE("cbor ondemand scan and read_item")
     {
         // [1, <invalid head 0x1f>]
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
         CHECK(result.error().position == 3);
@@ -133,12 +134,12 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
     SECTION("containers claiming huge counts are rejected")
     {
         std::vector<uint8_t> array = {0x9a,0xff,0xff,0xff,0xff};
-        auto array_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(array));
+        auto array_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(array));
         REQUIRE_FALSE(array_result.has_value());
         CHECK(array_result.error().code == cbor::cbor_errc::unexpected_eof);
 
         std::vector<uint8_t> map = {0xba,0xff,0xff,0xff,0xff};
-        auto map_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(map));
+        auto map_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(map));
         REQUIRE_FALSE(map_result.has_value());
         CHECK(map_result.error().code == cbor::cbor_errc::unexpected_eof);
     }
@@ -155,7 +156,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
     {
         // [_ {1: [2]}, [], {} ] followed by trailing bytes
         std::vector<uint8_t> data = {0x9f,0xa1,0x01,0x81,0x02,0x80,0xa0,0xff,0x63,'a','b','c'};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         CHECK(result.value().first.encoded_bytes().size() == 8);
         CHECK(result.value().remainder.size() == 4);
@@ -164,7 +165,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
     SECTION("an indefinite map break may not split a key from its value")
     {
         std::vector<uint8_t> dangling_key = {0xbf,0x01,0xff};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(dangling_key));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(dangling_key));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
 
@@ -175,7 +176,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
     SECTION("an invalid indefinite integer is rejected")
     {
         std::vector<uint8_t> data = {0x1f};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
         CHECK(result.error().code == cbor::cbor_errc::unknown_type);
     }
@@ -184,12 +185,12 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
     {
         // RFC 8949 3.3
         std::vector<uint8_t> below = {0xf8,0x13};
-        auto below_result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(below));
+        auto below_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(below));
         REQUIRE_FALSE(below_result.has_value());
         CHECK(below_result.error().code == cbor::cbor_errc::unknown_type);
 
         std::vector<uint8_t> nested = {0x81,0xf8,0x00};
-        CHECK_FALSE(cbor::ondemand::scan(jsoncons::span<const uint8_t>(nested)).has_value());
+        CHECK_FALSE(cbor::ondemand::read(jsoncons::span<const uint8_t>(nested)).has_value());
 
         std::vector<uint8_t> at_32 = {0xf8,0x20};
         auto at_32_result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(at_32));
@@ -376,7 +377,7 @@ TEST_CASE("cbor ondemand typed accessors")
         CHECK(*r == 10);
     }
 
-    SECTION("text views definite strings in place")
+    SECTION("text views definite jsoncons::string_view in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
         cbor::ondemand::item text_item = parse(data);
@@ -394,6 +395,45 @@ TEST_CASE("cbor ondemand typed accessors")
         std::vector<uint8_t> bytes = {0x41,0x01};
         CHECK_FALSE(parse(bytes).get_string());
     }
+
+#if defined(JSONCONS_HAS_CHAR8)
+    SECTION("text views definite jsoncons::u8string_view in place")
+    {
+        std::vector<uint8_t> data = {0x63,'a','b','c'};
+        cbor::ondemand::item text_item = parse(data);
+        cbor::ondemand::access_result<jsoncons::u8string_view> r;
+        REQUIRE((r = text_item.get_u8string()));
+        CHECK(std::u8string((*r).data(), (*r).size()) == u8"abc");
+        CHECK(reinterpret_cast<const uint8_t*>((*r).data()) == data.data() + 1);
+
+        std::vector<uint8_t> empty = {0x60};
+        REQUIRE((r = parse(empty).get_u8string()));
+        CHECK((*r).empty());
+
+        std::vector<uint8_t> chunked = {0x7f,0x61,'a',0xff};
+        CHECK_FALSE(parse(chunked).get_u8string());
+        std::vector<uint8_t> bytes = {0x41,0x01};
+        CHECK_FALSE(parse(bytes).get_u8string());
+    }
+    SECTION("text views definite std::u8string_view in place")
+    {
+        std::vector<uint8_t> data = {0x63, 'a', 'b', 'c'};
+        cbor::ondemand::item text_item = parse(data);
+        cbor::ondemand::access_result<std::u8string_view> r;
+        REQUIRE((r = text_item.get_u8string()));
+        CHECK(std::u8string((*r).data(), (*r).size()) == u8"abc");
+        CHECK(reinterpret_cast<const uint8_t*>((*r).data()) == data.data() + 1);
+
+        std::vector<uint8_t> empty = {0x60};
+        REQUIRE((r = parse(empty).get_u8string()));
+        CHECK((*r).empty());
+
+        std::vector<uint8_t> chunked = {0x7f, 0x61, 'a', 0xff};
+        CHECK_FALSE(parse(chunked).get_u8string());
+        std::vector<uint8_t> bytes = {0x41, 0x01};
+        CHECK_FALSE(parse(bytes).get_u8string());
+    }
+#endif
 
     SECTION("bytes views definite strings in place")
     {
@@ -417,6 +457,34 @@ TEST_CASE("cbor ondemand copying accessors are transactional")
         REQUIRE(parse({0x7f,0xff}).get_string(s));
         CHECK(s.empty());
     }
+    SECTION("text assembles chunked strings into custom string of char")
+    {
+        using char_allocator_type = mock_stateful_allocator<char>;
+        using custom_string = std::basic_string<char, std::char_traits<char>, char_allocator_type>;
+        char_allocator_type alloc(1);
+        custom_string s(alloc);
+        REQUIRE(parse({0x63,'a','b','c'}).get_string(s));
+        CHECK(s == "abc");
+        REQUIRE(parse({0x7f,0x62,'h','e',0x63,'l','l','o',0xff}).get_string(s));
+        CHECK(s == "hello");
+        REQUIRE(parse({0x7f,0xff}).get_string(s));
+        CHECK(s.empty());
+    }
+#if JSONCONS_HAS_CHAR8
+    SECTION("text assembles chunked strings into custom string of char8_t")
+    {
+        using char_allocator_type = mock_stateful_allocator<char8_t>;
+        using custom_string = std::basic_string<char8_t, std::char_traits<char8_t>, char_allocator_type>;
+        char_allocator_type alloc(1);
+        custom_string s(alloc);
+        REQUIRE(parse({0x63,'a','b','c'}).get_string(s));
+        CHECK(s == u8"abc");
+        REQUIRE(parse({0x7f,0x62,'h','e',0x63,'l','l','o',0xff}).get_string(s));
+        CHECK(s == u8"hello");
+        REQUIRE(parse({0x7f,0xff}).get_string(s));
+        CHECK(s.empty());
+    }
+#endif
 
     SECTION("bytes assembles chunked strings")
     {
@@ -424,7 +492,14 @@ TEST_CASE("cbor ondemand copying accessors are transactional")
         REQUIRE(parse({0x5f,0x41,0x01,0x42,0x02,0x03,0xff}).get_byte_string(buffer));
         CHECK((buffer == std::vector<uint8_t>{0x01,0x02,0x03}));
     }
-
+#if defined (JSONCONS_HAS_STD_BYTE)
+    SECTION("bytes assembles chunked strings into std::vector<std::byte>")
+    {
+        std::vector<std::byte> buffer;
+        REQUIRE(parse({0x5f,0x41,0x01,0x42,0x02,0x03,0xff}).get_byte_string(buffer));
+        CHECK((buffer == std::vector<std::byte>{std::byte(0x01),std::byte(0x02),std::byte(0x03)}));
+    }
+#endif
     SECTION("the destination is untouched on kind mismatch")
     {
         std::string s = "sentinel";
@@ -649,7 +724,7 @@ TEST_CASE("cbor ondemand item children")
     {
         // [1, {"a": [2, 3]}] then trailing bytes
         std::vector<uint8_t> data = {0x82,0x01,0xa1,0x61,'a',0x82,0x02,0x03,0x01,0x02};
-        auto result = cbor::ondemand::scan(jsoncons::span<const uint8_t>(data));
+        auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         cbor::ondemand::item last = result.value().first;
         std::size_t levels = 0;
