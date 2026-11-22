@@ -819,13 +819,19 @@ public:
                 length += (*r).size();
             }
             value.resize(length);
-            std::size_t pos = 0;
-            for (const item chunk : children())
+            if (length > 0)
             {
-                auto r = chunk.get_string();
-                auto sv = *r;
-                std::memcpy(value.data() + pos, reinterpret_cast<const char_type*>(sv.data()), sv.size());
-                pos += sv.size();
+                std::size_t pos = 0;
+                for (const item chunk : children())
+                {
+                    auto r = chunk.get_string();
+                    auto sv = *r;
+                    if (!sv.empty())
+                    {
+                        std::memcpy(reinterpret_cast<void*>(&(value[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+                        pos += sv.size();
+                    }
+                }
             }
         }
         else
@@ -833,7 +839,10 @@ public:
             auto r = get_string();
             auto sv = r.value();
             value.resize(sv.size());
-            std::memcpy(value.data(), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+            if (!sv.empty())
+            {
+                std::memcpy(reinterpret_cast<void*>(&(value[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+            }
         }
         return result_type{};
     }
@@ -862,13 +871,16 @@ public:
                 length += (*r).size();
             }
             value.resize(length);
-            std::size_t pos = 0;
-            for (const item chunk : children())
+            if (length > 0)
             {
-                auto r = chunk.get_byte_string();
-                auto bsv = *r;
-                std::memcpy(value.data() + pos, reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
-                pos += bsv.size();
+                std::size_t pos = 0;
+                for (const item chunk : children())
+                {
+                    auto r = chunk.get_byte_string();
+                    auto bsv = *r;
+                    std::memcpy((value.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+                    pos += bsv.size();
+                }
             }
         }
         else
@@ -876,7 +888,10 @@ public:
             auto r = get_byte_string();
             auto bsv = r.value();
             value.resize(bsv.size());
-            std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+            if (!bsv.empty())
+            {
+                std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+            }
         }
 
         return result_type{};
