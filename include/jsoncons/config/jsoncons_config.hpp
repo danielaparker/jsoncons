@@ -103,9 +103,6 @@ namespace jsoncons {
 using jsoncons::nonstd::basic_string_view;
 using string_view = jsoncons::nonstd::string_view;
 using wstring_view = jsoncons::nonstd::wstring_view;
-//#if !defined(__cpp_char8_t)
-//    using u8string_view = jsoncons::nonstd::u8string_view;   
-//#endif
 } // namespace jsoncons
 #else 
 #include <string_view>
