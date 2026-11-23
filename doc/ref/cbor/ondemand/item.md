@@ -11,7 +11,7 @@ An `item` is one complete, structurally valid encoding.
 <table border="0">
   <tr>
     <td>cbor_major_type major_type() const noexcept</td>
-    <td>Returns a cbor_major_type</td> 
+    <td>Returns a <a href="../cbor_major_type.md">cbor_major_type</></td> 
   </tr>
   <tr>
     <td>uint8_t additional_info() const noexcept</td>
