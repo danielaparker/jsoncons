@@ -16,6 +16,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <atomic>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
@@ -200,6 +201,32 @@ namespace ondemand_detail {
         cbor::cbor_major_type major_type{};
         uint8_t additional_info{0};
         uint64_t value{0};
+        mutable std::atomic<bool> valid_utf8{};
+
+        item_head() noexcept = default;
+
+        item_head(const item_head& other)
+            : major_type(other.major_type),
+              additional_info(other.additional_info),
+              value(other.value),
+              valid_utf8(other.valid_utf8.load(std::memory_order_relaxed))
+        {
+        }
+
+        item_head& operator=(const item_head& other)
+        {
+            if (this != &other)
+            {
+                major_type = other.major_type;
+                additional_info = other.additional_info;
+                value = other.value;
+                valid_utf8.store(
+                    other.valid_utf8.load(std::memory_order_relaxed),
+                    std::memory_order_relaxed
+                );
+            }
+            return *this;
+        }
 
         bool indefinite() const noexcept
         {
@@ -345,10 +372,17 @@ namespace ondemand_detail {
         }
         const char* s = reinterpret_cast<const char*>(content);
         std::size_t length = static_cast<std::size_t>(head.value);
+
+        if (head.valid_utf8.load(std::memory_order_relaxed))
+        {
+            return result_type{string_view(s, length)};
+        }
+
         if (unicode_traits::validate(s, length).ec != unicode_traits::unicode_errc())
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_utf8);
         }
+        head.valid_utf8.store(true, std::memory_order_relaxed);
         return result_type{string_view(s, length)};
     }
 
@@ -1231,36 +1265,32 @@ inline bool validate_text(const cbor_item& text_item) noexcept
         return false;
     }
     auto str = text_item.get_string();
-    if (str.has_value())
+    if (str)
     {
-        string_view text = *str;
-        return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
+        return true;
     }
-    else if (str.error().code() == access_errc::invalid_utf8)
+    if (str.error().code() == access_errc::invalid_utf8)
     {
         return false;
     }
-    for (const cbor_item chunk : text_item.children())
+    if (str.error().code() == access_errc::indefinite)
     {
-        auto r = chunk.get_string();
-        if (r)
+        for (const cbor_item chunk : text_item.children())
         {
-            string_view text = *r;
-            if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
+            auto r = chunk.get_string();
+            if (!r)
             {
                 return false;
             }
         }
-        else
-        {
-            return false;
-        }
+        return true;
     }
-    return true;
+
+    return true; // not text
 }
 
 template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
-access_result<void> cbor_item::get_string(CharBuffer& value) const
+access_result<void> cbor_item::get_string(CharBuffer& buf) const
 {
     using char_type = typename CharBuffer::value_type;
     using result_type = access_result<void>;
@@ -1277,21 +1307,25 @@ access_result<void> cbor_item::get_string(CharBuffer& value) const
             auto r = chunk.get_string();
             if (!r)
             {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                return result_type(jsoncons::unexpect, r.error().code());
             }
             length += (*r).size();
         }
-        value.resize(length);
+        buf.resize(length);
         if (length > 0)
         {
             std::size_t pos = 0;
             for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+                }
                 auto sv = *r;
                 if (!sv.empty())
                 {
-                    std::memcpy(reinterpret_cast<void*>(&(value[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+                    std::memcpy(reinterpret_cast<void*>(&(buf[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
                     pos += sv.size();
                 }
             }
@@ -1300,18 +1334,22 @@ access_result<void> cbor_item::get_string(CharBuffer& value) const
     else
     {
         auto r = get_string();
-        auto sv = r.value();
-        value.resize(sv.size());
+        if (!r)
+        {
+            return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+        }
+        auto sv = *r;
+        buf.resize(sv.size());
         if (!sv.empty())
         {
-            std::memcpy(reinterpret_cast<void*>(&(value[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+            std::memcpy(reinterpret_cast<void*>(&(buf[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
         }
     }
     return result_type{};
 }
 
 template <typename ByteBuffer, typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type>
-access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
+access_result<void> cbor_item::get_byte_string(ByteBuffer& buf) const
 {
     using byte_type = typename ByteBuffer::value_type;
     using result_type = access_result<void>;
@@ -1328,19 +1366,23 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
             auto r = chunk.get_byte_string();
             if (!r)
             {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
             }
             length += (*r).size();
         }
-        value.resize(length);
+        buf.resize(length);
         if (length > 0)
         {
             std::size_t pos = 0;
             for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_byte_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+                }
                 auto bsv = *r;
-                std::memcpy((value.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+                std::memcpy((buf.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
                 pos += bsv.size();
             }
         }
@@ -1348,11 +1390,15 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
     else
     {
         auto r = get_byte_string();
-        auto bsv = r.value();
-        value.resize(bsv.size());
+        if (!r)
+        {
+            return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+        }
+        auto bsv = *r;
+        buf.resize(bsv.size());
         if (!bsv.empty())
         {
-            std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+            std::memcpy(buf.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
         }
     }
 
