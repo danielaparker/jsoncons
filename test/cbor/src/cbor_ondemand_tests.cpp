@@ -36,15 +36,15 @@ namespace {
 
 TEST_CASE("cbor ondemand read and read_item")
 {
-    SECTION("read returns the first item and the remainder")
+    SECTION("read returns the first item and the tail")
     {
         std::vector<uint8_t> data = {0x01,0x02};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        CHECK(result.value().first.encoded_bytes().data() == data.data());
-        CHECK(result.value().first.encoded_bytes().size() == 1);
-        CHECK(result.value().remainder.data() == data.data() + 1);
-        CHECK(result.value().remainder.size() == 1);
+        CHECK(result.value().head.encoded_bytes().data() == data.data());
+        CHECK(result.value().head.encoded_bytes().size() == 1);
+        CHECK(result.value().tail.data() == data.data() + 1);
+        CHECK(result.value().tail.size() == 1);
     }
 
     SECTION("read walks a sequence of items")
@@ -56,7 +56,7 @@ TEST_CASE("cbor ondemand read and read_item")
         {
             auto result = cbor::ondemand::read(rest);
             REQUIRE(result.has_value());
-            rest = result.value().remainder;
+            rest = result.value().tail;
             ++count;
         }
         CHECK(count == 3);
@@ -158,8 +158,8 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> data = {0x9f,0xa1,0x01,0x81,0x02,0x80,0xa0,0xff,0x63,'a','b','c'};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        CHECK(result.value().first.encoded_bytes().size() == 8);
-        CHECK(result.value().remainder.size() == 4);
+        CHECK(result.value().head.encoded_bytes().size() == 8);
+        CHECK(result.value().tail.size() == 4);
     }
 
     SECTION("an indefinite map break may not split a key from its value")
@@ -716,7 +716,7 @@ TEST_CASE("cbor ondemand item children")
         std::vector<uint8_t> data = {0x82,0x01,0xa1,0x61,'a',0x82,0x02,0x03,0x01,0x02};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::ondemand::item last = result.value().first;
+        cbor::ondemand::item last = result.value().head;
         std::size_t levels = 0;
         while (!last.children().empty())
         {

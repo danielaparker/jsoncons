@@ -21,13 +21,13 @@ zero-copy and cannot fail.
 ### Functions
 
 ```cpp
-struct read_result
+struct read_pair
 {
-    item first;
-    span<const uint8_t> remainder;
+    item head;
+    span<const uint8_t> tail;
 };
 
-expected<read_result, read_error> read(
+expected<read_pair, read_error> read(
     span<const uint8_t> input,                             (1)
     int max_nesting_depth = default_max_nesting_depth);
 
@@ -36,12 +36,12 @@ expected<item, read_error> read_item(
     int max_nesting_depth = default_max_nesting_depth);
 ```
 
-(1) Returns a `read_result` or a [read_error](read_error.md).
+(1) Returns a `read_pair` or a [read_error](read_error.md).
 
 (2) Returns an [item](item.md) or a [read_error](read_error.md).
 
 `read` checks the first item in `input` and returns it with the bytes that
-follow, so a CBOR sequence can be read by scanning the remainder repeatedly.
+follow, so a CBOR sequence can be read by reading the remaining bytes repeatedly.
 `read_item` requires `input` to hold exactly one item; trailing bytes produce
 `cbor_errc::trailing_data`. Errors report the position at which scanning
 stopped. Scanning allocates only when nesting exceeds 32 open containers.

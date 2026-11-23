@@ -1152,21 +1152,21 @@ inline void item::copy_content(uint8_t* out) const noexcept
     }
 }
 
-struct read_result
+struct read_pair
 {
-    item first;
-    span<const uint8_t> remainder;
+    item head;
+    span<const uint8_t> tail;
 };
 
 // Scans the first item in `input`, checking its structure, and returns it
 // with the bytes that follow. Errors report where scanning stopped.
 // Allocates only when nesting exceeds 32 open containers.
-inline expected<read_result, read_error> read(span<const uint8_t> input,
+inline expected<read_pair, read_error> read(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
     if (input.empty())
     {
-        return expected<read_result, read_error>(unexpect, cbor_errc::unexpected_eof, 0);
+        return expected<read_pair, read_error>(unexpect, cbor_errc::unexpected_eof, 0);
     }
     const uint8_t* p = input.data();
     const uint8_t* end = p + input.size();
@@ -1189,10 +1189,10 @@ inline expected<read_result, read_error> read(span<const uint8_t> input,
     }
     if (!ok)
     {
-        return expected<read_result, read_error>(unexpect,
+        return expected<read_pair, read_error>(unexpect,
             ec, static_cast<std::size_t>(p - input.data()));
     }
-    return read_result{
+    return read_pair{
         ondemand_detail::item_access::make(
             span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data())), head, content),
         span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
@@ -1208,17 +1208,17 @@ inline expected<item, read_error> read_item(span<const uint8_t> input,
     {
         return expected<item, read_error>(unexpect, scanned.error());
     }
-    if (!scanned.value().remainder.empty())
+    if (!scanned.value().tail.empty())
     {
         return expected<item, read_error>(unexpect,
-            cbor_errc::trailing_data, scanned.value().first.encoded_bytes().size());
+            cbor_errc::trailing_data, scanned.value().head.encoded_bytes().size());
     }
-    return scanned.value().first;
+    return scanned.value().head;
 }
 
 // Reject temporary owning containers, whose items would dangle.
 template <typename Container>
-expected<read_result, read_error> read(const Container&&, int = default_max_nesting_depth) = delete;
+expected<read_pair, read_error> read(const Container&&, int = default_max_nesting_depth) = delete;
 template <typename Container>
 expected<item, read_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
 
