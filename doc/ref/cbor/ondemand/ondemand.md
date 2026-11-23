@@ -17,7 +17,7 @@ zero-copy and cannot fail.
     <td>Represents one complete, structurally valid encoding.</td> 
   </tr>
 </table>
-
+ 
 ### Functions
 
 ```cpp
@@ -34,11 +34,17 @@ expected<cbor_sequence, read_error> read_sequence(
 expected<cbor_item, read_error> read_item(
     span<const uint8_t> input,                             (2)
     int max_nesting_depth = default_max_nesting_depth);
+
+bool validate_text(const item&) noexcept;                  (3)
 ```
 
 (1) Returns a `cbor_sequence` or a [read_error](read_error.md).
 
 (2) Returns an [cbor_item](cbor_item.md) or a [read_error](read_error.md).
+
+(3) Validate_text checks that a text item is well-formed UTF-8. Each chunk 
+of an indefinite-length text string is checked independently, as RFC 8949 section 
+3.2.3 requires.
 
 `read_sequence` checks the first item in `input` and returns it with the bytes that
 follow, so a CBOR sequence can be read by reading the remaining bytes repeatedly.

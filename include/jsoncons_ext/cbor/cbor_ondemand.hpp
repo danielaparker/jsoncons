@@ -16,6 +16,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <atomic>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
@@ -200,6 +201,32 @@ namespace ondemand_detail {
         cbor::cbor_major_type major_type{};
         uint8_t additional_info{0};
         uint64_t value{0};
+        mutable std::atomic<bool> valid_utf8{};
+
+        item_head() noexcept = default;
+
+        item_head(const item_head& other)
+            : major_type(other.major_type),
+              additional_info(other.additional_info),
+              value(other.value),
+              valid_utf8(other.valid_utf8.load(std::memory_order_relaxed))
+        {
+        }
+
+        item_head& operator=(const item_head& other)
+        {
+            if (this != &other)
+            {
+                major_type = other.major_type;
+                additional_info = other.additional_info;
+                value = other.value;
+                valid_utf8.store(
+                    other.valid_utf8.load(std::memory_order_relaxed),
+                    std::memory_order_relaxed
+                );
+            }
+            return *this;
+        }
 
         bool indefinite() const noexcept
         {
@@ -345,10 +372,17 @@ namespace ondemand_detail {
         }
         const char* s = reinterpret_cast<const char*>(content);
         std::size_t length = static_cast<std::size_t>(head.value);
+
+        if (head.valid_utf8.load(std::memory_order_relaxed))
+        {
+            return result_type{string_view(s, length)};
+        }
+
         if (unicode_traits::validate(s, length).ec != unicode_traits::unicode_errc())
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_utf8);
         }
+        head.valid_utf8.store(true, std::memory_order_relaxed);
         return result_type{string_view(s, length)};
     }
 
@@ -1236,27 +1270,28 @@ inline bool validate_text(const cbor_item& text_item) noexcept
         string_view text = *str;
         return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
     }
-    else if (str.error().code() == access_errc::invalid_utf8)
+    else if (str.error().code() == access_errc::indefinite)
     {
-        return false;
-    }
-    for (const cbor_item chunk : text_item.children())
-    {
-        auto r = chunk.get_string();
-        if (r)
+        for (const cbor_item chunk : text_item.children())
         {
-            string_view text = *r;
-            if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
+            auto r = chunk.get_string();
+            if (r)
+            {
+                string_view text = *r;
+                if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
+                {
+                    return false;
+                }
+            }
+            else
             {
                 return false;
             }
         }
-        else
-        {
-            return false;
-        }
+        return true;
     }
-    return true;
+
+    return false;
 }
 
 template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
