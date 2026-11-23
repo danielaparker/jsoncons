@@ -15,7 +15,7 @@
 #include <vector>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
+namespace cbor = jsoncons::cbor;
 
 namespace {
 
@@ -29,7 +29,7 @@ namespace {
     cbor::cbor_errc parse_errc(const std::vector<uint8_t>& data)
     {
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data.data(), data.size()));
-        return result ? cbor::cbor_errc::success : result.error().code;
+        return result ? cbor::cbor_errc::success : result.error().code();
     }
 
 } // namespace
@@ -67,8 +67,8 @@ TEST_CASE("cbor ondemand read and read_item")
         std::vector<uint8_t> data = {0x01,0x02};
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::trailing_data);
-        CHECK(result.error().position == 1);
+        CHECK(result.error().code() == cbor::cbor_errc::trailing_data);
+        CHECK(result.error().position() == 1);
 
         std::vector<uint8_t> exact = {0x01};
         CHECK(cbor::ondemand::read_item(jsoncons::span<const uint8_t>(exact)).has_value());
@@ -78,8 +78,8 @@ TEST_CASE("cbor ondemand read and read_item")
     {
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>());
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::unexpected_eof);
-        CHECK(result.error().position == 0);
+        CHECK(result.error().code() == cbor::cbor_errc::unexpected_eof);
+        CHECK(result.error().position() == 0);
     }
 
     SECTION("errors carry the position where scanning stopped")
@@ -88,8 +88,8 @@ TEST_CASE("cbor ondemand read and read_item")
         std::vector<uint8_t> data = {0x82,0x01,0x1f};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
-        CHECK(result.error().position == 3);
+        CHECK(result.error().code() == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().position() == 3);
     }
 }
 
@@ -110,7 +110,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         data.push_back(0x01);
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::max_nesting_depth_exceeded);
+        CHECK(result.error().code() == cbor::cbor_errc::max_nesting_depth_exceeded);
 
         CHECK(cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data), 4000).has_value());
     }
@@ -136,12 +136,12 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> array = {0x9a,0xff,0xff,0xff,0xff};
         auto array_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(array));
         REQUIRE_FALSE(array_result.has_value());
-        CHECK(array_result.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(array_result.error().code() == cbor::cbor_errc::unexpected_eof);
 
         std::vector<uint8_t> map = {0xba,0xff,0xff,0xff,0xff};
         auto map_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(map));
         REQUIRE_FALSE(map_result.has_value());
-        CHECK(map_result.error().code == cbor::cbor_errc::unexpected_eof);
+        CHECK(map_result.error().code() == cbor::cbor_errc::unexpected_eof);
     }
 
     SECTION("a count beyond the input fails at its first malformed item, else EOF")
@@ -167,7 +167,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> dangling_key = {0xbf,0x01,0xff};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(dangling_key));
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().code() == cbor::cbor_errc::unknown_type);
 
         std::vector<uint8_t> complete_entry = {0xbf,0x01,0x02,0xff};
         CHECK(cbor::ondemand::read_item(jsoncons::span<const uint8_t>(complete_entry)).has_value());
@@ -178,7 +178,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> data = {0x1f};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE_FALSE(result.has_value());
-        CHECK(result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(result.error().code() == cbor::cbor_errc::unknown_type);
     }
 
     SECTION("a two-byte simple value below 32 is not well-formed")
@@ -187,7 +187,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> below = {0xf8,0x13};
         auto below_result = cbor::ondemand::read(jsoncons::span<const uint8_t>(below));
         REQUIRE_FALSE(below_result.has_value());
-        CHECK(below_result.error().code == cbor::cbor_errc::unknown_type);
+        CHECK(below_result.error().code() == cbor::cbor_errc::unknown_type);
 
         std::vector<uint8_t> nested = {0x81,0xf8,0x00};
         CHECK_FALSE(cbor::ondemand::read(jsoncons::span<const uint8_t>(nested)).has_value());
@@ -510,17 +510,7 @@ TEST_CASE("cbor ondemand copying accessors are transactional")
         CHECK_FALSE(parse({0x61,'a'}).get_byte_string(buffer));
         CHECK((buffer == std::vector<uint8_t>{0xaa}));
     }
-
-    /*SECTION("the destination may alias the scanned bytes")
-    {
-        std::vector<uint8_t> data = {0x42,0x01,0x02};
-        auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_byte_string(data));   // the item borrows `data` itself
-        CHECK((data == std::vector<uint8_t>{0x01,0x02}));
-    }*/
 }
-
 
 TEST_CASE("cbor ondemand string chunks")
 {

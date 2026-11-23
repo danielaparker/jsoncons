@@ -21,12 +21,6 @@ zero-copy and cannot fail.
 ### Functions
 
 ```cpp
-struct read_error
-{
-    cbor_errc code;
-    std::size_t position;
-};
-
 struct read_result
 {
     item first;
@@ -34,13 +28,17 @@ struct read_result
 };
 
 expected<read_result, read_error> read(
-    span<const uint8_t> input,
+    span<const uint8_t> input,                             (1)
     int max_nesting_depth = default_max_nesting_depth);
 
 expected<item, read_error> read_item(
-    span<const uint8_t> input,
+    span<const uint8_t> input,                             (2)
     int max_nesting_depth = default_max_nesting_depth);
 ```
+
+(1) Returns a `read_result` or a [read_error](read_error.md).
+
+(2) Returns an [item](item.md) or a [read_error](read_error.md).
 
 `read` checks the first item in `input` and returns it with the bytes that
 follow, so a CBOR sequence can be read by scanning the remainder repeatedly.
@@ -68,37 +66,36 @@ lifetime responsibility.
 #include <iostream>
 #include <vector>
 
-namespace ondemand = jsoncons::cbor::ondemand;
+namespace cbor = jsoncons::cbor;
 
 int main()
 {
     // {"id": 42, "scores": [1, 2]}
-    const std::vector<uint8_t&gt; data = {
+    const std::vector<uint8_t> data = {
         0xa2,
         0x62, 'i', 'd', 0x18, 0x2a,
         0x66, 's', 'c', 'o', 'r', 'e', 's', 0x82, 0x01, 0x02
     };
 
-    auto parsed = ondemand::read_item(jsoncons::span<const uint8_t&gt;(data));
+    auto parsed = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
     if (!parsed)
     {
-        std::cout << "error " << static_cast<int>(parsed.error().code)
-            << " at offset " << parsed.error().offset << "\n";
+        std::cout << "error " << parsed.error().message() << "\n";
         return 1;
     }
 
     bool is_key = true;
     std::string_view key;
-    for (const ondemand::item child : parsed.value().children())
+    for (const cbor::ondemand::item child : parsed.value().children())
     {
         if (is_key)
         {
             key = child.get_string().value();
         }
-        else if (child.type() == ondemand::item_type::array)
+        else if (child.type() == cbor::ondemand::item_type::array)
         {
             std::cout << key << ":";
-            for (const ondemand::item element : child.children())
+            for (const cbor::ondemand::item element : child.children())
             {
                 uint64_t value = element.get_uint64().value();
                 std::cout << " " << value;
@@ -112,6 +109,7 @@ int main()
         }
         is_key = !is_key;
     }
+    return 0;
 }
 ```
 

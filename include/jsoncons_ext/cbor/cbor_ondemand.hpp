@@ -83,31 +83,33 @@ std::error_code make_error_code(access_errc e) noexcept
 
 class access_error
 {
-    access_errc ec_{};
-    std::size_t position_;
+    access_errc code_{};
+    std::size_t position_{};
     
 public:
-    access_error(access_errc ec)
-        : ec_{ec}
+    access_error() noexcept = default;
+
+    access_error(access_errc ec) noexcept
+        : code_{ec}
     {
     }
     
-    access_error(access_errc ec, std::size_t position)
-        : ec_{ec}, position_{position}
+    access_error(access_errc ec, std::size_t position) noexcept
+        : code_{ec}, position_{position}
     {
     }
 
-    access_error(const access_error& other) = default;
+    access_error(const access_error& other) noexcept = default;
 
-    access_error(access_error&& other) = default;
+    access_error(access_error&& other) noexcept = default;
 
-    access_error& operator=(const access_error& other) = default;
+    access_error& operator=(const access_error& other) noexcept = default;
 
-    access_error& operator=(access_error&& other) = default;
+    access_error& operator=(access_error&& other) noexcept = default;
     
     access_errc code() const noexcept
     {
-        return ec_;
+        return code_;
     }
     std::size_t position() const noexcept
     {
@@ -116,7 +118,7 @@ public:
 
     std::string message() const
     {
-        std::string str(make_error_code(ec_).message());
+        std::string str(make_error_code(code_).message());
         str.append(" at position ");
         append_to_string(position_, str);
         return str;
@@ -149,8 +151,46 @@ enum class item_type : uint8_t
 
 struct read_error
 {
-    cbor_errc code;
-    std::size_t position;
+    cbor_errc code_{};
+    std::size_t position_{0};
+    
+public:
+    read_error() noexcept = default;
+
+    read_error(cbor_errc ec) noexcept
+        : code_{ec}
+    {
+    }
+    
+    read_error(cbor_errc ec, std::size_t position) noexcept
+        : code_{ec}, position_{position}
+    {
+    }
+
+    read_error(const read_error& other) noexcept = default;
+
+    read_error(read_error&& other) noexcept = default;
+
+    read_error& operator=(const read_error& other) noexcept = default;
+
+    read_error& operator=(read_error&& other) noexcept = default;
+    
+    cbor_errc code() const noexcept
+    {
+        return code_;
+    }
+    std::size_t position() const noexcept
+    {
+        return position_;
+    }
+
+    std::string message() const
+    {
+        std::string str(make_error_code(code_).message());
+        str.append(" at position ");
+        append_to_string(position_, str);
+        return str;
+    }
 };
 
 namespace ondemand_detail {
@@ -1126,8 +1166,7 @@ inline expected<read_result, read_error> read(span<const uint8_t> input,
 {
     if (input.empty())
     {
-        return expected<read_result, read_error>(unexpect,
-            read_error{cbor_errc::unexpected_eof, 0});
+        return expected<read_result, read_error>(unexpect, cbor_errc::unexpected_eof, 0);
     }
     const uint8_t* p = input.data();
     const uint8_t* end = p + input.size();
@@ -1151,7 +1190,7 @@ inline expected<read_result, read_error> read(span<const uint8_t> input,
     if (!ok)
     {
         return expected<read_result, read_error>(unexpect,
-            read_error{ec, static_cast<std::size_t>(p - input.data())});
+            ec, static_cast<std::size_t>(p - input.data()));
     }
     return read_result{
         ondemand_detail::item_access::make(
@@ -1172,7 +1211,7 @@ inline expected<item, read_error> read_item(span<const uint8_t> input,
     if (!scanned.value().remainder.empty())
     {
         return expected<item, read_error>(unexpect,
-            read_error{cbor_errc::trailing_data, scanned.value().first.encoded_bytes().size()});
+            cbor_errc::trailing_data, scanned.value().first.encoded_bytes().size());
     }
     return scanned.value().first;
 }
