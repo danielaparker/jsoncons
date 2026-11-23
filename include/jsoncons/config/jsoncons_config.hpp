@@ -112,7 +112,9 @@ using wstring_view = jsoncons::nonstd::wstring_view;
 namespace jsoncons {
 using std::basic_string_view;
 using std::string_view;
+#if defined(__cpp_char8_t)
 using std::u8string_view;
+#endif
 using std::wstring_view;
 }
 #endif
