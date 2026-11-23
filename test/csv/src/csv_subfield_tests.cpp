@@ -142,3 +142,36 @@ NY,LON,TOR;LON
     CHECK(expected == j);
 }
 
+
+TEST_CASE("test_m_columns empty subfield with ignore_empty_values")
+{
+    // An empty subfield under ignore_empty_values must not advance the column
+    // cursor past the last column while a subfield array is open.
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::m_columns)
+        .subfield_delimiter('|')
+        .ignore_empty_values(true);
+
+    SECTION("leading empty subfield in last column")
+    {
+        const std::string s = "a\n|x\n";
+        jsoncons::json expected = R"({"a":[["x"]]})"_json;
+        jsoncons::json j = csv::decode_csv<jsoncons::json>(s, options);
+        CHECK(expected == j);
+    }
+    SECTION("all subfields empty")
+    {
+        const std::string s = "a\n|\n";
+        jsoncons::json expected = R"({"a":[[]]})"_json;
+        jsoncons::json j = csv::decode_csv<jsoncons::json>(s, options);
+        CHECK(expected == j);
+    }
+    SECTION("empty subfield in last of several columns")
+    {
+        const std::string s = "a,b\n1,|x\n";
+        jsoncons::json expected = R"({"a":[1],"b":[["x"]]})"_json;
+        jsoncons::json j = csv::decode_csv<jsoncons::json>(s, options);
+        CHECK(expected == j);
+    }
+}
