@@ -1265,25 +1265,20 @@ inline bool validate_text(const cbor_item& text_item) noexcept
         return false;
     }
     auto str = text_item.get_string();
-    if (str.has_value())
+    if (str)
     {
-        string_view text = *str;
-        return ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size());
+        return true;
     }
-    else if (str.error().code() == access_errc::indefinite)
+    if (str.error().code() == access_errc::invalid_utf8)
+    {
+        return false;
+    }
+    if (str.error().code() == access_errc::indefinite)
     {
         for (const cbor_item chunk : text_item.children())
         {
             auto r = chunk.get_string();
-            if (r)
-            {
-                string_view text = *r;
-                if (!ondemand_detail::validate_utf8(reinterpret_cast<const uint8_t*>(text.data()), text.size()))
-                {
-                    return false;
-                }
-            }
-            else
+            if (!r)
             {
                 return false;
             }
@@ -1291,7 +1286,7 @@ inline bool validate_text(const cbor_item& text_item) noexcept
         return true;
     }
 
-    return false;
+    return true; // not text
 }
 
 template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
