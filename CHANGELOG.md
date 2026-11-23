@@ -3,6 +3,8 @@ master
 
 - Fixed bugs
 
+  - Fixed `jsoncons::nonstd::expected` copy assignment when assigning from an error. 
+
   - Git Issue PR #750: Fix JMESPath merge overrides for non-primitive values
 
   - Git Issue PR #751: Fix jmespath merge() dropping overrides for object/array values 
@@ -48,6 +50,8 @@ master
   - Git Issue PR #809: jmespath: reject unexpected characters instead of looping forever
 
   - Git Issue PR #810: jmespath: stop parsing when an unbalanced ')' empties the state stack
+
+  - Git Issue PR #811: jmespath: reject an unmatched ')' at the top level of an expression
 
   - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
 
