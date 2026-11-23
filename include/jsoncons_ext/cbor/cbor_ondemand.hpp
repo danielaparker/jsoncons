@@ -132,7 +132,7 @@ constexpr int default_max_nesting_depth = 1024;
 
 // The major type of an item's head, after any leading tags. `simple` is
 // major type 7: simple values and floats, told apart by the argument.
-enum class item_type : uint8_t
+enum class cbor_type : uint8_t
 {
     unsigned_integer = 0,
     negative_integer = 0x20,
@@ -217,11 +217,11 @@ namespace ondemand_detail {
         return head.additional_info;
     }
 
-    inline item_type type(const item_head& head) noexcept
+    inline cbor_type type(const item_head& head) noexcept
     {
         if (head.major_type != cbor_major_type::simple)
         {
-            return static_cast<item_type>(static_cast<uint8_t>(head.major_type) << 5); 
+            return static_cast<cbor_type>(static_cast<uint8_t>(head.major_type) << 5); 
         }
         else
         {
@@ -229,19 +229,19 @@ namespace ondemand_detail {
             {
                 case 20:
                 case 21:
-                    return item_type::boolean;
+                    return cbor_type::boolean;
                 case 22:
-                    return item_type::null;
+                    return cbor_type::null;
                 case 23:
-                    return item_type::undefined;
+                    return cbor_type::undefined;
                 case 25:
-                    return item_type::float16;
+                    return cbor_type::float16;
                 case 26:
-                    return item_type::float32;
+                    return cbor_type::float32;
                 case 27:
-                    return item_type::float64;
+                    return cbor_type::float64;
                 default:
-                    return item_type::simple;
+                    return cbor_type::simple;
             }
         }
     }
@@ -292,7 +292,7 @@ namespace ondemand_detail {
     {
         using result_type = access_result<bool>;
 
-        if (type(head) != item_type::boolean)
+        if (type(head) != cbor_type::boolean)
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }        
@@ -734,9 +734,9 @@ namespace ondemand_detail {
 } // namespace ondemand_detail
 
 // A zero-copy view of one complete, structurally well-formed CBOR item:
-// its leading tags, head and content. Obtained only from read, read_item
+// its leading tags, head and content. Obtained only from read_sequence, read_item
 // or children(). Borrows the scanned bytes and must not outlive them.
-class item
+class cbor_item
 {
 public:
     // The item's complete encoding, including leading tags.
@@ -755,7 +755,7 @@ public:
         return ondemand_detail::additional_info(head_);
     }
 
-    item_type type() const noexcept
+    cbor_type type() const noexcept
     {
         return ondemand_detail::type(head_);
     }
@@ -844,7 +844,7 @@ public:
 private:
     friend struct ondemand_detail::item_access;
 
-    item(span<const uint8_t> bytes, const ondemand_detail::item_head& head, const uint8_t* content) noexcept
+    cbor_item(span<const uint8_t> bytes, const ondemand_detail::item_head& head, const uint8_t* content) noexcept
         : bytes_(bytes), head_(head), content_(content)
     {
     }
@@ -862,16 +862,16 @@ namespace ondemand_detail {
 
     struct item_access
     {
-        static item make(span<const uint8_t> bytes, const item_head& head, const uint8_t* content) noexcept
+        static cbor_item make(span<const uint8_t> bytes, const item_head& head, const uint8_t* content) noexcept
         {
-            return item(bytes, head, content);
+            return cbor_item(bytes, head, content);
         }
     };
 
 } // namespace ondemand_detail
 
 // Iterates an item's leading tag numbers.
-class item::tag_iterator
+class cbor_item::tag_iterator
 {
 public:
     using value_type = uint64_t;
@@ -942,7 +942,7 @@ private:
     uint64_t value_;
 };
 
-class item::tag_range
+class cbor_item::tag_range
 {
 public:
     using iterator = tag_iterator;
@@ -953,14 +953,14 @@ public:
     bool empty() const noexcept { return first_ == stop_; }
 
 private:
-    friend class item;
+    friend class cbor_item;
     tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 
     const uint8_t* first_;
     const uint8_t* stop_;
 };
 
-inline item::tag_range item::tags() const noexcept
+inline cbor_item::tag_range cbor_item::tags() const noexcept
 {
     // Leading tags occupy [start of encoding, start of untagged head).
     return tag_range(bytes_.data(), content_ - ondemand_detail::head_size(head_));
@@ -968,11 +968,11 @@ inline item::tag_range item::tags() const noexcept
 
 // Iterates an item's children, measuring each once. The last child of a
 // definite-length container ends where its parent does, so is not measured.
-class item::child_iterator
+class cbor_item::child_iterator
 {
 public:
-    using value_type = item;
-    using reference = item;
+    using value_type = cbor_item;
+    using reference = cbor_item;
     using pointer = void;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
@@ -982,7 +982,7 @@ public:
     {
     }
 
-    item operator*() const noexcept
+    cbor_item operator*() const noexcept
     {
         assert(pos_ != nullptr);
         return ondemand_detail::item_access::make(
@@ -1060,7 +1060,7 @@ private:
     const uint8_t* content_;
 };
 
-class item::child_range
+class cbor_item::child_range
 {
 public:
     using iterator = child_iterator;
@@ -1084,7 +1084,7 @@ public:
     }
 
 private:
-    friend class item;
+    friend class cbor_item;
     child_range(const uint8_t* first, const uint8_t* end, uint64_t remaining) noexcept
         : first_(first), end_(end), remaining_(remaining)
     {
@@ -1095,7 +1095,7 @@ private:
     uint64_t remaining_;
 };
 
-inline item::child_range item::children() const noexcept
+inline cbor_item::child_range cbor_item::children() const noexcept
 {
     const uint8_t* const end = bytes_.data() + bytes_.size();
     switch (head_.major_type)
@@ -1121,21 +1121,21 @@ inline item::child_range item::children() const noexcept
     return child_range(nullptr, nullptr, 0);
 }
 
-inline std::size_t item::content_size() const noexcept
+inline std::size_t cbor_item::content_size() const noexcept
 {
     if (!head_.indefinite())
     {
         return static_cast<std::size_t>(head_.value);
     }
     std::size_t size = 0;
-    for (const item chunk : children())
+    for (const cbor_item chunk : children())
     {
         size += static_cast<std::size_t>(chunk.head_.value);
     }
     return size;
 }
 
-inline void item::copy_content(uint8_t* out) const noexcept
+inline void cbor_item::copy_content(uint8_t* out) const noexcept
 {
     if (!head_.indefinite())
     {
@@ -1145,28 +1145,28 @@ inline void item::copy_content(uint8_t* out) const noexcept
         }
         return;
     }
-    for (const item chunk : children())
+    for (const cbor_item chunk : children())
     {
         chunk.copy_content(out);
         out += static_cast<std::size_t>(chunk.head_.value);
     }
 }
 
-struct item_sequence
+struct cbor_sequence
 {
-    item head;
+    cbor_item head;
     span<const uint8_t> tail;
 };
 
 // Scans the first item in `input`, checking its structure, and returns it
 // with the bytes that follow. Errors report where scanning stopped.
 // Allocates only when nesting exceeds 32 open containers.
-inline expected<item_sequence, read_error> read(span<const uint8_t> input,
+inline expected<cbor_sequence, read_error> read_sequence(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
     if (input.empty())
     {
-        return expected<item_sequence, read_error>(unexpect, cbor_errc::unexpected_eof, 0);
+        return expected<cbor_sequence, read_error>(unexpect, cbor_errc::unexpected_eof, 0);
     }
     const uint8_t* p = input.data();
     const uint8_t* end = p + input.size();
@@ -1189,28 +1189,28 @@ inline expected<item_sequence, read_error> read(span<const uint8_t> input,
     }
     if (!ok)
     {
-        return expected<item_sequence, read_error>(unexpect,
+        return expected<cbor_sequence, read_error>(unexpect,
             ec, static_cast<std::size_t>(p - input.data()));
     }
-    return item_sequence{
+    return cbor_sequence{
         ondemand_detail::item_access::make(
             span<const uint8_t>(input.data(), static_cast<std::size_t>(p - input.data())), head, content),
         span<const uint8_t>(p, static_cast<std::size_t>(end - p))};
 }
 
-// Like read, but `input` must hold exactly one item: trailing bytes are
+// Like read_sequence, but `input` must hold exactly one item: trailing bytes are
 // cbor_errc::trailing_data.
-inline expected<item, read_error> read_item(span<const uint8_t> input,
+inline expected<cbor_item, read_error> read_item(span<const uint8_t> input,
     int max_nesting_depth = default_max_nesting_depth)
 {
-    auto scanned = read(input, max_nesting_depth);
+    auto scanned = read_sequence(input, max_nesting_depth);
     if (!scanned)
     {
-        return expected<item, read_error>(unexpect, scanned.error());
+        return expected<cbor_item, read_error>(unexpect, scanned.error());
     }
     if (!scanned.value().tail.empty())
     {
-        return expected<item, read_error>(unexpect,
+        return expected<cbor_item, read_error>(unexpect,
             cbor_errc::trailing_data, scanned.value().head.encoded_bytes().size());
     }
     return scanned.value().head;
@@ -1218,15 +1218,15 @@ inline expected<item, read_error> read_item(span<const uint8_t> input,
 
 // Reject temporary owning containers, whose items would dangle.
 template <typename Container>
-expected<item_sequence, read_error> read(const Container&&, int = default_max_nesting_depth) = delete;
+expected<cbor_sequence, read_error> read_sequence(const Container&&, int = default_max_nesting_depth) = delete;
 template <typename Container>
-expected<item, read_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
+expected<cbor_item, read_error> read_item(const Container&&, int = default_max_nesting_depth) = delete;
 
 // True if `text_item` is a text string of well-formed UTF-8, checking each
 // chunk of an indefinite-length string separately (RFC 8949 3.2.3).
-inline bool validate_text(const item& text_item) noexcept
+inline bool validate_text(const cbor_item& text_item) noexcept
 {
-    if (text_item.type() != item_type::text_string)
+    if (text_item.type() != cbor_type::text_string)
     {
         return false;
     }
@@ -1240,7 +1240,7 @@ inline bool validate_text(const item& text_item) noexcept
     {
         return false;
     }
-    for (const item chunk : text_item.children())
+    for (const cbor_item chunk : text_item.children())
     {
         auto r = chunk.get_string();
         if (r)
@@ -1260,7 +1260,7 @@ inline bool validate_text(const item& text_item) noexcept
 }
 
 template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
-access_result<void> item::get_string(CharBuffer& value) const
+access_result<void> cbor_item::get_string(CharBuffer& value) const
 {
     using char_type = typename CharBuffer::value_type;
     using result_type = access_result<void>;
@@ -1272,7 +1272,7 @@ access_result<void> item::get_string(CharBuffer& value) const
     if (head_.indefinite())
     {
         std::size_t length = 0;
-        for (const item chunk : children())
+        for (const cbor_item chunk : children())
         {
             auto r = chunk.get_string();
             if (!r)
@@ -1285,7 +1285,7 @@ access_result<void> item::get_string(CharBuffer& value) const
         if (length > 0)
         {
             std::size_t pos = 0;
-            for (const item chunk : children())
+            for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_string();
                 auto sv = *r;
@@ -1311,7 +1311,7 @@ access_result<void> item::get_string(CharBuffer& value) const
 }
 
 template <typename ByteBuffer, typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type>
-access_result<void> item::get_byte_string(ByteBuffer& value) const
+access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
 {
     using byte_type = typename ByteBuffer::value_type;
     using result_type = access_result<void>;
@@ -1323,7 +1323,7 @@ access_result<void> item::get_byte_string(ByteBuffer& value) const
     if (head_.indefinite())
     {
         std::size_t length = 0;
-        for (const item chunk : children())
+        for (const cbor_item chunk : children())
         {
             auto r = chunk.get_byte_string();
             if (!r)
@@ -1336,7 +1336,7 @@ access_result<void> item::get_byte_string(ByteBuffer& value) const
         if (length > 0)
         {
             std::size_t pos = 0;
-            for (const item chunk : children())
+            for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_byte_string();
                 auto bsv = *r;

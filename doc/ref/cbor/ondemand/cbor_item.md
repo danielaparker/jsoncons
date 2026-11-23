@@ -1,10 +1,10 @@
-### jsoncons::cbor::ondemand::item
+### jsoncons::cbor::ondemand::cbor_item
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
 ```
 
-An `item` is one complete, structurally valid encoding. 
+An `cbor_item` is one complete, structurally valid encoding. 
 
 #### Accessors
 
@@ -18,8 +18,8 @@ An `item` is one complete, structurally valid encoding.
     <td>Returns CBOR additional information.</td> 
   </tr>
   <tr>
-    <td>item_type type() const noexcept</td>
-    <td>Returns a <a href="item_type.md">item_type</a>.</td> 
+    <td>cbor_type type() const noexcept</td>
+    <td>Returns a <a href="cbor_type.md">cbor_type</a>.</td> 
   </tr>
   <tr>
     <td>uint64_t argument() const noexcept</td>
@@ -89,7 +89,7 @@ indefinite-length strings into the provided buffer.</td>
 #### Non-member functions
 
 ```cpp
-bool validate_text(const item&) noexcept;
+bool validate_text(const cbor_item&) noexcept;
 ```
 
 `validate_text` checks that a text item is well-formed UTF-8. Each chunk of an

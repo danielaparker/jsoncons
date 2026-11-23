@@ -19,7 +19,7 @@ namespace cbor = jsoncons::cbor;
 
 namespace {
 
-    cbor::ondemand::item parse(const std::vector<uint8_t>& data)
+    cbor::ondemand::cbor_item parse(const std::vector<uint8_t>& data)
     {
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data.data(), data.size()));
         REQUIRE(result.has_value());
@@ -195,7 +195,7 @@ TEST_CASE("cbor ondemand scanning validates well-formedness")
         std::vector<uint8_t> at_32 = {0xf8,0x20};
         auto at_32_result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(at_32));
         REQUIRE(at_32_result.has_value());
-        CHECK(at_32_result.value().type() == cbor::ondemand::item_type::simple);
+        CHECK(at_32_result.value().type() == cbor::ondemand::cbor_type::simple);
         CHECK(at_32_result.value().argument() == 32);
     }
 }
@@ -258,13 +258,13 @@ TEST_CASE("cbor ondemand item exposes wire structure")
 {
     SECTION("kinds follow the untagged major type")
     {
-        CHECK(parse({0x00}).type() == cbor::ondemand::item_type::unsigned_integer);
-        CHECK(parse({0x20}).type() == cbor::ondemand::item_type::negative_integer);
-        CHECK(parse({0x41,0x01}).type() == cbor::ondemand::item_type::byte_string);
-        CHECK(parse({0x61,'a'}).type() == cbor::ondemand::item_type::text_string);
-        CHECK(parse({0x80}).type() == cbor::ondemand::item_type::array);
-        CHECK(parse({0xa0}).type() == cbor::ondemand::item_type::map);
-        CHECK(parse({0xf4}).type() == cbor::ondemand::item_type::boolean);
+        CHECK(parse({0x00}).type() == cbor::ondemand::cbor_type::unsigned_integer);
+        CHECK(parse({0x20}).type() == cbor::ondemand::cbor_type::negative_integer);
+        CHECK(parse({0x41,0x01}).type() == cbor::ondemand::cbor_type::byte_string);
+        CHECK(parse({0x61,'a'}).type() == cbor::ondemand::cbor_type::text_string);
+        CHECK(parse({0x80}).type() == cbor::ondemand::cbor_type::array);
+        CHECK(parse({0xa0}).type() == cbor::ondemand::cbor_type::map);
+        CHECK(parse({0xf4}).type() == cbor::ondemand::cbor_type::boolean);
     }
 
     SECTION("argument exposes the head argument")
@@ -280,7 +280,7 @@ TEST_CASE("cbor ondemand item exposes wire structure")
     SECTION("indefinite length is visible")
     {
         std::vector<uint8_t> data = {0x9f,0x01,0xff};
-        cbor::ondemand::item scanned = parse(data);
+        cbor::ondemand::cbor_item scanned = parse(data);
         CHECK(scanned.indefinite());
         CHECK(scanned.argument() == 0);
         CHECK_FALSE(parse({0x81,0x01}).indefinite());
@@ -289,8 +289,8 @@ TEST_CASE("cbor ondemand item exposes wire structure")
     SECTION("tags are exposed, not interpreted")
     {
         std::vector<uint8_t> data = {0xd8,0x40,0xc2,0x42,0x01,0x02};   // tag 64, tag 2, bytes
-        cbor::ondemand::item tagged = parse(data);
-        CHECK(tagged.type() == cbor::ondemand::item_type::byte_string);
+        cbor::ondemand::cbor_item tagged = parse(data);
+        CHECK(tagged.type() == cbor::ondemand::cbor_type::byte_string);
 
         std::vector<uint64_t> tags;
         for (uint64_t tag : tagged.tags())
@@ -306,7 +306,7 @@ TEST_CASE("cbor ondemand item exposes wire structure")
     SECTION("encoded_bytes covers the whole item, tags included")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};
-        cbor::ondemand::item tagged = parse(data);
+        cbor::ondemand::cbor_item tagged = parse(data);
         CHECK(tagged.encoded_bytes().data() == data.data());
         CHECK(tagged.encoded_bytes().size() == data.size());
     }
@@ -370,7 +370,7 @@ TEST_CASE("cbor ondemand typed accessors")
     SECTION("a tagged scalar still reads, with its tag visible")
     {
         std::vector<uint8_t> data = {0xc1,0x0a};   // tag 1 (epoch time) 10
-        cbor::ondemand::item tagged = parse(data);
+        cbor::ondemand::cbor_item tagged = parse(data);
         CHECK_FALSE(tagged.tags().empty());
         cbor::ondemand::access_result<uint64_t> r;
         CHECK((r = tagged.get_uint64()));
@@ -380,7 +380,7 @@ TEST_CASE("cbor ondemand typed accessors")
     SECTION("text views definite jsoncons::string_view in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
-        cbor::ondemand::item text_item = parse(data);
+        cbor::ondemand::cbor_item text_item = parse(data);
         cbor::ondemand::access_result<jsoncons::string_view> r;
         REQUIRE((r = text_item.get_string()));
         CHECK(std::string((*r).data(), (*r).size()) == "abc");
@@ -400,7 +400,7 @@ TEST_CASE("cbor ondemand typed accessors")
     SECTION("text views definite jsoncons::u8string_view in place")
     {
         std::vector<uint8_t> data = {0x63,'a','b','c'};
-        cbor::ondemand::item text_item = parse(data);
+        cbor::ondemand::cbor_item text_item = parse(data);
         cbor::ondemand::access_result<jsoncons::u8string_view> r;
         REQUIRE((r = text_item.get_u8string()));
         CHECK(std::u8string((*r).data(), (*r).size()) == u8"abc");
@@ -418,7 +418,7 @@ TEST_CASE("cbor ondemand typed accessors")
     SECTION("text views definite std::u8string_view in place")
     {
         std::vector<uint8_t> data = {0x63, 'a', 'b', 'c'};
-        cbor::ondemand::item text_item = parse(data);
+        cbor::ondemand::cbor_item text_item = parse(data);
         cbor::ondemand::access_result<std::u8string_view> r;
         REQUIRE((r = text_item.get_u8string()));
         CHECK(std::u8string((*r).data(), (*r).size()) == u8"abc");
@@ -530,9 +530,9 @@ TEST_CASE("cbor ondemand string chunks")
     {
         std::vector<uint8_t> data = {0x7f,0x62,'h','e',0x63,'l','l','o',0xff};
         std::vector<std::size_t> sizes;
-        for (cbor::ondemand::item chunk : parse(data).children())
+        for (cbor::ondemand::cbor_item chunk : parse(data).children())
         {
-            CHECK(chunk.type() == cbor::ondemand::item_type::text_string);
+            CHECK(chunk.type() == cbor::ondemand::cbor_type::text_string);
             CHECK_FALSE(chunk.indefinite());
             cbor::ondemand::access_result<jsoncons::string_view> r;
             REQUIRE((r = chunk.get_string()));
@@ -587,24 +587,24 @@ TEST_CASE("cbor ondemand item children")
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
 
-        std::vector<cbor::ondemand::item> children;
-        for (cbor::ondemand::item child : result.value().children())
+        std::vector<cbor::ondemand::cbor_item> children;
+        for (cbor::ondemand::cbor_item child : result.value().children())
         {
             children.push_back(child);
         }
         REQUIRE(children.size() == 3);
-        CHECK(children[0].type() == cbor::ondemand::item_type::unsigned_integer);
+        CHECK(children[0].type() == cbor::ondemand::cbor_type::unsigned_integer);
         CHECK(children[0].argument() == 1);
-        CHECK(children[1].type() == cbor::ondemand::item_type::array);
+        CHECK(children[1].type() == cbor::ondemand::cbor_type::array);
         CHECK(children[1].encoded_bytes().data() == data.data() + 2);
         CHECK(children[1].encoded_bytes().size() == 3);
-        CHECK(children[2].type() == cbor::ondemand::item_type::text_string);
+        CHECK(children[2].type() == cbor::ondemand::cbor_type::text_string);
         cbor::ondemand::access_result<jsoncons::string_view> r1;
         CHECK((r1 = children[2].get_string()));
         CHECK(*r1 == "abc");
 
         std::vector<uint64_t> nested;
-        for (cbor::ondemand::item grandchild : children[1].children())
+        for (cbor::ondemand::cbor_item grandchild : children[1].children())
         {
             cbor::ondemand::access_result<uint64_t> r;
             REQUIRE((r = grandchild.get_uint64()));
@@ -626,7 +626,7 @@ TEST_CASE("cbor ondemand item children")
             auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
             REQUIRE(result.has_value());
             std::vector<uint64_t> values;
-            for (cbor::ondemand::item child : result.value().children())
+            for (cbor::ondemand::cbor_item child : result.value().children())
             {
                 cbor::ondemand::access_result<uint64_t> r;
                 REQUIRE((r = child.get_uint64()));
@@ -650,7 +650,7 @@ TEST_CASE("cbor ondemand item children")
             auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
             REQUIRE(result.has_value());
             CHECK(result.value().children().empty());
-            CHECK(result.value().children().begin() == cbor::ondemand::item::child_iterator());
+            CHECK(result.value().children().begin() == cbor::ondemand::cbor_item::child_iterator());
         }
     }
 
@@ -660,7 +660,7 @@ TEST_CASE("cbor ondemand item children")
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
         std::size_t count = 0;
-        for (cbor::ondemand::item child : result.value().children())
+        for (cbor::ondemand::cbor_item child : result.value().children())
         {
             (void)child;
             ++count;
@@ -678,15 +678,15 @@ TEST_CASE("cbor ondemand item children")
         auto result = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data), 200);
         REQUIRE(result.has_value());
         auto it = result.value().children().begin();
-        REQUIRE(it != cbor::ondemand::item::child_iterator());
+        REQUIRE(it != cbor::ondemand::cbor_item::child_iterator());
         CHECK((*it).encoded_bytes().size() == depth + 1);
         ++it;
-        REQUIRE(it != cbor::ondemand::item::child_iterator());
+        REQUIRE(it != cbor::ondemand::cbor_item::child_iterator());
         cbor::ondemand::access_result<uint64_t> r;
         CHECK((r = (*it).get_uint64()));
         CHECK(*r == 7);
         ++it;
-        CHECK(it == cbor::ondemand::item::child_iterator());
+        CHECK(it == cbor::ondemand::cbor_item::child_iterator());
     }
 
     SECTION("children are measured across mixed definite and indefinite nesting")
@@ -701,7 +701,7 @@ TEST_CASE("cbor ondemand item children")
         REQUIRE(result.has_value());
         std::vector<std::size_t> offsets;
         std::vector<std::size_t> sizes;
-        for (cbor::ondemand::item child : result.value().children())
+        for (cbor::ondemand::cbor_item child : result.value().children())
         {
             offsets.push_back(static_cast<std::size_t>(child.encoded_bytes().data() - data.data()));
             sizes.push_back(child.encoded_bytes().size());
@@ -716,11 +716,11 @@ TEST_CASE("cbor ondemand item children")
         std::vector<uint8_t> data = {0x82,0x01,0xa1,0x61,'a',0x82,0x02,0x03,0x01,0x02};
         auto result = cbor::ondemand::read(jsoncons::span<const uint8_t>(data));
         REQUIRE(result.has_value());
-        cbor::ondemand::item last = result.value().head;
+        cbor::ondemand::cbor_item last = result.value().head;
         std::size_t levels = 0;
         while (!last.children().empty())
         {
-            for (cbor::ondemand::item child : last.children())
+            for (cbor::ondemand::cbor_item child : last.children())
             {
                 last = child;
             }

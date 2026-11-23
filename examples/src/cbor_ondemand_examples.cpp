@@ -16,25 +16,25 @@ int cbor_ondemand_example()
         0x66, 's', 'c', 'o', 'r', 'e', 's', 0x82, 0x01, 0x02
     };
 
-    auto parsed = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
-    if (!parsed)
+    auto item = cbor::ondemand::read_item(jsoncons::span<const uint8_t>(data));
+    if (!item)
     {
-        std::cout << "error " << parsed.error().message() << "\n";
+        std::cout << "error " << item.error().message() << "\n";
         return 1;
     }
 
     bool is_key = true;
     std::string_view key;
-    for (const cbor::ondemand::item child : parsed.value().children())
+    for (const cbor::ondemand::cbor_item child : item.value().children())
     {
         if (is_key)
         {
             key = child.get_string().value();
         }
-        else if (child.type() == cbor::ondemand::item_type::array)
+        else if (child.type() == cbor::ondemand::cbor_type::array)
         {
             std::cout << key << ":";
-            for (const cbor::ondemand::item element : child.children())
+            for (const cbor::ondemand::cbor_item element : child.children())
             {
                 uint64_t value = element.get_uint64().value();
                 std::cout << " " << value;
