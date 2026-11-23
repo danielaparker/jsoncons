@@ -795,13 +795,11 @@ public:
     // Copies string content, assembling chunked strings. `value` is replaced
     // on success, unchanged on failure, and may alias the item's bytes.
 
-    template <typename CharBuffer>
-    typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, access_result<void>>::type
-    get_string(CharBuffer& value) const;
+    template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type = 0>
+    access_result<void> get_string(CharBuffer& value) const;
 
-    template <typename ByteBuffer>
-    typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, access_result<void>>::type
-    get_byte_string(ByteBuffer& value) const;
+    template <typename ByteBuffer,typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type = 0>
+    access_result<void> get_byte_string(ByteBuffer& value) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1222,9 +1220,8 @@ inline bool validate_text(const item& text_item) noexcept
     return true;
 }
 
-template <typename CharBuffer>
-typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, access_result<void>>::type
-item::get_string(CharBuffer& value) const 
+template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
+access_result<void> item::get_string(CharBuffer& value) const
 {
     using char_type = typename CharBuffer::value_type;
     using result_type = access_result<void>;
@@ -1274,9 +1271,8 @@ item::get_string(CharBuffer& value) const
     return result_type{};
 }
 
-template <typename ByteBuffer>
-typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, access_result<void>>::type
-item::get_byte_string(ByteBuffer& value) const
+template <typename ByteBuffer, typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type>
+access_result<void> item::get_byte_string(ByteBuffer& value) const
 {
     using byte_type = typename ByteBuffer::value_type;
     using result_type = access_result<void>;
