@@ -21,13 +21,13 @@ zero-copy and cannot fail.
 ### Functions
 
 ```cpp
-struct read_pair
+struct item_sequence
 {
     item head;
     span<const uint8_t> tail;
 };
 
-expected<read_pair, read_error> read(
+expected<item_sequence, read_error> read(
     span<const uint8_t> input,                             (1)
     int max_nesting_depth = default_max_nesting_depth);
 
@@ -36,7 +36,7 @@ expected<item, read_error> read_item(
     int max_nesting_depth = default_max_nesting_depth);
 ```
 
-(1) Returns a `read_pair` or a [read_error](read_error.md).
+(1) Returns a `item_sequence` or a [read_error](read_error.md).
 
 (2) Returns an [item](item.md) or a [read_error](read_error.md).
 
