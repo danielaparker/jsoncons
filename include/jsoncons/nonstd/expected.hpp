@@ -110,6 +110,7 @@ public:
         else
         {
             destroy();
+            has_value_ = false;
             ::new (&error_) E(other.error_);
         }
         return *this;
@@ -124,6 +125,7 @@ public:
         else
         {
             destroy();
+            has_value_ = false;
             ::new (&error_) E(other.error_);
         }
         return *this;
@@ -374,6 +376,7 @@ public:
         else
         {
             destroy();
+            has_value_ = false;
             ::new (&error_) E(other.error_);
         }
         return *this;
@@ -388,6 +391,7 @@ public:
         else
         {
             destroy();
+            has_value_ = false;
             ::new (&error_) E(other.error_);
         }
         return *this;

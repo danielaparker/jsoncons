@@ -1290,7 +1290,7 @@ inline bool validate_text(const cbor_item& text_item) noexcept
 }
 
 template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type>
-access_result<void> cbor_item::get_string(CharBuffer& value) const
+access_result<void> cbor_item::get_string(CharBuffer& buf) const
 {
     using char_type = typename CharBuffer::value_type;
     using result_type = access_result<void>;
@@ -1307,21 +1307,25 @@ access_result<void> cbor_item::get_string(CharBuffer& value) const
             auto r = chunk.get_string();
             if (!r)
             {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                return result_type(jsoncons::unexpect, r.error().code());
             }
             length += (*r).size();
         }
-        value.resize(length);
+        buf.resize(length);
         if (length > 0)
         {
             std::size_t pos = 0;
             for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+                }
                 auto sv = *r;
                 if (!sv.empty())
                 {
-                    std::memcpy(reinterpret_cast<void*>(&(value[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+                    std::memcpy(reinterpret_cast<void*>(&(buf[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
                     pos += sv.size();
                 }
             }
@@ -1330,18 +1334,22 @@ access_result<void> cbor_item::get_string(CharBuffer& value) const
     else
     {
         auto r = get_string();
-        auto sv = r.value();
-        value.resize(sv.size());
+        if (!r)
+        {
+            return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+        }
+        auto sv = *r;
+        buf.resize(sv.size());
         if (!sv.empty())
         {
-            std::memcpy(reinterpret_cast<void*>(&(value[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+            std::memcpy(reinterpret_cast<void*>(&(buf[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
         }
     }
     return result_type{};
 }
 
 template <typename ByteBuffer, typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type>
-access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
+access_result<void> cbor_item::get_byte_string(ByteBuffer& buf) const
 {
     using byte_type = typename ByteBuffer::value_type;
     using result_type = access_result<void>;
@@ -1358,19 +1366,23 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
             auto r = chunk.get_byte_string();
             if (!r)
             {
-                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
             }
             length += (*r).size();
         }
-        value.resize(length);
+        buf.resize(length);
         if (length > 0)
         {
             std::size_t pos = 0;
             for (const cbor_item chunk : children())
             {
                 auto r = chunk.get_byte_string();
+                if (!r)
+                {
+                    return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+                }
                 auto bsv = *r;
-                std::memcpy((value.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+                std::memcpy((buf.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
                 pos += bsv.size();
             }
         }
@@ -1378,11 +1390,15 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& value) const
     else
     {
         auto r = get_byte_string();
-        auto bsv = r.value();
-        value.resize(bsv.size());
+        if (!r)
+        {
+            return result_type(jsoncons::unexpect, r.error().code(), r.error().position());
+        }
+        auto bsv = *r;
+        buf.resize(bsv.size());
         if (!bsv.empty())
         {
-            std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+            std::memcpy(buf.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
         }
     }
 
