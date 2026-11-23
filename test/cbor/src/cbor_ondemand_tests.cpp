@@ -412,8 +412,8 @@ TEST_CASE("cbor ondemand typed accessors")
     {
         std::vector<uint8_t> data =  {
             0x7F,             // Indefinite-length CBOR text string
-            0x62, 0x61, 0xC3, // Chunk 1: 'a' + first byte of 'é'
-            0x62, 0xA9, 0x62, // Chunk 2: second byte of 'é' + 'b'
+            0x62, 0x61, 0xC3, // Chunk 1: 'a' + first byte of sequence
+            0x62, 0xA9, 0x62, // Chunk 2: second byte of sequence + 'b'
             0xFF              // Break
         };
         cbor::ondemand::cbor_item text_item = parse(data);
