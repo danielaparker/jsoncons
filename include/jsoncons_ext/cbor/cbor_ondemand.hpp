@@ -797,105 +797,11 @@ public:
 
     template <typename CharBuffer>
     typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, access_result<void>>::type
-    get_string(CharBuffer& value) const 
-    {
-        using char_type = typename CharBuffer::value_type;
-        using result_type = access_result<void>;
-        if (head_.major_type != cbor::cbor_major_type::text_string)
-        {
-            return result_type(jsoncons::unexpect, access_errc::invalid_type);
-        }
-
-        if (head_.indefinite())
-        {
-            std::size_t length = 0;
-            for (const item chunk : children())
-            {
-                auto r = chunk.get_string();
-                if (!r)
-                {
-                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
-                }
-                length += (*r).size();
-            }
-            value.resize(length);
-            if (length > 0)
-            {
-                std::size_t pos = 0;
-                for (const item chunk : children())
-                {
-                    auto r = chunk.get_string();
-                    auto sv = *r;
-                    if (!sv.empty())
-                    {
-                        std::memcpy(reinterpret_cast<void*>(&(value[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
-                        pos += sv.size();
-                    }
-                }
-            }
-        }
-        else
-        {
-            auto r = get_string();
-            auto sv = r.value();
-            value.resize(sv.size());
-            if (!sv.empty())
-            {
-                std::memcpy(reinterpret_cast<void*>(&(value[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
-            }
-        }
-        return result_type{};
-    }
+    get_string(CharBuffer& value) const;
 
     template <typename ByteBuffer>
     typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, access_result<void>>::type
-    get_byte_string(ByteBuffer& value) const
-    {
-        using byte_type = typename ByteBuffer::value_type;
-        using result_type = access_result<void>;
-        if (head_.major_type != cbor::cbor_major_type::byte_string)
-        {
-            return result_type(jsoncons::unexpect, access_errc::invalid_type);
-        }
-
-        if (head_.indefinite())
-        {
-            std::size_t length = 0;
-            for (const item chunk : children())
-            {
-                auto r = chunk.get_byte_string();
-                if (!r)
-                {
-                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
-                }
-                length += (*r).size();
-            }
-            value.resize(length);
-            if (length > 0)
-            {
-                std::size_t pos = 0;
-                for (const item chunk : children())
-                {
-                    auto r = chunk.get_byte_string();
-                    auto bsv = *r;
-                    std::memcpy((value.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
-                    pos += bsv.size();
-                }
-            }
-        }
-        else
-        {
-            auto r = get_byte_string();
-            auto bsv = r.value();
-            value.resize(bsv.size());
-            if (!bsv.empty())
-            {
-                std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
-            }
-        }
-
-        return result_type{};
-    }
+    get_byte_string(ByteBuffer& value) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1314,6 +1220,108 @@ inline bool validate_text(const item& text_item) noexcept
         }
     }
     return true;
+}
+
+template <typename CharBuffer>
+typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, access_result<void>>::type
+item::get_string(CharBuffer& value) const 
+{
+    using char_type = typename CharBuffer::value_type;
+    using result_type = access_result<void>;
+    if (head_.major_type != cbor::cbor_major_type::text_string)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+
+    if (head_.indefinite())
+    {
+        std::size_t length = 0;
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            length += (*r).size();
+        }
+        value.resize(length);
+        if (length > 0)
+        {
+            std::size_t pos = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_string();
+                auto sv = *r;
+                if (!sv.empty())
+                {
+                    std::memcpy(reinterpret_cast<void*>(&(value[0]) + pos), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+                    pos += sv.size();
+                }
+            }
+        }
+    }
+    else
+    {
+        auto r = get_string();
+        auto sv = r.value();
+        value.resize(sv.size());
+        if (!sv.empty())
+        {
+            std::memcpy(reinterpret_cast<void*>(&(value[0])), reinterpret_cast<const char_type*>(sv.data()), sv.size());
+        }
+    }
+    return result_type{};
+}
+
+template <typename ByteBuffer>
+typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, access_result<void>>::type
+item::get_byte_string(ByteBuffer& value) const
+{
+    using byte_type = typename ByteBuffer::value_type;
+    using result_type = access_result<void>;
+    if (head_.major_type != cbor::cbor_major_type::byte_string)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+
+    if (head_.indefinite())
+    {
+        std::size_t length = 0;
+        for (const item chunk : children())
+        {
+            auto r = chunk.get_byte_string();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            length += (*r).size();
+        }
+        value.resize(length);
+        if (length > 0)
+        {
+            std::size_t pos = 0;
+            for (const item chunk : children())
+            {
+                auto r = chunk.get_byte_string();
+                auto bsv = *r;
+                std::memcpy((value.data() + pos), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+                pos += bsv.size();
+            }
+        }
+    }
+    else
+    {
+        auto r = get_byte_string();
+        auto bsv = r.value();
+        value.resize(bsv.size());
+        if (!bsv.empty())
+        {
+            std::memcpy(value.data(), reinterpret_cast<const byte_type*>(bsv.data()), bsv.size());
+        }
+    }
+
+    return result_type{};
 }
 
 } // namespace ondemand
