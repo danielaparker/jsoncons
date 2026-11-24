@@ -405,7 +405,7 @@ private:
         auto sink = unicode_traits::validate(sv.data(), sv.size());
         if (sink.ec != unicode_traits::unicode_errc())
         {
-            JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));
+            JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8));
         }
 
         if (pack_strings_ && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))

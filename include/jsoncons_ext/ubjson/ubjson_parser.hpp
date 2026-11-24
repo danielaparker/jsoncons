@@ -499,7 +499,7 @@ private:
                 auto result = unicode_traits::validate(&ch, 1);
                 if (result.ec != unicode_traits::unicode_errc())
                 {
-                    ec = ubjson_errc::invalid_utf8_text_string;
+                    ec = ubjson_errc::invalid_utf8;
                     more_ = false;
                     return;
                 }
@@ -524,7 +524,7 @@ private:
                 auto result = unicode_traits::validate(data.data(), data.size());
                 if (result.ec != unicode_traits::unicode_errc())
                 {
-                    ec = ubjson_errc::invalid_utf8_text_string;
+                    ec = ubjson_errc::invalid_utf8;
                     more_ = false;
                     return;
                 }
@@ -934,7 +934,7 @@ private:
         auto result = unicode_traits::validate(data.data(), data.size());
         if (result.ec != unicode_traits::unicode_errc())
         {
-            ec = ubjson_errc::invalid_utf8_text_string;
+            ec = ubjson_errc::invalid_utf8;
             more_ = false;
             return;
         }

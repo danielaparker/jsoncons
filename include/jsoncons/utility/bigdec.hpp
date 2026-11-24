@@ -342,7 +342,7 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
     if (cur != end && *cur == '.')
     {
         cur++;
-        if (cur != end && !is_char_digit(*cur))
+        if (cur == end || !is_char_digit(*cur))
         {
             return to_number_result<CharT>{cur, std::errc::invalid_argument};
         }
@@ -367,10 +367,10 @@ to_number_result<CharT> to_bigdec(const CharT* s, std::size_t length, basic_bigd
                 negexp = true;
             }
             cur += is_char_sign(*cur);
-            if (cur == end || !is_char_digit(*cur))
-            {
-                return to_number_result<CharT>{cur, std::errc::invalid_argument};
-            }
+        }
+        if (cur == end || !is_char_digit(*cur))
+        {
+            return to_number_result<CharT>{cur, std::errc::invalid_argument};
         }
         mark = cur;
         ++cur;

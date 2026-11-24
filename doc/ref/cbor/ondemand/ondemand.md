@@ -17,7 +17,7 @@ zero-copy and cannot fail.
     <td>Represents one complete, structurally valid encoding.</td> 
   </tr>
 </table>
-
+ 
 ### Functions
 
 ```cpp

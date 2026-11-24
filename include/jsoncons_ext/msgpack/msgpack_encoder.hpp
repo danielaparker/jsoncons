@@ -390,7 +390,7 @@ namespace msgpack {
             auto sink = unicode_traits::validate(sv.data(), sv.size());
             if (sink.ec != unicode_traits::unicode_errc())
             {
-                JSONCONS_THROW(ser_error(msgpack_errc::invalid_utf8_text_string));
+                JSONCONS_THROW(ser_error(msgpack_errc::invalid_utf8));
             }
 
             const size_t length = sv.length();

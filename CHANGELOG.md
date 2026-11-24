@@ -3,6 +3,8 @@ master
 
 - Fixed bugs
 
+  - Fixed `jsoncons::nonstd::expected` copy assignment when assigning from an error. 
+
   - Git Issue PR #750: Fix JMESPath merge overrides for non-primitive values
 
   - Git Issue PR #751: Fix jmespath merge() dropping overrides for object/array values 
@@ -49,7 +51,19 @@ master
 
   - Git Issue PR #810: jmespath: stop parsing when an unbalanced ')' empties the state stack
 
+  - Git Issue PR #811: jmespath: reject an unmatched ')' at the top level of an expression
+
   - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
+
+  - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
+
+  - Git Issue PR #822: reflect: check the size of a json array before converting it to std::tuple
+
+  - Git Issue PR #823: jsonpointer: decide whether a level is an array before unflattening it
+
+  - Git Issue PR #824: toon: avoid unescaping a quoted key twice
+
+  - Git Issue PR #825: bigdec: don't read past end in to_bigdec when digits are missing
 
 - Changes:
 

@@ -934,6 +934,13 @@ header_result parse_header(jsoncons::span<char> line)
     {
         return header_result{};
     }
+    auto bracket_end = find_unquoted_char(line, ']', bracket_start);
+    if (bracket_end == jsoncons::string_view::npos)
+    {
+        return header_result{};
+    }
+    // parse_key unescapes in place, so only do it once the line is known
+    // to be a header, otherwise the caller parses the key a second time
     auto key = jsoncons::optional<jsoncons::string_view>{};
     if (bracket_start > 0)
     {
@@ -947,11 +954,6 @@ header_result parse_header(jsoncons::span<char> line)
             }
             key = *rkey;
         }
-    }
-    auto bracket_end = find_unquoted_char(line, ']', bracket_start);
-    if (bracket_end == jsoncons::string_view::npos)
-    {
-        return header_result{};
     }
 
     jsoncons::string_view bracket_content = jsoncons::string_view(line.data() + (bracket_start + 1), bracket_end - (bracket_start + 1));
@@ -1863,7 +1865,10 @@ public:
             return result_type{};
         }
 
-        auto header_result = parse_header(first_line.content);
+        // parse_header unescapes a quoted key in place, and decode_object
+        // parses the first line again, so inspect a copy of it here
+        std::string first_content(first_line.content.data(), first_line.content.size());
+        auto header_result = parse_header(jsoncons::span<char>{&first_content[0], first_content.size()});
         if (!header_result)
         {
             return result_type{jsoncons::unexpect, header_result.error(), first_line.line_num, 0};

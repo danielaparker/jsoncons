@@ -25,7 +25,7 @@ enum class ubjson_errc
     length_is_negative,
     length_must_be_integer,
     unknown_type,
-    invalid_utf8_text_string,
+    invalid_utf8,
     too_many_items,
     too_few_items,
     number_too_large,
@@ -60,7 +60,7 @@ public:
                 return "Length must be a integer numeric type (int8, uint8, int16, int32, int64)";
             case ubjson_errc::unknown_type:
                 return "Unknown type";
-            case ubjson_errc::invalid_utf8_text_string:
+            case ubjson_errc::invalid_utf8:
                 return "Illegal UTF-8 encoding in text string";
             case ubjson_errc::too_many_items:
                 return "Too many items were added to a UBJSON object or array of known length";

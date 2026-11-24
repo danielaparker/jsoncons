@@ -294,3 +294,15 @@ TEST_CASE("jmespath pipe inside parentheses")
     CHECK(jmespath::search(doc, "[(a | c), x]") == json::parse("[5,1]"));
     CHECK(jmespath::search(doc, "b | (c)") == json(7));
 }
+
+TEST_CASE("jmespath unbalanced right parenthesis")
+{
+    std::vector<std::string> exprs = {"a)", "a)b", "@)", "foo.bar)baz", "(a))", "a | b)"};
+
+    for (const auto& expr : exprs)
+    {
+        std::error_code ec;
+        jmespath::make_expression<json>(expr, ec);
+        CHECK(ec == jmespath::jmespath_errc::unbalanced_parentheses); //-V521
+    }
+}

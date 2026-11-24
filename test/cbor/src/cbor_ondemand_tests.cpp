@@ -394,6 +394,36 @@ TEST_CASE("cbor ondemand typed accessors")
         CHECK_FALSE(parse(chunked).get_string());
         std::vector<uint8_t> bytes = {0x41,0x01};
         CHECK_FALSE(parse(bytes).get_string());
+
+    }
+
+    SECTION("text string definite with utf8 error")
+    {
+        std::vector<uint8_t> data = {
+            0x63,             // CBOR text string, length 3
+            0x61, 0xFF, 0x62  // 'a', invalid UTF-8 byte, 'b'
+        };
+        cbor::ondemand::cbor_item text_item = parse(data);
+        cbor::ondemand::access_result<jsoncons::string_view> r;
+        REQUIRE_FALSE((r = text_item.get_string()));
+        CHECK((r.error().code() == cbor::ondemand::access_errc::invalid_utf8));
+    }
+    SECTION("text string indefinite with utf8 error")
+    {
+        std::vector<uint8_t> data =  {
+            0x7F,             // Indefinite-length CBOR text string
+            0x62, 0x61, 0xC3, // Chunk 1: 'a' + first byte of sequence
+            0x62, 0xA9, 0x62, // Chunk 2: second byte of sequence + 'b'
+            0xFF              // Break
+        };
+        cbor::ondemand::cbor_item text_item = parse(data);
+        cbor::ondemand::access_result<jsoncons::string_view> r;
+        REQUIRE_FALSE((r = text_item.get_string()));
+        CHECK((r.error().code() == cbor::ondemand::access_errc::indefinite));
+        std::string buf;
+        cbor::ondemand::access_result<void> r2;
+        REQUIRE_FALSE((r2 = text_item.get_string(buf)));
+        CHECK((r2.error().code() == cbor::ondemand::access_errc::invalid_utf8));
     }
 
 #if defined(JSONCONS_HAS_CHAR8)
