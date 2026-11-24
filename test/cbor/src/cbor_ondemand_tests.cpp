@@ -463,6 +463,7 @@ TEST_CASE("cbor ondemand typed accessors")
         std::vector<uint8_t> bytes = {0x41, 0x01};
         CHECK_FALSE(parse(bytes).get_u8string());
     }
+#endif
 
     SECTION("bytes views definite strings in place")
     {
@@ -760,7 +761,7 @@ TEST_CASE("cbor ondemand item children")
         CHECK(last.encoded_bytes().size() == 1);
     }
 }
-#endif
+
 TEST_CASE("cbor ondemand at tests")
 {
     SECTION("test 1")
