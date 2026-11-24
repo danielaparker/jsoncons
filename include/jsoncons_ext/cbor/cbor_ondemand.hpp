@@ -888,81 +888,11 @@ public:
 
     template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
         && std::is_same<typename StringViewLike::value_type,char>::value, int>::type = 0>
-    access_result<cbor_item> at(StringViewLike key) const
-    {
-        using result_type = access_result<cbor_item>;
-
-        if (head_.major_type != cbor::cbor_major_type::map)
-        {
-            return result_type(jsoncons::unexpect, access_errc::invalid_type);
-        }
-        bool is_key = true;
-        access_result<jsoncons::string_view> k;
-        for (auto child : children())
-        {
-            if (is_key)
-            {
-                k = child.get_string();
-            }
-            else 
-            {
-                if (k && *k == key)
-                {
-                    return result_type{child};
-                }
-            }
-            is_key = !is_key;
-        }
-
-        return result_type(jsoncons::unexpect, access_errc::key_not_found);
-    }
+    access_result<cbor_item> at(StringViewLike key) const;
 
     template <typename UnsignedInteger,typename std::enable_if<ext_traits::is_unsigned_integer<UnsignedInteger>::value, 
         int>::type = 0>
-    access_result<cbor_item> at(UnsignedInteger key) const
-    {
-        using result_type = access_result<cbor_item>;
-
-        if (head_.major_type == cbor::cbor_major_type::map)
-        {
-            bool is_key = true;
-            access_result<uint64_t> k;
-            for (auto child : children())
-            {
-                if (is_key)
-                {
-                    k = child.get_uint64();
-                }
-                else 
-                {
-                    if (k && *k == key)
-                    {
-                        return result_type{child};
-                    }
-                }
-                is_key = !is_key;
-            }
-
-            return result_type(jsoncons::unexpect, access_errc::key_not_found);
-        }
-        else if (head_.major_type == cbor::cbor_major_type::array)
-        {
-            std::size_t index = 0;
-            for (auto child : children())
-            {
-                if (index++ == key)
-                {
-                    return result_type{child};
-                }
-            }
-
-            return result_type(jsoncons::unexpect, access_errc::result_out_of_range);
-        }
-        else
-        {
-            return result_type(jsoncons::unexpect, access_errc::invalid_type);
-        }
-    }
+    access_result<cbor_item> at(UnsignedInteger key) const;
 
 private:
     friend struct ondemand_detail::item_access;
@@ -1488,6 +1418,84 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& buf) const
     }
 
     return result_type{};
+}
+
+template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
+    && std::is_same<typename StringViewLike::value_type,char>::value, int>::type>
+access_result<cbor_item> cbor_item::at(StringViewLike key) const
+{
+    using result_type = access_result<cbor_item>;
+
+    if (head_.major_type != cbor::cbor_major_type::map)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+    bool is_key = true;
+    access_result<jsoncons::string_view> k;
+    for (auto child : children())
+    {
+        if (is_key)
+        {
+            k = child.get_string();
+        }
+        else 
+        {
+            if (k && *k == key)
+            {
+                return result_type{child};
+            }
+        }
+        is_key = !is_key;
+    }
+
+    return result_type(jsoncons::unexpect, access_errc::key_not_found);
+}
+
+template <typename UnsignedInteger,typename std::enable_if<ext_traits::is_unsigned_integer<UnsignedInteger>::value, 
+    int>::type>
+access_result<cbor_item> cbor_item::at(UnsignedInteger key) const
+{
+    using result_type = access_result<cbor_item>;
+
+    if (head_.major_type == cbor::cbor_major_type::map)
+    {
+        bool is_key = true;
+        access_result<uint64_t> k;
+        for (auto child : children())
+        {
+            if (is_key)
+            {
+                k = child.get_uint64();
+            }
+            else 
+            {
+                if (k && *k == key)
+                {
+                    return result_type{child};
+                }
+            }
+            is_key = !is_key;
+        }
+
+        return result_type(jsoncons::unexpect, access_errc::key_not_found);
+    }
+    else if (head_.major_type == cbor::cbor_major_type::array)
+    {
+        std::size_t index = 0;
+        for (auto child : children())
+        {
+            if (index++ == key)
+            {
+                return result_type{child};
+            }
+        }
+
+        return result_type(jsoncons::unexpect, access_errc::result_out_of_range);
+    }
+    else
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
 }
 
 } // namespace ondemand
