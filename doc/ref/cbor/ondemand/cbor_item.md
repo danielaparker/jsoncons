@@ -67,7 +67,7 @@ it ends where its parent does.</td>
   <tr>
     <td><code>access_result&lt;jsoncons::u8string_view> get_u8string() const noexcept</code></td>
     <td>Returns an <a href="access_result.md">access_result&lt;jsoncons::string_view&gt;</a> 
-    guaranteed to contain valid UTF-8. This function template participates in overload resolution 
+    guaranteed to contain valid UTF-8. This function participates in overload resolution 
     only if **__cpp_char8_t** is defined.</td> 
   </tr>
   <tr>
@@ -75,12 +75,12 @@ it ends where its parent does.</td>
     <td>Returns an <a href="access_result.md">access_result&lt;jsoncons::span&lt;const uint8_t&gt;&gt;</a>.</td> 
   </tr>
   <tr>
-    <td><code>template <typename CharBuffer><br/> access_result&lt;void> get_string(CharBuffer& buffer) const</code></td>
+    <td><code>template &lt;typename CharBuffer&gt;<br/> access_result&lt;void> get_string(CharBuffer& buffer) const</code></td>
     <td>Copying get_string overload guaranteed to produce valid UTF-8, assembles
 indefinite-length strings into the provided buffer.</td> 
   </tr>
   <tr>
-    <td><code>template <typename ByteBuffer><br/>access_result&lt;void> get_byte_string(ByteBuffer& buffer) const</code></td>
+    <td><code>template &lt;typename ByteBuffer&gt;<br/>access_result&lt;void> get_byte_string(ByteBuffer& buffer) const</code></td>
     <td>Copying get_byte_string overload, assembles
 indefinite-length strings into the provided buffer.</td> 
   </tr>
