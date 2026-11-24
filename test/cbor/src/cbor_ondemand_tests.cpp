@@ -34,7 +34,6 @@ namespace {
 
 } // namespace
 
-#if 0
 TEST_CASE("cbor ondemand read and read_item")
 {
     SECTION("read returns the first item and the tail")
@@ -464,7 +463,6 @@ TEST_CASE("cbor ondemand typed accessors")
         std::vector<uint8_t> bytes = {0x41, 0x01};
         CHECK_FALSE(parse(bytes).get_u8string());
     }
-#endif
 
     SECTION("bytes views definite strings in place")
     {
