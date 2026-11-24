@@ -320,6 +320,24 @@ TEST_CASE("json_traits as std::tuple tests")
         auto result = jsoncons::reflect::json_traits<jsoncons::json,std::vector<qualifying_result>>::try_as(jsoncons::make_alloc_set(), j);
         REQUIRE_FALSE(result);
     }
+
+    SECTION("wrong number of elements")
+    {
+        using tuple_type = std::tuple<int,std::string,double>;
+
+        for (const auto& str : {R"([])", R"([1,"a"])", R"([1,"a",1.5,2])", R"({"a":1})", R"("foo")"})
+        {
+            auto j = jsoncons::json::parse(str);
+            CHECK_FALSE(j.is<tuple_type>());
+            auto result = jsoncons::reflect::json_traits<jsoncons::json,tuple_type>::try_as(jsoncons::make_alloc_set(), j);
+            REQUIRE_FALSE(result);
+            CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
+        }
+
+        auto result = jsoncons::try_decode_json<tuple_type>(std::string(R"([1,"a"])"));
+        REQUIRE_FALSE(result);
+        CHECK(jsoncons::conv_errc::conversion_failed == result.error().code());
+    }
 }
 
 TEST_CASE("json_traits as std::pair tests")
