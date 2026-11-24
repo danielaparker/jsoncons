@@ -873,10 +873,24 @@ public:
     // on success, unchanged on failure, and may alias the item's bytes.
 
     template <typename CharBuffer,typename std::enable_if<ext_traits::is_narrow_char_buffer<CharBuffer>::value, int>::type = 0>
-    access_result<void> get_string(CharBuffer& value) const;
+    access_result<void> get_string(CharBuffer& buf) const;
 
     template <typename ByteBuffer,typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type = 0>
-    access_result<void> get_byte_string(ByteBuffer& value) const;
+    access_result<void> get_byte_string(ByteBuffer& buf) const;
+
+    template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
+        && std::is_same<typename StringViewLike::value_type,char>::value, int>::type = 0>
+    access_result<cbor_item> at(StringViewLike key) const
+    {
+        using result_type = access_result<cbor_item>;
+
+        if (head_.major_type != cbor::cbor_major_type::map)
+        {
+            return result_type(jsoncons::unexpect, access_errc::invalid_type);
+        }
+
+        return result_type(jsoncons::unexpect, access_errc::indefinite);
+    }
 
 private:
     friend struct ondemand_detail::item_access;

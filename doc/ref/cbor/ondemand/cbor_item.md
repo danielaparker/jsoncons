@@ -86,16 +86,6 @@ indefinite-length strings into the provided buffer.</td>
   </tr>
 </table>
 
-#### Non-member functions
-
-```cpp
-bool validate_text(const cbor_item&) noexcept;
-```
-
-`validate_text` checks that a text item is well-formed UTF-8. Each chunk of an
-indefinite-length text string is checked independently, as RFC 8949 section
-3.2.3 requires.
-
 ### Examples
 
 #### Try to access indefinite length byte string

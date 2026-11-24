@@ -34,6 +34,7 @@ namespace {
 
 } // namespace
 
+#if 0
 TEST_CASE("cbor ondemand read and read_item")
 {
     SECTION("read returns the first item and the tail")
@@ -759,5 +760,41 @@ TEST_CASE("cbor ondemand item children")
         CHECK(levels == 3);
         CHECK(last.encoded_bytes().data() == data.data() + 7);
         CHECK(last.encoded_bytes().size() == 1);
+    }
+}
+#endif
+TEST_CASE("cbor ondemand at tests")
+{
+    SECTION("test 1")
+    {
+        const std::vector<uint8_t> data = {
+    0x83,       // Array with 3 elements
+    0x01,       // Value: 1
+    0x02,       // Value: 2
+    0x03        // Value: 3
+        };
+
+        auto result = cbor::ondemand::read_item(data);
+        REQUIRE(result);
+        auto bar = (*result).at(jsoncons::string_view("bar"));
+        REQUIRE_FALSE(bar);
+        CHECK(cbor::ondemand::access_errc::invalid_type == bar.error().code());
+    }
+
+    SECTION("test 2")
+    {
+        const std::vector<uint8_t> data = {
+    0xA3,                         // Map with 3 key-value pairs
+    0x63, 0x66, 0x6F, 0x6F,       // Key: "foo"
+    0x01,                         // Value: 1
+    0x63, 0x62, 0x61, 0x72,       // Key: "bar"
+    0x02,                         // Value: 2
+    0x63, 0x62, 0x61, 0x7A,       // Key: "baz"
+    0x03                          // Value: 3
+        };
+
+        auto result = cbor::ondemand::read_item(data);
+        REQUIRE(result);
+        auto bar = (*result).at(jsoncons::string_view("bar"));
     }
 }

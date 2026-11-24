@@ -47,7 +47,7 @@ follow, so a CBOR sequence can be read by reading the remaining bytes repeatedly
 stopped. Scanning allocates only when nesting exceeds 32 open containers.
 
 Structural validation covers CBOR framing, lengths, container balance and the
-configured nesting limit. It does not validate UTF-8 (see `validate_text`),
+configured nesting limit. It validates UTF-8 once when first accessed,
 deterministic encoding, tag semantics, duplicate map keys or application
 schemas. Tags are exposed, never interpreted.
 
