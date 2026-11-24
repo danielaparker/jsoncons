@@ -92,6 +92,10 @@ indefinite-length strings into the provided buffer.</td>
     <td>access_result&lt;cbor_view> at(const char* key) const</code></td>
     <td>Returns item if found, otherwise error.</td> 
   </tr>
+  <tr>
+    <td><code>template &lt;typename UnsignedInteger&gt;<br/>access_result&lt;cbor_view> at(UnsignedInteger key) const</code></td>
+    <td>Returns mapped item from map or indexed item from array if found, otherwise error.</td> 
+  </tr>
 </table>
 
 ### Examples
@@ -232,7 +236,7 @@ Output:
 Invalid UTF-8 at position 0
 ```
 
-#### Access mapped value by key
+#### Access mapped item by string key
 
 ```cpp
     const std::vector<uint8_t> data = {
@@ -262,6 +266,56 @@ Invalid UTF-8 at position 0
         std::cout << "(1) " << bar.error().message() << "\n";
     }
     if (auto qux = (*item).at("qux"); qux)
+    {
+        if (auto val = (*qux).get_uint64(); val)
+        {
+            std::cout << "(2) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(2) " << qux.error().message() << "\n";
+    }
+    return 0;
+}
+```
+Output:
+
+```
+(1) 2
+(2) Key not found at position 0
+```
+
+#### Access mapped item by unsigned integer key
+
+```cpp
+    const std::vector<uint8_t> data = {
+0xA3,       // Map with 3 key-value pairs
+0x01,       // Key: unsigned integer 1
+0x0A,       // Value: 10
+0x02,       // Key: unsigned integer 2
+0x14,       // Value: 20
+0x03,       // Key: unsigned integer 3
+0x18, 0x1E  // Value: 30
+    };
+
+    auto item = cbor::ondemand::read_item(data);   
+    if (!item)
+    {
+        return 1;
+    }
+    if (auto bar = (*item).at(1u); bar)
+    {
+        if (auto val = (*bar).get_uint64(); val)
+        {
+            std::cout << "(1) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(1) " << bar.error().message() << "\n";
+    }
+    if (auto qux = (*item).at(4u); qux)
     {
         if (auto val = (*qux).get_uint64(); val)
         {

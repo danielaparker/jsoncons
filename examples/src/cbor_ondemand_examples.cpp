@@ -143,7 +143,7 @@ int indefinite_length_string_invalid_utf8()
     return 0;
 }
 
-int at_example()
+int mapped_item_by_string_key()
 {
     const std::vector<uint8_t> data = {
 0xA3,                         // Map with 3 key-value pairs
@@ -185,6 +185,48 @@ int at_example()
     return 0;
 }
 
+int mapped_item_by_unsigned_integer_key()
+{
+    const std::vector<uint8_t> data = {
+0xA3,       // Map with 3 key-value pairs
+0x01,       // Key: unsigned integer 1
+0x0A,       // Value: 10
+0x02,       // Key: unsigned integer 2
+0x14,       // Value: 20
+0x03,       // Key: unsigned integer 3
+0x18, 0x1E  // Value: 30
+    };
+
+    auto item = cbor::ondemand::read_item(data);   
+    if (!item)
+    {
+        return 1;
+    }
+    if (auto bar = (*item).at(1u); bar)
+    {
+        if (auto val = (*bar).get_uint64(); val)
+        {
+            std::cout << "(1) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(1) " << bar.error().message() << "\n";
+    }
+    if (auto qux = (*item).at(4u); qux)
+    {
+        if (auto val = (*qux).get_uint64(); val)
+        {
+            std::cout << "(2) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(2) " << qux.error().message() << "\n";
+    }
+    return 0;
+}
+
 int main()
 {
     std::cout << "cbor::ondemand examples\n\n";
@@ -197,6 +239,8 @@ int main()
     std::cout << "\n";
     indefinite_length_string_invalid_utf8();
     std::cout << "\n";
-    at_example();
+    mapped_item_by_string_key();
+    std::cout << "\n";
+    mapped_item_by_unsigned_integer_key();
 }
 
