@@ -19,7 +19,7 @@ enum class bson_errc
     success = 0,
     unexpected_eof = 1,
     source_error,
-    invalid_utf8_text_string,
+    invalid_utf8,
     max_nesting_depth_exceeded,
     unmatched_end_array,
     unmatched_end_object,
@@ -52,7 +52,7 @@ public:
                 return "Unexpected end of file";
             case bson_errc::source_error:
                 return "Source error";
-            case bson_errc::invalid_utf8_text_string:
+            case bson_errc::invalid_utf8:
                 return "Illegal UTF-8 encoding in text string";
             case bson_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";

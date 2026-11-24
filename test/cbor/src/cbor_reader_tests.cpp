@@ -824,7 +824,7 @@ TEST_CASE("cbor indefinite length text chunks are validated individually")
     SECTION("a code point split across chunks is rejected")
     {
         // RFC 8949 3.2.3
-        CHECK(parse_cbor_error({0x7f,0x61,0xc3,0x61,0xa9,0xff}) == cbor::cbor_errc::invalid_utf8_text_string);
+        CHECK(parse_cbor_error({0x7f,0x61,0xc3,0x61,0xa9,0xff}) == cbor::cbor_errc::invalid_utf8);
     }
 
     SECTION("well-formed chunks are accepted")

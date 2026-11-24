@@ -1474,7 +1474,7 @@ public:
                 auto result = unicode_traits::validate(sv.data(),sv.size());
                 if (result.ec != unicode_traits::unicode_errc())
                 {
-                    ec = cbor_errc::invalid_utf8_text_string;
+                    ec = cbor_errc::invalid_utf8;
                     more_ = false;
                     return;
                 }
@@ -2055,7 +2055,7 @@ private:
                 reinterpret_cast<const char*>(v.data()) + offset, length);
             if (result.ec != unicode_traits::unicode_errc())
             {
-                ec = cbor_errc::invalid_utf8_text_string;
+                ec = cbor_errc::invalid_utf8;
                 more_ = false;
                 return;
             }

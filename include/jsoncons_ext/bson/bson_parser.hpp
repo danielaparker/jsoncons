@@ -383,7 +383,7 @@ private:
             auto result = unicode_traits::validate(name_buffer_.data(),name_buffer_.size());
             if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
             {
-                ec = bson_errc::invalid_utf8_text_string;
+                ec = bson_errc::invalid_utf8;
                 more_ = false;
                 return;
             }
@@ -425,7 +425,7 @@ private:
                 auto result = unicode_traits::validate(sv.data(), sv.size());
                 if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
                 {
-                    ec = bson_errc::invalid_utf8_text_string;
+                    ec = bson_errc::invalid_utf8;
                     more_ = false;
                     return;
                 }
@@ -443,7 +443,7 @@ private:
                 auto result = unicode_traits::validate(sv.data(), sv.size());
                 if (JSONCONS_UNLIKELY(result.ec != unicode_traits::unicode_errc()))
                 {
-                    ec = bson_errc::invalid_utf8_text_string;
+                    ec = bson_errc::invalid_utf8;
                     more_ = false;
                     return;
                 }

@@ -51,10 +51,58 @@ int cbor_ondemand_example()
     return 0;
 }
 
+int definite_length_string_invalid_utf8()
+{
+    std::vector<uint8_t> data = {
+        0x63,             // CBOR text string, length 3
+        0x61, 0xFF, 0x62  // 'a', invalid UTF-8 byte, 'b'
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    std::string buf;
+    auto str = (*r).get_string(buf);
+    if (str)
+    {
+        std::cout << buf << "\n";
+    }
+    else
+    {
+        std::cout << str.error().message() << "\n";
+    }
+    return 0;
+}
+
+int indefinite_length_string_invalid_utf8()
+{
+    std::vector<uint8_t> data = {
+        0x7F,             // Indefinite-length CBOR text string
+        0x62, 0x61, 0xC3, // Chunk 1: 'a' + first byte of UTF-8 sequence
+        0x62, 0xA9, 0x62, // Chunk 2: second byte of UTF-8 sequence + 'b'
+        0xFF              // Break
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    std::string buf;
+    auto str = (*r).get_string(buf);
+    if (str)
+    {
+        std::cout << buf << "\n";
+    }
+    else
+    {
+        std::cout << str.error().message() << "\n";
+    }
+    return 0;
+}
+
 int main()
 {
-    std::cout << "\ncbor examples\n\n";
+    std::cout << "cbor::ondemand examples\n\n";
 
     cbor_ondemand_example();
+    std::cout << "\n";
+    definite_length_string_invalid_utf8();
+    std::cout << "\n";
+    indefinite_length_string_invalid_utf8();
 }
 

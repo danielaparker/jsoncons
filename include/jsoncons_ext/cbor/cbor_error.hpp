@@ -26,7 +26,7 @@ enum class cbor_errc
     bigdec_scale_overflow,
     bigfloat_scale_overflow,
     invalid_bigfloat,
-    invalid_utf8_text_string,
+    invalid_utf8,
     too_many_items,
     too_few_items,
     number_too_large,
@@ -50,8 +50,7 @@ enum class cbor_errc
     bigfloat_decimal_scale_overflow,
     expected_unsigned_integer,
     invalid_mdarray_header,
-    float128_not_supported,
-    not_a_string,
+    float128_not_supported
 };
 
 class cbor_error_category_impl
@@ -84,7 +83,7 @@ public:
                 return "CBOR bigfloat requires an impractically large decimal mantissa";
             case cbor_errc::max_dimensions_exceeded:
                 return "Maximum number of dimensions exceeded.";
-            case cbor_errc::invalid_utf8_text_string:
+            case cbor_errc::invalid_utf8:
                 return "Illegal UTF-8 encoding in text string";
             case cbor_errc::too_many_items:
                 return "Too many items were added to a CBOR map or array of known length";
@@ -130,8 +129,6 @@ public:
                 return "Invalid multi-dimensional array header.";
             case cbor_errc::float128_not_supported:
                 return "float128 typed array is not supported.";              
-            case cbor_errc::not_a_string:
-                return "Not a string.";              
             default:
                 return "Unknown CBOR parser error";
         }
